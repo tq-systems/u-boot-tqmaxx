@@ -34,6 +34,7 @@ extern struct spl_image_info spl_image;
 /* SPL common functions */
 void preloader_console_init(void);
 u32 spl_boot_device(void);
+u32 spl_boot_device_instance(void);
 u32 spl_boot_mode(void);
 void spl_set_header_raw_uboot(void);
 void spl_parse_image_header(const struct image_header *header);
