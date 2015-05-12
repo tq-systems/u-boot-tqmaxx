@@ -4,6 +4,7 @@
 # SPDX-License-Identifier:	GPL-2.0+
 #
 
-obj-y  := tqma6.o
+obj-y  := tqma6.o \
+	tqma6_eeprom.o
 
 obj-$(CONFIG_MBA6) += tqma6_mba6.o
