@@ -127,6 +127,11 @@ void spl_set_header_raw_uboot(struct spl_image_info *spl_image)
 	spl_image->name = "U-Boot";
 }
 
+__weak u32 spl_boot_device_instance(void)
+{
+	return 0;
+}
+
 int spl_parse_image_header(struct spl_image_info *spl_image,
 			   const struct image_header *header)
 {
