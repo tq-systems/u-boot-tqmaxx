@@ -335,6 +335,54 @@ int tqma6_bb_board_init(void)
 
 int tqma6_bb_board_late_init(void)
 {
+	/*
+	* try to get sd card slots in order:
+	* eMMC: on Module
+	* -> therefore index 0 for bootloader
+	* index n in kernel (controller instance 3) -> patches needed for
+	* alias indexing
+	* SD2: on Mainboard
+	* index n in kernel (controller instance 2) -> patches needed for
+	* alias indexing
+	* we assume to have a kernel patch that will present mmcblk dev
+	* indexed like controller devs
+	*/
+	puts("Boot:\t");
+	switch (imx_boot_device()) {
+	case BOOT_DEVICE_MMC1:
+		printf("ESDHC%u\n", imx_boot_device_instance() + 1);
+		env_set("boot_dev", "mmc");
+		switch (mmc_get_env_devno()) {
+		/* eMMC (USDHC3)*/
+		case 0:
+			env_set("mmcblkdev", "0");
+			env_set("mmcdev", "0");
+			break;
+		/* ext SD (USDHC2)*/
+		case 1:
+			env_set("mmcblkdev", "1");
+			env_set("mmcdev", "1");
+			break;
+		default:
+			puts("unhandled boot device\n");
+			env_set("mmcblkdev", "");
+			env_set("mmcdev", "");
+		};
+		break;
+	case BOOT_DEVICE_SPI:
+		printf("ECSPI%u\n", imx_boot_device_instance() + 1);
+		env_set("boot_dev", "spi");
+		/* mmcdev is dev index for u-boot */
+		env_set("mmcdev", "0");
+		/* mmcblkdev is dev index for linux env */
+		env_set("mmcblkdev", "0");
+		break;
+	default:
+		puts("unhandled boot device\n");
+		env_set("mmcblkdev", "");
+		env_set("mmcdev", "");
+	}
+
 	return 0;
 }
 
