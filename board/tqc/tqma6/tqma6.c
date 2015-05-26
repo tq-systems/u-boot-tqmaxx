@@ -360,8 +360,21 @@ int board_late_init(void)
 
 int checkboard(void)
 {
-	printf("Board: %s on a %s - %d\n", tqma6_get_boardname(),
-	       tqma6_bb_get_boardname(), tqma6_system_i2c_busnum);
+	printf("Board: %s on a %s\n", tqma6_get_boardname(),
+	       tqma6_bb_get_boardname());
+	puts("Enet workaround: ");
+	switch (tqma6_get_enet_workaround()) {
+	case 0:
+		puts("NO");
+		break;
+	case 1:
+		puts("OK");
+		break;
+	default:
+		puts("???");
+		break;
+	};
+	puts("\n");
 	return 0;
 }
 
