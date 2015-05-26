@@ -20,6 +20,9 @@ int tqma6_bb_board_late_init(void);
 int tqma6_bb_checkboard(void);
 
 const char *tqma6_bb_get_boardname(void);
+int tqma6_get_enet_workaround(void);
+int tqma6_get_system_i2c_bus(void);
+
 /*
  * Device Tree Support
  */
