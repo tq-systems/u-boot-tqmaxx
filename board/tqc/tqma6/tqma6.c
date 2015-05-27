@@ -237,6 +237,8 @@ int board_late_init(void)
 	struct pmic *p;
 	u32 reg;
 	int ret;
+	/* must hold largest field of eeprom data */
+	char safe_string[0x41];
 	struct tqma6_eeprom_data eedat;
 
 	setenv("board_name", tqma6_get_boardname());
@@ -253,11 +255,24 @@ int board_late_init(void)
 		printf("PMIC: PFUZE100 ID=0x%02x\n", reg);
 	}
 
+
 	ret = tqma6_read_eeprom(2, CONFIG_SYS_I2C_EEPROM_ADDR, &eedat);
-	if (!ret)
+	if (!ret) {
+		/* ID */
+		tqma6_parse_eeprom_id(&eedat, safe_string,
+				      ARRAY_SIZE(safe_string));
+		if (0 == strncmp(safe_string, "TQM", 3))
+			setenv("boardtype", safe_string);
+		if (0 == tqma6_parse_eeprom_serial(&eedat, safe_string,
+						   ARRAY_SIZE(safe_string)))
+			setenv("serial#", safe_string);
+		else
+			setenv("serial#", "???");
+
 		tqma6_show_eeprom(&eedat, "TQM");
-	else
+	} else {
 		printf("EEPROM: err %d\n", ret);
+	}
 
 	tqma6_bb_board_late_init();
 
