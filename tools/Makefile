@@ -122,7 +122,7 @@ endif
 
 # MXSImage needs LibSSL
 ifneq ($(CONFIG_MX23)$(CONFIG_MX28)$(CONFIG_FIT_SIGNATURE),)
-HOSTLOADLIBES_mkimage += -lssl -lcrypto
+HOSTLOADLIBES_mkimage += -lssl -lcrypto -ldl
 endif
 
 HOSTLOADLIBES_dumpimage := $(HOSTLOADLIBES_mkimage)
