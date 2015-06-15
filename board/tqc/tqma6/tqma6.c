@@ -168,8 +168,10 @@ __weak void tqma6_iomuxc_spi(void)
 {
 	unsigned i;
 
-	for (i = 0; i < ARRAY_SIZE(tqma6_ecspi1_cs); ++i)
+	for (i = 0; i < ARRAY_SIZE(tqma6_ecspi1_cs); ++i) {
+		gpio_requestf(tqma6_ecspi1_cs[i], "ecspi1-cs%d", i);
 		gpio_direction_output(tqma6_ecspi1_cs[i], 1);
+	}
 	imx_iomux_v3_setup_multiple_pads(tqma6_ecspi1_pads,
 					 ARRAY_SIZE(tqma6_ecspi1_pads));
 }
@@ -257,7 +259,8 @@ static void tqma6_detect_enet_workaround(void)
 {
 	imx_iomux_v3_setup_multiple_pads(tqma6_revdet_pads,
 					 ARRAY_SIZE(tqma6_revdet_pads));
-	gpio_request(TQMA6_REVDET_GPIO, NULL);
+
+	gpio_request(TQMA6_REVDET_GPIO, "tqma6-revdet");
 	gpio_direction_input(TQMA6_REVDET_GPIO);
 	if (gpio_get_value(TQMA6_REVDET_GPIO) == 0)
 		tqma6_has_enet_workaround = 1;
