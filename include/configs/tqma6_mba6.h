@@ -27,4 +27,6 @@
 #define CONFIG_MXC_UART_BASE		UART2_BASE
 #define CONFIG_CONSOLE_DEV		"ttymxc1"
 
+#define CONFIG_CMD_GPIO
+
 #endif /* __CONFIG_TQMA6_MBA6_H */
