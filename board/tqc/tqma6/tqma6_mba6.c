@@ -74,7 +74,7 @@ DECLARE_GLOBAL_DATA_PTR;
 #define ENET_RX_PAD_CTRL	(PAD_CTL_DSE_34ohm)
 #define ENET_TX_PAD_CTRL	(PAD_CTL_PUS_100K_UP | PAD_CTL_DSE_34ohm)
 #define ENET_CLK_PAD_CTRL	(PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_HIGH | \
-				 PAD_CTL_DSE_34ohm)
+				 PAD_CTL_DSE_40ohm | PAD_CTL_HYS)
 #define ENET_MDIO_PAD_CTRL	(PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_MED | \
 				 PAD_CTL_DSE_60ohm)
 
@@ -86,6 +86,7 @@ DECLARE_GLOBAL_DATA_PTR;
 #define IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII_1P5V	0x000C0000
 
 #define ENET_PHY_RESET_GPIO IMX_GPIO_NR(1, 25)
+#define ENET_PHY_INT_GPIO IMX_GPIO_NR(1, 28)
 
 static iomux_v3_cfg_t const mba6_enet_pads[] = {
 	NEW_PAD_CTRL(MX6_PAD_ENET_MDIO__ENET_MDIO,	ENET_MDIO_PAD_CTRL),
@@ -98,7 +99,7 @@ static iomux_v3_cfg_t const mba6_enet_pads[] = {
 	NEW_PAD_CTRL(MX6_PAD_RGMII_TD3__RGMII_TD3,	ENET_TX_PAD_CTRL),
 	NEW_PAD_CTRL(MX6_PAD_RGMII_TX_CTL__RGMII_TX_CTL,
 		     ENET_TX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_ENET_REF_CLK__ENET_TX_CLK,	ENET_CLK_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET_REF_CLK__ENET_TX_CLK,	ENET_CLK_PAD_CTRL) & ~(MUX_MODE_SION),
 	/*
 	 * these pins are also used for config strapping by phy
 	 */
@@ -112,6 +113,8 @@ static iomux_v3_cfg_t const mba6_enet_pads[] = {
 	/* KSZ9031 PHY Reset */
 	NEW_PAD_CTRL(MX6_PAD_ENET_CRS_DV__GPIO1_IO25,	GPIO_OUT_PAD_CTRL) |
 		MUX_MODE_SION,
+	/* FEC phy IRQ */
+	NEW_PAD_CTRL(MX6_PAD_ENET_TX_EN__GPIO1_IO28,	GPIO_IN_PAD_CTRL),
 };
 
 static void mba6_setup_iomuxc_enet(void)
@@ -130,6 +133,8 @@ static void mba6_setup_iomuxc_enet(void)
 					 ARRAY_SIZE(mba6_enet_pads));
 
 	gpio_request(ENET_PHY_RESET_GPIO, "phy-rst#");
+	gpio_request(ENET_PHY_INT_GPIO, "phy-int");
+	gpio_direction_input(ENET_PHY_INT_GPIO);
 	/* Reset PHY */
 	gpio_direction_output(ENET_PHY_RESET_GPIO , 0);
 	/* Need delay 10ms after power on according to KSZ9031 spec */
