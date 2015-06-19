@@ -264,10 +264,12 @@ static void tqma6_detect_enet_workaround(void)
 
 	gpio_request(TQMA6_REVDET_GPIO, "tqma6-revdet");
 	gpio_direction_input(TQMA6_REVDET_GPIO);
-	if (gpio_get_value(TQMA6_REVDET_GPIO) == 0)
+	if (gpio_get_value(TQMA6_REVDET_GPIO) == 0) {
 		tqma6_has_enet_workaround = 1;
-	else if (gpio_get_value(TQMA6_REVDET_GPIO) > 0)
+	} else if (gpio_get_value(TQMA6_REVDET_GPIO) > 0) {
 		tqma6_has_enet_workaround = 0;
+		gpio_direction_output(TQMA6_REVDET_GPIO, 1);
+	}
 	gpio_free(TQMA6_REVDET_GPIO);
 }
 
