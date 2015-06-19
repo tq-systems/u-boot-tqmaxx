@@ -181,6 +181,7 @@ extern int mmc_get_env_addr(struct mmc *mmc, int copy, u32 *env_addr);
 # ifdef CONFIG_SYS_MMC_ENV_PART
 extern uint mmc_get_env_part(struct mmc *mmc);
 # endif
+extern int mmc_get_env_devno(void);
 #endif
 
 #ifndef DO_DEPS_ONLY
