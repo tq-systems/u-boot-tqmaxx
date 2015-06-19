@@ -341,6 +341,7 @@ U_BOOT_DRIVER(gpio_mxc) = {
 	.priv_auto_alloc_size = sizeof(struct mxc_bank_info),
 	.of_match = mxc_gpio_ids,
 	.bind	= mxc_gpio_bind,
+	.flags  = DM_FLAG_PRE_RELOC,
 };
 
 #if !CONFIG_IS_ENABLED(OF_CONTROL)
