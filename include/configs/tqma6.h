@@ -195,8 +195,11 @@
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0"                       \
 	"loadimage=mmc dev ${mmcdev}; "                                        \
 		"mmc read ${loadaddr} ${kernel_start} ${kernel_size};\0"       \
-	"loadfdt=mmc dev ${mmcdev}; "                                          \
+	"loadfdtsingle=mmc dev ${mmcdev}; "                                    \
 		"mmc read ${fdt_addr} ${fdt_start} ${fdt_size};\0"             \
+	"loadfdtfit=mmc dev ${mmcdev}; "                                       \
+		"mmc read ${loadaddr} ${fdt_start} ${fdt_size}; "              \
+		"imxtract ${loadaddr} ${fitfdt_part} ${fdt_addr}\0"            \
 	"update_uboot=if tftp ${uboot}; then "                                 \
 		"if itest ${filesize} > 0; then "                              \
 			"mmc dev ${mmcdev}; mmc rescan; "                      \
@@ -221,7 +224,7 @@
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"setenv filesize; setenv blkc \0"                              \
-	"update_fdt=if tftp ${fdt_file}; then "                                \
+	"update_fdt=run fdt_name; if tftp ${fdtimg}; then "                    \
 		"if itest ${filesize} > 0; then "                              \
 			"mmc dev ${mmcdev}; mmc rescan; "                      \
 			"setexpr blkc ${filesize} / 0x200; "                   \
@@ -303,7 +306,7 @@
 			"fi; "                                                 \
 		"fi; fi; "                                                     \
 		"setenv filesize 0; setenv size ; setenv offset\0"             \
-	"update_fdt=if tftp ${fdt_file}; then "                                \
+	"update_fdt=run fdt_name; if tftp ${fdtimg}; then "                    \
 		"if itest ${filesize} > 0; then "                              \
 			"setexpr size ${fdt_sectors} * "                       \
 				__stringify(TQMA6_SPI_FLASH_SECTOR_SIZE)"; "   \
@@ -316,6 +319,7 @@
 					"${filesize}; "                        \
 			"fi; "                                                 \
 		"fi; fi; "                                                     \
+		"setenv fdtimg"                                                \
 		"setenv filesize 0; setenv size ; setenv offset\0"             \
 	"loadimage=sf probe; "                                                 \
 		"setexpr size ${kernel_sectors} * "                            \
@@ -324,13 +328,21 @@
 			__stringify(TQMA6_SPI_FLASH_SECTOR_SIZE)"; "           \
 		"sf read ${loadaddr} ${offset} ${size}; "                      \
 		"setenv size ; setenv offset\0"                                \
-	"loadfdt=sf probe; "                                                   \
+	"loadfdtsingle=sf probe; "                                             \
 		"setexpr size ${fdt_sectors} * "                               \
 			__stringify(TQMA6_SPI_FLASH_SECTOR_SIZE)"; "           \
 		"setexpr offset ${fdt_start} * "                               \
 			__stringify(TQMA6_SPI_FLASH_SECTOR_SIZE)"; "           \
 		"sf read ${fdt_addr} ${offset} ${size}; "                      \
 		"setenv size ; setenv offset\0"                                \
+	"loadfdtfit=sf probe; "                                                \
+		"setexpr size ${fdt_sectors} * "                               \
+			__stringify(TQMA6_SPI_FLASH_SECTOR_SIZE)"; "           \
+		"setexpr offset ${fdt_start} * "                               \
+			__stringify(TQMA6_SPI_FLASH_SECTOR_SIZE)"; "           \
+		"sf read ${loadaddr} ${offset} ${size}; "                      \
+		"setenv size ; setenv offset "                                 \
+		"imxtract ${loadaddr} ${fitfdt_part} ${fdt_addr}\0"            \
 
 
 #define CONFIG_BOOTCOMMAND                                                     \
@@ -357,7 +369,13 @@
 		"setenv kernel ${uimage}; "                                    \
 		"else setenv kernel ${zimage}; fi\0"                           \
 	"uboot=u-boot.imx\0"                                                   \
+	"fdt_type=single\0"                                                    \
+	"fitfdt_file=" CONFIG_DEFAULT_FDT_FILE ".fit\0"                        \
+	"fitfdt_part=fdt@0\0"                                                  \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"                               \
+	"fdt_name=if test \"${fdt_type}\" != single; then "                    \
+		"setenv fdtimg ${fitfdt_file}; "                               \
+		"else setenv fdtimg ${fdt_file}; fi\0"                         \
 	"fdt_addr="__stringify(TQMA6_FDT_ADDRESS)"\0"                          \
 	"console=" CONFIG_CONSOLE_DEV "\0"                                     \
 	"cma_size="__stringify(TQMA6_CMA_SIZE)"\0"                             \
@@ -377,12 +395,15 @@
 	"mmcboot=echo Booting from mmc ...; "                                  \
 		"setenv bootargs; "                                            \
 		"run mmcargs; "                                                \
-		"run loadimage; "                                              \
 		"if run loadfdt; then "                                        \
 			"echo boot device tree kernel ...; "                   \
-			"${boot_type} ${loadaddr} - ${fdt_addr}; "             \
+			"if run loadimage; then "                              \
+				"${boot_type} ${loadaddr} - ${fdt_addr}; "     \
+			"fi; "                                                 \
 		"else "                                                        \
-			"${boot_type}; "                                       \
+			"if run loadimage; then "                              \
+				"${boot_type}; "                               \
+			"fi; "                                                 \
 		"fi;\0"                                                        \
 		"setenv bootargs \0"                                           \
 	"netdev=eth0\0"                                                        \
@@ -401,19 +422,34 @@
 	"set_getcmd=if test \"${ipmode}\" != static; then "                    \
 		"setenv getcmd dhcp; setenv autoload yes; "                    \
 		"else setenv getcmd tftp; setenv autoload no; fi\0"            \
+	"get_fdt=run fdt_name; "                                               \
+		"if test \"${fdt_type}\" != single; then "                     \
+			"echo use dtb from fit; "                              \
+			"if ${getcmd} ${loadaddr} ${fdtimg}; then "            \
+				"imxtract ${loadaddr} ${fitfdt_part} "         \
+					"${fdt_addr}; "                        \
+			"fi; "                                                 \
+		"else "                                                        \
+			"echo use dtb; "                                       \
+			"${getcmd} ${fdt_addr} ${fdtimg}; "                    \
+		"fi; "                                                         \
+		"setenv fdtimg\0"                                              \
 	"netboot=echo Booting from net ...; "                                  \
 		"run kernel_name; "                                            \
 		"run set_getcmd; "                                             \
 		"setenv bootargs; "                                            \
 		"run netargs; "                                                \
-		"if ${getcmd} ${kernel}; then "                                \
-			"if ${getcmd} ${fdt_addr} ${fdt_file}; then "          \
+		"if run get_fdt; then "                                        \
+			"if ${getcmd} ${loadaddr} ${kernel}; then "            \
 				"${boot_type} ${loadaddr} - ${fdt_addr}; "     \
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"echo ... failed\0"                                            \
 	"panicboot=echo No boot device !!! reset\0"                            \
-	TQMA6_EXTRA_BOOTDEV_ENV_SETTINGS                                      \
+	"loadfdt=if test \"${fdt_type}\" != single; then "                     \
+		"run loadfdtfit; "                                             \
+		"else run loadfdtsingle; fi\0"                                 \
+	TQMA6_EXTRA_BOOTDEV_ENV_SETTINGS                                       \
 
 /* Miscellaneous configurable options */
 #define CONFIG_SYS_LONGHELP
