@@ -17,6 +17,11 @@
 
 #define CONFIG_DTT_SENSORS		{ 0, 1 }
 
+/* RTC and time support */
+#define CONFIG_CMD_DATE
+#define CONFIG_RTC_DS1339
+#define CONFIG_SYS_I2C_RTC_ADDR 0x68
+
 #define CONFIG_FEC_XCV_TYPE		RGMII
 #define CONFIG_ETHPRIME			"FEC"
 
