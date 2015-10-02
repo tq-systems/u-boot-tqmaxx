@@ -15,6 +15,13 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+__weak int board_get_rtc_bus(void)
+{
+	return CONFIG_SYS_RTC_BUS_NUM;
+}
+
+#undef CONFIG_SYS_I2C_RTC_BUS
+
 static const char * const weekdays[] = {
 	"Sun", "Mon", "Tues", "Wednes", "Thurs", "Fri", "Satur",
 };
@@ -36,10 +43,10 @@ static int do_date(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 	/* switch to correct I2C bus */
 #ifdef CONFIG_SYS_I2C
 	old_bus = i2c_get_bus_num();
-	i2c_set_bus_num(CONFIG_SYS_RTC_BUS_NUM);
+	i2c_set_bus_num(board_get_rtc_bus());
 #else
 	old_bus = I2C_GET_BUS();
-	I2C_SET_BUS(CONFIG_SYS_RTC_BUS_NUM);
+	I2C_SET_BUS(board_get_rtc_bus());
 #endif
 
 	switch (argc) {
