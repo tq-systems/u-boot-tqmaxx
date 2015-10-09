@@ -347,7 +347,7 @@ int board_late_init(void)
 		/* ID */
 		tqma6_parse_eeprom_id(&eedat, safe_string,
 				      ARRAY_SIZE(safe_string));
-		if (0 == strncmp(safe_string, "TQM", 3))
+		if (0 == strncmp(safe_string, "TQMa6", 5))
 			setenv("boardtype", safe_string);
 		if (0 == tqma6_parse_eeprom_serial(&eedat, safe_string,
 						   ARRAY_SIZE(safe_string)))
@@ -355,7 +355,7 @@ int board_late_init(void)
 		else
 			setenv("serial#", "???");
 
-		tqma6_show_eeprom(&eedat, "TQM");
+		tqma6_show_eeprom(&eedat, "TQMa6");
 	} else {
 		printf("EEPROM: err %d\n", ret);
 	}
