@@ -16,6 +16,7 @@
 #include <asm/cache.h>
 #include <asm/global_data.h>
 #include <linux/delay.h>
+#include <asm/mach-imx/sys_proto.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -350,6 +351,12 @@ static void draw_splash_screen(void)
 
 void epdc_enable(void)
 {
+	if (CONFIG_IS_ENABLED(IMX_MODULE_FUSE)) {
+		if (check_module_fused(MODULE_EPDC)) {
+			return;
+		}
+	}
+
 	if (board_setup_logo_file(lcd_base)) {
 		debug("Load logo failed!\n");
 		return;
@@ -367,6 +374,12 @@ void epdc_enable(void)
 
 void epdc_disable(void)
 {
+	if (CONFIG_IS_ENABLED(IMX_MODULE_FUSE)) {
+		if (check_module_fused(MODULE_EPDC)) {
+			return;
+		}
+	}
+
 	debug("lcd_disable\n");
 
 	/* Disable clocks to EPDC */
@@ -381,6 +394,13 @@ void epdc_panel_disable(void)
 void epdc_ctrl_init(void *lcdbase)
 {
 	unsigned int val;
+
+	if (CONFIG_IS_ENABLED(IMX_MODULE_FUSE)) {
+		if (check_module_fused(MODULE_EPDC)) {
+			printf("EPDC@0x%x is fused, disable it\n", EPDC_BASE_ADDR);
+			return;
+		}
+	}
 
 	/*
 	 * We rely on lcdbase being a physical address, i.e., either MMU off,
