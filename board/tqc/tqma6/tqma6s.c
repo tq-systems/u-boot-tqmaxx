@@ -137,6 +137,8 @@ static void tqma6s_init_ddr_controller(void)
 	init_write_reg(MX6_MMDC_P0_MAPSR, 0x00001006);
 	init_write_reg(MX6_MMDC_P0_MDSCR, 0x00000000);
 
+	/* wait for auto-ZQ calibration to complete */
+	mdelay(1);
 	debug("spl: tqma6s ddr init done ...\n");
 }
 
