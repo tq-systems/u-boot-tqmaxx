@@ -859,7 +859,9 @@ struct spi_slave *spi_setup_slave(unsigned int bus, unsigned int cs,
 	/*
 	 * Any read access to non-implemented addresses will provide
 	 * undefined results.
-	 *
+	 */
+#if !defined(FSL_QSPI_FLASH_DUALDIE)
+	/*
 	 * In case single die flash devices, TOP_ADDR_MEMA2 and
 	 * TOP_ADDR_MEMB2 should be initialized/programmed to
 	 * TOP_ADDR_MEMA1 and TOP_ADDR_MEMB1 respectively - in effect,
@@ -874,6 +876,23 @@ struct spi_slave *spi_setup_slave(unsigned int bus, unsigned int cs,
 		     total_size | amba_bases[bus]);
 	qspi_write32(qspi->priv.flags, &regs->sfb2ad,
 		     total_size | amba_bases[bus]);
+#else
+	/*
+	 * In case of dual die flash devices (or two flashes on port A),
+	 * TOP_ADDR_MEMB1 and TOP_ADDR_MEMB2 should be initialized/programmed to
+	 * TOP_ADDR_MEMA2 - in effect, setting the size of these devices to 0.
+	 * This would ensure that the memory map is splitted between
+	 * CS_A1 and CS_A2
+	 */
+	qspi_write32(qspi->priv.flags, &regs->sfa1ad,
+		     FSL_QSPI_FLASH_SIZE | amba_bases[bus]);
+	qspi_write32(qspi->priv.flags, &regs->sfa2ad,
+		     total_size | amba_bases[bus]);
+	qspi_write32(qspi->priv.flags, &regs->sfb1ad,
+		     total_size | amba_bases[bus]);
+	qspi_write32(qspi->priv.flags, &regs->sfb2ad,
+		     total_size | amba_bases[bus]);
+#endif
 
 	qspi_set_lut(&qspi->priv);
 
