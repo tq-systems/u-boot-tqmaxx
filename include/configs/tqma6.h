@@ -474,6 +474,8 @@
 #define CONFIG_SYS_INIT_SP_ADDR \
 	(CONFIG_SYS_INIT_RAM_ADDR + CONFIG_SYS_INIT_SP_OFFSET)
 
+#define CONFIG_ZERO_BOOTDELAY_CHECK
+
 /* FLASH and environment organization */
 #define CONFIG_SYS_NO_FLASH
 
