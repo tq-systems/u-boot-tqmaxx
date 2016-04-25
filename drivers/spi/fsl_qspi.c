@@ -52,6 +52,7 @@ DECLARE_GLOBAL_DATA_PTR;
 #define QSPI_CMD_RDSR		0x05	/* Read status register */
 #define QSPI_CMD_WREN		0x06	/* Write enable */
 #define QSPI_CMD_FAST_READ	0x0b	/* Read data bytes (high frequency) */
+#define QSPI_CMD_FAST_READ1_1_4	0x6b	/* Read data bytes (high frequency) */
 #define QSPI_CMD_BE_4K		0x20    /* 4K erase */
 #define QSPI_CMD_FLAG_STATUS	0x70	/*  */
 #define QSPI_CMD_CHIP_ERASE	0xc7	/* Erase whole flash chip */
@@ -68,6 +69,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 /* 4-byte address QSPI CMD - used on Spansion and some Macronix flashes */
 #define QSPI_CMD_FAST_READ_4B	0x0c    /* Read data bytes (high frequency) */
+#define QSPI_CMD_FAST_READ_4B1_1_4	0x6c    /* Read data bytes 1-1-4 mode (high frequency) */
 #define QSPI_CMD_PP_4B		0x12    /* Page program (up to 256 bytes) */
 #define QSPI_CMD_PP_4B1_1_4	0x34    /* Page program 1-1-4 mode (up to 256 bytes) */
 #define QSPI_CMD_SE_4B		0xdc    /* Sector erase (usually 64KiB) */
@@ -180,7 +182,8 @@ static void qspi_set_lut(struct fsl_qspi_priv *priv)
 	qspi_write32(priv->flags, &regs->lut[lut_base + 2], 0);
 	qspi_write32(priv->flags, &regs->lut[lut_base + 3], 0);
 
-	/* Fast Read */
+#if !defined(FSL_QSPI_QUAD_MODE)
+	/* Fast Read 1-1-1 mode */
 	lut_base = SEQID_FAST_READ * 4;
 #ifdef CONFIG_SPI_FLASH_BAR
 	qspi_write32(priv->flags, &regs->lut[lut_base],
@@ -206,6 +209,35 @@ static void qspi_set_lut(struct fsl_qspi_priv *priv)
 		     INSTR1(LUT_READ));
 	qspi_write32(priv->flags, &regs->lut[lut_base + 2], 0);
 	qspi_write32(priv->flags, &regs->lut[lut_base + 3], 0);
+#else
+	/* Fast Read 1-1-4 mode */
+	lut_base = SEQID_FAST_READ * 4;
+#ifdef CONFIG_SPI_FLASH_BAR
+	qspi_write32(priv->flags, &regs->lut[lut_base],
+		     OPRND0(QSPI_CMD_FAST_READ1_1_4) | PAD0(LUT_PAD1) |
+		     INSTR0(LUT_CMD) | OPRND1(ADDR24BIT) |
+		     PAD1(LUT_PAD1) | INSTR1(LUT_ADDR));
+#else
+	if (FSL_QSPI_FLASH_SIZE  <= SZ_16M)
+		qspi_write32(priv->flags, &regs->lut[lut_base],
+			     OPRND0(QSPI_CMD_FAST_READ1_1_4) |
+			     PAD0(LUT_PAD1) | INSTR0(LUT_CMD) |
+			     OPRND1(ADDR24BIT) | PAD1(LUT_PAD1) |
+			     INSTR1(LUT_ADDR));
+	else
+		qspi_write32(priv->flags, &regs->lut[lut_base],
+			     OPRND0(QSPI_CMD_FAST_READ_4B1_1_4) |
+			     PAD0(LUT_PAD1) | INSTR0(LUT_CMD) |
+			     OPRND1(ADDR32BIT) | PAD1(LUT_PAD1) |
+			     INSTR1(LUT_ADDR));
+#endif
+	qspi_write32(priv->flags, &regs->lut[lut_base + 1],
+		     OPRND0(8) | PAD0(LUT_PAD1) | INSTR0(LUT_DUMMY) |
+		     OPRND1(RX_BUFFER_SIZE) | PAD1(LUT_PAD4) |
+		     INSTR1(LUT_READ));
+	qspi_write32(priv->flags, &regs->lut[lut_base + 2], 0);
+	qspi_write32(priv->flags, &regs->lut[lut_base + 3], 0);
+#endif /* FSL_QSPI_QUAD_MODE */
 
 	/* Read Status */
 	lut_base = SEQID_RDSR * 4;
@@ -809,7 +841,8 @@ int qspi_xfer(struct fsl_qspi_priv *priv, unsigned int bitlen,
 			return 0;
 		}
 
-		if (priv->cur_seqid == QSPI_CMD_FAST_READ) {
+		if ((priv->cur_seqid == QSPI_CMD_FAST_READ) ||
+		    (priv->cur_seqid == QSPI_CMD_FAST_READ1_1_4)){
 			priv->sf_addr = swab32(txbuf) & OFFSET_BITS_MASK;
 		} else if ((priv->cur_seqid == QSPI_CMD_SE) ||
 			   (priv->cur_seqid == QSPI_CMD_BE_4K)) {
@@ -827,7 +860,8 @@ int qspi_xfer(struct fsl_qspi_priv *priv, unsigned int bitlen,
 	}
 
 	if (din) {
-		if (priv->cur_seqid == QSPI_CMD_FAST_READ) {
+		if ((priv->cur_seqid == QSPI_CMD_FAST_READ) ||
+		    (priv->cur_seqid == QSPI_CMD_FAST_READ1_1_4)){
 #ifdef CONFIG_SYS_FSL_QSPI_AHB
 			qspi_ahb_read(priv, din, bytes);
 #else
