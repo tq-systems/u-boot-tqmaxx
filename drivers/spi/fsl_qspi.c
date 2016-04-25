@@ -48,6 +48,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 /* QSPI CMD */
 #define QSPI_CMD_PP		0x02	/* Page program (up to 256 bytes) */
+#define QSPI_CMD_PP1_1_4	0x32	/* Page program 1-1-4 mode (up to 256 bytes) */
 #define QSPI_CMD_RDSR		0x05	/* Read status register */
 #define QSPI_CMD_WREN		0x06	/* Write enable */
 #define QSPI_CMD_FAST_READ	0x0b	/* Read data bytes (high frequency) */
@@ -68,6 +69,7 @@ DECLARE_GLOBAL_DATA_PTR;
 /* 4-byte address QSPI CMD - used on Spansion and some Macronix flashes */
 #define QSPI_CMD_FAST_READ_4B	0x0c    /* Read data bytes (high frequency) */
 #define QSPI_CMD_PP_4B		0x12    /* Page program (up to 256 bytes) */
+#define QSPI_CMD_PP_4B1_1_4	0x34    /* Page program 1-1-4 mode (up to 256 bytes) */
 #define QSPI_CMD_SE_4B		0xdc    /* Sector erase (usually 64KiB) */
 
 /* fsl_qspi_platdata flags */
@@ -254,7 +256,8 @@ static void qspi_set_lut(struct fsl_qspi_priv *priv)
 	qspi_write32(priv->flags, &regs->lut[lut_base + 2], 0);
 	qspi_write32(priv->flags, &regs->lut[lut_base + 3], 0);
 
-	/* Page Program */
+#if !defined(FSL_QSPI_QUAD_MODE)
+	/* Page Program 1-1-1 mode */
 	lut_base = SEQID_PP * 4;
 #ifdef CONFIG_SPI_FLASH_BAR
 	qspi_write32(priv->flags, &regs->lut[lut_base], OPRND0(QSPI_CMD_PP) |
@@ -286,6 +289,42 @@ static void qspi_set_lut(struct fsl_qspi_priv *priv)
 #endif
 	qspi_write32(priv->flags, &regs->lut[lut_base + 2], 0);
 	qspi_write32(priv->flags, &regs->lut[lut_base + 3], 0);
+#else
+	/* Page program 1-1-4 mode */
+	lut_base = SEQID_PP * 4;
+#ifdef CONFIG_SPI_FLASH_BAR
+	qspi_write32(priv->flags, &regs->lut[lut_base],
+		     OPRND0(QSPI_CMD_PP1_1_4) | PAD0(LUT_PAD1) |
+		     INSTR0(LUT_CMD) | OPRND1(ADDR24BIT) |
+		     PAD1(LUT_PAD1) | INSTR1(LUT_ADDR));
+#else
+	if (FSL_QSPI_FLASH_SIZE  <= SZ_16M)
+		qspi_write32(priv->flags, &regs->lut[lut_base],
+			     OPRND0(QSPI_CMD_PP1_1_4) | PAD0(LUT_PAD1) |
+			     INSTR0(LUT_CMD) | OPRND1(ADDR24BIT) |
+			     PAD1(LUT_PAD1) | INSTR1(LUT_ADDR));
+	else
+		qspi_write32(priv->flags, &regs->lut[lut_base],
+			     OPRND0(QSPI_CMD_PP_4B1_1_4) |
+			     PAD0(LUT_PAD1) | INSTR0(LUT_CMD) |
+			     OPRND1(ADDR32BIT) | PAD1(LUT_PAD1) |
+			     INSTR1(LUT_ADDR));
+#endif
+#ifdef CONFIG_MX6SX
+	/*
+	 * To MX6SX, OPRND0(TX_BUFFER_SIZE) can not work correctly.
+	 * So, Use IDATSZ in IPCR to determine the size and here set 0.
+	 */
+	qspi_write32(priv->flags, &regs->lut[lut_base + 1], OPRND0(0) |
+		     PAD0(LUT_PAD4) | INSTR0(LUT_WRITE));
+#else
+	qspi_write32(priv->flags, &regs->lut[lut_base + 1],
+		     OPRND0(TX_BUFFER_SIZE) |
+		     PAD0(LUT_PAD4) | INSTR0(LUT_WRITE));
+#endif
+	qspi_write32(priv->flags, &regs->lut[lut_base + 2], 0);
+	qspi_write32(priv->flags, &regs->lut[lut_base + 3], 0);
+#endif /* (FSL_QSPI_QUAD_MODE) */
 
 	/* READ ID */
 	lut_base = SEQID_RDID * 4;
@@ -776,7 +815,8 @@ int qspi_xfer(struct fsl_qspi_priv *priv, unsigned int bitlen,
 			   (priv->cur_seqid == QSPI_CMD_BE_4K)) {
 			priv->sf_addr = swab32(txbuf) & OFFSET_BITS_MASK;
 			qspi_op_erase(priv);
-		} else if (priv->cur_seqid == QSPI_CMD_PP) {
+		} else if ((priv->cur_seqid == QSPI_CMD_PP) ||
+			   (priv->cur_seqid == QSPI_CMD_PP1_1_4)){
 			wr_sfaddr = swab32(txbuf) & OFFSET_BITS_MASK;
 		} else if ((priv->cur_seqid == QSPI_CMD_BRWR) ||
 			 (priv->cur_seqid == QSPI_CMD_WREAR)) {
@@ -811,6 +851,7 @@ int qspi_xfer(struct fsl_qspi_priv *priv, unsigned int bitlen,
 #ifdef CONFIG_SYS_FSL_QSPI_AHB
 	if ((priv->cur_seqid == QSPI_CMD_SE) ||
 	    (priv->cur_seqid == QSPI_CMD_PP) ||
+	    (priv->cur_seqid == QSPI_CMD_PP1_1_4) ||
 	    (priv->cur_seqid == QSPI_CMD_BE_4K) ||
 	    (priv->cur_seqid == QSPI_CMD_WREAR) ||
 	    (priv->cur_seqid == QSPI_CMD_BRWR))
