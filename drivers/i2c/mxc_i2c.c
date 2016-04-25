@@ -262,8 +262,14 @@ static void i2c_imx_stop(struct mxc_i2c_bus *i2c_bus)
 	temp &= ~(I2CR_MSTA | I2CR_MTX);
 	writeb(temp, base + (I2CR << reg_shift));
 	ret = wait_for_sr_state(i2c_bus, ST_BUS_IDLE);
-	if (ret < 0)
+	if (ret < 0) {
 		printf("%s:trigger stop failed\n", __func__);
+		temp |= I2CR_RSTA;
+		writeb(temp, base + (I2CR << reg_shift));
+		udelay(10);
+		writeb(temp, base + (I2CR << reg_shift));
+		wait_for_sr_state(i2c_bus, ST_BUS_IDLE);
+	}
 }
 
 /*
