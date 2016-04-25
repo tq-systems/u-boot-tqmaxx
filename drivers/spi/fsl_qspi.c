@@ -959,6 +959,9 @@ struct spi_slave *spi_setup_slave(unsigned int bus, unsigned int cs,
 
 	regs = (struct fsl_qspi_regs *)spi_bases[bus];
 	qspi->priv.regs = regs;
+#ifdef FSL_QSPI_QUAD_MODE
+	qspi->slave.mode = SPI_RX_QUAD | SPI_TX_QUAD;
+#endif
 	/*
 	 * According cs, use different amba_base to choose the
 	 * corresponding flash devices.
