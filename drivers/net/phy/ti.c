@@ -149,8 +149,8 @@ static inline bool phy_interface_is_rgmii(struct phy_device *phydev)
 }
 
 /* User setting - can be taken from DTS */
-#define RX_ID_DELAY	8
-#define TX_ID_DELAY	0xa
+#define RX_ID_DELAY	9
+#define TX_ID_DELAY	7
 #define FIFO_DEPTH	1
 
 static int dp83867_config(struct phy_device *phydev)
