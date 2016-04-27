@@ -180,6 +180,7 @@ int board_eth_init(bd_t *bis)
 
 #ifdef CONFIG_TSEC1
 	SET_STD_TSEC_INFO(tsec_info[num], 1);
+	tsec_info[num].interface = PHY_INTERFACE_MODE_RGMII_ID;
 	num++;
 #endif
 #ifdef CONFIG_TSEC2
@@ -188,6 +189,7 @@ int board_eth_init(bd_t *bis)
 #endif
 #ifdef CONFIG_TSEC3
 	SET_STD_TSEC_INFO(tsec_info[num], 3);
+	tsec_info[num].interface = PHY_INTERFACE_MODE_RGMII_ID;
 	num++;
 #endif
 	if (!num) {
