@@ -698,6 +698,11 @@ config TARGET_LS1043ARDB
 	help
 	  Support for Freescale LS1043ARDB platform.
 
+config TARGET_TQMLS102XA
+        bool "Support tqmls102xa"
+        select CPU_V7
+        select SUPPORT_SPL
+
 config TARGET_H2200
 	bool "Support h2200"
 	select CPU_PXA
@@ -878,6 +883,7 @@ source "board/timll/devkit3250/Kconfig"
 source "board/toradex/colibri_pxa270/Kconfig"
 source "board/toradex/colibri_vf/Kconfig"
 source "board/technologic/ts4800/Kconfig"
+source "board/tqc/tqmls102xa/Kconfig"
 source "board/vscom/baltos/Kconfig"
 source "board/woodburn/Kconfig"
 source "board/work-microwave/work_92105/Kconfig"

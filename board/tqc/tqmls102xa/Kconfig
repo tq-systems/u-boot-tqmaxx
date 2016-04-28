@@ -1,0 +1,15 @@
+if TARGET_TQMLS102XA
+
+config SYS_BOARD
+	default "tqmls102xa"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_SOC
+	default "ls102xa"
+
+config SYS_CONFIG_NAME
+	default "tqmls102xa"
+
+endif
