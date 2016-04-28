@@ -28,6 +28,7 @@
 #ifdef CONFIG_U_QE
 #include <fsl_qe.h>
 #endif
+#include "tqmls102xa_eeprom.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -343,6 +344,29 @@ void board_sleep_prepare(void)
 #ifdef CONFIG_BOARD_LATE_INIT
 int board_late_init(void)
 {
+	int ret;
+	struct tqmls102xa_eeprom_data eedat;
+	/* must hold largest field of eeprom data */
+	char safe_string[0x41];
+
+	ret = tqmls102xa_read_eeprom(CONFIG_SYS_EEPROM_BUS_NUM,
+				     CONFIG_SYS_I2C_EEPROM_ADDR, &eedat);
+	if (!ret) {
+		/* ID */
+		tqmls102xa_parse_eeprom_id(&eedat, safe_string,
+					   ARRAY_SIZE(safe_string));
+		if (0 == strncmp(safe_string, "TQM", 3))
+			setenv("boardtype", safe_string);
+		if (0 == tqmls102xa_parse_eeprom_serial(&eedat, safe_string,
+							ARRAY_SIZE(safe_string)))
+			setenv("serial#", safe_string);
+		else
+			setenv("serial#", "???");
+		tqmls102xa_show_eeprom(&eedat, "TQM");
+	} else {
+		printf("EEPROM: err %d\n", ret);
+	}
+
 	ls1021a_sata_init();
 
 	return 0;
