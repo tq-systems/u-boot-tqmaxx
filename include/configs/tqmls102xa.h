@@ -218,7 +218,10 @@
 #define FSL_QSPI_FLASH_SIZE		SZ_64M
 #define FSL_QSPI_FLASH_NUM		2
 #define FSL_QSPI_FLASH_DUALDIE
+
+#if defined(CONFIG_SD_BOOT)
 #define FSL_QSPI_QUAD_MODE
+#endif
 
 #define CONFIG_CMD_SF
 #define CONFIG_SPI_FLASH
