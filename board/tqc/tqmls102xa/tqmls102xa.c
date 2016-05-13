@@ -210,41 +210,50 @@ int board_eth_init(bd_t *bis)
 
 #ifdef CONFIG_TSEC1
 	phy = mdio_phydev_for_ethname(CONFIG_TSEC1_NAME);
-	/* set GPIO to out low */
-	phy_write_mmd_indirect(phy, 0x0171, DP83867_DEVADDR, TSEC1_PHY_ADDR,
-			       0x8888);
-	phy_write_mmd_indirect(phy, 0x0172, DP83867_DEVADDR, TSEC1_PHY_ADDR,
-			       0x0888);
-	/* LED configuration */
-	phy_write(phy, TSEC1_PHY_ADDR, 0x18, 0x6b90);
-	phy_write(phy, TSEC1_PHY_ADDR, 0x19, 0x0000);
+	if (phy) {
+		/* set GPIO to out low */
+		phy_write_mmd_indirect(phy, 0x0171, DP83867_DEVADDR,
+				       TSEC1_PHY_ADDR, 0x8888);
+		phy_write_mmd_indirect(phy, 0x0172, DP83867_DEVADDR,
+				       TSEC1_PHY_ADDR, 0x0888);
+		/* LED configuration */
+		phy_write(phy, TSEC1_PHY_ADDR, 0x18, 0x6b90);
+		phy_write(phy, TSEC1_PHY_ADDR, 0x19, 0x0000);
+	} else {
+		printf("Unregistering %s\n", CONFIG_TSEC1_NAME);
+		eth_unregister(eth_get_dev_by_name(CONFIG_TSEC1_NAME));
+	}
 #endif
 #ifdef CONFIG_TSEC2
 	phy = mdio_phydev_for_ethname(CONFIG_TSEC2_NAME);
-	/* set GPIO to out low */
-	phy_write_mmd_indirect(phy, 0x0171, DP83867_DEVADDR, TSEC2_PHY_ADDR,
-			       0x8888);
-	phy_write_mmd_indirect(phy, 0x0172, DP83867_DEVADDR, TSEC2_PHY_ADDR,
-			       0x0888);
-	/* LED configuration */
-	phy_write(phy, TSEC2_PHY_ADDR, 0x18, 0x6b90);
-	phy_write(phy, TSEC2_PHY_ADDR, 0x19, 0x0000);
+	if (phy) {
+		/* set GPIO to out low */
+		phy_write_mmd_indirect(phy, 0x0171, DP83867_DEVADDR,
+				       TSEC2_PHY_ADDR, 0x8888);
+		phy_write_mmd_indirect(phy, 0x0172, DP83867_DEVADDR,
+				       TSEC2_PHY_ADDR, 0x0888);
+		/* LED configuration */
+		phy_write(phy, TSEC2_PHY_ADDR, 0x18, 0x6b90);
+		phy_write(phy, TSEC2_PHY_ADDR, 0x19, 0x0000);
+	}
 #endif
 #ifdef CONFIG_TSEC3
 	phy = mdio_phydev_for_ethname(CONFIG_TSEC3_NAME);
-	/* set GPIO to out low */
-	phy_write_mmd_indirect(phy, 0x0171, DP83867_DEVADDR, TSEC3_PHY_ADDR,
-			       0x8888);
-	phy_write_mmd_indirect(phy, 0x0172, DP83867_DEVADDR, TSEC3_PHY_ADDR,
-			       0x0888);
-	/* enable clock out */
-	regval = phy_read_mmd_indirect(phy, 0x0170, DP83867_DEVADDR,
-				       TSEC3_PHY_ADDR);
-	phy_write_mmd_indirect(phy, 0x0170, DP83867_DEVADDR, TSEC3_PHY_ADDR,
-			       regval | 0x040);
-	/* LED configuration */
-	phy_write(phy, TSEC3_PHY_ADDR, 0x18, 0x6b90);
-	phy_write(phy, TSEC3_PHY_ADDR, 0x19, 0x0000);
+	if (phy) {
+		/* set GPIO to out low */
+		phy_write_mmd_indirect(phy, 0x0171, DP83867_DEVADDR,
+				       TSEC3_PHY_ADDR, 0x8888);
+		phy_write_mmd_indirect(phy, 0x0172, DP83867_DEVADDR,
+				       TSEC3_PHY_ADDR, 0x0888);
+		/* enable clock out */
+		regval = phy_read_mmd_indirect(phy, 0x0170, DP83867_DEVADDR,
+					       TSEC3_PHY_ADDR);
+		phy_write_mmd_indirect(phy, 0x0170, DP83867_DEVADDR,
+				       TSEC3_PHY_ADDR, regval | 0x040);
+		/* LED configuration */
+		phy_write(phy, TSEC3_PHY_ADDR, 0x18, 0x6b90);
+		phy_write(phy, TSEC3_PHY_ADDR, 0x19, 0x0000);
+	}
 #endif
 
 	return pci_eth_init(bis);
