@@ -499,7 +499,7 @@
 	"kernel_name=if test \"${boot_type}\" != bootz; then "                 \
 		"setenv kernel ${uimage}; "                                    \
 		"else setenv kernel ${zimage}; fi\0"                           \
-	"uboot=u-boot-with-spl-pbl-mmcsd-2016.05-rc1.bin\0"                    \
+	"uboot=u-boot-with-spl-pbl-mmcsd-2016.05.bin\0"                        \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"                               \
 	"fdt_addr="__stringify(TQMLS102X_FDT_ADDRESS)"\0"                      \
 	"console=" TQMLS201X_CONSOLE_DEV "\0"                                  \
