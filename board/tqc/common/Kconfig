@@ -1,0 +1,4 @@
+
+config TQC_EEPROM
+	bool
+	default n

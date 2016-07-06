@@ -199,6 +199,7 @@ config TARGET_TITANIUM
 
 config TARGET_TQMA6
 	bool "TQ Systems TQMa6 board"
+	select TQC_EEPROM
 
 config TARGET_UDOO
 	bool "udoo"
