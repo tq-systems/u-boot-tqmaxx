@@ -2,7 +2,7 @@
  * Copyright (C) 2012 Freescale Semiconductor, Inc.
  * Author: Fabio Estevam <fabio.estevam@freescale.com>
  *
- * Copyright (C) 2013, 2014 TQ Systems (ported SabreSD to TQMa6x)
+ * Copyright (C) 2013, 2014 - 2016 TQ Systems (ported SabreSD to TQMa6x)
  * Author: Markus Niebel <markus.niebel@tq-group.com>
  *
  * SPDX-License-Identifier:	GPL-2.0+
@@ -30,8 +30,9 @@
 #include <netdev.h>
 #include <spl.h>
 
+#include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
-#include "tqma6_bb.h"
+#include "tqma6_private.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -165,7 +166,7 @@ static void mba6_setup_iomuxc_uart(void)
 #define USDHC2_CD_GPIO	IMX_GPIO_NR(1, 4)
 #define USDHC2_WP_GPIO	IMX_GPIO_NR(1, 2)
 
-int tqma6_bb_board_mmc_getcd(struct mmc *mmc)
+int tqc_bb_board_mmc_getcd(struct mmc *mmc)
 {
 	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
 	int ret = 0;
@@ -176,7 +177,7 @@ int tqma6_bb_board_mmc_getcd(struct mmc *mmc)
 	return ret;
 }
 
-int tqma6_bb_board_mmc_getwp(struct mmc *mmc)
+int tqc_bb_board_mmc_getwp(struct mmc *mmc)
 {
 	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
 	int ret = 0;
@@ -205,7 +206,7 @@ static iomux_v3_cfg_t const mba6_usdhc2_pads[] = {
 	NEW_PAD_CTRL(MX6_PAD_GPIO_2__GPIO1_IO02,	GPIO_IN_PAD_CTRL),
 };
 
-int tqma6_bb_board_mmc_init(bd_t *bis)
+int tqc_bb_board_mmc_init(bd_t *bis)
 {
 	imx_iomux_v3_setup_multiple_pads(mba6_usdhc2_pads,
 					 ARRAY_SIZE(mba6_usdhc2_pads));
@@ -341,14 +342,14 @@ int board_get_dtt_bus(void)
 	return tqma6_get_system_i2c_bus();
 }
 
-int tqma6_bb_board_early_init_f(void)
+int tqc_bb_board_early_init_f(void)
 {
 	mba6_setup_iomuxc_uart();
 
 	return 0;
 }
 
-int tqma6_bb_board_init(void)
+int tqc_bb_board_init(void)
 {
 	mba6_setup_i2c();
 	/* do it here - to have reset completed */
@@ -357,7 +358,7 @@ int tqma6_bb_board_init(void)
 	return 0;
 }
 
-int tqma6_bb_board_late_init(void)
+int tqc_bb_board_late_init(void)
 {
 	int ret;
 	struct tqc_eeprom_data eedat;
@@ -369,7 +370,7 @@ int tqma6_bb_board_late_init(void)
 		setenv("usbethaddr", mac);
 		tqc_show_eeprom(&eedat, "MBA6");
 	} else {
-		printf("%s EEPROM: err %d\n", tqma6_bb_get_boardname(), ret);
+		printf("%s EEPROM: err %d\n", tqc_bb_get_boardname(), ret);
 	}
 
 	/*
@@ -423,7 +424,7 @@ int tqma6_bb_board_late_init(void)
 	return 0;
 }
 
-const char *tqma6_bb_get_boardname(void)
+const char *tqc_bb_get_boardname(void)
 {
 	return "MBa6x";
 }
@@ -453,7 +454,7 @@ int mmc_get_env_devno(void)
  * Device Tree Support
  */
 #if defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT)
-void tqma6_bb_ft_board_setup(void *blob, bd_t *bd)
+void tqc_bb_ft_board_setup(void *blob, bd_t *bd)
 {
 	int offset, len, chk;
 	const char *compatible, *expect;

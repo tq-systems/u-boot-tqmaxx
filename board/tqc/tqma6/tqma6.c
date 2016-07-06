@@ -2,7 +2,7 @@
  * Copyright (C) 2012 Freescale Semiconductor, Inc.
  * Author: Fabio Estevam <fabio.estevam@freescale.com>
  *
- * Copyright (C) 2013, 2014 TQ Systems (ported SabreSD to TQMa6x)
+ * Copyright (C) 2013, 2014 - 2016 TQ Systems (ported SabreSD to TQMa6x)
  * Author: Markus Niebel <markus.niebel@tq-group.com>
  *
  * SPDX-License-Identifier:	GPL-2.0+
@@ -26,8 +26,9 @@
 #include <power/pfuze100_pmic.h>
 #include <power/pmic.h>
 
+#include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
-#include "tqma6_bb.h"
+#include "tqma6_private.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -114,7 +115,7 @@ int board_mmc_getcd(struct mmc *mmc)
 		/* eMMC/uSDHC3 is always present */
 		ret = 1;
 	else
-		ret = tqma6_bb_board_mmc_getcd(mmc);
+		ret = tqc_bb_board_mmc_getcd(mmc);
 
 	return ret;
 }
@@ -128,7 +129,7 @@ int board_mmc_getwp(struct mmc *mmc)
 		/* eMMC/uSDHC3 is always present */
 		ret = 0;
 	else
-		ret = tqma6_bb_board_mmc_getwp(mmc);
+		ret = tqc_bb_board_mmc_getwp(mmc);
 
 	return ret;
 }
@@ -146,7 +147,7 @@ int board_mmc_init(bd_t *bis)
 			mmc_set_dsr(mmc, tqma6_emmc_dsr);
 	}
 
-	tqma6_bb_board_mmc_init(bis);
+	tqc_bb_board_mmc_init(bis);
 
 	return 0;
 }
@@ -276,7 +277,7 @@ static void tqma6_detect_enet_workaround(void)
 int board_early_init_f(void)
 {
 	tqma6_detect_enet_workaround();
-	return tqma6_bb_board_early_init_f();
+	return tqc_bb_board_early_init_f();
 }
 
 int board_init(void)
@@ -288,7 +289,7 @@ int board_init(void)
 	tqma6_iomuxc_spi();
 	tqma6_setup_i2c();
 
-	tqma6_bb_board_init();
+	tqc_bb_board_init();
 
 	return 0;
 }
@@ -360,7 +361,7 @@ int board_late_init(void)
 		printf("EEPROM: err %d\n", ret);
 	}
 
-	tqma6_bb_board_late_init();
+	tqc_bb_board_late_init();
 
 	return 0;
 }
@@ -368,7 +369,7 @@ int board_late_init(void)
 int checkboard(void)
 {
 	printf("Board: %s on a %s\n", tqma6_get_boardname(),
-	       tqma6_bb_get_boardname());
+	       tqc_bb_get_boardname());
 	puts("Enet workaround: ");
 	switch (tqma6_get_enet_workaround()) {
 	case 0:
@@ -396,7 +397,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 	char modelstr[MODELSTRLEN];
 
 	snprintf(modelstr, MODELSTRLEN, "TQ %s on %s", tqma6_get_boardname(),
-		 tqma6_bb_get_boardname());
+		 tqc_bb_get_boardname());
 	do_fixup_by_path_string(blob, "/", "model", modelstr);
 	fdt_fixup_memory(blob, (u64)PHYS_SDRAM, (u64)gd->ram_size);
 
@@ -419,7 +420,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 	do_fixup_by_path_u32(blob,
 			     "/soc/aips-bus@02100000/usdhc@02198000",
 			     "dsr", tqma6_emmc_dsr, 2);
-	tqma6_bb_ft_board_setup(blob, bd);
+	tqc_bb_ft_board_setup(blob, bd);
 
 	return 0;
 }
