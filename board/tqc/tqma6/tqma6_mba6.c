@@ -30,8 +30,8 @@
 #include <netdev.h>
 #include <spl.h>
 
+#include "../common/tqc_eeprom.h"
 #include "tqma6_bb.h"
-#include "tqma6_eeprom.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -360,14 +360,14 @@ int tqma6_bb_board_init(void)
 int tqma6_bb_board_late_init(void)
 {
 	int ret;
-	struct tqma6_eeprom_data eedat;
+	struct tqc_eeprom_data eedat;
 	char mac[17];
 
-	ret = tqma6_read_eeprom(tqma6_get_system_i2c_bus(), 0x57, &eedat);
+	ret = tqc_read_eeprom(tqma6_get_system_i2c_bus(), 0x57, &eedat);
 	if (!ret) {
-		tqma6_parse_eeprom_mac(&eedat, mac, ARRAY_SIZE(mac));
+		tqc_parse_eeprom_mac(&eedat, mac, ARRAY_SIZE(mac));
 		setenv("usbethaddr", mac);
-		tqma6_show_eeprom(&eedat, "MBA6");
+		tqc_show_eeprom(&eedat, "MBA6");
 	} else {
 		printf("%s EEPROM: err %d\n", tqma6_bb_get_boardname(), ret);
 	}

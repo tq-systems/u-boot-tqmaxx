@@ -26,8 +26,8 @@
 #include <power/pfuze100_pmic.h>
 #include <power/pmic.h>
 
+#include "../common/tqc_eeprom.h"
 #include "tqma6_bb.h"
-#include "tqma6_eeprom.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -337,25 +337,25 @@ int board_late_init(void)
 	int ret;
 	/* must hold largest field of eeprom data */
 	char safe_string[0x41];
-	struct tqma6_eeprom_data eedat;
+	struct tqc_eeprom_data eedat;
 
 	setenv("board_name", tqma6_get_boardname());
 
-	ret = tqma6_read_eeprom(tqma6_system_i2c_busnum,
+	ret = tqc_read_eeprom(tqma6_system_i2c_busnum,
 				CONFIG_SYS_I2C_EEPROM_ADDR, &eedat);
 	if (!ret) {
 		/* ID */
-		tqma6_parse_eeprom_id(&eedat, safe_string,
+		tqc_parse_eeprom_id(&eedat, safe_string,
 				      ARRAY_SIZE(safe_string));
 		if (0 == strncmp(safe_string, "TQMa6", 5))
 			setenv("boardtype", safe_string);
-		if (0 == tqma6_parse_eeprom_serial(&eedat, safe_string,
+		if (0 == tqc_parse_eeprom_serial(&eedat, safe_string,
 						   ARRAY_SIZE(safe_string)))
 			setenv("serial#", safe_string);
 		else
 			setenv("serial#", "???");
 
-		tqma6_show_eeprom(&eedat, "TQMa6");
+		tqc_show_eeprom(&eedat, "TQMa6");
 	} else {
 		printf("EEPROM: err %d\n", ret);
 	}

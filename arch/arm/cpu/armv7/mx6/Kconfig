@@ -38,6 +38,7 @@ config TARGET_SECOMX6
 config TARGET_TQMA6
 	bool "TQ Systems TQMa6 board"
 	select CPU_V7
+	select TQC_EEPROM
 
 endchoice
 

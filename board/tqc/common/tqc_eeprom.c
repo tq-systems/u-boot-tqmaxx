@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 TQ Systems GmbH
+ * Copyright (C) 2014 - 2016 TQ Systems GmbH
  * Markus Niebel <Markus.Niebel@tq-group.com>
  *
  * SPDX-License-Identifier:	GPL-2.0+
@@ -10,10 +10,10 @@
 #include <malloc.h>
 #include <linux/ctype.h>
 
-#include "tqma6_eeprom.h"
+#include "tqc_eeprom.h"
 
-int tqma6_parse_eeprom_mac(struct tqma6_eeprom_data *eeprom, char *buf,
-			   size_t len)
+int tqc_parse_eeprom_mac(struct tqc_eeprom_data *eeprom, char *buf,
+			 size_t len)
 {
 	u8 *p;
 	int ret;
@@ -32,8 +32,8 @@ int tqma6_parse_eeprom_mac(struct tqma6_eeprom_data *eeprom, char *buf,
 	return 0;
 }
 
-int tqma6_parse_eeprom_serial(struct tqma6_eeprom_data *eeprom, char *buf,
-			      size_t len)
+int tqc_parse_eeprom_serial(struct tqc_eeprom_data *eeprom, char *buf,
+			    size_t len)
 {
 	unsigned i;
 
@@ -52,8 +52,8 @@ int tqma6_parse_eeprom_serial(struct tqma6_eeprom_data *eeprom, char *buf,
 	return 0;
 }
 
-int tqma6_parse_eeprom_id(struct tqma6_eeprom_data *eeprom, char *buf,
-			  size_t len)
+int tqc_parse_eeprom_id(struct tqc_eeprom_data *eeprom, char *buf,
+			size_t len)
 {
 	unsigned i;
 
@@ -73,7 +73,7 @@ int tqma6_parse_eeprom_id(struct tqma6_eeprom_data *eeprom, char *buf,
 /*
  * show_eeprom - display the contents of the module EEPROM
  */
-int tqma6_show_eeprom(struct tqma6_eeprom_data *eeprom, const char *id)
+int tqc_show_eeprom(struct tqc_eeprom_data *eeprom, const char *id)
 {
 	/* must hold largest field of eeprom data */
 	char safe_string[0x41];
@@ -84,7 +84,7 @@ int tqma6_show_eeprom(struct tqma6_eeprom_data *eeprom, const char *id)
 	puts(id);
 	puts(" EEPROM:\n");
 	/* ID */
-	tqma6_parse_eeprom_id(eeprom, safe_string,
+	tqc_parse_eeprom_id(eeprom, safe_string,
 			      ARRAY_SIZE(safe_string));
 	if (0 == strncmp(safe_string, id, strlen(id)))
 		printf("  ID: %s\n", safe_string);
@@ -92,13 +92,13 @@ int tqma6_show_eeprom(struct tqma6_eeprom_data *eeprom, const char *id)
 		puts("  unknown hardware variant\n");
 
 	/* Serial number */
-	if (0 == tqma6_parse_eeprom_serial(eeprom, safe_string,
+	if (0 == tqc_parse_eeprom_serial(eeprom, safe_string,
 					   ARRAY_SIZE(safe_string)))
 		printf("  SN: %s\n", safe_string);
 	else
 		puts("  unknown serial number\n");
 	/* MAC address */
-	if (0 == tqma6_parse_eeprom_mac(eeprom, safe_string,
+	if (0 == tqc_parse_eeprom_mac(eeprom, safe_string,
 					ARRAY_SIZE(safe_string)))
 		printf("  MAC: %s\n", safe_string);
 	else
@@ -110,8 +110,8 @@ int tqma6_show_eeprom(struct tqma6_eeprom_data *eeprom, const char *id)
 /*
  * read_eeprom - read the given EEPROM into memory
  */
-int tqma6_read_eeprom(unsigned int bus, unsigned int addr,
-		      struct tqma6_eeprom_data *eeprom)
+int tqc_read_eeprom(unsigned int bus, unsigned int addr,
+		    struct tqc_eeprom_data *eeprom)
 {
 	int ret;
 	unsigned int oldbus;
