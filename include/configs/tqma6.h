@@ -476,6 +476,12 @@
 
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 
+#if !defined(CONFIG_SYS_BOOTM_LEN) || (CONFIG_SYS_BOOTM_LEN < SZ_16M)
+#undef CONFIG_SYS_BOOTM_LEN
+#define CONFIG_SYS_BOOTM_LEN		SZ_16M
+#endif
+
+
 /* FLASH and environment organization */
 #define CONFIG_SYS_NO_FLASH
 
