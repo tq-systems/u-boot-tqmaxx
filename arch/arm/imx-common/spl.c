@@ -58,6 +58,48 @@ u32 spl_boot_device(void)
 	}
 	return BOOT_DEVICE_NONE;
 }
+
+/* determine boot device instance from SRC_SBMR1 register */
+u32 spl_boot_device_instance(void)
+{
+	struct src *psrc = (struct src *)SRC_BASE_ADDR;
+	unsigned reg = readl(&psrc->sbmr1);
+
+	/* BOOT_CFG1[7:4] - see IMX6DQRM Table 8-8 */
+	switch ((reg & 0x000000FF) >> 4) {
+	 /* EIM: See 8.5.1, Table 8-9 */
+	case 0x0:
+		return 0;
+		break;
+	/* SATA: See 8.5.4, Table 8-20 */
+	case 0x2:
+		return 0;
+	/* Serial ROM: See 8.5.5.1, Table 8-22 */
+	case 0x3:
+		/* BOOT_CFG4[2:0] */
+		switch ((reg & 0x07000000) >> 24) {
+		case 0x0 ... 0x4:
+			return (reg & 0x07000000) >> 24;
+		case 0x5 ... 0x7:
+			return ((reg & 0x07000000) >> 24) - 5;
+		}
+		break;
+	/* SD/eSD: 8.5.3, Table 8-15  */
+	case 0x4:
+	case 0x5:
+		return (reg >> 11) & 0x03;
+		break;
+	/* MMC/eMMC: 8.5.3 */
+	case 0x6:
+	case 0x7:
+		return (reg >> 11) & 0x03;
+		break;
+	/* NAND Flash: 8.5.2 */
+	case 0x8 ... 0xf:
+		return 0;
+	}
+	return 0xffffffff;
+}
 #endif
 
 #if defined(CONFIG_SPL_MMC_SUPPORT)
