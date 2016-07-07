@@ -42,6 +42,9 @@ extern int dtt_init_one(int);
 extern int dtt_read(int sensor, int reg);
 extern int dtt_write(int sensor, int reg, int val);
 extern int dtt_get_temp(int sensor);
+
+int board_get_dtt_bus(void);
+
 #endif
 
 #endif /* _DTT_H_ */

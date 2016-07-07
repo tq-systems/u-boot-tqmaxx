@@ -16,6 +16,13 @@
 #if defined CONFIG_DTT_SENSORS
 static unsigned long sensor_initialized;
 
+__weak int board_get_dtt_bus(void)
+{
+	return CONFIG_SYS_DTT_BUS_NUM;
+}
+
+#undef CONFIG_SYS_DTT_BUS_NUM
+
 static void _initialize_dtt(void)
 {
 	int i;
@@ -38,7 +45,7 @@ void dtt_init(void)
 
 	/* switch to correct I2C bus */
 	old_bus = I2C_GET_BUS();
-	I2C_SET_BUS(CONFIG_SYS_DTT_BUS_NUM);
+	I2C_SET_BUS(board_get_dtt_bus());
 
 	_initialize_dtt();
 
@@ -59,10 +66,10 @@ int dtt_i2c(void)
 	/* switch to correct I2C bus */
 #ifdef CONFIG_SYS_I2C
 	old_bus = i2c_get_bus_num();
-	i2c_set_bus_num(CONFIG_SYS_DTT_BUS_NUM);
+	i2c_set_bus_num(board_get_dtt_bus());
 #else
 	old_bus = I2C_GET_BUS();
-	I2C_SET_BUS(CONFIG_SYS_DTT_BUS_NUM);
+	I2C_SET_BUS(board_get_dtt_bus());
 #endif
 
 	_initialize_dtt();
