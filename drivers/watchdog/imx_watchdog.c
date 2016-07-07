@@ -33,7 +33,7 @@ void hw_watchdog_init(void)
 #define CONFIG_WATCHDOG_TIMEOUT_MSECS 128000
 #endif
 	timeout = (CONFIG_WATCHDOG_TIMEOUT_MSECS / 500) - 1;
-	writew(WCR_WDZST | WCR_WDBG | WCR_WDE | WCR_WDT | WCR_SRS |
+	writew(WCR_WDZST | WCR_WDBG | WCR_WDE | WCR_WDT | WCR_SRS | WCR_WDA |
 		SET_WCR_WT(timeout), &wdog->wcr);
 	hw_watchdog_reset();
 }
