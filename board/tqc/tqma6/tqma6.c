@@ -27,6 +27,7 @@
 #include <power/pmic.h>
 
 #include "tqma6_bb.h"
+#include "tqma6_eeprom.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -235,6 +236,8 @@ int board_late_init(void)
 {
 	struct pmic *p;
 	u32 reg;
+	int ret;
+	struct tqma6_eeprom_data eedat;
 
 	setenv("board_name", tqma6_get_boardname());
 
@@ -249,6 +252,12 @@ int board_late_init(void)
 		pmic_reg_read(p, PFUZE100_DEVICEID, &reg);
 		printf("PMIC: PFUZE100 ID=0x%02x\n", reg);
 	}
+
+	ret = tqma6_read_eeprom(2, CONFIG_SYS_I2C_EEPROM_ADDR, &eedat);
+	if (!ret)
+		tqma6_show_eeprom(&eedat, "TQM");
+	else
+		printf("EEPROM: err %d\n", ret);
 
 	tqma6_bb_board_late_init();
 
