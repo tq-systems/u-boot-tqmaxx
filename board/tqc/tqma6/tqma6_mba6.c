@@ -360,6 +360,15 @@ const char *tqma6_bb_get_boardname(void)
 	return "MBa6x";
 }
 
+int board_mmc_get_env_dev(int devno)
+{
+	/*
+	 * eMMC:	USDHC3 -> 0
+	 * SD:		USDHC1 -> 1
+	 */
+	return (2 == devno) ? 0 : 1;
+}
+
 /*
  * Device Tree Support
  */
