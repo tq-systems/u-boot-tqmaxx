@@ -8,14 +8,15 @@
  */
 
 #include <common.h>
+#include <asm/imx-common/boot_device.h>
 #include <asm/io.h>
 #include <asm/arch/imx-regs.h>
 #include <asm/spl.h>
 #include <spl.h>
 
 #if defined(CONFIG_MX6)
-/* determine boot device from SRC_SBMR1 (BOOT_CFG[4:1]) or SRC_GPR9 register */
-u32 spl_boot_device(void)
+/* determine boot device from SRC_SBMR1 register (BOOT_CFG[4:1]) */
+u32 imx_boot_device(void)
 {
 	struct src *psrc = (struct src *)SRC_BASE_ADDR;
 	unsigned int gpr10_boot = readl(&psrc->gpr10) & (1 << 28);
@@ -60,7 +61,7 @@ u32 spl_boot_device(void)
 }
 
 /* determine boot device instance from SRC_SBMR1 register */
-u32 spl_boot_device_instance(void)
+u32 imx_boot_device_instance(void)
 {
 	struct src *psrc = (struct src *)SRC_BASE_ADDR;
 	unsigned reg = readl(&psrc->sbmr1);
@@ -102,6 +103,18 @@ u32 spl_boot_device_instance(void)
 }
 #endif
 
+#if defined(CONFIG_SPL_BUILD)
+
+u32 spl_boot_device(void)
+{
+	return imx_boot_device();
+}
+
+u32 spl_boot_device_instance(void)
+{
+	return imx_boot_device_instance();
+}
+
 #if defined(CONFIG_SPL_MMC_SUPPORT)
 /* called from spl_mmc to see type of boot mode for storage (RAW or FAT) */
 u32 spl_boot_mode(void)
@@ -124,3 +137,5 @@ u32 spl_boot_mode(void)
 	}
 }
 #endif
+
+#endif /* CONFIG_BUILD_SPL */

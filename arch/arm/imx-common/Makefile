@@ -26,7 +26,7 @@ obj-$(CONFIG_SYSCOUNTER_TIMER) += syscounter.o
 endif
 ifeq ($(SOC),$(filter $(SOC),mx7 mx6 mxs))
 obj-y	+= misc.o
-obj-$(CONFIG_SPL_BUILD)	+= spl.o
+obj-y	+= spl.o
 endif
 ifeq ($(SOC),$(filter $(SOC),mx6))
 obj-$(CONFIG_CMD_SATA) += sata.o
