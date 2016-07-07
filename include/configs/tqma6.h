@@ -9,8 +9,6 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-#define CONFIG_MX6
-
 /* SPL */
 /* #if defined(CONFIG_SPL_BUILD) */
 
