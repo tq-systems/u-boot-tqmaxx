@@ -32,6 +32,8 @@
 
 #include "mx6_common.h"
 
+#undef CONFIG_LDO_BYPASS_CHECK
+
 #if defined(CONFIG_MX6DL) || defined(CONFIG_MX6S)
 #define PHYS_SDRAM_SIZE			(512u * SZ_1M)
 #elif defined(CONFIG_MX6Q) || defined(CONFIG_MX6D)
