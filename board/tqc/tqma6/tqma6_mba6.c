@@ -331,6 +331,16 @@ int board_eth_init(bd_t *bis)
 	return 0;
 }
 
+int board_get_rtc_bus(void)
+{
+	return tqma6_get_system_i2c_bus();
+}
+
+int board_get_dtt_bus(void)
+{
+	return tqma6_get_system_i2c_bus();
+}
+
 int tqma6_bb_board_early_init_f(void)
 {
 	mba6_setup_iomuxc_uart();
