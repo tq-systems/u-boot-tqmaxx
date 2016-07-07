@@ -126,6 +126,10 @@ static int ksz90xx_startup(struct phy_device *phydev)
 	return 0;
 }
 
+#define CTRL1000_PREFER_MASTER		(1 << 10)
+#define CTRL1000_CONFIG_MASTER		(1 << 11)
+#define CTRL1000_MANUAL_CONFIG		(1 << 12)
+
 #ifdef CONFIG_PHY_MICREL_KSZ9021
 /*
  * KSZ9021
@@ -135,10 +139,6 @@ static int ksz90xx_startup(struct phy_device *phydev)
 #define MII_KSZ9021_EXTENDED_CTRL	0x0b
 #define MII_KSZ9021_EXTENDED_DATAW	0x0c
 #define MII_KSZ9021_EXTENDED_DATAR	0x0d
-
-#define CTRL1000_PREFER_MASTER		(1 << 10)
-#define CTRL1000_CONFIG_MASTER		(1 << 11)
-#define CTRL1000_MANUAL_CONFIG		(1 << 12)
 
 int ksz9021_phy_extended_write(struct phy_device *phydev, int regnum, u16 val)
 {
@@ -256,13 +256,40 @@ static int ksz9031_phy_extwrite(struct phy_device *phydev, int addr,
 					 MII_KSZ9031_MOD_DATA_POST_INC_RW, val);
 };
 
+/* config handler for errata workaround */
+static int ksz9031_config(struct phy_device *phydev)
+{
+	unsigned ctrl1000 = 0;
+	const unsigned master = CTRL1000_PREFER_MASTER |
+			CTRL1000_CONFIG_MASTER | CTRL1000_MANUAL_CONFIG;
+	unsigned features = phydev->drv->features;
+
+	if (getenv("disable_giga"))
+		features &= ~(SUPPORTED_1000baseT_Half |
+				SUPPORTED_1000baseT_Full);
+	/* force master mode for 1000BaseT due to chip errata */
+	if (features & SUPPORTED_1000baseT_Half)
+		ctrl1000 |= ADVERTISE_1000HALF | master;
+	if (features & SUPPORTED_1000baseT_Full)
+		ctrl1000 |= ADVERTISE_1000FULL | master;
+	/* disable async pause due to chip errata */
+	features &= ~ADVERTISE_PAUSE_ASYM;
+	/* update feature support and forward to advertised features */
+	phydev->supported = features;
+	phydev->advertising = phydev->supported;
+
+	phy_write(phydev, MDIO_DEVAD_NONE, MII_CTRL1000, ctrl1000);
+	genphy_config_aneg(phydev);
+	genphy_restart_aneg(phydev);
+	return 0;
+}
 
 static struct phy_driver ksz9031_driver = {
 	.name = "Micrel ksz9031",
 	.uid  = 0x221620,
 	.mask = 0xfffff0,
 	.features = PHY_GBIT_FEATURES,
-	.config   = &genphy_config,
+	.config   = &ksz9031_config,
 	.startup  = &ksz90xx_startup,
 	.shutdown = &genphy_shutdown,
 	.writeext = &ksz9031_phy_extwrite,
