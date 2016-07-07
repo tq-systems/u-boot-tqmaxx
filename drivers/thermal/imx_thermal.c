@@ -16,6 +16,7 @@
 #include <asm/arch/sys_proto.h>
 #include <dm.h>
 #include <errno.h>
+#include <linux/math64.h>
 #include <malloc.h>
 #include <thermal.h>
 #include <imx_thermal.h>
@@ -49,6 +50,7 @@ static int read_cpu_temperature(struct udevice *dev)
 	int t1, n1;
 	u64 c1, c2;
 	u64 temp64;
+	s64 diff;
 
 	/*
 	 * Sensor data layout:
@@ -115,7 +117,8 @@ static int read_cpu_temperature(struct udevice *dev)
 	writel(TEMPSENSE0_FINISHED, &anatop->tempsense0_clr);
 
 	/* Tmeas = (c2 - Nmeas * c1 + OFFSET) / 1000000 */
-	temperature = lldiv(c2 - n_meas * c1 + OFFSET, 1000000);
+	diff = (s64)c2 - (s64)(n_meas * c1)  + (s64)(OFFSET);
+	temperature = div_s64(diff, 1000000);
 
 	/* power down anatop thermal sensor */
 	writel(TEMPSENSE0_POWER_DOWN, &anatop->tempsense0_set);
