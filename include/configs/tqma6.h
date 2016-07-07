@@ -31,14 +31,6 @@
 #include <asm/imx-common/gpio.h>
 #include <linux/sizes.h>
 
-#if defined(CONFIG_TQMA6S)
-#define PHYS_SDRAM_SIZE			(512u * SZ_1M)
-#elif defined(CONFIG_TQMA6DL)
-#define PHYS_SDRAM_SIZE			(SZ_1G)
-#elif defined(CONFIG_TQMA6Q)
-#define PHYS_SDRAM_SIZE			(SZ_1G)
-#endif
-
 #define CONFIG_DISPLAY_CPUINFO
 #define CONFIG_DISPLAY_BOARDINFO
 #define CONFIG_SYS_GENERIC_BOARD
