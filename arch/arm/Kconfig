@@ -461,6 +461,10 @@ config ARCH_MX5
 	bool "Freescale MX5"
 	select CPU_V7
 
+config ARCH_MX7
+	bool "Freescale MX7"
+	select CPU_V7
+
 config TARGET_M53EVK
 	bool "Support m53evk"
 	select CPU_V7
