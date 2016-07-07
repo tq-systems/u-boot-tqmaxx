@@ -1,0 +1,72 @@
+if TARGET_TQMA7
+
+config SYS_BOARD
+	default "tqma7"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_SOC
+	default "mx7"
+
+config SYS_CONFIG_NAME
+	default "tqma7"
+
+choice
+	prompt "TQMa7 SoC variant"
+	default TQMA7D
+	help
+	  select the TQMa7 module variant. The variants differing in the used
+	  i.MX7 CPU type
+
+config TQMA7D
+	bool "TQMa7D"
+	select MX7D
+	help
+	  FIXME
+
+config TQMA7S
+	bool "TQMa7S"
+	select MX7
+	help
+	  select TQMa7S with i.MX7S
+
+endchoice
+
+choice
+	prompt "TQMa7 boot configuration"
+	default TQMA7_MMC_BOOT
+	help
+	  Configure boot device. This is also used to implement environment
+	  location.
+
+config TQMA7_MMC_BOOT
+	bool "MMC / SD Boot"
+	help
+	  Boot from eMMC / SD Card
+
+config TQMA7_QSPI_BOOT
+	bool "QSPI NOR Boot"
+	help
+	  Boot from on board QSPI NOR flash
+
+endchoice
+
+choice
+	prompt "TQMa7 base board variant"
+	default MBA7
+
+config MBA7
+	bool "TQMa7 on MBa7 Starterkit"
+	help
+	  Select the MBa7 starterkit.
+
+endchoice
+
+config IMX_CONFIG
+	default "board/tqc/tqma7/tqma7d.cfg" if TQMA7D
+	default "board/tqc/tqma7/tqma7s.cfg" if TQMA7
+
+source "board/tqc/common/Kconfig"
+
+endif

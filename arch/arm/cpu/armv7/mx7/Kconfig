@@ -1,0 +1,30 @@
+if ARCH_MX7
+
+config MX7
+	bool
+	select ROM_UNIFIED_SECTIONS
+	default y
+
+config MX7D
+	select ROM_UNIFIED_SECTIONS
+	bool
+
+choice
+	prompt "MX7 board select"
+	optional
+
+
+config TARGET_TQMA7
+	bool "tqma7"
+	select MX7D
+	select TQC_EEPROM
+
+endchoice
+
+config SYS_SOC
+	default "mx7"
+
+source "board/tqc/tqma7/Kconfig"
+
+endif
+
