@@ -34,14 +34,6 @@
 
 #undef CONFIG_LDO_BYPASS_CHECK
 
-#if defined(CONFIG_TQMA6S)
-#define PHYS_SDRAM_SIZE			(512u * SZ_1M)
-#elif defined(CONFIG_TQMA6DL)
-#define PHYS_SDRAM_SIZE			(SZ_1G)
-#elif defined(CONFIG_TQMA6Q)
-#define PHYS_SDRAM_SIZE			(SZ_1G)
-#endif
-
 #define CONFIG_BOARD_EARLY_INIT_F
 #define CONFIG_BOARD_LATE_INIT
 
