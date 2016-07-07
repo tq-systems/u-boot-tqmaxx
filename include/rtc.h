@@ -87,4 +87,9 @@ void rtc_write32(int reg, u32 value);
  */
 void rtc_init(void);
 
+/**
+ * board_get_rtc_bus() - query i2c bus num for RTC (optional)
+ */
+int board_get_rtc_bus(void);
+
 #endif	/* _RTC_H_ */
