@@ -197,8 +197,8 @@
 	"update_uboot=if tftp ${uboot}; then "                                 \
 		"if itest ${filesize} > 0; then "                              \
 			"mmc dev ${mmcdev}; mmc rescan; "                      \
-			"setexpr blkc ${filesize} / 0x200; "                   \
-			"setexpr blkc ${blkc} + 1; "                           \
+			"setexpr blkc ${filesize} + 0x1ff; "                   \
+			"setexpr blkc ${blkc} / 0x200; "                           \
 			"if itest ${blkc} <= ${uboot_size}; then "             \
 				"mmc write ${loadaddr} ${uboot_start} "        \
 					"${blkc}; "                            \
@@ -209,8 +209,8 @@
 		"if tftp ${kernel}; then "                                     \
 			"if itest ${filesize} > 0; then "                      \
 				"mmc dev ${mmcdev}; mmc rescan; "              \
-				"setexpr blkc ${filesize} / 0x200; "           \
-				"setexpr blkc ${blkc} + 1; "                   \
+				"setexpr blkc ${filesize} + 0x1ff; "                   \
+				"setexpr blkc ${blkc} / 0x200; "                           \
 				"if itest ${blkc} <= ${kernel_size}; then "    \
 					"mmc write ${loadaddr} "               \
 						"${kernel_start} ${blkc}; "    \
@@ -221,8 +221,8 @@
 	"update_fdt=run fdt_name; if tftp ${fdtimg}; then "                    \
 		"if itest ${filesize} > 0; then "                              \
 			"mmc dev ${mmcdev}; mmc rescan; "                      \
-			"setexpr blkc ${filesize} / 0x200; "                   \
-			"setexpr blkc ${blkc} + 1; "                           \
+			"setexpr blkc ${filesize} + 0x1ff; "                   \
+			"setexpr blkc ${blkc} / 0x200; "                           \
 			"if itest ${blkc} <= ${fdt_size}; then "               \
 				"mmc write ${loadaddr} ${fdt_start} ${blkc}; " \
 			"fi; "                                                 \
