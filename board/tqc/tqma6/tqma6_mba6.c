@@ -16,6 +16,7 @@
 #include <asm/arch/sys_proto.h>
 #include <asm/errno.h>
 #include <asm/gpio.h>
+#include <asm/imx-common/boot_mode.h>
 #include <asm/imx-common/mxc_i2c.h>
 
 #include <common.h>
@@ -352,6 +353,45 @@ int tqma6_bb_board_init(void)
 
 int tqma6_bb_board_late_init(void)
 {
+	/*
+	* try to get sd card slots in order:
+	* eMMC: on Module
+	* -> therefore index 0 for bootloader
+	* index n in kernel (controller instance 3) -> patches needed for
+	* alias indexing
+	* SD2: on Mainboard
+	* index n in kernel (controller instance 2) -> patches needed for
+	* alias indexing
+	* we assume to have a kernel patch that will present mmcblk dev
+	* indexed like controller devs
+	*/
+	puts("Boot:\t");
+	switch (get_boot_device()) {
+	case MMC3_BOOT:
+		setenv("boot_dev", "mmc");
+		/* eMMC (USDHC3)*/
+		setenv("mmcblkdev", "0");
+		setenv("mmcdev", "0");
+		break;
+	case SD2_BOOT:
+		setenv("boot_dev", "mmc");
+		/* ext SD (USDHC2)*/
+		setenv("mmcblkdev", "1");
+		setenv("mmcdev", "1");
+		break;
+	case SPI_NOR_BOOT:
+		setenv("boot_dev", "spi");
+		/* mmcdev is dev index for u-boot */
+		setenv("mmcdev", "0");
+		/* mmcblkdev is dev index for linux env */
+		setenv("mmcblkdev", "0");
+		break;
+	default:
+		puts("unhandled boot device\n");
+		setenv("mmcblkdev", "");
+		setenv("mmcdev", "");
+	}
+
 	return 0;
 }
 
