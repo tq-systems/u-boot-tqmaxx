@@ -229,4 +229,9 @@ int rtc_to_tm(int time_t, struct rtc_time *time);
  */
 unsigned long rtc_mktime(const struct rtc_time *time);
 
+/**
+ * board_get_rtc_bus() - query i2c bus num for RTC (optional)
+ */
+int board_get_rtc_bus(void);
+
 #endif	/* _RTC_H_ */
