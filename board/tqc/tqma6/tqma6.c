@@ -392,12 +392,28 @@ int checkboard(void)
 #define MODELSTRLEN 32u
 int ft_board_setup(void *blob, bd_t *bd)
 {
+	int off;
 	char modelstr[MODELSTRLEN];
 
 	snprintf(modelstr, MODELSTRLEN, "TQ %s on %s", tqma6_get_boardname(),
 		 tqma6_bb_get_boardname());
 	do_fixup_by_path_string(blob, "/", "model", modelstr);
 	fdt_fixup_memory(blob, (u64)PHYS_SDRAM, (u64)gd->ram_size);
+
+	if (MXC_CPU_MX6SOLO == (((get_cpu_rev() & 0xFF000) >> 12))) {
+		off = fdt_node_offset_by_prop_value(blob, -1,
+						    "device_type",
+						    "cpu", 4);
+		while (off != -FDT_ERR_NOTFOUND) {
+			u32 *reg = (u32 *)fdt_getprop(blob, off, "reg", 0);
+			if (*reg > 0) {
+				fdt_del_node(blob, off);
+			}
+			off = fdt_node_offset_by_prop_value(blob, off,
+							    "device_type",
+							    "cpu", 4);
+		}
+	}
 
 	/* bring in eMMC dsr settings */
 	do_fixup_by_path_u32(blob,
