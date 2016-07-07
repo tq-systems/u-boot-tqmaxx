@@ -367,7 +367,7 @@ int tqma6_bb_board_late_init(void)
 	if (!ret) {
 		tqma6_parse_eeprom_mac(&eedat, mac, ARRAY_SIZE(mac));
 		setenv("usbethaddr", mac);
-		tqma6_show_eeprom(&eedat, tqma6_bb_get_boardname());
+		tqma6_show_eeprom(&eedat, "MBA6");
 	} else {
 		printf("%s EEPROM: err %d\n", tqma6_bb_get_boardname(), ret);
 	}
