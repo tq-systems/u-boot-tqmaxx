@@ -25,6 +25,9 @@
 /* #endif */
 
 #include "mx6_common.h"
+
+#undef CONFIG_LDO_BYPASS_CHECK
+
 #include <asm/arch/imx-regs.h>
 #include <asm/imx-common/gpio.h>
 #include <linux/sizes.h>
