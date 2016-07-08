@@ -15,6 +15,8 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#define BIT(x)			(1 << (x))
+
 /* TI DP83867 */
 #define DP83867_DEVADDR		0x1f
 
