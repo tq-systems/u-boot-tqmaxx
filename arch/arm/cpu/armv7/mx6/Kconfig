@@ -40,6 +40,11 @@ config TARGET_TQMA6
 	select CPU_V7
 	select TQC_EEPROM
 
+config TARGET_TQMA6UL
+	bool "TQ Systems TQMa6UL board"
+	select CPU_V7
+	select TQC_EEPROM
+
 endchoice
 
 config SYS_SOC
@@ -47,5 +52,6 @@ config SYS_SOC
 
 source "board/seco/Kconfig"
 source "board/tqc/tqma6/Kconfig"
+source "board/tqc/tqma6ul/Kconfig"
 
 endif

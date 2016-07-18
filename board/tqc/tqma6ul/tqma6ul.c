@@ -1,0 +1,327 @@
+/*
+ * Copyright (C) 2016 TQ Systems
+ * Author: Marco Felsch <Marco.Felsch@tq-group.com>
+ *
+ * SPDX-License-Identifier:	GPL-2.0+
+ */
+
+#include <asm/arch/clock.h>
+#include <asm/arch/crm_regs.h>
+#include <asm/arch/imx-regs.h>
+#include <asm/arch/mx6-pins.h>
+#include <asm/arch/sys_proto.h>
+#include <asm/errno.h>
+#include <asm/gpio.h>
+#include <asm/imx-common/iomux-v3.h>
+#include <asm/imx-common/boot_mode.h>
+#include <asm/imx-common/mxc_i2c.h>
+#include <asm/imx-common/spi.h>
+#include <asm/io.h>
+#include <common.h>
+#include <fsl_esdhc.h>
+#include <i2c.h>
+#include <libfdt.h>
+#include <linux/sizes.h>
+#include <mmc.h>
+#include <miiphy.h>
+#include <netdev.h>
+#include <power/pfuze3000_pmic.h>
+#include <power/pmic.h>
+
+#include "../common/tqc_bb.h"
+#include "../common/tqc_eeprom.h"
+
+DECLARE_GLOBAL_DATA_PTR;
+
+/* TODO: check drive strength and pin config with hardware */
+
+#define USDHC_CLK_PAD_CTRL (PAD_CTL_PUS_47K_UP  | PAD_CTL_SPEED_LOW |	\
+	PAD_CTL_DSE_40ohm   | PAD_CTL_SRE_FAST  | PAD_CTL_HYS)
+
+#define USDHC_PAD_CTRL (PAD_CTL_PUS_47K_UP  | PAD_CTL_SPEED_LOW |	\
+	PAD_CTL_DSE_80ohm   | PAD_CTL_SRE_FAST  | PAD_CTL_HYS)
+
+#define GPIO_OUT_PAD_CTRL  (PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_LOW |	\
+	PAD_CTL_DSE_40ohm   | PAD_CTL_HYS)
+
+#define GPIO_IN_PAD_CTRL  (PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_LOW |	\
+	PAD_CTL_DSE_40ohm   | PAD_CTL_HYS)
+
+#define I2C_PAD_CTRL	(PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_MED |	\
+	PAD_CTL_DSE_80ohm | PAD_CTL_HYS | PAD_CTL_ODE | 		\
+	PAD_CTL_SRE_FAST)
+
+#define QSPI_PAD_CTRL	(PAD_CTL_SRE_FAST | PAD_CTL_SPEED_MED |		\
+	PAD_CTL_PKE | PAD_CTL_PUE | PAD_CTL_PUS_47K_UP |		\
+	PAD_CTL_DSE_120ohm)
+
+static const uint16_t tqma6ul_emmc_dsr = 0x0100;
+
+int dram_init(void)
+{
+	gd->ram_size = PHYS_SDRAM_SIZE;
+
+	return 0;
+}
+
+/* eMMC on USDHCI3 always present */
+static iomux_v3_cfg_t const tqma6ul_usdhc2_pads[] = {
+	NEW_PAD_CTRL(MX6_PAD_NAND_RE_B__USDHC2_CLK,	USDHC_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_NAND_WE_B__USDHC2_CMD,	USDHC_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_NAND_DATA00__USDHC2_DATA0,	USDHC_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_NAND_DATA01__USDHC2_DATA1,	USDHC_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_NAND_DATA02__USDHC2_DATA2,	USDHC_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_NAND_DATA03__USDHC2_DATA3,	USDHC_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_NAND_DATA04__USDHC2_DATA4,	USDHC_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_NAND_DATA05__USDHC2_DATA5,	USDHC_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_NAND_DATA06__USDHC2_DATA6,	USDHC_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_NAND_DATA07__USDHC2_DATA7,	USDHC_PAD_CTRL),
+	/* eMMC reset */
+	/* TODO: should we mux it as GPIO ? */
+	NEW_PAD_CTRL(MX6_PAD_NAND_ALE__USDHC2_RESET_B,	USDHC_PAD_CTRL),
+};
+
+/*
+ * According to board_mmc_init() the following map is done:
+ * (U-boot device node)    (Physical Port)
+ * mmc0                    eMMC (SD2) on TQMa6UL
+ * mmc1 .. n               optional slots used on baseboard
+ */
+struct fsl_esdhc_cfg tqma6ul_usdhc_cfg = {
+	.esdhc_base = USDHC2_BASE_ADDR,
+	.max_bus_width = 8,
+};
+
+int board_mmc_getcd(struct mmc *mmc)
+{
+	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
+	int ret = 0;
+
+	if (cfg->esdhc_base == USDHC2_BASE_ADDR)
+		/* eMMC/uSDHC2 is always present */
+		ret = 1;
+	else
+		ret = tqc_bb_board_mmc_getcd(mmc);
+
+	return ret;
+}
+
+int board_mmc_getwp(struct mmc *mmc)
+{
+	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
+	int ret = 0;
+
+	if (cfg->esdhc_base == USDHC2_BASE_ADDR)
+		/* eMMC/uSDHC2 is always present */
+		ret = 0;
+	else
+		ret = tqc_bb_board_mmc_getwp(mmc);
+
+	return ret;
+}
+
+int board_mmc_init(bd_t *bis)
+{
+	imx_iomux_v3_setup_multiple_pads(tqma6ul_usdhc2_pads,
+					 ARRAY_SIZE(tqma6ul_usdhc2_pads));
+	tqma6ul_usdhc_cfg.sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
+	if (fsl_esdhc_initialize(bis, &tqma6ul_usdhc_cfg)) {
+		puts("Warning: failed to initialize eMMC dev\n");
+	} else {
+		struct mmc *mmc = find_mmc_device(0);
+		if (mmc)
+			mmc_set_dsr(mmc, tqma6ul_emmc_dsr);
+	}
+
+	tqc_bb_board_mmc_init(bis);
+
+	return 0;
+}
+
+static struct i2c_pads_info tqma6ul_i2c1_pads = {
+	/* I2C4: on board LM75, M24C64, */
+	.scl = {
+		.i2c_mode = NEW_PAD_CTRL(MX6_PAD_UART2_TX_DATA__I2C4_SCL,
+					 I2C_PAD_CTRL),
+		.gpio_mode = NEW_PAD_CTRL(MX6_PAD_UART2_TX_DATA__GPIO1_IO20,
+					  I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(1, 20)
+	},
+	.sda = {
+		.i2c_mode = NEW_PAD_CTRL(MX6_PAD_UART2_RX_DATA__I2C4_SDA,
+					 I2C_PAD_CTRL),
+		.gpio_mode = NEW_PAD_CTRL(MX6_PAD_UART2_RX_DATA__GPIO1_IO21,
+					  I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(1, 21)
+	}
+};
+
+static void tqma6ul_setup_i2c(void)
+{
+	int ret;
+
+	/*
+	 * use logical index for bus, e.g. I2C1 -> 0
+	 * warn on error
+	 */
+	ret = setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f,
+			&tqma6ul_i2c1_pads);
+	if (ret)
+		printf("setup I2C1 failed: %d\n", ret);
+}
+
+static iomux_v3_cfg_t const tqma6ul_quadspi_pads[] = {
+	MX6_PAD_NAND_READY_B__QSPI_A_DATA00	| MUX_PAD_CTRL(QSPI_PAD_CTRL),
+	MX6_PAD_NAND_CE0_B__QSPI_A_DATA01   | MUX_PAD_CTRL(QSPI_PAD_CTRL),
+	MX6_PAD_NAND_CE1_B__QSPI_A_DATA02   | MUX_PAD_CTRL(QSPI_PAD_CTRL),
+	MX6_PAD_NAND_CLE__QSPI_A_DATA03     | MUX_PAD_CTRL(QSPI_PAD_CTRL),
+	MX6_PAD_NAND_WP_B__QSPI_A_SCLK      | MUX_PAD_CTRL(QSPI_PAD_CTRL),
+	MX6_PAD_NAND_DQS__QSPI_A_SS0_B      | MUX_PAD_CTRL(QSPI_PAD_CTRL),
+	/* TODO: QSPI chip Reset is provided from PMIC */
+};
+
+static void tqma6ul_setup_qspi(void)
+{
+	/* QSPI chip Reset is provided from PMIC */
+	/* Set the iomux */
+	imx_iomux_v3_setup_multiple_pads(tqma6ul_quadspi_pads,
+					 ARRAY_SIZE(tqma6ul_quadspi_pads));
+	/* Set the clock */
+	enable_qspi_clk(0);
+}
+
+int board_early_init_f(void)
+{
+	return tqc_bb_board_early_init_f();
+}
+
+int board_init(void)
+{
+	/* address of boot parameters */
+	gd->bd->bi_boot_params = PHYS_SDRAM + 0x100;
+
+	tqma6ul_setup_i2c();
+	tqma6ul_setup_qspi();
+	tqc_bb_board_init();
+
+	return 0;
+}
+
+static const char *tqma6ul_get_boardname(void)
+{
+	u32 cpurev = get_cpu_rev();
+
+	switch ((cpurev & 0xFF000) >> 12) {
+	case MXC_CPU_MX6UL:
+		return "TQMa6UL";
+		break;
+	default:
+		return "??";
+	};
+}
+
+int power_init_board(void)
+{
+	struct pmic *p;
+	u32 reg, rev;
+	int ret;
+
+	/* PMIC on I2C0 */
+	ret = power_pfuze3000_init(0);
+	if (ret)
+		return ret;
+	p = pmic_get("PFUZE3000");
+	if (p && !pmic_probe(p)) {
+		pmic_reg_read(p, PFUZE3000_DEVICEID, &reg);
+		pmic_reg_read(p, PFUZE3000_REVID, &rev);
+		printf("PMIC: PFUZE3000 ID=0x%02x REV=0x%02x\n", reg, rev);
+	}
+
+	return 0;
+}
+
+#ifdef CONFIG_CMD_BMODE
+static const struct boot_mode tqma6ul_board_boot_modes[] = {
+	/* 4 bit bus width */
+	{"sd1", MAKE_CFGVAL(0x40, 0x20, 0x00, 0x00)},
+	{"emmc", MAKE_CFGVAL(0x42, 0x28, 0x00, 0x00)},
+/*	{"qspi", MAKE_CFGVAL(0x10, 0x00, 0x00, 0x00)}, */
+	{NULL,   0},
+};
+#endif
+
+/* TODO: use define or const for "TQMa6UL", check with PM if TQMa6UL or TQMA6UL */
+int board_late_init(void)
+{
+	int ret;
+	/* must hold largest field of eeprom data */
+	char safe_string[0x41];
+	struct tqc_eeprom_data eedat;
+
+	add_board_boot_modes(tqma6ul_board_boot_modes);
+
+	setenv("board_name", tqma6ul_get_boardname());
+
+	ret = tqc_read_eeprom(0, CONFIG_SYS_I2C_EEPROM_ADDR, &eedat);
+	if (!ret) {
+		/* ID */
+		tqc_parse_eeprom_id(&eedat, safe_string,
+				    ARRAY_SIZE(safe_string));
+		if (0 == strncmp(safe_string, "TQMa6UL", 5))
+			setenv("boardtype", safe_string);
+		if (0 == tqc_parse_eeprom_serial(&eedat, safe_string,
+						   ARRAY_SIZE(safe_string)))
+			setenv("serial#", safe_string);
+		else
+			setenv("serial#", "???");
+
+		tqc_show_eeprom(&eedat, "TQMa6UL");
+	} else {
+		printf("EEPROM: err %d\n", ret);
+	}
+
+	tqc_bb_board_late_init();
+
+	return 0;
+}
+
+int checkboard(void)
+{
+	printf("Board: %s on a %s\n", tqma6ul_get_boardname(),
+	       tqc_bb_get_boardname());
+	return 0;
+}
+
+int board_get_rtc_bus(void)
+{
+	return 0;
+}
+
+int board_get_dtt_bus(void)
+{
+	return 0;
+}
+
+/*
+ * Device Tree Support
+ */
+#if defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT)
+#define MODELSTRLEN 32u
+int ft_board_setup(void *blob, bd_t *bd)
+{
+	char modelstr[MODELSTRLEN];
+
+	snprintf(modelstr, MODELSTRLEN, "TQ %s on %s", tqma6ul_get_boardname(),
+		 tqc_bb_get_boardname());
+	do_fixup_by_path_string(blob, "/", "model", modelstr);
+	fdt_fixup_memory(blob, (u64)PHYS_SDRAM, (u64)gd->ram_size);
+
+	/* bring in eMMC dsr settings */
+	do_fixup_by_path_u32(blob,
+			     "/soc/aips-bus@02100000/usdhc@02198000",
+			     "dsr", tqma6ul_emmc_dsr, 2);
+	tqc_bb_ft_board_setup(blob, bd);
+
+	return 0;
+}
+#endif /* defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT) */
