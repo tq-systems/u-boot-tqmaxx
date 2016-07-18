@@ -1,0 +1,56 @@
+if TARGET_TQMA6UL
+
+config SYS_BOARD
+	default "tqma6ul"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_SOC
+	default "mx6"
+
+config SYS_CONFIG_NAME
+	default "tqma6ul"
+
+config TQMA6UL
+	bool "TQMa6UL"
+	select MX6UL
+	help
+	  select TQMa6UL with i.MX6UL and 256 MiB DRAM
+
+choice
+	prompt "TQMa6UL boot configuration"
+	default TQMA6UL_MMC_BOOT
+	help
+	  Configure boot device. This is also used to implement environment
+	  location.
+
+config TQMA6UL_MMC_BOOT
+	bool "MMC / SD Boot"
+	help
+	  Boot from eMMC / SD Card
+
+config TQMA6UL_QSPI_BOOT
+	bool "QSPI NOR Boot"
+	help
+	  Boot from on board QSPI NOR flash
+
+endchoice
+
+choice
+	prompt "TQMa6UL base board variant"
+	default MBA6UL
+
+config MBA6UL
+	bool "TQMa6UL on MBa6UL Starterkit"
+	help
+	  Select the MBa6UL starterkit.
+
+endchoice
+
+config IMX_CONFIG
+	default "board/tqc/tqma6ul/tqma6ul.cfg" if TQMA6UL
+
+source "board/tqc/common/Kconfig"
+
+endif

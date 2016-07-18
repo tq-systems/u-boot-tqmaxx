@@ -201,6 +201,13 @@ config TARGET_TQMA6
 	bool "TQ Systems TQMa6 board"
 	select TQC_EEPROM
 
+config TARGET_TQMA6UL
+	bool "TQ Systems TQMa6UL board"
+	select MX6UL
+	select DM
+	select DM_THERMAL
+	select TQC_EEPROM
+
 config TARGET_UDOO
 	bool "udoo"
 	select SUPPORT_SPL
@@ -245,6 +252,7 @@ source "board/solidrun/mx6cuboxi/Kconfig"
 source "board/tbs/tbs2910/Kconfig"
 source "board/technexion/picosom-imx6ul/Kconfig"
 source "board/tqc/tqma6/Kconfig"
+source "board/tqc/tqma6ul/Kconfig"
 source "board/udoo/Kconfig"
 source "board/wandboard/Kconfig"
 source "board/warp/Kconfig"
