@@ -194,6 +194,8 @@ static void tqma7_setup_qspi(void)
 
 int board_early_init_f(void)
 {
+	tqma7_setup_i2c();
+
 	return tqc_bb_board_early_init_f();
 }
 
@@ -202,7 +204,6 @@ int board_init(void)
 	/* address of boot parameters */
 	gd->bd->bi_boot_params = PHYS_SDRAM + 0x100;
 
-	tqma7_setup_i2c();
 	tqma7_setup_qspi();
 
 	tqc_bb_board_init();
