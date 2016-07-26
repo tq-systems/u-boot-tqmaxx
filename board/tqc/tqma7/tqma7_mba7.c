@@ -291,13 +291,13 @@ static void mba7_setup_i2c(void)
 int tqc_bb_board_early_init_f(void)
 {
 	mba7_setup_iomuxc_uart();
+	mba7_setup_i2c();
 
 	return 0;
 }
 
 int tqc_bb_board_init(void)
 {
-	mba7_setup_i2c();
 	/* do it here - to have reset completed */
 	mba7_setup_iomuxc_enet();
 	mba7_setup_fec(0);
