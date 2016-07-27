@@ -34,8 +34,9 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#define UART_PAD_CTRL  (PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_MED | \
-	PAD_CTL_DSE_80ohm   | PAD_CTL_SRE_FAST  | PAD_CTL_HYS)
+#define UART_PAD_CTRL (PAD_CTL_PKE | PAD_CTL_PUE |		\
+	PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_MED |		\
+	PAD_CTL_DSE_40ohm   | PAD_CTL_SRE_FAST  | PAD_CTL_HYS)
 
 #define USDHC_PAD_CTRL (PAD_CTL_PUS_47K_UP  | PAD_CTL_SPEED_LOW | \
 	PAD_CTL_DSE_80ohm   | PAD_CTL_SRE_FAST  | PAD_CTL_HYS)
@@ -59,20 +60,29 @@ DECLARE_GLOBAL_DATA_PTR;
 				 PAD_CTL_DSE_40ohm | PAD_CTL_HYS)
 #define ENET_MDIO_PAD_CTRL	(PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_MED | \
 				 PAD_CTL_DSE_60ohm)
+#define ENET_PAD_CTRL  (PAD_CTL_PUS_100K_UP | PAD_CTL_PUE |     \
+	PAD_CTL_SPEED_HIGH   |                                   \
+	PAD_CTL_DSE_48ohm   | PAD_CTL_SRE_FAST)
+
+enum fec_device {
+	FEC0,
+	FEC1,
+	FEC_ALL
+};
 
 /*
  * pin conflicts for fec1 and fec2, GPIO1_IO06 and GPIO1_IO07 can only
  * be used for ENET1 or ENET2, cannot be used for both.
  */
 static iomux_v3_cfg_t const mba6ul_fec1_pads[] = {
-	NEW_PAD_CTRL(MX6_PAD_ENET1_RX_DATA0__ENET1_RDATA00, ENET_RX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_ENET1_RX_DATA1__ENET1_RDATA01, ENET_RX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_ENET1_RX_EN__ENET1_RX_EN, ENET_RX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_ENET1_RX_ER__ENET1_RX_ER, ENET_RX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_ENET1_TX_DATA0__ENET1_TDATA00, ENET_TX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_ENET1_TX_DATA1__ENET1_TDATA01, ENET_TX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_ENET1_TX_EN__ENET1_TX_EN, ENET_TX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_ENET1_TX_CLK__ENET1_TX_CLK, ENET_CLK_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET1_RX_DATA0__ENET1_RDATA00, ENET_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET1_RX_DATA1__ENET1_RDATA01, ENET_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET1_RX_EN__ENET1_RX_EN, ENET_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET1_RX_ER__ENET1_RX_ER, ENET_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET1_TX_DATA0__ENET1_TDATA00, ENET_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET1_TX_DATA1__ENET1_TDATA01, ENET_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET1_TX_EN__ENET1_TX_EN, ENET_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET1_TX_CLK__ENET1_REF_CLK1, ENET_CLK_PAD_CTRL),
 
 	/* MDIO */
 	/* pins are shared with fec2 */
@@ -91,14 +101,14 @@ static iomux_v3_cfg_t const mba6ul_fec1_pads[] = {
 #endif
 
 static iomux_v3_cfg_t const mba6ul_fec2_pads[] = {
-	NEW_PAD_CTRL(MX6_PAD_ENET2_RX_DATA0__ENET2_RDATA00, ENET_RX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_ENET2_RX_DATA1__ENET2_RDATA01, ENET_RX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_ENET2_RX_EN__ENET2_RX_EN, ENET_RX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_ENET2_RX_ER__ENET2_RX_ER, ENET_RX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_ENET2_TX_DATA0__ENET2_TDATA00, ENET_TX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_ENET2_TX_DATA1__ENET2_TDATA01, ENET_TX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_ENET2_TX_EN__ENET2_TX_EN, ENET_TX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_ENET2_TX_CLK__ENET2_TX_CLK, ENET_CLK_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET2_RX_DATA0__ENET2_RDATA00, ENET_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET2_RX_DATA1__ENET2_RDATA01, ENET_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET2_RX_EN__ENET2_RX_EN, ENET_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET2_RX_ER__ENET2_RX_ER, ENET_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET2_TX_DATA0__ENET2_TDATA00, ENET_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET2_TX_DATA1__ENET2_TDATA01, ENET_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET2_TX_EN__ENET2_TX_EN, ENET_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET2_TX_CLK__ENET2_REF_CLK2, ENET_CLK_PAD_CTRL),
 
 	/* MDIO */
 	/* pins are shared with fec1 */
@@ -135,16 +145,24 @@ static void mba6ul_setup_iomuxc_enet(void)
 					 ARRAY_SIZE(mba6ul_fec_common_pads));
 	imx_iomux_v3_setup_multiple_pads(mba6ul_fec1_pads,
 					 ARRAY_SIZE(mba6ul_fec1_pads));
+	imx_iomux_v3_setup_multiple_pads(mba6ul_fec2_pads,
+					 ARRAY_SIZE(mba6ul_fec2_pads));
+}
+
+int board_eth_init(bd_t *bis)
+{
+	int ret;
+
 #if defined(CONFIG_MBA6UL_ENET1_INT)
 		gpio_request(ENET1_PHY_INT_GPIO, "enet1-phy-int");
 		gpio_direction_input(ENET1_PHY_INT_GPIO);
 #endif
-	imx_iomux_v3_setup_multiple_pads(mba6ul_fec2_pads,
-					 ARRAY_SIZE(mba6ul_fec2_pads));
+
 #if defined(CONFIG_MBA6UL_ENET2_INT)
 		gpio_request(ENET2_PHY_INT_GPIO, "enet2-phy-int");
 		gpio_direction_input(ENET2_PHY_INT_GPIO);
 #endif
+
 #if defined(CONFIG_MBA6UL_ENET_RST)
 	/* Reset PHY1 and/or PHY2
 	 * 
@@ -152,17 +170,14 @@ static void mba6ul_setup_iomuxc_enet(void)
 	 * R1522 -> PHY2 reset (RESOLDER R1517)
 	 * R1422 & R1422 -> PHY1 & PHY2 reset
 	 * */
-	gpio_request(ENET_PHY_RESET_GPIO, "enet1-phy-rst#");
+	gpio_request(ENET_PHY_RESET_GPIO, "enet-phy-rst#");
+	gpio_direction_output(ENET_PHY_RESET_GPIO , 1);
+	udelay(100);
 	gpio_direction_output(ENET_PHY_RESET_GPIO , 0);
-	udelay(20);
+	/* lan8720: 5.5.3 reset time should be 25ms */
+	udelay(24900);
 	gpio_set_value(ENET_PHY_RESET_GPIO, 1);
-	udelay(250);
 #endif
-}
-
-int board_eth_init(bd_t *bis)
-{
-	int ret;
 
 	ret = fecmxc_initialize_multi(bis, 0, TQMA6UL_ENET1_PHYADDR,
 				      ENET_BASE_ADDR);
@@ -182,9 +197,10 @@ static int mba6ul_setup_fec(int fec_id)
 	struct iomuxc_gpr_base_regs *const iomuxc_gpr_regs
 		= (struct iomuxc_gpr_base_regs *) IOMUXC_GPR_BASE_ADDR;
 	int ret;
+	u32 clrbits, setbits;
 
 	switch (fec_id) {
-	case 0:
+	case FEC0:
 		if (check_module_fused(MX6_MODULE_ENET1))
 			return -1;
 
@@ -195,15 +211,28 @@ static int mba6ul_setup_fec(int fec_id)
 		clrsetbits_le32(&iomuxc_gpr_regs->gpr[1], IOMUX_GPR1_FEC1_MASK,
 				IOMUX_GPR1_FEC1_CLOCK_MUX1_SEL_MASK);
 		break;
-	case 1:
+	case FEC1:
 		if (check_module_fused(MX6_MODULE_ENET2))
 			return -1;
 		/*
-		 * Use 50M anatop loopback REF_CLK1 for ENET1,
+		 * Use 50M anatop loopback REF_CLK1 for ENET2,
 		 * clear gpr1[13], set gpr1[17]
 		 */
 		clrsetbits_le32(&iomuxc_gpr_regs->gpr[1], IOMUX_GPR1_FEC2_MASK,
 				IOMUX_GPR1_FEC2_CLOCK_MUX2_SEL_MASK);
+		break;
+	case FEC_ALL:
+		/* TODO: Check if both clocks can be enabled at the same time !*/
+		if (check_module_fused(MX6_MODULE_ENET1) &&
+		    check_module_fused(MX6_MODULE_ENET2))
+			return -1;
+		/*
+		 * Use 50M anatop loopback REF_CLK1 for ENET1/2,
+		 * clear gpr1[13], set gpr1[17]
+		 */
+		clrbits = (IOMUX_GPR1_FEC1_MASK | IOMUX_GPR1_FEC2_MASK);
+		setbits = (IOMUX_GPR1_FEC1_CLOCK_MUX1_SEL_MASK | IOMUX_GPR1_FEC2_CLOCK_MUX2_SEL_MASK);
+		clrsetbits_le32(&iomuxc_gpr_regs->gpr[1], clrbits, setbits);
 		break;
 	default:
 		printf("FEC%d: unsupported\n", fec_id);
@@ -220,9 +249,7 @@ static int mba6ul_setup_fec(int fec_id)
 
 int board_phy_config(struct phy_device *phydev)
 {
-	/* TODO: set skew values using phy_read_mmd_indirec from
-	* /driver/net/phy/ti - see also LS102xa for detaiuls about LED config
-	*/
+	/* TODO: set skew values using phy_read_mmd_indirec from */
 
 	if (phydev->drv->config)
 		phydev->drv->config(phydev);
@@ -301,52 +328,6 @@ int tqc_bb_board_mmc_init(bd_t *bis)
 	return 0;
 }
 
-/*
- * read_eeprom - read the given EEPROM into memory
- */
- /* I2C EEPROM (SE97BTP) */
-#define MBA6UL_SYS_I2C_EEPROM_ADDR	0X51
-#define MBA6UL_SYS_I2C_EEPROM_ADDR_LEN	1	/* 8-bit addresses */
-int mba6ul_read_eeprom(unsigned int bus, unsigned int addr,
-		    struct tqc_eeprom_data *eeprom)
-{
-	int ret;
-	unsigned int oldbus;
-	if (!eeprom)
-		return -1;
-
-	oldbus = i2c_get_bus_num();
-	i2c_set_bus_num(bus);
-	ret = i2c_read(addr, 0, MBA6UL_SYS_I2C_EEPROM_ADDR_LEN,
-		       (uchar *)eeprom, sizeof(*eeprom));
-	i2c_set_bus_num(oldbus);
-	return ret;
-}
-
-/*
- * parse_eeprom_mac2 - parse reserved field two and interprete it
- * 		       as mac-address
- */
-int mba6ul_parse_eeprom_mac2(struct tqc_eeprom_data *eeprom, char *buf,
-			 size_t len)
-{
-	u8 *p;
-	int ret;
-
-	if (!buf || !eeprom)
-		return -1;
-	/* MAC address */
-	p = eeprom->rsv1;
-	ret = snprintf(buf, len, "%02x:%02x:%02x:%02x:%02x:%02x",
-		       p[0], p[1], p[2], p[3], p[4], p[5]);
-	if (ret < 0)
-		return ret;
-	if (ret >= len)
-		return ret;
-
-	return 0;
-}
-
 static struct i2c_pads_info mba6ul_i2c2_pads = {
 /* I2C2: MBa6UL */
 	.scl = {
@@ -370,7 +351,7 @@ static void mba6ul_setup_i2c(void)
 	int ret;
 
 	/*
-	 * use logical index for bus, e.g. I2C1 -> 0
+	 * use logical index for bus, e.g. I2C2 -> 1
 	 * warn on error
 	 */
 	ret = setup_i2c(1, CONFIG_SYS_I2C_SPEED, 0x7f, &mba6ul_i2c2_pads);
@@ -381,7 +362,6 @@ static void mba6ul_setup_i2c(void)
 int tqc_bb_board_early_init_f(void)
 {
 	mba6ul_setup_iomuxc_uart();
-
 	return 0;
 }
 
@@ -390,32 +370,13 @@ int tqc_bb_board_init(void)
 	mba6ul_setup_i2c();
 	/* do it here - to have reset completed */
 	mba6ul_setup_iomuxc_enet();
-	mba6ul_setup_fec(0);
-	mba6ul_setup_fec(1);
+	mba6ul_setup_fec(FEC0);
 
 	return 0;
 }
 
 int tqc_bb_board_late_init(void)
 {
-	int ret;
-	struct tqc_eeprom_data eedat;
-	char mac[7];
-
-	/* TODO: Need read_eeprom to be more common -> add to tqc/common */
-	/* Baseboard use the same i2c bus like the module */
-	ret = mba6ul_read_eeprom(0, MBA6UL_SYS_I2C_EEPROM_ADDR, &eedat);
-	if (!ret) {
-		tqc_parse_eeprom_mac(&eedat, mac, ARRAY_SIZE(mac));
-		setenv("ethaddr", mac);
-		/* TODO: Need parse_eeprom_mac2 to be more common -> add to tqc/common */
-		mba6ul_parse_eeprom_mac2(&eedat, mac, ARRAY_SIZE(mac));
-		setenv("eth1addr", mac);
-		tqc_show_eeprom(&eedat, "MBA6UL");
-	} else {
-		printf("%s EEPROM: err %d\n", tqc_bb_get_boardname(), ret);
-	}
-
 	/*
 	* try to get sd card slots in order:
 	* eMMC: on Module
@@ -428,23 +389,26 @@ int tqc_bb_board_late_init(void)
 	* we assume to have a kernel patch that will present mmcblk dev
 	* indexed like controller devs
 	*/
-	
 	puts("Boot:\t");
-
 	switch (imx_boot_device()) {
 	case BOOT_DEVICE_MMC1:
-		printf("USDHC%u\n", imx_boot_device_instance() + 1);
 		setenv("boot_dev", "mmc");
-		switch (mmc_get_env_devno()) {
-		/* eMMC (USDHC2)*/
-		case 0:
-			setenv("mmcblkdev", "0");
-			setenv("mmcdev", "0");
-			break;
+		switch (imx_boot_device_instance()) {
 		/* SD (USDHC1)*/
-		case 1:
-			setenv("mmcblkdev", "1");
+		case 0:
+		/*
+		 * This assumes that the kernel registered the baseboard
+		 * as the first boot device ...
+		 */
+			printf("USDHC%u (SD)\n", imx_boot_device_instance() + 1);
+			setenv("mmcblkdev", "0");
 			setenv("mmcdev", "1");
+			break;
+		/* eMMC (USDHC2)*/
+		case 1:
+			printf("USDHC%u (eMMC)\n", imx_boot_device_instance() + 1);
+			setenv("mmcblkdev", "1");
+			setenv("mmcdev", "0");
 			break;
 		default:
 			puts("unhandled boot device\n");
@@ -488,9 +452,11 @@ int mmc_get_env_devno(void)
 		/*
 		 * This assumes that the baseboard registered
 		 * the boot device first ...
-		 * Note: SDHC2 == idx1
+		 * Note:
+		 * eSDHC1 -> SD
+		 * eSDHC2 -> eMMC
 		 */
-		return (1 == inst) ? 0 : 1;
+		return (0 == inst) ? 1 : 0;
 	}
 
 	return -1;

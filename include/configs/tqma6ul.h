@@ -140,11 +140,10 @@
 #define CONFIG_BOOTDELAY		3
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 
-/* TODO: Set to correct value */
 #define CONFIG_LOADADDR			0x82000000
 
 /* place code in last 4 MiB of RAM of 256 MiB RAM */
-#define CONFIG_SYS_TEXT_BASE		0xfc00000
+#define CONFIG_SYS_TEXT_BASE		0x8fc00000
 
 #define CONFIG_ENV_SIZE			SZ_8K
 /* Size of malloc() pool */
@@ -244,10 +243,10 @@
 #endif
 
 /* 128 MiB offset as in ARM related docu for linux suggested */
-#define TQMA6UL_FDT_ADDRESS		0x8000000
+#define TQMA6UL_FDT_ADDRESS		0x88000000
 
 /* set to a resonable value, changeable by user */
-#define TQMA6UL_CMA_SIZE                 32M
+#define TQMA6UL_CMA_SIZE		32M
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"board=tqma6ul\0"                                                        \
@@ -275,7 +274,7 @@
 	"addtty=setenv bootargs ${bootargs} console=${console},${baudrate}\0"  \
 	"mmcpart=2\0"                                                          \
 	"mmcblkdev=0\0"                                                        \
-	"mmcargs=run addmmc addtty addfb addcma\0"                             \
+	"mmcargs=run addmmc addtty addcma\0"                                   \
 	"addmmc=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/mmcblk${mmcblkdev}p${mmcpart} ${rootfsmode} "       \
 		"rootwait\0"                                                   \
@@ -296,7 +295,7 @@
 	"netdev=eth0\0"                                                        \
 	"rootpath=/srv/nfs/tqma6\0"                                            \
 	"ipmode=static\0"                                                      \
-	"netargs=run addnfs addip addtty addfb addcma\0"                       \
+	"netargs=run addnfs addip addtty addcma\0"                             \
 	"addnfs=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/nfs rw "                                            \
 		"nfsroot=${serverip}:${rootpath},v3,tcp;\0"                    \
@@ -339,7 +338,10 @@
 	TQMA6UL_EXTRA_BOOTDEV_ENV_SETTINGS                                       \
 
 /* Miscellaneous configurable options */
+#define CONFIG_SYS_CONSOLE_IS_IN_ENV
 #define CONFIG_SYS_LONGHELP
+#define CONFIG_SYS_HUSH_PARSER
+#define CONFIG_SYS_PROMPT		"=> "
 
 #define CONFIG_AUTO_COMPLETE
 #define CONFIG_SYS_CBSIZE		1024
@@ -381,8 +383,6 @@
 #ifndef CONFIG_SYS_DCACHE_OFF
 #define CONFIG_CMD_CACHE
 #endif
-
-#define CONFIG_SYS_CONSOLE_IS_IN_ENV
 
 /*
  * All the defines above are for the TQMa6UL SoM
