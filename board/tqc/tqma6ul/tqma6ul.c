@@ -300,7 +300,8 @@ int board_get_rtc_bus(void)
 
 int board_get_dtt_bus(void)
 {
-	return 0;
+	/* LM75 on I2C4 */
+	return 3;
 }
 
 /*
