@@ -28,6 +28,8 @@
 #include <mmc.h>
 #include <netdev.h>
 #include <spl.h>
+#include <usb.h>
+#include <usb/ehci-fsl.h>
 
 #include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
@@ -63,6 +65,12 @@ DECLARE_GLOBAL_DATA_PTR;
 #define ENET_PAD_CTRL  (PAD_CTL_PUS_100K_UP | PAD_CTL_PUE |     \
 	PAD_CTL_SPEED_HIGH   |                                   \
 	PAD_CTL_DSE_48ohm   | PAD_CTL_SRE_FAST)
+
+#define USB_ID_PAD_CTRL (PAD_CTL_PUS_100K_DOWN  | PAD_CTL_SPEED_MED |	\
+	PAD_CTL_DSE_120ohm   | PAD_CTL_SRE_FAST  | PAD_CTL_HYS)
+
+#define USB_OC_PAD_CTRL (PAD_CTL_SPEED_MED | PAD_CTL_DSE_40ohm |	\
+	PAD_CTL_HYS | PAD_CTL_PKE)
 
 enum fec_device {
 	FEC0,
@@ -359,9 +367,99 @@ static void mba6ul_setup_i2c(void)
 		printf("setup I2C2 failed: %d\n", ret);
 }
 
+#ifdef CONFIG_USB_EHCI_MX6
+#define USB_OTHERREGS_OFFSET	0x800
+#define UCTRL_PWR_POL		(1 << 9)
+#define UCTRL_OC_POL		(1 << 8)
+#define UCTRL_OC_DISABLE	(1 << 7)
+
+static iomux_v3_cfg_t const usb_otg1_pads[] = {
+	NEW_PAD_CTRL(MX6_PAD_GPIO1_IO01__USB_OTG1_OC,	USB_OC_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_GPIO1_IO00__ANATOP_OTG1_ID, USB_ID_PAD_CTRL),
+	/* OTG1_PWR */
+	NEW_PAD_CTRL(MX6_PAD_GPIO1_IO04__GPIO1_IO04,	GPIO_OUT_PAD_CTRL),
+};
+#define USB_OTG1_PWR	IMX_GPIO_NR(1, 4)
+
+static void mba6ul_setup_usb(void)
+{
+	imx_iomux_v3_setup_multiple_pads(usb_otg1_pads,
+					 ARRAY_SIZE(usb_otg1_pads));
+}
+
+int board_usb_phy_mode(int port)
+{
+	/* port index start at 0 */
+	if (port > (CONFIG_USB_MAX_CONTROLLER_COUNT - 1) || port < 0)
+		return -EINVAL;
+
+	if (1 == port)
+		return USB_INIT_HOST;
+	else
+		return usb_phy_mode(port);
+}
+
+int board_ehci_hcd_init(int port)
+{
+	u32 *usbnc_usb_ctrl;
+
+	/* port index start at 0 */
+	if (port > (CONFIG_USB_MAX_CONTROLLER_COUNT - 1) || port < 0)
+		return -EINVAL;
+
+	usbnc_usb_ctrl = (u32 *)(USB_BASE_ADDR + USB_OTHERREGS_OFFSET +
+				 port * 4);
+
+	switch (port) {
+		case 0:
+			/* Set Power polarity */
+			setbits_le32(usbnc_usb_ctrl, UCTRL_PWR_POL);
+			/* Set Overcurrent polarity */
+			setbits_le32(usbnc_usb_ctrl, UCTRL_OC_POL);
+			break;
+		case 1:
+			/* Disable Overcurrent detection */
+			/* managed by 2517i 7port usb hub */
+			setbits_le32(usbnc_usb_ctrl, UCTRL_OC_DISABLE);
+			break;
+		default:
+			printf ("USB%d: Initializing port not supported\n", port);
+	}
+
+	return 0;
+}
+
+int board_ehci_power(int port, int on)
+{
+	/* port index start at 0 */
+	if (port > (CONFIG_USB_MAX_CONTROLLER_COUNT - 1) || port < 0)
+		return -EINVAL;
+
+	switch (port) {
+		case 0:
+			gpio_request(USB_OTG1_PWR, "usb-otg1-pwr");
+			if (on) {
+				/* enable usb-otg */
+				gpio_direction_output(USB_OTG1_PWR , 1);
+			} else {
+				/* disable usb-otg */
+				gpio_direction_output(USB_OTG1_PWR , 0);
+			}
+			break;
+		case 1:
+			/* managed by 2517i 7port usb hub */
+			break;
+		default:
+			printf ("USB%d: Powering port is not supported\n", port);
+	}
+	return 0;
+}
+#endif
+
 int tqc_bb_board_early_init_f(void)
 {
 	mba6ul_setup_iomuxc_uart();
+
 	return 0;
 }
 
@@ -371,6 +469,7 @@ int tqc_bb_board_init(void)
 	/* do it here - to have reset completed */
 	mba6ul_setup_iomuxc_enet();
 	mba6ul_setup_fec(FEC0);
+	mba6ul_setup_usb();
 
 	return 0;
 }
