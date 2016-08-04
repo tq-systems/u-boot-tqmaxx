@@ -220,6 +220,8 @@ static const char *tqma6ul_get_boardname(void)
 	};
 }
 
+#define PFUZE3000_VLDOXEN_B 4
+#define PFUZE3000_VLDO_DISABLE(ctlreg) (ctlreg &= ~(1 << PFUZE3000_VLDOXEN_B))
 int power_init_board(void)
 {
 	struct pmic *p;
@@ -230,12 +232,30 @@ int power_init_board(void)
 	ret = power_pfuze3000_init(3);
 	if (ret)
 		return ret;
+
 	p = pmic_get("PFUZE3000");
-	if (p && !pmic_probe(p)) {
-		pmic_reg_read(p, PFUZE3000_DEVICEID, &reg);
-		pmic_reg_read(p, PFUZE3000_REVID, &rev);
-		printf("PMIC: PFUZE3000 ID=0x%02x REV=0x%02x\n", reg, rev);
-	}
+	ret = pmic_probe(p);
+	if (ret)
+		return ret;
+
+	pmic_reg_read(p, PFUZE3000_DEVICEID, &reg);
+	pmic_reg_read(p, PFUZE3000_REVID, &rev);
+	printf("PMIC: PFUZE3000 ID=0x%02x REV=0x%02x\n", reg, rev);
+
+	/* disable VLDO1 */
+	pmic_reg_read(p, PFUZE3000_VLDO1CTL, &reg);
+	PFUZE3000_VLDO_DISABLE(reg);
+	pmic_reg_write(p, PFUZE3000_VLDO1CTL, reg);
+
+	/* disable VCC_SD */
+	pmic_reg_read(p, PFUZE3000_VCC_SDCTL, &reg);
+	PFUZE3000_VLDO_DISABLE(reg);
+	pmic_reg_write(p, PFUZE3000_VCC_SDCTL, reg);
+
+	/* set VLDO4 voltage 1.8 -> 2.5 */
+	pmic_reg_read(p, PFUZE3000_VLD4CTL, &reg);
+	reg |= 0x07;
+	pmic_reg_write(p, PFUZE3000_VLD4CTL, reg);
 
 	return 0;
 }
