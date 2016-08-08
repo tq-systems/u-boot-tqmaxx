@@ -39,6 +39,8 @@ u16 *ataid[AHCI_MAX_PORTS];
 #define MAX_SATA_BLOCKS_READ_WRITE	0x80
 #endif
 
+#define AHCI_FATAL_RETRIES	3
+
 /* Maximum timeouts for each event */
 #define WAIT_MS_SPINUP	20000
 #define WAIT_MS_DATAIO	10000
@@ -637,8 +639,10 @@ static int ahci_device_data_io(u8 port, u8 *fis, int fis_len, u8 *buf,
 	struct ahci_ioports *pp = &(probe_ent->port[port]);
 	void __iomem *port_mmio = pp->port_mmio;
 	u32 opts;
+	u32 port_cmd;
 	u32 port_status;
 	int sg_count;
+	int retries = 0;
 
 	debug("Enter %s: for port %d\n", __func__, port);
 
@@ -653,6 +657,7 @@ static int ahci_device_data_io(u8 port, u8 *fis, int fis_len, u8 *buf,
 		return -1;
 	}
 
+retry_on_error:
 	memcpy((unsigned char *)pp->cmd_tbl, fis, fis_len);
 
 	sg_count = ahci_fill_sg(port, buf, buf_len);
@@ -668,6 +673,37 @@ static int ahci_device_data_io(u8 port, u8 *fis, int fis_len, u8 *buf,
 				WAIT_MS_DATAIO, 0x1)) {
 		printf("timeout exit!\n");
 		return -1;
+	}
+
+	/* Non-queued error recovery according to AHCI spec. */
+	if (readl(port_mmio + PORT_IRQ_STAT) & (PORT_IRQ_FATAL)) {
+		u32 tmp;
+
+		/* 6.2.2.1, AHCI 1.3.1 - only cmd slot 1 used */
+		port_cmd = readl(port_mmio + PORT_CMD);
+		port_cmd &= ~(PORT_CMD_START);
+		writel_with_flush(port_cmd, port_mmio + PORT_CMD);
+
+		/* wait for PxCMD.CR to clear */
+		while(readl(port_mmio + PORT_CMD) & PORT_CMD_LIST_ON)
+			udelay(1);
+
+		/* clear error bits */
+		tmp = readl(port_mmio + PORT_SCR_ERR);
+		if (tmp)
+			writel_with_flush(tmp, port_mmio + PORT_SCR_ERR);
+
+		/* clear status bits */
+		tmp = readl(port_mmio + PORT_IRQ_STAT);
+		if (tmp)
+			writel_with_flush(tmp, port_mmio + PORT_IRQ_STAT);
+
+		port_cmd |= (PORT_CMD_START);
+		writel_with_flush(port_cmd, port_mmio + PORT_CMD);
+
+		/* re-issue command */
+		if (++retries < AHCI_FATAL_RETRIES)
+			goto retry_on_error;
 	}
 
 	ahci_dcache_invalidate_range((unsigned long)buf,
