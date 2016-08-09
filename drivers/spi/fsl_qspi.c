@@ -185,6 +185,7 @@
 #define SEQID_RDEAR		12
 #define SEQID_WREAR		13
 #endif
+#define SEQID_RDFSR		14
 
 /* Flash opcodes. */
 #define	OPCODE_WREN		0x06	/* Write enable */
@@ -202,6 +203,7 @@
 #define	OPCODE_SE		0xd8	/* Sector erase (usually 64KiB) */
 #define	OPCODE_RDID		0x9f	/* Read JEDEC ID */
 #define	OPCODE_RDCR             0x35    /* Read configuration register */
+#define	OPCODE_RDFSR		0x70	/* Read flag status register */
 
 /* 4-byte address opcodes - used on Spansion and some Macronix flashes. */
 #define	OPCODE_NORM_READ_4B	0x13	/* Read data bytes (low frequency) */
@@ -402,6 +404,12 @@ static void fsl_qspi_init_lut(struct fsl_qspi *q)
 	writel(LUT0(CMD, PAD1, cmd) | LUT1(WRITE, PAD1, 0x1),
 	       base + QUADSPI_LUT(lut_base));
 #endif
+
+	/* Read Flag Status*/
+	lut_base = SEQID_RDFSR * 4;
+	cmd = OPCODE_RDFSR;
+	writel(LUT0(CMD, PAD1, cmd) | LUT1(READ, PAD1, 0x1),
+			base + QUADSPI_LUT(lut_base));
 
 	fsl_qspi_lock_lut(q);
 }
@@ -627,6 +635,8 @@ static int fsl_qspi_get_seqid(struct fsl_qspi *q, u8 cmd)
 	case OPCODE_WREAR:
 		return SEQID_WREAR;
 #endif
+	case OPCODE_RDFSR:
+		return SEQID_RDFSR;
 	default:
 		break;
 	}
