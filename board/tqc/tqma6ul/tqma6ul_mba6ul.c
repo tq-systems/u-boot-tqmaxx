@@ -516,14 +516,24 @@ int tqc_bb_board_late_init(void)
 		};
 		break;
 /* TODO: QSPI -> not supported in imx_boot_device(), add qspi enum in arch/arm/include/asm/spl.h */
-	case BOOT_DEVICE_SPI:
-		/* only ine qspi controller */
-		printf("QSPI1\n");
+	case BOOT_DEVICE_QSPI:
 		setenv("boot_dev", "qspi");
-		/* mmcdev is dev index for u-boot */
-		setenv("mmcdev", "0");
-		/* mmcblkdev is dev index for linux env */
-		setenv("mmcblkdev", "0");
+		switch (imx_boot_device_instance()) {
+		/* QSPI1 Controller */
+		case 0:
+			printf("QSPI%u\n", imx_boot_device_instance() + 1);
+			/* mmcdev is dev index for u-boot */
+			setenv("mmcdev", "0");
+			/* mmcblkdev is dev index for linux env */
+			setenv("mmcblkdev", "0");
+			break;
+		/* QSPI2 Controller */
+		case 1:
+			/* Reserved - see IMX6ULRM 8.6.1, Table 8-22 */
+			printf("QSPI%u Controller is not supported\n",
+				imx_boot_device_instance() + 1);
+			break;
+		}
 		break;
 	default:
 		puts("unhandled boot device\n");
