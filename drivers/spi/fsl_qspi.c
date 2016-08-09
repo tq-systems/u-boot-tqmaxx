@@ -182,10 +182,8 @@
 #define SEQID_DDR_QUAD_READ	10
 #define SEQID_BE_4K		11
 #ifdef CONFIG_SPI_FLASH_BAR
-#define SEQID_BRRD		12
-#define SEQID_BRWR		13
-#define SEQID_RDEAR		14
-#define SEQID_WREAR		15
+#define SEQID_RDEAR		12
+#define SEQID_WREAR		13
 #endif
 
 /* Flash opcodes. */
@@ -391,19 +389,9 @@ static void fsl_qspi_init_lut(struct fsl_qspi *q)
 
 #ifdef CONFIG_SPI_FLASH_BAR
 	/*
-	 * BRRD BRWR RDEAR WREAR are all supported, because it is hard to
-	 * dynamically check whether to set BRRD BRWR or RDEAR WREAR.
+	 * Only RDEAR WREAR are supported, because we only use micron
+	 * flash chips.
 	 */
-	lut_base = SEQID_BRRD * 4;
-	cmd = OPCODE_BRRD;
-	writel(LUT0(CMD, PAD1, cmd) | LUT1(READ, PAD1, 0x1),
-	       base + QUADSPI_LUT(lut_base));
-
-	lut_base = SEQID_BRWR * 4;
-	cmd = OPCODE_BRWR;
-	writel(LUT0(CMD, PAD1, cmd) | LUT1(WRITE, PAD1, 0x1),
-	       base + QUADSPI_LUT(lut_base));
-
 	lut_base = SEQID_RDEAR * 4;
 	cmd = OPCODE_RDEAR;
 	writel(LUT0(CMD, PAD1, cmd) | LUT1(READ, PAD1, 0x1),
@@ -634,10 +622,6 @@ static int fsl_qspi_get_seqid(struct fsl_qspi *q, u8 cmd)
 	case OPCODE_BE_4K:
 		return SEQID_BE_4K;
 #ifdef CONFIG_SPI_FLASH_BAR
-	case OPCODE_BRRD:
-		return SEQID_BRRD;
-	case OPCODE_BRWR:
-		return SEQID_BRWR;
 	case OPCODE_RDEAR:
 		return SEQID_RDEAR;
 	case OPCODE_WREAR:
