@@ -10,6 +10,15 @@
 
 #include <linux/kconfig.h>
 
+/* SPL */
+#define CONFIG_SPL_MMC_SUPPORT
+#define CONFIG_SPL_SPI_SUPPORT
+#define CONFIG_SPL_FAT_SUPPORT
+#define CONFIG_SPL_EXT_SUPPORT
+
+/* common IMX6 SPL configuration */
+#include "imx6_spl.h"
+
 #include <asm/arch/imx-regs.h>
 #include <asm/imx-common/gpio.h>
 #include <linux/sizes.h>
@@ -65,6 +74,22 @@
 #define CONFIG_SYS_I2C_EEPROM_PAGE_WRITE_BITS		5 /* 32 Bytes */
 #define CONFIG_SYS_I2C_EEPROM_PAGE_WRITE_DELAY_MS	20
 #define CONFIG_CMD_EEPROM
+
+/* Quad-SPI */
+#define CONFIG_FSL_QSPI
+#define CONFIG_QSPI_BASE		QSPI0_BASE_ADDR
+#define CONFIG_QSPI_MEMMAP_BASE		QSPI0_AMBA_BASE
+
+/* Quad-SPI Flash */
+#define	CONFIG_SPI_FLASH
+#define	CONFIG_SPI_FLASH_STMICRO
+#define	CONFIG_SPI_FLASH_BAR
+
+#define CONFIG_CMD_SF
+#define	CONFIG_SF_DEFAULT_BUS		0
+#define	CONFIG_SF_DEFAULT_CS		0
+#define	CONFIG_SF_DEFAULT_SPEED		40000000
+#define	CONFIG_SF_DEFAULT_MODE		SPI_MODE_0
 
 /* PMIC */
 #undef CONFIG_LDO_BYPASS_CHECK
@@ -213,28 +238,121 @@
 	"run mmcboot; run netboot; run panicboot"
 
 #elif defined(CONFIG_TQMA6UL_QSPI_BOOT)
-#define CONFIG_ENV_IS_IN_SPI_FLASH
 
-/* TODO: Fill this part */
+#define TQMA6UL_SPI_FLASH_SECTOR_SIZE	SZ_64K
+
+#define TQMA6UL_UBOOT_OFFSET		SZ_4K
+#define TQMA6UL_UBOOT_SECTOR_START	0x0
+/* max u-boot size: 512k */
+#define TQMA6UL_UBOOT_SECTOR_SIZE	TQMA6UL_SPI_FLASH_SECTOR_SIZE
+#define TQMA6UL_UBOOT_SECTOR_COUNT	0x8
+#define TQMA6UL_UBOOT_SIZE		(TQMA6UL_UBOOT_SECTOR_SIZE * \
+					 TQMA6UL_UBOOT_SECTOR_COUNT)
+
+#define CONFIG_ENV_IS_IN_SPI_FLASH
+#define CONFIG_SYS_REDUNDAND_ENVIRONMENT
+#define CONFIG_ENV_OFFSET		(TQMA6UL_UBOOT_SIZE)
+#define CONFIG_ENV_SECT_SIZE		TQMA6UL_SPI_FLASH_SECTOR_SIZE
+#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + \
+					 CONFIG_ENV_SECT_SIZE)
+
+#define CONFIG_ENV_SPI_BUS		(CONFIG_SF_DEFAULT_BUS)
+#define CONFIG_ENV_SPI_CS		(CONFIG_SF_DEFAULT_CS)
+#define CONFIG_ENV_SPI_MAX_HZ		(CONFIG_SF_DEFAULT_SPEED)
+#define CONFIG_ENV_SPI_MODE		(CONFIG_SF_DEFAULT_MODE)
+
+#define TQMA6UL_FDT_OFFSET		(CONFIG_ENV_OFFSET_REDUND + \
+					 CONFIG_ENV_SECT_SIZE)
+#define TQMA6UL_FDT_SECT_SIZE		(TQMA6UL_SPI_FLASH_SECTOR_SIZE)
+
+#define TQMA6UL_FDT_SECTOR_START	0x0a /* 8 Sector u-boot, 2 Sector env */
+#define TQMA6UL_FDT_SECTOR_COUNT	0x01
+
+#define TQMA6UL_KERNEL_SECTOR_START	0x10
+#define TQMA6UL_KERNEL_SECTOR_COUNT	0x60
+
+#define TQMA6UL_EXTRA_BOOTDEV_ENV_SETTINGS                                       \
+	"mmcblkdev=0\0"                                                        \
+	"uboot_offset="__stringify(TQMA6UL_UBOOT_OFFSET)"\0"                     \
+	"uboot_sectors="__stringify(TQMA6UL_UBOOT_SECTOR_COUNT)"\0"              \
+	"fdt_start="__stringify(TQMA6UL_FDT_SECTOR_START)"\0"                    \
+	"fdt_sectors="__stringify(TQMA6UL_FDT_SECTOR_COUNT)"\0"                  \
+	"kernel_start="__stringify(TQMA6UL_KERNEL_SECTOR_START)"\0"              \
+	"kernel_sectors="__stringify(TQMA6UL_KERNEL_SECTOR_COUNT)"\0"            \
+	"update_uboot=if tftp ${uboot}; then "                                 \
+		"if itest ${filesize} > 0; then "                              \
+			"setexpr blkc ${filesize} + "                          \
+				__stringify(TQMA6UL_UBOOT_OFFSET) "; "           \
+			"setexpr size ${uboot_sectors} * "                     \
+				__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; "   \
+			"if itest ${blkc} <= ${size}; then "                   \
+				"sf probe; "                                   \
+				"sf erase 0 ${size}; "                         \
+				"sf write ${loadaddr} ${uboot_offset} "        \
+					"${filesize}; "                        \
+			"fi; "                                                 \
+		"fi; fi; "                                                     \
+		"setenv filesize 0; setenv blkc; setenv size \0"               \
+	"update_kernel=run kernel_name; if tftp ${kernel}; then "              \
+		"if itest ${filesize} > 0; then "                              \
+			"setexpr size ${kernel_sectors} * "                    \
+				__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; "   \
+			"setexpr offset ${kernel_start} * "                    \
+				__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; "   \
+			"if itest ${filesize} <= ${size}; then "               \
+				"sf probe; "                                   \
+				"sf erase ${offset} ${size}; "                 \
+				"sf write ${loadaddr} ${offset} "              \
+					"${filesize}; "                        \
+			"fi; "                                                 \
+		"fi; fi; "                                                     \
+		"setenv filesize 0; setenv size ; setenv offset\0"             \
+	"update_fdt=run fdt_name; if tftp ${fdtimg}; then "                    \
+		"if itest ${filesize} > 0; then "                              \
+			"setexpr size ${fdt_sectors} * "                       \
+				__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; "   \
+			"setexpr offset ${fdt_start} * "                       \
+				__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; "   \
+			"if itest ${filesize} <= ${size}; then "               \
+				"sf probe; "                                   \
+				"sf erase ${offset} ${size}; "                 \
+				"sf write ${loadaddr} ${offset} "              \
+					"${filesize}; "                        \
+			"fi; "                                                 \
+		"fi; fi; "                                                     \
+		"setenv fdtimg"                                                \
+		"setenv filesize 0; setenv size ; setenv offset\0"             \
+	"loadimage=sf probe; "                                                 \
+		"setexpr size ${kernel_sectors} * "                            \
+			__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; "           \
+		"setexpr offset ${kernel_start} * "                            \
+			__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; "           \
+		"sf read ${loadaddr} ${offset} ${size}; "                      \
+		"setenv size ; setenv offset\0"                                \
+	"loadfdtsingle=sf probe; "                                             \
+		"setexpr size ${fdt_sectors} * "                               \
+			__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; "           \
+		"setexpr offset ${fdt_start} * "                               \
+			__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; "           \
+		"sf read ${fdt_addr} ${offset} ${size}; "                      \
+		"setenv size ; setenv offset\0"                                \
+	"loadfdtfit=sf probe; "                                                \
+		"setexpr size ${fdt_sectors} * "                               \
+			__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; "           \
+		"setexpr offset ${fdt_start} * "                               \
+			__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; "           \
+		"sf read ${loadaddr} ${offset} ${size}; "                      \
+		"setenv size ; setenv offset "                                 \
+		"imxtract ${loadaddr} ${fitfdt_part} ${fdt_addr}\0"            \
+
+#define CONFIG_BOOTCOMMAND                                                     \
+	"sf probe; run mmcboot; run netboot; run panicboot"                    \
 
 #else
 
 #error "need to define boot source"
 
 #endif
-
-#define CONFIG_FSL_QSPI
-#define CONFIG_QSPI_BASE		QSPI0_BASE_ADDR
-#define CONFIG_QSPI_MEMMAP_BASE		QSPI0_AMBA_BASE
-
-#define CONFIG_CMD_SF
-#define	CONFIG_SPI_FLASH
-#define	CONFIG_SPI_FLASH_STMICRO
-#define	CONFIG_SPI_FLASH_BAR
-#define	CONFIG_SF_DEFAULT_BUS		0
-#define	CONFIG_SF_DEFAULT_CS		0
-#define	CONFIG_SF_DEFAULT_SPEED		40000000
-#define	CONFIG_SF_DEFAULT_MODE		SPI_MODE_0
 
 /* 128 MiB offset as in ARM related docu for linux suggested */
 #define TQMA6UL_FDT_ADDRESS		0x88000000

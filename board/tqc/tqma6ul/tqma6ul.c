@@ -266,7 +266,7 @@ static const struct boot_mode tqma6ul_board_boot_modes[] = {
 	/* 4 bit bus width */
 	{"sd", MAKE_CFGVAL(0x42, 0x20, 0x00, 0x00)},
 	{"emmc", MAKE_CFGVAL(0x40, 0x28, 0x00, 0x00)},
-/*	{"qspi", MAKE_CFGVAL(0x10, 0x00, 0x00, 0x00)}, */
+	{"qspi", MAKE_CFGVAL(0x10, 0x00, 0x00, 0x00)},
 	{NULL, 0},
 };
 #endif

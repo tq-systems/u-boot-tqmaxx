@@ -505,9 +505,8 @@ int tqc_bb_board_late_init(void)
 		setenv("mmcblkdev", "1");
 		setenv("mmcdev", "1");
 		break;
-/* TODO: QSPI -> not supported in imx_boot_device(), add qspi enum in arch/arm/include/asm/spl.h */
-	case SPI_NOR_BOOT:
-		/* only ine qspi controller */
+	case QSPI_BOOT:
+		/* only one qspi controller */
 		printf("QSPI1\n");
 		setenv("boot_dev", "qspi");
 		/* mmcdev is dev index for u-boot */
