@@ -32,6 +32,9 @@ u32 imx_boot_device(void)
 		else
 			return BOOT_DEVICE_NOR;
 		break;
+	/* QSPI: See IMX6ULRM 8.6.1, Table 8-22 */
+	case 0x1:
+		return BOOT_DEVICE_QSPI;
 	/* SATA: See 8.5.4, Table 8-20 */
 	case 0x2:
 		return BOOT_DEVICE_SATA;
@@ -72,6 +75,9 @@ u32 imx_boot_device_instance(void)
 	case 0x0:
 		return 0;
 		break;
+	/* QSPI: See IMX6ULRM 8.6.1, Table 8-22 */
+	case 0x1:
+		return 0;
 	/* SATA: See 8.5.4, Table 8-20 */
 	case 0x2:
 		return 0;
