@@ -159,6 +159,7 @@ static const table_entry_t uimage_type[] = {
 	{	IH_TYPE_RKSD,       "rksd",       "Rockchip SD Boot Image" },
 	{	IH_TYPE_RKSPI,      "rkspi",      "Rockchip SPI Boot Image" },
 	{	IH_TYPE_ZYNQIMAGE,  "zynqimage",  "Xilinx Zynq Boot Image" },
+	{	IH_TYPE_PBLBINARY,  "pblbinary",  "Freescale binary PBL Image",},
 	{	-1,		    "",		  "",			},
 };
 

@@ -211,6 +211,7 @@ int imagetool_get_filesize(struct image_tool_params *params, const char *fname);
 
 
 void pbl_load_uboot(int fd, struct image_tool_params *mparams);
+void pbl_binary(int fd, struct image_tool_params *mparams);
 
 #define ___cat(a, b) a ## b
 #define __cat(a, b) ___cat(a, b)
