@@ -104,13 +104,6 @@
 #define SDRAM_CFG_BI			0x00000001
 
 #ifdef CONFIG_SD_BOOT
-
-#define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_sd.cfg
-
-#ifdef CONFIG_RAMBOOT_PBL
-#define CONFIG_SYS_FSL_PBL_PBI	board/tqc/tqmls102xa/ls102xa_pbi_sd.cfg
-#endif
-
 #define CONFIG_SPL_FRAMEWORK
 #define CONFIG_SPL_LDSCRIPT	"arch/$(ARCH)/cpu/u-boot-spl.lds"
 #define CONFIG_SPL_LIBCOMMON_SUPPORT
@@ -140,6 +133,7 @@
 
 #ifdef CONFIG_QSPI_BOOT
 #define CONFIG_SYS_TEXT_BASE		0x40010000
+#define CONFIG_SPL_PAD_TO		0x10000
 #endif
 
 #if defined(CONFIG_QSPI_BOOT) || defined(CONFIG_SD_BOOT)
@@ -211,7 +205,15 @@
 #define ESDHCI_QUIRK_BROKEN_TIMEOUT_VALUE
 
 /* QSPI */
-#if defined(CONFIG_QSPI_BOOT) || defined(CONFIG_SD_BOOT)
+#if defined(CONFIG_QSPI_BOOT)
+#if defined(CONFIG_RAMBOOT_PBL) || defined(CONFIG_RAMBOOT_PBL_BIN)
+#define CONFIG_SYS_FSL_PBL_PBI	board/tqc/tqmls102xa/ls102xa_pbi_qspi.cfg
+#define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_qspi.cfg
+#endif
+#elif defined(CONFIG_SD_BOOT)
+#define CONFIG_SYS_FSL_PBL_PBI	board/tqc/tqmls102xa/ls102xa_pbi_sd.cfg
+#define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_sd.cfg
+#endif
 
 #define CONFIG_FSL_QSPI
 #define QSPI0_AMBA_BASE			0x40000000
@@ -230,8 +232,6 @@
 #define CONFIG_SPI_FLASH_STMICRO
 
 #define CONFIG_CMD_TIME
-
-#endif /* QSPI */
 
 /*
  * Video -> TODO
