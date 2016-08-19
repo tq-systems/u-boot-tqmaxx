@@ -417,8 +417,6 @@
 #define CONFIG_ENV_OFFSET		0x100000
 #define CONFIG_ENV_SECT_SIZE		0x10000
 
-#define TQMLS102X_UBOOT_SPI_OFFSET	SZ_64K
-
 #else
 #error
 #endif
@@ -427,7 +425,7 @@
 #define TQMLS102X_UBOOT_OFFSET		SZ_4K
 #define TQMLS102X_UBOOT_SECTOR_START	0x8
 #define TQMLS102X_UBOOT_SECTOR_COUNT	0x7f8
-#define TQMLS102X_UBOOT_SPI_OFFSET	SZ_64K
+#define TQMLS102X_UBOOT_SPI_OFFSET	0
 
 #define TQMLS102X_FDT_OFFSET		(2 * SZ_1M)
 #define TQMLS102X_FDT_SECTOR_START	0x1000
@@ -550,26 +548,18 @@
 		"fi; "                                                         \
 		"echo ... failed\0"                                            \
 	"panicboot=echo No boot device !!! reset\0"                            \
-	"uboot-qspi=u-boot.bin-u-boot-qspi\0"                                  \
+	"uboot-qspi=u-boot-pbl.bin.bswap\0"                                    \
 	"update_uboot-qspi=if tftp ${uboot-qspi}; then "                       \
 		"if itest ${filesize} > 0; then "                              \
-			"setexpr erasesz ${filesize} / 0x10000; "              \
-			"setexpr erasesz ${erasesz} + 1; "                     \
-			"setexpr erasesz ${erasesz} * 0x10000; "               \
-			"sf probe; sf erase "__stringify(TQMLS102X_UBOOT_SPI_OFFSET)" ${erasesz}; " \
-			"sf write ${loadaddr} "__stringify(TQMLS102X_UBOOT_SPI_OFFSET)" ${filesize}; " \
+			"sf probe; sf update ${loadaddr} "__stringify(TQMLS102X_UBOOT_SPI_OFFSET)" ${filesize}; " \
 		"fi; fi; "                                                     \
-		"setenv filesize; setenv erasesz\0"                            \
+		"setenv filesize;\0"                                           \
 	"rcw-qspi=ls102xa-rcw-tqmls-qspi-0100.bin.bswap\0"                     \
 	"update_rcw=if tftp ${rcw-qspi}; then "                                \
 		"if itest ${filesize} > 0; then "                              \
-			"setexpr erasesz ${filesize} / 0x10000; "              \
-			"setexpr erasesz ${erasesz} + 1; "                     \
-			"setexpr erasesz ${erasesz} * 0x10000; "               \
-			"sf probe; sf erase 0 ${erasesz}; "                    \
-			"sf write ${loadaddr} 0 ${filesize}; "                 \
+			"sf probe; sf update ${loadaddr} 0 ${filesize}; "      \
 		"fi; fi; "                                                     \
-		"setenv filesize; setenv erasesz\0"                            \
+		"setenv filesize;\0"                                           \
 	TQMLS102X_EXTRA_BOOTDEV_ENV_SETTINGS                                   \
 
 #define CONFIG_CMD_BOOTZ
