@@ -270,6 +270,7 @@ enum {
 	IH_TYPE_TEE,            /* Trusted Execution Environment OS Image */
 	IH_TYPE_FIRMWARE_IVT,		/* Firmware Image with HABv4 IVT */
 	IH_TYPE_PMMC,            /* TI Power Management Micro-Controller Firmware */
+	IH_TYPE_PBLBINARY,		/* Freescale binary PBL instructions */
 
 	IH_TYPE_COUNT,			/* Number of image types */
 };
