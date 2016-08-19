@@ -218,9 +218,32 @@ void pbl_load_uboot(int ifd, struct image_tool_params *params)
 	}
 }
 
+/* This converts PBL RCW/PBI+CRC to binary format. */
+void pbl_binary(int ifd, struct image_tool_params *params)
+{
+	int size;
+
+	/* parse the rcw.cfg file. */
+	pbl_parser(params->imagename);
+
+	/* parse the pbi.cfg file. */
+	pbl_parser(params->imagename2);
+
+	add_end_cmd();
+
+	lseek(ifd, 0, SEEK_SET);
+
+	size = pbl_size;
+	if (write(ifd, (const void *)&mem_buf, size) != size) {
+		fprintf(stderr, "Write error on %s: %s\n",
+			params->imagefile, strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+}
+
 static int pblimage_check_image_types(uint8_t type)
 {
-	if (type == IH_TYPE_PBLIMAGE)
+	if ((type == IH_TYPE_PBLIMAGE) || (type == IH_TYPE_PBLBINARY))
 		return EXIT_SUCCESS;
 	else
 		return EXIT_FAILURE;
@@ -317,6 +340,21 @@ int pblimage_check_params(struct image_tool_params *params)
 U_BOOT_IMAGE_TYPE(
 	pblimage,
 	"Freescale PBL Boot Image support",
+	sizeof(struct pbl_header),
+	(void *)&pblimage_header,
+	pblimage_check_params,
+	pblimage_verify_header,
+	pblimage_print_header,
+	pblimage_set_header,
+	NULL,
+	pblimage_check_image_types,
+	NULL,
+	NULL
+);
+
+U_BOOT_IMAGE_TYPE(
+	pblbinary,
+	"Freescale PBL binary instructions",
 	sizeof(struct pbl_header),
 	(void *)&pblimage_header,
 	pblimage_check_params,

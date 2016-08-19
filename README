@@ -489,6 +489,11 @@ The following options need to be configured:
 		It adds a target to create boot binary having SPL binary in PBI format
 		concatenated with u-boot binary.
 
+		CONFIG_RAMBOOT_PBL_BINARY
+		The default PBL image concatenates U-Boot to PBI and splits it to
+		64 byte chunks to load via pre-boot instruction. This option builds the
+		u-boot image with PBI at offset 0 and u-boot.bin at offset CONFIG_SPL_PAD_TO.
+
 		CONFIG_SYS_FSL_DDR_BE
 		Defines the DDR controller register space as Big Endian
 

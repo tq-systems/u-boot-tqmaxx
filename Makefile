@@ -770,6 +770,7 @@ ifneq ($(CONFIG_SECURE_BOOT), y)
 # For Secure Boot The Image needs to be signed and Header must also
 # be included. So The image has to be built explicitly
 ALL-$(CONFIG_RAMBOOT_PBL) += u-boot.pbl
+ALL-$(CONFIG_RAMBOOT_PBL_BIN) += u-boot-pbl.bin
 endif
 endif
 ALL-$(CONFIG_SPL) += spl/u-boot-spl.bin
@@ -1180,6 +1181,13 @@ MKIMAGEFLAGS_u-boot-spl.pbl = -n $(srctree)/$(CONFIG_SYS_FSL_PBL_RCW:"%"=%) \
 spl/u-boot-spl.pbl: spl/u-boot-spl.bin FORCE
 	$(call if_changed,mkimage)
 
+MKIMAGEFLAGS_pbl.bin = -n $(srctree)/$(CONFIG_SYS_FSL_PBL_RCW:"%"=%) \
+		-R $(srctree)/$(CONFIG_SYS_FSL_PBL_PBI:"%"=%) -T pblbinary \
+		-A $(ARCH)
+
+pbl.bin: tools prepare FORCE
+	$(call if_changed,mkimage)
+
 ifeq ($(ARCH),arm)
 UBOOT_BINLOAD := u-boot.img
 else
@@ -1190,6 +1198,11 @@ OBJCOPYFLAGS_u-boot-with-spl-pbl.bin = -I binary -O binary --pad-to=$(CONFIG_SPL
 			  --gap-fill=0xff
 
 u-boot-with-spl-pbl.bin: spl/u-boot-spl.pbl $(UBOOT_BINLOAD) FORCE
+	$(call if_changed,pad_cat)
+
+OBJCOPYFLAGS_u-boot-pbl.bin = $(OBJCOPYFLAGS_u-boot-with-spl-pbl.bin)
+
+u-boot-pbl.bin: pbl.bin u-boot.bin FORCE
 	$(call if_changed,pad_cat)
 
 # PPC4xx needs the SPL at the end of the image, since the reset vector
