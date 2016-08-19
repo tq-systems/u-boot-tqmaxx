@@ -277,6 +277,7 @@ enum {
 	IH_TYPE_PMMC,            /* TI Power Management Micro-Controller Firmware */
 	IH_TYPE_STM32IMAGE,		/* STMicroelectronics STM32 Image */
 	IH_TYPE_SOCFPGAIMAGE_V1,	/* Altera SOCFPGA A10 Preloader	*/
+	IH_TYPE_PBLBINARY,		/* Freescale binary PBL instructions */
 
 	IH_TYPE_COUNT,			/* Number of image types */
 };
