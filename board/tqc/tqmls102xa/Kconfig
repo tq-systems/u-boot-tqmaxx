@@ -12,4 +12,18 @@ config SYS_SOC
 config SYS_CONFIG_NAME
 	default "tqmls102xa"
 
+choice
+	prompt "Base board variant"
+	optional
+	help
+	  Select base board for TQMLS102xA module
+
+config TQMLS102XA_MBLS102XA
+	bool "TQMLS102xA on MBLS102xA Starterkit"
+	help
+	  Select the MBLS102xA starterkit.
+	  This features a Ethernet, USB, SD-Card, etc.
+
+endchoice
+
 endif

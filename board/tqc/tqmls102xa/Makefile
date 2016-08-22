@@ -8,4 +8,6 @@
 obj-y += tqmls102xa.o \
 	tqmls102xa_eeprom.o
 
+obj-$(CONFIG_TQMLS102XA_MBLS102XA) += tqmls102xa_mbls102xa.o
+
 obj-$(CONFIG_FSL_DCU_FB) += dcu.o
