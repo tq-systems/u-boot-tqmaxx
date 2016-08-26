@@ -134,21 +134,47 @@ static void mba7_setup_iomuxc_enet(void)
 	udelay(500);
 }
 
+static const uint32_t fec_base[] = {
+	ENET_IPS_BASE_ADDR,
+	ENET2_IPS_BASE_ADDR
+};
+
+static const uint32_t phy_addr[] = {
+	TQMA7_ENET1_PHYADDR,
+	TQMA7_ENET2_PHYADDR
+};
+
 int board_eth_init(bd_t *bis)
 {
 	int ret;
+	int i;
 
-	ret = fecmxc_initialize_multi(bis, 0, TQMA7_ENET1_PHYADDR,
-				      ENET_IPS_BASE_ADDR);
-	if (ret)
-		printf("FEC0 MXC: %s:failed %i\n", __func__, ret);
+	struct mii_dev *bus = NULL;
+	struct phy_device *phydev = NULL;
 
-	ret = fecmxc_initialize_multi(bis, 1, TQMA7_ENET2_PHYADDR,
-				      ENET2_IPS_BASE_ADDR);
-	if (ret)
-		printf("FEC1 MXC: %s:failed %i\n", __func__, ret);
+	for (i = 0; i < ARRAY_SIZE(fec_base); ++i) {
+		bus = fec_get_miibus(fec_base[i], i);
+		if (!bus)
+			goto err_bus;
+		/* scan phy */
+		phydev = phy_find_by_mask(bus, (0x1 << phy_addr[i]),
+					  PHY_INTERFACE_MODE_RGMII_ID);
+		if (!phydev)
+			goto err_phydev;
+		ret = fec_probe(bis, i, fec_base[i], bus, phydev);
+		if (ret)
+			goto err_fec;
+		continue;
 
-	return ret;
+err_fec:
+		free(phydev);
+err_phydev:
+		free(bus);
+err_bus:
+		printf("Error init FEC%d\n", i);
+	}
+
+	return 0;
 }
 
 static int mba7_setup_fec(int fec_id)
