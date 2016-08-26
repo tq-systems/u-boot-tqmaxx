@@ -1,7 +1,6 @@
 /*
- * Copyright (C) 2015 Freescale Semiconductor, Inc.
- *
- * Configuration settings for the Freescale i.MX7D SABRESD board.
+ * Copyright (C) 2016 Freescale Semiconductor, Inc.
+ * Configuration settings for the TQ Systems TQMa7x SOM
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
@@ -124,17 +123,41 @@
 #define CONFIG_CMD_MII
 #define CONFIG_FEC_DMA_MINALIGN		64
 
+#define CONFIG_CMD_SF
+#define	CONFIG_SPI_FLASH
+#define	CONFIG_SPI_FLASH_STMICRO
+#define	CONFIG_SPI_FLASH_BAR
+#define	CONFIG_SF_DEFAULT_BUS		0
+#define	CONFIG_SF_DEFAULT_CS		0
+#define	CONFIG_SF_DEFAULT_SPEED		40000000
+#define	CONFIG_SF_DEFAULT_MODE		SPI_MODE_0
+
+/* QUADSPI driver */
+#define CONFIG_FSL_QSPI
+#define CONFIG_QSPI_BASE		QSPI1_IPS_BASE_ADDR
+#define CONFIG_QSPI_MEMMAP_BASE		QSPI0_ARB_BASE_ADDR
 
 /* Command definition */
 #include <config_cmd_default.h>
 
 #define CONFIG_CMD_BMODE
 #define CONFIG_CMD_BOOTZ
+
+#if !defined(CONFIG_SYS_BOOTM_LEN) || (CONFIG_SYS_BOOTM_LEN < SZ_16M)
+#undef CONFIG_SYS_BOOTM_LEN
+#define CONFIG_SYS_BOOTM_LEN		SZ_16M
+#endif
+
+#undef CONFIG_BOOTM_NETBSD
+#undef CONFIG_BOOTM_PLAN9
+#undef CONFIG_BOOTM_RTEMS
+
 #define CONFIG_CMD_ITEST
 #define CONFIG_CMD_SETEXPR
 #undef CONFIG_CMD_IMLS
 
 #define CONFIG_BOOTDELAY		3
+#define CONFIG_ZERO_BOOTDELAY_CHECK
 
 #define CONFIG_LOADADDR			0x82000000
 
@@ -214,25 +237,20 @@
 #define CONFIG_BOOTCOMMAND \
 	"run mmcboot; run netboot; run panicboot"
 
+#elif defined(CONFIG_TQMA7_QSPI_BOOT)
+
+#define CONFIG_FSL_QSPI
+#define CONFIG_ENV_IS_IN_SPI_FLASH
+
 #else
 
 #error "need to define boot source"
 
 #endif
 
-/* 128 MiB offset as in ARM related docu for linux suggested */
-#define TQMA_FDT_ADDRESS		0x18000000
-
-#undef CONFIG_BOOTM_NETBSD
-#undef CONFIG_BOOTM_PLAN9
-#undef CONFIG_BOOTM_RTEMS
-
 #ifdef CONFIG_SYS_BOOT_QSPI
 #define CONFIG_SYS_USE_QSPI
 #define CONFIG_ENV_IS_IN_SPI_FLASH
-#elif defined CONFIG_SYS_BOOT_NAND
-#define CONFIG_SYS_USE_NAND
-#define CONFIG_ENV_IS_IN_NAND
 #else
 #define CONFIG_ENV_IS_IN_MMC
 #endif
@@ -402,30 +420,6 @@
 #define CONFIG_SYS_INIT_SP_ADDR \
 	(CONFIG_SYS_INIT_RAM_ADDR + CONFIG_SYS_INIT_SP_OFFSET)
 
-#define CONFIG_ZERO_BOOTDELAY_CHECK
-
-#if !defined(CONFIG_SYS_BOOTM_LEN) || (CONFIG_SYS_BOOTM_LEN < SZ_16M)
-#undef CONFIG_SYS_BOOTM_LEN
-#define CONFIG_SYS_BOOTM_LEN		SZ_16M
-#endif
-
-/* FLASH and environment organization */
-#define CONFIG_SYS_NO_FLASH
-
-#ifdef CONFIG_SYS_USE_QSPI
-#define CONFIG_FSL_QSPI    /* enable the QUADSPI driver */
-#define CONFIG_QSPI_BASE		QSPI1_IPS_BASE_ADDR
-#define CONFIG_QSPI_MEMMAP_BASE		QSPI0_ARB_BASE_ADDR
-
-#define CONFIG_CMD_SF
-#define	CONFIG_SPI_FLASH
-#define	CONFIG_SPI_FLASH_MACRONIX
-#define	CONFIG_SPI_FLASH_BAR
-#define	CONFIG_SF_DEFAULT_BUS		0
-#define	CONFIG_SF_DEFAULT_CS		0
-#define	CONFIG_SF_DEFAULT_SPEED		40000000
-#define	CONFIG_SF_DEFAULT_MODE		SPI_MODE_0
-#endif
 
 #if defined(CONFIG_ENV_IS_IN_MMC)
 #
@@ -446,13 +440,6 @@
 #define CONFIG_SYS_MMC_ENV_DEV		0   /* USDHC1 */
 #define CONFIG_SYS_MMC_ENV_PART		0	/* user area */
 #define CONFIG_MMCROOT			"/dev/mmcblk0p2"  /* USDHC1 */
-
-#define CONFIG_ZERO_BOOTDELAY_CHECK
-
-#if !defined(CONFIG_SYS_BOOTM_LEN) || (CONFIG_SYS_BOOTM_LEN < SZ_16M)
-#undef CONFIG_SYS_BOOTM_LEN
-#define CONFIG_SYS_BOOTM_LEN		SZ_16M
-#endif
 
 /* FLASH and environment organization */
 #define CONFIG_SYS_NO_FLASH
