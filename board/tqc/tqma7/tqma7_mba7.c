@@ -162,6 +162,7 @@ static int mba7_setup_fec(int fec_id)
 		clrsetbits_le32(&iomuxc_gpr_regs->gpr[1],
 			(IOMUXC_GPR_GPR1_GPR_ENET2_TX_CLK_SEL_MASK |
 			 IOMUXC_GPR_GPR1_GPR_ENET2_CLK_DIR_MASK), 0);
+		break;
 	default:
 		printf("FEC%d: unsupported\n", fec_id);
 		return -1;
