@@ -235,6 +235,7 @@ __weak void dram_init_banksize(void)
 #if defined(CONFIG_HARD_I2C) || defined(CONFIG_SYS_I2C)
 static int init_func_i2c(void)
 {
+	return 0;
 	puts("I2C:   ");
 #ifdef CONFIG_SYS_I2C
 	i2c_init_all();
