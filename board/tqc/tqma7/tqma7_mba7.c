@@ -360,11 +360,25 @@ const char *tqc_bb_get_boardname(void)
 
 int board_mmc_get_env_dev(int devno)
 {
+	int env_dev;
 	/*
 	 * eMMC:	USDHC3 -> 0
 	 * SD:		USDHC1 -> 1
 	 */
-	return (2 == devno) ? 0 : 1;
+	switch (devno) {
+	case 2:
+		env_dev = 0;
+		break;
+	case 0:
+		env_dev = 1;
+		break;
+	default:
+		printf("mmc boot dev %d not supported, use default",
+		       devno);
+		env_dev = CONFIG_SYS_MMC_ENV_DEV;
+	};
+
+	return env_dev;
 }
 
 /*
