@@ -390,8 +390,18 @@ int mmc_get_env_devno(void)
 	if ((boot_type != BOOT_TYPE_SD) && (boot_type != BOOT_TYPE_MMC))
 		return CONFIG_SYS_MMC_ENV_DEV;
 
-	if (2 == dev_no)
+	switch (dev_no) {
+	case 2:
+		dev_no = 0;
+		break;
+	case 0:
 		dev_no = 1;
+		break;
+	default:
+		printf("mmc boot dev %d not supported, use default",
+		       (int)dev_no);
+		dev_no = CONFIG_SYS_MMC_ENV_DEV;
+	}
 
 	return dev_no;
 #endif
