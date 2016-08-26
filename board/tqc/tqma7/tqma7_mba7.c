@@ -70,9 +70,11 @@ static iomux_v3_cfg_t const mba7_fec1_pads[] = {
 	MX7D_PAD_GPIO1_IO10__ENET1_MDIO | MUX_PAD_CTRL(ENET_PAD_CTRL_MII),
 	MX7D_PAD_GPIO1_IO11__ENET1_MDC | MUX_PAD_CTRL(ENET_PAD_CTRL_MII),
 	/* PHY reset */
-	MX7D_PAD_ENET1_COL__GPIO7_IO15 | MUX_PAD_CTRL(GPIO_OUT_PAD_CTRL),
-	/* INT */
-	MX7D_PAD_GPIO1_IO09__GPIO1_IO9 | MUX_PAD_CTRL(GPIO_IN_PAD_CTRL),
+	MX7D_PAD_ENET1_COL__GPIO7_IO15 | MUX_PAD_CTRL(GPIO_OUT_PAD_CTRL) |
+		MUX_MODE_SION,
+	/* INT/PWDN */
+	MX7D_PAD_GPIO1_IO09__GPIO1_IO9 | MUX_PAD_CTRL(GPIO_OUT_PAD_CTRL) |
+		MUX_MODE_SION,
 };
 
 #define ENET1_PHY_RESET_GPIO IMX_GPIO_NR(7, 15)
@@ -96,9 +98,11 @@ static iomux_v3_cfg_t const mba7_fec2_pads[] = {
 	MX7D_PAD_SD2_WP__ENET2_MDC | MUX_PAD_CTRL(ENET_PAD_CTRL_MII),
 
 	/* PHY reset */
-	MX7D_PAD_EPDC_BDR0__GPIO2_IO28 | MUX_PAD_CTRL(GPIO_OUT_PAD_CTRL),
-	/* INT */
-	MX7D_PAD_EPDC_PWR_STAT__GPIO2_IO31 | MUX_PAD_CTRL(GPIO_IN_PAD_CTRL),
+	MX7D_PAD_EPDC_BDR0__GPIO2_IO28 | MUX_PAD_CTRL(GPIO_OUT_PAD_CTRL) |
+		MUX_MODE_SION,
+	/* INT/PWDN */
+	MX7D_PAD_EPDC_PWR_STAT__GPIO2_IO31 | MUX_PAD_CTRL(GPIO_OUT_PAD_CTRL) |
+		MUX_MODE_SION,
 };
 
 #define ENET2_PHY_RESET_GPIO IMX_GPIO_NR(2, 28)
@@ -110,24 +114,24 @@ static void mba7_setup_iomuxc_enet(void)
 					 ARRAY_SIZE(mba7_fec1_pads));
 
 	gpio_request(ENET1_PHY_RESET_GPIO, "enet1-phy-rst#");
-	gpio_request(ENET1_PHY_INT_GPIO, "enet1-phy-int");
-	gpio_direction_input(ENET1_PHY_INT_GPIO);
+	gpio_request(ENET1_PHY_INT_GPIO, "enet1-phy-intpwdn");
+	gpio_direction_output(ENET1_PHY_INT_GPIO, 1);
 	/* Reset PHY */
-	gpio_direction_output(ENET1_PHY_RESET_GPIO , 0);
-	udelay(20);
+	gpio_direction_output(ENET1_PHY_RESET_GPIO, 0);
+	udelay(100);
 	gpio_set_value(ENET1_PHY_RESET_GPIO, 1);
-	udelay(250);
+	udelay(500);
 	/* TODO: only for TQMa7D, not available on TQMa7S */
 	imx_iomux_v3_setup_multiple_pads(mba7_fec2_pads,
 					 ARRAY_SIZE(mba7_fec2_pads));
 	gpio_request(ENET2_PHY_RESET_GPIO, "enet2-phy-rst#");
-	gpio_request(ENET2_PHY_INT_GPIO, "enet2-phy-int");
-	gpio_direction_input(ENET2_PHY_INT_GPIO);
+	gpio_request(ENET2_PHY_INT_GPIO, "enet2-phy-intpwdn");
+	gpio_direction_output(ENET2_PHY_INT_GPIO, 1);
 	/* Reset PHY */
-	gpio_direction_output(ENET2_PHY_RESET_GPIO , 0);
-	udelay(20);
+	gpio_direction_output(ENET2_PHY_RESET_GPIO, 0);
+	udelay(100);
 	gpio_set_value(ENET2_PHY_RESET_GPIO, 1);
-	udelay(250);
+	udelay(500);
 }
 
 int board_eth_init(bd_t *bis)
