@@ -189,6 +189,39 @@ int board_phy_config(struct phy_device *phydev)
 	return 0;
 }
 
+iomux_v3_cfg_t const mba7_usb_otg1_pads[] = {
+	MX7D_PAD_GPIO1_IO04__USB_OTG1_OC |
+		MUX_PAD_CTRL(GPIO_IN_PAD_CTRL),
+	MX7D_PAD_GPIO1_IO05__USB_OTG1_PWR |
+		MUX_PAD_CTRL(GPIO_OUT_PAD_CTRL),
+};
+
+iomux_v3_cfg_t const mba7_usb_otg2_pads[] = {
+	MX7D_PAD_GPIO1_IO06__USB_OTG2_OC |
+		MUX_PAD_CTRL(GPIO_IN_PAD_CTRL),
+	MX7D_PAD_GPIO1_IO07__USB_OTG2_PWR |
+		MUX_PAD_CTRL(GPIO_OUT_PAD_CTRL),
+};
+
+int board_ehci_hcd_init(int port)
+{
+	switch (port) {
+	case 0:
+		imx_iomux_v3_setup_multiple_pads(mba7_usb_otg1_pads,
+						 ARRAY_SIZE(mba7_usb_otg1_pads));
+		break;
+	case 1:
+		imx_iomux_v3_setup_multiple_pads(mba7_usb_otg2_pads,
+						 ARRAY_SIZE(mba7_usb_otg2_pads));
+		break;
+	case 2:
+		break;
+	default:
+		printf("MXC USB port %d not yet supported\n", port);
+		return 1;
+	}
+	return 0;
+}
 
 static iomux_v3_cfg_t const mba7_uart2_pads[] = {
 	NEW_PAD_CTRL(MX7D_PAD_EPDC_DATA08__UART6_DCE_RX, UART_PAD_CTRL),
