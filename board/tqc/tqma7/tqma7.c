@@ -321,7 +321,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 
 	/* bring in eMMC dsr settings */
 	do_fixup_by_path_u32(blob,
-			     "/soc/aips-bus@02100000/usdhc@02198000",
+			     "/soc/aips-bus@30800000/usdhc@30b60000",
 			     "dsr", tqma7_emmc_dsr, 2);
 	tqc_bb_ft_board_setup(blob, bd);
 
