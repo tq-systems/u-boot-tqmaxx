@@ -212,6 +212,7 @@ static int mba7_setup_fec(int fec_id)
 
 int board_phy_config(struct phy_device *phydev)
 {
+	uint32_t val;
 	/*
 	* TODO: set skew values using phy_read_mmd_indirect from
 	* /driver/net/phy/ti - see also LS102xa for details about LED
@@ -241,6 +242,16 @@ int board_phy_config(struct phy_device *phydev)
 			      0x0171, 0x8888);
 	phydev->drv->writeext(phydev, phydev->addr, DP83867_DEVADDR,
 			      0x0172, 0x8888);
+
+	val = phydev->drv->readext(phydev, phydev->addr, DP83867_DEVADDR,
+				   0x0031);
+	val |= 1;
+	phydev->drv->writeext(phydev, phydev->addr, DP83867_DEVADDR,
+			      0x0031, val);
+
+	val = phy_read(phydev, MDIO_DEVAD_NONE, 0x10);
+	val |= 0x2;
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x10, val);
 
 	return 0;
 }
