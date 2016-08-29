@@ -208,14 +208,40 @@ static int mba7_setup_fec(int fec_id)
 	return 0;
 }
 
+#define DP83867_DEVADDR         0x1f
+
 int board_phy_config(struct phy_device *phydev)
 {
-	/* TODO: set skew values using phy_read_mmd_indirec from 
-	* /driver/net/phy/ti - see also LS102xa for detaiuls about LED config
+	/*
+	* TODO: set skew values using phy_read_mmd_indirect from
+	* /driver/net/phy/ti - see also LS102xa for details about LED
+	* config
 	*/
-
 	if (phydev->drv->config)
 		phydev->drv->config(phydev);
+
+	/* LED configuration */
+	/*
+	 * LED1: Link / Activity
+	 * LED2: error
+	 */
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x18, 0x0db0);
+	/* active low, LED1/2 driven by phy */
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x19, 0x1001);
+
+
+	if (!phydev->drv ||
+	    (!phydev->drv->writeext) || (!phydev->drv->readext)) {
+		puts("PHY does not have extended functions\n");
+		return 0;
+	}
+
+	/* set GPIO to out low */
+	phydev->drv->writeext(phydev, phydev->addr, DP83867_DEVADDR,
+			      0x0171, 0x8888);
+	phydev->drv->writeext(phydev, phydev->addr, DP83867_DEVADDR,
+			      0x0172, 0x8888);
+
 	return 0;
 }
 
