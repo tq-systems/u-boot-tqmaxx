@@ -243,6 +243,16 @@ int board_phy_config(struct phy_device *phydev)
 	phydev->drv->writeext(phydev, phydev->addr, DP83867_DEVADDR,
 			      0x0172, 0x8888);
 
+	val = phydev->drv->readext(phydev, phydev->addr, DP83867_DEVADDR,
+				   0x0031);
+	val |= 1;
+	phydev->drv->writeext(phydev, phydev->addr, DP83867_DEVADDR,
+			      0x0031, val);
+
+	val = phy_read(phydev, MDIO_DEVAD_NONE, 0x10);
+	val |= 0x2;
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x10, val);
+
 	return 0;
 }
 
