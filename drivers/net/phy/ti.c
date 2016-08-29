@@ -164,6 +164,23 @@ void phy_write_mmd_indirect(struct phy_device *phydev, int prtad,
 	phy_write(phydev, addr, MII_MMD_DATA, data);
 }
 
+static int dp83867_phy_extread(struct phy_device *phydev,
+			       int addr, int devad, int reg)
+{
+	if (devad != DP83867_DEVADDR)
+		return -1;
+	return phy_read_mmd_indirect(phydev, reg, devad, addr);
+};
+
+static int dp83867_phy_extwrite(struct phy_device *phydev, int addr,
+				int devad, int reg, u16 val)
+{
+	if (devad != DP83867_DEVADDR)
+		return -1;
+	phy_write_mmd_indirect(phydev, reg, devad, addr, (u32)val);
+	return 0;
+};
+
 #if defined(CONFIG_DM_ETH)
 /**
  * dp83867_data_init - Convenience function for setting PHY specific data
@@ -317,6 +334,8 @@ static struct phy_driver DP83867_driver = {
 	.config = &dp83867_config,
 	.startup = &genphy_startup,
 	.shutdown = &genphy_shutdown,
+	.readext = dp83867_phy_extread,
+	.writeext = dp83867_phy_extwrite,
 };
 
 int phy_ti_init(void)
