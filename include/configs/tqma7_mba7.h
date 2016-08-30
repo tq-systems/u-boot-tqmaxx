@@ -24,7 +24,7 @@
 
 #define CONFIG_MXC_UART_BASE		UART6_IPS_BASE_ADDR
 /* TODO: for kernel command line */
-#define CONFIG_CONSOLE_DEV		"ttymxc6"
+#define CONFIG_CONSOLE_DEV		"ttymxc5"
 
 #define CONFIG_CMD_GPIO
 
