@@ -411,6 +411,10 @@ int tqc_bb_board_init(void)
 	return 0;
 }
 
+static iomux_v3_cfg_t const mba7_wdog_pads[] = {
+	NEW_PAD_CTRL(MX7D_PAD_GPIO1_IO00__WDOG1_WDOG_B, NO_PAD_CTRL),
+};
+
 int tqc_bb_board_late_init(void)
 {
 	/*
@@ -452,6 +456,10 @@ int tqc_bb_board_late_init(void)
 		setenv("mmcblkdev", "");
 		setenv("mmcdev", "");
 	}
+
+	imx_iomux_v3_setup_multiple_pads(mba7_wdog_pads,
+					 ARRAY_SIZE(mba7_wdog_pads));
+	set_wdog_reset((struct wdog_regs *)WDOG1_BASE_ADDR);
 
 	return 0;
 }
