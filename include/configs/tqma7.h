@@ -324,7 +324,7 @@
 	"addtty=setenv bootargs ${bootargs} console=${console},${baudrate}\0"  \
 	"mmcpart=2\0"                                                          \
 	"mmcblkdev=0\0"                                                        \
-	"mmcargs=run addmmc addtty addfb addcma\0"                             \
+	"mmcargs=run addmmc addtty addcma\0"                                   \
 	"addmmc=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/mmcblk${mmcblkdev}p${mmcpart} ${rootfsmode} "       \
 		"rootwait\0"                                                   \
@@ -345,7 +345,7 @@
 	"netdev=eth0\0"                                                        \
 	"rootpath=/srv/nfs/tqma6\0"                                            \
 	"ipmode=static\0"                                                      \
-	"netargs=run addnfs addip addtty addfb addcma\0"                       \
+	"netargs=run addnfs addip addtty addcma\0"                             \
 	"addnfs=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/nfs rw "                                            \
 		"nfsroot=${serverip}:${rootpath},v3,tcp;\0"                    \
