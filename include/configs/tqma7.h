@@ -397,11 +397,17 @@
 
 #define CONFIG_SYS_LOAD_ADDR		CONFIG_LOADADDR
 
+/*
+ * config alternate mtest:
+ * enable 3/4 of RAM to test
+ * U-Boot is relocated to the end of RAM
+ * TODO: enable dynamic sizing
+ */
 #define CONFIG_CMD_MEMTEST
 #define CONFIG_SYS_ALT_MEMTEST
-#define CONFIG_SYS_MEMTEST_START	0x80000000
+#define CONFIG_SYS_MEMTEST_START	CONFIG_SYS_SDRAM_BASE
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + \
-					SZ_1G / 4)
+					(PHYS_SDRAM_SIZE) / 4 * 3)
 #define CONFIG_SYS_MEMTEST_SCRATCH	CONFIG_SYS_MEMTEST_END
 
 #define CONFIG_CMDLINE_EDITING
