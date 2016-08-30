@@ -295,7 +295,7 @@
 #define TQMA7_FDT_ADDRESS		0x88000000
 
 /* set to a resonable value, changeable by user */
-#define TQMA7_CMA_SIZE                 64M
+#define TQMA7_CMA_SIZE                 32M
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	UPDATE_M4_ENV \
@@ -316,7 +316,7 @@
 		"else setenv fdtimg ${fdt_file}; fi\0"                         \
 	"fdt_addr="__stringify(TQMA7_FDT_ADDRESS)"\0"                          \
 	"console=" CONFIG_CONSOLE_DEV "\0"                                     \
-	"cma_size="__stringify(TQMA6_CMA_SIZE)"\0"                             \
+	"cma_size="__stringify(TQMA7_CMA_SIZE)"\0"                             \
 	"fdt_high=0xffffffff\0"                                                \
 	"initrd_high=0xffffffff\0"                                             \
 	"rootfsmode=ro\0"                                                      \
