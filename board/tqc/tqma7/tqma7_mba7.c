@@ -292,18 +292,18 @@ int board_ehci_hcd_init(int port)
 	return 0;
 }
 
-static iomux_v3_cfg_t const mba7_uart2_pads[] = {
+static iomux_v3_cfg_t const mba7_uart6_pads[] = {
 	NEW_PAD_CTRL(MX7D_PAD_EPDC_DATA08__UART6_DCE_RX, UART_PAD_CTRL),
 	NEW_PAD_CTRL(MX7D_PAD_EPDC_DATA09__UART6_DCE_TX, UART_PAD_CTRL),
 };
 
 static void mba7_setup_iomuxc_uart(void)
 {
-	imx_iomux_v3_setup_multiple_pads(mba7_uart2_pads,
-					 ARRAY_SIZE(mba7_uart2_pads));
+	imx_iomux_v3_setup_multiple_pads(mba7_uart6_pads,
+					 ARRAY_SIZE(mba7_uart6_pads));
 }
 
-static iomux_v3_cfg_t const mba7_usdhc2_pads[] = {
+static iomux_v3_cfg_t const mba7_usdhc1_pads[] = {
 	NEW_PAD_CTRL(MX7D_PAD_SD1_CLK__SD1_CLK,		USDHC_CLK_PAD_CTRL),
 	NEW_PAD_CTRL(MX7D_PAD_SD1_CMD__SD1_CMD,		USDHC_CMD_PAD_CTRL),
 	NEW_PAD_CTRL(MX7D_PAD_SD1_DATA0__SD1_DATA0,	USDHC_DATA_PAD_CTRL),
@@ -348,8 +348,8 @@ static struct fsl_esdhc_cfg mba7_usdhc_cfg = {
 
 int tqc_bb_board_mmc_init(bd_t *bis)
 {
-	imx_iomux_v3_setup_multiple_pads(mba7_usdhc2_pads,
-					 ARRAY_SIZE(mba7_usdhc2_pads));
+	imx_iomux_v3_setup_multiple_pads(mba7_usdhc1_pads,
+					 ARRAY_SIZE(mba7_usdhc1_pads));
 	gpio_request(USDHC1_CD_GPIO, "usdhc1-cd");
 	gpio_request(USDHC1_WP_GPIO, "usdhc1-wp");
 	gpio_direction_input(USDHC1_CD_GPIO);
