@@ -381,7 +381,7 @@
 		"else setenv fdtimg ${fdt_file}; fi\0"                         \
 	"fdt_addr="__stringify(TQMA6UL_FDT_ADDRESS)"\0"                          \
 	"console=" CONFIG_CONSOLE_DEV "\0"                                     \
-	"cma_size="__stringify(TQMA6_CMA_SIZE)"\0"                             \
+	"cma_size="__stringify(TQMA6UL_CMA_SIZE)"\0"                             \
 	"fdt_high=0xffffffff\0"                                                \
 	"initrd_high=0xffffffff\0"                                             \
 	"rootfsmode=ro\0"                                                      \
