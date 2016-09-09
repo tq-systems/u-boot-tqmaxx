@@ -5,6 +5,8 @@
  */
 
 #include "tqmls102xa_bb.h"
+#include <spi.h>
+#include <spi_flash.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -256,6 +258,35 @@ int board_late_init(void)
 }
 #endif
 
+int tqmls102xa_qspi_has_second_chip(void)
+{
+	struct spi_slave *spi;
+	int ret;
+	u8 idcode[5], cmd_read_id = 0x9f;
+
+	spi = spi_setup_slave(CONFIG_SF_DEFAULT_BUS, 1,
+			      CONFIG_SF_DEFAULT_SPEED, CONFIG_SF_DEFAULT_MODE);
+	if (spi) {
+		ret = spi_claim_bus(spi);
+		if (ret)
+			return -1;
+
+		ret = spi_xfer(spi, 8, &cmd_read_id, NULL, SPI_XFER_BEGIN);
+		ret += spi_xfer(spi, sizeof(idcode) * 8, NULL, idcode, SPI_XFER_END);
+		if (ret)
+			return -1;
+
+		if (idcode[0] == 0xff && idcode[1] == 0xff &&
+		    idcode[2] == 0xff && idcode[3] == 0xff &&
+		    idcode[4] == 0xff)
+			return 0;
+
+		return 1;
+	}
+
+	return -1;
+}
+
 int ft_board_setup(void *blob, bd_t *bd)
 {
 	int off;
@@ -273,6 +304,36 @@ int ft_board_setup(void *blob, bd_t *bd)
 	off = fdt_node_offset_by_compat_reg(blob, FSL_QSPI_COMPAT,
 					    QSPI0_BASE_ADDR);
 	fdt_set_node_status(blob, off, FDT_STATUS_OKAY, 0);
+
+	/* Detect second qspi flash chip */
+	if (!tqmls102xa_qspi_has_second_chip()) {
+		int offset, ret = 0;
+
+		printf("ft_board_setup: single qspi flash found");
+
+		offset = fdt_path_offset(blob,
+					 "/soc/quadspi@1550000/mt25ql512@1");
+		if (offset >= 0) {
+			fdt_del_node(blob, offset);
+			ret += 1;
+		}
+
+		offset = fdt_path_offset(blob,
+					 "/soc/quadspi@1550000");
+		if (!fdt_delprop(blob, offset, "fsl,qspi-has-second-chip"))
+			ret += 2;
+
+		switch(ret) {
+		case 0: printf("\n");
+			break;
+		case 1: printf(", removed node for second chip.\n");
+			break;
+		case 2: printf(", removed property for second chip\n");
+			break;
+		case 3: printf(", removed references to second chip\n");
+			break;
+		}
+	}
 
 	return 0;
 }
