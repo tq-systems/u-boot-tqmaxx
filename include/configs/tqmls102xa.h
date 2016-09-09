@@ -76,7 +76,11 @@
 #define CONFIG_SYS_CLK_FREQ		100000000
 #define CONFIG_DDR_CLK_FREQ		100000000
 
+#if defined(CONFIG_DDR_ECC)
+#define DDR_SDRAM_CFG			0x670c000c
+#else
 #define DDR_SDRAM_CFG			0x470c0008
+#endif
 #define DDR_CS0_BNDS			0x008000bf
 #define DDR_CS0_CONFIG			0x80014302
 #define DDR_TIMING_CFG_0		0x50550004
@@ -432,6 +436,14 @@
 #define TQMLS102X_FDT_SECTOR_COUNT	0x800
 #define CONFIG_DEFAULT_FDT_FILE		"ls1021a-tqmls1021a-mbls102x.dtb"
 
+#if defined(CONFIG_DDR_ECC)
+#define CONFIG_UBOOT_MMCSD_IMAGE_FILE	"u-boot-with-spl-pbl-ecc-mmcsd-2016.05.bin"
+#define CONFIG_UBOOT_QSPI_IMAGE_FILE	"u-boot-pbl.bin.ecc.bswap"
+#else
+#define CONFIG_UBOOT_MMCSD_IMAGE_FILE	"u-boot-with-spl-pbl-mmcsd-2016.05.bin"
+#define CONFIG_UBOOT_QSPI_IMAGE_FILE	"u-boot-pbl.bin.bswap"
+#endif
+
 #define TQMLS102X_KERNEL_SECTOR_START	0x2000
 #define TQMLS102X_KERNEL_SECTOR_COUNT	0x4000
 
@@ -498,7 +510,7 @@
 	"kernel_name=if test \"${boot_type}\" != bootz; then "                 \
 		"setenv kernel ${uimage}; "                                    \
 		"else setenv kernel ${zimage}; fi\0"                           \
-	"uboot=u-boot-with-spl-pbl-mmcsd-2016.05.bin\0"                        \
+	"uboot=" CONFIG_UBOOT_MMCSD_IMAGE_FILE "\0"                            \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"                               \
 	"fdt_addr="__stringify(TQMLS102X_FDT_ADDRESS)"\0"                      \
 	"console=" TQMLS201X_CONSOLE_DEV "\0"                                  \
@@ -549,7 +561,7 @@
 		"fi; "                                                         \
 		"echo ... failed\0"                                            \
 	"panicboot=echo No boot device !!! reset\0"                            \
-	"uboot-qspi=u-boot-pbl.bin.bswap\0"                                    \
+	"uboot-qspi=" CONFIG_UBOOT_QSPI_IMAGE_FILE "\0"                        \
 	"update_uboot-qspi=if tftp ${uboot-qspi}; then "                       \
 		"if itest ${filesize} > 0; then "                              \
 			"sf probe; sf update ${loadaddr} "__stringify(TQMLS102X_UBOOT_SPI_OFFSET)" ${filesize}; " \
