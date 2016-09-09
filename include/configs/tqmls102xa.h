@@ -490,6 +490,7 @@
 	"run mmcboot; run netboot; run panicboot"
 
 #define CONFIG_EXTRA_ENV_SETTINGS                                              \
+	"addmisc=setenv bootargs ${bootargs} hdmi\0"                           \
 	"board=tqmls102x\0"                                                    \
 	"uimage=uImage\0"                                                      \
 	"zimage=zImage\0"                                                      \
@@ -506,7 +507,7 @@
 	"addtty=setenv bootargs ${bootargs} console=${console},${baudrate}\0"  \
 	"mmcpart=2\0"                                                          \
 	"mmcblkdev=0\0"                                                        \
-	"mmcargs=run addmmc addtty\0"                                          \
+	"mmcargs=run addmmc addtty addmisc\0"                                  \
 	"addmmc=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/mmcblk${mmcblkdev}p${mmcpart} rw rootwait\0"        \
 	"mmcboot=echo Booting from mmc ...; "                                  \
@@ -523,7 +524,7 @@
 	"netdev=eth0\0"                                                        \
 	"rootpath=/srv/nfs/tqmls1021a\0"                                       \
 	"ipmode=static\0"                                                      \
-	"netargs=run addnfs addip addtty addfb\0"                              \
+	"netargs=run addnfs addip addtty addmisc\0"                            \
 	"addnfs=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/nfs rw "                                            \
 		"nfsroot=${serverip}:${rootpath},v3,tcp;\0"                    \
