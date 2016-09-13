@@ -43,6 +43,8 @@ void ddrmc_init(void)
 	struct ccsr_ddr *ddr = (struct ccsr_ddr *)CONFIG_SYS_FSL_DDR_ADDR;
 	u32 temp_sdram_cfg;
 
+	printf("DDR ECC: %s - ", (DDR_SDRAM_CFG & (1 << 29)) ? "ON" : "OFF");
+
 	out_be32(&ddr->sdram_cfg, DDR_SDRAM_CFG);
 
 	out_be32(&ddr->cs0_bnds, DDR_CS0_BNDS);
