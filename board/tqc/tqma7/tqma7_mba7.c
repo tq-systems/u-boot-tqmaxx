@@ -213,6 +213,22 @@ static int mba7_setup_fec(int fec_id)
 
 #define DP83867_DEVADDR         0x1f
 
+/* TODO: needed here until we hav DT init */
+
+#define MBA7_DP83867_RGMII_TX_DELAY_CTRL	0x09 /* 0b1001 = 2,5 ns */
+#define MBA7_DP83867_RGMII_RX_DELAY_CTRL	0x09 /* 0b1001 = 2,5 ns */
+
+/* Extended Registers */
+#define DP83867_RGMIICTL	0x0032
+#define DP83867_RGMIIDCTL	0x0086
+
+/* RGMIIDCTL bits */
+#define DP83867_RGMII_TX_CLK_DELAY_SHIFT	4
+
+/* RGMIICTL bits */
+#define DP83867_RGMII_TX_CLK_DELAY_EN		BIT(1)
+#define DP83867_RGMII_RX_CLK_DELAY_EN		BIT(0)
+
 int board_phy_config(struct phy_device *phydev)
 {
 	uint32_t val;
@@ -255,6 +271,21 @@ int board_phy_config(struct phy_device *phydev)
 	val = phy_read(phydev, MDIO_DEVAD_NONE, 0x10);
 	val |= 0x2;
 	phy_write(phydev, MDIO_DEVAD_NONE, 0x10, val);
+
+	val = phydev->drv->readext(phydev, phydev->addr, DP83867_DEVADDR,
+				   DP83867_RGMIICTL);
+	val |= (DP83867_RGMII_TX_CLK_DELAY_EN |
+		DP83867_RGMII_RX_CLK_DELAY_EN);
+
+	phydev->drv->writeext(phydev, phydev->addr, DP83867_DEVADDR,
+			      DP83867_RGMIICTL, val);
+
+	val = ((MBA7_DP83867_RGMII_RX_DELAY_CTRL) |
+	       (MBA7_DP83867_RGMII_TX_DELAY_CTRL <<
+		DP83867_RGMII_TX_CLK_DELAY_SHIFT));
+
+	phydev->drv->writeext(phydev, phydev->addr, DP83867_DEVADDR,
+			      DP83867_RGMIIDCTL, val);
 
 	return 0;
 }
