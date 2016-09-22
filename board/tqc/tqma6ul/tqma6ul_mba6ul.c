@@ -497,16 +497,16 @@ int tqc_bb_board_late_init(void)
 		case 0:
 		/*
 		 * This assumes that the kernel registered the baseboard
-		 * as the first boot device ...
+		 * as the second boot device ...
 		 */
 			printf("USDHC%u (SD)\n", imx_boot_device_instance() + 1);
-			setenv("mmcblkdev", "0");
+			setenv("mmcblkdev", "1");
 			setenv("mmcdev", "1");
 			break;
 		/* eMMC (USDHC2)*/
 		case 1:
 			printf("USDHC%u (eMMC)\n", imx_boot_device_instance() + 1);
-			setenv("mmcblkdev", "1");
+			setenv("mmcblkdev", "0");
 			setenv("mmcdev", "0");
 			break;
 		default:
