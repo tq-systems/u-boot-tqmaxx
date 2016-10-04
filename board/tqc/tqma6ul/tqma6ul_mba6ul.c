@@ -72,12 +72,6 @@ DECLARE_GLOBAL_DATA_PTR;
 #define USB_OC_PAD_CTRL (PAD_CTL_SPEED_MED | PAD_CTL_DSE_40ohm |	\
 	PAD_CTL_HYS | PAD_CTL_PKE)
 
-enum fec_device {
-	FEC0,
-	FEC1,
-	FEC_ALL
-};
-
 /*
  * pin conflicts for fec1 and fec2, GPIO1_IO06 and GPIO1_IO07 can only
  * be used for ENET1 or ENET2, cannot be used for both.
@@ -136,8 +130,8 @@ static iomux_v3_cfg_t const mba6ul_fec2_pads[] = {
 
 static iomux_v3_cfg_t const mba6ul_fec_common_pads[] = {
 	/* MDIO */
-	NEW_PAD_CTRL(MX6_PAD_GPIO1_IO06__ENET1_MDIO, ENET_MDIO_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_GPIO1_IO07__ENET1_MDC, ENET_MDIO_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_GPIO1_IO06__ENET2_MDIO, ENET_MDIO_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_GPIO1_IO07__ENET2_MDC, ENET_MDIO_PAD_CTRL),
 #if defined(CONFIG_MBA6UL_ENET_RST)	
 	/* PHY reset*/
 	NEW_PAD_CTRL(MX6_PAD_GPIO1_IO02__GPIO1_IO02, GPIO_OUT_PAD_CTRL),
@@ -155,20 +149,15 @@ static void mba6ul_setup_iomuxc_enet(void)
 					 ARRAY_SIZE(mba6ul_fec1_pads));
 	imx_iomux_v3_setup_multiple_pads(mba6ul_fec2_pads,
 					 ARRAY_SIZE(mba6ul_fec2_pads));
-}
-
-int board_eth_init(bd_t *bis)
-{
-	int ret;
 
 #if defined(CONFIG_MBA6UL_ENET1_INT)
-		gpio_request(ENET1_PHY_INT_GPIO, "enet1-phy-int");
-		gpio_direction_input(ENET1_PHY_INT_GPIO);
+	gpio_request(ENET1_PHY_INT_GPIO, "enet1-phy-int");
+	gpio_direction_input(ENET1_PHY_INT_GPIO);
 #endif
 
 #if defined(CONFIG_MBA6UL_ENET2_INT)
-		gpio_request(ENET2_PHY_INT_GPIO, "enet2-phy-int");
-		gpio_direction_input(ENET2_PHY_INT_GPIO);
+	gpio_request(ENET2_PHY_INT_GPIO, "enet2-phy-int");
+	gpio_direction_input(ENET2_PHY_INT_GPIO);
 #endif
 
 #if defined(CONFIG_MBA6UL_ENET_RST)
@@ -186,7 +175,18 @@ int board_eth_init(bd_t *bis)
 	udelay(24900);
 	gpio_set_value(ENET_PHY_RESET_GPIO, 1);
 #endif
+}
 
+int board_eth_init(bd_t *bis)
+{
+	int ret;
+
+	/*
+	 * FEC0 and FEC1 shares the mdio bus therefore the
+	 * CONFIG_FEC_MXC_MDIO_BASE macro is used to specify the bus.
+	 * This makes the ENET_BASE_ADDR and ENET2_BASE_ADDR macro
+	 * useless for the fecmxc_initialize_multi function.
+	 */
 	ret = fecmxc_initialize_multi(bis, 0, TQMA6UL_ENET1_PHYADDR,
 				      ENET_BASE_ADDR);
 	if (ret)
@@ -200,12 +200,16 @@ int board_eth_init(bd_t *bis)
 	return ret;
 }
 
+enum fec_device {
+	FEC0,
+	FEC1
+};
+
 static int mba6ul_setup_fec(int fec_id)
 {
 	struct iomuxc_gpr_base_regs *const iomuxc_gpr_regs
 		= (struct iomuxc_gpr_base_regs *) IOMUXC_GPR_BASE_ADDR;
 	int ret;
-	u32 clrbits, setbits;
 
 	switch (fec_id) {
 	case FEC0:
@@ -227,20 +231,7 @@ static int mba6ul_setup_fec(int fec_id)
 		 * clear gpr1[13], set gpr1[17]
 		 */
 		clrsetbits_le32(&iomuxc_gpr_regs->gpr[1], IOMUX_GPR1_FEC2_MASK,
-				IOMUX_GPR1_FEC2_CLOCK_MUX2_SEL_MASK);
-		break;
-	case FEC_ALL:
-		/* TODO: Check if both clocks can be enabled at the same time !*/
-		if (check_module_fused(MX6_MODULE_ENET1) &&
-		    check_module_fused(MX6_MODULE_ENET2))
-			return -1;
-		/*
-		 * Use 50M anatop loopback REF_CLK1 for ENET1/2,
-		 * clear gpr1[13], set gpr1[17]
-		 */
-		clrbits = (IOMUX_GPR1_FEC1_MASK | IOMUX_GPR1_FEC2_MASK);
-		setbits = (IOMUX_GPR1_FEC1_CLOCK_MUX1_SEL_MASK | IOMUX_GPR1_FEC2_CLOCK_MUX2_SEL_MASK);
-		clrsetbits_le32(&iomuxc_gpr_regs->gpr[1], clrbits, setbits);
+				IOMUX_GPR1_FEC2_CLOCK_MUX1_SEL_MASK);
 		break;
 	default:
 		printf("FEC%d: unsupported\n", fec_id);
@@ -468,6 +459,12 @@ int tqc_bb_board_init(void)
 	mba6ul_setup_i2c();
 	/* do it here - to have reset completed */
 	mba6ul_setup_iomuxc_enet();
+	/* Only ENET2_MII can manage multiple phy's so we need to
+	 * init FEC1 first.
+	 * TODO:
+	 *   Check if we can change this with MBa6UL-REV.0200
+	 */
+	mba6ul_setup_fec(FEC1);
 	mba6ul_setup_fec(FEC0);
 	mba6ul_setup_usb();
 
