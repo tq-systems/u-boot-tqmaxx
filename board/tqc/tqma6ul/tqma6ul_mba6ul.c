@@ -327,6 +327,7 @@ int tqc_bb_board_mmc_init(bd_t *bis)
 	return 0;
 }
 
+#ifdef CONFIG_MBA6UL_I2C2
 static struct i2c_pads_info mba6ul_i2c2_pads = {
 /* I2C2: MBa6UL */
 	.scl = {
@@ -357,6 +358,7 @@ static void mba6ul_setup_i2c(void)
 	if (ret)
 		printf("setup I2C2 failed: %d\n", ret);
 }
+#endif
 
 #ifdef CONFIG_USB_EHCI_MX6
 #define USB_OTHERREGS_OFFSET	0x800
@@ -456,7 +458,14 @@ int tqc_bb_board_early_init_f(void)
 
 int tqc_bb_board_init(void)
 {
+#ifdef CONFIG_MBA6UL_I2C2
+	/*
+	 * The I2C2 Signals and the UART6 RTS/CTS Signals sharing the
+	 * same MX6UL pins. We configured the kernel to use these pins
+	 * as rts/cts signals.
+	 */
 	mba6ul_setup_i2c();
+#endif
 	/* do it here - to have reset completed */
 	mba6ul_setup_iomuxc_enet();
 	/* Only ENET2_MII can manage multiple phy's so we need to
