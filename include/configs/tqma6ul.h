@@ -407,7 +407,7 @@
 			"fi; "                                                 \
 		"fi;\0"                                                        \
 		"setenv bootargs \0"                                           \
-	"netdev=eth0\0"                                                        \
+	"netdev=eth1\0"                                                        \
 	"rootpath=/srv/nfs/tqma6\0"                                            \
 	"ipmode=static\0"                                                      \
 	"netargs=run addnfs addip addtty addcma\0"                             \
