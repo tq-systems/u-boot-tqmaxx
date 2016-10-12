@@ -173,15 +173,7 @@ static int ls_pcie_link_state(struct ls_pcie *pcie)
 static int ls_pcie_link_up(struct ls_pcie *pcie)
 {
 	int state;
-	u32 cap;
 
-	state = ls_pcie_link_state(pcie);
-	if (state)
-		return state;
-
-	/* Try to download speed to gen1 */
-	cap = readl(pcie->dbi + PCIE_LINK_CAP);
-	writel((cap & (~PCIE_LINK_SPEED_MASK)) | 1, pcie->dbi + PCIE_LINK_CAP);
 	/*
 	 * Notice: the following delay has critical impact on link training
 	 * if too short (<30ms) the link doesn't get up.
@@ -190,8 +182,6 @@ static int ls_pcie_link_up(struct ls_pcie *pcie)
 	state = ls_pcie_link_state(pcie);
 	if (state)
 		return state;
-
-	writel(cap, pcie->dbi + PCIE_LINK_CAP);
 
 	return 0;
 }
