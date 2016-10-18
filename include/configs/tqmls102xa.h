@@ -324,6 +324,20 @@
 #define CONFIG_CMD_PCI
 #endif
 
+#ifdef CONFIG_TQMLS102XA_MBLS102XA
+#define CONFIG_CMD_CPLD_MUX
+#define CONFIG_CPLD_MUX_DIP_BUS		0x0
+#define CONFIG_CPLD_MUX_DIP_ADDRESS	0x22
+#define CONFIG_CPLD_MUX_DIP_REGISTER	0x0
+/* for LVDS and LVDS_RGBINV add video mode definition to bootargs
+ * in order to disable HDMI connector modes
+ */
+#define CONFIG_CPLD_MUX_DIP_MASK	0x08
+#define CONFIG_CPLD_MUX_MATCH_COMMAND	"setenv bootargs ${bootargs} " \
+					"video=HDMI-A-1:d video=LVDS-1:800x480-32"
+#endif
+
+
 #define CONFIG_CMD_PING
 #define CONFIG_CMD_DHCP
 #define CONFIG_CMD_MII
@@ -450,6 +464,12 @@
 /* 128 MiB offset as in ARM related docu for linux suggested */
 #define TQMLS102X_FDT_ADDRESS		0x88000000
 
+#if defined(CONFIG_TQMLS102XA_MBLS102XA)
+#define BASEBOARD_EXTRA_ENV_SETTINGS	"addplatform=cpld_mux\0"
+#else
+#define BASEBOARD_EXTRA_ENV_SETTINGS	"addplatform=\0"
+#endif
+
 #define TQMLS102X_EXTRA_BOOTDEV_ENV_SETTINGS                                   \
 	"uboot_start="__stringify(TQMLS102X_UBOOT_SECTOR_START)"\0"            \
 	"uboot_size="__stringify(TQMLS102X_UBOOT_SECTOR_COUNT)"\0"             \
@@ -496,7 +516,7 @@
 			"fi; "                                                 \
 		"fi; fi; "                                                     \
 		"setenv filesize; setenv blkc \0"                              \
-
+	BASEBOARD_EXTRA_ENV_SETTINGS                                           \
 
 #define CONFIG_BOOTCOMMAND \
 	"run mmcboot; run netboot; run panicboot"
@@ -516,10 +536,11 @@
 	"console=" TQMLS201X_CONSOLE_DEV "\0"                                  \
 	"fdt_high=0xffffffff\0"                                                \
 	"initrd_high=0xffffffff\0"                                             \
-	"addtty=setenv bootargs ${bootargs} console=${console},${baudrate}\0"  \
+	"addtty=setenv bootargs ${bootargs} console=tty0 "                     \
+		"console=${console},${baudrate}\0"                             \
 	"mmcpart=2\0"                                                          \
 	"mmcblkdev=0\0"                                                        \
-	"mmcargs=run addmmc addtty addmisc\0"                                  \
+	"mmcargs=run addmmc addtty addmisc addplatform\0"                      \
 	"addmmc=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/mmcblk${mmcblkdev}p${mmcpart} rw rootwait\0"        \
 	"mmcboot=echo Booting from mmc ...; "                                  \
