@@ -461,10 +461,27 @@ static iomux_v3_cfg_t const mba7_wdog_pads[] = {
 	NEW_PAD_CTRL(MX7D_PAD_GPIO1_IO00__WDOG1_WDOG_B, WDOG_PAD_CTRL),
 };
 
+#define MBA7_PCF8574_I2C_BUS	1
+#define MBA7_PCF8574_DEV0_ADDR	0x3c
+#define MBA7_PCF8574_DEV0_VAL	0x1f /* 0 - output, 1 - input */
+#define MBA7_PCF8574_DEV1_ADDR	0x39
+#define MBA7_PCF8574_DEV1_VAL	0xe0 /* 0 - output, 1 - input */
+
+static const uint8_t io_exp[] = {
+	MBA7_PCF8574_DEV0_ADDR,
+	MBA7_PCF8574_DEV1_ADDR
+};
+
+static uint8_t io_dat[] = {
+	MBA7_PCF8574_DEV0_VAL,
+	MBA7_PCF8574_DEV1_VAL
+};
+
 int tqc_bb_board_late_init(void)
 {
 	struct bootrom_sw_info **p =
 		(struct bootrom_sw_info **)ROM_SW_INFO_ADDR;
+	int i;
 
 	u8 boot_type = (*p)->boot_dev_type;
 	u8 dev_no = (*p)->boot_dev_instance;
@@ -522,6 +539,19 @@ int tqc_bb_board_late_init(void)
 	imx_iomux_v3_setup_multiple_pads(mba7_wdog_pads,
 					 ARRAY_SIZE(mba7_wdog_pads));
 	set_wdog_reset((struct wdog_regs *)WDOG1_BASE_ADDR);
+
+	/* There is a HW-BUG on HW.REV.0100
+	 * set port-expander default values to avoid unexpected behaviours */
+	i2c_set_bus_num(MBA7_PCF8574_I2C_BUS);
+	for (i = 0; i < ARRAY_SIZE(io_exp); ++i) {
+		if (!i2c_probe(io_exp[i])) {
+			/* this device has no addr hence addr length is 0 */
+			if (i2c_write(io_exp[i], 0, 0, &io_dat[i], 1))
+				printf("PCF8574 write failed\n");
+		} else {
+			printf("PCF8574 Not found\n");
+		}
+	}
 
 	return 0;
 }
