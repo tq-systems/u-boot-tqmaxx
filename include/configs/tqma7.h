@@ -320,7 +320,8 @@
 	"initrd_high=0xffffffff\0"                                             \
 	"rootfsmode=ro\0"                                                      \
 	"addcma=setenv bootargs ${bootargs} cma=${cma_size}\0"                 \
-	"addtty=setenv bootargs ${bootargs} console=${console},${baudrate}\0"  \
+	"addtty=setenv bootargs ${bootargs} console=${console},${baudrate} "   \
+		"consoleblank=0\0"                                             \
 	"mmcpart=2\0"                                                          \
 	"mmcblkdev=0\0"                                                        \
 	"mmcargs=run addmmc addtty addcma\0"                                   \
