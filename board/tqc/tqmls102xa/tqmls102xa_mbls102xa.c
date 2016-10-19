@@ -107,8 +107,35 @@ void tqmls102xa_bb_early_init(void)
 #endif
 }
 
+void mbls102xa_cpld_config(void)
+{
+	unsigned int oldbus, i;
+	uchar pca_in, pca_out, pca_cfg = 0x0f;
+
+	/* display cpld_mux dip-switch-values on 4 LEDs */
+	oldbus = i2c_get_bus_num();
+	i2c_set_bus_num(0);
+	i2c_read(0x22, 0, 1, &pca_in, 1);
+	/* assign input values to led outputs */
+	pca_out = (pca_in & 0x01) << 7 | (pca_in & 0x02) << 5 |
+		  (pca_in & 0x04) << 3 | (pca_in & 0x08) << 1;
+	/* set direction */
+	i2c_write(0x22, 3, 1, &pca_cfg, 1);
+	/* set output */
+	i2c_write(0x22, 1, 1, &pca_out, 1);
+
+	printf("CPLD:  ");
+	for(i = 0; i <= 3; i++)
+		printf("%d",(pca_in>>i) & 0x01);
+	printf("\n");
+
+	i2c_set_bus_num(oldbus);
+}
+
 void tqmls102xa_bb_late_init(void)
 {
+	mbls102xa_cpld_config();
+
 	ls1021a_sata_init();
 }
 #endif
