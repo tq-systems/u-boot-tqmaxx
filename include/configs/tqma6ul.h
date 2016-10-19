@@ -361,7 +361,7 @@
 #define TQMA6UL_CMA_SIZE		32M
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
-	"board=tqma6ul\0"                                                        \
+	"board=tqma6ul\0"                                                      \
 	"uimage=uImage\0"                                                      \
 	"zimage=zImage\0"                                                      \
 	"boot_type=bootz\0"                                                    \
@@ -376,14 +376,15 @@
 	"fdt_name=if test \"${fdt_type}\" != single; then "                    \
 		"setenv fdtimg ${fitfdt_file}; "                               \
 		"else setenv fdtimg ${fdt_file}; fi\0"                         \
-	"fdt_addr="__stringify(TQMA6UL_FDT_ADDRESS)"\0"                          \
+	"fdt_addr="__stringify(TQMA6UL_FDT_ADDRESS)"\0"                        \
 	"console=" CONFIG_CONSOLE_DEV "\0"                                     \
-	"cma_size="__stringify(TQMA6UL_CMA_SIZE)"\0"                             \
+	"cma_size="__stringify(TQMA6UL_CMA_SIZE)"\0"                           \
 	"fdt_high=0xffffffff\0"                                                \
 	"initrd_high=0xffffffff\0"                                             \
 	"rootfsmode=ro\0"                                                      \
 	"addcma=setenv bootargs ${bootargs} cma=${cma_size}\0"                 \
-	"addtty=setenv bootargs ${bootargs} console=${console},${baudrate}\0"  \
+	"addtty=setenv bootargs ${bootargs} console=${console},${baudrate} "   \
+		"consoleblank=0\0"                                             \
 	"mmcpart=2\0"                                                          \
 	"mmcblkdev=0\0"                                                        \
 	"mmcargs=run addmmc addtty addcma\0"                                   \
@@ -447,7 +448,7 @@
 	"loadfdt=if test \"${fdt_type}\" != single; then "                     \
 		"run loadfdtfit; "                                             \
 		"else run loadfdtsingle; fi\0"                                 \
-	TQMA6UL_EXTRA_BOOTDEV_ENV_SETTINGS                                       \
+	TQMA6UL_EXTRA_BOOTDEV_ENV_SETTINGS                                     \
 
 /* Miscellaneous configurable options */
 #define CONFIG_SYS_CONSOLE_IS_IN_ENV
