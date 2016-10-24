@@ -134,17 +134,20 @@ static void mba7_setup_iomuxc_enet(void)
 	udelay(100);
 	gpio_set_value(ENET1_PHY_RESET_GPIO, 1);
 	udelay(500);
-	/* TODO: only for TQMa7D, not available on TQMa7S */
-	imx_iomux_v3_setup_multiple_pads(mba7_fec2_pads,
-					 ARRAY_SIZE(mba7_fec2_pads));
-	gpio_request(ENET2_PHY_RESET_GPIO, "enet2-phy-rst#");
-	gpio_request(ENET2_PHY_INT_GPIO, "enet2-phy-intpwdn");
-	gpio_direction_output(ENET2_PHY_INT_GPIO, 1);
-	/* Reset PHY */
-	gpio_direction_output(ENET2_PHY_RESET_GPIO, 0);
-	udelay(100);
-	gpio_set_value(ENET2_PHY_RESET_GPIO, 1);
-	udelay(500);
+
+	if (is_cpu_type(MXC_CPU_MX7S)) {
+		/* TODO: only for TQMa7D, not available on TQMa7S */
+		imx_iomux_v3_setup_multiple_pads(mba7_fec2_pads,
+						 ARRAY_SIZE(mba7_fec2_pads));
+		gpio_request(ENET2_PHY_RESET_GPIO, "enet2-phy-rst#");
+		gpio_request(ENET2_PHY_INT_GPIO, "enet2-phy-intpwdn");
+		gpio_direction_output(ENET2_PHY_INT_GPIO, 1);
+		/* Reset PHY */
+		gpio_direction_output(ENET2_PHY_RESET_GPIO, 0);
+		udelay(100);
+		gpio_set_value(ENET2_PHY_RESET_GPIO, 1);
+		udelay(500);
+	}
 }
 
 static const uint32_t fec_base[] = {
@@ -161,11 +164,12 @@ int board_eth_init(bd_t *bis)
 {
 	int ret;
 	int i;
+	int count = (is_cpu_type(MXC_CPU_MX7D)) ? ARRAY_SIZE(fec_base) : 1;
 
 	struct mii_dev *bus = NULL;
 	struct phy_device *phydev = NULL;
 
-	for (i = 0; i < ARRAY_SIZE(fec_base); ++i) {
+	for (i = 0; i < count; ++i) {
 		bus = fec_get_miibus(fec_base[i], i);
 		if (!bus)
 			goto err_bus;
@@ -204,6 +208,9 @@ static int mba7_setup_fec(int fec_id)
 			 IOMUXC_GPR_GPR1_GPR_ENET1_CLK_DIR_MASK), 0);
 		break;
 	case 1:
+		if (is_cpu_type(MXC_CPU_MX7S))
+			return -ENODEV;
+
 		/* Use 125M anatop REF_CLK2 for ENET2, clear gpr1[14], gpr1[18]*/
 		clrsetbits_le32(&iomuxc_gpr_regs->gpr[1],
 			(IOMUXC_GPR_GPR1_GPR_ENET2_TX_CLK_SEL_MASK |
@@ -324,6 +331,9 @@ int board_ehci_hcd_init(int port)
 						 ARRAY_SIZE(mba7_usb_otg1_pads));
 		break;
 	case 1:
+		if (is_cpu_type(MXC_CPU_MX7S))
+			return -ENODEV;
+
 		imx_iomux_v3_setup_multiple_pads(mba7_usb_otg2_pads,
 						 ARRAY_SIZE(mba7_usb_otg2_pads));
 		break;
