@@ -226,6 +226,9 @@ static const char *tqma7_get_boardname(void)
 	u32 cpurev = get_cpu_rev();
 
 	switch ((cpurev & 0xFF000) >> 12) {
+	case MXC_CPU_MX7S:
+		return "TQMa7S";
+		break;
 	case MXC_CPU_MX7D:
 		return "TQMa7D";
 		break;
