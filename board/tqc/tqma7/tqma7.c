@@ -325,12 +325,39 @@ int board_get_dtt_bus(void)
 #define MODELSTRLEN 32u
 int ft_board_setup(void *blob, bd_t *bd)
 {
+	int off;
 	char modelstr[MODELSTRLEN];
 
 	snprintf(modelstr, MODELSTRLEN, "TQ %s on %s", tqma7_get_boardname(),
 		 tqc_bb_get_boardname());
 	do_fixup_by_path_string(blob, "/", "model", modelstr);
 	fdt_fixup_memory(blob, (u64)PHYS_SDRAM, (u64)gd->ram_size);
+	if (is_cpu_type(MXC_CPU_MX7S)) {
+		off = fdt_node_offset_by_prop_value(blob, -1,
+						    "device_type",
+						    "cpu", 4);
+		while (off != -FDT_ERR_NOTFOUND) {
+			u32 *reg = (u32 *)fdt_getprop(blob, off, "reg", 0);
+			if (*reg > 0) {
+				fdt_del_node(blob, off);
+			}
+			off = fdt_node_offset_by_prop_value(blob, off,
+							    "device_type",
+							    "cpu", 4);
+		}
+
+		off = fdt_node_offset_by_compat_reg(blob, "fsl,imx7d-usb",
+						    USBOTG2_IPS_BASE_ADDR);
+		fdt_set_node_status(blob, off, FDT_STATUS_DISABLED, 0);
+
+		off = fdt_node_offset_by_compat_reg(blob, "fsl,imx7d-fec",
+						    ENET2_IPS_BASE_ADDR);
+		fdt_set_node_status(blob, off, FDT_STATUS_DISABLED, 0);
+
+		off = fdt_node_offset_by_compat_reg(blob, "fsl,imx7d-pcie",
+						    0x33800000);
+		fdt_set_node_status(blob, off, FDT_STATUS_DISABLED, 0);
+	}
 
 	/* bring in eMMC dsr settings */
 	do_fixup_by_path_u32(blob,
