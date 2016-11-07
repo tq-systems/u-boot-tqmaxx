@@ -135,8 +135,7 @@ static void mba7_setup_iomuxc_enet(void)
 	gpio_set_value(ENET1_PHY_RESET_GPIO, 1);
 	udelay(500);
 
-	if (is_cpu_type(MXC_CPU_MX7S)) {
-		/* TODO: only for TQMa7D, not available on TQMa7S */
+	if (is_cpu_type(MXC_CPU_MX7D)) {
 		imx_iomux_v3_setup_multiple_pads(mba7_fec2_pads,
 						 ARRAY_SIZE(mba7_fec2_pads));
 		gpio_request(ENET2_PHY_RESET_GPIO, "enet2-phy-rst#");
