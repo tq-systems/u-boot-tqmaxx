@@ -70,6 +70,7 @@ int ehci_hcd_init(int index, enum usb_init_type init,
 {
 	struct usb_ehci *ehci = (struct usb_ehci *)(USB_BASE_ADDR +
 		(0x10000 * index));
+	int ret;
 
 	if (index > 3)
 		return -EINVAL;
@@ -77,7 +78,9 @@ int ehci_hcd_init(int index, enum usb_init_type init,
 	mdelay(1);
 
 	/* Do board specific initialization */
-	board_ehci_hcd_init(index);
+	ret = board_ehci_hcd_init(index);
+	if (ret)
+		return ret;
 
 	usb_oc_config(index);
 
