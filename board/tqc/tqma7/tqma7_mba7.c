@@ -336,10 +336,11 @@ int board_ehci_hcd_init(int port)
 						 ARRAY_SIZE(mba7_usb_otg2_pads));
 		break;
 	case 2:
+		printf("MXC USB port %d not yet supported\n", port);
+		return -ENODEV;
 		break;
 	default:
-		printf("MXC USB port %d not yet supported\n", port);
-		return 1;
+		return -ENODEV;
 	}
 	return 0;
 }
