@@ -305,6 +305,7 @@ int ehci_hcd_init(int index, enum usb_init_type init,
 		struct ehci_hccr **hccr, struct ehci_hcor **hcor)
 {
 	enum usb_init_type type;
+	int ret;
 #if defined(CONFIG_MX6)
 	u32 controller_spacing = 0x200;
 #elif defined(CONFIG_MX7)
@@ -328,7 +329,9 @@ int ehci_hcd_init(int index, enum usb_init_type init,
 	mdelay(1);
 
 	/* Do board specific initialization */
-	board_ehci_hcd_init(index);
+	ret = board_ehci_hcd_init(index);
+	if (ret)
+		return ret;
 
 	usb_power_config(index);
 	usb_oc_config(index);
