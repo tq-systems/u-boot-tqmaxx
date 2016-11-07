@@ -146,6 +146,11 @@ static void mba7_setup_iomuxc_enet(void)
 		udelay(100);
 		gpio_set_value(ENET2_PHY_RESET_GPIO, 1);
 		udelay(500);
+	} else {
+		gpio_request(ENET2_PHY_RESET_GPIO, "enet2-reserved0");
+		gpio_request(ENET2_PHY_INT_GPIO, "enet2-reserved1");
+		gpio_direction_output(ENET2_PHY_INT_GPIO, 0);
+		gpio_direction_output(ENET2_PHY_RESET_GPIO, 0);
 	}
 }
 
