@@ -96,7 +96,7 @@ u32 fuse_bank_physical(int index)
 	u32 phy_index;
 
 	if ((index == 0) || is_cpu_type(MXC_CPU_MX6SL) ||
-	    is_cpu_type(MXC_CPU_MX7D))
+	    is_cpu_type(MXC_CPU_MX7D) || is_cpu_type(MXC_CPU_MX7S))
 		phy_index = index;
 	else if (is_cpu_type(MXC_CPU_MX6UL)) {
 		if (index >= 6)
