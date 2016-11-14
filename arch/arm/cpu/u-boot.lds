@@ -156,6 +156,22 @@ SECTIONS
 	. = ALIGN(4);
 	__image_copy_end = .;
 
+#ifdef CONFIG_IMX_M4_BIND
+	.firmware_image_start : {
+                *(.__firmware_image_start)
+        }
+
+	.firmware_image : {
+		KEEP(*(.firmware_image))
+        }
+
+	.firmware_image_end : {
+                *(.__firmware_image_end)
+        }
+
+	. = ALIGN(4);
+#endif
+
 	/*
 	 * if CONFIG_USE_ARCH_MEMSET is not selected __bss_end - __bss_start
 	 * needs to be a multiple of 4 and we overlay .bss with .rel.dyn
