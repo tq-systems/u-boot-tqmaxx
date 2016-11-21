@@ -368,5 +368,6 @@ int ehci_hcd_init(int index, enum usb_init_type init,
 
 int ehci_hcd_stop(int index)
 {
+	board_ehci_power(index, 0);
 	return 0;
 }
