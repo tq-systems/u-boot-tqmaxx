@@ -217,9 +217,6 @@ static int mba7_setup_fec(int fec_id)
 			 IOMUXC_GPR_GPR1_GPR_ENET1_CLK_DIR_MASK), 0);
 		break;
 	case 1:
-		if (is_cpu_type(MXC_CPU_MX7S))
-			return -ENODEV;
-
 		/* Use 125M anatop REF_CLK2 for ENET2, clear gpr1[14], gpr1[18]*/
 		clrsetbits_le32(&iomuxc_gpr_regs->gpr[1],
 			(IOMUXC_GPR_GPR1_GPR_ENET2_TX_CLK_SEL_MASK |
@@ -513,8 +510,9 @@ int tqc_bb_board_init(void)
 	/* do it here - to have reset completed */
 	mba7_setup_iomuxc_enet();
 	mba7_setup_fec(0);
-	/* TODO: only for TQMa7D */
-	mba7_setup_fec(1);
+
+	if (!is_cpu_type(MXC_CPU_MX7S))
+		mba7_setup_fec(1);
 
 	mba7_setup_iomux_usb();
 
