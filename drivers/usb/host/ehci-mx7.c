@@ -95,7 +95,7 @@ int ehci_hcd_init(int index, enum usb_init_type init,
 	__raw_writel(CONFIG_MXC_USB_PORTSC, &ehci->portsc);
 	setbits_le32(&ehci->portsc, USB_EN);
 
-	mdelay(10);
+	mdelay(500);
 
 	return 0;
 }
