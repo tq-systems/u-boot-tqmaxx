@@ -46,9 +46,14 @@ DECLARE_GLOBAL_DATA_PTR;
 #define USDHC_CLK_PAD_CTRL	(PAD_CTL_DSE_3P3V_32OHM | PAD_CTL_SRE_SLOW | \
 	PAD_CTL_PUE | PAD_CTL_PUS_PU47KOHM)
 
-#define GPIO_IN_PAD_CTRL	(PAD_CTL_PUS_PU5KOHM | PAD_CTL_PUE | \
+/* output of MIC2016 is open drain */
+#define USB_OC_PAD_CTRL	(PAD_CTL_PUS_PU47KOHM | \
+	PAD_CTL_DSE_3P3V_32OHM | PAD_CTL_HYS | PAD_CTL_SRE_SLOW)
+
+#define GPIO_IN_PAD_CTRL	(PAD_CTL_PUS_PU100KOHM | \
 	PAD_CTL_DSE_3P3V_196OHM | PAD_CTL_HYS | PAD_CTL_SRE_SLOW)
-#define GPIO_OUT_PAD_CTRL	(PAD_CTL_PUS_PU100KOHM | PAD_CTL_PUE | \
+
+#define GPIO_OUT_PAD_CTRL	(PAD_CTL_PUS_PU100KOHM | \
 	PAD_CTL_DSE_3P3V_196OHM | PAD_CTL_HYS | PAD_CTL_SRE_FAST)
 
 #define I2C_PAD_CTRL		(PAD_CTL_DSE_3P3V_196OHM | PAD_CTL_SRE_FAST | \
@@ -315,31 +320,75 @@ int board_phy_config(struct phy_device *phydev)
 
 iomux_v3_cfg_t const mba7_usb_otg1_pads[] = {
 	MX7D_PAD_GPIO1_IO04__USB_OTG1_OC |
-		MUX_PAD_CTRL(GPIO_IN_PAD_CTRL),
-	MX7D_PAD_GPIO1_IO05__USB_OTG1_PWR |
+		MUX_PAD_CTRL(USB_OC_PAD_CTRL),
+	MX7D_PAD_GPIO1_IO05__GPIO1_IO5 |
 		MUX_PAD_CTRL(GPIO_OUT_PAD_CTRL),
 };
 
 iomux_v3_cfg_t const mba7_usb_otg2_pads[] = {
 	MX7D_PAD_GPIO1_IO06__USB_OTG2_OC |
-		MUX_PAD_CTRL(GPIO_IN_PAD_CTRL),
-	MX7D_PAD_GPIO1_IO07__USB_OTG2_PWR |
+		MUX_PAD_CTRL(USB_OC_PAD_CTRL),
+	MX7D_PAD_GPIO1_IO07__GPIO1_IO7 |
 		MUX_PAD_CTRL(GPIO_OUT_PAD_CTRL),
 };
+
+/*
+ * use gpio instead of PWR as log as he ehci driver does not support
+ * board specific polarity
+ */
+#define MBA7_OTG1_PWR_GPIO IMX_GPIO_NR(1, 5)
+#define MBA7_OTG2_PWR_GPIO IMX_GPIO_NR(1, 7)
+
+static void mba7_setup_iomux_usb(void)
+{
+	int ret;
+
+	imx_iomux_v3_setup_multiple_pads(mba7_usb_otg1_pads,
+					 ARRAY_SIZE(mba7_usb_otg1_pads));
+	ret = gpio_request(MBA7_OTG1_PWR_GPIO, "usb-otg1-pwr");
+	if (!ret)
+		gpio_direction_output(MBA7_OTG1_PWR_GPIO, 0);
+
+	if (is_cpu_type(MXC_CPU_MX7S))
+		return;
+
+	imx_iomux_v3_setup_multiple_pads(mba7_usb_otg2_pads,
+					 ARRAY_SIZE(mba7_usb_otg2_pads));
+	ret = gpio_request(MBA7_OTG2_PWR_GPIO, "usb-otg2-pwr");
+	if (!ret)
+		gpio_direction_output(MBA7_OTG2_PWR_GPIO, 0);
+}
+
 
 int board_ehci_hcd_init(int port)
 {
 	switch (port) {
 	case 0:
-		imx_iomux_v3_setup_multiple_pads(mba7_usb_otg1_pads,
-						 ARRAY_SIZE(mba7_usb_otg1_pads));
 		break;
 	case 1:
 		if (is_cpu_type(MXC_CPU_MX7S))
 			return -ENODEV;
+		break;
+	case 2:
+		printf("MXC USB port %d not yet supported\n", port);
+		return -ENODEV;
+		break;
+	default:
+		return -ENODEV;
+	}
+	return 0;
+}
 
-		imx_iomux_v3_setup_multiple_pads(mba7_usb_otg2_pads,
-						 ARRAY_SIZE(mba7_usb_otg2_pads));
+int board_ehci_power(int port, int on)
+{
+	switch (port) {
+	case 0:
+		gpio_set_value(MBA7_OTG1_PWR_GPIO, on);
+		break;
+	case 1:
+		if (is_cpu_type(MXC_CPU_MX7S))
+			return -ENODEV;
+		gpio_set_value(MBA7_OTG2_PWR_GPIO, on);
 		break;
 	case 2:
 		printf("MXC USB port %d not yet supported\n", port);
@@ -468,6 +517,8 @@ int tqc_bb_board_init(void)
 	mba7_setup_fec(0);
 	/* TODO: only for TQMa7D */
 	mba7_setup_fec(1);
+
+	mba7_setup_iomux_usb();
 
 	return 0;
 }
