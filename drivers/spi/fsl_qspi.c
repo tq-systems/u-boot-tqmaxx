@@ -718,6 +718,11 @@ fsl_qspi_runcmd(struct fsl_qspi *q, u8 cmd, unsigned int addr, int len)
 
 	/* trigger the LUT now */
 	seqid = fsl_qspi_get_seqid(q, cmd);
+	if (seqid < 0) {
+		printf("unsupported opcode %x\n", (u32)cmd);
+		return -1;
+	}
+
 	writel((seqid << QUADSPI_IPCR_SEQID_SHIFT) | len, base + QUADSPI_IPCR);
 
 	/* Wait until completed */
