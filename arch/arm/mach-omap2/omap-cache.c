@@ -66,6 +66,21 @@ void dram_bank_mmu_setup(int bank)
 		set_section_dcache(i, ARMV7_DCACHE_POLICY);
 }
 
+#ifdef CONFIG_SPL_BUILD
+void sram_bank_mmu_setup(phys_addr_t start, phys_addr_t size)
+{
+	int i;
+	phys_addr_t end;
+
+	start = start >> MMU_SECTION_SHIFT;
+	size = size >> MMU_SECTION_SHIFT;
+	end = start + size;
+
+	for (i = start; i <= end; i++)
+		set_section_dcache(i, ARMV7_DCACHE_POLICY);
+}
+#endif
+
 void arm_init_domains(void)
 {
 	u32 reg;

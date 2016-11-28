@@ -38,6 +38,7 @@ void arm_init_before_mmu(void);
 void arm_init_domains(void);
 void cpu_cache_initialization(void);
 void dram_bank_mmu_setup(int bank);
+void sram_bank_mmu_setup(phys_addr_t start, phys_addr_t size);
 
 #endif
 

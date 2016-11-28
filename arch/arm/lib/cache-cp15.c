@@ -86,6 +86,17 @@ void mmu_set_region_dcache_behaviour(phys_addr_t start, size_t size,
 	mmu_page_table_flush(startpt, stoppt);
 }
 
+static void set_section_caches(int i)
+{
+#if defined(CONFIG_SYS_ARM_CACHE_WRITETHROUGH)
+		set_section_dcache(i, DCACHE_WRITETHROUGH);
+#elif defined(CONFIG_SYS_ARM_CACHE_WRITEALLOC)
+		set_section_dcache(i, DCACHE_WRITEALLOC);
+#else
+		set_section_dcache(i, DCACHE_WRITEBACK);
+#endif
+}
+
 __weak void dram_bank_mmu_setup(int bank)
 {
 	bd_t *bd = gd->bd;
@@ -94,17 +105,22 @@ __weak void dram_bank_mmu_setup(int bank)
 	debug("%s: bank: %d\n", __func__, bank);
 	for (i = bd->bi_dram[bank].start >> MMU_SECTION_SHIFT;
 	     i < (bd->bi_dram[bank].start >> MMU_SECTION_SHIFT) +
-		 (bd->bi_dram[bank].size >> MMU_SECTION_SHIFT);
-	     i++) {
-#if defined(CONFIG_SYS_ARM_CACHE_WRITETHROUGH)
-		set_section_dcache(i, DCACHE_WRITETHROUGH);
-#elif defined(CONFIG_SYS_ARM_CACHE_WRITEALLOC)
-		set_section_dcache(i, DCACHE_WRITEALLOC);
-#else
-		set_section_dcache(i, DCACHE_WRITEBACK);
-#endif
-	}
+		 (bd->bi_dram[bank].size >> MMU_SECTION_SHIFT); i++)
+		set_section_caches(i);
 }
+
+#if defined(CONFIG_SPL_BUILD) && (defined(CONFIG_SPL_MAX_SIZE) || \
+				  defined(CONFIG_SPL_MAX_FOOTPRINT))
+__weak void sram_bank_mmu_setup(phys_addr_t start, phys_addr_t size)
+{
+	int i;
+
+	for (i = start >> MMU_SECTION_SHIFT;
+	     i < (start >> MMU_SECTION_SHIFT) + (size >> MMU_SECTION_SHIFT);
+	     i++)
+		set_section_caches(i);
+}
+#endif
 
 /* to activate the MMU we need to set up virtual memory: use 1M areas */
 static inline void mmu_setup(void)
@@ -120,6 +136,16 @@ static inline void mmu_setup(void)
 	for (i = 0; i < CONFIG_NR_DRAM_BANKS; i++) {
 		dram_bank_mmu_setup(i);
 	}
+
+#if defined(CONFIG_SPL_BUILD)
+#if defined(CONFIG_SPL_MAX_SIZE)
+	sram_bank_mmu_setup(CONFIG_SPL_TEXT_BASE,
+			    ALIGN(CONFIG_SPL_MAX_SIZE, MMU_SECTION_SIZE));
+#elif defined(CONFIG_SPL_MAX_FOOTPRINT)
+	sram_bank_mmu_setup(CONFIG_SPL_TEXT_BASE,
+			    ALIGN(CONFIG_SPL_MAX_FOOTPRINT, MMU_SECTION_SIZE));
+#endif
+#endif
 
 #if defined(CONFIG_ARMV7_LPAE) && __LINUX_ARM_ARCH__ != 4
 	/* Set up 4 PTE entries pointing to our 4 1GB page tables */
