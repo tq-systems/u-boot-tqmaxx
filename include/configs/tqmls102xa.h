@@ -229,11 +229,32 @@
 #define FSL_QSPI_QUAD_MODE
 #endif
 
+/* filesystem on flash */
+#define CONFIG_CMD_MTDPARTS
+#define CONFIG_MTD_DEVICE
+#define CONFIG_MTD_PARTITIONS
+#define CONFIG_CMD_UBI
+#define CONFIG_RBTREE
+#define CONFIG_MTD_UBI_WL_THRESHOLD	4096
+#define CONFIG_CMD_UBIFS
+#define CONFIG_LZO
+#define MTDIDS_DEFAULT \
+	"nor0=nor0\0"                                                          \
+
+#define MTDPARTS_DEFAULT \
+	"mtdparts=nor0:"                                                       \
+		"768k@0k(U-Boot-PBL),"                                         \
+		 "64k@768k(ENV),"                                              \
+		 "64k@832k(DTB),"                                              \
+		  "8M@896k(Linux),"                                            \
+		 "55M@9M(RootFS)\0"                                            \
+
 #define CONFIG_CMD_SF
 #define CONFIG_SPI_FLASH
 /* Banked address mode - TODO implement 4 Byte adressing */
 #define CONFIG_SPI_FLASH_BAR
 #define CONFIG_SPI_FLASH_STMICRO
+#define CONFIG_SPI_FLASH_MTD
 
 #define CONFIG_CMD_TIME
 
@@ -443,7 +464,6 @@
 #define TQMLS102X_UBOOT_OFFSET		SZ_4K
 #define TQMLS102X_UBOOT_SECTOR_START	0x8
 #define TQMLS102X_UBOOT_SECTOR_COUNT	0x7f8
-#define TQMLS102X_UBOOT_SPI_OFFSET	0
 
 #define TQMLS102X_FDT_OFFSET		(2 * SZ_1M)
 #define TQMLS102X_FDT_SECTOR_START	0x1000
@@ -478,6 +498,7 @@
 	"kernel_start="__stringify(TQMLS102X_KERNEL_SECTOR_START)"\0"          \
 	"kernel_size="__stringify(TQMLS102X_KERNEL_SECTOR_COUNT)"\0"           \
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0"                       \
+	"mtdparts=" MTDPARTS_DEFAULT                                           \
 	"loadimage=mmc dev ${mmcdev}; "                                        \
 		"mmc read ${loadaddr} ${kernel_start} ${kernel_size};\0"       \
 	"loadfdt=mmc dev ${mmcdev}; "                                          \
@@ -519,7 +540,7 @@
 	BASEBOARD_EXTRA_ENV_SETTINGS                                           \
 
 #define CONFIG_BOOTCOMMAND \
-	"run mmcboot; run netboot; run panicboot"
+	"run mmcboot; run spiboot; run netboot; run panicboot"
 
 #define CONFIG_EXTRA_ENV_SETTINGS                                              \
 	"addmisc=setenv bootargs ${bootargs} hdmi\0"                           \
@@ -582,16 +603,39 @@
 		"fi; "                                                         \
 		"echo ... failed\0"                                            \
 	"panicboot=echo No boot device !!! reset\0"                            \
+	"addspi=setenv bootargs ${bootargs} root=/dev/mtdblock5 rw "           \
+		"rootfstype=ubifs\0"                                           \
+	"spiargs=run addspi addtty addmisc\0"                                  \
+	"loadspiimage=sf probe; sf read ${loadaddr} Linux 0x800000\0"          \
+	"loadspifdt=sf probe; sf read ${fdt_addr} DTB 0x10000\0"               \
+	"spiboot=echo Booting from SPI NOR flash...; setenv bootargs; "        \
+		"run spiargs; run loadspiimage; "                              \
+		"if run loadspifdt; then "                                     \
+			"${boot_type} ${loadaddr} - ${fdt_addr}; "             \
+		"else "                                                        \
+			"${boot_type}; "                                       \
+		"fi;\0"                                                        \
 	"uboot-qspi=" CONFIG_UBOOT_QSPI_IMAGE_FILE "\0"                        \
+	"rootfs=root.ubi\0"                                                    \
+	"update_rcw=run update_uboot-qspi\0"                                   \
 	"update_uboot-qspi=if tftp ${uboot-qspi}; then "                       \
 		"if itest ${filesize} > 0; then "                              \
-			"sf probe; sf update ${loadaddr} "__stringify(TQMLS102X_UBOOT_SPI_OFFSET)" ${filesize}; " \
+			"sf probe; sf update ${loadaddr} U-Boot-PBL ${filesize}; " \
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"                                           \
-	"rcw-qspi=ls102xa-rcw-tqmls-qspi-0100.bin.bswap\0"                     \
-	"update_rcw=if tftp ${rcw-qspi}; then "                                \
+	"update_kernel-qspi=run kernel_name; if tftp ${kernel}; then "         \
 		"if itest ${filesize} > 0; then "                              \
-			"sf probe; sf update ${loadaddr} 0 ${filesize}; "      \
+			"sf probe; sf update ${loadaddr} Linux ${filesize};"   \
+		"fi; fi; "                                                     \
+		"setenv filesize;\0"                                           \
+	"update_fdt-qspi=if tftp ${fdt_file}; then "                           \
+		"if itest ${filesize} > 0; then "                              \
+			"sf probe; sf update ${loadaddr} DTB ${filesize}; "    \
+		"fi; fi; "                                                     \
+		"setenv filesize;\0"                                           \
+	"update_rootfs-qspi=if tftp ${rootfs}; then "                          \
+		"if itest ${filesize} > 0; then "                              \
+			"sf probe; sf update ${loadaddr} RootFS ${filesize};"  \
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"                                           \
 	TQMLS102X_EXTRA_BOOTDEV_ENV_SETTINGS                                   \
