@@ -363,6 +363,7 @@ int tqc_bb_board_late_init(void)
 	int ret;
 	struct tqc_eeprom_data eedat;
 	char mac[17];
+	enum boot_device bd;
 
 	ret = tqc_read_eeprom(tqma6_get_system_i2c_bus(), 0x57, &eedat);
 	if (!ret) {
@@ -386,20 +387,22 @@ int tqc_bb_board_late_init(void)
 	* indexed like controller devs
 	*/
 	puts("Boot:\t");
-	switch (get_boot_device()) {
+	bd = get_boot_device();
+	switch (bd) {
 	case MMC3_BOOT:
 		setenv("boot_dev", "mmc");
-		/* eMMC (USDHC3)*/
+		puts("USDHC3 (eMMC)\n");
 		setenv("mmcblkdev", "0");
 		setenv("mmcdev", "0");
 		break;
 	case SD2_BOOT:
 		setenv("boot_dev", "mmc");
-		/* ext SD (USDHC2)*/
+		puts("USDHC2 (SD)\n");
 		setenv("mmcblkdev", "1");
 		setenv("mmcdev", "1");
 		break;
 	case SPI_NOR_BOOT:
+		puts("SPI NOR\n");
 		setenv("boot_dev", "spi");
 		/* mmcdev is dev index for u-boot */
 		setenv("mmcdev", "0");
@@ -407,7 +410,7 @@ int tqc_bb_board_late_init(void)
 		setenv("mmcblkdev", "0");
 		break;
 	default:
-		puts("unhandled boot device\n");
+		printf("unhandled boot device %d\n",(int)bd);
 		setenv("mmcblkdev", "");
 		setenv("mmcdev", "");
 	}
