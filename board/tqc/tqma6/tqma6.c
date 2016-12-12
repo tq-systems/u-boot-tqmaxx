@@ -312,6 +312,12 @@ static const char *tqma6_get_boardname(void)
 	case MXC_CPU_MX6Q:
 		return "TQMa6Q";
 		break;
+	case MXC_CPU_MX6DP:
+		return "TQMa6DP";
+		break;
+	case MXC_CPU_MX6QP:
+		return "TQMa6QP";
+		break;
 	default:
 		return "??";
 	};
@@ -369,21 +375,32 @@ int board_late_init(void)
 
 int checkboard(void)
 {
+	u32 cpurev = get_cpu_rev();
+
 	printf("Board: %s on a %s\n", tqma6_get_boardname(),
 	       tqc_bb_get_boardname());
-	puts("Enet workaround: ");
-	switch (tqma6_get_enet_workaround()) {
-	case 0:
-		puts("NO");
-		break;
-	case 1:
-		puts("OK");
+
+	switch ((cpurev & 0xFF000) >> 12) {
+	case MXC_CPU_MX6DP:
+	case MXC_CPU_MX6QP:
+		if (tqma6_get_enet_workaround())
+			puts("ERROR: DP/QP and ENET workaround\n");
 		break;
 	default:
-		puts("???");
-		break;
-	};
-	puts("\n");
+		puts("Enet workaround: ");
+		switch (tqma6_get_enet_workaround()) {
+		case 0:
+			puts("NO");
+			break;
+		case 1:
+			puts("OK");
+			break;
+		default:
+			puts("???");
+			break;
+		};
+		puts("\n");
+	}
 	return 0;
 }
 
