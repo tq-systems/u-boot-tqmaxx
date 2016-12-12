@@ -542,6 +542,7 @@ static uint8_t io_dat[] = {
 int tqc_bb_board_late_init(void)
 {
 	int i;
+	enum boot_device bd;
 	/*
 	* try to get sd card slots in order:
 	* eMMC: on Module
@@ -555,29 +556,31 @@ int tqc_bb_board_late_init(void)
 	* indexed like controller devs
 	*/
 	puts("Boot:\t");
-	switch (get_boot_device()) {
+
+	bd = get_boot_device();
+	switch (bd) {
 	case MMC3_BOOT:
 		setenv("boot_dev", "mmc");
-		/* eMMC (USDHC3)*/
+		puts("USDHC3(eMMC)\n");
 		setenv("mmcblkdev", "0");
 		setenv("mmcdev", "0");
 		break;
-	case SD2_BOOT:
+	case SD1_BOOT:
 		setenv("boot_dev", "mmc");
-		/* ext SD (USDHC1)*/
+		puts("USDHC1(SD)\n");
 		setenv("mmcblkdev", "1");
 		setenv("mmcdev", "1");
 		break;
-	/* TODO: QSPI */
 	case QSPI_BOOT:
 		setenv("boot_dev", "qspi");
+		puts("QSPI\n");
 		/* mmcdev is dev index for u-boot */
 		setenv("mmcdev", "0");
 		/* mmcblkdev is dev index for linux env */
 		setenv("mmcblkdev", "0");
 		break;
 	default:
-		puts("unhandled boot device\n");
+		printf("unhandled boot device %d\n", (int)bd);
 		setenv("mmcblkdev", "");
 		setenv("mmcdev", "");
 	}
