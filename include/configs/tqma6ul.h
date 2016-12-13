@@ -132,6 +132,7 @@
 #define CONFIG_CMD_EXT4
 #define CONFIG_CMD_EXT4_WRITE
 #define CONFIG_CMD_FAT
+#define CONFIG_FAT_WRITE
 #define CONFIG_CMD_FS_GENERIC
 #define CONFIG_DOS_PARTITION
 
@@ -196,13 +197,14 @@
 	"kernel_start="__stringify(TQMA6UL_KERNEL_SECTOR_START)"\0"              \
 	"kernel_size="__stringify(TQMA6UL_KERNEL_SECTOR_COUNT)"\0"               \
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0"                       \
-	"loadimage=mmc dev ${mmcdev}; "                                        \
-		"mmc read ${loadaddr} ${kernel_start} ${kernel_size};\0"       \
-	"loadfdtsingle=mmc dev ${mmcdev}; "                                    \
-		"mmc read ${fdt_addr} ${fdt_start} ${fdt_size};\0"             \
-	"loadfdtfit=mmc dev ${mmcdev}; "                                       \
-		"mmc read ${loadaddr} ${fdt_start} ${fdt_size}; "              \
-		"imxtract ${loadaddr} ${fitfdt_part} ${fdt_addr}\0"            \
+	"firmwarepart=1\0"                                                          \
+	"loadimage="                                                                \
+		"fatload mmc ${mmcdev}:${firmwarepart} ${loadaddr} ${kernel} \0"   \
+	"loadfdtsingle="                                                            \
+		"fatload mmc ${mmcdev}:${firmwarepart} ${fdt_addr} ${fdt_file} \0" \
+	"loadfdtfit="                                                               \
+		"fatload mmc ${mmcdev}:${firmwarepart} ${loadaddr} ${fdt_file}; "  \
+		"imxtract ${loadaddr} ${fitfdt_part} ${fdt_addr} \0"                \
 	"update_uboot=if tftp ${uboot}; then "                                 \
 		"if itest ${filesize} > 0; then "                              \
 			"mmc dev ${mmcdev}; mmc rescan; "                      \
@@ -217,26 +219,19 @@
 	"update_kernel=run kernel_name; "                                      \
 		"if tftp ${kernel}; then "                                     \
 			"if itest ${filesize} > 0; then "                      \
-				"mmc dev ${mmcdev}; mmc rescan; "              \
-				"setexpr blkc ${filesize} + 0x1ff; "                   \
-				"setexpr blkc ${blkc} / 0x200; "                           \
-				"if itest ${blkc} <= ${kernel_size}; then "    \
-					"mmc write ${loadaddr} "               \
-						"${kernel_start} ${blkc}; "    \
-				"fi; "                                         \
+				"echo Write kernel image to mmc ${mmcdev}:${firmwarepart}...; " \
+				"fatwrite mmc ${mmcdev}:${firmwarepart} ${loadaddr} "          \
+					"${kernel} ${filesize}; "                           \
 			"fi; "                                                 \
 		"fi; "                                                         \
-		"setenv filesize; setenv blkc \0"                              \
+		"setenv filesize \0"                              \
 	"update_fdt=run fdt_name; if tftp ${fdtimg}; then "                    \
 		"if itest ${filesize} > 0; then "                              \
-			"mmc dev ${mmcdev}; mmc rescan; "                      \
-			"setexpr blkc ${filesize} + 0x1ff; "                   \
-			"setexpr blkc ${blkc} / 0x200; "                           \
-			"if itest ${blkc} <= ${fdt_size}; then "               \
-				"mmc write ${loadaddr} ${fdt_start} ${blkc}; " \
-			"fi; "                                                 \
+			"echo Write fdt image to mmc ${mmcdev}:${firmwarepart}...; "    \
+			"fatwrite mmc ${mmcdev}:${firmwarepart} ${loadaddr} "          \
+				"${fdt_file} ${filesize}; "                         \
 		"fi; fi; "                                                     \
-		"setenv filesize; setenv blkc \0"                              \
+		"setenv filesize \0"                              \
 
 #define CONFIG_BOOTCOMMAND \
 	"run mmcboot; run netboot; run panicboot"
@@ -366,7 +361,7 @@
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"board=tqma6ul\0"                                                      \
 	"uimage=uImage\0"                                                      \
-	"zimage=zImage\0"                                                      \
+	"zimage=linuximage\0"                                                  \
 	"boot_type=bootz\0"                                                    \
 	"kernel_name=if test \"${boot_type}\" != bootz; then "                 \
 		"setenv kernel ${uimage}; "                                    \
@@ -397,6 +392,7 @@
 	"mmcboot=echo Booting from mmc ...; "                                  \
 		"setenv bootargs; "                                            \
 		"run mmcargs; "                                                \
+		"run kernel_name; "                                            \
 		"if run loadfdt; then "                                        \
 			"echo boot device tree kernel ...; "                   \
 			"if run loadimage; then "                              \
