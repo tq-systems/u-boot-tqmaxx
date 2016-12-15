@@ -182,20 +182,9 @@
 #define CONFIG_ENV_OFFSET		SZ_1M
 #define CONFIG_SYS_MMC_ENV_DEV		0
 
-#define TQMA6UL_FDT_OFFSET		SZ_2M
-#define TQMA6UL_FDT_SECTOR_START	0x1000
-#define TQMA6UL_FDT_SECTOR_COUNT	0x800
-
-#define TQMA6UL_KERNEL_SECTOR_START	0x2000
-#define TQMA6UL_KERNEL_SECTOR_COUNT	0x2000
-
 #define TQMA6UL_EXTRA_BOOTDEV_ENV_SETTINGS                                       \
 	"uboot_start="__stringify(TQMA6UL_UBOOT_SECTOR_START)"\0"                \
 	"uboot_size="__stringify(TQMA6UL_UBOOT_SECTOR_COUNT)"\0"                 \
-	"fdt_start="__stringify(TQMA6UL_FDT_SECTOR_START)"\0"                    \
-	"fdt_size="__stringify(TQMA6UL_FDT_SECTOR_COUNT)"\0"                     \
-	"kernel_start="__stringify(TQMA6UL_KERNEL_SECTOR_START)"\0"              \
-	"kernel_size="__stringify(TQMA6UL_KERNEL_SECTOR_COUNT)"\0"               \
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0"                       \
 	"firmwarepart=1\0"                                                          \
 	"loadimage="                                                                \
