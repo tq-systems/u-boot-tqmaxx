@@ -17,10 +17,12 @@ choice
 	  i.MX6 CPU type and DRAM
 
 config TQMA6Q
-	bool "TQMa6Q / TQMa6D"
+	bool "TQMa6Q / TQMa6D / TQMaQP / TQMaDP"
 	select MX6Q
+	select MX6QP
 	help
-	  select TQMa6Q / TQMa6D with i.MX6Q/D and 1GiB DRAM
+	  select TQMa6Q / TQMa6D with i.MX6Q/D and 1GiB DRAM and
+	  TQMa6QP / TQMa6DP with i.MX6Q/DP and 1GiB DRAM
 
 config TQMA6DL
 	bool "TQMa6DL"
