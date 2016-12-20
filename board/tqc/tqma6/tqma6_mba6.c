@@ -28,6 +28,7 @@
 #include <miiphy.h>
 #include <mmc.h>
 #include <netdev.h>
+#include <usb.h>
 
 #include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
@@ -342,6 +343,74 @@ int board_get_dtt_bus(void)
 	return tqma6_get_system_i2c_bus();
 }
 
+#define MBA6_USB_PAD_CTRL	(PAD_CTL_PUS_47K_UP  | PAD_CTL_SPEED_LOW | \
+				 PAD_CTL_DSE_80ohm   | PAD_CTL_SRE_FAST | \
+				 PAD_CTL_HYS)
+
+iomux_v3_cfg_t const mba6_usb_otg_pads[] = {
+	NEW_PAD_CTRL(MX6_PAD_EIM_D21__USB_OTG_OC, MBA6_USB_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_GPIO_1__USB_OTG_ID, MBA6_USB_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_EIM_D22__GPIO3_IO22, MBA6_USB_PAD_CTRL),
+};
+
+/*
+ * use gpio instead of PWR as log as he ehci driver does not support
+ * board specific polarity
+ */
+#define MBA6_OTG_PWR_GPIO IMX_GPIO_NR(3, 22)
+
+static void mba6_setup_iomux_usb(void)
+{
+	int ret;
+
+	imx_iomux_v3_setup_multiple_pads(mba6_usb_otg_pads,
+					 ARRAY_SIZE(mba6_usb_otg_pads));
+	ret = gpio_request(MBA6_OTG_PWR_GPIO, "usb-otg1-pwr");
+	if (!ret)
+		gpio_direction_output(MBA6_OTG_PWR_GPIO, 0);
+}
+
+int board_ehci_hcd_init(int port)
+{
+	switch (port) {
+	case 0:
+	case 1:
+		break;
+	case 2:
+	case 3:
+		printf("MXC USB port %d not yet supported\n", port);
+		return -ENODEV;
+		break;
+	default:
+		return -ENODEV;
+	}
+	return 0;
+}
+
+int board_ehci_power(int port, int on)
+{
+	switch (port) {
+	case 0:
+		gpio_set_value(MBA6_OTG_PWR_GPIO, on);
+		break;
+	case 1:
+		break;
+	case 2:
+	case 3:
+		printf("MXC USB port %d not yet supported\n", port);
+		return -ENODEV;
+		break;
+	default:
+		return -ENODEV;
+	}
+	return 0;
+}
+
+int board_usb_phy_mode(int index)
+{
+	return USB_INIT_HOST;
+}
+
 int tqc_bb_board_early_init_f(void)
 {
 	mba6_setup_iomuxc_uart();
@@ -354,6 +423,8 @@ int tqc_bb_board_init(void)
 	mba6_setup_i2c();
 	/* do it here - to have reset completed */
 	mba6_setup_iomuxc_enet();
+
+	mba6_setup_iomux_usb();
 
 	return 0;
 }
@@ -371,7 +442,7 @@ int tqc_bb_board_late_init(void)
 		setenv("usbethaddr", mac);
 		tqc_show_eeprom(&eedat, "MBA6");
 	} else {
-		printf("%s EEPROM: err %d\n", tqc_bb_get_boardname(), ret);
+		printf("%s EEPROM: err %d, bus %d\n", tqc_bb_get_boardname(), ret, tqma6_get_system_i2c_bus());
 	}
 
 	/*
