@@ -124,8 +124,11 @@ static void mba6_setup_iomuxc_enet(void)
 {
 	struct iomuxc *const iomuxc_regs = (struct iomuxc *)IOMUXC_BASE_ADDR;
 
-	/* clear gpr1[ENET_CLK_SEL] for externel clock */
+	/* clear gpr1[ENET_CLK_SEL] for external clock */
 	clrbits_le32(&iomuxc_regs->gpr[1], IOMUXC_GPR1_ENET_CLK_SEL_MASK);
+	if (is_mx6dqp()) {
+		clrbits_le32(&iomuxc_regs->gpr[5], IOMUXC_GPR5_ENET_TXCLK_SEL_MASK);
+	}
 
 	__raw_writel(IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM_DISABLE,
 		     (void *)IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM);
