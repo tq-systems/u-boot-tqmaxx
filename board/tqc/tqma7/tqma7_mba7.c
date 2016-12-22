@@ -234,16 +234,16 @@ static int mba7_setup_fec(int fec_id)
 	return 0;
 }
 
-#define DP83867_DEVADDR         0x1f
+#define DP83867_DEVADDR				0x1f
 
-/* TODO: needed here until we hav DT init */
+/* TODO: needed here until we have DT init */
 
 #define MBA7_DP83867_RGMII_TX_DELAY_CTRL	0x09 /* 0b1001 = 2,5 ns */
 #define MBA7_DP83867_RGMII_RX_DELAY_CTRL	0x09 /* 0b1001 = 2,5 ns */
 
 /* Extended Registers */
-#define DP83867_RGMIICTL	0x0032
-#define DP83867_RGMIIDCTL	0x0086
+#define DP83867_RGMIICTL			0x0032
+#define DP83867_RGMIIDCTL			0x0086
 
 /* RGMIIDCTL bits */
 #define DP83867_RGMII_TX_CLK_DELAY_SHIFT	4
