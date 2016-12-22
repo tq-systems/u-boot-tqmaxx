@@ -285,6 +285,7 @@ int board_phy_config(struct phy_device *phydev)
 	phydev->drv->writeext(phydev, phydev->addr, DP83867_DEVADDR,
 			      0x0172, 0x8888);
 
+#if defined(CONFIG_MBA7_REV0100)
 	val = phydev->drv->readext(phydev, phydev->addr, DP83867_DEVADDR,
 				   0x0031);
 	val |= 1;
@@ -294,6 +295,7 @@ int board_phy_config(struct phy_device *phydev)
 	val = phy_read(phydev, MDIO_DEVAD_NONE, 0x10);
 	val |= 0x2;
 	phy_write(phydev, MDIO_DEVAD_NONE, 0x10, val);
+#endif
 
 	val = phydev->drv->readext(phydev, phydev->addr, DP83867_DEVADDR,
 				   DP83867_RGMIICTL);
@@ -523,6 +525,7 @@ static iomux_v3_cfg_t const mba7_wdog_pads[] = {
 	NEW_PAD_CTRL(MX7D_PAD_GPIO1_IO00__WDOG1_WDOG_B, WDOG_PAD_CTRL),
 };
 
+#if defined(CONFIG_MBA7_REV0100)
 #define MBA7_PCF8574_I2C_BUS	1
 #define MBA7_PCF8574_DEV0_ADDR	0x3c
 #define MBA7_PCF8574_DEV0_VAL	0x1f /* 0 - output, 1 - input */
@@ -538,10 +541,13 @@ static uint8_t io_dat[] = {
 	MBA7_PCF8574_DEV0_VAL,
 	MBA7_PCF8574_DEV1_VAL
 };
+#endif
 
 int tqc_bb_board_late_init(void)
 {
+#if defined(CONFIG_MBA7_REV0100)
 	int i;
+#endif
 	enum boot_device bd;
 	/*
 	* try to get sd card slots in order:
@@ -589,6 +595,7 @@ int tqc_bb_board_late_init(void)
 					 ARRAY_SIZE(mba7_wdog_pads));
 	set_wdog_reset((struct wdog_regs *)WDOG1_BASE_ADDR);
 
+#if defined(CONFIG_MBA7_REV0100)
 	/* There is a HW-BUG on HW.REV.0100
 	 * set port-expander default values to avoid unexpected behaviours */
 	i2c_set_bus_num(MBA7_PCF8574_I2C_BUS);
@@ -601,6 +608,9 @@ int tqc_bb_board_late_init(void)
 			printf("PCF8574 Not found\n");
 		}
 	}
+#else
+#
+#endif
 
 	return 0;
 }
