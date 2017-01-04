@@ -1,0 +1,405 @@
+/*
+ * Copyright (C) 2012 Freescale Semiconductor, Inc.
+ * Author: Fabio Estevam <fabio.estevam@freescale.com>
+ *
+ * Copyright (C) 2013, 2014 - 2016 TQ Systems (ported SabreSD to TQMa6x)
+ * Author: Markus Niebel <markus.niebel@tq-group.com>
+ *
+ * SPDX-License-Identifier:	GPL-2.0+
+ */
+
+#include <asm/io.h>
+#include <asm/arch/clock.h>
+#include <asm/arch/mx6-pins.h>
+#include <asm/arch/imx-regs.h>
+#include <asm/arch/iomux.h>
+#include <asm/arch/sys_proto.h>
+#include <asm/errno.h>
+#include <asm/gpio.h>
+#include <asm/imx-common/boot_mode.h>
+#include <asm/imx-common/mxc_i2c.h>
+
+#include <common.h>
+#include <fsl_esdhc.h>
+#include <libfdt.h>
+#include <malloc.h>
+#include <i2c.h>
+#include <micrel.h>
+#include <miiphy.h>
+#include <mmc.h>
+#include <netdev.h>
+#include <usb.h>
+
+#include "../common/tqc_bb.h"
+#include "../common/tqc_eeprom.h"
+#include "tqma6_private.h"
+
+DECLARE_GLOBAL_DATA_PTR;
+
+#define UART_PAD_CTRL  (PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_MED | \
+	PAD_CTL_DSE_80ohm   | PAD_CTL_SRE_FAST  | PAD_CTL_HYS)
+
+#define USDHC_CLK_PAD_CTRL (PAD_CTL_PUS_47K_UP  | PAD_CTL_SPEED_LOW | \
+	PAD_CTL_DSE_40ohm   | PAD_CTL_SRE_FAST  | PAD_CTL_HYS)
+
+#define USDHC_PAD_CTRL (PAD_CTL_PUS_47K_UP  | PAD_CTL_SPEED_LOW | \
+	PAD_CTL_DSE_80ohm   | PAD_CTL_SRE_FAST  | PAD_CTL_HYS)
+
+#define GPIO_OUT_PAD_CTRL  (PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_LOW | \
+	PAD_CTL_DSE_40ohm   | PAD_CTL_HYS)
+
+#define GPIO_IN_PAD_CTRL  (PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_LOW | \
+	PAD_CTL_DSE_40ohm   | PAD_CTL_HYS)
+
+#define I2C_PAD_CTRL	(PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_MED | \
+	PAD_CTL_DSE_80ohm | PAD_CTL_HYS |			\
+	PAD_CTL_ODE | PAD_CTL_SRE_FAST)
+
+#define USB_PAD_CTRL	(PAD_CTL_PUS_47K_UP  | PAD_CTL_SPEED_LOW | \
+			 PAD_CTL_DSE_80ohm   | PAD_CTL_SRE_FAST | \
+			 PAD_CTL_HYS)
+
+#define ENET_RX_PAD_CTRL	(PAD_CTL_DSE_34ohm)
+#define ENET_TX_PAD_CTRL	(PAD_CTL_PUS_100K_UP | PAD_CTL_DSE_34ohm)
+#define ENET_CLK_PAD_CTRL	(PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_HIGH | \
+				 PAD_CTL_DSE_40ohm | PAD_CTL_HYS)
+#define ENET_MDIO_PAD_CTRL	(PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_MED | \
+				 PAD_CTL_DSE_60ohm)
+
+static iomux_v3_cfg_t const nav_enet_pads[] = {
+	NEW_PAD_CTRL(MX6_PAD_ENET_MDIO__ENET_MDIO,	ENET_MDIO_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET_MDC__ENET_MDC,	ENET_MDIO_PAD_CTRL),
+
+	NEW_PAD_CTRL(MX6_PAD_ENET_TXD0__ENET_TX_DATA0,	ENET_TX_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET_TXD1__ENET_TX_DATA1,	ENET_TX_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET_TX_EN__ENET_TX_EN,	ENET_TX_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET_CRS_DV__ENET_RX_EN,	ENET_TX_PAD_CTRL),
+
+
+	NEW_PAD_CTRL(MX6_PAD_ENET_RXD0__ENET_RX_DATA0,	ENET_RX_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET_RXD1__ENET_RX_DATA1,	ENET_RX_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET_RX_ER__ENET_RX_ER,	ENET_RX_PAD_CTRL),
+
+	NEW_PAD_CTRL(MX6_PAD_GPIO_16__ENET_REF_CLK, ENET_CLK_PAD_CTRL),
+
+	NEW_PAD_CTRL(MX6_PAD_GPIO_7__GPIO1_IO07,	GPIO_OUT_PAD_CTRL) |
+		MUX_MODE_SION,
+};
+
+#define ENET_PHY_RESET_GPIO IMX_GPIO_NR(1, 7)
+
+static void nav_setup_iomuxc_enet(void)
+{
+	struct iomuxc *const iomuxc_regs = (struct iomuxc *)IOMUXC_BASE_ADDR;
+
+	/* clear gpr1[ENET_CLK_SEL] for external clock */
+	clrbits_le32(&iomuxc_regs->gpr[1], IOMUXC_GPR1_ENET_CLK_SEL_MASK);
+	if (is_mx6dqp()) {
+		clrbits_le32(&iomuxc_regs->gpr[5], IOMUXC_GPR5_ENET_TXCLK_SEL_MASK);
+	}
+
+	imx_iomux_v3_setup_multiple_pads(nav_enet_pads,
+					 ARRAY_SIZE(nav_enet_pads));
+
+	gpio_request(ENET_PHY_RESET_GPIO, "phy-rst#");
+	/* Reset PHY */
+	gpio_direction_output(ENET_PHY_RESET_GPIO , 0);
+	/* SMSC 8720 Datasheet: 100 us + 800 ns until outputs are driven */
+	udelay(200);
+	gpio_set_value(ENET_PHY_RESET_GPIO, 1);
+	/* wait after reset so all phy internals are stable and setup */
+	udelay(50);
+}
+
+static iomux_v3_cfg_t const nav_uart2_pads[] = {
+	NEW_PAD_CTRL(MX6_PAD_SD4_DAT4__UART2_RX_DATA, UART_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_SD4_DAT7__UART2_TX_DATA, UART_PAD_CTRL),
+};
+
+static void nav_setup_iomuxc_uart(void)
+{
+	imx_iomux_v3_setup_multiple_pads(nav_uart2_pads,
+					 ARRAY_SIZE(nav_uart2_pads));
+}
+
+static iomux_v3_cfg_t const nav_usdhc2_pads[] = {
+	NEW_PAD_CTRL(MX6_PAD_SD2_CLK__SD2_CLK,		USDHC_CLK_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_SD2_CMD__SD2_CMD,		USDHC_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_SD2_DAT0__SD2_DATA0,	USDHC_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_SD2_DAT1__SD2_DATA1,	USDHC_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_SD2_DAT2__SD2_DATA2,	USDHC_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_SD2_DAT3__SD2_DATA3,	USDHC_PAD_CTRL),
+	/* CD */
+	NEW_PAD_CTRL(MX6_PAD_GPIO_4__GPIO1_IO04,	GPIO_IN_PAD_CTRL),
+	/* WP */
+	NEW_PAD_CTRL(MX6_PAD_GPIO_2__GPIO1_IO02,	GPIO_IN_PAD_CTRL),
+};
+
+#define USDHC2_CD_GPIO	IMX_GPIO_NR(1, 4)
+#define USDHC2_WP_GPIO	IMX_GPIO_NR(1, 2)
+
+int tqc_bb_board_mmc_getcd(struct mmc *mmc)
+{
+	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
+	int ret = 0;
+
+	if (cfg->esdhc_base == USDHC2_BASE_ADDR)
+		ret = !gpio_get_value(USDHC2_CD_GPIO);
+
+	return ret;
+}
+
+int tqc_bb_board_mmc_getwp(struct mmc *mmc)
+{
+	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
+	int ret = 0;
+
+	if (cfg->esdhc_base == USDHC2_BASE_ADDR)
+		ret = gpio_get_value(USDHC2_WP_GPIO);
+
+	return ret;
+}
+
+static struct fsl_esdhc_cfg nav_usdhc_cfg = {
+	.esdhc_base = USDHC2_BASE_ADDR,
+	.max_bus_width = 4,
+};
+
+int tqc_bb_board_mmc_init(bd_t *bis)
+{
+	imx_iomux_v3_setup_multiple_pads(nav_usdhc2_pads,
+					 ARRAY_SIZE(nav_usdhc2_pads));
+	gpio_request(USDHC2_CD_GPIO, "usdhc2-cd");
+	gpio_request(USDHC2_WP_GPIO, "usdhc2-wp");
+	gpio_direction_input(USDHC2_CD_GPIO);
+	gpio_direction_input(USDHC2_WP_GPIO);
+
+	nav_usdhc_cfg.sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
+	if (fsl_esdhc_initialize(bis, &nav_usdhc_cfg))
+		puts("Warning: failed to initialize SD\n");
+
+	return 0;
+}
+
+static struct i2c_pads_info nav_i2c1_pads = {
+/* I2C1: MBa6x */
+	.scl = {
+		.i2c_mode = NEW_PAD_CTRL(MX6_PAD_CSI0_DAT9__I2C1_SCL,
+					 I2C_PAD_CTRL),
+		.gpio_mode = NEW_PAD_CTRL(MX6_PAD_CSI0_DAT9__GPIO5_IO27,
+					  I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(5, 27)
+	},
+	.sda = {
+		.i2c_mode = NEW_PAD_CTRL(MX6_PAD_CSI0_DAT8__I2C1_SDA,
+					 I2C_PAD_CTRL),
+		.gpio_mode = NEW_PAD_CTRL(MX6_PAD_CSI0_DAT8__GPIO5_IO26,
+					  I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(5, 26)
+	}
+};
+
+static void nav_setup_i2c(void)
+{
+	int ret;
+
+	if (tqma6_get_system_i2c_bus() == 0)
+		return;
+	/*
+	 * use logical index for bus, e.g. I2C1 -> 0
+	 * warn on error
+	 */
+	ret = setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &nav_i2c1_pads);
+	if (ret)
+		printf("setup I2C1 failed: %d\n", ret);
+}
+
+int board_eth_init(bd_t *bis)
+{
+	struct iomuxc *iomuxc_regs = (struct iomuxc *)IOMUXC_BASE_ADDR;
+
+	/* clear gpr1[ENET_CLK_SEL] -> disable clock output from anatop */
+	clrbits_le32(&iomuxc_regs->gpr[1], IOMUXC_GPR1_ENET_CLK_SEL_MASK);
+	return cpu_eth_init(bis);
+}
+
+int board_get_dtt_bus(void)
+{
+	return tqma6_get_system_i2c_bus();
+}
+
+iomux_v3_cfg_t const nav_usb_pads[] = {
+	NEW_PAD_CTRL(MX6_PAD_GPIO_0__GPIO1_IO00, USB_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_GPIO_3__USB_H1_OC, USB_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_GPIO_1__USB_OTG_ID, USB_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_EIM_D21__USB_OTG_OC, USB_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_EIM_D22__GPIO3_IO22, USB_PAD_CTRL),
+};
+
+/*
+ * use gpio instead of PWR as log as he ehci driver does not support
+ * board specific polarity
+ */
+#define NAV_OTG_PWR_GPIO IMX_GPIO_NR(3, 22)
+#define NAV_H1_PWR_GPIO IMX_GPIO_NR(1, 0)
+
+static void nav_setup_iomux_usb(void)
+{
+	int ret;
+
+	imx_iomux_v3_setup_multiple_pads(nav_usb_pads,
+					 ARRAY_SIZE(nav_usb_pads));
+	ret = gpio_request(NAV_OTG_PWR_GPIO, "usb-otg-pwr");
+	if (!ret)
+		gpio_direction_output(NAV_OTG_PWR_GPIO, 0);
+	ret = gpio_request(NAV_H1_PWR_GPIO, "usb-h1-pwr");
+	if (!ret)
+		gpio_direction_output(NAV_H1_PWR_GPIO, 0);
+}
+
+int board_ehci_hcd_init(int port)
+{
+	switch (port) {
+	case 0:
+	case 1:
+		break;
+	case 2:
+	case 3:
+		printf("MXC USB port %d not yet supported\n", port);
+		return -ENODEV;
+		break;
+	default:
+		return -ENODEV;
+	}
+	return 0;
+}
+
+int board_ehci_power(int port, int on)
+{
+	switch (port) {
+	case 0:
+		gpio_set_value(NAV_OTG_PWR_GPIO, on);
+		break;
+	case 1:
+		gpio_set_value(NAV_H1_PWR_GPIO, on);
+		break;
+	case 2:
+	case 3:
+		printf("MXC USB port %d not yet supported\n", port);
+		return -ENODEV;
+		break;
+	default:
+		return -ENODEV;
+	}
+	return 0;
+}
+
+int board_usb_phy_mode(int index)
+{
+	return USB_INIT_HOST;
+}
+
+int tqc_bb_board_early_init_f(void)
+{
+	nav_setup_iomuxc_uart();
+
+	return 0;
+}
+
+int tqc_bb_board_init(void)
+{
+	nav_setup_i2c();
+	/* do it here - to have reset completed */
+	nav_setup_iomuxc_enet();
+
+	nav_setup_iomux_usb();
+
+	return 0;
+}
+
+int tqc_bb_board_late_init(void)
+{
+	enum boot_device bd;
+
+	/*
+	* try to get sd card slots in order:
+	* eMMC: on Module
+	* -> therefore index 0 for bootloader
+	* index n in kernel (controller instance 3) -> patches needed for
+	* alias indexing
+	* SD2: on Mainboard
+	* index n in kernel (controller instance 2) -> patches needed for
+	* alias indexing
+	* we assume to have a kernel patch that will present mmcblk dev
+	* indexed like controller devs
+	*/
+	puts("Boot:\t");
+	bd = get_boot_device();
+	switch (bd) {
+	case MMC3_BOOT:
+		setenv("boot_dev", "mmc");
+		puts("USDHC3 (eMMC)\n");
+		setenv("mmcblkdev", "0");
+		setenv("mmcdev", "0");
+		break;
+	case SD2_BOOT:
+		setenv("boot_dev", "mmc");
+		puts("USDHC2 (SD)\n");
+		setenv("mmcblkdev", "1");
+		setenv("mmcdev", "1");
+		break;
+	default:
+		printf("unhandled boot device %d\n",(int)bd);
+		setenv("mmcblkdev", "");
+		setenv("mmcdev", "");
+	}
+
+	return 0;
+}
+
+const char *tqc_bb_get_boardname(void)
+{
+	return "NAV";
+}
+
+int board_mmc_get_env_dev(int devno)
+{
+	/*
+	 * eMMC:	USDHC3 -> 0
+	 * SD:		USDHC1 -> 1
+	 */
+	return (2 == devno) ? 0 : 1;
+}
+
+/*
+ * Device Tree Support
+ */
+#if defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT)
+void tqc_bb_ft_board_setup(void *blob, bd_t *bd)
+{
+	int offset, len, chk;
+	const char *compatible, *expect;
+
+	if (tqma6_get_enet_workaround())
+		expect = "tq,nav";
+
+	offset = fdt_path_offset(blob, "/");
+	compatible = fdt_getprop(blob, offset, "compatible", &len);
+	if (len > 0)
+		printf("   Device Tree: /compatible = %s\n", compatible);
+
+	chk = fdt_node_check_compatible(blob, offset, expect);
+	switch (chk) {
+		case 0:
+			break;
+		case 1:
+			printf("   WARNING! Wrong DT variant: "
+						"Expecting %s!\n", expect);
+			break;
+		default:
+			printf("   Device Tree: cannot read /compatible"
+						"to identify tree variant!\n");
+	}
+
+}
+#endif /* defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT) */

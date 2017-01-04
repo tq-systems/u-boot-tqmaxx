@@ -7,4 +7,5 @@
 obj-y  := tqma6.o
 
 obj-$(CONFIG_MBA6) += tqma6_mba6.o
+obj-$(CONFIG_NAV) += tqma6_nav.o
 obj-$(CONFIG_WRU4) += tqma6_wru4.o
