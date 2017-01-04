@@ -74,6 +74,11 @@ config MBA6
 	  Select the MBa6 starterkit. This features a GigE Phy, USB, SD-Card
 	  etc.
 
+config NAV
+	bool "TQMa6 on NAV baseboard"
+	help
+	  Select the NAV baseboard. This features a 100MBit Phy, USB, SD-Card
+
 config WRU4
 	bool "OHB WRU-IV"
 	help
