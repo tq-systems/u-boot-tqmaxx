@@ -49,6 +49,12 @@ DECLARE_GLOBAL_DATA_PTR;
 	PAD_CTL_DSE_40ohm   | PAD_CTL_HYS)
 
 #define GPIO_IN_PAD_CTRL  (PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_LOW | \
+	PAD_CTL_DSE_240ohm   | PAD_CTL_HYS)
+
+#define GPIO_TP_PAD_CTRL  (PAD_CTL_PUS_100K_DOWN | PAD_CTL_SPEED_LOW | \
+	PAD_CTL_DSE_240ohm | PAD_CTL_HYS)
+
+#define GPIO_PKE_PAD_CTRL  (PAD_CTL_PKE | PAD_CTL_SPEED_LOW | \
 	PAD_CTL_DSE_40ohm   | PAD_CTL_HYS)
 
 #define I2C_PAD_CTRL	(PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_MED | \
@@ -80,10 +86,10 @@ static iomux_v3_cfg_t const nav_enet_pads[] = {
 	NEW_PAD_CTRL(MX6_PAD_ENET_RXD1__ENET_RX_DATA1,	ENET_RX_PAD_CTRL),
 	NEW_PAD_CTRL(MX6_PAD_ENET_RX_ER__ENET_RX_ER,	ENET_RX_PAD_CTRL),
 
-	NEW_PAD_CTRL(MX6_PAD_GPIO_16__ENET_REF_CLK, ENET_CLK_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_GPIO_16__ENET_REF_CLK,	ENET_CLK_PAD_CTRL),
 
 	NEW_PAD_CTRL(MX6_PAD_GPIO_7__GPIO1_IO07,	GPIO_OUT_PAD_CTRL) |
-		MUX_MODE_SION,
+		     MUX_MODE_SION,
 };
 
 #define ENET_PHY_RESET_GPIO IMX_GPIO_NR(1, 7)
@@ -299,6 +305,80 @@ int board_usb_phy_mode(int index)
 	return USB_INIT_HOST;
 }
 
+static iomux_v3_cfg_t const nav_gpio_pads[] = {
+	NEW_PAD_CTRL(MX6_PAD_DISP0_DAT17__GPIO5_IO11, GPIO_TP_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_DISP0_DAT19__GPIO5_IO13, GPIO_TP_PAD_CTRL),
+
+	NEW_PAD_CTRL(MX6_PAD_EIM_CS1__GPIO2_IO24, GPIO_PKE_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_EIM_OE__GPIO2_IO25, GPIO_PKE_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_EIM_D27__GPIO3_IO27, GPIO_PKE_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_EIM_D29__GPIO3_IO29, GPIO_PKE_PAD_CTRL),
+
+	NEW_PAD_CTRL(MX6_PAD_CSI0_DATA_EN__GPIO5_IO20, GPIO_OUT_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_NANDF_CLE__GPIO6_IO07, GPIO_OUT_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_SD4_DAT3__GPIO2_IO11, GPIO_PKE_PAD_CTRL),
+};
+
+struct gpio_output_pin {
+	unsigned gpio;
+	const char *name;
+	bool out;
+	int level;
+};
+
+static const struct gpio_output_pin nav_gpios[] = {
+	{
+		.gpio = IMX_GPIO_NR(2, 11),
+		.name = "zero-credit",
+	}, {
+		.gpio = IMX_GPIO_NR(6, 7),
+		.name = "ir-out",
+		.out = true
+	}, {
+		.gpio = IMX_GPIO_NR(5, 20),
+		.name = "aud-rst",
+		.out = true,
+		.level = 0,
+	}, {
+		.gpio = IMX_GPIO_NR(2, 24),
+		.name = "revdet0",
+	}, {
+		.gpio = IMX_GPIO_NR(2, 25),
+		.name = "revdet1",
+	}, {
+		.gpio = IMX_GPIO_NR(3, 27),
+		.name = "revdet2",
+	}, {
+		.gpio = IMX_GPIO_NR(2, 29),
+		.name = "revdet3",
+	}, {
+		.gpio = IMX_GPIO_NR(5, 11),
+		.name = "pmbin-0",
+	}, {
+		.gpio = IMX_GPIO_NR(5, 13),
+		.name = "pmbin-1",
+	},
+};
+
+void nav_setup_gpio(void)
+{
+	int i;
+	int ret;
+
+	imx_iomux_v3_setup_multiple_pads(nav_gpio_pads,
+					 ARRAY_SIZE(nav_gpio_pads));
+	for (i = 0; i < ARRAY_SIZE(nav_gpios); ++i) {
+		ret = gpio_request(nav_gpios[i].gpio, nav_gpios[i].name);
+		if (!ret) {
+			if (nav_gpios[i].out)
+				gpio_direction_output(nav_gpios[i].gpio,
+						      nav_gpios[i].level);
+			else
+				gpio_direction_input(nav_gpios[i].gpio);
+		}
+	}
+}
+
 int tqc_bb_board_early_init_f(void)
 {
 	nav_setup_iomuxc_uart();
@@ -308,6 +388,8 @@ int tqc_bb_board_early_init_f(void)
 
 int tqc_bb_board_init(void)
 {
+	nav_setup_gpio();
+
 	nav_setup_i2c();
 	/* do it here - to have reset completed */
 	nav_setup_iomuxc_enet();
