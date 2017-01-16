@@ -26,6 +26,7 @@
 #include <miiphy.h>
 #include <mmc.h>
 #include <netdev.h>
+#include <pca953x.h>
 
 #include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
@@ -547,6 +548,8 @@ int tqc_bb_board_late_init(void)
 {
 #if defined(CONFIG_MBA7_REV0100)
 	int i;
+#else
+	int old_bus;
 #endif
 	enum boot_device bd;
 	/*
@@ -609,7 +612,27 @@ int tqc_bb_board_late_init(void)
 		}
 	}
 #else
+#if defined(CONFIG_SYS_I2C)
 #
+#else
+# error
+#endif
+	/*
+	 * init GPIO expander here to enable PCIe voltage rails. Since the GPIO
+	 * are on an expander they will be later than the PCIe controller in the
+	 * kernel. So a regulator device cannot be used because the PCIe driver
+	 * does not support probe deferral
+	 */
+	old_bus = i2c_get_bus_num();
+	i2c_set_bus_num(1);
+
+	if (is_cpu_type(MXC_CPU_MX7S))
+		pca953x_set_val(CONFIG_SYS_I2C_PCA953X_ADDR, 0xffff, 0xe000);
+	else
+		pca953x_set_val(CONFIG_SYS_I2C_PCA953X_ADDR, 0xffff, 0xf400);
+	pca953x_set_dir(CONFIG_SYS_I2C_PCA953X_ADDR, 0xffff, 0xe000);
+
+	i2c_set_bus_num(old_bus);
 #endif
 
 	return 0;
