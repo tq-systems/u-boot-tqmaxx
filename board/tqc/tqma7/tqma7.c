@@ -361,6 +361,17 @@ int ft_board_setup(void *blob, bd_t *bd)
 		off = fdt_node_offset_by_compat_reg(blob, "fsl,imx7d-pcie",
 						    0x33800000);
 		fdt_set_node_status(blob, off, FDT_STATUS_DISABLED, 0);
+	} else if (is_cpu_type(MXC_CPU_MX7D)) {
+		off = fdt_node_offset_by_prop_value(blob, -1,
+						    "device_type",
+						    "cpu", 4);
+		while (off != -FDT_ERR_NOTFOUND) {
+			fdt_setprop_u32(blob, off, "clock-frequency",
+					996000000);
+			off = fdt_node_offset_by_prop_value(blob, off,
+							    "device_type",
+							    "cpu", 4);
+		}
 	}
 
 	/* bring in eMMC dsr settings */
