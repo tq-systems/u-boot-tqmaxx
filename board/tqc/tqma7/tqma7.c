@@ -340,6 +340,10 @@ int ft_board_setup(void *blob, bd_t *bd)
 			u32 *reg = (u32 *)fdt_getprop(blob, off, "reg", 0);
 			if (*reg > 0) {
 				fdt_del_node(blob, off);
+			} else {
+				fdt_setprop_u32(blob, off, "clock-frequency",
+						792000000);
+				fdt_delprop(blob, off, "operating-points");
 			}
 			off = fdt_node_offset_by_prop_value(blob, off,
 							    "device_type",
