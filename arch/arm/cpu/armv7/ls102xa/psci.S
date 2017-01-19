@@ -14,9 +14,12 @@
 
 #define SCFG_CORE0_SFT_RST      0x130
 #define SCFG_CORESRENCR         0x204
+#define SCFG_CLUSTERPMCR        0x904
 
 #define DCFG_CCSR_BRR           0x0E4
 #define DCFG_CCSR_SCRATCHRW1    0x200
+
+#define RCPM_POWMGTCSR		0x130
 
 	.pushsection ._secure.text, "ax"
 
@@ -111,6 +114,41 @@ psci_cpu_off:
 1:	wfi
 	b	1b
 
+.globl psci_cpu_suspend
+psci_cpu_suspend:
+	push	{lr}
+
+	@ Get Power State
+	mov	r0, r2, lsr #16
+	ands	r0, r0, #1
+	bne	out
+
+	@ STANDBY Power State
+	@ Get RCPM base address
+	movw	r0, #(CONFIG_SYS_FSL_RCPM_ADDR & 0xffff)
+	movt	r0, #(CONFIG_SYS_FSL_RCPM_ADDR >> 16)
+
+	@ Get POWMGTCSR
+	ldr	r1, [r0, #RCPM_POWMGTCSR]
+	rev	r1, r1
+
+	movw	r2, #0
+	movt	r2, #(1 << 4)
+
+	orr	r1, r1, r2
+	rev	r1, r1
+	str     r1, [r0, #RCPM_POWMGTCSR]
+
+	dsb
+	wfi
+
+out:
+	@ Return
+	mov	r0, #ARM_PSCI_RET_SUCCESS
+
+	pop	{lr}
+	bx	lr
+
 .globl	psci_arch_init
 psci_arch_init:
 	mov	r6, lr
@@ -121,6 +159,6 @@ psci_arch_init:
 
 	bx	r6
 
-	.globl psci_text_end
+.globl psci_text_end
 psci_text_end:
 	.popsection
