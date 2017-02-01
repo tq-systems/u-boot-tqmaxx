@@ -660,7 +660,7 @@ int board_mmc_get_env_dev(int devno)
 	default:
 		printf("mmc boot dev %d not supported, use default",
 		       devno);
-		env_dev = CONFIG_SYS_MMC_ENV_DEV;
+		env_dev = 0;
 	};
 
 	return env_dev;
