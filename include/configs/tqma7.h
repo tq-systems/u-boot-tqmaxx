@@ -429,27 +429,6 @@
 #define CONFIG_SYS_INIT_SP_ADDR \
 	(CONFIG_SYS_INIT_RAM_ADDR + CONFIG_SYS_INIT_SP_OFFSET)
 
-
-#if defined(CONFIG_ENV_IS_IN_MMC)
-#
-#elif defined(CONFIG_ENV_IS_IN_SPI_FLASH)
-#define CONFIG_ENV_OFFSET		(768 * 1024)
-#define CONFIG_ENV_SECT_SIZE		(64 * 1024)
-#define CONFIG_ENV_SPI_BUS		CONFIG_SF_DEFAULT_BUS
-#define CONFIG_ENV_SPI_CS		CONFIG_SF_DEFAULT_CS
-#define CONFIG_ENV_SPI_MODE		CONFIG_SF_DEFAULT_MODE
-#define CONFIG_ENV_SPI_MAX_HZ		CONFIG_SF_DEFAULT_SPEED
-#endif
-
-#ifdef CONFIG_SYS_USE_NAND
-#define CONFIG_SYS_FSL_USDHC_NUM	1
-#else
-#define CONFIG_SYS_FSL_USDHC_NUM	2
-#endif
-#define CONFIG_SYS_MMC_ENV_DEV		0   /* USDHC1 */
-#define CONFIG_SYS_MMC_ENV_PART		0	/* user area */
-#define CONFIG_MMCROOT			"/dev/mmcblk0p2"  /* USDHC1 */
-
 /* FLASH and environment organization */
 #define CONFIG_SYS_NO_FLASH
 
@@ -466,10 +445,6 @@
 
 
 #define CONFIG_IMX_THERMAL
-
-#if defined(CONFIG_MXC_EPDC) && defined(CONFIG_SYS_USE_QSPI)
-#error "EPDC Pins conflicts QSPI, Either EPDC or QSPI can be enabled!"
-#endif
 
 /*
  * All the defines above are for the TQMa7 SoM
