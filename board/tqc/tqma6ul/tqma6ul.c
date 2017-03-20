@@ -254,10 +254,10 @@ int power_init_board(void)
 	PFUZE3000_VLDO_DISABLE(reg);
 	pmic_reg_write(p, PFUZE3000_VLDO1CTL, reg);
 
-	/* disable VCC_SD */
-	pmic_reg_read(p, PFUZE3000_VCC_SDCTL, &reg);
+	/* disable VLDO2 */
+	pmic_reg_read(p, PFUZE3000_VLDO2CTL, &reg);
 	PFUZE3000_VLDO_DISABLE(reg);
-	pmic_reg_write(p, PFUZE3000_VCC_SDCTL, reg);
+	pmic_reg_write(p, PFUZE3000_VLDO2CTL, reg);
 
 	/* set VLDO4 voltage 1.8 -> 2.5 */
 	pmic_reg_read(p, PFUZE3000_VLD4CTL, &reg);
