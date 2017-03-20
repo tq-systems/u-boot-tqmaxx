@@ -325,12 +325,6 @@ int board_get_rtc_bus(void)
 	return 0;
 }
 
-int board_get_dtt_bus(void)
-{
-	/* LM75 on I2C4 */
-	return 3;
-}
-
 /*
  * Device Tree Support
  */
