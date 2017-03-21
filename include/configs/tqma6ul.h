@@ -185,11 +185,11 @@
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0"                                        \
 	"firmwarepart=1\0"                                                                      \
 	"loadimage="                                                                            \
-		"fatload mmc ${mmcdev}:${firmwarepart} ${loadaddr} ${kernel} \0"                \
+		"load mmc ${mmcdev}:${firmwarepart} ${loadaddr} ${kernel} \0"                       \
 	"loadfdtsingle="                                                                        \
-		"fatload mmc ${mmcdev}:${firmwarepart} ${fdt_addr} ${fdt_file} \0"              \
+		"load mmc ${mmcdev}:${firmwarepart} ${fdt_addr} ${fdt_file} \0"              \
 	"loadfdtfit="                                                                           \
-		"fatload mmc ${mmcdev}:${firmwarepart} ${loadaddr} ${fdt_file}; "               \
+		"load mmc ${mmcdev}:${firmwarepart} ${loadaddr} ${fdt_file}; "               \
 		"imxtract ${loadaddr} ${fitfdt_part} ${fdt_addr} \0"                            \
 	"update_uboot=if tftp ${uboot}; then "                                                  \
 		"if itest ${filesize} > 0; then "                                               \
@@ -206,7 +206,7 @@
 		"if tftp ${kernel}; then "                                                      \
 			"if itest ${filesize} > 0; then "                                       \
 				"echo Write kernel image to mmc ${mmcdev}:${firmwarepart}...; " \
-				"fatwrite mmc ${mmcdev}:${firmwarepart} ${loadaddr} "           \
+				"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} "           \
 					"${kernel} ${filesize}; "                               \
 			"fi; "                                                                  \
 		"fi; "                                                                          \
@@ -214,7 +214,7 @@
 	"update_fdt=run fdt_name; if tftp ${fdtimg}; then "                                     \
 		"if itest ${filesize} > 0; then "                                               \
 			"echo Write fdt image to mmc ${mmcdev}:${firmwarepart}...; "            \
-			"fatwrite mmc ${mmcdev}:${firmwarepart} ${loadaddr} "                   \
+			"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} "                   \
 				"${fdt_file} ${filesize}; "                                     \
 		"fi; fi; "                                                                      \
 		"setenv filesize \0"                                                            \
