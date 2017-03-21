@@ -428,10 +428,14 @@ U_BOOT_DEVICES(mxc_gpios) = {
 #if defined(CONFIG_MX27) || defined(CONFIG_MX53) || defined(CONFIG_MX6) || \
 		 defined(CONFIG_MX7)
 	{ "gpio_mxc", &mxc_plat[4] },
+#if !defined(CONFIG_MX6UL)
 	{ "gpio_mxc", &mxc_plat[5] },
 #endif
+#endif
 #if defined(CONFIG_MX53) || defined(CONFIG_MX6) || defined(CONFIG_MX7)
+#if !defined(CONFIG_MX6UL)
 	{ "gpio_mxc", &mxc_plat[6] },
+#endif
 #endif
 };
 #endif
