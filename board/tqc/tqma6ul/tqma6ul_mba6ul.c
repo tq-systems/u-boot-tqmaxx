@@ -91,9 +91,6 @@ static iomux_v3_cfg_t const mba6ul_fec1_pads[] = {
 	/* MDIO */
 	/* pins are shared with fec2 */
 
-	/* PHY reset*/
-	/* There is a global Baseboard reset */
-
 #if defined(CONFIG_MBA6UL_ENET1_INT)
 	/* INT */
 	/* TODO: enable on Basebord with R423 */
@@ -117,16 +114,13 @@ static iomux_v3_cfg_t const mba6ul_fec2_pads[] = {
 	/* MDIO */
 	/* pins are shared with fec1 */
 
-	/* PHY reset*/
-	/* There is a global Baseboard reset */
-
-#if defined(CONFIG_MBA6UL_ENET2_INT)	
+#if defined(CONFIG_MBA6UL_ENET2_INT)
 	/* INT */
 	/* TODO: enable on Basebord with R426 */
 	NEW_PAD_CTRL(MX6_PAD_CSI_DATA03__GPIO4_IO24, GPIO_IN_PAD_CTRL),
 #endif
 };
-#if defined(CONFIG_MBA6UL_ENET2_INT)	
+#if defined(CONFIG_MBA6UL_ENET2_INT)
 #define ENET2_PHY_INT_GPIO IMX_GPIO_NR(4, 21)
 #endif
 
@@ -134,14 +128,7 @@ static iomux_v3_cfg_t const mba6ul_fec_common_pads[] = {
 	/* MDIO */
 	NEW_PAD_CTRL(MX6_PAD_GPIO1_IO06__ENET2_MDIO, ENET_MDIO_PAD_CTRL),
 	NEW_PAD_CTRL(MX6_PAD_GPIO1_IO07__ENET2_MDC, ENET_MDIO_PAD_CTRL),
-#if defined(CONFIG_MBA6UL_ENET_RST)	
-	/* PHY reset*/
-	NEW_PAD_CTRL(MX6_PAD_GPIO1_IO02__GPIO1_IO02, GPIO_OUT_PAD_CTRL),
-#endif
 };
-#if defined(CONFIG_MBA6UL_ENET_RST)
-#define ENET_PHY_RESET_GPIO IMX_GPIO_NR(1, 2)
-#endif
 
 static void mba6ul_setup_iomuxc_enet(void)
 {
@@ -160,22 +147,6 @@ static void mba6ul_setup_iomuxc_enet(void)
 #if defined(CONFIG_MBA6UL_ENET2_INT)
 	gpio_request(ENET2_PHY_INT_GPIO, "enet2-phy-int");
 	gpio_direction_input(ENET2_PHY_INT_GPIO);
-#endif
-
-#if defined(CONFIG_MBA6UL_ENET_RST)
-	/* Reset PHY1 and/or PHY2
-	 * 
-	 * R1422 -> PHY1 reset (RESOLDER R1417)
-	 * R1522 -> PHY2 reset (RESOLDER R1517)
-	 * R1422 & R1422 -> PHY1 & PHY2 reset
-	 * */
-	gpio_request(ENET_PHY_RESET_GPIO, "enet-phy-rst#");
-	gpio_direction_output(ENET_PHY_RESET_GPIO , 1);
-	udelay(100);
-	gpio_direction_output(ENET_PHY_RESET_GPIO , 0);
-	/* lan8720: 5.5.3 reset time should be 25ms */
-	udelay(24900);
-	gpio_set_value(ENET_PHY_RESET_GPIO, 1);
 #endif
 }
 
@@ -250,7 +221,7 @@ static int mba6ul_setup_fec(int fec_id)
 
 int board_phy_config(struct phy_device *phydev)
 {
-	/* TODO: set skew values using phy_read_mmd_indirec from */
+	/* TODO: set skew values using phy_read_mmd_indirect from */
 
 	if (phydev->drv->config)
 		phydev->drv->config(phydev);
