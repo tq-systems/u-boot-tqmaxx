@@ -28,6 +28,10 @@
 #define CONFIG_DISPLAY_CPUINFO
 #define CONFIG_DISPLAY_BOARDINFO
 
+/* support fused HW units */
+#define CONFIG_MODULE_FUSE
+#define CONFIG_OF_SYSTEM_SETUP
+
 /* uncomment for SECURE mode support */
 /* #define CONFIG_SECURE_BOOT */
 
