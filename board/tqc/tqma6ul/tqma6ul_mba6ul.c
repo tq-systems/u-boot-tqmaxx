@@ -27,6 +27,7 @@
 #include <miiphy.h>
 #include <mmc.h>
 #include <netdev.h>
+#include <pca953x.h>
 #include <spl.h>
 #include <usb.h>
 #include <usb/ehci-fsl.h>
@@ -434,6 +435,8 @@ int tqc_bb_board_early_init_f(void)
 
 int tqc_bb_board_init(void)
 {
+	int old_bus;
+
 #ifdef CONFIG_MBA6UL_I2C2
 	/*
 	 * The I2C2 Signals and the UART6 RTS/CTS Signals sharing the
@@ -442,6 +445,28 @@ int tqc_bb_board_init(void)
 	 */
 	mba6ul_setup_i2c();
 #endif
+
+	/*
+	 * init GPIO expander here to have all in place
+	 */
+	old_bus = i2c_get_bus_num();
+	i2c_set_bus_num(3);
+
+	/* TBD: PCIE PWREN HIGH */
+	pca953x_set_val(0x20, 0xff, 0x00);
+	pca953x_set_dir(0x20, 0xff, 0x80);
+
+	/* all input */
+	pca953x_set_dir(0x21, 0xff, 0xff);
+
+	/* 0..6 out, 7 NC */
+	pca953x_set_val(0x22, 0xff, 0x00);
+	pca953x_set_dir(0x22, 0xff, 0x80);
+	/* LED */
+	pca953x_set_val(0x22, 0x30, 0x30);
+
+	i2c_set_bus_num(old_bus);
+
 	/* do it here - to have reset completed */
 	mba6ul_setup_iomuxc_enet();
 	/* Only ENET2_MII can manage multiple phy's so we need to
