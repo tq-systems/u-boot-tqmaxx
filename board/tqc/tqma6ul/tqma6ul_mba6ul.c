@@ -133,6 +133,8 @@ static iomux_v3_cfg_t const mba6ul_fec_common_pads[] = {
 
 static void mba6ul_setup_iomuxc_enet(void)
 {
+	int old_bus;
+
 	imx_iomux_v3_setup_multiple_pads(mba6ul_fec_common_pads,
 					 ARRAY_SIZE(mba6ul_fec_common_pads));
 	imx_iomux_v3_setup_multiple_pads(mba6ul_fec1_pads,
@@ -149,6 +151,17 @@ static void mba6ul_setup_iomuxc_enet(void)
 	gpio_request(ENET2_PHY_INT_GPIO, "enet2-phy-int");
 	gpio_direction_input(ENET2_PHY_INT_GPIO);
 #endif
+
+	old_bus = i2c_get_bus_num();
+	i2c_set_bus_num(3);
+
+	pca953x_set_val(0x22, 0x06, 0x00);
+	pca953x_set_dir(0x22, 0x06, 0x00);
+	/* lan8720: 5.5.3 reset time should be 25ms */
+	udelay(30000);
+	pca953x_set_val(0x22, 0x06, 0x06);
+
+	i2c_set_bus_num(old_bus);
 }
 
 int board_eth_init(bd_t *bis)
