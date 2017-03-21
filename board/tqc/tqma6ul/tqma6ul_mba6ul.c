@@ -414,6 +414,7 @@ int board_ehci_hcd_init(int port)
 
 int board_ehci_power(int port, int on)
 {
+	int old_bus;
 	/* port index start at 0 */
 	if (port > (CONFIG_USB_MAX_CONTROLLER_COUNT - 1) || port < 0)
 		return -EINVAL;
@@ -430,7 +431,12 @@ int board_ehci_power(int port, int on)
 			}
 			break;
 		case 1:
-			/* managed by 2517i 7port usb hub */
+			/* power managed by 2517i 7port usb hub */
+			old_bus = i2c_get_bus_num();
+			i2c_set_bus_num(3);
+			pca953x_set_val(0x22, 0x01, (on) ? 1 : 0);
+			udelay(10000);
+			i2c_set_bus_num(old_bus);
 			break;
 		default:
 			printf ("USB%d: Powering port is not supported\n", port);
