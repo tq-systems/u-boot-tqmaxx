@@ -322,7 +322,7 @@ int checkboard(void)
 
 int board_get_rtc_bus(void)
 {
-	return 0;
+	return 3;
 }
 
 /*
