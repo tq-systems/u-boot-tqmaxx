@@ -71,6 +71,9 @@ DECLARE_GLOBAL_DATA_PTR;
 #define USB_OC_PAD_CTRL (PAD_CTL_SPEED_MED | PAD_CTL_DSE_40ohm |	\
 	PAD_CTL_HYS | PAD_CTL_PKE)
 
+#define WDOG_PAD_CTRL		(PAD_CTL_PUS_22K_UP | PAD_CTL_PUE | \
+	PAD_CTL_DSE_40ohm)
+
 /*
  * pin conflicts for fec1 and fec2, GPIO1_IO06 and GPIO1_IO07 can only
  * be used for ENET1 or ENET2, cannot be used for both.
@@ -482,6 +485,10 @@ int tqc_bb_board_init(void)
 	return 0;
 }
 
+static iomux_v3_cfg_t const mba6ul_wdog_pads[] = {
+	NEW_PAD_CTRL(MX6_PAD_GPIO1_IO08__WDOG1_WDOG_B, WDOG_PAD_CTRL),
+};
+
 int tqc_bb_board_late_init(void)
 {
 	/*
@@ -527,6 +534,10 @@ int tqc_bb_board_late_init(void)
 		setenv("mmcblkdev", "");
 		setenv("mmcdev", "");
 	}
+
+	imx_iomux_v3_setup_multiple_pads(mba6ul_wdog_pads,
+					 ARRAY_SIZE(mba6ul_wdog_pads));
+	set_wdog_reset((struct wdog_regs *)WDOG1_BASE_ADDR);
 
 	return 0;
 }
