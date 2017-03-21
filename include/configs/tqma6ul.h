@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2016 TQ Systems
  * Author: Marco Felsch <Marco.Felsch@tq-group.com>
+ * Configuration settings for the TQ Systems TQMa6UL SOM.
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */

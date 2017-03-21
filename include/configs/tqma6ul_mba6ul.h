@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2016 Markus Niebel <Markus.Niebel@tq-group.com>
  *
- * Configuration settings for the TQ Systems TQMa7 module.
+ * Configuration settings for the TQ Systems MBa6UL Carrier board for TQMa6UL.
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
