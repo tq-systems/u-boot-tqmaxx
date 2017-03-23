@@ -27,6 +27,8 @@
 #include <mmc.h>
 #include <netdev.h>
 #include <pca953x.h>
+#include <usb.h>
+#include <usb/ehci-fsl.h>
 
 #include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
@@ -357,6 +359,19 @@ static void mba7_setup_iomux_usb(void)
 		gpio_direction_output(MBA7_OTG2_PWR_GPIO, 0);
 }
 
+/*
+ * we force phy mode to host for all supported boards
+ * supporting gadget mode needs an USB VID
+ */
+int board_usb_phy_mode(int port)
+{
+	if (is_cpu_type(MXC_CPU_MX7S))
+		return (port == 0) ? USB_INIT_HOST : -ENODEV;
+	else
+		return ((port >= 0) && (port <= 1)) ? USB_INIT_HOST : -ENODEV;
+
+	return -ENODEV;
+}
 
 int board_ehci_hcd_init(int port)
 {
