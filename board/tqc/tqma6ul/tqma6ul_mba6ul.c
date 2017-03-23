@@ -91,16 +91,7 @@ static iomux_v3_cfg_t const mba6ul_fec1_pads[] = {
 
 	/* MDIO */
 	/* pins are shared with fec2 */
-
-#if defined(CONFIG_MBA6UL_ENET1_INT)
-	/* INT */
-	/* TODO: enable on Basebord with R423 */
-	NEW_PAD_CTRL(MX6_PAD_CSI_DATA03__GPIO4_IO24, GPIO_IN_PAD_CTRL),
-#endif
 };
-#if defined(CONFIG_MBA6UL_ENET1_INT)
-#define ENET1_PHY_INT_GPIO IMX_GPIO_NR(4, 24)
-#endif
 
 static iomux_v3_cfg_t const mba6ul_fec2_pads[] = {
 	NEW_PAD_CTRL(MX6_PAD_ENET2_RX_DATA0__ENET2_RDATA00, ENET_PAD_CTRL),
@@ -114,16 +105,7 @@ static iomux_v3_cfg_t const mba6ul_fec2_pads[] = {
 
 	/* MDIO */
 	/* pins are shared with fec1 */
-
-#if defined(CONFIG_MBA6UL_ENET2_INT)
-	/* INT */
-	/* TODO: enable on Basebord with R426 */
-	NEW_PAD_CTRL(MX6_PAD_CSI_DATA03__GPIO4_IO24, GPIO_IN_PAD_CTRL),
-#endif
 };
-#if defined(CONFIG_MBA6UL_ENET2_INT)
-#define ENET2_PHY_INT_GPIO IMX_GPIO_NR(4, 21)
-#endif
 
 static iomux_v3_cfg_t const mba6ul_fec_common_pads[] = {
 	/* MDIO */
@@ -141,16 +123,6 @@ static void mba6ul_setup_iomuxc_enet(void)
 					 ARRAY_SIZE(mba6ul_fec1_pads));
 	imx_iomux_v3_setup_multiple_pads(mba6ul_fec2_pads,
 					 ARRAY_SIZE(mba6ul_fec2_pads));
-
-#if defined(CONFIG_MBA6UL_ENET1_INT)
-	gpio_request(ENET1_PHY_INT_GPIO, "enet1-phy-int");
-	gpio_direction_input(ENET1_PHY_INT_GPIO);
-#endif
-
-#if defined(CONFIG_MBA6UL_ENET2_INT)
-	gpio_request(ENET2_PHY_INT_GPIO, "enet2-phy-int");
-	gpio_direction_input(ENET2_PHY_INT_GPIO);
-#endif
 
 	old_bus = i2c_get_bus_num();
 	i2c_set_bus_num(3);
