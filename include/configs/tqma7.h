@@ -221,7 +221,7 @@
 			"if itest ${filesize} > 0; then "                      \
 				"echo Write fdt image to mmc ${mmcdev}:${firmwarepart}...; " \
 				"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} " \
-					"/${fdt_file} ${filesize}; "           \
+					"${fdt_file} ${filesize}; "            \
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"setenv filesize; setenv getcmd; setenv fdtimg \0"             \
