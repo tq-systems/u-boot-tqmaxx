@@ -301,7 +301,7 @@
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"setenv filesize 0; setenv size ; setenv offset; "             \
-		"setenv getcmd 0"                                              \
+		"setenv getcmd \0"                                              \
 	"update_fdt=run fdt_name; run set_getcmd; "                            \
 		"if ${getcmd} ${fdtimg}; then "                                \
 			"if itest ${filesize} > 0; then "                      \
