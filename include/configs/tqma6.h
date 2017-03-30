@@ -107,6 +107,14 @@
 #define CONFIG_ARP_TIMEOUT		200UL
 
 /* Command definition */
+#define CONFIG_CMD_EXT2
+#define CONFIG_CMD_EXT4
+#define CONFIG_CMD_EXT4_WRITE
+#define CONFIG_CMD_FAT
+#define CONFIG_FAT_WRITE
+#define CONFIG_CMD_FS_GENERIC
+#define CONFIG_DOS_PARTITION
+
 #define CONFIG_CMD_BMODE
 
 #define CONFIG_ENV_SIZE			(SZ_8K)
