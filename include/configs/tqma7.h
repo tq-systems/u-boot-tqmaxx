@@ -79,17 +79,9 @@
 #define CONFIG_PFUZE3000_PMIC_I2C
 #define CONFIG_POWER_PFUZE3000_I2C_ADDR		0x08
 
-/* MMC Configs */
-#define CONFIG_FSL_ESDHC
-#define CONFIG_FSL_USDHC
+/* MMC Configs, other options from mx7_common */
 #define CONFIG_SYS_FSL_ESDHC_ADDR	0
-#define CONFIG_SUPPORT_EMMC_BOOT
-
-#define CONFIG_MMC
-#define CONFIG_CMD_MMC
-#define CONFIG_GENERIC_MMC
-/* TODO: check if needed */
-#define CONFIG_BOUNCE_BUFFER
+#define CONFIG_SUPPORT_EMMC_RPMB
 
 /* USB Configs */
 #define CONFIG_USB_EHCI
