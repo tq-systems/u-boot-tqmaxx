@@ -425,6 +425,8 @@
 #define CONFIG_FIT
 #define CONFIG_FIT_VERBOSE
 
+#define CONFIG_IMX_THERMAL
+
 /*
  * All the defines above are for the TQMa6 SoM
  *
