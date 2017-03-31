@@ -436,7 +436,7 @@ int tqc_bb_board_late_init(void)
 {
 	int ret;
 	struct tqc_eeprom_data eedat;
-	char mac[17];
+	char mac[20];
 	enum boot_device bd;
 
 	ret = tqc_read_eeprom(tqma6_get_system_i2c_bus(), 0x57, &eedat);
