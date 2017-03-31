@@ -176,47 +176,51 @@
 #define CONFIG_ENV_OFFSET		SZ_1M
 #define CONFIG_SYS_MMC_ENV_DEV		0
 
-#define TQMA6UL_EXTRA_BOOTDEV_ENV_SETTINGS                                                      \
-	"uboot_start="__stringify(TQMA6UL_UBOOT_SECTOR_START)"\0"                               \
-	"uboot_size="__stringify(TQMA6UL_UBOOT_SECTOR_COUNT)"\0"                                \
-	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0"                                        \
-	"firmwarepart=1\0"                                                                      \
-	"loadimage="                                                                            \
-		"load mmc ${mmcdev}:${firmwarepart} ${loadaddr} ${kernel} \0"                       \
-	"loadfdtsingle="                                                                        \
-		"load mmc ${mmcdev}:${firmwarepart} ${fdt_addr} ${fdt_file} \0"              \
-	"loadfdtfit="                                                                           \
-		"load mmc ${mmcdev}:${firmwarepart} ${loadaddr} ${fdt_file}; "               \
-		"imxtract ${loadaddr} ${fitfdt_part} ${fdt_addr} \0"                            \
-	"update_uboot=if tftp ${uboot}; then "                                                  \
-		"if itest ${filesize} > 0; then "                                               \
-			"mmc dev ${mmcdev}; mmc rescan; "                                       \
-			"setexpr blkc ${filesize} + 0x1ff; "                                    \
-			"setexpr blkc ${blkc} / 0x200; "                                        \
-			"if itest ${blkc} <= ${uboot_size}; then "                              \
-				"mmc write ${loadaddr} ${uboot_start} "                         \
-					"${blkc}; "                                             \
-			"fi; "                                                                  \
-		"fi; fi; "                                                                      \
-		"setenv filesize; setenv blkc \0"                                               \
-	"update_kernel=run kernel_name; "                                                       \
-		"if tftp ${kernel}; then "                                                      \
-			"if itest ${filesize} > 0; then "                                       \
+#define TQMA6UL_EXTRA_BOOTDEV_ENV_SETTINGS                                     \
+	"uboot_start="__stringify(TQMA6UL_UBOOT_SECTOR_START)"\0"              \
+	"uboot_size="__stringify(TQMA6UL_UBOOT_SECTOR_COUNT)"\0"               \
+	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0"                       \
+	"firmwarepart=1\0"                                                     \
+	"loadimage=run kernel_name; "                                          \
+		"load mmc ${mmcdev}:${firmwarepart} ${loadaddr} ${kernel} \0"  \
+	"loadfdtsingle="                                                       \
+		"load mmc ${mmcdev}:${firmwarepart} ${fdt_addr} ${fdt_file} \0"\
+	"loadfdtfit="                                                          \
+		"load mmc ${mmcdev}:${firmwarepart} ${loadaddr} ${fdt_file}; " \
+		"imxtract ${loadaddr} ${fitfdt_part} ${fdt_addr} \0"           \
+	"update_uboot=run set_getcmd; "                                        \
+		"if ${getcmd} ${uboot}; then "                                 \
+			"if itest ${filesize} > 0; then "                      \
+				"mmc dev ${mmcdev}; mmc rescan; "              \
+				"setexpr blkc ${filesize} + 0x1ff; "           \
+				"setexpr blkc ${blkc} / 0x200; "               \
+				"if itest ${blkc} <= ${uboot_size}; then "     \
+					"mmc write ${loadaddr} ${uboot_start} "\
+						"${blkc}; "                    \
+				"fi; "                                         \
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; setenv blkc; setenv getcmd \0"               \
+	"update_kernel=run kernel_name; run set_getcmd; "                      \
+		"if ${getcmd} ${kernel}; then "                                \
+			"if itest ${filesize} > 0; then "                      \
 				"echo Write kernel image to mmc ${mmcdev}:${firmwarepart}...; " \
-				"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} "           \
-					"${kernel} ${filesize}; "                               \
-			"fi; "                                                                  \
-		"fi; "                                                                          \
-		"setenv filesize \0"                                                            \
-	"update_fdt=run fdt_name; if tftp ${fdtimg}; then "                                     \
-		"if itest ${filesize} > 0; then "                                               \
-			"echo Write fdt image to mmc ${mmcdev}:${firmwarepart}...; "            \
-			"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} "                   \
-				"${fdt_file} ${filesize}; "                                     \
-		"fi; fi; "                                                                      \
-		"setenv filesize \0"                                                            \
+				"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} " \
+					"${kernel} ${filesize}; "              \
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; setenv getcmd \0"                            \
+	"update_fdt=run fdt_name; run set_getcmd; "                            \
+		"if ${getcmd} ${fdtimg}; then "                                \
+			"if itest ${filesize} > 0; then "                      \
+				"echo Write fdt image to mmc ${mmcdev}:${firmwarepart}...; " \
+				"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} " \
+					"${fdt_file} ${filesize}; "            \
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; setenv getcmd; setenv fdtimg \0"             \
 
-#define CONFIG_BOOTCOMMAND                                                                      \
+#define CONFIG_BOOTCOMMAND                                                     \
 	"run mmcboot; run netboot; run panicboot"
 
 #elif defined(CONFIG_TQMA6UL_QSPI_BOOT)
@@ -261,49 +265,56 @@
 	"fdt_sectors="__stringify(TQMA6UL_FDT_SECTOR_COUNT)"\0"                \
 	"kernel_start="__stringify(TQMA6UL_KERNEL_SECTOR_START)"\0"            \
 	"kernel_sectors="__stringify(TQMA6UL_KERNEL_SECTOR_COUNT)"\0"          \
-	"update_uboot=if tftp ${uboot}; then "                                 \
-		"if itest ${filesize} > 0; then "                              \
-			"setexpr blkc ${filesize} + "                          \
-				__stringify(TQMA6UL_UBOOT_OFFSET) "; "         \
-			"setexpr size ${uboot_sectors} * "                     \
-				__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; " \
-			"if itest ${blkc} <= ${size}; then "                   \
-				"sf probe; "                                   \
-				"sf erase 0 ${size}; "                         \
-				"sf write ${loadaddr} ${uboot_offset} "        \
-					"${filesize}; "                        \
+	"update_uboot=run set_getcmd; "                                        \
+		"if ${getcmd} ${uboot}; then "                                 \
+			"if itest ${filesize} > 0; then "                      \
+				"setexpr blkc ${filesize} + "                  \
+					__stringify(TQMA6UL_UBOOT_OFFSET) "; " \
+				"setexpr size ${uboot_sectors} * "             \
+					__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; " \
+				"if itest ${blkc} <= ${size}; then "           \
+					"sf probe; "                           \
+					"sf erase 0 ${size}; "                 \
+					"sf write ${loadaddr} ${uboot_offset} "\
+						"${filesize}; "                \
+				"fi; "                                         \
 			"fi; "                                                 \
-		"fi; fi; "                                                     \
-		"setenv filesize 0; setenv blkc; setenv size \0"               \
-	"update_kernel=run kernel_name; if tftp ${kernel}; then "              \
-		"if itest ${filesize} > 0; then "                              \
-			"setexpr size ${kernel_sectors} * "                    \
-				__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; " \
-			"setexpr offset ${kernel_start} * "                    \
-				__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; " \
-			"if itest ${filesize} <= ${size}; then "               \
-				"sf probe; "                                   \
-				"sf erase ${offset} ${size}; "                 \
-				"sf write ${loadaddr} ${offset} "              \
-					"${filesize}; "                        \
+		"fi; "                                                         \
+		"setenv filesize 0; setenv blkc; setenv size; setenv getcmd \0"\
+	"update_kernel=run kernel_name; run set_getcmd; "                      \
+		"if ${getcmd} ${kernel}; then "                                \
+			"if itest ${filesize} > 0; then "                      \
+				"setexpr size ${kernel_sectors} * "            \
+					__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; " \
+				"setexpr offset ${kernel_start} * "            \
+					__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; " \
+				"if itest ${filesize} <= ${size}; then "       \
+					"sf probe; "                           \
+					"sf erase ${offset} ${size}; "         \
+					"sf write ${loadaddr} ${offset} "      \
+						"${filesize}; "                \
+				"fi; "                                         \
 			"fi; "                                                 \
-		"fi; fi; "                                                     \
-		"setenv filesize 0; setenv size ; setenv offset\0"             \
-	"update_fdt=run fdt_name; if tftp ${fdtimg}; then "                    \
-		"if itest ${filesize} > 0; then "                              \
-			"setexpr size ${fdt_sectors} * "                       \
-				__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; " \
-			"setexpr offset ${fdt_start} * "                       \
-				__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; " \
-			"if itest ${filesize} <= ${size}; then "               \
-				"sf probe; "                                   \
-				"sf erase ${offset} ${size}; "                 \
-				"sf write ${loadaddr} ${offset} "              \
-					"${filesize}; "                        \
+		"fi; "                                                         \
+		"setenv filesize 0; setenv size ; setenv offset; "             \
+		"setenv getcmd \0"                                             \
+	"update_fdt=run fdt_name; run set_getcmd; "                            \
+		"if ${getcmd} ${fdtimg}; then "                                \
+			"if itest ${filesize} > 0; then "                      \
+				"setexpr size ${fdt_sectors} * "               \
+					__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; " \
+				"setexpr offset ${fdt_start} * "               \
+					__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; " \
+				"if itest ${filesize} <= ${size}; then "       \
+					"sf probe; "                           \
+					"sf erase ${offset} ${size}; "         \
+					"sf write ${loadaddr} ${offset} "      \
+						"${filesize}; "                \
+				"fi; "                                         \
 			"fi; "                                                 \
-		"fi; fi; "                                                     \
-		"setenv fdtimg"                                                \
-		"setenv filesize 0; setenv size ; setenv offset\0"             \
+		"fi; "                                                         \
+		"setenv fdtimg; setenv getcmd; "                               \
+		"setenv filesize 0; setenv size; setenv offset\0"              \
 	"loadimage=sf probe; "                                                 \
 		"setexpr size ${kernel_sectors} * "                            \
 			__stringify(TQMA6UL_SPI_FLASH_SECTOR_SIZE)"; "         \
@@ -376,7 +387,6 @@
 	"mmcboot=echo Booting from mmc ...; "                                  \
 		"setenv bootargs; "                                            \
 		"run mmcargs; "                                                \
-		"run kernel_name; "                                            \
 		"if run loadfdt; then "                                        \
 			"echo boot device tree kernel ...; "                   \
 			"if run loadimage; then "                              \
