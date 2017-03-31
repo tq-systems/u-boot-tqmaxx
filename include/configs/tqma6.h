@@ -81,8 +81,9 @@
 #define CONFIG_POWER_PFUZE100
 #define CONFIG_POWER_PFUZE100_I2C_ADDR	0x08
 
-/* MMC Configs */
+/* MMC Configs, other options from mx6_common */
 #define CONFIG_SYS_FSL_ESDHC_ADDR	0
+#define CONFIG_SUPPORT_EMMC_RPMB
 
 /* USB Configs */
 #define CONFIG_CMD_USB
