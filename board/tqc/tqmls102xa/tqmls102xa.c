@@ -10,6 +10,8 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+u8 tqmls102xa_module_eeprom_addr = CONFIG_SYS_I2C_EEPROM_ADDR;
+
 int checkboard(void)
 {
 	struct ccsr_gur __iomem *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
@@ -231,27 +233,86 @@ void board_sleep_prepare(void)
 #ifdef CONFIG_BOARD_LATE_INIT
 int board_late_init(void)
 {
-	int ret;
+	int ret = -1;
 	struct tqmls102xa_eeprom_data eedat;
 	/* must hold largest field of eeprom data */
 	char safe_string[0x41];
+	int addr = CONFIG_SYS_I2C_EEPROM_ADDR;
+	int content_valid = 1;
 
 	ret = tqmls102xa_read_eeprom(CONFIG_SYS_EEPROM_BUS_NUM,
-				     CONFIG_SYS_I2C_EEPROM_ADDR, &eedat);
-	if (!ret) {
+				     addr,
+				     &eedat);
+
+	/* TQMLS102xA.0203 EEPROM i2c address is 0x54,
+	 * try old address in case running on a pre-0203 module
+	 */
+	if (ret && (0x50 != addr)) {
+		printf("EEPROM: (0x%x) err %d\n", addr, ret);
+		addr = 0x50;
+		ret = tqmls102xa_read_eeprom(CONFIG_SYS_EEPROM_BUS_NUM,
+					     addr,
+					     &eedat);
+	}
+
+	if (ret) {
+		printf("EEPROM: (0x%x) err %d\n", addr, ret);
+	} else {
 		/* ID */
 		tqmls102xa_parse_eeprom_id(&eedat, safe_string,
 					   ARRAY_SIZE(safe_string));
 		if (0 == strncmp(safe_string, "TQM", 3))
 			setenv("boardtype", safe_string);
-		if (0 == tqmls102xa_parse_eeprom_serial(&eedat, safe_string,
-							ARRAY_SIZE(safe_string)))
-			setenv("serial#", safe_string);
 		else
+			content_valid = 0;
+
+		/* Serial# */
+		if (0 == tqmls102xa_parse_eeprom_serial(&eedat,
+							safe_string,
+							ARRAY_SIZE(safe_string)))
+		{
+			setenv("serial#", safe_string);
+		} else {
+			content_valid = 0;
 			setenv("serial#", "???");
+		}
+
+		/* MAC */
+		if (0 == tqmls102xa_parse_eeprom_mac(&eedat,
+						     safe_string,
+						     ARRAY_SIZE(safe_string)))
+		{
+			uint32_t mac;
+			char addr[17];
+
+			setenv("ethaddr", safe_string);
+
+			mac = (eedat.mac[3] << 16) |
+				(eedat.mac[4] << 8) |
+				(eedat.mac[5]);
+			mac++;
+			snprintf(addr, sizeof(addr),
+				 "%02x:%02x:%02x:%02x:%02x:%02x",
+				eedat.mac[0], eedat.mac[1],
+				eedat.mac[2], ((mac >> 16) & 0xFF),
+				((mac >> 8) & 0xFF), (mac & 0xFF));
+			setenv("eth1addr", addr);
+
+			mac++;
+			snprintf(addr, sizeof(addr),
+				 "%02x:%02x:%02x:%02x:%02x:%02x",
+				eedat.mac[0], eedat.mac[1],
+				eedat.mac[2], ((mac >> 16) & 0xFF),
+				((mac >> 8) & 0xFF), (mac & 0xFF));
+			setenv("eth2addr", addr);
+		} else {
+			content_valid = 0;
+		}
+
+		if (content_valid)
+			tqmls102xa_module_eeprom_addr = addr;
+
 		tqmls102xa_show_eeprom(&eedat, "TQM");
-	} else {
-		printf("EEPROM: err %d\n", ret);
 	}
 
 	tqmls102xa_bb_late_init();
@@ -335,6 +396,16 @@ int ft_board_setup(void *blob, bd_t *bd)
 		case 3: printf(", removed references to second chip\n");
 			break;
 		}
+	}
+
+	/* Modify device tree for module eeprom address */
+	if (tqmls102xa_module_eeprom_addr != 0x54) {
+		printf("ft_board_setup: setting module eeprom address to 0x%x\n",
+			tqmls102xa_module_eeprom_addr);
+
+		do_fixup_by_path_u32(blob,
+				"/soc/i2c@2180000/24c64@54",
+				"reg", tqmls102xa_module_eeprom_addr, 0);
 	}
 
 	return 0;
