@@ -227,6 +227,9 @@ static const char *tqma6_get_boardname(void)
 	case MXC_CPU_MX6Q:
 		return "TQMa6Q";
 		break;
+	case MXC_CPU_MX6QP:
+		return "TQMa6QP";
+		break;
 	default:
 		return "??";
 	};

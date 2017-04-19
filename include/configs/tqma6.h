@@ -20,7 +20,7 @@
 /* place code in last 4 MiB of RAM */
 #if defined(CONFIG_TQMA6S)
 #define CONFIG_SYS_TEXT_BASE		0x2fc00000
-#elif defined(CONFIG_TQMA6Q) || defined(CONFIG_TQMA6DL)
+#elif defined(CONFIG_TQMA6QP) ||defined(CONFIG_TQMA6Q) || defined(CONFIG_TQMA6DL)
 #define CONFIG_SYS_TEXT_BASE		0x4fc00000
 #endif
 
@@ -31,6 +31,8 @@
 #elif defined(CONFIG_TQMA6DL)
 #define PHYS_SDRAM_SIZE			(SZ_1G)
 #elif defined(CONFIG_TQMA6Q)
+#define PHYS_SDRAM_SIZE			(SZ_1G)
+#elif defined(CONFIG_TQMA6QP)
 #define PHYS_SDRAM_SIZE			(SZ_1G)
 #endif
 
