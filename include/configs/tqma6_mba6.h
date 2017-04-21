@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2013 - 2015 Markus Niebel <Markus.Niebel@tq-group.com>
+ * Copyright (C) 2013 - 2017 Markus Niebel <Markus.Niebel@tq-group.com>
  *
- * Configuration settings for the TQ Systems TQMa6<Q,S> module.
+ * Configuration settings for the TQ Systems TQMa6<Q,S,DL,QP> module.
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
@@ -13,6 +13,8 @@
 #define CONFIG_DEFAULT_FDT_FILE		"imx6dl-mba6x.dtb"
 #elif defined(CONFIG_TQMA6Q)
 #define CONFIG_DEFAULT_FDT_FILE		"imx6q-mba6x.dtb"
+#elif defined(CONFIG_TQMA6QP)
+#define CONFIG_DEFAULT_FDT_FILE		"imx6qp-mba6b.dtb"
 #endif
 
 #define CONFIG_DTT_SENSORS		{ 0, 1 }
