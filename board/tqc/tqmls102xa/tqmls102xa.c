@@ -283,7 +283,7 @@ int board_late_init(void)
 						     ARRAY_SIZE(safe_string)))
 		{
 			uint32_t mac;
-			char addr[17];
+			char addr[18];
 
 			setenv("ethaddr", safe_string);
 
