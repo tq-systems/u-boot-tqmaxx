@@ -160,6 +160,7 @@
 	"update_kernel=run kernel_name; run set_getcmd; "                      \
 		"if ${getcmd} ${kernel}; then "                                \
 			"if itest ${filesize} > 0; then "                      \
+				"mmc dev ${mmcdev}; mmc rescan; "              \
 				"echo Write kernel image to mmc ${mmcdev}:${firmwarepart}...; " \
 				"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} " \
 					"${kernel} ${filesize}; "              \
@@ -169,6 +170,7 @@
 	"update_fdt=run fdt_name; run set_getcmd; "                            \
 		"if ${getcmd} ${fdtimg}; then "                                \
 			"if itest ${filesize} > 0; then "                      \
+				"mmc dev ${mmcdev}; mmc rescan; "              \
 				"echo Write fdt image to mmc ${mmcdev}:${firmwarepart}...; " \
 				"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} " \
 					"${fdt_file} ${filesize}; "            \
