@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 TQ Systems
+ * Copyright (C) 2016 - 2017 TQ Systems
  * Author: Marco Felsch <Marco.Felsch@tq-group.com>
  *
  * SPDX-License-Identifier:	GPL-2.0+
@@ -220,7 +220,13 @@ static const char *tqma6ul_get_boardname(void)
 
 	switch ((cpurev & 0xFF000) >> 12) {
 	case MXC_CPU_MX6UL:
+#if defined(CONFIG_TQMA6UL_VARIANT_STANDARD)
 		return "TQMa6UL";
+#elif defined(CONFIG_TQMA6UL_VARIANT_LGA)
+		return "TQMa6ULxL";
+#else
+#error
+#endif
 		break;
 	default:
 		return "??";
@@ -229,6 +235,12 @@ static const char *tqma6ul_get_boardname(void)
 
 #define PFUZE3000_VLDOXEN_B 4
 #define PFUZE3000_VLDO_DISABLE(ctlreg) (ctlreg &= ~(1 << PFUZE3000_VLDOXEN_B))
+
+#define PFUZE3000_SWX_MODE_OMODE	BIT(5)
+#define PFUZE3000_SWX_MODE_SW_MMODE	0x0f
+#define PFUZE3000_SW_DISABLE(modereg) (modereg &= \
+	~((PFUZE3000_SWX_MODE_OMODE) | PFUZE3000_SWX_MODE_SW_MMODE))
+
 int power_init_board(void)
 {
 	struct pmic *p;
@@ -259,10 +271,41 @@ int power_init_board(void)
 	PFUZE3000_VLDO_DISABLE(reg);
 	pmic_reg_write(p, PFUZE3000_VLDO2CTL, reg);
 
-	/* set VLDO4 voltage 1.8 -> 2.5 */
+#if defined(CONFIG_TQMA6UL_VARIANT_STANDARD)
+
+	/* set VLDO3 voltage 1.8 */
+	pmic_reg_read(p, PFUZE3000_VLDO3CTL, &reg);
+	reg &= ~(0x0F);
+	pmic_reg_write(p, PFUZE3000_VLDO3CTL, reg);
+	/* set VLDO4 voltage 2.5 */
 	pmic_reg_read(p, PFUZE3000_VLD4CTL, &reg);
+	reg &= ~(0x0F);
 	reg |= 0x07;
 	pmic_reg_write(p, PFUZE3000_VLD4CTL, reg);
+
+#elif defined(CONFIG_TQMA6UL_VARIANT_LGA)
+
+	/* set VLDO3 voltage 2.5 */
+	pmic_reg_read(p, PFUZE3000_VLDO3CTL, &reg);
+	reg &= ~(0x0F);
+	reg |= 0x07;
+	pmic_reg_write(p, PFUZE3000_VLDO3CTL, reg);
+	/* set VLDO4 voltage 1.8 */
+	pmic_reg_read(p, PFUZE3000_VLD4CTL, &reg);
+	reg &= ~(0x0F);
+	pmic_reg_write(p, PFUZE3000_VLD4CTL, reg);
+
+	/* disable SW1A */
+	pmic_reg_read(p, PFUZE3000_SW1AMODE, &reg);
+	PFUZE3000_SW_DISABLE(reg);
+	pmic_reg_write(p, PFUZE3000_SW1AMODE, reg);
+	/* disable SW2 */
+	pmic_reg_read(p, PFUZE3000_SW2MODE, &reg);
+	PFUZE3000_SW_DISABLE(reg);
+	pmic_reg_write(p, PFUZE3000_SW2MODE, reg);
+#else
+#error
+#endif
 
 	return 0;
 }

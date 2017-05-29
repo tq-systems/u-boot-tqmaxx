@@ -19,6 +19,24 @@ config TQMA6UL
 	  select TQMa6UL with i.MX6UL and 256 MiB DRAM
 
 choice
+	prompt "TQMa6UL module variant"
+	default TQMA6UL_VARIANT_STANDARD
+	help
+	  Configure module variant.
+
+config TQMA6UL_VARIANT_STANDARD
+	bool "standard module with board connector"
+	help
+	  "TQMa6ULx variant with board to board connectors"
+
+config TQMA6UL_VARIANT_LGA
+	bool "LGA module with solder balls"
+	help
+	  "TQMa6ULxL variant LGA with solder balls"
+
+endchoice
+
+choice
 	prompt "TQMa6UL boot configuration"
 	default TQMA6UL_MMC_BOOT
 	help
