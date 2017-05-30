@@ -66,7 +66,7 @@ static const uint16_t tqma6ul_emmc_dsr = 0x0100;
 
 int dram_init(void)
 {
-	gd->ram_size = PHYS_SDRAM_SIZE;
+	gd->ram_size = imx_ddr_size();
 
 	return 0;
 }

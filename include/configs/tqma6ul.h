@@ -133,8 +133,6 @@
 #define CONFIG_DOS_PARTITION
 
 
-#define PHYS_SDRAM_SIZE			SZ_256M
-
 /* FEC */
 #define CONFIG_FEC_MXC
 #define CONFIG_PHYLIB
