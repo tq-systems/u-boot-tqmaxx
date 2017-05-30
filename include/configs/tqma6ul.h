@@ -100,9 +100,9 @@
 #define CONFIG_PFUZE3000_PMIC_I2C
 #define CONFIG_POWER_PFUZE3000_I2C_ADDR	0x08
 
-/* MMC Configs, other options from mx7_common */
-#define CONFIG_SUPPORT_EMMC_RPMB
+/* MMC Configs, other options from mx6_common */
 #define CONFIG_SYS_FSL_ESDHC_ADDR	0
+#define CONFIG_SUPPORT_EMMC_RPMB
 
 /* USB Configs */
 #ifdef CONFIG_CMD_USB
@@ -147,7 +147,6 @@
 #define CONFIG_BOOTDELAY		3
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 
-/* TODO: Set to correct value */
 #undef CONFIG_LOADADDR
 #define CONFIG_LOADADDR			0x82000000
 
