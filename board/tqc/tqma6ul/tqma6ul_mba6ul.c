@@ -325,9 +325,9 @@ static void mba6ul_setup_i2c(void)
 
 #ifdef CONFIG_USB_EHCI_MX6
 #define USB_OTHERREGS_OFFSET	0x800
-#define UCTRL_PWR_POL		(1 << 9)
-#define UCTRL_OC_POL		(1 << 8)
-#define UCTRL_OC_DISABLE	(1 << 7)
+#define UCTRL_PWR_POL		BIT(9)
+#define UCTRL_OC_POL		BIT(8)
+#define UCTRL_OC_DISABLE	BIT(7)
 
 static iomux_v3_cfg_t const usb_otg1_pads[] = {
 	NEW_PAD_CTRL(MX6_PAD_GPIO1_IO01__USB_OTG1_OC,	USB_OC_PAD_CTRL),
