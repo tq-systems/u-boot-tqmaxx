@@ -145,6 +145,9 @@ int board_eth_init(bd_t *bis)
 	 * CONFIG_FEC_MXC_MDIO_BASE macro is used to specify the bus.
 	 * This makes the ENET_BASE_ADDR and ENET2_BASE_ADDR macro
 	 * useless for the fecmxc_initialize_multi function.
+	 * also not, that dev_id param is used internally to pick up the
+	 * correct fused MAC address - renaming can be done under linux
+	 * using udev / systemd
 	 */
 	ret = fecmxc_initialize_multi(bis, 0, TQMA6UL_ENET1_PHYADDR,
 				      ENET_BASE_ADDR);
@@ -207,8 +210,6 @@ static int mba6ul_setup_fec(int fec_id)
 
 int board_phy_config(struct phy_device *phydev)
 {
-	/* TODO: set skew values using phy_read_mmd_indirect from */
-
 	if (phydev->drv->config)
 		phydev->drv->config(phydev);
 	return 0;
