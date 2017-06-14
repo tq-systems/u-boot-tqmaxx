@@ -58,6 +58,10 @@
 #define UCMD_RUN_STOP           (1 << 0) /* controller run/stop */
 #define UCMD_RESET		(1 << 1) /* controller reset */
 
+#if defined(CONFIG_MX7)
+#define HSIC_PORT_IDX 2
+#endif
+
 #if defined(CONFIG_MX6)
 static const unsigned phy_bases[] = {
 	USB_PHY0_BASE_ADDR,
@@ -354,7 +358,12 @@ int ehci_hcd_init(int index, enum usb_init_type init,
 		return 0;
 
 	setbits_le32(&ehci->usbmode, CM_HOST);
-	writel(CONFIG_MXC_USB_PORTSC, &ehci->portsc);
+#if defined(CONFIG_MX7_USB_HSIC_PORTSC)
+	if (index >= HSIC_PORT_IDX)
+		writel(CONFIG_MX7_USB_HSIC_PORTSC, &ehci->portsc);
+	else
+#endif
+		writel(CONFIG_MXC_USB_PORTSC, &ehci->portsc);
 	setbits_le32(&ehci->portsc, USB_EN);
 
 #if defined(CONFIG_MX7)
