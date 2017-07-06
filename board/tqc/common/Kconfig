@@ -2,3 +2,8 @@
 config TQC_EEPROM
 	bool
 	default n
+
+config TQC_EMMC
+	bool
+	default n
+
