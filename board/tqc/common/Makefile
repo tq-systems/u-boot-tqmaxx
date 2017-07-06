@@ -1,6 +1,7 @@
 #
 # (C) Copyright 2006
 # Wolfgang Denk, DENX Software Engineering, wd@denx.de.
+# Copyright (C) 2017, Markus Niebel <Markus.Niebel@tq-group.com>
 #
 # SPDX-License-Identifier:	GPL-2.0+
 #
@@ -43,3 +44,6 @@ endif
 obj-$(CONFIG_CHAIN_OF_TRUST) += fsl_chain_of_trust.o
 
 endif
+
+obj-$(CONFIG_TQC_EMMC) += tqc_emmc.o
+
