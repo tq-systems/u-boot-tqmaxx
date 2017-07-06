@@ -1,0 +1,4 @@
+
+config TQC_EMMC
+	bool
+
