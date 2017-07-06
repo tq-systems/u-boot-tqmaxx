@@ -922,6 +922,43 @@ int mmc_switch_part(struct mmc *mmc, unsigned int part_num)
 }
 
 #if CONFIG_IS_ENABLED(MMC_HW_PARTITIONING)
+int mmc_max_enhanced_size(struct mmc *mmc, u64 *size)
+{
+	u64 sz;
+	int err;
+	ALLOC_CACHE_ALIGN_BUFFER(u8, ext_csd, MMC_MAX_BLOCK_LEN);
+
+	if (IS_SD(mmc) || (mmc->version < MMC_VERSION_4_41)) {
+		printf("eMMC >= 4.4 required for enhanced user data area\n");
+		return -EMEDIUMTYPE;
+	}
+
+	if (!(mmc->part_support & PART_SUPPORT)) {
+		printf("Card does not support partitioning\n");
+		return -EMEDIUMTYPE;
+	}
+
+	if (!mmc->hc_wp_grp_size) {
+		printf("Card does not define HC WP group size\n");
+		return -EMEDIUMTYPE;
+	}
+
+	err = mmc_send_ext_csd(mmc, ext_csd);
+	if (err)
+		return err;
+
+	sz =
+		(u64)(ext_csd[EXT_CSD_MAX_ENH_SIZE_MULT+2] << 16) +
+		(u64)(ext_csd[EXT_CSD_MAX_ENH_SIZE_MULT+1] << 8) +
+		(u64)ext_csd[EXT_CSD_MAX_ENH_SIZE_MULT];
+	sz *= (u64)ext_csd[EXT_CSD_HC_ERASE_GRP_SIZE];
+	sz *= (u64)ext_csd[EXT_CSD_HC_WP_GRP_SIZE];
+	sz <<= (u64)19;
+	*size = sz;
+
+	return 0;
+}
+
 int mmc_hwpart_config(struct mmc *mmc,
 		      const struct mmc_hwpart_conf *conf,
 		      enum mmc_hwpart_conf_mode mode)
