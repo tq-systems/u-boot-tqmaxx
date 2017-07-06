@@ -1273,6 +1273,11 @@ static int mmc_startup(struct mmc *mmc)
 	if (mmc->write_bl_len > MMC_MAX_BLOCK_LEN)
 		mmc->write_bl_len = MMC_MAX_BLOCK_LEN;
 
+/*
+ * TODO: call board detect cardtype
+*/
+	board_mmc_detect_card_type(mmc);
+
 	if ((mmc->dsr_imp) && (0xffffffff != mmc->dsr)) {
 		cmd.cmdidx = MMC_CMD_SET_DSR;
 		cmd.cmdarg = (mmc->dsr & 0xffff) << 16;
@@ -1680,6 +1685,11 @@ static int mmc_power_init(struct mmc *mmc)
 	board_mmc_power_init();
 #endif
 	return 0;
+}
+
+/* board-specific MMC card detection / modification */
+__weak void board_mmc_detect_card_type(struct mmc *mmc)
+{
 }
 
 int mmc_start_init(struct mmc *mmc)
