@@ -31,6 +31,26 @@ config TQMA7_QSPI_BOOT
 
 endchoice
 
+
+choice
+	prompt "TQMa7 DRAM configuration"
+	default TQMA7_512MB
+	help
+	  Configure DRAM size
+
+config TQMA7_512MB
+	bool "512 MB DRAM"
+	help
+	  configure for variant with 512 MB DRAM
+
+config TQMA7_1GB
+	bool "1 GB DRAM"
+	help
+	  configure for variant with 1 GB DRAM
+
+endchoice
+
+
 choice
 	prompt "TQMa7 base board variant"
 	default MBA7

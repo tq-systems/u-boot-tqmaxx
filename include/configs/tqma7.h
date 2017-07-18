@@ -107,8 +107,11 @@
 #define CONFIG_CMD_FS_GENERIC
 #define CONFIG_DOS_PARTITION
 
-
+#if defined(CONFIG_TQMA7_512MB)
 #define PHYS_SDRAM_SIZE			SZ_512M
+#elif defined(CONFIG_TQMA7_1GB)
+#define PHYS_SDRAM_SIZE			SZ_1G
+#endif
 
 #define CONFIG_FEC_MXC
 #define CONFIG_PHYLIB
@@ -154,11 +157,16 @@
 #endif
 #define CONFIG_LOADADDR			0x82000000
 
-/* place code in last 4 MiB of RAM of 512 MiB RAM (minimal variant) */
+/* place code in last 4 MiB of RAM of RAM */
 #if defined(CONFIG_SYS_TEXT_BASE)
 #undef CONFIG_SYS_TEXT_BASE
 #endif
+#if defined(CONFIG_TQMA7_512MB)
 #define CONFIG_SYS_TEXT_BASE		0x9fc00000
+#elif defined(CONFIG_TQMA7_1GB)
+#define CONFIG_SYS_TEXT_BASE		0xbfc00000
+#endif
+
 
 #define CONFIG_ENV_SIZE			(SZ_8K)
 /* Size of malloc() pool */
