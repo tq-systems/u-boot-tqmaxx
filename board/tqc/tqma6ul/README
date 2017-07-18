@@ -1,0 +1,39 @@
+U-Boot for the TQ Systems TQMa6ULx[L] modules
+
+This file contains information for the port of
+U-Boot to the TQ Systems TQMa6ULx[L] modules.
+
+1. Boot source
+--------------
+
+The following boot source is supported:
+
+- SD/eMMC
+- QSPI NOR
+
+2. Building
+------------
+
+To build U-Boot for the TQ Systems TQMa6 modules:
+
+	make <som>_<baseboard>_<boot>_defconfig
+	make
+
+som is a placeholder for the module
+tqma6ul		TQMa6UL
+tqma6ulxl	TQMa6ULxL
+
+baseboard is a placeholder for the mainboard to compile for
+mba6ul
+
+boot is a placeholder for the boot device
+mmc - means eMMC
+qspi - mean QSPI NOR
+
+This gives the following configurations:
+
+tqma6ul_mba6ul_mmc_defconfig
+tqma6ul_mba6ul_qspi_defconfig
+tqma6ulxl_mba6ul_mmc_defconfig
+tqma6ulxl_mba6ul_qspi_defconfig
+
