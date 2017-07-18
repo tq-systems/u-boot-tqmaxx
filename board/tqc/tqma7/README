@@ -1,0 +1,39 @@
+U-Boot for the TQ Systems TQMa7x modules
+
+This file contains information for the port of
+U-Boot to the TQ Systems TQMa7x modules.
+
+1. Boot source
+--------------
+
+The following boot source is supported:
+
+- SD/eMMC
+- QSPI NOR (work in progress)
+
+2. Building
+------------
+
+To build U-Boot for the TQ Systems TQMa6 modules:
+
+	make tqma7d_<dram>_<baseboard>_<boot>_defconfig
+	make
+
+dram is a placeholder for the DRAM size
+512mb
+1gb
+
+baseboard is a placeholder for the mainboard to compile for
+mba7
+
+boot is a placeholder for the boot device
+mmc - means eMMC
+qspi - mean QSPI NOR
+
+This gives the following configurations:
+
+tqma7d_512mb_mba7_mmc_defconfig
+tqma7d_1gb_mba7_mmc_defconfig
+tqma7d_512mb_mba7_qspi_defconfig
+tqma7d_1gb_mba7_qspi_defconfig
+
