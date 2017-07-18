@@ -13,27 +13,6 @@ config SYS_CONFIG_NAME
 	default "tqma7"
 
 choice
-	prompt "TQMa7 SoC variant"
-	default TQMA7D
-	help
-	  select the TQMa7 module variant. The variants differing in the used
-	  i.MX7 CPU type
-
-config TQMA7D
-	bool "TQMa7D"
-	select MX7D
-	help
-	  FIXME
-
-config TQMA7S
-	bool "TQMa7S"
-	select MX7
-	help
-	  select TQMa7S with i.MX7S
-
-endchoice
-
-choice
 	prompt "TQMa7 boot configuration"
 	default TQMA7_MMC_BOOT
 	help
@@ -69,8 +48,7 @@ config MBA7_REV0100
 	default n
 
 config IMX_CONFIG
-	default "board/tqc/tqma7/tqma7d.cfg" if TQMA7D
-	default "board/tqc/tqma7/tqma7s.cfg" if TQMA7
+	default "board/tqc/tqma7/tqma7d.cfg"
 
 source "board/tqc/common/Kconfig"
 
