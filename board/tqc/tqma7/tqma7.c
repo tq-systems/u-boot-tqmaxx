@@ -30,6 +30,7 @@
 
 #include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
+#include "../common/tqc_emmc.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -130,17 +131,25 @@ int board_mmc_init(bd_t *bis)
 	imx_iomux_v3_setup_multiple_pads(tqma7_usdhc3_pads,
 					 ARRAY_SIZE(tqma7_usdhc3_pads));
 	tqma7_usdhc_cfg.sdhc_clk = mxc_get_clock(MXC_ESDHC3_CLK);
-	if (fsl_esdhc_initialize(bis, &tqma7_usdhc_cfg)) {
+	if (fsl_esdhc_initialize(bis, &tqma7_usdhc_cfg))
 		puts("Warning: failed to initialize eMMC dev\n");
-	} else {
-		struct mmc *mmc = find_mmc_device(0);
-		if (mmc)
-			mmc_set_dsr(mmc, tqma7_emmc_dsr);
-	}
 
 	tqc_bb_board_mmc_init(bis);
 
 	return 0;
+}
+
+/* board-specific MMC card detection / modification */
+void board_mmc_detect_card_type(struct mmc *mmc)
+{
+	struct mmc *emmc = find_mmc_device(0);
+	if (emmc != mmc)
+		return;
+
+	if (tqc_emmc_need_dsr(mmc) > 0)
+		mmc_set_dsr(mmc, tqma7_emmc_dsr);
+	else
+		puts("e-MMC: no DSR, check pin config for serial termination\n");
 }
 
 static struct i2c_pads_info tqma7_i2c1_pads = {
@@ -325,6 +334,7 @@ int board_get_dtt_bus(void)
 #define MODELSTRLEN 32u
 int ft_board_setup(void *blob, bd_t *bd)
 {
+	struct mmc *mmc = find_mmc_device(0);
 	int off;
 	char modelstr[MODELSTRLEN];
 
@@ -374,10 +384,17 @@ int ft_board_setup(void *blob, bd_t *bd)
 		}
 	}
 
-	/* bring in eMMC dsr settings */
-	do_fixup_by_path_u32(blob,
-			     "/soc/aips-bus@30800000/usdhc@30b60000",
-			     "dsr", tqma7_emmc_dsr, 2);
+	/* bring in eMMC dsr settings if needed */
+	if (mmc && (!mmc_init(mmc))) {
+		if (tqc_emmc_need_dsr(mmc) > 0) {
+			tqc_ft_fixup_emmc_dsr(blob,
+					      "/soc/aips-bus@30800000/usdhc@30b60000",
+					      tqma7_emmc_dsr);
+		}
+	} else {
+		puts("e-MMC: not present?\n");
+	}
+
 	tqc_bb_ft_board_setup(blob, bd);
 
 	return 0;
