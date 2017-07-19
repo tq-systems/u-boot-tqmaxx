@@ -169,6 +169,45 @@ static struct mmc *init_mmc_device(int dev, bool force_init)
 		return NULL;
 	return mmc;
 }
+
+static int do_mmc_maxhwpartsectors(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+{
+	struct mmc *mmc;
+	u64 max_enh_user_size;
+	ulong sectors;
+
+	if (curr_device < 0) {
+		if (get_mmc_num() > 0)
+			curr_device = 0;
+		else {
+			puts("No MMC device available\n");
+			return 1;
+		}
+	}
+
+	mmc = init_mmc_device(curr_device, false);
+	if (!mmc)
+		return CMD_RET_FAILURE;
+
+	if (IS_SD(mmc))
+		return CMD_RET_FAILURE;
+
+	if (mmc_max_enhanced_size(mmc, &max_enh_user_size))
+		return CMD_RET_FAILURE;
+
+	max_enh_user_size /= 0x200ULL;
+	if (max_enh_user_size >= (u64)(ULONG_MAX)) {
+		printf("ERROR: size to large for setenv_hex\n");
+		return CMD_RET_FAILURE;
+	}
+
+	sectors = (ulong)max_enh_user_size;
+	setenv_hex("maxhwpartsectors", sectors);
+	printf("maxhwpartsectors: %lx\n", sectors);
+
+	return 0;
+}
+
 static int do_mmcinfo(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
 	struct mmc *mmc;
@@ -809,6 +848,7 @@ static cmd_tbl_t cmd_mmc[] = {
 	U_BOOT_CMD_MKENT(dev, 3, 0, do_mmc_dev, "", ""),
 	U_BOOT_CMD_MKENT(list, 1, 1, do_mmc_list, "", ""),
 	U_BOOT_CMD_MKENT(hwpartition, 28, 0, do_mmc_hwpartition, "", ""),
+	U_BOOT_CMD_MKENT(maxhwpartsectors, 1, 0, do_mmc_maxhwpartsectors, "", ""),
 #ifdef CONFIG_SUPPORT_EMMC_BOOT
 	U_BOOT_CMD_MKENT(bootbus, 5, 0, do_mmc_bootbus, "", ""),
 	U_BOOT_CMD_MKENT(bootpart-resize, 4, 0, do_mmc_boot_resize, "", ""),
@@ -865,6 +905,8 @@ U_BOOT_CMD(
 	"    [check|set|complete] - mode, complete set partitioning completed\n"
 	"  WARNING: Partitioning is a write-once setting once it is set to complete.\n"
 	"  Power cycling is required to initialize partitions after set to complete.\n"
+	"mmc maxhwpartsectors - max 512-byte blocks usable for hardware partitioning\n"
+	"    if succeeded, env var maxhwpartsectors will be set\n"
 #ifdef CONFIG_SUPPORT_EMMC_BOOT
 	"mmc bootbus dev boot_bus_width reset_boot_bus_width boot_mode\n"
 	" - Set the BOOT_BUS_WIDTH field of the specified device\n"
