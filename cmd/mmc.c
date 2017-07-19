@@ -521,6 +521,45 @@ static int do_mmc_list(cmd_tbl_t *cmdtp, int flag,
 }
 
 #if CONFIG_IS_ENABLED(MMC_HW_PARTITIONING)
+static int do_mmc_maxhwpartsectors(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+{
+	struct mmc *mmc;
+	u64 max_enh_user_size;
+	ulong sectors;
+
+	if (curr_device < 0) {
+		if (get_mmc_num() > 0)
+			curr_device = 0;
+		else {
+			puts("No MMC device available\n");
+			return 1;
+		}
+	}
+
+	mmc = init_mmc_device(curr_device, false);
+	if (!mmc)
+		return CMD_RET_FAILURE;
+
+	if (IS_SD(mmc))
+		return CMD_RET_FAILURE;
+
+	if (mmc_max_enhanced_size(mmc, &max_enh_user_size))
+		return CMD_RET_FAILURE;
+
+	max_enh_user_size /= 0x200ULL;
+	if (max_enh_user_size >= (u64)(ULONG_MAX)) {
+		printf("ERROR: size to large for setenv_hex\n");
+		return CMD_RET_FAILURE;
+	}
+
+	sectors = (ulong)max_enh_user_size;
+	env_set_hex("maxhwpartsectors", sectors);
+
+	printf("maxhwpartsectors: %lx\n", sectors);
+
+	return 0;
+}
+
 static int parse_hwpart_user(struct mmc_hwpart_conf *pconf,
 			     int argc, char * const argv[])
 {
@@ -887,6 +926,7 @@ static cmd_tbl_t cmd_mmc[] = {
 	U_BOOT_CMD_MKENT(list, 1, 1, do_mmc_list, "", ""),
 #if CONFIG_IS_ENABLED(MMC_HW_PARTITIONING)
 	U_BOOT_CMD_MKENT(hwpartition, 28, 0, do_mmc_hwpartition, "", ""),
+	U_BOOT_CMD_MKENT(maxhwpartsectors, 1, 0, do_mmc_maxhwpartsectors, "", ""),
 #endif
 #ifdef CONFIG_SUPPORT_EMMC_BOOT
 	U_BOOT_CMD_MKENT(bootbus, 5, 0, do_mmc_bootbus, "", ""),
@@ -944,6 +984,8 @@ U_BOOT_CMD(
 	"mmc dev [dev] [part] - show or set current mmc device [partition]\n"
 	"mmc list - lists available devices\n"
 #if CONFIG_IS_ENABLED(MMC_HW_PARTITIONING)
+	"mmc maxhwpartsectors - max 512-byte blocks usable for hardware partitioning\n"
+	"    if succeeded, env var maxhwpartsectors will be set\n"
 	"mmc hwpartition [args...] - does hardware partitioning\n"
 	"  arguments (sizes in 512-byte blocks):\n"
 	"    [user [enh start cnt] [wrrel {on|off}]] - sets user data area attributes\n"
