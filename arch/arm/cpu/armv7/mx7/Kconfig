@@ -54,6 +54,7 @@ config TARGET_TQMA7
 	select DM
 	select DM_THERMAL
 	select TQC_EEPROM
+	select TQC_EMMC
 
 endchoice
 
