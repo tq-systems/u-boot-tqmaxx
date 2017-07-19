@@ -199,7 +199,11 @@ config TARGET_TITANIUM
 
 config TARGET_TQMA6
 	bool "TQ Systems TQMa6 board"
+	select DM
+	select DM_GPIO
+	select DM_THERMAL
 	select TQC_EEPROM
+	select TQC_EMMC
 
 config TARGET_TQMA6UL
 	bool "TQ Systems TQMa6UL board"
