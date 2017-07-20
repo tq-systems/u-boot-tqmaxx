@@ -62,8 +62,11 @@ int tqc_emmc_need_dsr(struct mmc *mmc)
 		}
 	}
 
-	if (ret < 0)
+	if (ret < 0) {
 		printf("e-MMC unknown: MFG: %x PNM: %s\n", mfgid, name);
+		/* request DSR, even if not known if supported to be safe */
+		ret = 1;
+	}
 
 	return ret;
 }
