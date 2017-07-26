@@ -545,7 +545,7 @@
 	"addmisc=setenv bootargs ${bootargs} hdmi\0"                           \
 	"board=tqmls102x\0"                                                    \
 	"uimage=uImage\0"                                                      \
-	"zimage=zImage\0"                                                      \
+	"zimage=linuximage\0"                                                  \
 	"boot_type=bootz\0"                                                    \
 	"kernel_name=if test \"${boot_type}\" != bootz; then "                 \
 		"setenv kernel ${uimage}; "                                    \
