@@ -244,17 +244,12 @@
 #define MTDPARTS_DEFAULT \
 	"mtdparts=nor0:"                                                       \
 		"768k@0k(U-Boot-PBL),"                                         \
-		 "64k@768k(ENV),"                                              \
-		 "64k@832k(DTB),"                                              \
-		  "8M@896k(Linux),"                                            \
-		 "55M@9M(RootFS)\0"                                            \
+		"64k@768k(ENV),"                                               \
+		"64k@832k(DTB),"                                               \
+		 "8M@896k(Linux),"                                             \
+		"55M@9M(RootFS)\0"                                             \
 
 #define CONFIG_CMD_SF
-#define CONFIG_SPI_FLASH
-/* Banked address mode - TODO implement 4 Byte adressing */
-#define CONFIG_SPI_FLASH_BAR
-#define CONFIG_SPI_FLASH_STMICRO
-#define CONFIG_SPI_FLASH_MTD
 
 #define CONFIG_CMD_TIME
 

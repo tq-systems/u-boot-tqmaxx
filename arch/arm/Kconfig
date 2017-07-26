@@ -702,6 +702,13 @@ config TARGET_TQMLS102XA
         bool "Support tqmls102xa"
         select CPU_V7
         select SUPPORT_SPL
+        select SPI_FLASH
+        select SPI_FLASH_BAR
+        select SPI_FLASH_STMICRO
+        select SPI_FLASH_WINBOND
+        select SPI_FLASH_MTD
+# need to do this in board config:
+# CONFIG_SPI_FLASH_USE_4K_SECTORS is not set
 
 config TARGET_H2200
 	bool "Support h2200"
