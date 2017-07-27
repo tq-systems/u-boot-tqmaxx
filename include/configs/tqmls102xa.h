@@ -222,7 +222,7 @@
 #define CONFIG_FSL_QSPI
 #define QSPI0_AMBA_BASE			0x40000000
 #define FSL_QSPI_FLASH_SIZE		SZ_64M
-#define FSL_QSPI_FLASH_NUM		2
+#define FSL_QSPI_FLASH_NUM		1
 #define FSL_QSPI_FLASH_DUALDIE
 #define CONFIG_SYS_FSL_QSPI_AHB
 
@@ -240,15 +240,15 @@
 #define CONFIG_CMD_UBIFS
 #define CONFIG_LZO
 #define MTDIDS_DEFAULT \
-	"nor0=nor0\0"                                                          \
+	"nor0=nor0\0"
 
 #define MTDPARTS_DEFAULT \
 	"mtdparts=nor0:"                                                       \
-		"768k@0k(U-Boot-PBL),"                                         \
-		"64k@768k(ENV),"                                               \
-		"64k@832k(DTB),"                                               \
-		 "8M@896k(Linux),"                                             \
-		"55M@9M(RootFS)\0"                                             \
+		"896k@0k(U-Boot-PBL),"                                         \
+		 "64k@896k(ENV),"                                              \
+		 "64k@960k(DTB),"                                              \
+		  "7M@1M(Linux),"                                              \
+		 "56M@8M(RootFS)\0"                                            \
 
 #define CONFIG_CMD_SF
 
@@ -598,11 +598,11 @@
 		"fi; "                                                         \
 		"echo ... failed\0"                                            \
 	"panicboot=echo No boot device !!! reset\0"                            \
-	"addspi=setenv bootargs ${bootargs} root=/dev/mtdblock5 rw "           \
-		"rootfstype=ubifs\0"                                           \
+	"addspi=setenv bootargs ${bootargs} root=ubi0:root rw "                \
+		"rootfstype=ubifs ubi.mtd=4\0"                                 \
 	"spiargs=run addspi addtty addmisc\0"                                  \
-	"loadspiimage=sf probe; sf read ${loadaddr} Linux 0x800000\0"          \
-	"loadspifdt=sf probe; sf read ${fdt_addr} DTB 0x10000\0"               \
+	"loadspiimage=sf probe 0; sf read ${loadaddr} Linux\0"                 \
+	"loadspifdt=sf probe 0; sf read ${fdt_addr} DTB\0"                     \
 	"spiboot=echo Booting from SPI NOR flash...; setenv bootargs; "        \
 		"run spiargs; run loadspiimage; "                              \
 		"if run loadspifdt; then "                                     \
@@ -611,26 +611,28 @@
 			"${boot_type}; "                                       \
 		"fi;\0"                                                        \
 	"uboot-qspi=" CONFIG_UBOOT_QSPI_IMAGE_FILE "\0"                        \
-	"rootfs=root.ubi\0"                                                    \
+	"rootfs-qspi=root.ubi\0"                                               \
 	"update_rcw=run update_uboot-qspi\0"                                   \
 	"update_uboot-qspi=if tftp ${uboot-qspi}; then "                       \
 		"if itest ${filesize} > 0; then "                              \
-			"sf probe; sf update ${loadaddr} U-Boot-PBL ${filesize}; " \
+			"sf probe 0; "                                         \
+			"sf update ${loadaddr} U-Boot-PBL ${filesize}; "       \
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"                                           \
 	"update_kernel-qspi=run kernel_name; if tftp ${kernel}; then "         \
 		"if itest ${filesize} > 0; then "                              \
-			"sf probe; sf update ${loadaddr} Linux ${filesize};"   \
+			"sf probe 0; sf update ${loadaddr} Linux ${filesize};" \
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"                                           \
 	"update_fdt-qspi=if tftp ${fdt_file}; then "                           \
 		"if itest ${filesize} > 0; then "                              \
-			"sf probe; sf update ${loadaddr} DTB ${filesize}; "    \
+			"sf probe 0; sf update ${loadaddr} DTB ${filesize}; "  \
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"                                           \
-	"update_rootfs-qspi=if tftp ${rootfs}; then "                          \
+	"init_rootfs-qspi=if tftp ${rootfs-qspi}; then "                       \
 		"if itest ${filesize} > 0; then "                              \
-			"sf probe; sf update ${loadaddr} RootFS ${filesize};"  \
+			"sf probe 0; sf erase RootFS 3800000; "                \
+			"sf write ${loadaddr} RootFS ${filesize}; "            \
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"                                           \
 	TQMLS102X_EXTRA_BOOTDEV_ENV_SETTINGS                                   \
