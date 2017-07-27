@@ -474,9 +474,6 @@
 #define TQMLS102X_UBOOT_SECTOR_START	0x8
 #define TQMLS102X_UBOOT_SECTOR_COUNT	0x7f8
 
-#define TQMLS102X_FDT_OFFSET		(2 * SZ_1M)
-#define TQMLS102X_FDT_SECTOR_START	0x1000
-#define TQMLS102X_FDT_SECTOR_COUNT	0x800
 #define CONFIG_DEFAULT_FDT_FILE		"ls1021a-tqmls1021a-mbls102x.dtb"
 
 #if defined(CONFIG_DDR_ECC)
@@ -486,9 +483,6 @@
 #define CONFIG_UBOOT_MMCSD_IMAGE_FILE	"u-boot-with-spl-pbl-mmcsd-2016.05.bin"
 #define CONFIG_UBOOT_QSPI_IMAGE_FILE	"u-boot-pbl.bin.bswap"
 #endif
-
-#define TQMLS102X_KERNEL_SECTOR_START	0x2000
-#define TQMLS102X_KERNEL_SECTOR_COUNT	0x4000
 
 /* 128 MiB offset as in ARM related docu for linux suggested */
 #define TQMLS102X_FDT_ADDRESS		0x88000000
@@ -502,50 +496,46 @@
 #define TQMLS102X_EXTRA_BOOTDEV_ENV_SETTINGS                                   \
 	"uboot_start="__stringify(TQMLS102X_UBOOT_SECTOR_START)"\0"            \
 	"uboot_size="__stringify(TQMLS102X_UBOOT_SECTOR_COUNT)"\0"             \
-	"fdt_start="__stringify(TQMLS102X_FDT_SECTOR_START)"\0"                \
-	"fdt_size="__stringify(TQMLS102X_FDT_SECTOR_COUNT)"\0"                 \
-	"kernel_start="__stringify(TQMLS102X_KERNEL_SECTOR_START)"\0"          \
-	"kernel_size="__stringify(TQMLS102X_KERNEL_SECTOR_COUNT)"\0"           \
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0"                       \
 	"mtdparts=" MTDPARTS_DEFAULT                                           \
-	"loadimage=mmc dev ${mmcdev}; "                                        \
-		"mmc read ${loadaddr} ${kernel_start} ${kernel_size};\0"       \
-	"loadfdt=mmc dev ${mmcdev}; "                                          \
-		"mmc read ${fdt_addr} ${fdt_start} ${fdt_size};\0"             \
-	"update_uboot=if tftp ${uboot}; then "                                 \
-		"if itest ${filesize} > 0; then "                              \
-			"mmc dev ${mmcdev}; mmc rescan; "                      \
-			"setexpr blkc ${filesize} / 0x200; "                   \
-			"setexpr blkc ${blkc} + 1; "                           \
-			"if itest ${blkc} <= ${uboot_size}; then "             \
-				"mmc write ${loadaddr} ${uboot_start} "        \
-					"${blkc}; "                            \
-			"fi; "                                                 \
-		"fi; fi; "                                                     \
-		"setenv filesize; setenv blkc \0"                              \
-	"update_kernel=run kernel_name; "                                      \
-		"if tftp ${kernel}; then "                                     \
+	"firmwarepart=1\0"                                                     \
+	"loadimage=run kernel_name; "                                          \
+		"load mmc ${mmcdev}:${firmwarepart} ${loadaddr} ${kernel} \0"  \
+	"loadfdt="                                                       \
+		"load mmc ${mmcdev}:${firmwarepart} ${fdt_addr} ${fdt_file} \0"\
+	"update_uboot=run set_getcmd; "                                        \
+		"if ${getcmd} ${uboot}; then "                                 \
 			"if itest ${filesize} > 0; then "                      \
 				"mmc dev ${mmcdev}; mmc rescan; "              \
-				"setexpr blkc ${filesize} / 0x200; "           \
-				"setexpr blkc ${blkc} + 1; "                   \
-				"if itest ${blkc} <= ${kernel_size}; then "    \
-					"mmc write ${loadaddr} "               \
-						"${kernel_start} ${blkc}; "    \
+				"setexpr blkc ${filesize} + 0x1ff; "           \
+				"setexpr blkc ${blkc} / 0x200; "               \
+				"if itest ${blkc} <= ${uboot_size}; then "     \
+					"mmc write ${loadaddr} ${uboot_start} "\
+						"${blkc}; "                    \
 				"fi; "                                         \
 			"fi; "                                                 \
 		"fi; "                                                         \
-		"setenv filesize; setenv blkc \0"                              \
-	"update_fdt=if tftp ${fdt_file}; then "                                \
-		"if itest ${filesize} > 0; then "                              \
-			"mmc dev ${mmcdev}; mmc rescan; "                      \
-			"setexpr blkc ${filesize} / 0x200; "                   \
-			"setexpr blkc ${blkc} + 1; "                           \
-			"if itest ${blkc} <= ${fdt_size}; then "               \
-				"mmc write ${loadaddr} ${fdt_start} ${blkc}; " \
+		"setenv filesize; setenv blkc; setenv getcmd \0"               \
+	"update_kernel=run kernel_name; run set_getcmd; "                      \
+		"if ${getcmd} ${kernel}; then "                                \
+			"if itest ${filesize} > 0; then "                      \
+				"mmc dev ${mmcdev}; mmc rescan; "              \
+				"echo Write kernel image to mmc ${mmcdev}:${firmwarepart}...; " \
+				"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} " \
+					"${kernel} ${filesize}; "              \
 			"fi; "                                                 \
-		"fi; fi; "                                                     \
-		"setenv filesize; setenv blkc \0"                              \
+		"fi; "                                                         \
+		"setenv filesize; setenv getcmd \0"                            \
+	"update_fdt=run set_getcmd; "                                          \
+		"if ${getcmd} ${fdt_file}; then "                              \
+			"if itest ${filesize} > 0; then "                      \
+				"mmc dev ${mmcdev}; mmc rescan; "              \
+				"echo Write fdt image to mmc ${mmcdev}:${firmwarepart}...; " \
+				"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} " \
+					"${fdt_file} ${filesize}; "            \
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; setenv getcmd \0"                            \
 	BASEBOARD_EXTRA_ENV_SETTINGS                                           \
 
 #define CONFIG_BOOTCOMMAND \
