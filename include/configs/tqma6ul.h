@@ -459,12 +459,30 @@
 /* Miscellaneous configurable options */
 #define CONFIG_SYS_CONSOLE_IS_IN_ENV
 #define CONFIG_SYS_LONGHELP
-
 #define CONFIG_AUTO_COMPLETE
 
 #define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
 
 #define CONFIG_SYS_LOAD_ADDR		CONFIG_LOADADDR
+
+#if defined(CONFIG_CMD_MEMTEST)
+/*
+ * config alternate mtest:
+ * enable 3/4 of RAM to test
+ * U-Boot is relocated to the end of RAM
+ */
+#if !defined(__ASSEMBLY__)
+
+unsigned imx_ddr_size(void);
+
+#endif
+
+#define CONFIG_SYS_ALT_MEMTEST
+#define CONFIG_SYS_MEMTEST_START	CONFIG_SYS_SDRAM_BASE
+#define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + \
+					(imx_ddr_size() / 4 * 3))
+#define CONFIG_SYS_MEMTEST_SCRATCH	CONFIG_SYS_MEMTEST_END
+#endif
 
 #define CONFIG_CMDLINE_EDITING
 #define CONFIG_STACKSIZE		SZ_128K
