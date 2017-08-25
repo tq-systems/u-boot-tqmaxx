@@ -948,6 +948,13 @@ void mmc_set_preinit(struct mmc *mmc, int preinit);
 
 #define mmc_dev(x)	((x)->dev)
 
+/**
+ * optional enable the board to modify card interface based on card detection
+ * data
+ * will be called after reading CSD / CID
+ */
+void board_mmc_detect_card_type(struct mmc *mmc);
+
 void board_mmc_power_init(void);
 int board_mmc_init(struct bd_info *bis);
 int cpu_mmc_init(struct bd_info *bis);
