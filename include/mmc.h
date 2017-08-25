@@ -454,6 +454,13 @@ struct mmc *mmc_spi_init(uint bus, uint cs, uint speed, uint mode);
 int mmc_legacy_init(int verbose);
 #endif
 
+/**
+ * optional enable the board to modify card interface based on card detection
+ * data
+ * will be called after reading CSD / CID
+ */
+void board_mmc_detect_card_type(struct mmc *mmc);
+
 void board_mmc_power_init(void);
 int board_mmc_init(bd_t *bis);
 int cpu_mmc_init(bd_t *bis);
