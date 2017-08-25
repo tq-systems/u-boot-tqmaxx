@@ -87,4 +87,6 @@ config IMX_CONFIG
 	default "board/tqc/tqma6/tqma6dl.cfg" if TQMA6DL
 	default "board/tqc/tqma6/tqma6s.cfg" if TQMA6S
 
+source "board/tqc/common/Kconfig"
+
 endif
