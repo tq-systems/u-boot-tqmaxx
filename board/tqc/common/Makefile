@@ -23,7 +23,9 @@ obj-$(CONFIG_ID_EEPROM)	+= sys_eeprom.o
 endif
 obj-$(CONFIG_FSL_SGMII_RISER)	+= sgmii_riser.o
 ifndef CONFIG_RAMBOOT_PBL
+ifndef CONFIG_RAMBOOT_PBL_BIN
 obj-$(CONFIG_FSL_FIXED_MMC_LOCATION)	+= sdhc_boot.o
+endif
 endif
 
 ifdef CONFIG_ARM

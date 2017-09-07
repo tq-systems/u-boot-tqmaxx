@@ -1,0 +1,65 @@
+if TARGET_TQMLS102XA
+
+config SYS_BOARD
+	default "tqmls102xa"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_SOC
+	default "ls102xa"
+
+config SYS_CONFIG_NAME
+	default "tqmls102xa"
+
+choice
+	prompt "Base board variant"
+	optional
+	help
+	  Select base board for TQMLS102xA module
+
+config TQMLS102XA_MBLS102XA
+	bool "TQMLS102xA on MBLS102xA Starterkit"
+	help
+	  Select the MBLS102xA starterkit.
+	  This features a Ethernet, USB, SD-Card, etc.
+
+endchoice
+
+endif
+
+config CMD_CPLD_MUX
+	bool "cpld_mux - read MBLS102xA CPLD muxing"
+	default y if TQMLS102XA_MBLS102XA
+	help
+	  This baseboard has a CPLD that muxes peripheral interfaces
+	  depending on four GPIOs at the CPLD. The GPIOs are readable via
+	  an i2c port expander. The function allows testing against a
+	  user defined pin mask and when matching allows to execute a
+	  user defined shell command."
+
+if CMD_CPLD_MUX
+menu "CPLD MUX settings"
+
+config CPLD_MUX_DIP_BUS
+	hex "I2C bus to read"
+	default 0x0 if TQMLS102XA_MBLS102XA
+
+config CPLD_MUX_DIP_ADDRESS
+	hex "I2C address to read"
+	default 0x22 if TQMLS102XA_MBLS102XA
+
+config CPLD_MUX_DIP_REGISTER
+	hex "Register to read from I2C address"
+	default 0x0 if TQMLS102XA_MBLS102XA
+
+config CPLD_MUX_DIP_MASK
+	hex "Bitmask to compare against"
+	default 0x08 if TQMLS102XA_MBLS102XA
+
+config CPLD_MUX_MATCH_COMMAND
+	string "Command to run on match"
+	default "setenv bootargs ${bootargs} video=HDMI-A-1:d video=LVDS-1:800x480-32" if TQMLS102XA_MBLS102XA
+
+endmenu
+endif

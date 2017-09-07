@@ -894,6 +894,18 @@ config TARGET_LS1021ATWR
 	select LS1_DEEP_SLEEP
 	select BOARD_EARLY_INIT_F
 
+config TARGET_TQMLS102XA
+	bool "Support tqmls102xa"
+	select BOARD_LATE_INIT
+	select CPU_V7
+	select CPU_V7_HAS_NONSEC
+	select CPU_V7_HAS_VIRT
+	select SUPPORT_SPL
+	select ARCH_LS1021A
+	select ARCH_SUPPORT_PSCI
+	select LS1_DEEP_SLEEP
+	select BOARD_EARLY_INIT_F
+
 config TARGET_LS1021AIOT
 	bool "Support ls1021aiot"
 	select BOARD_LATE_INIT
@@ -1185,6 +1197,7 @@ source "board/birdland/bav335x/Kconfig"
 source "board/timll/devkit3250/Kconfig"
 source "board/toradex/colibri_pxa270/Kconfig"
 source "board/technologic/ts4600/Kconfig"
+source "board/tqc/tqmls102xa/Kconfig"
 source "board/vscom/baltos/Kconfig"
 source "board/woodburn/Kconfig"
 source "board/work-microwave/work_92105/Kconfig"

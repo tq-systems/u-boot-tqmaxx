@@ -1,0 +1,38 @@
+U-Boot for the TQ Systems TQMLS102xA modules
+
+This file contains information for the port of
+U-Boot to the TQ Systems TQMLS102xA modules.
+
+1. Boot source
+--------------
+
+The following boot source is supported:
+
+- e-MMC/SD
+- QSPI NOR
+
+2. Building
+------------
+
+To build U-Boot for the TQ Systems TQMLS102xA modules:
+
+	make tqmls102xa_<baseboard>_[ecc]_<boot>_defconfig
+	make
+
+<baseboard> is a placeholder for the board the module is plugged into:
+mbls102xa	- Starter kit STKLS102xA by TQ
+
+[ecc] is an optional boolean parameter that enables usage of ECC RAM:
+ecc		- ECC enabled
+-not given-	- ECC disabled
+
+<boot> is a placeholder for the boot device
+mmcsd		- build to boot from device on esDHC (eMMC or SD card)
+qspi		- build to boot from flash on QSPI interface
+
+This gives the following configurations:
+
+tqmls102xa_mbls102xa_ecc_mmcsd_defconfig
+tqmls102xa_mbls102xa_ecc_qspi_defconfig
+tqmls102xa_mbls102xa_mmcsd_defconfig
+tqmls102xa_mbls102xa_qspi_defconfig
