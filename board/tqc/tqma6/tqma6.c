@@ -158,8 +158,6 @@ void board_mmc_detect_card_type(struct mmc *mmc)
 
 	if (tqc_emmc_need_dsr(mmc) > 0)
 		mmc_set_dsr(mmc, tqma6_emmc_dsr);
-	else
-		puts("e-MMC: no DSR, check pin config for serial termination\n");
 }
 
 static iomux_v3_cfg_t const tqma6_ecspi1_pads[] = {
