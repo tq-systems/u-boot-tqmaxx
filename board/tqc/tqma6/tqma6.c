@@ -2,7 +2,7 @@
  * Copyright (C) 2012 Freescale Semiconductor, Inc.
  * Author: Fabio Estevam <fabio.estevam@freescale.com>
  *
- * Copyright (C) 2013, 2014 - 2016 TQ Systems (ported SabreSD to TQMa6x)
+ * Copyright (C) 2013, 2014 - 2017 TQ Systems (ported SabreSD to TQMa6x)
  * Author: Markus Niebel <markus.niebel@tq-group.com>
  *
  * SPDX-License-Identifier:	GPL-2.0+
@@ -16,6 +16,7 @@
 #include <asm/errno.h>
 #include <asm/gpio.h>
 #include <asm/io.h>
+#include <asm/imx-common/boot_mode.h>
 #include <asm/imx-common/mxc_i2c.h>
 #include <asm/imx-common/spi.h>
 #include <common.h>
@@ -25,8 +26,10 @@
 #include <mmc.h>
 #include <power/pfuze100_pmic.h>
 #include <power/pmic.h>
+#include <spi.h>
 #include <spi_flash.h>
 
+#include "../common/tqc_emmc.h"
 #include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
 #include "../common/tqc_emmc.h"
@@ -421,6 +424,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 	struct mmc *mmc = find_mmc_device(0);
 	int off;
 	char modelstr[MODELSTRLEN];
+	int enable_flash = 0;
 
 	snprintf(modelstr, MODELSTRLEN, "TQ %s on %s", tqma6_get_boardname(),
 		 tqc_bb_get_boardname());
@@ -452,6 +456,44 @@ int ft_board_setup(void *blob, bd_t *bd)
 	} else {
 		puts("e-MMC: not present?\n");
 	}
+
+	if (SPI_NOR_BOOT== get_boot_device()) {
+		enable_flash = 1;
+	} else {
+		unsigned int bus = CONFIG_SF_DEFAULT_BUS;
+		unsigned int cs = CONFIG_SF_DEFAULT_CS;
+		unsigned int speed = CONFIG_SF_DEFAULT_SPEED;
+		unsigned int mode = CONFIG_SF_DEFAULT_MODE;
+#ifdef CONFIG_DM_SPI_FLASH
+		struct udevice *new, *bus_dev;
+		int ret;
+
+		/* Remove the old device, otherwise probe will just be a nop */
+		ret = spi_find_bus_and_cs(bus, cs, &bus_dev, &new);
+		if (!ret) {
+			device_remove(new);
+			device_unbind(new);
+		}
+		ret = spi_flash_probe_bus_cs(bus, cs, speed, mode, &new);
+		if (!ret) {
+			device_remove(new);
+			device_unbind(new);
+			enable_flash = 1;
+		}
+#else
+		struct spi_flash *new;
+
+		new = spi_flash_probe(bus, cs, speed, mode);
+		if (new) {
+			spi_flash_free(new);
+			enable_flash = 1;
+		}
+#endif
+	}
+	off = fdt_node_offset_by_compatible(blob, -1, "jedec,spi-nor");
+	fdt_set_node_status(blob, off,
+			    (enable_flash) ? FDT_STATUS_OKAY : FDT_STATUS_DISABLED,
+			    0);
 
 	tqc_bb_ft_board_setup(blob, bd);
 
