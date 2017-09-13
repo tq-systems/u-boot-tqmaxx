@@ -29,6 +29,7 @@
 
 #include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
+#include "../common/tqc_emmc.h"
 #include "tqma6_private.h"
 
 DECLARE_GLOBAL_DATA_PTR;
