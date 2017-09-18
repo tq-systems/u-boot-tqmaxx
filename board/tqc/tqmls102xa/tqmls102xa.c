@@ -5,12 +5,14 @@
  */
 
 #include "tqmls102xa_bb.h"
+#include "../common/tqc_emmc.h"
 #include <spi.h>
 #include <spi_flash.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
 u8 tqmls102xa_module_eeprom_addr = CONFIG_SYS_I2C_EEPROM_ADDR;
+static const uint16_t tqmls102xa_emmc_dsr = 0x0100;
 
 void ddrmc_init(void)
 {
@@ -115,6 +117,18 @@ int board_mmc_init(bd_t *bis)
 	esdhc_cfg[0].sdhc_clk = mxc_get_clock(MXC_ESDHC_CLK);
 
 	return fsl_esdhc_initialize(bis, &esdhc_cfg[0]);
+}
+
+/* board-specific MMC card detection / modification */
+void board_mmc_detect_card_type(struct mmc *mmc)
+{
+	struct mmc *emmc = find_mmc_device(0);
+
+	if (emmc != mmc)
+		return;
+
+	if (tqc_emmc_need_dsr(mmc) > 0)
+		mmc_set_dsr(mmc, tqmls102xa_emmc_dsr);
 }
 #endif
 
@@ -333,6 +347,19 @@ int ft_board_setup(void *blob, bd_t *bd)
 {
 	int off;
 	int present;
+#ifdef CONFIG_FSL_ESDHC
+	struct mmc *mmc = find_mmc_device(0);
+
+	/* bring in eMMC dsr settings if needed */
+	if (mmc && (!mmc_init(mmc))) {
+		if (tqc_emmc_need_dsr(mmc) > 0)
+			tqc_ft_fixup_emmc_dsr(blob,
+					      "/soc/esdhc@1560000",
+					      tqmls102xa_emmc_dsr);
+	} else {
+		puts("e-MMC: not present?\n");
+	}
+#endif
 
 	ft_cpu_setup(blob, bd);
 
