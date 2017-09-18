@@ -50,6 +50,12 @@ static void print_mmcinfo(struct mmc *mmc)
 	puts("Erase Group Size: ");
 	print_size(((u64)mmc->erase_grp_size) << 9, "\n");
 
+	puts("DSR support: ");
+	if (mmc->dsr_imp)
+		printf("%#04x\n", mmc->dsr_imp);
+	else
+		puts("NO\n");
+
 	if (!IS_SD(mmc) && mmc->version >= MMC_VERSION_4_41) {
 		bool has_enh = (mmc->part_support & ENHNCD_SUPPORT) != 0;
 		bool usr_enh = has_enh && (mmc->part_attr & EXT_CSD_ENH_USR);
