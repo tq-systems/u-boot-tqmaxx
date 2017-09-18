@@ -905,6 +905,7 @@ config TARGET_TQMLS102XA
 	select ARCH_SUPPORT_PSCI
 	select LS1_DEEP_SLEEP
 	select BOARD_EARLY_INIT_F
+	select TQC_EMMC
 
 config TARGET_LS1021AIOT
 	bool "Support ls1021aiot"

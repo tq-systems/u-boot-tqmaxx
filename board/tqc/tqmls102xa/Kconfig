@@ -26,6 +26,8 @@ config TQMLS102XA_MBLS102XA
 
 endchoice
 
+source "board/tqc/common/Kconfig"
+
 endif
 
 config CMD_CPLD_MUX
