@@ -38,7 +38,6 @@ enum spi_read_cmds {
 /* sf param flags */
 enum {
 	SECT_4K		= 1 << 0,
-	SECT_32K	= 1 << 1,
 	E_FSR		= 1 << 2,
 	SST_BP		= 1 << 3,
 	SST_WP		= 1 << 4,
@@ -59,7 +58,6 @@ enum {
 
 /* Erase commands */
 #define CMD_ERASE_4K			0x20
-#define CMD_ERASE_32K			0x52
 #define CMD_ERASE_CHIP			0xc7
 #define CMD_ERASE_64K			0xd8
 
