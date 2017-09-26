@@ -360,7 +360,7 @@ int tqma6_bb_board_late_init(void)
 {
 	int ret;
 	struct tqma6_eeprom_data eedat;
-	char mac[17];
+	char mac[20];
 
 	ret = tqma6_read_eeprom(tqma6_get_system_i2c_bus(), 0x57, &eedat);
 	if (!ret) {
