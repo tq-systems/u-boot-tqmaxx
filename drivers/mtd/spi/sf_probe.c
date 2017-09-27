@@ -172,10 +172,13 @@ static int spi_flash_validate_params(struct spi_slave *spi, u8 *idcode,
 #endif
 
 	/* Compute erase sector and command */
+#ifdef CONFIG_SPI_FLASH_USE_4K_SECTORS
 	if (params->flags & SECT_4K) {
 		flash->erase_cmd = CMD_ERASE_4K;
 		flash->erase_size = 4096 << flash->shift;
-	} else {
+	} else
+#endif
+	{
 		flash->erase_cmd = CMD_ERASE_64K;
 		flash->erase_size = flash->sector_size;
 	}
