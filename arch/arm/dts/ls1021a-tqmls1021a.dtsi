@@ -74,13 +74,11 @@
 &qspi {
 	bus-num = <0>;
 	#address-cells = <1>;
-	#size-cells = <1>;
+	#size-cells = <0>;
 	status = "okay";
 
 	qflash0: mt25ql512@0 {
 		compatible = "n25q512a", "cfi-flash";
-		#address-cells = <1>;
-		#size-cells = <1>;
 		spi-max-frequency = <20000000>;
 		reg = <0>;
 
@@ -118,8 +116,6 @@
 
 	qflash1: mt25ql512@1 {
 		compatible = "n25q512a", "cfi-flash";
-		#address-cells = <1>;
-		#size-cells = <1>;
 		spi-max-frequency = <20000000>;
 		reg = <1>;
 
