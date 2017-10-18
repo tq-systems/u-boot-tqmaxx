@@ -26,7 +26,7 @@ static const struct emmc_dsr_lookup dsr_tbl[] = {
 	{ 0x13, "Q1J54A", 1 },
 	{ 0x13, "Q2J54A", 1 },
 	/* Micron, e-MMC 5.0 8 GB*/
-	{ 0x13, "Q2J55L", 0 },
+	{ 0x13, "Q2J55L", 1 },
 	/* Samsung, e-MMC 5.0 */
 	{ 0x15, "8GSD3R", 0 },
 	{ 0x15, "AGSD3R", 0 },
