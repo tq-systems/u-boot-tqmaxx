@@ -432,6 +432,27 @@ int tqma6_bb_board_late_init(void)
 		env_set("mmcdev", "");
 	}
 
+	/* provide default setting for fdt_file if nothing in env is set */
+	if (NULL == env_get("fdt_file")) {
+		int enw = (tqma6_get_enet_workaround() > 0);
+		u32 cpurev = get_cpu_rev();
+
+		switch ((cpurev & 0xFF000) >> 12) {
+		case MXC_CPU_MX6SOLO:
+		case MXC_CPU_MX6DL:
+			env_set("fdt_file",
+				(enw) ? "imx6dl-mba6a.dtb" : "imx6dl-mba6b.dtb");
+			break;
+		case MXC_CPU_MX6D:
+		case MXC_CPU_MX6Q:
+			env_set("fdt_file",
+				(enw) ? "imx6q-mba6a.dtb" : "imx6q-mba6b.dtb");
+			break;
+		default:
+			debug("unknown CPU");
+		}
+	}
+
 	return 0;
 }
 
