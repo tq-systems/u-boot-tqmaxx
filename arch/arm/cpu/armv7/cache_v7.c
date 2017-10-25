@@ -235,9 +235,9 @@ static void v7_inval_tlb(void)
 
 void invalidate_dcache_all(void)
 {
-	v7_maint_dcache_all(ARMV7_DCACHE_INVAL_ALL);
-
 	v7_outer_cache_inval_all();
+
+	v7_maint_dcache_all(ARMV7_DCACHE_INVAL_ALL);
 }
 
 /*
@@ -257,9 +257,9 @@ void flush_dcache_all(void)
  */
 void invalidate_dcache_range(unsigned long start, unsigned long stop)
 {
-	v7_dcache_maint_range(start, stop, ARMV7_DCACHE_INVAL_RANGE);
-
 	v7_outer_cache_inval_range(start, stop);
+
+	v7_dcache_maint_range(start, stop, ARMV7_DCACHE_INVAL_RANGE);
 }
 
 /*
