@@ -9,12 +9,6 @@
 #ifndef __CONFIG_TQMA6_MBA6_H
 #define __CONFIG_TQMA6_MBA6_H
 
-#if defined(CONFIG_TQMA6S) || defined(CONFIG_TQMA6DL)
-#define CONFIG_DEFAULT_FDT_FILE		"imx6dl-mba6x.dtb"
-#elif defined(CONFIG_TQMA6Q)
-#define CONFIG_DEFAULT_FDT_FILE		"imx6q-mba6x.dtb"
-#endif
-
 #define CONFIG_DTT_SENSORS		{ 0, 1 }
 
 /* RTC and time support */
