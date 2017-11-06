@@ -439,4 +439,11 @@
 #define CONFIG_DTT_SENSORS		{ 0 }
 #endif
 
+#if defined(CONFIG_SECURE_BOOT)
+#if !defined(CONFIG_CSF_SIZE)
+/* TODO: this is 0x2000 in Mainline */
+#define CONFIG_CSF_SIZE		0x4000
+#endif
+#endif
+
 #endif /* __CONFIG_H */
