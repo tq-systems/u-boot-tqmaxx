@@ -18,7 +18,9 @@
 #include <asm/io.h>
 #include <asm/imx-common/boot_mode.h>
 #include <asm/imx-common/mxc_i2c.h>
+#if defined(CONFIG_MXC_SPI)
 #include <asm/imx-common/spi.h>
+#endif
 #include <common.h>
 #include <fsl_esdhc.h>
 #include <libfdt.h>
@@ -26,8 +28,10 @@
 #include <mmc.h>
 #include <power/pfuze100_pmic.h>
 #include <power/pmic.h>
+#if defined(CONFIG_MXC_SPI)
 #include <spi.h>
 #include <spi_flash.h>
+#endif
 
 #include "../common/tqc_emmc.h"
 #include "../common/tqc_bb.h"
@@ -163,6 +167,8 @@ void board_mmc_detect_card_type(struct mmc *mmc)
 		mmc_set_dsr(mmc, tqma6_emmc_dsr);
 }
 
+#if defined(CONFIG_MXC_SPI)
+
 static iomux_v3_cfg_t const tqma6_ecspi1_pads[] = {
 	/* SS1 */
 	NEW_PAD_CTRL(MX6_PAD_EIM_D19__GPIO3_IO19, SPI_PAD_CTRL) |
@@ -195,6 +201,10 @@ int board_spi_cs_gpio(unsigned bus, unsigned cs)
 	return ((bus == CONFIG_SF_DEFAULT_BUS) &&
 		(cs == CONFIG_SF_DEFAULT_CS)) ? TQMA6_SF_CS_GPIO : -1;
 }
+
+#else
+__weak void tqma6_iomuxc_spi(void) {}
+#endif
 
 static struct i2c_pads_info tqma6_i2c3_pads = {
 	/* I2C3: on board LM75, M24C64,  */
@@ -460,6 +470,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 	if (SPI_NOR_BOOT== get_boot_device()) {
 		enable_flash = 1;
 	} else {
+#if defined(CONFIG_MXC_SPI)
 		unsigned int bus = CONFIG_SF_DEFAULT_BUS;
 		unsigned int cs = CONFIG_SF_DEFAULT_CS;
 		unsigned int speed = CONFIG_SF_DEFAULT_SPEED;
@@ -488,6 +499,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 			spi_flash_free(new);
 			enable_flash = 1;
 		}
+#endif
 #endif
 	}
 	off = fdt_node_offset_by_compatible(blob, -1, "jedec,spi-nor");
