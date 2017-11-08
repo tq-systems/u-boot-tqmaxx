@@ -20,10 +20,11 @@
 #include <asm/imx-common/mxc_i2c.h>
 
 #include <common.h>
+#include <fdt_support.h>
 #include <fsl_esdhc.h>
+#include <i2c.h>
 #include <libfdt.h>
 #include <malloc.h>
-#include <i2c.h>
 #include <micrel.h>
 #include <miiphy.h>
 #include <mmc.h>
@@ -644,6 +645,5 @@ void tqc_bb_ft_board_setup(void *blob, bd_t *bd)
 			printf("   Device Tree: cannot read /compatible"
 						"to identify tree variant!\n");
 	}
-
 }
 #endif /* defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT) */
