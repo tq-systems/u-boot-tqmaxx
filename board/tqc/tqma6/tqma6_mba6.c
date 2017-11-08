@@ -20,10 +20,11 @@
 #include <asm/imx-common/mxc_i2c.h>
 
 #include <common.h>
+#include <fdt_support.h>
 #include <fsl_esdhc.h>
+#include <i2c.h>
 #include <libfdt.h>
 #include <malloc.h>
-#include <i2c.h>
 #include <micrel.h>
 #include <miiphy.h>
 #include <mmc.h>
