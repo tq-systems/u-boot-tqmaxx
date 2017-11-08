@@ -23,8 +23,9 @@
 #endif
 #include <common.h>
 #include <fsl_esdhc.h>
-#include <libfdt.h>
+#include <fdt_support.h>
 #include <i2c.h>
+#include <libfdt.h>
 #include <mmc.h>
 #include <power/pfuze100_pmic.h>
 #include <power/pmic.h>
