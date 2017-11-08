@@ -6,6 +6,7 @@
  */
 
 #include <common.h>
+#include <fdt_support.h>
 #include <mmc.h>
 
 #include "tqc_emmc.h"
