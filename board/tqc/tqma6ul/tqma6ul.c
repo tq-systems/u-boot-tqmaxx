@@ -18,6 +18,7 @@
 #include <asm/imx-common/spi.h>
 #include <asm/io.h>
 #include <common.h>
+#include <fdt_support.h>
 #include <fsl_esdhc.h>
 #include <i2c.h>
 #include <libfdt.h>
