@@ -31,5 +31,7 @@
 #undef CONFIG_CMD_SF
 #undef CONFIG_CMD_SPI
 #undef CONFIG_MXC_SPI
+#undef CONFIG_BMODE
+#undef CONFIG_FIT
 
 #endif /* __CONFIG_TQMA6_NAV_H */
