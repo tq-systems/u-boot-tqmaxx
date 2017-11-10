@@ -81,6 +81,28 @@
 #define CONFIG_POWER_PFUZE100
 #define CONFIG_POWER_PFUZE100_I2C_ADDR	0x08
 
+#if defined(CONFIG_FSL_CAAM)
+
+/* TODO: this is part of Kconfig in Mainline */
+#define CONFIG_SYS_FSL_SEC_COMPAT	4
+#define CONFIG_SYS_FSL_SEC_LE
+
+/*
+ * TODO: hashing support not per Kconfig to prevent warnings for
+ * redefining in image.h
+ */
+#if !defined(CONFIG_SHA1)
+#define CONFIG_SHA1		/* and SHA1 */
+#endif
+#if !defined(CONFIG_SHA1)
+#define CONFIG_SHA256		/* and SHA256 */
+#endif
+
+#define CONFIG_CMD_HASH
+#define CONFIG_HASH_VERIFY
+
+#endif
+
 /* MMC Configs, other options from mx6_common */
 #define CONFIG_SYS_FSL_ESDHC_ADDR	0
 #define CONFIG_SUPPORT_EMMC_RPMB
