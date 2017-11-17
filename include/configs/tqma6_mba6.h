@@ -26,4 +26,7 @@
 #define CONFIG_MXC_UART_BASE		UART2_BASE
 #define CONFIG_CONSOLE_DEV		"ttymxc1"
 
+#define	TQMA6_BASEBOARD_ENV_SETTINGS                                           \
+	"firmwarepart=1\0"                                                     \
+
 #endif /* __CONFIG_TQMA6_MBA6_H */

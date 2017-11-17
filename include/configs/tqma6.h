@@ -340,10 +340,48 @@
 /* set to a resonable value, changeable by user */
 #define TQMA6_CMA_SIZE                 160M
 
-#if defined(CONFIG_DEFAULT_FDT_FILE)
-#define TQMA6_FDT_FILE_ENV	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"
+#define CONFIG_STACKSIZE		(128u * SZ_1K)
+
+/* Physical Memory Map */
+#define CONFIG_NR_DRAM_BANKS		1
+#define PHYS_SDRAM			MMDC0_ARB_BASE_ADDR
+
+#define CONFIG_SYS_SDRAM_BASE		PHYS_SDRAM
+#define CONFIG_SYS_INIT_RAM_ADDR	IRAM_BASE_ADDR
+#define CONFIG_SYS_INIT_RAM_SIZE	IRAM_SIZE
+
+#define CONFIG_SYS_INIT_SP_OFFSET \
+	(CONFIG_SYS_INIT_RAM_SIZE - GENERATED_GBL_DATA_SIZE)
+#define CONFIG_SYS_INIT_SP_ADDR \
+	(CONFIG_SYS_INIT_RAM_ADDR + CONFIG_SYS_INIT_SP_OFFSET)
+
+#define CONFIG_ZERO_BOOTDELAY_CHECK
+
+#if !defined(CONFIG_SYS_BOOTM_LEN) || (CONFIG_SYS_BOOTM_LEN < SZ_16M)
+#undef CONFIG_SYS_BOOTM_LEN
+#define CONFIG_SYS_BOOTM_LEN		SZ_16M
+#endif
+
+#define CONFIG_OF_LIBFDT
+#define CONFIG_OF_BOARD_SETUP
+#define CONFIG_FIT
+#define CONFIG_FIT_VERBOSE
+
+#define CONFIG_IMX_THERMAL
+
+/*
+ * All the defines above are for the TQMa6 SoM
+ *
+ * Now include the baseboard specific configuration
+ */
+#ifdef CONFIG_MBA6
+#include "tqma6_mba6.h"
+#elif CONFIG_NAV
+#include "tqma6_nav.h"
+#elif CONFIG_WRU4
+#include "tqma6_wru4.h"
 #else
-#define TQMA6_FDT_FILE_ENV
+#error "No baseboard for the TQMa6 defined!"
 #endif
 
 #define CONFIG_EXTRA_ENV_SETTINGS                                              \
@@ -355,7 +393,6 @@
 		"setenv kernel ${uimage}; "                                    \
 		"else setenv kernel ${zimage}; fi\0"                           \
 	"uboot=u-boot.imx\0"                                                   \
-	TQMA6_FDT_FILE_ENV                                                     \
 	"fdt_addr="__stringify(TQMA6_FDT_ADDRESS)"\0"                          \
 	"console=" CONFIG_CONSOLE_DEV "\0"                                     \
 	"cma_size="__stringify(TQMA6_CMA_SIZE)"\0"                             \
@@ -415,50 +452,7 @@
 	"panicboot=echo No boot device !!! reset\0"                            \
 	TQMA6_EXTRA_BOOTDEV_ENV_SETTINGS                                       \
 	TQMA6_MFG_ENV_SETTINGS                                                 \
-
-#define CONFIG_STACKSIZE		(128u * SZ_1K)
-
-/* Physical Memory Map */
-#define CONFIG_NR_DRAM_BANKS		1
-#define PHYS_SDRAM			MMDC0_ARB_BASE_ADDR
-
-#define CONFIG_SYS_SDRAM_BASE		PHYS_SDRAM
-#define CONFIG_SYS_INIT_RAM_ADDR	IRAM_BASE_ADDR
-#define CONFIG_SYS_INIT_RAM_SIZE	IRAM_SIZE
-
-#define CONFIG_SYS_INIT_SP_OFFSET \
-	(CONFIG_SYS_INIT_RAM_SIZE - GENERATED_GBL_DATA_SIZE)
-#define CONFIG_SYS_INIT_SP_ADDR \
-	(CONFIG_SYS_INIT_RAM_ADDR + CONFIG_SYS_INIT_SP_OFFSET)
-
-#define CONFIG_ZERO_BOOTDELAY_CHECK
-
-#if !defined(CONFIG_SYS_BOOTM_LEN) || (CONFIG_SYS_BOOTM_LEN < SZ_16M)
-#undef CONFIG_SYS_BOOTM_LEN
-#define CONFIG_SYS_BOOTM_LEN		SZ_16M
-#endif
-
-#define CONFIG_OF_LIBFDT
-#define CONFIG_OF_BOARD_SETUP
-#define CONFIG_FIT
-#define CONFIG_FIT_VERBOSE
-
-#define CONFIG_IMX_THERMAL
-
-/*
- * All the defines above are for the TQMa6 SoM
- *
- * Now include the baseboard specific configuration
- */
-#ifdef CONFIG_MBA6
-#include "tqma6_mba6.h"
-#elif CONFIG_NAV
-#include "tqma6_nav.h"
-#elif CONFIG_WRU4
-#include "tqma6_wru4.h"
-#else
-#error "No baseboard for the TQMa6 defined!"
-#endif
+	TQMA6_BASEBOARD_ENV_SETTINGS                                           \
 
 /* Support at least the sensor on TQMa6 SOM */
 #if !defined(CONFIG_DTT_SENSORS)

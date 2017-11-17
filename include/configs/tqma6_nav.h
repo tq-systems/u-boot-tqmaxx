@@ -61,4 +61,10 @@
 
 #endif
 
+#define	TQMA6_BASEBOARD_ENV_SETTINGS                                           \
+	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"                               \
+	"firmwarepath=/boot\0"                                                 \
+	"firmwarepart=2\0"                                                     \
+	"zimage=zImage\0"                                                      \
+
 #endif /* __CONFIG_TQMA6_NAV_H */

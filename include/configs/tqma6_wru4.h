@@ -75,4 +75,7 @@
 #undef CONFIG_CMD_SPI
 #undef CONFIG_MXC_SPI
 
+#define	TQMA6_BASEBOARD_ENV_SETTINGS                                           \
+	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"                               \
+
 #endif /* __CONFIG_TQMA6_WRU4_H */
