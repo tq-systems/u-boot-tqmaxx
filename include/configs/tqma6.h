@@ -178,8 +178,10 @@
 	"mmcdev=-1\0"                                                          \
 	"firmwarepart=1\0"                                                     \
 	"loadimage=run kernel_name; "                                          \
-		"load mmc ${mmcdev}:${firmwarepart} ${loadaddr} ${kernel} \0"  \
-	"loadfdt=load mmc ${mmcdev}:${firmwarepart} ${fdt_addr} ${fdt_file}\0" \
+		"load mmc ${mmcdev}:${firmwarepart} ${loadaddr} "              \
+		"${firmwarepath}/${kernel} \0"                                 \
+	"loadfdt=load mmc ${mmcdev}:${firmwarepart} ${fdt_addr} "              \
+		"${firmwarepath}/${fdt_file}\0"                                \
 	"update_uboot=run set_getcmd; "                                        \
 		"if ${getcmd} ${uboot}; then "                                 \
 			"if itest ${filesize} > 0; then "                      \
@@ -199,7 +201,7 @@
 				"mmc dev ${mmcdev}; mmc rescan; "              \
 				"echo Write kernel image to mmc ${mmcdev}:${firmwarepart}...; " \
 				"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} " \
-					"${kernel} ${filesize}; "              \
+					"${firmwarepath}/${kernel} ${filesize}; " \
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"setenv filesize; setenv getcmd \0"                            \
@@ -209,7 +211,7 @@
 				"mmc dev ${mmcdev}; mmc rescan; "              \
 				"echo Write fdt image to mmc ${mmcdev}:${firmwarepart}...; " \
 				"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} " \
-					"${fdt_file} ${filesize}; "            \
+					"${firmwarepath}/${fdt_file} ${filesize}; " \
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"setenv filesize; setenv getcmd \0"                            \
