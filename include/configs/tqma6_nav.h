@@ -61,6 +61,15 @@
 
 #endif
 
+#define CONFIG_BOOTCOUNT_LIMIT
+#define CONFIG_SYS_BOOTCOUNT_BE
+#define CONFIG_BOOTCOUNT_ENV
+
+/* Watchdog */
+#define CONFIG_HW_WATCHDOG
+#define CONFIG_IMX_WATCHDOG
+#define CONFIG_WATCHDOG_TIMEOUT_MSECS 60000
+
 #define	TQMA6_BASEBOARD_ENV_SETTINGS                                           \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"                               \
 	"firmwarepath=/boot\0"                                                 \
