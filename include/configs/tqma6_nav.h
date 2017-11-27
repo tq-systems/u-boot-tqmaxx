@@ -57,8 +57,6 @@
 #undef CONFIG_USB_ETHER_SMSC95XX
 #undef CONFIG_USB_HOST_ETHER
 
-#undef CONFIG_ENV_OVERWRITE
-
 #define CONFIG_SILENT_CONSOLE
 #define CONFIG_SYS_DEVICE_NULLDEV
 /* TODO: set to -1 to force no wait at all */
