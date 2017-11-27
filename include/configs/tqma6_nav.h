@@ -88,7 +88,7 @@
  */
 #undef CONFIG_SYS_MMC_ENV_DEV
 /*
- * Mender: error CONFIG_ENV_OFFSET should not be defined et:\EW_Projekte\TQ_Embedded\Module\TQMa6ULx\30_Software\REV0103\ETW\xplicitly
+ * Mender: error CONFIG_ENV_OFFSET should not be defined explicitly
  * (will be auto-configured).
  */
 #undef CONFIG_ENV_OFFSET
