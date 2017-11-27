@@ -72,6 +72,10 @@
 	"firmwarepart=2\0"                                                     \
 	"zimage=zImage\0"                                                      \
 
+#define CONFIG_SYS_REDUNDAND_ENVIRONMENT
+#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + \
+					 CONFIG_ENV_SIZE)
+
 /* TODO: is this the right check? */
 #if defined(CONFIG_TQMA6_SUPPORT_MENDERIO)
 
@@ -92,6 +96,9 @@
  * (will be auto-configured).
  */
 #undef CONFIG_ENV_OFFSET
+
+#undef CONFIG_SYS_REDUNDAND_ENVIRONMENT
+#undef CONFIG_ENV_OFFSET_REDUND
 
 #undef CONFIG_BOOTCOMMAND
 #define CONFIG_BOOTCOMMAND \
