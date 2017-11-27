@@ -61,10 +61,6 @@
 
 #endif
 
-#define CONFIG_BOOTCOUNT_LIMIT
-#define CONFIG_SYS_BOOTCOUNT_BE
-#define CONFIG_BOOTCOUNT_ENV
-
 /* Watchdog */
 #define CONFIG_HW_WATCHDOG
 #define CONFIG_IMX_WATCHDOG
@@ -75,5 +71,48 @@
 	"firmwarepath=/boot\0"                                                 \
 	"firmwarepart=2\0"                                                     \
 	"zimage=zImage\0"                                                      \
+
+/* TODO: is this the right check? */
+#if defined(CONFIG_TQMA6_SUPPORT_MENDERIO)
+
+/*
+ * Define the variables for mender integration
+ * see: https://docs.mender.io/1.2/devices/integrating-with-u-boot#integration-points
+ */
+#define CONFIG_BOOTCOUNT_LIMIT
+#define CONFIG_BOOTCOUNT_ENV
+
+/*
+ * Mender: error CONFIG_SYS_MMC_ENV_DEV should not be defined explicitly
+ * (will be auto-configured).
+ */
+#undef CONFIG_SYS_MMC_ENV_DEV
+/*
+ * Mender: error CONFIG_ENV_OFFSET should not be defined et:\EW_Projekte\TQ_Embedded\Module\TQMa6ULx\30_Software\REV0103\ETW\xplicitly
+ * (will be auto-configured).
+ */
+#undef CONFIG_ENV_OFFSET
+
+#undef CONFIG_BOOTCOMMAND
+#define CONFIG_BOOTCOMMAND \
+        "run mender_setup; run mmcboot; run mender_try_to_recover; run panicboot"
+
+#undef TQMA6_BASEBOARD_ENV_SETTINGS
+#define	TQMA6_BASEBOARD_ENV_SETTINGS                                           \
+	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"                               \
+	"firmwarepath=/boot\0"                                                 \
+	"firmwarepart=2\0"                                                     \
+	"zimage=zImage\0"                                                      \
+	"mender_uboot_root=${mmcdev}:${firmwarepart}\0"                        \
+	"mender_kernel_root=/dev/mmcblk${mmcblkdev}p${mmcpart}\0"              \
+	"loadimage=load ${mender_uboot_root} ${loadaddr} "                     \
+		"${firmwarepath}/${zimage}\0"                                  \
+	"loadfdt=load ${mender_uboot_root} ${fdt_addr} "                       \
+		"${firmwarepath}/${fdt_file}\0"                                \
+	"addmmc=setenv bootargs ${bootargs} "                                  \
+		"root=${mender_kernel_root} ${rootfsmode} "                    \
+		"rootwait\0"                                                   \
+
+#endif
 
 #endif /* __CONFIG_TQMA6_NAV_H */
