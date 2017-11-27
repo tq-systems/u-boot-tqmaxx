@@ -544,7 +544,11 @@ void nav_setup_gpio(void)
 
 int tqc_bb_board_early_init_f(void)
 {
+#if defined(CONFIG_DISABLE_CONSOLE)
+	gd->flags |= (GD_FLG_DISABLE_CONSOLE);
+#else
 	nav_setup_iomuxc_uart();
+#endif
 
 	return 0;
 }

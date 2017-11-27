@@ -85,6 +85,8 @@
 /* TODO: is this the right check? */
 #if defined(CONFIG_TQMA6_SUPPORT_MENDERIO)
 
+#define CONFIG_DISABLE_CONSOLE
+
 /*
  * Define the variables for mender integration
  * see: https://docs.mender.io/1.2/devices/integrating-with-u-boot#integration-points
