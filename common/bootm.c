@@ -541,7 +541,7 @@ static void fixup_silent_linux(void)
 
 		if (start) {
 			char *end = strchr(start, ' ');
-			int num_start_bytes = start - cmdline + CONSOLE_ARG_LEN;
+			int num_start_bytes = start - cmdline;
 
 			strncpy(buf, cmdline, num_start_bytes);
 			if (end)
