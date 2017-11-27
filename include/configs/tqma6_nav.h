@@ -12,7 +12,7 @@
 #if defined(CONFIG_TQMA6S) || defined(CONFIG_TQMA6DL)
 #error
 #elif defined(CONFIG_TQMA6Q)
-#define CONFIG_DEFAULT_FDT_FILE		"imx6q-nav.dtb"
+#define CONFIG_DEFAULT_FDT_FILE		"imx6q-nav-hdcp.dtb"
 #endif
 
 #define CONFIG_FEC_XCV_TYPE		RMII
