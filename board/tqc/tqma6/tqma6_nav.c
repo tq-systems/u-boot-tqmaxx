@@ -144,6 +144,25 @@ static void nav_setup_iomuxc_uart(void)
 					 ARRAY_SIZE(nav_uart2_pads));
 }
 
+#if defined(CONFIG_TQMA6_SUPPORT_MENDERIO)
+
+int tqc_bb_board_mmc_init(bd_t *bis)
+{
+	return 0;
+}
+
+int tqc_bb_board_mmc_getcd(struct mmc *mmc)
+{
+	return 0;
+}
+
+int tqc_bb_board_mmc_getwp(struct mmc *mmc)
+{
+	return 0;
+}
+
+#else
+
 static iomux_v3_cfg_t const nav_usdhc2_pads[] = {
 	NEW_PAD_CTRL(MX6_PAD_SD2_CLK__SD2_CLK,		USDHC_CLK_PAD_CTRL),
 	NEW_PAD_CTRL(MX6_PAD_SD2_CMD__SD2_CMD,		USDHC_PAD_CTRL),
@@ -202,6 +221,8 @@ int tqc_bb_board_mmc_init(bd_t *bis)
 
 	return 0;
 }
+
+#endif
 
 static struct i2c_pads_info nav_i2c1_pads = {
 /* I2C1: MBa6x */
