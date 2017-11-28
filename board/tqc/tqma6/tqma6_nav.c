@@ -237,6 +237,8 @@ int board_get_dtt_bus(void)
 	return tqma6_get_system_i2c_bus();
 }
 
+#if defined(CONFIG_USB)
+
 iomux_v3_cfg_t const nav_usb_pads[] = {
 	NEW_PAD_CTRL(MX6_PAD_GPIO_0__GPIO1_IO00, USB_PAD_CTRL),
 	NEW_PAD_CTRL(MX6_PAD_GPIO_3__USB_H1_OC, USB_PAD_CTRL),
@@ -307,6 +309,8 @@ int board_usb_phy_mode(int index)
 {
 	return USB_INIT_HOST;
 }
+
+#endif
 
 static iomux_v3_cfg_t const nav_hog_pads[] = {
 	NEW_PAD_CTRL(MX6_PAD_NANDF_D0__GPIO2_IO00, GPIO_HOG_PAD_CTRL),
@@ -561,7 +565,9 @@ int tqc_bb_board_init(void)
 	/* do it here - to have reset completed */
 	nav_setup_iomuxc_enet();
 
+#if defined(CONFIG_USB)
 	nav_setup_iomux_usb();
+#endif
 
 	return 0;
 }
