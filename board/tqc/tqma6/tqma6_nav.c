@@ -75,6 +75,8 @@ DECLARE_GLOBAL_DATA_PTR;
 #define ENET_MDIO_PAD_CTRL	(PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_MED | \
 				 PAD_CTL_DSE_60ohm)
 
+#if defined(CONFIG_FEC_MXC)
+
 static iomux_v3_cfg_t const nav_enet_pads[] = {
 	NEW_PAD_CTRL(MX6_PAD_ENET_MDIO__ENET_MDIO,	ENET_MDIO_PAD_CTRL),
 	NEW_PAD_CTRL(MX6_PAD_ENET_MDC__ENET_MDC,	ENET_MDIO_PAD_CTRL),
@@ -119,6 +121,17 @@ static void nav_setup_iomuxc_enet(void)
 	/* wait after reset so all phy internals are stable and setup */
 	udelay(50);
 }
+
+int board_eth_init(bd_t *bis)
+{
+	struct iomuxc *iomuxc_regs = (struct iomuxc *)IOMUXC_BASE_ADDR;
+
+	/* clear gpr1[ENET_CLK_SEL] -> disable clock output from anatop */
+	clrbits_le32(&iomuxc_regs->gpr[1], IOMUXC_GPR1_ENET_CLK_SEL_MASK);
+	return cpu_eth_init(bis);
+}
+
+#endif
 
 static iomux_v3_cfg_t const nav_uart2_pads[] = {
 	NEW_PAD_CTRL(MX6_PAD_SD4_DAT4__UART2_RX_DATA, UART_PAD_CTRL),
@@ -221,15 +234,6 @@ static void nav_setup_i2c(void)
 	ret = setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &nav_i2c1_pads);
 	if (ret)
 		printf("setup I2C1 failed: %d\n", ret);
-}
-
-int board_eth_init(bd_t *bis)
-{
-	struct iomuxc *iomuxc_regs = (struct iomuxc *)IOMUXC_BASE_ADDR;
-
-	/* clear gpr1[ENET_CLK_SEL] -> disable clock output from anatop */
-	clrbits_le32(&iomuxc_regs->gpr[1], IOMUXC_GPR1_ENET_CLK_SEL_MASK);
-	return cpu_eth_init(bis);
 }
 
 int board_get_dtt_bus(void)
@@ -562,8 +566,11 @@ int tqc_bb_board_init(void)
 	nav_setup_gpio();
 
 	nav_setup_i2c();
+
+#if defined(CONFIG_FEC_MXC)
 	/* do it here - to have reset completed */
 	nav_setup_iomuxc_enet();
+#endif
 
 #if defined(CONFIG_USB)
 	nav_setup_iomux_usb();
