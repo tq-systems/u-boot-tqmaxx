@@ -22,6 +22,7 @@
 #include <common.h>
 #include <fdt_support.h>
 #include <fsl_esdhc.h>
+#include <fuse.h>
 #include <i2c.h>
 #include <libfdt.h>
 #include <malloc.h>
@@ -689,12 +690,44 @@ static void nav_ft_handle_silent_boot(void *blob, bd_t *bd)
 #endif
 }
 
+struct nav_chosen_fuse {
+	u32 bank;
+	u32 word;
+	const char *prop;
+};
+
+static struct nav_chosen_fuse const nav_chosen_fuses[] = {
+	{ 4, 6, "tqc,gp1" },
+	{ 4, 7, "tqc,gp2" },
+	{ 0, 1, "tqc,uid1" },
+	{ 0, 2, "tqc,uid2" },
+};
+
+static void nav_ft_populate_chosen(void *blob, bd_t *bd)
+{
+	int ret;
+	size_t i;
+	u32 val;
+	struct nav_chosen_fuse const *fuse;
+
+	for (i = 0, fuse = nav_chosen_fuses;
+	     i < ARRAY_SIZE(nav_chosen_fuses);
+	     ++i, ++fuse) {
+		ret = fuse_read(fuse->bank, fuse->word, &val);
+		if (ret)
+			val = 0;
+		do_fixup_by_path_u32(blob, "/chosen", fuse->prop,
+				     val, 2);
+	}
+}
+
 void tqc_bb_ft_board_setup(void *blob, bd_t *bd)
 {
 	int offset, len, chk;
 	const char *compatible, *expect;
 
 	nav_ft_handle_silent_boot(blob, bd);
+	nav_ft_populate_chosen(blob, bd);
 
 	if (tqma6_get_enet_workaround())
 		expect = "tq,nav";
