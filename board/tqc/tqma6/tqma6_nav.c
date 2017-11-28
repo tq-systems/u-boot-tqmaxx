@@ -624,10 +624,43 @@ int board_mmc_get_env_dev(int devno)
  * Device Tree Support
  */
 #if defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT)
+static void nav_ft_handle_silent_boot(void *blob, bd_t *bd)
+{
+#if defined(CONFIG_SILENT_CONSOLE) && !defined(CONFIG_SILENT_U_BOOT_ONLY)
+	int offset;
+	int want_silent;
+
+	/*
+	 * This is doubled with silent handling of cmdline
+	 * has to be done here for now
+	 * Only fix DT when requested. The environment variable can be:
+	 *
+	 *	no - we never fixup
+	 *	yes - we always fixup
+	 *	unset - we rely on the console silent flag
+	 */
+	want_silent = getenv_yesno("silent_linux");
+	debug("%s silent_linux: %d\n", __func__, want_silent);
+	if (want_silent == 0)
+		return;
+	else if (want_silent == -1 && !(gd->flags & GD_FLG_SILENT))
+		return;
+
+	/* find or create "/chosen" node. */
+	offset = fdt_find_or_add_subnode(blob, 0, "chosen");
+	if (offset < 0)
+		return;
+	fdt_delprop(blob, offset, "stdout-path");
+	fdt_delprop(blob, offset, "linux,stdout-path");
+#endif
+}
+
 void tqc_bb_ft_board_setup(void *blob, bd_t *bd)
 {
 	int offset, len, chk;
 	const char *compatible, *expect;
+
+	nav_ft_handle_silent_boot(blob, bd);
 
 	if (tqma6_get_enet_workaround())
 		expect = "tq,nav";
