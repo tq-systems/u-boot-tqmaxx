@@ -116,6 +116,7 @@
 
 #undef TQMA6_BASEBOARD_ENV_SETTINGS
 #define	TQMA6_BASEBOARD_ENV_SETTINGS                                           \
+	"silent_linux=1\0"                                                     \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"                               \
 	"firmwarepath=/boot\0"                                                 \
 	"firmwarepart=2\0"                                                     \
