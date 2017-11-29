@@ -58,7 +58,7 @@
 	eeprom0: 24c64@54 {
 		compatible = "atmel,24c64";
 		reg = <0x54>;
-		pagesize = <32>;
+		u-boot,i2c-offset-len = <2>;
 		status = "okay";
 	};
 };
