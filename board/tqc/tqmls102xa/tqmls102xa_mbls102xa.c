@@ -86,6 +86,7 @@ int board_eth_init(bd_t *bis)
 					       TSEC1_PHY_ADDR);
 		phy_write_mmd_indirect(phy, 0x0031, DP83867_DEVADDR,
 				       TSEC1_PHY_ADDR, regval & ~(0x0080));
+		printf("DP83867: Cleared bit[7] of CFG4 (RX_CTRL mode fix)\n");
 		/* LED configuration */
 		phy_write(phy, TSEC2_PHY_ADDR, 0x18, 0x6b90);
 		phy_write(phy, TSEC2_PHY_ADDR, 0x19, 0x0000);
