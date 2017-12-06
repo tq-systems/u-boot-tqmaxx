@@ -275,27 +275,32 @@ int power_init_board(void)
 	pmic_reg_read(p, PFUZE3000_REVID, &rev);
 	printf("PMIC: PFUZE3000 ID=0x%02x REV=0x%02x\n", reg, rev);
 
-	/* disable VLDO1 */
+	/* disable VLDO1, reserved */
 	pmic_reg_read(p, PFUZE3000_VLDO1CTL, &reg);
 	PFUZE3000_VLDO_DISABLE(reg);
 	pmic_reg_write(p, PFUZE3000_VLDO1CTL, reg);
 
-	/* disable VLDO2 */
+	/* disable VLDO2, NC */
 	pmic_reg_read(p, PFUZE3000_VLDO2CTL, &reg);
 	PFUZE3000_VLDO_DISABLE(reg);
 	pmic_reg_write(p, PFUZE3000_VLDO2CTL, reg);
 
 #if defined(CONFIG_TQMA6UL_VARIANT_STANDARD)
 
-	/* set VLDO3 voltage 1.8 */
+	/* disable SW1A */
+	pmic_reg_read(p, PFUZE3000_SW1AMODE, &reg);
+	PFUZE3000_SW_DISABLE(reg);
+	pmic_reg_write(p, PFUZE3000_SW1AMODE, reg);
+	/* set VLDO3 voltage 1.8, VCC1V8 @ base boad connector */
 	pmic_reg_read(p, PFUZE3000_VLDO3CTL, &reg);
 	reg &= ~(0x0F);
 	pmic_reg_write(p, PFUZE3000_VLDO3CTL, reg);
-	/* set VLDO4 voltage 2.5 */
+	/* set VLDO4 voltage 1.8, e-MMC / QSPI VCC IO */
 	pmic_reg_read(p, PFUZE3000_VLD4CTL, &reg);
+	printf("VLDO4 OTP: %x\n", reg);
 	reg &= ~(0x0F);
-	reg |= 0x07;
 	pmic_reg_write(p, PFUZE3000_VLD4CTL, reg);
+	printf("VLDO4 runtime: %x\n", reg);
 
 #elif defined(CONFIG_TQMA6UL_VARIANT_LGA)
 
