@@ -863,10 +863,65 @@ int enable_lvds_bridge(u32 lcd_base_addr)
 #endif
 
 #ifdef CONFIG_FSL_QSPI
+
+static u32 get_qspi_clk(int qspi_num)
+{
+	u32 reg, qspi_podf, qspi_sel;
+	u32 freq;
+
+	if (!is_cpu_type(MXC_CPU_MX6UL)) {
+		puts("get_qspi_clk() only implemented for i.MX6UL");
+		return 0;
+	}
+
+	switch (qspi_num) {
+	case 0:
+		reg = readl(&imx_ccm->cscmr1);
+		qspi_podf = ((reg & MXC_CCM_CSCMR1_QSPI1_PODF_MASK) >>
+			     MXC_CCM_CSCMR1_QSPI1_PODF_OFFSET) + 1;
+		qspi_sel = (reg & MXC_CCM_CSCMR1_QSPI1_CLK_SEL_MASK) >>
+			    MXC_CCM_CSCMR1_QSPI1_CLK_SEL_OFFSET;
+		switch (qspi_sel) {
+		case 0:
+			freq = decode_pll(PLL_USBOTG, MXC_HCLK);
+			break;
+		case 1:
+			freq = mxc_get_pll_pfd(PLL_BUS, 0);
+			break;
+		case 2:
+			freq = mxc_get_pll_pfd(PLL_BUS, 2);
+			break;
+		case 3:
+			freq = decode_pll(PLL_BUS, MXC_HCLK);
+			break;
+		case 4:
+			freq = mxc_get_pll_pfd(PLL_USBOTG, 3);
+			break;
+		case 5:
+			freq = mxc_get_pll_pfd(PLL_USBOTG, 2);
+			break;
+		default:
+			return 0;
+		}
+		break;
+	case 1:
+		puts("get_qspi_clk(1) not implemented yet\n");
+		return 0;
+		break;
+	default:
+		puts("get_qspi_clk(n) no valid qspi num\n");
+		return 0;
+		break;
+	}
+
+	return freq / qspi_podf;
+}
+
 /* qspi_num can be from 0 - 1 */
 void enable_qspi_clk(int qspi_num)
 {
 	u32 reg = 0;
+
 	/* Enable QuadSPI clock */
 	switch (qspi_num) {
 	case 0:
@@ -1313,6 +1368,11 @@ int do_mx6_showclocks(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 	printf("UART       %8d kHz\n", mxc_get_clock(MXC_UART_CLK) / 1000);
 #ifdef CONFIG_MXC_SPI
 	printf("CSPI       %8d kHz\n", mxc_get_clock(MXC_CSPI_CLK) / 1000);
+#endif
+#if defined(CONFIG_FSL_QSPI)
+	if (is_cpu_type(MXC_CPU_MX6UL))
+		printf("QSPI1      %8d kHz\n", get_qspi_clk(0) / 1000);
+	/* TODO: test for MX6SX */
 #endif
 	printf("AHB        %8d kHz\n", mxc_get_clock(MXC_AHB_CLK) / 1000);
 	printf("AXI        %8d kHz\n", mxc_get_clock(MXC_AXI_CLK) / 1000);
