@@ -932,7 +932,11 @@ void enable_qspi_clk(int qspi_num)
 		reg = readl(&imx_ccm->cscmr1);
 		reg &= ~(MXC_CCM_CSCMR1_QSPI1_PODF_MASK |
 			 MXC_CCM_CSCMR1_QSPI1_CLK_SEL_MASK);
+#if defined(CONFIG_TQMA6UL_VARIANT_STANDARD)
+		reg |= ((2 << MXC_CCM_CSCMR1_QSPI1_PODF_OFFSET) |
+#else
 		reg |= ((1 << MXC_CCM_CSCMR1_QSPI1_PODF_OFFSET) |
+#endif
 			(2 << MXC_CCM_CSCMR1_QSPI1_CLK_SEL_OFFSET));
 		writel(reg, &imx_ccm->cscmr1);
 
