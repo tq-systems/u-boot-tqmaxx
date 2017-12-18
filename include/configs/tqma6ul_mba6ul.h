@@ -36,4 +36,16 @@
 /* TODO: for kernel command line */
 #define CONFIG_CONSOLE_DEV		"ttymxc0"
 
+#define MTDIDS_DEFAULT \
+	"nor0=nor0\0"
+
+#define MTDPARTS_DEFAULT \
+	"mtdparts=nor0:"                                               \
+		"832k@0k(U-Boot),"                                     \
+		"64k@832k(ENV1),"                                      \
+		"64k@896k(ENV2),"                                      \
+		"64k@960k(DTB),"                                       \
+		"7M@1M(Linux),"                                        \
+		"56M@8M(RootFS)\0"                                     \
+
 #endif /* __CONFIG_TQMA6UL_MBA6UL_H */
