@@ -197,8 +197,6 @@ void board_mmc_detect_card_type(struct mmc *mmc)
 
 	if (tqc_emmc_need_dsr(mmc) > 0)
 		mmc_set_dsr(mmc, tqma6ul_emmc_dsr);
-	else
-		puts("e-MMC: no DSR, check pin config for serial termination\n");
 }
 
 static struct i2c_pads_info tqma6ul_i2c4_pads = {
