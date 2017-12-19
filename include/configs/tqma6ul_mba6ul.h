@@ -46,6 +46,6 @@
 		"64k@896k(ENV2),"                                      \
 		"64k@960k(DTB),"                                       \
 		"7M@1M(Linux),"                                        \
-		"56M@8M(RootFS)\0"                                     \
+		"56M@8M(RootFS)"                                       \
 
 #endif /* __CONFIG_TQMA6UL_MBA6UL_H */
