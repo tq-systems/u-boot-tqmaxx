@@ -372,15 +372,13 @@
 	"mmcboot=echo Booting from mmc ...; "                                  \
 		"setenv bootargs; "                                            \
 		"run mmcargs; "                                                \
-		"if run loadfdt; then "                                        \
-			"echo boot device tree kernel ...; "                   \
-			"if run loadimage; then "                              \
+		"if run loadimage; then "                                      \
+			"if run loadfdt; then "                                \
+				"echo boot device tree kernel ...; "           \
 				"${boot_type} ${loadaddr} - ${fdt_addr}; "     \
 			"fi; "                                                 \
 		"else "                                                        \
-			"if run loadimage; then "                              \
-				"${boot_type}; "                               \
-			"fi; "                                                 \
+			"${boot_type}; "                                       \
 		"fi;\0"                                                        \
 		"setenv bootargs \0"                                           \
 	"netdev=eth0\0"                                                        \
