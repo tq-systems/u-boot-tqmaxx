@@ -377,32 +377,30 @@
 	"initrd_high=0xffffffff\0"                                             \
 	"rootfsmode=ro\0"                                                      \
 	"addcma=setenv bootargs ${bootargs} cma=${cma_size}\0"                 \
-	"addtty=setenv bootargs ${bootargs} console=${console},${baudrate} "   \
-		"consoleblank=0\0"                                             \
+	"addtty=setenv bootargs ${bootargs} console=${console},${baudrate}\0"  \
+	"addfb=setenv bootargs ${bootargs} consoleblank=0\0"                   \
 	"mmcpart=2\0"                                                          \
 	"mmcblkdev=0\0"                                                        \
-	"mmcargs=run addmmc addtty addcma\0"                                   \
+	"mmcargs=run addmmc addtty addfb addcma\0"                             \
 	"addmmc=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/mmcblk${mmcblkdev}p${mmcpart} ${rootfsmode} "       \
 		"rootwait\0"                                                   \
 	"mmcboot=echo Booting from mmc ...; "                                  \
 		"setenv bootargs; "                                            \
 		"run mmcargs; "                                                \
-		"if run loadfdt; then "                                        \
-			"echo boot device tree kernel ...; "                   \
-			"if run loadimage; then "                              \
+		"if run loadimage; then "                                      \
+			"if run loadfdt; then "                                \
+				"echo boot device tree kernel ...; "           \
 				"${boot_type} ${loadaddr} - ${fdt_addr}; "     \
 			"fi; "                                                 \
 		"else "                                                        \
-			"if run loadimage; then "                              \
-				"${boot_type}; "                               \
-			"fi; "                                                 \
+			"${boot_type}; "                                       \
 		"fi;\0"                                                        \
 		"setenv bootargs \0"                                           \
 	"netdev=eth1\0"                                                        \
 	"rootpath=/srv/nfs/tqma6\0"                                            \
 	"ipmode=static\0"                                                      \
-	"netargs=run addnfs addip addtty addcma\0"                             \
+	"netargs=run addnfs addip addtty addfb addcma\0"                       \
 	"addnfs=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/nfs rw "                                            \
 		"nfsroot=${serverip}:${rootpath},v3,tcp;\0"                    \
