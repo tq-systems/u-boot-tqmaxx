@@ -337,10 +337,8 @@ int power_init_board(void)
 	pmic_reg_write(p, PFUZE3000_VLDO3CTL, reg);
 	/* set VLDO4 voltage 1.8, e-MMC / QSPI VCC IO */
 	pmic_reg_read(p, PFUZE3000_VLD4CTL, &reg);
-	printf("VLDO4 OTP: %x\n", reg);
 	reg &= ~(0x0F);
 	pmic_reg_write(p, PFUZE3000_VLD4CTL, reg);
-	printf("VLDO4 runtime: %x\n", reg);
 
 #elif defined(CONFIG_TQMA6UL_VARIANT_LGA)
 
