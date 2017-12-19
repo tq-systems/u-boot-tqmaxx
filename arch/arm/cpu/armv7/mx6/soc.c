@@ -737,6 +737,9 @@ enum boot_device get_boot_device(void)
 		else
 			boot_dev = WEIM_NOR_BOOT;
 		break;
+	case 0x1:
+		boot_dev = QSPI_BOOT;
+		break;
 	case 0x2:
 			boot_dev = SATA_BOOT;
 		break;
