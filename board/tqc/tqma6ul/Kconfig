@@ -13,7 +13,7 @@ config SYS_CONFIG_NAME
 	default "tqma6ul"
 
 config TQMA6UL
-	bool "TQMa6UL"
+	bool
 	select MX6UL
 	select SPI_FLASH if MBA6UL || TQMA6UL_QSPI_BOOT
 	select SPI_FLASH_STMICRO if SPI_FLASH

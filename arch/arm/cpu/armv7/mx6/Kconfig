@@ -208,6 +208,7 @@ config TARGET_TQMA6
 config TARGET_TQMA6UL
 	bool "TQ Systems TQMa6UL board"
 	select MX6UL
+	select TQMA6UL
 	select DM
 	select DM_GPIO
 	select DM_THERMAL
