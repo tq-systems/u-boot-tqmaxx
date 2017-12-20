@@ -12,6 +12,16 @@ config SYS_SOC
 config SYS_CONFIG_NAME
 	default "tqma7"
 
+config TQMA7
+	bool
+	select MX7D
+	select SPI_FLASH if MBA7 || TQMA7_QSPI_BOOT
+	select SPI_FLASH_STMICRO if SPI_FLASH
+	select SPI_FLASH_WINBOND if SPI_FLASH
+	select SPI_FLASH_SPANSION if SPI_FLASH
+	select SPI_FLASH_MTD if SPI_FLASH
+	select SPI_FLASH_BAR if SPI_FLASH
+
 choice
 	prompt "TQMa7 boot configuration"
 	default TQMA7_MMC_BOOT

@@ -51,6 +51,7 @@ config TARGET_MX7D_19X19_DDR3_ARM2
 config TARGET_TQMA7
 	bool "tqma7"
 	select MX7D
+	select TQMA7
 	select DM
 	select DM_THERMAL
 	select TQC_EEPROM
