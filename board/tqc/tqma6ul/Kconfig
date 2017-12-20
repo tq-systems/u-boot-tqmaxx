@@ -56,7 +56,7 @@ config TQMA6UL_MMC_BOOT
 
 config TQMA6UL_QSPI_BOOT
 	bool "QSPI NOR Boot"
-	select CONFIG_SPI_FLASH
+	select SPI_FLASH
 	help
 	  Boot from on board QSPI NOR flash
 
