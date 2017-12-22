@@ -514,11 +514,11 @@ int tqc_bb_board_late_init(void)
 		setenv("boot_dev", "qspi");
 		/* mmcdev is dev index for u-boot */
 		setenv("mmcdev", "0");
-		/* mmcblkdev is dev index for linux env */
+		/* mmcblkdev is dev index for linux */
 		setenv("mmcblkdev", "0");
 		break;
 	default:
-		puts("unhandled boot device\n");
+		printf("unhandled boot device %d\n", get_boot_device());
 		setenv("mmcblkdev", "");
 		setenv("mmcdev", "");
 	}
