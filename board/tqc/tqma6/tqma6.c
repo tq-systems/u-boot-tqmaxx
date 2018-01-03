@@ -28,6 +28,7 @@
 #include <spi_flash.h>
 
 #include "tqma6_bb.h"
+#include "tqma6_eeprom.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -254,7 +255,31 @@ int power_init_board(void)
 
 int board_late_init(void)
 {
+	int ret;
+	/* must hold largest field of eeprom data */
+	char safe_string[0x41];
+	struct tqma6_eeprom_data eedat;
+
 	env_set("board_name", tqma6_get_boardname());
+
+	ret = tqma6_read_eeprom(tqma6_system_i2c_busnum,
+				CONFIG_SYS_I2C_EEPROM_ADDR, &eedat);
+	if (!ret) {
+		/* ID */
+		tqma6_parse_eeprom_id(&eedat, safe_string,
+				      ARRAY_SIZE(safe_string));
+		if (0 == strncmp(safe_string, "TQMa6", 5))
+			env_set("boardtype", safe_string);
+		if (0 == tqma6_parse_eeprom_serial(&eedat, safe_string,
+						   ARRAY_SIZE(safe_string)))
+			env_set("serial#", safe_string);
+		else
+			env_set("serial#", "???");
+
+		tqma6_show_eeprom(&eedat, "TQMa6");
+	} else {
+		printf("EEPROM: err %d\n", ret);
+	}
 
 	tqma6_bb_board_late_init();
 
