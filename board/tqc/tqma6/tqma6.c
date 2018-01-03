@@ -401,6 +401,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 		 tqma6_bb_get_boardname());
 	do_fixup_by_path_string(blob, "/", "model", modelstr);
 	fdt_fixup_memory(blob, (u64)PHYS_SDRAM, (u64)gd->ram_size);
+
 	/* bring in eMMC dsr settings */
 	do_fixup_by_path_u32(blob,
 			     "/soc/aips-bus@02100000/usdhc@02198000",

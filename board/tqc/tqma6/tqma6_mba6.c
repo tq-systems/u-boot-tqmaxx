@@ -414,6 +414,31 @@ const char *tqma6_bb_get_boardname(void)
 #if defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT)
 void tqma6_bb_ft_board_setup(void *blob, bd_t *bd)
 {
- /* TBD */
+	int offset, len, chk;
+	const char *compatible, *expect;
+
+	if (tqma6_get_enet_workaround())
+		expect = "tq,mba6a";
+	else
+		expect = "tq,mba6b";
+
+	offset = fdt_path_offset(blob, "/");
+	compatible = fdt_getprop(blob, offset, "compatible", &len);
+	if (len > 0)
+		printf("   Device Tree: /compatible = %s\n", compatible);
+
+	chk = fdt_node_check_compatible(blob, offset, expect);
+	switch (chk) {
+		case 0:
+			break;
+		case 1:
+			printf("   WARNING! Wrong DT variant: "
+						"Expecting %s!\n", expect);
+			break;
+		default:
+			printf("   Device Tree: cannot read /compatible"
+						"to identify tree variant!\n");
+	}
+
 }
 #endif /* defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT) */
