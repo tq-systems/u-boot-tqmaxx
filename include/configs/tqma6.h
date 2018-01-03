@@ -36,6 +36,7 @@
 #define PHYS_SDRAM_SIZE			(SZ_1G)
 #endif
 
+#define CONFIG_IMX_THERMAL
 #define CONFIG_MXC_UART
 
 /* SPI */
