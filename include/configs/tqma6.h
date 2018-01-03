@@ -73,6 +73,7 @@
 
 /* MMC Configs */
 #define CONFIG_SYS_FSL_ESDHC_ADDR	0
+#define CONFIG_SUPPORT_EMMC_BOOT
 
 /* USB Configs */
 #define CONFIG_MXC_USB_PORTSC	(PORT_PTS_UTMI | PORT_PTS_PTW)
