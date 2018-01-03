@@ -29,6 +29,7 @@
 #include <netdev.h>
 
 #include "tqma6_bb.h"
+#include "tqma6_eeprom.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -335,6 +336,15 @@ int tqma6_bb_board_init(void)
 
 int tqma6_bb_board_late_init(void)
 {
+	int ret;
+	struct tqma6_eeprom_data eedat;
+
+	ret = tqma6_read_eeprom(2, 0x57, &eedat);
+	if (!ret)
+		tqma6_show_eeprom(&eedat, "MBA6");
+	else
+		printf("%s EEPROM: err %d\n", tqma6_bb_get_boardname(), ret);
+
 	/*
 	* try to get sd card slots in order:
 	* eMMC: on Module
