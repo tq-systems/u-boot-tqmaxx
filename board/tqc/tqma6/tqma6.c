@@ -169,8 +169,10 @@ __weak void tqma6_iomuxc_spi(void)
 {
 	unsigned i;
 
-	for (i = 0; i < ARRAY_SIZE(tqma6_ecspi1_cs); ++i)
+	for (i = 0; i < ARRAY_SIZE(tqma6_ecspi1_cs); ++i) {
+		gpio_requestf(tqma6_ecspi1_cs[i], "ecspi1-cs%d", i);
 		gpio_direction_output(tqma6_ecspi1_cs[i], 1);
+	}
 	imx_iomux_v3_setup_multiple_pads(tqma6_ecspi1_pads,
 					 ARRAY_SIZE(tqma6_ecspi1_pads));
 }

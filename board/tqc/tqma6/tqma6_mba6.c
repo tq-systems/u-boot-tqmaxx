@@ -128,6 +128,7 @@ static void mba6_setup_iomuxc_enet(void)
 	imx_iomux_v3_setup_multiple_pads(mba6_enet_pads,
 					 ARRAY_SIZE(mba6_enet_pads));
 
+	gpio_request(ENET_PHY_RESET_GPIO, "phy-rst#");
 	/* Reset PHY */
 	gpio_direction_output(ENET_PHY_RESET_GPIO , 0);
 	/* Need delay 10ms after power on according to KSZ9031 spec */
@@ -200,6 +201,8 @@ int tqma6_bb_board_mmc_init(bd_t *bis)
 {
 	imx_iomux_v3_setup_multiple_pads(mba6_usdhc2_pads,
 					 ARRAY_SIZE(mba6_usdhc2_pads));
+	gpio_request(USDHC2_CD_GPIO, "usdhc2-cd");
+	gpio_request(USDHC2_WP_GPIO, "usdhc2-wp");
 	gpio_direction_input(USDHC2_CD_GPIO);
 	gpio_direction_input(USDHC2_WP_GPIO);
 
