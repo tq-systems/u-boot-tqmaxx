@@ -110,7 +110,8 @@ static iomux_v3_cfg_t const mba6_enet_pads[] = {
 	NEW_PAD_CTRL(MX6_PAD_RGMII_RX_CTL__RGMII_RX_CTL,
 		     ENET_RX_PAD_CTRL),
 	/* KSZ9031 PHY Reset */
-	NEW_PAD_CTRL(MX6_PAD_ENET_CRS_DV__GPIO1_IO25,	GPIO_OUT_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_ENET_CRS_DV__GPIO1_IO25,	GPIO_OUT_PAD_CTRL) |
+		MUX_MODE_SION,
 };
 
 static void mba6_setup_iomuxc_enet(void)
