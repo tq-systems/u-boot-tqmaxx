@@ -231,6 +231,9 @@ static struct i2c_pads_info mba6_i2c1_pads = {
 static void mba6_setup_i2c(void)
 {
 	int ret;
+
+	if (tqma6_get_system_i2c_bus() == 0)
+		return;
 	/*
 	 * use logical index for bus, e.g. I2C1 -> 0
 	 * warn on error
@@ -339,7 +342,7 @@ int tqma6_bb_board_late_init(void)
 	int ret;
 	struct tqma6_eeprom_data eedat;
 
-	ret = tqma6_read_eeprom(2, 0x57, &eedat);
+	ret = tqma6_read_eeprom(tqma6_get_system_i2c_bus(), 0x57, &eedat);
 	if (!ret)
 		tqma6_show_eeprom(&eedat, "MBA6");
 	else

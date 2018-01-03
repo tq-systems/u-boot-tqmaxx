@@ -51,6 +51,24 @@ DECLARE_GLOBAL_DATA_PTR;
 	PAD_CTL_DSE_80ohm | PAD_CTL_HYS |			\
 	PAD_CTL_ODE | PAD_CTL_SRE_FAST)
 
+/*!
+ * Rev. 0200 and newer optionally implements GIGE ping issue fix
+ * us a global to signal presence of the fix. this should be checked
+ * early. If fix is present, system I2C is I2C1 - otherwise I2C3
+ */
+static int tqma6_has_enet_workaround = -1;
+static int tqma6_system_i2c_busnum = -1;
+
+int tqma6_get_enet_workaround(void)
+{
+	return tqma6_has_enet_workaround;
+}
+
+int tqma6_get_system_i2c_bus(void)
+{
+	return tqma6_system_i2c_busnum;
+}
+
 int dram_init(void)
 {
 	gd->ram_size = imx_ddr_size();
@@ -181,6 +199,24 @@ static struct i2c_pads_info tqma6_i2c3_pads = {
 	}
 };
 
+static struct i2c_pads_info tqma6_i2c1_pads = {
+/* I2C1: MBa6x */
+	.scl = {
+		.i2c_mode = NEW_PAD_CTRL(MX6_PAD_CSI0_DAT9__I2C1_SCL,
+					 I2C_PAD_CTRL),
+		.gpio_mode = NEW_PAD_CTRL(MX6_PAD_CSI0_DAT9__GPIO5_IO27,
+					  I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(5, 27)
+	},
+	.sda = {
+		.i2c_mode = NEW_PAD_CTRL(MX6_PAD_CSI0_DAT8__I2C1_SDA,
+					 I2C_PAD_CTRL),
+		.gpio_mode = NEW_PAD_CTRL(MX6_PAD_CSI0_DAT8__GPIO5_IO26,
+					  I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(5, 26)
+	}
+};
+
 static void tqma6_setup_i2c(void)
 {
 	int ret;
@@ -188,13 +224,54 @@ static void tqma6_setup_i2c(void)
 	 * use logical index for bus, e.g. I2C1 -> 0
 	 * warn on error
 	 */
-	ret = setup_i2c(2, CONFIG_SYS_I2C_SPEED, 0x7f, &tqma6_i2c3_pads);
-	if (ret)
-		printf("setup I2C3 failed: %d\n", ret);
+	switch (tqma6_has_enet_workaround) {
+	case 1:
+		tqma6_system_i2c_busnum = 0;
+		ret = setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f,
+				&tqma6_i2c1_pads);
+		if (ret)
+			printf("setup I2C1 failed: %d\n", ret);
+		break;
+	case 0:
+		tqma6_system_i2c_busnum = 2;
+		ret = setup_i2c(2, CONFIG_SYS_I2C_SPEED, 0x7f,
+				&tqma6_i2c3_pads);
+		if (ret)
+			printf("setup I2C3 failed: %d\n", ret);
+		break;
+	default:
+		puts("No default I2C bus detected\n");
+	};
+}
+
+#define TQMA6_REVDET_GPIO IMX_GPIO_NR(1, 6)
+
+#define GPIO_REVDET_PAD_CTRL  (PAD_CTL_PUS_100K_DOWN | PAD_CTL_SPEED_LOW | \
+			       PAD_CTL_DSE_40ohm | PAD_CTL_HYS)
+
+static iomux_v3_cfg_t const tqma6_revdet_pads[] = {
+	NEW_PAD_CTRL(MX6_PAD_GPIO_6__GPIO1_IO06, GPIO_REVDET_PAD_CTRL),
+};
+
+static void tqma6_detect_enet_workaround(void)
+{
+	imx_iomux_v3_setup_multiple_pads(tqma6_revdet_pads,
+					 ARRAY_SIZE(tqma6_revdet_pads));
+
+	gpio_request(TQMA6_REVDET_GPIO, "tqma6-revdet");
+	gpio_direction_input(TQMA6_REVDET_GPIO);
+	if (gpio_get_value(TQMA6_REVDET_GPIO) == 0) {
+		tqma6_has_enet_workaround = 1;
+	} else if (gpio_get_value(TQMA6_REVDET_GPIO) > 0) {
+		tqma6_has_enet_workaround = 0;
+		gpio_direction_output(TQMA6_REVDET_GPIO, 1);
+	}
+	gpio_free(TQMA6_REVDET_GPIO);
 }
 
 int board_early_init_f(void)
 {
+	tqma6_detect_enet_workaround();
 	return tqma6_bb_board_early_init_f();
 }
 
@@ -203,6 +280,7 @@ int board_init(void)
 	/* address of boot parameters */
 	gd->bd->bi_boot_params = PHYS_SDRAM + 0x100;
 
+	tqma6_detect_enet_workaround();
 	tqma6_iomuxc_spi();
 	tqma6_setup_i2c();
 
@@ -242,7 +320,7 @@ int power_init_board(void)
 	struct pmic *p;
 	u32 reg, rev;
 
-	power_pfuze100_init(TQMA6_PFUZE100_I2C_BUS);
+	power_pfuze100_init(tqma6_system_i2c_busnum);
 	p = pmic_get("PFUZE100");
 	if (p && !pmic_probe(p)) {
 		pmic_reg_read(p, PFUZE100_DEVICEID, &reg);
@@ -290,6 +368,20 @@ int checkboard(void)
 {
 	printf("Board: %s on a %s\n", tqma6_get_boardname(),
 	       tqma6_bb_get_boardname());
+
+	puts("Enet workaround: ");
+	switch (tqma6_get_enet_workaround()) {
+	case 0:
+		puts("NO");
+		break;
+	case 1:
+		puts("OK");
+		break;
+	default:
+		puts("???");
+		break;
+	};
+	puts("\n");
 	return 0;
 }
 
