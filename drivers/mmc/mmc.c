@@ -1682,6 +1682,11 @@ static int mmc_power_init(struct mmc *mmc)
 	return 0;
 }
 
+/* board-specific MMC card detection / modification */
+__weak void board_mmc_detect_card_type(struct mmc *mmc)
+{
+}
+
 int mmc_start_init(struct mmc *mmc)
 {
 	bool no_card;
