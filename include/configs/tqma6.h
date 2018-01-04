@@ -339,7 +339,10 @@
 #define CONFIG_SYS_INIT_SP_ADDR \
 	(CONFIG_SYS_INIT_RAM_ADDR + CONFIG_SYS_INIT_SP_OFFSET)
 
+#if !defined(CONFIG_SYS_BOOTM_LEN) || (CONFIG_SYS_BOOTM_LEN < SZ_16M)
+#undef CONFIG_SYS_BOOTM_LEN
 #define CONFIG_SYS_BOOTM_LEN 		SZ_16M
+#endif
 
 /*
  * All the defines above are for the TQMa6 SoM
