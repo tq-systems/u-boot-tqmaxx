@@ -121,8 +121,8 @@ static void mba6_setup_iomuxc_enet(void)
 {
 	struct iomuxc *const iomuxc_regs = (struct iomuxc *)IOMUXC_BASE_ADDR;
 
-	/* clear gpr1[ENET_CLK_SEL] for externel clock */
-	clrbits_le32(&iomuxc_regs->gpr[1], IOMUXC_GPR1_ENET_CLK_SEL_MASK);
+	/* set gpr1[ENET_CLK_SEL] for ENET_REF_CLK / PTP from anatop */
+	setbits_le32(&iomuxc_regs->gpr[1], IOMUXC_GPR1_ENET_CLK_SEL_MASK);
 
 	__raw_writel(IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM_DISABLE,
 		     (void *)IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM);
