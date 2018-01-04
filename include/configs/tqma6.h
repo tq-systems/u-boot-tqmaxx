@@ -26,16 +26,6 @@
 
 #include "mx6_common.h"
 
-#if defined(CONFIG_TQMA6S)
-#define PHYS_SDRAM_SIZE			(512u * SZ_1M)
-#elif defined(CONFIG_TQMA6DL)
-#define PHYS_SDRAM_SIZE			(SZ_1G)
-#elif defined(CONFIG_TQMA6Q)
-#define PHYS_SDRAM_SIZE			(SZ_1G)
-#elif defined(CONFIG_TQMA6QP)
-#define PHYS_SDRAM_SIZE			(SZ_1G)
-#endif
-
 #define CONFIG_IMX_THERMAL
 #define CONFIG_MXC_UART
 
