@@ -40,6 +40,12 @@ static void print_mmcinfo(struct mmc *mmc)
 	printf("Bus Width: %d-bit%s\n", mmc->bus_width,
 			mmc->ddr_mode ? " DDR" : "");
 
+	puts("DSR support: ");
+	if (mmc->dsr_imp)
+		printf("%#04x\n", mmc->dsr_imp);
+	else
+		puts("NO\n");
+
 	puts("Erase Group Size: ");
 	print_size(((u64)mmc->erase_grp_size) << 9, "\n");
 
