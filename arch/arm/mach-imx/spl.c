@@ -8,6 +8,7 @@
  */
 
 #include <common.h>
+#include <asm/mach-imx/boot_device.h>
 #include <asm/io.h>
 #include <asm/arch/imx-regs.h>
 #include <asm/arch/sys_proto.h>
@@ -20,8 +21,8 @@
 DECLARE_GLOBAL_DATA_PTR;
 
 #if defined(CONFIG_MX6)
-/* determine boot device from SRC_SBMR1 (BOOT_CFG[4:1]) or SRC_GPR9 register */
-u32 spl_boot_device(void)
+/* determine boot device from SRC_SBMR1 register (BOOT_CFG[4:1]) */
+u32 imx_boot_device(void)
 {
 	unsigned int bmode = readl(&src_base->sbmr2);
 	u32 reg = imx6_src_get_boot_mode();
@@ -97,6 +98,54 @@ u32 spl_boot_device(void)
 	return BOOT_DEVICE_NONE;
 }
 
+/* determine boot device instance from SRC_SBMR1 register */
+u32 imx_boot_device_instance(void)
+{
+	struct src *psrc = (struct src *)SRC_BASE_ADDR;
+	unsigned reg = readl(&psrc->sbmr1);
+
+	/* BOOT_CFG1[7:4] - see IMX6DQRM Table 8-8 */
+	switch ((reg & IMX6_BMODE_MASK) >> IMX6_BMODE_SHIFT) {
+	 /* EIM: See 8.5.1, Table 8-9 */
+	case IMX6_BMODE_EMI:
+		return 0;
+	/* SATA: See 8.5.4, Table 8-20 */
+	case IMX6_BMODE_SATA:
+		return 0;
+	/* Serial ROM: See 8.5.5.1, Table 8-22 */
+	case IMX6_BMODE_SERIAL_ROM:
+		/* BOOT_CFG4[2:0] */
+		switch ((reg & IMX6_BMODE_SERIAL_ROM_MASK) >>
+			IMX6_BMODE_SERIAL_ROM_SHIFT) {
+		case IMX6_BMODE_ECSPI1:
+		case IMX6_BMODE_ECSPI2:
+		case IMX6_BMODE_ECSPI3:
+		case IMX6_BMODE_ECSPI4:
+		case IMX6_BMODE_ECSPI5:
+			return (reg & 0x07000000) >> 24;
+		case IMX6_BMODE_I2C1:
+		case IMX6_BMODE_I2C2:
+		case IMX6_BMODE_I2C3:
+			return ((reg & 0x07000000) >> 24) - 5;
+
+		}
+		break;
+	/* SD/eSD: 8.5.3, Table 8-15  */
+	case IMX6_BMODE_SD:
+	case IMX6_BMODE_ESD:
+		return (reg >> 11) & 0x03;
+		break;
+	/* MMC/eMMC: 8.5.3 */
+	case IMX6_BMODE_MMC:
+	case IMX6_BMODE_EMMC:
+		return (reg >> 11) & 0x03;
+		break;
+	/* NAND Flash: 8.5.2, Table 8-10 */
+	case IMX6_BMODE_NAND:
+		return 0;
+	}
+	return 0xffffffff;
+}
 #elif defined(CONFIG_MX7)
 /* Translate iMX7 boot device to the SPL boot device enumeration */
 u32 spl_boot_device(void)
@@ -127,6 +176,18 @@ int g_dnl_bind_fixup(struct usb_device_descriptor *dev, const char *name)
 }
 #endif
 
+#if defined(CONFIG_SPL_BUILD)
+
+u32 spl_boot_device(void)
+{
+	return imx_boot_device();
+}
+
+u32 spl_boot_device_instance(void)
+{
+	return imx_boot_device_instance();
+}
+
 #if defined(CONFIG_SPL_MMC_SUPPORT)
 /* called from spl_mmc to see type of boot mode for storage (RAW or FAT) */
 u32 spl_boot_mode(const u32 boot_device)
@@ -149,6 +210,9 @@ u32 spl_boot_mode(const u32 boot_device)
 	}
 }
 #endif
+
+#endif /* CONFIG_BUILD_SPL */
+
 
 #if defined(CONFIG_SECURE_BOOT)
 
