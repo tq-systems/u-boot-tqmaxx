@@ -252,6 +252,12 @@
 /* set to a resonable value, changeable by user */
 #define TQMA6_CMA_SIZE                 160M
 
+#if defined(CONFIG_DEFAULT_FDT_FILE)
+#define TQMA6_FDT_FILE_ENV	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"
+#else
+#define TQMA6_FDT_FILE_ENV
+#endif
+
 #define CONFIG_EXTRA_ENV_SETTINGS                                              \
 	"board=tqma6\0"                                                        \
 	"uimage=uImage\0"                                                      \
@@ -261,7 +267,7 @@
 		"setenv kernel ${uimage}; "                                    \
 		"else setenv kernel ${zimage}; fi\0"                           \
 	"uboot=u-boot.imx\0"                                                   \
-	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"                               \
+	TQMA6_FDT_FILE_ENV                                                     \
 	"fdt_addr="__stringify(TQMA6_FDT_ADDRESS)"\0"                          \
 	"console=" CONSOLE_DEV "\0"                                            \
 	"cma_size="__stringify(TQMA6_CMA_SIZE)"\0"                             \
