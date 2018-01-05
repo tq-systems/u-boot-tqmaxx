@@ -315,51 +315,46 @@ int power_init_board(void)
 	pmic_reg_read(p, PFUZE3000_REVID, &rev);
 	printf("PMIC: PFUZE3000 ID=0x%02x REV=0x%02x\n", reg, rev);
 
-	/* disable VLDO1, reserved */
-	pmic_reg_read(p, PFUZE3000_VLDO1CTL, &reg);
-	PFUZE3000_VLDO_DISABLE(reg);
-	pmic_reg_write(p, PFUZE3000_VLDO1CTL, reg);
-
 	/* disable VLDO2, NC */
 	pmic_reg_read(p, PFUZE3000_VLDO2CTL, &reg);
 	PFUZE3000_VLDO_DISABLE(reg);
 	pmic_reg_write(p, PFUZE3000_VLDO2CTL, reg);
 
-#if defined(CONFIG_TQMA6UL_VARIANT_STANDARD)
-
-	/* disable SW1A */
-	pmic_reg_read(p, PFUZE3000_SW1AMODE, &reg);
-	PFUZE3000_SW_DISABLE(reg);
-	pmic_reg_write(p, PFUZE3000_SW1AMODE, reg);
-	/* set VLDO3 voltage 1.8, VCC1V8 @ base boad connector */
+	/* set VLDO3 voltage 1.8, VCC1V8 @ base board connector */
 	pmic_reg_read(p, PFUZE3000_VLDO3CTL, &reg);
 	reg &= ~(0x0F);
 	pmic_reg_write(p, PFUZE3000_VLDO3CTL, reg);
+
 	/* set VLDO4 voltage 1.8, e-MMC / QSPI VCC IO */
 	pmic_reg_read(p, PFUZE3000_VLD4CTL, &reg);
 	reg &= ~(0x0F);
 	pmic_reg_write(p, PFUZE3000_VLD4CTL, reg);
 
-#elif defined(CONFIG_TQMA6UL_VARIANT_LGA)
-
-	/* set VLDO3 voltage 2.5 */
-	pmic_reg_read(p, PFUZE3000_VLDO3CTL, &reg);
-	reg &= ~(0x0F);
-	reg |= 0x07;
-	pmic_reg_write(p, PFUZE3000_VLDO3CTL, reg);
-	/* set VLDO4 voltage 1.8 */
-	pmic_reg_read(p, PFUZE3000_VLD4CTL, &reg);
-	reg &= ~(0x0F);
-	pmic_reg_write(p, PFUZE3000_VLD4CTL, reg);
-
 	/* disable SW1A */
 	pmic_reg_read(p, PFUZE3000_SW1AMODE, &reg);
 	PFUZE3000_SW_DISABLE(reg);
 	pmic_reg_write(p, PFUZE3000_SW1AMODE, reg);
+
+#if defined(CONFIG_TQMA6UL_VARIANT_STANDARD)
+
+	/* disable VLDO1, reserved */
+	pmic_reg_read(p, PFUZE3000_VLDO1CTL, &reg);
+	PFUZE3000_VLDO_DISABLE(reg);
+	pmic_reg_write(p, PFUZE3000_VLDO1CTL, reg);
+
+#elif defined(CONFIG_TQMA6UL_VARIANT_LGA)
+
+	/* set VLDO1 voltage 2.5, VCC2V5 @ base board connector */
+	pmic_reg_read(p, PFUZE3000_VLDO1CTL, &reg);
+	reg &= ~(0x0F);
+	reg |= 0x07;
+	pmic_reg_write(p, PFUZE3000_VLDO1CTL, reg);
+
 	/* disable SW2 */
 	pmic_reg_read(p, PFUZE3000_SW2MODE, &reg);
 	PFUZE3000_SW_DISABLE(reg);
 	pmic_reg_write(p, PFUZE3000_SW2MODE, reg);
+
 #else
 #error
 #endif
