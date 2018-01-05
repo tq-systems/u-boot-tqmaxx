@@ -27,6 +27,7 @@
 #include <power/pmic.h>
 #include <spi_flash.h>
 
+#include "../common/tqc_emmc.h"
 #include "tqma6_bb.h"
 #include "tqma6_eeprom.h"
 
@@ -138,17 +139,23 @@ int board_mmc_init(bd_t *bis)
 	imx_iomux_v3_setup_multiple_pads(tqma6_usdhc3_pads,
 					 ARRAY_SIZE(tqma6_usdhc3_pads));
 	tqma6_usdhc_cfg.sdhc_clk = mxc_get_clock(MXC_ESDHC3_CLK);
-	if (fsl_esdhc_initialize(bis, &tqma6_usdhc_cfg)) {
+	if (fsl_esdhc_initialize(bis, &tqma6_usdhc_cfg))
 		puts("Warning: failed to initialize eMMC dev\n");
-	} else {
-		struct mmc *mmc = find_mmc_device(0);
-		if (mmc)
-			mmc_set_dsr(mmc, tqma6_emmc_dsr);
-	}
 
 	tqma6_bb_board_mmc_init(bis);
 
 	return 0;
+}
+
+/* board-specific MMC card detection / modification */
+void board_mmc_detect_card_type(struct mmc *mmc)
+{
+	struct mmc *emmc = find_mmc_device(0);
+	if (emmc != mmc)
+		return;
+
+	if (tqc_emmc_need_dsr(mmc) > 0)
+		mmc_set_dsr(mmc, tqma6_emmc_dsr);
 }
 
 static iomux_v3_cfg_t const tqma6_ecspi1_pads[] = {
@@ -395,6 +402,8 @@ int checkboard(void)
 #define MODELSTRLEN 32u
 int ft_board_setup(void *blob, bd_t *bd)
 {
+	struct mmc *mmc = find_mmc_device(0);
+	int off;
 	char modelstr[MODELSTRLEN];
 
 	snprintf(modelstr, MODELSTRLEN, "TQ %s on %s", tqma6_get_boardname(),
@@ -402,10 +411,34 @@ int ft_board_setup(void *blob, bd_t *bd)
 	do_fixup_by_path_string(blob, "/", "model", modelstr);
 	fdt_fixup_memory(blob, (u64)PHYS_SDRAM, (u64)gd->ram_size);
 
-	/* bring in eMMC dsr settings */
-	do_fixup_by_path_u32(blob,
-			     "/soc/aips-bus@02100000/usdhc@02198000",
-			     "dsr", tqma6_emmc_dsr, 2);
+	if (MXC_CPU_MX6SOLO == (((get_cpu_rev() & 0xFF000) >> 12))) {
+		off = fdt_node_offset_by_prop_value(blob, -1,
+						    "device_type",
+						    "cpu", 4);
+		while (off != -FDT_ERR_NOTFOUND) {
+			u32 *reg = (u32 *)fdt_getprop(blob, off, "reg", 0);
+			if (*reg > 0) {
+				fdt_del_node(blob, off);
+			}
+			off = fdt_node_offset_by_prop_value(blob, off,
+							    "device_type",
+							    "cpu", 4);
+		}
+	}
+
+
+	/* bring in eMMC dsr settings if needed */
+	if (mmc && (!mmc_init(mmc))) {
+		if (tqc_emmc_need_dsr(mmc) > 0) {
+			tqc_ft_fixup_emmc_dsr(blob,
+					      "/soc/aips-bus@02100000/usdhc@02198000",
+					      tqma6_emmc_dsr);
+			}
+	} else {
+		puts("e-MMC: not present?\n");
+	}
+
+
 	tqma6_bb_ft_board_setup(blob, bd);
 
 	return 0;
