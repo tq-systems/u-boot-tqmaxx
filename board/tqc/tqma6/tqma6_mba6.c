@@ -16,6 +16,7 @@
 #include <asm/arch/sys_proto.h>
 #include <linux/errno.h>
 #include <asm/gpio.h>
+#include <asm/mach-imx/boot_device.h>
 #include <asm/mach-imx/mxc_i2c.h>
 
 #include <common.h>
@@ -27,6 +28,7 @@
 #include <miiphy.h>
 #include <mmc.h>
 #include <netdev.h>
+#include <spl.h>
 
 #include "tqma6_bb.h"
 #include "tqma6_eeprom.h"
@@ -415,6 +417,27 @@ int tqma6_bb_board_late_init(void)
 const char *tqma6_bb_get_boardname(void)
 {
 	return "MBa6x";
+}
+
+int mmc_get_env_devno(void)
+{
+#if defined(CONFIG_SPL_BUILD)
+	return 0;
+#else
+	u32 dev = imx_boot_device();
+
+	if (BOOT_DEVICE_MMC1 == dev) {
+		u32 inst = imx_boot_device_instance();
+		/*
+		 * This assumes that the baseboard registered
+		 * the boot device first ...
+		 * Note: SDHC3 == idx2
+		 */
+		return (2 == inst) ? 0 : 1;
+	}
+
+	return -1;
+#endif
 }
 
 /*
