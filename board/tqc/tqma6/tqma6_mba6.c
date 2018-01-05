@@ -350,12 +350,16 @@ int tqma6_bb_board_late_init(void)
 {
 	int ret;
 	struct tqma6_eeprom_data eedat;
+	char mac[20];
 
 	ret = tqma6_read_eeprom(tqma6_get_system_i2c_bus(), 0x57, &eedat);
-	if (!ret)
+	if (!ret) {
+		tqma6_parse_eeprom_mac(&eedat, mac, ARRAY_SIZE(mac));
+		env_set("usbethaddr", mac);
 		tqma6_show_eeprom(&eedat, "MBA6");
-	else
+	} else {
 		printf("%s EEPROM: err %d\n", tqma6_bb_get_boardname(), ret);
+	}
 
 	/*
 	* try to get sd card slots in order:
