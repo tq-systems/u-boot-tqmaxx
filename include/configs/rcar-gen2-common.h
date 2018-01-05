@@ -12,7 +12,6 @@
 #include <asm/arch/rmobile.h>
 
 /* Support File sytems */
-#define CONFIG_SUPPORT_VFAT
 #define CONFIG_FS_EXT4
 #define CONFIG_EXT4_WRITE
 

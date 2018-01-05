@@ -69,9 +69,6 @@
 #define CONFIG_LIBATA
 #define CONFIG_LBA48
 
-/* Additional FS support/configuration */
-#define CONFIG_SUPPORT_VFAT
-
 /* PCIe support */
 #ifdef CONFIG_CMD_PCI
 #ifndef CONFIG_SPL_BUILD

@@ -24,7 +24,6 @@
 /* MMC/SD IP block */
 #define CONFIG_BOUNCE_BUFFER
 
-#define CONFIG_SUPPORT_VFAT
 #define CONFIG_FS_EXT4
 
 /* RAW SD card / eMMC locations. */
