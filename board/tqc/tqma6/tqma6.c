@@ -198,7 +198,11 @@ __weak void tqma6_iomuxc_spi(void)
 	unsigned i;
 
 	for (i = 0; i < ARRAY_SIZE(tqma6_ecspi1_cs); ++i) {
+		#if defined(CONFIG_SPL_BUILD)
+		gpio_request(tqma6_ecspi1_cs[i], 0);
+#else
 		gpio_requestf(tqma6_ecspi1_cs[i], "ecspi1-cs%d", i);
+#endif
 		gpio_direction_output(tqma6_ecspi1_cs[i], 1);
 	}
 	imx_iomux_v3_setup_multiple_pads(tqma6_ecspi1_pads,
@@ -279,6 +283,19 @@ static void tqma6_setup_i2c(void)
 #define GPIO_REVDET_PAD_CTRL  (PAD_CTL_PUS_100K_DOWN | PAD_CTL_SPEED_LOW | \
 			       PAD_CTL_DSE_40ohm | PAD_CTL_HYS)
 
+#if defined(CONFIG_SPL_BUILD)
+int board_early_init_f(void)
+{
+	return tqma6_bb_board_early_init_f();
+}
+
+void spl_board_init(void)
+{
+	tqma6_iomuxc_spi();
+	enable_spi_clk(1, 0);
+}
+#else
+
 static iomux_v3_cfg_t const tqma6_revdet_pads[] = {
 	NEW_PAD_CTRL(MX6_PAD_GPIO_6__GPIO1_IO06, GPIO_REVDET_PAD_CTRL),
 };
@@ -305,13 +322,6 @@ int board_early_init_f(void)
 	return tqma6_bb_board_early_init_f();
 }
 
-#if defined(CONFIG_SPL_BUILD)
-void spl_board_init(void)
-{
-	tqma6_iomuxc_spi();
-	tqma6_setup_i2c();
-}
-#else
 int board_init(void)
 {
 	/* address of boot parameters */

@@ -54,7 +54,7 @@ void reset_cpu(ulong addr)
 #if defined(CONFIG_SPL_SPI_SUPPORT)
 u32 spl_spi_get_uboot_offset(void)
 {
-	return CONFIG_FLASH_SECTOR_SIZE;
+	return TQMA6_SPI_FLASH_SECTOR_SIZE;
 }
 #endif
 
