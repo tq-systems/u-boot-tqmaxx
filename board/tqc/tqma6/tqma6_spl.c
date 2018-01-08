@@ -7,9 +7,11 @@
  */
 
 #include <common.h>
+#include <config.h>
 #include <environment.h>
 #include <i2c.h>
 #include <asm/io.h>
+#include <asm/arch/crm_regs.h>
 #include <asm/arch/iomux.h>
 #include <asm/arch/mx6-ddr.h>
 #include <asm/arch/mx6-pins.h>
@@ -19,7 +21,26 @@
 #include <asm/mach-imx/mxc_i2c.h>
 #include <spl.h>
 
+void tqma6s_init(void);
+void tqma6dl_init(void);
+void tqma6q_init(void);
+void tqma6qp_init(void);
+
 DECLARE_GLOBAL_DATA_PTR;
+
+static void ccgr_init(void)
+{
+	struct mxc_ccm_reg *ccm = (struct mxc_ccm_reg *)CCM_BASE_ADDR;
+
+	/* set the default clock gate to save power */
+	writel(0x00C03F3F, &ccm->CCGR0);
+	writel(0x0030FC03, &ccm->CCGR1);
+	writel(0x0FFFC000, &ccm->CCGR2);
+	writel(0x3FF00000, &ccm->CCGR3);
+	writel(0x00FFF300, &ccm->CCGR4);
+	writel(0x0F0000C3, &ccm->CCGR5);
+	writel(0x000003FF, &ccm->CCGR6);
+}
 
 /*
  * called from C runtime startup code (arch/arm/lib/crt0.S:_main)
@@ -31,6 +52,9 @@ void board_init_f(ulong dummy)
 	/* setup AIPS and disable watchdog */
 	arch_cpu_init();
 
+	ccgr_init();
+	gpr_init();
+
 	/* iomux and setup of uart */
 	board_early_init_f();
 
@@ -39,6 +63,18 @@ void board_init_f(ulong dummy)
 
 	/* UART clocks enabled and gd valid - init serial console */
 	preloader_console_init();
+
+#if defined(CONFIG_TQMA6S)
+	tqma6s_init();
+#elif defined(CONFIG_TQMA6DL)
+	tqma6dl_init();
+#elif defined(CONFIG_TQMA6Q)
+	tqma6q_init();
+#elif defined(CONFIG_TQMA6QP)
+	tqma6qp_init();
+#else
+	hang();
+#endif
 
 	/* Clear the BSS. */
 	memset(__bss_start, 0, __bss_end - __bss_start);
