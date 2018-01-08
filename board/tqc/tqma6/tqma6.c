@@ -27,6 +27,11 @@
 #include <power/pmic.h>
 #include <spi_flash.h>
 
+#if defined(CONFIG_SPL_BUILD)
+#include <spl.h>
+#include <fdt_support.h>
+#endif
+
 #include "../common/tqc_emmc.h"
 #include "tqma6_bb.h"
 #include "tqma6_eeprom.h"
@@ -134,7 +139,7 @@ int board_mmc_getwp(struct mmc *mmc)
 	return ret;
 }
 
-int board_mmc_init(bd_t *bis)
+static int tqma6_emmc_init(bd_t *bis)
 {
 	imx_iomux_v3_setup_multiple_pads(tqma6_usdhc3_pads,
 					 ARRAY_SIZE(tqma6_usdhc3_pads));
@@ -142,10 +147,25 @@ int board_mmc_init(bd_t *bis)
 	if (fsl_esdhc_initialize(bis, &tqma6_usdhc_cfg))
 		puts("Warning: failed to initialize eMMC dev\n");
 
-	tqma6_bb_board_mmc_init(bis);
-
 	return 0;
 }
+
+int board_mmc_init(bd_t *bis)
+{
+#if defined(CONFIG_SPL_BUILD)
+	if (BOOT_DEVICE_MMC1 == spl_boot_device()) {
+		if (2 == spl_boot_device_instance())
+			return tqma6_emmc_init(bis);
+		else
+			return tqma6_bb_board_mmc_init(bis);
+	}
+	return -ENODEV;
+#else
+	tqma6_emmc_init(bis);
+	tqma6_bb_board_mmc_init(bis);
+	return 0;
+#endif
+ }
 
 /* board-specific MMC card detection / modification */
 void board_mmc_detect_card_type(struct mmc *mmc)
@@ -285,6 +305,13 @@ int board_early_init_f(void)
 	return tqma6_bb_board_early_init_f();
 }
 
+#if defined(CONFIG_SPL_BUILD)
+void spl_board_init(void)
+{
+	tqma6_iomuxc_spi();
+	tqma6_setup_i2c();
+}
+#else
 int board_init(void)
 {
 	/* address of boot parameters */
@@ -298,6 +325,7 @@ int board_init(void)
 
 	return 0;
 }
+#endif
 
 static const char *tqma6_get_boardname(void)
 {

@@ -376,6 +376,7 @@ config TARGET_TQMA6
 	bool "TQ Systems TQMa6 board"
 	select BOARD_LATE_INIT
 	select TQC_EMMC
+	select SUPPORT_SPL
 
 config TARGET_UDOO
 	bool "udoo"

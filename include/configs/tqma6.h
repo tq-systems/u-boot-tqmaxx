@@ -11,11 +11,25 @@
 
 #include <linux/kconfig.h>
 /* SPL */
-/* #if defined(CONFIG_SPL_BUILD) */
 /* common IMX6 SPL configuration */
 #include "imx6_spl.h"
 
-/* #endif */
+#undef CONFIG_SPL_MAX_SIZE
+/*
+ * define CONFIG_SPL_MAX_SIZE to fill at max one SPI NOR flash sector (64k)
+ * substracted by image offset (1k)
+ */
+#define CONFIG_SPL_MAX_SIZE		0xfc00
+
+#undef CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR
+/*
+ * force offset im eMMC/SD the same as in SPI NOR. if using SPI NOR sector size,
+ * we can have combinded and splitted images as well
+ */
+#define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR	(TQMA6_SPI_FLASH_SECTOR_SIZE) / \
+						0x200
+
+#define CONFIG_SYS_SPI_U_BOOT_OFFS	0x10000
 
 /* place code in last 4 MiB of RAM */
 #if defined(CONFIG_TQMA6S)
@@ -135,7 +149,7 @@
 
 #elif defined(CONFIG_TQMA6X_SPI_BOOT)
 
-#define TQMA6_UBOOT_OFFSET		0x400
+#define TQMA6_UBOOT_OFFSET		SZ_1K
 #define TQMA6_UBOOT_SECTOR_START	0x0
 /* max u-boot size: 512k */
 #define TQMA6_UBOOT_SECTOR_SIZE		TQMA6_SPI_FLASH_SECTOR_SIZE
