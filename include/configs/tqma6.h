@@ -31,10 +31,15 @@
 
 #define CONFIG_SYS_SPI_U_BOOT_OFFS	0x10000
 
-/* place code in last 4 MiB of RAM */
-#if defined(CONFIG_TQMA6S)
+/*
+ * place code in last 4 MiB of RAM, for combined image use 512 MiB as common
+ * value
+ */
+#if defined(CONFIG_TQMA6QDL) || defined(CONFIG_TQMA6S)
+#undef CONFIG_SYS_TEXT_BASE
 #define CONFIG_SYS_TEXT_BASE		0x2fc00000
 #elif defined(CONFIG_TQMA6QP) ||defined(CONFIG_TQMA6Q) || defined(CONFIG_TQMA6DL)
+#undef CONFIG_SYS_TEXT_BASE
 #define CONFIG_SYS_TEXT_BASE		0x4fc00000
 #endif
 

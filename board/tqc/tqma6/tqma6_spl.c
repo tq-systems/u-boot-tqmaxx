@@ -8,8 +8,7 @@
 
 #include <common.h>
 #include <config.h>
-#include <environment.h>
-#include <i2c.h>
+
 #include <asm/io.h>
 #include <asm/arch/crm_regs.h>
 #include <asm/arch/iomux.h>
@@ -19,12 +18,17 @@
 #include <asm/mach-imx/boot_mode.h>
 #include <asm/mach-imx/iomux-v3.h>
 #include <asm/mach-imx/mxc_i2c.h>
+#include <environment.h>
+#include <fdt_support.h>
+#include <i2c.h>
 #include <spl.h>
+
 
 void tqma6s_init(void);
 void tqma6dl_init(void);
 void tqma6q_init(void);
 void tqma6qp_init(void);
+
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -64,17 +68,16 @@ void board_init_f(ulong dummy)
 	/* UART clocks enabled and gd valid - init serial console */
 	preloader_console_init();
 
-#if defined(CONFIG_TQMA6S)
-	tqma6s_init();
-#elif defined(CONFIG_TQMA6DL)
-	tqma6dl_init();
-#elif defined(CONFIG_TQMA6Q)
-	tqma6q_init();
-#elif defined(CONFIG_TQMA6QP)
-	tqma6qp_init();
-#else
-	hang();
-#endif
+	if (is_mx6solo())
+		tqma6s_init();
+	else if (is_mx6dl())
+		tqma6dl_init();
+	else if (is_mx6dq())
+		tqma6q_init();
+	else if (is_mx6dqp())
+		tqma6qp_init();
+	else
+		hang();
 
 	/* Clear the BSS. */
 	memset(__bss_start, 0, __bss_end - __bss_start);

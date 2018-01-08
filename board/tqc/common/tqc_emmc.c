@@ -8,6 +8,10 @@
 #include <common.h>
 #include <mmc.h>
 
+#if defined(CONFIG_SPL_BUILD)
+#include <fdt_support.h>
+#endif
+
 #include "tqc_emmc.h"
 
 struct emmc_dsr_lookup {

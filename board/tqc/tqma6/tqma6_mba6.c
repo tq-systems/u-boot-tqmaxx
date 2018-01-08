@@ -7,6 +7,7 @@
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
+#include <common.h>
 
 #include <asm/io.h>
 #include <asm/arch/clock.h>
@@ -14,16 +15,14 @@
 #include <asm/arch/imx-regs.h>
 #include <asm/arch/iomux.h>
 #include <asm/arch/sys_proto.h>
-#include <linux/errno.h>
 #include <asm/gpio.h>
 #include <asm/mach-imx/boot_device.h>
 #include <asm/mach-imx/mxc_i2c.h>
-
-#include <common.h>
 #include <fsl_esdhc.h>
-#include <libfdt.h>
-#include <malloc.h>
 #include <i2c.h>
+#include <libfdt.h>
+#include <linux/errno.h>
+#include <malloc.h>
 #include <micrel.h>
 #include <miiphy.h>
 #include <mmc.h>
@@ -57,21 +56,11 @@ DECLARE_GLOBAL_DATA_PTR;
 	PAD_CTL_DSE_80ohm | PAD_CTL_HYS |			\
 	PAD_CTL_ODE | PAD_CTL_SRE_FAST)
 
-#if defined(CONFIG_MX6QP) || defined(CONFIG_MX6Q)
+#define TQMA6Q_IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII	0x020e0790
+#define TQMA6Q_IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM	0x020e07ac
 
-#define IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII	0x020e0790
-#define IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM	0x020e07ac
-
-#elif defined(CONFIG_MX6S) || defined(CONFIG_MX6DL)
-
-#define IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII	0x020e0768
-#define IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM	0x020e0788
-
-#else
-
-#error "need to select CPU"
-
-#endif
+#define TQMA6DL_IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII	0x020e0768
+#define TQMA6DL_IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM	0x020e0788
 
 #define ENET_RX_PAD_CTRL	(PAD_CTL_DSE_34ohm)
 #define ENET_TX_PAD_CTRL	(PAD_CTL_PUS_100K_UP | PAD_CTL_DSE_34ohm)
@@ -91,32 +80,31 @@ DECLARE_GLOBAL_DATA_PTR;
 #define ENET_PHY_INT_GPIO IMX_GPIO_NR(1, 28)
 
 static iomux_v3_cfg_t const mba6_enet_pads[] = {
-	NEW_PAD_CTRL(MX6_PAD_ENET_MDIO__ENET_MDIO,	ENET_MDIO_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_ENET_MDC__ENET_MDC,	ENET_MDIO_PAD_CTRL),
+	IOMUX_PADS(PAD_ENET_MDIO__ENET_MDIO |	MUX_PAD_CTRL(ENET_MDIO_PAD_CTRL)),
+	IOMUX_PADS(PAD_ENET_MDC__ENET_MDC |	MUX_PAD_CTRL(ENET_MDIO_PAD_CTRL)),
 
-	NEW_PAD_CTRL(MX6_PAD_RGMII_TXC__RGMII_TXC,	ENET_TX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_RGMII_TD0__RGMII_TD0,	ENET_TX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_RGMII_TD1__RGMII_TD1,	ENET_TX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_RGMII_TD2__RGMII_TD2,	ENET_TX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_RGMII_TD3__RGMII_TD3,	ENET_TX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_RGMII_TX_CTL__RGMII_TX_CTL,
-		     ENET_TX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_ENET_REF_CLK__ENET_TX_CLK,	ENET_CLK_PAD_CTRL) & ~(MUX_MODE_SION),
+	IOMUX_PADS(PAD_RGMII_TXC__RGMII_TXC |	MUX_PAD_CTRL(ENET_TX_PAD_CTRL)),
+	IOMUX_PADS(PAD_RGMII_TD0__RGMII_TD0 |	MUX_PAD_CTRL(ENET_TX_PAD_CTRL)),
+	IOMUX_PADS(PAD_RGMII_TD1__RGMII_TD1 |	MUX_PAD_CTRL(ENET_TX_PAD_CTRL)),
+	IOMUX_PADS(PAD_RGMII_TD2__RGMII_TD2 |	MUX_PAD_CTRL(ENET_TX_PAD_CTRL)),
+	IOMUX_PADS(PAD_RGMII_TD3__RGMII_TD3 |	MUX_PAD_CTRL(ENET_TX_PAD_CTRL)),
+	IOMUX_PADS(PAD_RGMII_TX_CTL__RGMII_TX_CTL | MUX_PAD_CTRL(ENET_TX_PAD_CTRL)),
+	IOMUX_PADS(PAD_ENET_REF_CLK__ENET_TX_CLK | (MUX_PAD_CTRL(ENET_CLK_PAD_CTRL) &
+		   (~(MUX_MODE_SION)))),
 	/*
 	 * these pins are also used for config strapping by phy
 	 */
-	NEW_PAD_CTRL(MX6_PAD_RGMII_RD0__RGMII_RD0,	ENET_RX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_RGMII_RD1__RGMII_RD1,	ENET_RX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_RGMII_RD2__RGMII_RD2,	ENET_RX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_RGMII_RD3__RGMII_RD3,	ENET_RX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_RGMII_RXC__RGMII_RXC,	ENET_RX_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_RGMII_RX_CTL__RGMII_RX_CTL,
-		     ENET_RX_PAD_CTRL),
+	IOMUX_PADS(PAD_RGMII_RD0__RGMII_RD0 |	MUX_PAD_CTRL(ENET_RX_PAD_CTRL)),
+	IOMUX_PADS(PAD_RGMII_RD1__RGMII_RD1 |	MUX_PAD_CTRL(ENET_RX_PAD_CTRL)),
+	IOMUX_PADS(PAD_RGMII_RD2__RGMII_RD2 |	MUX_PAD_CTRL(ENET_RX_PAD_CTRL)),
+	IOMUX_PADS(PAD_RGMII_RD3__RGMII_RD3 |	MUX_PAD_CTRL(ENET_RX_PAD_CTRL)),
+	IOMUX_PADS(PAD_RGMII_RXC__RGMII_RXC |	MUX_PAD_CTRL(ENET_RX_PAD_CTRL)),
+	IOMUX_PADS(PAD_RGMII_RX_CTL__RGMII_RX_CTL | MUX_PAD_CTRL(ENET_RX_PAD_CTRL)),
 	/* KSZ9031 PHY Reset */
-	NEW_PAD_CTRL(MX6_PAD_ENET_CRS_DV__GPIO1_IO25,	GPIO_OUT_PAD_CTRL) |
-		MUX_MODE_SION,
+	IOMUX_PADS(PAD_ENET_CRS_DV__GPIO1_IO25 | (MUX_PAD_CTRL(GPIO_OUT_PAD_CTRL) |
+		   MUX_MODE_SION)),
 	/* FEC phy IRQ */
-	NEW_PAD_CTRL(MX6_PAD_ENET_TX_EN__GPIO1_IO28,	GPIO_IN_PAD_CTRL),
+	IOMUX_PADS(PAD_ENET_TX_EN__GPIO1_IO28 |	MUX_PAD_CTRL(GPIO_IN_PAD_CTRL)),
 };
 
 static void mba6_setup_iomuxc_enet(void)
@@ -126,13 +114,19 @@ static void mba6_setup_iomuxc_enet(void)
 	/* set gpr1[ENET_CLK_SEL] for ENET_REF_CLK / PTP from anatop */
 	setbits_le32(&iomuxc_regs->gpr[1], IOMUXC_GPR1_ENET_CLK_SEL_MASK);
 
-	__raw_writel(IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM_DISABLE,
-		     (void *)IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM);
-	__raw_writel(IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII_1P5V,
-		     (void *)IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII);
+	if (is_mx6dqp() || is_mx6dq()) {
+		__raw_writel(IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM_DISABLE,
+			     (void *)TQMA6Q_IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM);
+		__raw_writel(IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII_1P5V,
+			     (void *)TQMA6Q_IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII);
+	} else {
+		__raw_writel(IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM_DISABLE,
+			     (void *)TQMA6DL_IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM);
+		__raw_writel(IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII_1P5V,
+			     (void *)TQMA6DL_IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII);
+	};
 
-	imx_iomux_v3_setup_multiple_pads(mba6_enet_pads,
-					 ARRAY_SIZE(mba6_enet_pads));
+	SETUP_IOMUX_PADS(mba6_enet_pads);
 
 	gpio_request(ENET_PHY_RESET_GPIO, "phy-rst#");
 	gpio_request(ENET_PHY_INT_GPIO, "phy-int");
@@ -152,14 +146,13 @@ static void mba6_setup_iomuxc_enet(void)
 }
 
 static iomux_v3_cfg_t const mba6_uart2_pads[] = {
-	NEW_PAD_CTRL(MX6_PAD_SD4_DAT4__UART2_RX_DATA, UART_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_SD4_DAT7__UART2_TX_DATA, UART_PAD_CTRL),
+	IOMUX_PADS(PAD_SD4_DAT4__UART2_RX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL)),
+	IOMUX_PADS(PAD_SD4_DAT7__UART2_TX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL)),
 };
 
 static void mba6_setup_iomuxc_uart(void)
 {
-	imx_iomux_v3_setup_multiple_pads(mba6_uart2_pads,
-					 ARRAY_SIZE(mba6_uart2_pads));
+	SETUP_IOMUX_PADS(mba6_uart2_pads);
 }
 
 #define USDHC2_CD_GPIO	IMX_GPIO_NR(1, 4)
@@ -193,22 +186,21 @@ static struct fsl_esdhc_cfg mba6_usdhc_cfg = {
 };
 
 static iomux_v3_cfg_t const mba6_usdhc2_pads[] = {
-	NEW_PAD_CTRL(MX6_PAD_SD2_CLK__SD2_CLK,		USDHC_CLK_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_SD2_CMD__SD2_CMD,		USDHC_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_SD2_DAT0__SD2_DATA0,	USDHC_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_SD2_DAT1__SD2_DATA1,	USDHC_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_SD2_DAT2__SD2_DATA2,	USDHC_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_SD2_DAT3__SD2_DATA3,	USDHC_PAD_CTRL),
+	IOMUX_PADS(PAD_SD2_CLK__SD2_CLK |	MUX_PAD_CTRL(USDHC_CLK_PAD_CTRL)),
+	IOMUX_PADS(PAD_SD2_CMD__SD2_CMD |	MUX_PAD_CTRL(USDHC_PAD_CTRL)),
+	IOMUX_PADS(PAD_SD2_DAT0__SD2_DATA0 |	MUX_PAD_CTRL(USDHC_PAD_CTRL)),
+	IOMUX_PADS(PAD_SD2_DAT1__SD2_DATA1 |	MUX_PAD_CTRL(USDHC_PAD_CTRL)),
+	IOMUX_PADS(PAD_SD2_DAT2__SD2_DATA2 |	MUX_PAD_CTRL(USDHC_PAD_CTRL)),
+	IOMUX_PADS(PAD_SD2_DAT3__SD2_DATA3 |	MUX_PAD_CTRL(USDHC_PAD_CTRL)),
 	/* CD */
-	NEW_PAD_CTRL(MX6_PAD_GPIO_4__GPIO1_IO04,	GPIO_IN_PAD_CTRL),
+	IOMUX_PADS(PAD_GPIO_4__GPIO1_IO04 |	MUX_PAD_CTRL(GPIO_IN_PAD_CTRL)),
 	/* WP */
-	NEW_PAD_CTRL(MX6_PAD_GPIO_2__GPIO1_IO02,	GPIO_IN_PAD_CTRL),
+	IOMUX_PADS(PAD_GPIO_2__GPIO1_IO02 |	MUX_PAD_CTRL(GPIO_IN_PAD_CTRL)),
 };
 
 int tqma6_bb_board_mmc_init(bd_t *bis)
 {
-	imx_iomux_v3_setup_multiple_pads(mba6_usdhc2_pads,
-					 ARRAY_SIZE(mba6_usdhc2_pads));
+	SETUP_IOMUX_PADS(mba6_usdhc2_pads);
 	gpio_request(USDHC2_CD_GPIO, "usdhc2-cd");
 	gpio_request(USDHC2_WP_GPIO, "usdhc2-wp");
 	gpio_direction_input(USDHC2_CD_GPIO);
@@ -221,19 +213,38 @@ int tqma6_bb_board_mmc_init(bd_t *bis)
 	return 0;
 }
 
-static struct i2c_pads_info mba6_i2c1_pads = {
+
+static struct i2c_pads_info mba6dl_i2c1_pads = {
 /* I2C1: MBa6x */
 	.scl = {
-		.i2c_mode = NEW_PAD_CTRL(MX6_PAD_CSI0_DAT9__I2C1_SCL,
+		.i2c_mode = NEW_PAD_CTRL(MX6DL_PAD_CSI0_DAT9__I2C1_SCL,
 					 I2C_PAD_CTRL),
-		.gpio_mode = NEW_PAD_CTRL(MX6_PAD_CSI0_DAT9__GPIO5_IO27,
+		.gpio_mode = NEW_PAD_CTRL(MX6DL_PAD_CSI0_DAT9__GPIO5_IO27,
 					  I2C_PAD_CTRL),
 		.gp = IMX_GPIO_NR(5, 27)
 	},
 	.sda = {
-		.i2c_mode = NEW_PAD_CTRL(MX6_PAD_CSI0_DAT8__I2C1_SDA,
+		.i2c_mode = NEW_PAD_CTRL(MX6DL_PAD_CSI0_DAT8__I2C1_SDA,
 					 I2C_PAD_CTRL),
-		.gpio_mode = NEW_PAD_CTRL(MX6_PAD_CSI0_DAT8__GPIO5_IO26,
+		.gpio_mode = NEW_PAD_CTRL(MX6DL_PAD_CSI0_DAT8__GPIO5_IO26,
+					  I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(5, 26)
+	}
+};
+
+static struct i2c_pads_info mba6q_i2c1_pads = {
+/* I2C1: MBa6x */
+	.scl = {
+		.i2c_mode = NEW_PAD_CTRL(MX6Q_PAD_CSI0_DAT9__I2C1_SCL,
+					 I2C_PAD_CTRL),
+		.gpio_mode = NEW_PAD_CTRL(MX6Q_PAD_CSI0_DAT9__GPIO5_IO27,
+					  I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(5, 27)
+	},
+	.sda = {
+		.i2c_mode = NEW_PAD_CTRL(MX6Q_PAD_CSI0_DAT8__I2C1_SDA,
+					 I2C_PAD_CTRL),
+		.gpio_mode = NEW_PAD_CTRL(MX6Q_PAD_CSI0_DAT8__GPIO5_IO26,
 					  I2C_PAD_CTRL),
 		.gp = IMX_GPIO_NR(5, 26)
 	}
@@ -249,52 +260,62 @@ static void mba6_setup_i2c(void)
 	 * use logical index for bus, e.g. I2C1 -> 0
 	 * warn on error
 	 */
-	ret = setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &mba6_i2c1_pads);
+	if (is_mx6dqp() || is_mx6dq())
+		ret = setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &mba6q_i2c1_pads);
+	else
+		ret = setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &mba6dl_i2c1_pads);
+
 	if (ret)
 		printf("setup I2C1 failed: %d\n", ret);
 }
 
-int board_phy_config(struct phy_device *phydev)
-{
+struct mba6_phy_skew {
+	u16 address;
+	u16 value;
+};
+
 /*
  * optimized pad skew values depends on CPU variant on the TQMa6x module:
- * CONFIG_TQMA6Q: i.MX6Q/D
- * CONFIG_TQMA6S: i.MX6S
- * CONFIG_TQMA6DL: i.MX6DL
+ * i.MX6QP/Q/D
+ * i.MX6S/DL
  */
-#if defined(CONFIG_TQMA6QP) || defined(CONFIG_TQMA6Q)
-#define MBA6X_KSZ9031_CTRL_SKEW	0x0032
-#define MBA6X_KSZ9031_CLK_SKEW	0x03ff
-#define MBA6X_KSZ9031_RX_SKEW	0x3333
-#define MBA6X_KSZ9031_TX_SKEW	0x2036
-#elif defined(CONFIG_TQMA6S) || defined(CONFIG_TQMA6DL)
-#define MBA6X_KSZ9031_CTRL_SKEW	0x0030
-#define MBA6X_KSZ9031_CLK_SKEW	0x03ff
-#define MBA6X_KSZ9031_RX_SKEW	0x3333
-#define MBA6X_KSZ9031_TX_SKEW	0x2052
-#else
-#error
-#endif
+static struct mba6_phy_skew const mba6q_phy_skews[] = {
 	/* min rx/tx ctrl delay */
-	ksz9031_phy_extended_write(phydev, 2,
-				   MII_KSZ9031_EXT_RGMII_CTRL_SIG_SKEW,
-				   MII_KSZ9031_MOD_DATA_NO_POST_INC,
-				   MBA6X_KSZ9031_CTRL_SKEW);
+	{ MII_KSZ9031_EXT_RGMII_CTRL_SIG_SKEW, 0x0032 },
 	/* min rx delay */
-	ksz9031_phy_extended_write(phydev, 2,
-				   MII_KSZ9031_EXT_RGMII_RX_DATA_SKEW,
-				   MII_KSZ9031_MOD_DATA_NO_POST_INC,
-				   MBA6X_KSZ9031_RX_SKEW);
+	{ MII_KSZ9031_EXT_RGMII_RX_DATA_SKEW, 0x3333 },
 	/* max tx delay */
-	ksz9031_phy_extended_write(phydev, 2,
-				   MII_KSZ9031_EXT_RGMII_TX_DATA_SKEW,
-				   MII_KSZ9031_MOD_DATA_NO_POST_INC,
-				   MBA6X_KSZ9031_TX_SKEW);
+	{ MII_KSZ9031_EXT_RGMII_TX_DATA_SKEW, 0x2036 },
 	/* rx/tx clk skew */
-	ksz9031_phy_extended_write(phydev, 2,
-				   MII_KSZ9031_EXT_RGMII_CLOCK_SKEW,
-				   MII_KSZ9031_MOD_DATA_NO_POST_INC,
-				   MBA6X_KSZ9031_CLK_SKEW);
+	{ MII_KSZ9031_EXT_RGMII_CLOCK_SKEW, 0x03ff },
+};
+
+static struct mba6_phy_skew const mba6dl_phy_skews[] = {
+	{ MII_KSZ9031_EXT_RGMII_CTRL_SIG_SKEW, 0x0030 },
+	{ MII_KSZ9031_EXT_RGMII_RX_DATA_SKEW, 0x3333 },
+	{ MII_KSZ9031_EXT_RGMII_TX_DATA_SKEW, 0x2052 },
+	{ MII_KSZ9031_EXT_RGMII_CLOCK_SKEW, 0x03ff },
+};
+
+int board_phy_config(struct phy_device *phydev)
+{
+	unsigned int i;
+
+	if (is_mx6dqp() || is_mx6dq()) {
+		for (i = 0; i < ARRAY_SIZE(mba6q_phy_skews); ++i)
+			ksz9031_phy_extended_write(phydev, 2,
+						   mba6q_phy_skews[i].address,
+						   MII_KSZ9031_MOD_DATA_NO_POST_INC,
+						   mba6q_phy_skews[i].value
+						  );
+	} else {
+		for (i = 0; i < ARRAY_SIZE(mba6dl_phy_skews); ++i)
+			ksz9031_phy_extended_write(phydev, 2,
+						   mba6dl_phy_skews[i].address,
+						   MII_KSZ9031_MOD_DATA_NO_POST_INC,
+						   mba6dl_phy_skews[i].value
+						  );
+	}
 
 	phydev->drv->config(phydev);
 

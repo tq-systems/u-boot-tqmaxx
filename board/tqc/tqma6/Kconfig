@@ -14,29 +14,39 @@ choice
 	default TQMA6Q
 	help
 	  select the TQMa6 module variant. The variants differing in the used
-	  i.MX6 CPU type and DRAM
+	  i.MX6 CPU type and DRAM configuration
+
+config TQMA6QDL
+	bool "unified config for all CPU variants"
+	select MX6QDL
+	select SPL
+	help
+	  select TQMA6QP / TQMa6Q / TQMa6D / TQMa6DL / TQMa6S in an image with SPL
 
 config TQMA6QP
 	bool "TQMaQP / TQMaDP"
-	select MX6QP
+	select MX6QDL
 	select MX6Q
 	help
 	  select TQMa6QP / TQMa6DP with i.MX6QP/DP and 1GiB DRAM
 
 config TQMA6Q
 	bool "TQMa6Q / TQMa6D"
+	select MX6QDL
 	select MX6Q
 	help
 	  select TQMa6Q / TQMa6D with i.MX6Q/D and 1GiB DRAM
 
 config TQMA6DL
 	bool "TQMa6DL"
+	select MX6QDL
 	select MX6DL
 	help
 	  select TQMa6DL with i.MX6DL and 1GiB DRAM
 
 config TQMA6S
 	bool "TQMa6S"
+	select MX6QDL
 	select MX6S
 	help
 	  select TQMa6S with i.MX6S and 512 MiB DRAM
@@ -82,7 +92,7 @@ config WRU4
 endchoice
 
 config IMX_CONFIG
-	default "board/tqc/tqma6/tqma6spl.cfg" if SPL
+	default "board/tqc/tqma6/tqma6spl.cfg" if TQMA6QDL
 	default "board/tqc/tqma6/tqma6qp.cfg" if TQMA6QP && !SPL
 	default "board/tqc/tqma6/tqma6q.cfg" if TQMA6Q && !SPL
 	default "board/tqc/tqma6/tqma6dl.cfg" if TQMA6DL && !SPL

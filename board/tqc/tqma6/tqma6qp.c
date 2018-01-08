@@ -10,7 +10,7 @@
 
 #if !defined(CONFIG_MX6Q)
 #undef CONFIG_MX6QDL
-#undef CONFIG_MX6QSOLO
+#undef CONFIG_MX6DL
 #undef CONFIG_MX6QS
 #define CONFIG_MX6Q
 #endif

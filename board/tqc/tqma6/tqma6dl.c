@@ -10,8 +10,9 @@
 
 #if !defined(CONFIG_MX6DL)
 #undef CONFIG_MX6QDL
-#define CONFIG_MX6Q
-#define CONFIG_MX6D
+#undef CONFIG_MX6Q
+#undef CONFIG_MX6D
+#define CONFIG_MX6DL
 #endif
 
 #include <asm/io.h>

@@ -7,29 +7,31 @@
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
+#include <common.h>
+#include <config.h>
 
+#include <asm/io.h>
 #include <asm/arch/clock.h>
-#include <asm/arch/mx6-pins.h>
 #include <asm/arch/imx-regs.h>
 #include <asm/arch/iomux.h>
+#include <asm/arch/mx6-pins.h>
 #include <asm/arch/sys_proto.h>
-#include <linux/errno.h>
 #include <asm/gpio.h>
-#include <asm/io.h>
+#include <asm/mach-imx/iomux-v3.h>
 #include <asm/mach-imx/mxc_i2c.h>
 #include <asm/mach-imx/spi.h>
-#include <common.h>
+#include <i2c.h>
 #include <fsl_esdhc.h>
 #include <libfdt.h>
-#include <i2c.h>
+#include <linux/errno.h>
 #include <mmc.h>
 #include <power/pfuze100_pmic.h>
 #include <power/pmic.h>
 #include <spi_flash.h>
 
 #if defined(CONFIG_SPL_BUILD)
-#include <spl.h>
 #include <fdt_support.h>
+#include <spl.h>
 #endif
 
 #include "../common/tqc_emmc.h"
@@ -85,19 +87,19 @@ int dram_init(void)
 static const uint16_t tqma6_emmc_dsr = 0x0100;
 
 /* eMMC on USDHCI3 always present */
-static iomux_v3_cfg_t const tqma6_usdhc3_pads[] = {
-	NEW_PAD_CTRL(MX6_PAD_SD3_CLK__SD3_CLK,		USDHC_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_SD3_CMD__SD3_CMD,		USDHC_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_SD3_DAT0__SD3_DATA0,	USDHC_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_SD3_DAT1__SD3_DATA1,	USDHC_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_SD3_DAT2__SD3_DATA2,	USDHC_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_SD3_DAT3__SD3_DATA3,	USDHC_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_SD3_DAT4__SD3_DATA4,	USDHC_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_SD3_DAT5__SD3_DATA5,	USDHC_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_SD3_DAT6__SD3_DATA6,	USDHC_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_SD3_DAT7__SD3_DATA7,	USDHC_PAD_CTRL),
+static iomux_v3_cfg_t tqma6_usdhc3_pads[] = {
+	IOMUX_PADS(PAD_SD3_CLK__SD3_CLK |	MUX_PAD_CTRL(USDHC_PAD_CTRL)),
+	IOMUX_PADS(PAD_SD3_CMD__SD3_CMD |	MUX_PAD_CTRL(USDHC_PAD_CTRL)),
+	IOMUX_PADS(PAD_SD3_DAT0__SD3_DATA0 |	MUX_PAD_CTRL(USDHC_PAD_CTRL)),
+	IOMUX_PADS(PAD_SD3_DAT1__SD3_DATA1 |	MUX_PAD_CTRL(USDHC_PAD_CTRL)),
+	IOMUX_PADS(PAD_SD3_DAT2__SD3_DATA2 |	MUX_PAD_CTRL(USDHC_PAD_CTRL)),
+	IOMUX_PADS(PAD_SD3_DAT3__SD3_DATA3 |	MUX_PAD_CTRL(USDHC_PAD_CTRL)),
+	IOMUX_PADS(PAD_SD3_DAT4__SD3_DATA4 |	MUX_PAD_CTRL(USDHC_PAD_CTRL)),
+	IOMUX_PADS(PAD_SD3_DAT5__SD3_DATA5 |	MUX_PAD_CTRL(USDHC_PAD_CTRL)),
+	IOMUX_PADS(PAD_SD3_DAT6__SD3_DATA6 |	MUX_PAD_CTRL(USDHC_PAD_CTRL)),
+	IOMUX_PADS(PAD_SD3_DAT7__SD3_DATA7 |	MUX_PAD_CTRL(USDHC_PAD_CTRL)),
 	/* eMMC reset */
-	NEW_PAD_CTRL(MX6_PAD_SD3_RST__SD3_RESET,	GPIO_OUT_PAD_CTRL),
+	IOMUX_PADS(PAD_SD3_RST__SD3_RESET |	MUX_PAD_CTRL(GPIO_OUT_PAD_CTRL)),
 };
 
 /*
@@ -141,8 +143,7 @@ int board_mmc_getwp(struct mmc *mmc)
 
 static int tqma6_emmc_init(bd_t *bis)
 {
-	imx_iomux_v3_setup_multiple_pads(tqma6_usdhc3_pads,
-					 ARRAY_SIZE(tqma6_usdhc3_pads));
+	SETUP_IOMUX_PADS(tqma6_usdhc3_pads);
 	tqma6_usdhc_cfg.sdhc_clk = mxc_get_clock(MXC_ESDHC3_CLK);
 	if (fsl_esdhc_initialize(bis, &tqma6_usdhc_cfg))
 		puts("Warning: failed to initialize eMMC dev\n");
@@ -178,13 +179,13 @@ void board_mmc_detect_card_type(struct mmc *mmc)
 		mmc_set_dsr(mmc, tqma6_emmc_dsr);
 }
 
-static iomux_v3_cfg_t const tqma6_ecspi1_pads[] = {
+static iomux_v3_cfg_t tqma6_ecspi1_pads[] = {
 	/* SS1 */
-	NEW_PAD_CTRL(MX6_PAD_EIM_D19__GPIO3_IO19, SPI_PAD_CTRL) |
-		MUX_MODE_SION,
-	NEW_PAD_CTRL(MX6_PAD_EIM_D16__ECSPI1_SCLK, SPI_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_EIM_D17__ECSPI1_MISO, SPI_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_EIM_D18__ECSPI1_MOSI, SPI_PAD_CTRL),
+	IOMUX_PADS(PAD_EIM_D19__GPIO3_IO19 | (MUX_PAD_CTRL(SPI_PAD_CTRL) |
+		   MUX_MODE_SION)),
+	IOMUX_PADS(PAD_EIM_D16__ECSPI1_SCLK | MUX_PAD_CTRL(SPI_PAD_CTRL)),
+	IOMUX_PADS(PAD_EIM_D17__ECSPI1_MISO | MUX_PAD_CTRL(SPI_PAD_CTRL)),
+	IOMUX_PADS(PAD_EIM_D18__ECSPI1_MOSI | MUX_PAD_CTRL(SPI_PAD_CTRL)),
 };
 
 #define TQMA6_SF_CS_GPIO IMX_GPIO_NR(3, 19)
@@ -205,8 +206,7 @@ __weak void tqma6_iomuxc_spi(void)
 #endif
 		gpio_direction_output(tqma6_ecspi1_cs[i], 1);
 	}
-	imx_iomux_v3_setup_multiple_pads(tqma6_ecspi1_pads,
-					 ARRAY_SIZE(tqma6_ecspi1_pads));
+	SETUP_IOMUX_PADS(tqma6_ecspi1_pads);
 }
 
 int board_spi_cs_gpio(unsigned bus, unsigned cs)
@@ -215,43 +215,79 @@ int board_spi_cs_gpio(unsigned bus, unsigned cs)
 		(cs == CONFIG_SF_DEFAULT_CS)) ? TQMA6_SF_CS_GPIO : -1;
 }
 
-static struct i2c_pads_info tqma6_i2c3_pads = {
+static struct i2c_pads_info tqma6dl_i2c3_pads = {
 	/* I2C3: on board LM75, M24C64,  */
 	.scl = {
-		.i2c_mode = NEW_PAD_CTRL(MX6_PAD_GPIO_5__I2C3_SCL,
+		.i2c_mode = NEW_PAD_CTRL(MX6DL_PAD_GPIO_5__I2C3_SCL,
 					 I2C_PAD_CTRL),
-		.gpio_mode = NEW_PAD_CTRL(MX6_PAD_GPIO_5__GPIO1_IO05,
+		.gpio_mode = NEW_PAD_CTRL(MX6DL_PAD_GPIO_5__GPIO1_IO05,
 					  I2C_PAD_CTRL),
 		.gp = IMX_GPIO_NR(1, 5)
 	},
 	.sda = {
-		.i2c_mode = NEW_PAD_CTRL(MX6_PAD_GPIO_6__I2C3_SDA,
+		.i2c_mode = NEW_PAD_CTRL(MX6DL_PAD_GPIO_6__I2C3_SDA,
 					 I2C_PAD_CTRL),
-		.gpio_mode = NEW_PAD_CTRL(MX6_PAD_GPIO_6__GPIO1_IO06,
+		.gpio_mode = NEW_PAD_CTRL(MX6DL_PAD_GPIO_6__GPIO1_IO06,
 					  I2C_PAD_CTRL),
 		.gp = IMX_GPIO_NR(1, 6)
 	}
 };
 
-static struct i2c_pads_info tqma6_i2c1_pads = {
+static struct i2c_pads_info tqma6q_i2c3_pads = {
+	/* I2C3: on board LM75, M24C64,  */
+	.scl = {
+		.i2c_mode = NEW_PAD_CTRL(MX6Q_PAD_GPIO_5__I2C3_SCL,
+					 I2C_PAD_CTRL),
+		.gpio_mode = NEW_PAD_CTRL(MX6Q_PAD_GPIO_5__GPIO1_IO05,
+					  I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(1, 5)
+	},
+	.sda = {
+		.i2c_mode = NEW_PAD_CTRL(MX6Q_PAD_GPIO_6__I2C3_SDA,
+					 I2C_PAD_CTRL),
+		.gpio_mode = NEW_PAD_CTRL(MX6Q_PAD_GPIO_6__GPIO1_IO06,
+					  I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(1, 6)
+	}
+};
+
+static struct i2c_pads_info tqma6dl_i2c1_pads = {
 /* I2C1: MBa6x */
 	.scl = {
-		.i2c_mode = NEW_PAD_CTRL(MX6_PAD_CSI0_DAT9__I2C1_SCL,
+		.i2c_mode = NEW_PAD_CTRL(MX6DL_PAD_CSI0_DAT9__I2C1_SCL,
 					 I2C_PAD_CTRL),
-		.gpio_mode = NEW_PAD_CTRL(MX6_PAD_CSI0_DAT9__GPIO5_IO27,
+		.gpio_mode = NEW_PAD_CTRL(MX6DL_PAD_CSI0_DAT9__GPIO5_IO27,
 					  I2C_PAD_CTRL),
 		.gp = IMX_GPIO_NR(5, 27)
 	},
 	.sda = {
-		.i2c_mode = NEW_PAD_CTRL(MX6_PAD_CSI0_DAT8__I2C1_SDA,
+		.i2c_mode = NEW_PAD_CTRL(MX6DL_PAD_CSI0_DAT8__I2C1_SDA,
 					 I2C_PAD_CTRL),
-		.gpio_mode = NEW_PAD_CTRL(MX6_PAD_CSI0_DAT8__GPIO5_IO26,
+		.gpio_mode = NEW_PAD_CTRL(MX6DL_PAD_CSI0_DAT8__GPIO5_IO26,
 					  I2C_PAD_CTRL),
 		.gp = IMX_GPIO_NR(5, 26)
 	}
 };
 
-static void tqma6_setup_i2c(void)
+static struct i2c_pads_info tqma6q_i2c1_pads = {
+/* I2C1: MBa6x */
+	.scl = {
+		.i2c_mode = NEW_PAD_CTRL(MX6Q_PAD_CSI0_DAT9__I2C1_SCL,
+					 I2C_PAD_CTRL),
+		.gpio_mode = NEW_PAD_CTRL(MX6Q_PAD_CSI0_DAT9__GPIO5_IO27,
+					  I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(5, 27)
+	},
+	.sda = {
+		.i2c_mode = NEW_PAD_CTRL(MX6Q_PAD_CSI0_DAT8__I2C1_SDA,
+					 I2C_PAD_CTRL),
+		.gpio_mode = NEW_PAD_CTRL(MX6Q_PAD_CSI0_DAT8__GPIO5_IO26,
+					  I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(5, 26)
+	}
+};
+
+void tqma6_setup_i2c(void)
 {
 	int ret;
 	/*
@@ -261,15 +297,23 @@ static void tqma6_setup_i2c(void)
 	switch (tqma6_has_enet_workaround) {
 	case 1:
 		tqma6_system_i2c_busnum = 0;
-		ret = setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f,
-				&tqma6_i2c1_pads);
+		if (is_mx6dqp() || is_mx6dq())
+			ret = setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f,
+					&tqma6q_i2c1_pads);
+		else
+			ret = setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f,
+					&tqma6dl_i2c1_pads);
 		if (ret)
 			printf("setup I2C1 failed: %d\n", ret);
 		break;
 	case 0:
 		tqma6_system_i2c_busnum = 2;
-		ret = setup_i2c(2, CONFIG_SYS_I2C_SPEED, 0x7f,
-				&tqma6_i2c3_pads);
+		if (is_mx6dqp() || is_mx6dq())
+			ret = setup_i2c(2, CONFIG_SYS_I2C_SPEED, 0x7f,
+					&tqma6q_i2c3_pads);
+		else
+			ret = setup_i2c(2, CONFIG_SYS_I2C_SPEED, 0x7f,
+					&tqma6dl_i2c3_pads);
 		if (ret)
 			printf("setup I2C3 failed: %d\n", ret);
 		break;
@@ -297,13 +341,12 @@ void spl_board_init(void)
 #else
 
 static iomux_v3_cfg_t const tqma6_revdet_pads[] = {
-	NEW_PAD_CTRL(MX6_PAD_GPIO_6__GPIO1_IO06, GPIO_REVDET_PAD_CTRL),
+	IOMUX_PADS(PAD_GPIO_6__GPIO1_IO06 | MUX_PAD_CTRL(GPIO_REVDET_PAD_CTRL)),
 };
 
 static void tqma6_detect_enet_workaround(void)
 {
-	imx_iomux_v3_setup_multiple_pads(tqma6_revdet_pads,
-					 ARRAY_SIZE(tqma6_revdet_pads));
+	SETUP_IOMUX_PADS(tqma6_revdet_pads);
 
 	gpio_request(TQMA6_REVDET_GPIO, "tqma6-revdet");
 	gpio_direction_input(TQMA6_REVDET_GPIO);
