@@ -31,7 +31,7 @@ static inline void init_write_reg(uint32_t address, uint32_t value)
 static void tqma6qp_init_ddr_controller(void)
 {
 	debug("spl: tqma6qp ddr iom ....\n");
-	/* TQMa6QP DDR config Rev. 0300C */
+	/* TQMa6QP DDR config Rev. 0300D */
 	/* IOMUX configuration */
 	init_write_reg(MX6_IOM_GRP_DDR_TYPE, 0x000C0000);
 	init_write_reg(MX6_IOM_GRP_DDRPKE, 0x00000000);

@@ -31,7 +31,7 @@ static inline void init_write_reg(uint32_t address, uint32_t value)
 static void tqma6q_init_ddr_controller(void)
 {
 	debug("spl: tqma6q ddr iom ....\n");
-	/* TQMa6Q/D DDR config Rev. 0100B */
+	/* TQMa6Q/D DDR config Rev. 0300D */
 	/* IOMUX configuration */
 	init_write_reg(MX6_IOM_GRP_DDR_TYPE, 0x000C0000);
 	init_write_reg(MX6_IOM_GRP_DDRPKE, 0x00000000);
@@ -40,7 +40,7 @@ static void tqma6q_init_ddr_controller(void)
 	init_write_reg(MX6_IOM_DRAM_CAS, 0x00008030);
 	init_write_reg(MX6_IOM_DRAM_RAS, 0x00008030);
 	init_write_reg(MX6_IOM_GRP_ADDDS, 0x00000030);
-	init_write_reg(MX6_IOM_DRAM_RESET, 0x000C3030);
+	init_write_reg(MX6_IOM_DRAM_RESET, 0x00000030);
 	init_write_reg(MX6_IOM_DRAM_SDCKE0, 0x00003000);
 	init_write_reg(MX6_IOM_DRAM_SDCKE1, 0x00000000);
 	init_write_reg(MX6_IOM_DRAM_SDBA2, 0x00000000);
@@ -67,7 +67,7 @@ static void tqma6q_init_ddr_controller(void)
 	init_write_reg(MX6_IOM_GRP_B5DS, 0x00000030);
 	init_write_reg(MX6_IOM_GRP_B6DS, 0x00000030);
 	init_write_reg(MX6_IOM_GRP_B7DS, 0x00000030);
-	
+
 	init_write_reg(MX6_IOM_DRAM_DQM0, 0x00000030);
 	init_write_reg(MX6_IOM_DRAM_DQM1, 0x00000030);
 	init_write_reg(MX6_IOM_DRAM_DQM2, 0x00000030);
@@ -81,21 +81,21 @@ static void tqma6q_init_ddr_controller(void)
 	/* memory interface calibration values */
 	init_write_reg(MX6_MMDC_P0_MPZQHWCTRL, 0xA1390003);
 	init_write_reg(MX6_MMDC_P1_MPZQHWCTRL, 0xA1390003);
-	
-	init_write_reg(MX6_MMDC_P0_MPWLDECTRL0, 0x001B0013);
-	init_write_reg(MX6_MMDC_P0_MPWLDECTRL1, 0x0018001B);
-	init_write_reg(MX6_MMDC_P1_MPWLDECTRL0, 0x001B0016);
-	init_write_reg(MX6_MMDC_P1_MPWLDECTRL1, 0x0012001c);
-	
-	init_write_reg(MX6_MMDC_P0_MPDGCTRL0, 0x43400350);
-	init_write_reg(MX6_MMDC_P0_MPDGCTRL1, 0x023E032C);
-	init_write_reg(MX6_MMDC_P1_MPDGCTRL0, 0x43400348);
-	init_write_reg(MX6_MMDC_P1_MPDGCTRL1, 0x03300304);
-	
-	init_write_reg(MX6_MMDC_P0_MPRDDLCTL, 0x3C323436);
-	init_write_reg(MX6_MMDC_P1_MPRDDLCTL, 0x38383242);
-	init_write_reg(MX6_MMDC_P0_MPWRDLCTL, 0x3E3C4440);
-	init_write_reg(MX6_MMDC_P1_MPWRDLCTL, 0x4236483E);
+
+	init_write_reg(MX6_MMDC_P0_MPWLDECTRL0, 0x00180016);
+	init_write_reg(MX6_MMDC_P0_MPWLDECTRL1, 0x001F0018);
+	init_write_reg(MX6_MMDC_P1_MPWLDECTRL0, 0x00130023);
+	init_write_reg(MX6_MMDC_P1_MPWLDECTRL1, 0x00040018);
+
+	init_write_reg(MX6_MMDC_P0_MPDGCTRL0, 0x43500364);
+	init_write_reg(MX6_MMDC_P0_MPDGCTRL1, 0x034C0344);
+	init_write_reg(MX6_MMDC_P1_MPDGCTRL0, 0x43580364);
+	init_write_reg(MX6_MMDC_P1_MPDGCTRL1, 0x033C031C);
+
+	init_write_reg(MX6_MMDC_P0_MPRDDLCTL, 0x3C323438);
+	init_write_reg(MX6_MMDC_P1_MPRDDLCTL, 0x383A3040);
+	init_write_reg(MX6_MMDC_P0_MPWRDLCTL, 0x3A3E4440);
+	init_write_reg(MX6_MMDC_P1_MPWRDLCTL, 0x4834483A);
 	init_write_reg(MX6_MMDC_P0_MPRDDQBY0DL, 0x33333333);
 	init_write_reg(MX6_MMDC_P0_MPRDDQBY1DL, 0x33333333);
 	init_write_reg(MX6_MMDC_P0_MPRDDQBY2DL, 0x33333333);
@@ -114,7 +114,7 @@ static void tqma6q_init_ddr_controller(void)
 	init_write_reg(MX6_MMDC_P0_MDCFG0, 0x545A79B4);
 	init_write_reg(MX6_MMDC_P0_MDCFG1, 0xDB538F64);
 	init_write_reg(MX6_MMDC_P0_MDCFG2, 0x01FF00DB);
-	init_write_reg(MX6_MMDC_P0_MDMISC, 0x00001740);
+	init_write_reg(MX6_MMDC_P0_MDMISC, 0x00011740);
 	init_write_reg(MX6_MMDC_P0_MDSCR, 0x00008000);
 
 	debug("spl: tqma6q MX6_MMDC_P0_MDSCR %x ....\n", __raw_readl(MX6_MMDC_P0_MDSCR));
@@ -122,17 +122,17 @@ static void tqma6q_init_ddr_controller(void)
 	init_write_reg(MX6_MMDC_P0_MDRWD, 0x000026D2);
 	init_write_reg(MX6_MMDC_P0_MDOR, 0x005A1023);
 	init_write_reg(MX6_MMDC_P0_MDASP, 0x00000027);
-	
+
 	debug("spl: tqma6q ddr mdctl - leave reset\n");
 	init_write_reg(MX6_MMDC_P0_MDCTL, 0x831A0000);
 	
 /* TODO: wait to CKE ???? */
-	init_write_reg(MX6_MMDC_P0_MDSCR, 0x00088032);
+	init_write_reg(MX6_MMDC_P0_MDSCR, 0x00488032);
 	init_write_reg(MX6_MMDC_P0_MDSCR, 0x00008033);
 	init_write_reg(MX6_MMDC_P0_MDSCR, 0x00048031);
-	init_write_reg(MX6_MMDC_P0_MDSCR, 0x09308030);
+	init_write_reg(MX6_MMDC_P0_MDSCR, 0x19308030);
 	init_write_reg(MX6_MMDC_P0_MDSCR, 0x04008040);
-	init_write_reg(MX6_MMDC_P0_MDREF, 0x00005800);
+	init_write_reg(MX6_MMDC_P0_MDREF, 0x00007800);
 	init_write_reg(MX6_MMDC_P0_MPODTCTRL, 0x00022222);
 	init_write_reg(MX6_MMDC_P1_MPODTCTRL, 0x00022222);
 	init_write_reg(MX6_MMDC_P0_MDPDC, 0x00025536);

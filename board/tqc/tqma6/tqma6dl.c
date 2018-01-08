@@ -30,7 +30,7 @@ static inline void init_write_reg(uint32_t address, uint32_t value)
 static void tqma6dl_init_ddr_controller(void)
 {
 	debug("spl: tqma6dl ddr iom ....\n");
-	/* TQMa6DL DDR config Rev. 0100E */
+	/* TQMa6DL DDR config Rev. 0300D */
 	/* IOMUX configuration */
 	init_write_reg(MX6_IOM_GRP_DDR_TYPE, 0x000C0000);
 	init_write_reg(MX6_IOM_GRP_DDRPKE, 0x00000000);
@@ -39,7 +39,7 @@ static void tqma6dl_init_ddr_controller(void)
 	init_write_reg(MX6_IOM_DRAM_CAS, 0x00008030);
 	init_write_reg(MX6_IOM_DRAM_RAS, 0x00008030);
 	init_write_reg(MX6_IOM_GRP_ADDDS, 0x00000030);
-	init_write_reg(MX6_IOM_DRAM_RESET, 0x000C3030);
+	init_write_reg(MX6_IOM_DRAM_RESET, 0x00000030);
 	init_write_reg(MX6_IOM_DRAM_SDCKE0, 0x00003000);
 	init_write_reg(MX6_IOM_DRAM_SDCKE1, 0x00000000);
 	init_write_reg(MX6_IOM_DRAM_SDBA2, 0x00000000);
@@ -112,7 +112,7 @@ static void tqma6dl_init_ddr_controller(void)
 	init_write_reg(MX6_MMDC_P0_MDCFG0, 0x3F435333);
 	init_write_reg(MX6_MMDC_P0_MDCFG1, 0xB68E8B63);
 	init_write_reg(MX6_MMDC_P0_MDCFG2, 0x01FF00DB);
-	init_write_reg(MX6_MMDC_P0_MDMISC, 0x00001740);
+	init_write_reg(MX6_MMDC_P0_MDMISC, 0x00011740);
 	init_write_reg(MX6_MMDC_P0_MDSCR, 0x00008000);
 
 	debug("spl: tqma6dl MX6_MMDC_P0_MDSCR %x ....\n", __raw_readl(MX6_MMDC_P0_MDSCR));
@@ -121,7 +121,7 @@ static void tqma6dl_init_ddr_controller(void)
 	init_write_reg(MX6_MMDC_P0_MDRWD, 0x000026D2);
 	init_write_reg(MX6_MMDC_P0_MDOR, 0x00431023);
 	init_write_reg(MX6_MMDC_P0_MDASP, 0x00000027);
-	
+
 	debug("spl: tqma6dl ddr mdctl - leave reset\n");
 	init_write_reg(MX6_MMDC_P0_MDCTL, 0x831A0000);
 	
@@ -129,7 +129,7 @@ static void tqma6dl_init_ddr_controller(void)
 	init_write_reg(MX6_MMDC_P0_MDSCR, 0x00408032);
 	init_write_reg(MX6_MMDC_P0_MDSCR, 0x00008033);
 	init_write_reg(MX6_MMDC_P0_MDSCR, 0x00048031);
-	init_write_reg(MX6_MMDC_P0_MDSCR, 0x05208030);
+	init_write_reg(MX6_MMDC_P0_MDSCR, 0x15208030);
 	init_write_reg(MX6_MMDC_P0_MDSCR, 0x04008040);
 	init_write_reg(MX6_MMDC_P0_MDREF, 0x00007800);
 	init_write_reg(MX6_MMDC_P0_MPODTCTRL, 0x00022222);
