@@ -39,13 +39,20 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-/* TODO: check drive strength and pin config  with hardware */
+/* TODO: check drive strength and pin config with hardware */
 
 #define USDHC_PAD_CTRL		(PAD_CTL_DSE_3P3V_32OHM | PAD_CTL_SRE_SLOW | \
 	PAD_CTL_HYS | PAD_CTL_PUE | PAD_CTL_PUS_PU47KOHM)
 
-#define USDHC_CLK_PAD_CTRL	(PAD_CTL_PUS_PU47KOHM | PAD_CTL_PUE | \
-	PAD_CTL_SRE_FAST | PAD_CTL_DSE_3P3V_32OHM)
+#define USDHC_CMD_PAD_CTRL	(PAD_CTL_DSE_3P3V_32OHM | PAD_CTL_SRE_SLOW | \
+	PAD_CTL_HYS | PAD_CTL_PUE | PAD_CTL_PUS_PU47KOHM)
+
+#define USDHC_CLK_PAD_CTRL	(PAD_CTL_DSE_3P3V_32OHM | PAD_CTL_SRE_FAST | \
+	PAD_CTL_PUE | PAD_CTL_PUS_PU47KOHM)
+
+/* HW Rev.0200, DDR50 */
+#define USDHC_CLK_PAD_CTRL_R0200	(PAD_CTL_DSE_3P3V_49OHM | \
+	PAD_CTL_SRE_SLOW | PAD_CTL_PUE | PAD_CTL_PUS_PU47KOHM)
 
 #define GPIO_IN_PAD_CTRL	(PAD_CTL_PUS_PU100KOHM | \
 	PAD_CTL_DSE_3P3V_196OHM | PAD_CTL_HYS | PAD_CTL_SRE_SLOW)
@@ -76,7 +83,7 @@ int dram_init(void)
 /* eMMC on USDHCI3 always present */
 static iomux_v3_cfg_t const tqma7_usdhc3_pads[] = {
 	NEW_PAD_CTRL(MX7D_PAD_SD3_CLK__SD3_CLK,		USDHC_CLK_PAD_CTRL),
-	NEW_PAD_CTRL(MX7D_PAD_SD3_CMD__SD3_CMD,		USDHC_PAD_CTRL),
+	NEW_PAD_CTRL(MX7D_PAD_SD3_CMD__SD3_CMD,		USDHC_CMD_PAD_CTRL),
 	NEW_PAD_CTRL(MX7D_PAD_SD3_DATA0__SD3_DATA0,	USDHC_PAD_CTRL),
 	NEW_PAD_CTRL(MX7D_PAD_SD3_DATA1__SD3_DATA1,	USDHC_PAD_CTRL),
 	NEW_PAD_CTRL(MX7D_PAD_SD3_DATA2__SD3_DATA2,	USDHC_PAD_CTRL),
@@ -90,6 +97,10 @@ static iomux_v3_cfg_t const tqma7_usdhc3_pads[] = {
 	/* eMMC reset */
 	/* TODO: should we mux it as GPIO ? */
 	NEW_PAD_CTRL(MX7D_PAD_SD3_RESET_B__SD3_RESET_B,	USDHC_PAD_CTRL),
+};
+
+static iomux_v3_cfg_t const tqma7_usdhc3_r0200_pads[] = {
+	NEW_PAD_CTRL(MX7D_PAD_SD3_CLK__SD3_CLK,		USDHC_CLK_PAD_CTRL_R0200),
 };
 
 /*
@@ -154,7 +165,9 @@ void board_mmc_detect_card_type(struct mmc *mmc)
 	if (tqc_emmc_need_dsr(mmc) > 0)
 		mmc_set_dsr(mmc, tqma7_emmc_dsr);
 	else
-		puts("e-MMC: no DSR, check pin config for serial termination\n");
+		imx_iomux_v3_setup_multiple_pads(tqma7_usdhc3_r0200_pads,
+						ARRAY_SIZE(tqma7_usdhc3_r0200_pads));
+
 }
 
 static struct i2c_pads_info tqma7_i2c1_pads = {
