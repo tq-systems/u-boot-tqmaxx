@@ -79,6 +79,8 @@
 #endif
 #define DDR_CS0_BNDS			0x008000bf
 #define DDR_CS0_CONFIG			0x80014302
+#define DDR_CS1_BNDS			0x00c000ff
+#define DDR_CS1_CONFIG			0x80014302
 #define DDR_TIMING_CFG_0		0x0066000c
 #define DDR_TIMING_CFG_1		0xbcb40c66
 #define DDR_TIMING_CFG_2		0x0040c120
@@ -132,7 +134,11 @@
 
 #define CONFIG_NR_DRAM_BANKS		1
 #define PHYS_SDRAM			0x80000000
-#define PHYS_SDRAM_SIZE			(1u * 1024 * 1024 * 1024)
+#ifdef CONFIG_SYS_1G_CS0
+  #define PHYS_SDRAM_SIZE		(1u * 1024 * 1024 * 1024)
+#elif CONFIG_SYS_2G_CS0CS1
+  #define PHYS_SDRAM_SIZE		(2u * 1024 * 1024 * 1024)
+#endif
 
 #define CONFIG_SYS_DDR_SDRAM_BASE      0x80000000UL
 #define CONFIG_SYS_SDRAM_BASE          CONFIG_SYS_DDR_SDRAM_BASE
@@ -183,8 +189,12 @@
 /* QSPI */
 #if defined(CONFIG_QSPI_BOOT)
 #if defined(CONFIG_RAMBOOT_PBL) || defined(CONFIG_RAMBOOT_PBL_BIN)
-#define CONFIG_SYS_FSL_PBL_PBI	board/tqc/tqmls102xa/ls102xa_pbi_qspi.cfg
-#define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_qspi.cfg
+  #define CONFIG_SYS_FSL_PBL_PBI	board/tqc/tqmls102xa/ls102xa_pbi_qspi.cfg
+  #if defined(CONFIG_SYS_CPU_1200)
+    #define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_qspi_1200.cfg
+  #else
+    #define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_qspi_1000.cfg
+  #endif
 #endif
 #elif defined(CONFIG_SD_BOOT)
 #define CONFIG_SYS_FSL_PBL_PBI	board/tqc/tqmls102xa/ls102xa_pbi_sd.cfg

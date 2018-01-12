@@ -25,6 +25,10 @@ void ddrmc_init(void)
 
 	out_be32(&ddr->cs0_bnds, DDR_CS0_BNDS);
 	out_be32(&ddr->cs0_config, DDR_CS0_CONFIG);
+#ifdef CONFIG_SYS_2G_CS0CS1
+	out_be32(&ddr->cs1_bnds, DDR_CS1_BNDS);
+	out_be32(&ddr->cs1_config, DDR_CS1_CONFIG);
+#endif
 
 	out_be32(&ddr->timing_cfg_0, DDR_TIMING_CFG_0);
 	out_be32(&ddr->timing_cfg_1, DDR_TIMING_CFG_1);

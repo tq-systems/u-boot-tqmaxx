@@ -13,6 +13,30 @@ config SYS_CONFIG_NAME
 	default "tqmls102xa"
 
 choice
+	prompt "Memory configuration"
+	default SYS_1G_CS0
+
+config SYS_1G_CS0
+	bool "1 GiB on CS0"
+
+config SYS_2G_CS0CS1
+	bool "2 GiB on CS0 and CS1"
+
+endchoice
+
+choice
+	prompt "CPU clock speed"
+	default SYS_CPU_1000
+
+config SYS_CPU_1000
+	bool "1000 MHz"
+
+config SYS_CPU_1200
+	bool "1200 MHz"
+
+endchoice
+
+choice
 	prompt "Base board variant"
 	optional
 	help
