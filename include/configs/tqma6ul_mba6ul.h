@@ -10,9 +10,9 @@
 #define __CONFIG_TQMA6UL_MBA6UL_H
 
 #if defined(CONFIG_TQMA6UL_VARIANT_STANDARD)
-#define CONFIG_DEFAULT_FDT_FILE		"imx6ul-mba6ul.dtb"
+#define CONFIG_DEFAULT_FDT_FILE		"imx6ul-mba6ulx.dtb"
 #elif defined(CONFIG_TQMA6UL_VARIANT_LGA)
-#define CONFIG_DEFAULT_FDT_FILE		"imx6ul-mba6ulxl.dtb"
+#define CONFIG_DEFAULT_FDT_FILE		"imx6ul-mba6ulx-lga.dtb"
 #else
 #error
 #endif
