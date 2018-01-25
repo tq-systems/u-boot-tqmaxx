@@ -1,12 +1,39 @@
-U-Boot for the TQ Systems TQMa6ULx[L] modules
+U-Boot for the TQ Systems TQMa6ULx and TQMa6ULxL modules
 
 This file contains information for the port of
-U-Boot to the TQ Systems TQMa6ULx[L] modules.
+U-Boot to the TQ Systems TQMa6ULx and TQMa6ULxL modules.
+
+Main difference is form factor power supply concept. The modules
+share the same hardware, use the same peripherals an can be used on the
+same starter kit.
+
+The following hardwarerevisions are supported:
+
+TQMa6ULx:	REV.030x
+TQMa6ULxL:	REV.020x
+MBa6ULx:	REV.020x
+
+Hardware on modules TQMa6ULx and TQMa6ULxL:
+
+- e-MMC
+- RTC
+- PMIC
+- QSPI-NOR (optional)
+- EEPROM
+- temperature sensor
+- 256 MiB RAM
+
+supported hardware on Starterkit MBa6ULx:
+
+- 2 Ethernet PHY connected to FEC0 / FEC1
+- SD-Card slot
+- UART
+- USB
 
 1. Boot source
 --------------
 
-The following boot source is supported:
+The following boot sources are supported:
 
 - SD/eMMC
 - QSPI NOR
@@ -19,21 +46,21 @@ To build U-Boot for the TQ Systems TQMa6 modules:
 	make <som>_<baseboard>_<boot>_defconfig
 	make
 
-som is a placeholder for the module
-tqma6ul		TQMa6UL
+som is a placeholder for the module:
+tqma6ulx	TQMa6ULx
 tqma6ulxl	TQMa6ULxL
 
-baseboard is a placeholder for the mainboard to compile for
-mba6ul
+baseboard is a placeholder for the mainboard to compile for:
+mba6ul		MBa6ULx
 
-boot is a placeholder for the boot device
+boot is a placeholder for the boot device:
 mmc - means eMMC
 qspi - mean QSPI NOR
 
 This gives the following configurations:
 
-tqma6ul_mba6ul_mmc_defconfig
-tqma6ul_mba6ul_qspi_defconfig
+tqma6ulx_mba6ul_mmc_defconfig
+tqma6ulx_mba6ul_qspi_defconfig
 tqma6ulxl_mba6ul_mmc_defconfig
 tqma6ulxl_mba6ul_qspi_defconfig
 
