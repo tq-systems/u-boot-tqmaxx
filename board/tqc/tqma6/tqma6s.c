@@ -30,7 +30,7 @@ static inline void init_write_reg(uint32_t address, uint32_t value)
 
 static void tqma6s_init_ddr_controller(void)
 {
-	debug("spl: tqma6s ddr iom ....\n");
+	debug("SPL: tqma6s ddr iom ....\n");
 	/* TQMa6S DDR config Rev. 0300D */
 	/* IOMUX configuration */
 	init_write_reg(MX6_IOM_GRP_DDR_TYPE, 0x000C0000);
@@ -77,7 +77,7 @@ static void tqma6s_init_ddr_controller(void)
 	init_write_reg(MX6_IOM_DRAM_DQM6, 0x00000000);
 	init_write_reg(MX6_IOM_DRAM_DQM7, 0x00000000);
 
-	debug("spl: tqma6s ddr calibration ....\n");
+	debug("SPL: tqma6s ddr calibration ....\n");
 	/* memory interface calibration values */
 	init_write_reg(MX6_MMDC_P0_MPZQHWCTRL, 0xA1390003);
 	init_write_reg(MX6_MMDC_P1_MPZQHWCTRL, 0xA1380000);
@@ -104,7 +104,7 @@ static void tqma6s_init_ddr_controller(void)
 	init_write_reg(MX6_MMDC_P0_MPMUR0, 0x00000800);
 	init_write_reg(MX6_MMDC_P1_MPMUR0, 0x00000000);
 
-	debug("spl: tqma6s ddr config ....\n");
+	debug("SPL: tqma6s ddr config ....\n");
 	/* configure memory interface */
 	init_write_reg(MX6_MMDC_P0_MDPDC, 0x0002002D);
 	init_write_reg(MX6_MMDC_P0_MDOTC, 0x00333030);
@@ -114,14 +114,14 @@ static void tqma6s_init_ddr_controller(void)
 	init_write_reg(MX6_MMDC_P0_MDMISC, 0x00011740);
 	init_write_reg(MX6_MMDC_P0_MDSCR, 0x00008000);
 
-	debug("spl: tqma6s MX6_MMDC_P0_MDSCR %x ....\n", __raw_readl(MX6_MMDC_P0_MDSCR));
+	debug("SPL: tqma6s MX6_MMDC_P0_MDSCR %x ....\n", __raw_readl(MX6_MMDC_P0_MDSCR));
 
 /* TODO: leave it in Power Up Default */
 	init_write_reg(MX6_MMDC_P0_MDRWD, 0x000026D2);
 	init_write_reg(MX6_MMDC_P0_MDOR, 0x00431023);
 	init_write_reg(MX6_MMDC_P0_MDASP, 0x00000017);
 
-	debug("spl: tqma6s ddr mdctl - leave reset\n");
+	debug("SPL: tqma6s ddr mdctl - leave reset\n");
 	init_write_reg(MX6_MMDC_P0_MDCTL, 0x83190000);
 	
 /* TODO: wait to CKE ???? */
@@ -139,7 +139,7 @@ static void tqma6s_init_ddr_controller(void)
 
 	/* wait for auto-ZQ calibration to complete */
 	mdelay(1);
-	debug("spl: tqma6s ddr init done ...\n");
+	debug("SPL: tqma6s ddr init done ...\n");
 }
 
 void tqma6s_init(void)

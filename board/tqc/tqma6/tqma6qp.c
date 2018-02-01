@@ -30,7 +30,7 @@ static inline void init_write_reg(uint32_t address, uint32_t value)
 
 static void tqma6qp_init_ddr_controller(void)
 {
-	debug("spl: tqma6qp ddr iom ....\n");
+	debug("SPL: tqma6qp ddr iom ....\n");
 	/* TQMa6QP DDR config Rev. 0300D */
 	/* IOMUX configuration */
 	init_write_reg(MX6_IOM_GRP_DDR_TYPE, 0x000C0000);
@@ -77,7 +77,7 @@ static void tqma6qp_init_ddr_controller(void)
 	init_write_reg(MX6_IOM_DRAM_DQM6, 0x00008030);
 	init_write_reg(MX6_IOM_DRAM_DQM7, 0x00008030);
 
-	debug("spl: tqma6qp ddr calibration ....\n");
+	debug("SPL: tqma6qp ddr calibration ....\n");
 	/* memory interface calibration values */
 	init_write_reg(MX6_MMDC_P0_MPZQHWCTRL, 0xA1390003);
 	init_write_reg(MX6_MMDC_P1_MPZQHWCTRL, 0xA1390003);
@@ -104,7 +104,7 @@ static void tqma6qp_init_ddr_controller(void)
 	init_write_reg(MX6_MMDC_P0_MPMUR0, 0x00000800);
 	init_write_reg(MX6_MMDC_P1_MPMUR0, 0x00000800);
 
-	debug("spl: tqma6qp ddr config ....\n");
+	debug("SPL: tqma6qp ddr config ....\n");
 	/* configure memory interface */
 	init_write_reg(MX6_MMDC_P0_MDPDC, 0x00020036);
 	init_write_reg(MX6_MMDC_P0_MDOTC, 0x09444040);
@@ -114,14 +114,14 @@ static void tqma6qp_init_ddr_controller(void)
 	init_write_reg(MX6_MMDC_P0_MDMISC, 0x00011740);
 	init_write_reg(MX6_MMDC_P0_MDSCR, 0x00008000);
 
-	debug("spl: tqma6qp MX6_MMDC_P0_MDSCR %x ....\n", __raw_readl(MX6_MMDC_P0_MDSCR));
+	debug("SPL: tqma6qp MX6_MMDC_P0_MDSCR %x ....\n", __raw_readl(MX6_MMDC_P0_MDSCR));
 /* TODO: leave it in Power Up Default */
 	init_write_reg(MX6_MMDC_P0_MDRWD, 0x000026D2);
 	init_write_reg(MX6_MMDC_P0_MDOR, 0x005A1023);
 	init_write_reg(MX6_MMDC_P0_MDASP, 0x00000027);
 	init_write_reg(MX6_MMDC_P0_MAARCR, 0x14420000);
 
-	debug("spl: tqma6qp ddr mdctl - leave reset\n");
+	debug("SPL: tqma6qp ddr mdctl - leave reset\n");
 	init_write_reg(MX6_MMDC_P0_MDCTL, 0x831A0000);
 	init_write_reg(MX6_MMDC_P1S_A_0_DDRCONF, 0x00000000);
 	init_write_reg(MX6_MMDC_P1S_A_0_DDRTIMING, 0x2871C39B);
@@ -145,7 +145,7 @@ static void tqma6qp_init_ddr_controller(void)
 	
 	/* wait for auto-ZQ calibration to complete */
 	mdelay(1);
-	debug("spl: tqma6qp ddr init done ...\n");
+	debug("SPL: tqma6qp ddr init done ...\n");
 }
 
 void tqma6qp_init(void)
