@@ -416,10 +416,12 @@ int ft_board_setup(void *blob, bd_t *bd)
 			u32 *reg = (u32 *)fdt_getprop(blob, off, "reg", 0);
 			if (*reg > 0) {
 				fdt_del_node(blob, off);
+#if 0
 			} else {
 				fdt_setprop_u32(blob, off, "clock-frequency",
 						792000000);
 				fdt_delprop(blob, off, "operating-points");
+#endif
 			}
 			off = fdt_node_offset_by_prop_value(blob, off,
 							    "device_type",
@@ -438,6 +440,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 						    0x33800000);
 		fdt_set_node_status(blob, off, FDT_STATUS_DISABLED, 0);
 	} else if (is_cpu_type(MXC_CPU_MX7D)) {
+#if 0
 		off = fdt_node_offset_by_prop_value(blob, -1,
 						    "device_type",
 						    "cpu", 4);
@@ -448,6 +451,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 							    "device_type",
 							    "cpu", 4);
 		}
+#endif
 	}
 
 	/* bring in eMMC dsr settings if needed */
