@@ -318,6 +318,12 @@ int ehci_hcd_init(int index, enum usb_init_type init,
 	struct usb_ehci *ehci = (struct usb_ehci *)(USB_BASE_ADDR +
 		(controller_spacing * index));
 
+	if (is_cpu_type(MXC_CPU_MX7S)) {
+		/* no USB2 (OTG2) port on i.MX7S */
+		if (index == 1)
+			return -ENODEV;
+	}
+
 	if (index > 3)
 		return -EINVAL;
 
