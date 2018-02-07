@@ -368,25 +368,6 @@ int board_usb_phy_mode(int port)
 	return USB_INIT_HOST;
 }
 
-int board_ehci_hcd_init(int port)
-{
-	switch (port) {
-	case 0:
-		break;
-	case 1:
-		if (is_cpu_type(MXC_CPU_MX7S))
-			return -ENODEV;
-		break;
-	case 2:
-		printf("MXC USB port %d not yet supported\n", port);
-		return -ENODEV;
-		break;
-	default:
-		return -ENODEV;
-	}
-	return 0;
-}
-
 int board_ehci_power(int port, int on)
 {
 	switch (port) {
