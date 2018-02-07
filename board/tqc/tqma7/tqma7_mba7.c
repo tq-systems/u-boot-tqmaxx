@@ -380,8 +380,6 @@ int board_ehci_power(int port, int on)
 		gpio_set_value(MBA7_OTG2_PWR_GPIO, on);
 		break;
 	case 2:
-		printf("MXC USB port %d not yet supported\n", port);
-		return -ENODEV;
 		break;
 	default:
 		return -ENODEV;
