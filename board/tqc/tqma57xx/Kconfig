@@ -1,0 +1,55 @@
+if TARGET_TQMA57XX
+
+config SYS_BOARD
+	default "tqma57xx"
+
+config SYS_VENDOR
+        default "tqc"
+
+config SYS_CONFIG_NAME
+        default "tqma57xx"
+
+choice
+	prompt "TQMa57xx SoC variant"
+	default TQMA572X
+	help
+		Select the TQMa57xx module variant. The variants differing in
+		the used CPU type and DRAM.
+
+config TQMA572X
+	bool "TQMa572x"
+	help
+		Select TQMa572x with AM572x and 2GiB DRAM
+
+config TQMA571X
+	bool "TQMa571x"
+	help
+		Select TQMa571x with AM571x and 1GiB DRAM
+
+endchoice
+
+choice
+	prompt "TQMa57xx base board variant"
+	default MBA57XX
+	help
+		Select base board for TQMa57xx
+
+config MBA57XX
+	bool "TQMa57xx on MBa57xx Starterkit"
+	help
+		Select the MBa57xx starterkit. This features GigE Phy, USB,
+		SD-Card	etc.
+
+endchoice
+
+config CONS_INDEX
+        int "UART used for console"
+        range 1 6
+        default 3
+        help
+                The AM57x (and DRA7xx) SoC has a total of 6 UARTs available to
+		it. Depending on your specific board you may want something
+		other than UART3 here.
+
+endif
+

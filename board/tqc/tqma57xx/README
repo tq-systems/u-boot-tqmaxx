@@ -1,0 +1,23 @@
+U-Boot to the TQ Systems TQMa57xx modules
+
+This file contains information for the port of
+U-Boot to the TQ Systems TQMa57xx modules.
+
+xx is a placeholder for the CPU variant
+
+As of now, all CPU variants share the same bootloader.
+
+Building
+--------
+
+To build U-Boot for the TQ Systems TQMa57xx modules:
+
+	make tqma57xx_<baseboard>_config
+	make
+
+Currently implemented baseboards:
+- mba57xx
+
+This gives the following configurations:
+
+tqma57xx_mba57xx_config

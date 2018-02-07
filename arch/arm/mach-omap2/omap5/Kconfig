@@ -44,6 +44,12 @@ config TARGET_AM57XX_EVM
 	imply DM_THERMAL
 	imply TI_DRA7_THERMAL
 
+config TARGET_TQMA57XX
+	bool "TQMA57XX"
+	select BOARD_LATE_INIT
+	select DRA7XX
+	imply SCSI
+
 endchoice
 
 config SYS_SOC
@@ -164,5 +170,6 @@ source "board/compulab/cm_t54/Kconfig"
 source "board/ti/omap5_uevm/Kconfig"
 source "board/ti/dra7xx/Kconfig"
 source "board/ti/am57xx/Kconfig"
+source "board/tqc/tqma57xx/Kconfig"
 
 endif
