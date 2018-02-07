@@ -318,6 +318,82 @@ int board_phy_config(struct phy_device *phydev)
 	return 0;
 }
 
+/*!
+ * @brief HW_PMU_REG_HSIC_1P2 - Anadig 1.2V HSIC Regulator Control Register (RW)
+ *
+ * Reset value: 0x00001878U
+ *
+ * This register defines the control and status bits for the 1.1V regulator.
+ * This regulator is designed to power the digital portions of the analog cells.
+ */
+static void inline hsic_1p2_regulator_out(void)
+{
+	struct mxc_ccm_anatop_reg *ccm_anatop = (struct mxc_ccm_anatop_reg *)
+					 ANATOP_BASE_ADDR;
+	/*
+	 * allow the GPC to override register settings.
+	 * use ANATOP_BASE_ADDR which is 0x30360000 instead of PMU_BASE (0x30360200)
+	 */
+	writel(PMU_REG_HSIC_1P2_SET_OVERRIDE_MASK, &ccm_anatop->reg_hsic_1p2_set);
+}
+
+#define GPC_PGC_HSIC				0xd00
+#define GPC_PGC_CPU_MAPPING			0xec
+#define GPC_PU_PGC_SW_PUP_REQ			0xf8
+#define BM_CPU_PGC_SW_PDN_PUP_REQ_USB_HSIC_PHY	0x10
+#define USB_HSIC_PHY_A7_DOMAIN			0x40
+
+static int imx_set_usb_hsic_power(void)
+{
+	u32 reg;
+	u32 val;
+
+	writel(1, GPC_IPS_BASE_ADDR + GPC_PGC_HSIC);
+
+	reg = GPC_IPS_BASE_ADDR + GPC_PGC_CPU_MAPPING;
+	val = readl(reg);
+	val |= USB_HSIC_PHY_A7_DOMAIN;
+	writel(val, reg);
+
+	hsic_1p2_regulator_out();
+
+	reg = GPC_IPS_BASE_ADDR + GPC_PU_PGC_SW_PUP_REQ;
+	val = readl(reg);
+	val |= BM_CPU_PGC_SW_PDN_PUP_REQ_USB_HSIC_PHY;
+	writel(val, reg);
+
+	while ((readl(reg) &
+		BM_CPU_PGC_SW_PDN_PUP_REQ_USB_HSIC_PHY) != 0);
+
+	writel(0, GPC_IPS_BASE_ADDR + GPC_PGC_HSIC);
+
+	return 0;
+}
+
+#define CONFIG_KEX_USBHUB_I2C_ADDR 0x2d
+
+static int attach_usb_hub(void)
+{
+	uint8_t usbattach_cmd[] = {0xaa, 0x55, 0x00};
+#if 0
+	/* reset USBHUB */
+	gpio_direction_output(IMX_GPIO_NR(1, 0), 0);
+	udelay(1000);
+	/* remove USBHUB reset */
+	gpio_direction_output(IMX_GPIO_NR(1, 0), 1);
+	udelay(250000);
+
+	i2c_set_bus_num(1);
+	if (i2c_probe(CONFIG_KEX_USBHUB_I2C_ADDR)) {
+		printf("USBHUB not found\n");
+		return 0;
+	}
+	i2c_write(CONFIG_KEX_USBHUB_I2C_ADDR, 0, 0, usbattach_cmd, 3);
+#endif
+
+	return 0;
+}
+
 iomux_v3_cfg_t const mba7_usb_otg1_pads[] = {
 	MX7D_PAD_GPIO1_IO04__USB_OTG1_OC |
 		MUX_PAD_CTRL(USB_OC_PAD_CTRL),
@@ -348,6 +424,8 @@ static void mba7_setup_iomux_usb(void)
 	ret = gpio_request(MBA7_OTG1_PWR_GPIO, "usb-otg1-pwr");
 	if (!ret)
 		gpio_direction_output(MBA7_OTG1_PWR_GPIO, 0);
+
+	imx_set_usb_hsic_power();
 
 	if (is_cpu_type(MXC_CPU_MX7S))
 		return;
