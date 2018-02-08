@@ -661,6 +661,22 @@ int tqc_bb_board_late_init(void)
 		setenv("mmcdev", "");
 	}
 
+	/* provide default setting for fdt_file if nothing in env is set */
+	if (NULL == getenv("fdt_file")) {
+		u32 cpurev = get_cpu_rev();
+
+		switch ((cpurev & 0xFF000) >> 12) {
+		case MXC_CPU_MX7S:
+			setenv("fdt_file", "imx7s-mba7.dtb");
+			break;
+		case MXC_CPU_MX7D:
+			setenv("fdt_file", "imx7d-mba7.dtb");
+			break;
+		default:
+			debug("unknown CPU");
+		}
+	}
+
 	imx_iomux_v3_setup_multiple_pads(mba7_wdog_pads,
 					 ARRAY_SIZE(mba7_wdog_pads));
 	set_wdog_reset((struct wdog_regs *)WDOG1_BASE_ADDR);
