@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 TQ Systems
+ * Copyright (C) 2016-2017 TQ Systems
  * Author: Markus Niebel <markus.niebel@tq-group.com>
  *
  * SPDX-License-Identifier:	GPL-2.0+
@@ -287,18 +287,6 @@ int board_phy_config(struct phy_device *phydev)
 			      0x0171, 0x8888);
 	phydev->drv->writeext(phydev, phydev->addr, DP83867_DEVADDR,
 			      0x0172, 0x8888);
-
-#if defined(CONFIG_MBA7_REV0100)
-	val = phydev->drv->readext(phydev, phydev->addr, DP83867_DEVADDR,
-				   0x0031);
-	val |= 1;
-	phydev->drv->writeext(phydev, phydev->addr, DP83867_DEVADDR,
-			      0x0031, val);
-
-	val = phy_read(phydev, MDIO_DEVAD_NONE, 0x10);
-	val |= 0x2;
-	phy_write(phydev, MDIO_DEVAD_NONE, 0x10, val);
-#endif
 
 	val = phydev->drv->readext(phydev, phydev->addr, DP83867_DEVADDR,
 				   DP83867_RGMIICTL);
@@ -593,31 +581,9 @@ static iomux_v3_cfg_t const mba7_wdog_pads[] = {
 	NEW_PAD_CTRL(MX7D_PAD_GPIO1_IO00__WDOG1_WDOG_B, WDOG_PAD_CTRL),
 };
 
-#if defined(CONFIG_MBA7_REV0100)
-#define MBA7_PCF8574_I2C_BUS	1
-#define MBA7_PCF8574_DEV0_ADDR	0x3c
-#define MBA7_PCF8574_DEV0_VAL	0x1f /* 0 - output, 1 - input */
-#define MBA7_PCF8574_DEV1_ADDR	0x39
-#define MBA7_PCF8574_DEV1_VAL	0xe0 /* 0 - output, 1 - input */
-
-static const uint8_t io_exp[] = {
-	MBA7_PCF8574_DEV0_ADDR,
-	MBA7_PCF8574_DEV1_ADDR
-};
-
-static uint8_t io_dat[] = {
-	MBA7_PCF8574_DEV0_VAL,
-	MBA7_PCF8574_DEV1_VAL
-};
-#endif
-
 int tqc_bb_board_late_init(void)
 {
-#if defined(CONFIG_MBA7_REV0100)
-	int i;
-#else
 	int old_bus;
-#endif
 	enum boot_device bd;
 	/*
 	* try to get sd card slots in order:
@@ -681,30 +647,11 @@ int tqc_bb_board_late_init(void)
 					 ARRAY_SIZE(mba7_wdog_pads));
 	set_wdog_reset((struct wdog_regs *)WDOG1_BASE_ADDR);
 
-#if defined(CONFIG_MBA7_REV0100)
-	/* There is a HW-BUG on HW.REV.0100
-	 * set port-expander default values to avoid unexpected behaviours */
-	i2c_set_bus_num(MBA7_PCF8574_I2C_BUS);
-	for (i = 0; i < ARRAY_SIZE(io_exp); ++i) {
-		if (!i2c_probe(io_exp[i])) {
-			/* this device has no addr hence addr length is 0 */
-			if (i2c_write(io_exp[i], 0, 0, &io_dat[i], 1))
-				printf("PCF8574 write failed\n");
-		} else {
-			printf("PCF8574 Not found\n");
-		}
-	}
-#else
-#if defined(CONFIG_SYS_I2C)
-#
-#else
-# error
-#endif
 	/*
 	 * init GPIO expander here to enable PCIe voltage rails. Since the GPIO
 	 * are on an expander they will be later than the PCIe controller in the
 	 * kernel. So a regulator device cannot be used because the PCIe driver
-	 * does not support probe deferral
+	 * does not support probe deferral at the moment
 	 */
 	old_bus = i2c_get_bus_num();
 	i2c_set_bus_num(1);
@@ -716,7 +663,6 @@ int tqc_bb_board_late_init(void)
 	pca953x_set_dir(CONFIG_SYS_I2C_PCA953X_ADDR, 0xffff, 0xe000);
 
 	i2c_set_bus_num(old_bus);
-#endif
 
 	return 0;
 }

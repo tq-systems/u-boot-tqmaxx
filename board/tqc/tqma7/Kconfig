@@ -72,11 +72,6 @@ config MBA7
 
 endchoice
 
-config MBA7_REV0100
-	bool "support for MBA7 REV0100"
-	depends on MBA7
-	default n
-
 config IMX_CONFIG
 	default "board/tqc/tqma7/tqma7d.cfg"
 
