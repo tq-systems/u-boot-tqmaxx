@@ -9,8 +9,6 @@
 #ifndef __CONFIG_TQMA7_MBA7_H
 #define __CONFIG_TQMA7_MBA7_H
 
-#define CONFIG_DEFAULT_FDT_FILE		"imx7d-mba7.dtb"
-
 #define CONFIG_DTT_SENSORS		{ 0, 1 }
 
 #define CONFIG_SYS_I2C_MXC_I2C2		/* enable I2C bus 2 */
