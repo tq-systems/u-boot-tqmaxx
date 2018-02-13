@@ -14,28 +14,28 @@
  */
 
 static const struct emif_regs tqma572x_emif1_ddr3_532mhz_emif_regs = {
-	.sdram_config_init              = 0x61851b32,
-	.sdram_config                   = 0x61851b32,
-	.sdram_config2                  = 0x08000000,
-	.ref_ctrl                       = 0x000040F1,
-	.ref_ctrl_final                 = 0x00001035,
-	.sdram_tim1                     = 0xcccf36ab,
-	.sdram_tim2                     = 0x308f7fda,
-	.sdram_tim3                     = 0x409f88a8,
-	.read_idle_ctrl                 = 0x00050000,
-	.zq_config                      = 0x5007190b,
-	.temp_alert_config              = 0x00000000,
-	.emif_ddr_phy_ctlr_1_init       = 0x0024400b,
-	.emif_ddr_phy_ctlr_1            = 0x0e24400b,
-	.emif_ddr_ext_phy_ctrl_1        = 0x10040100,
-	.emif_ddr_ext_phy_ctrl_2        = 0x00910091,
-	.emif_ddr_ext_phy_ctrl_3        = 0x00950095,
-	.emif_ddr_ext_phy_ctrl_4        = 0x009b009b,
-	.emif_ddr_ext_phy_ctrl_5        = 0x009e009e,
-	.emif_rd_wr_lvl_rmp_win         = 0x00000000,
-	.emif_rd_wr_lvl_rmp_ctl         = 0x80000000,
-	.emif_rd_wr_lvl_ctl             = 0x00000000,
-	.emif_rd_wr_exec_thresh         = 0x00000305
+	.sdram_config_init = 0x61851B32,
+	.sdram_config = 0x61851B32,
+	.sdram_config2 = 0x00000000,
+	.ref_ctrl = 0x100040F1,
+	.ref_ctrl_final = 0x1000081A,
+	.sdram_tim1 = 0xCEEF2663,
+	.sdram_tim2 = 0x308F7FDA,
+	.sdram_tim3 = 0x407F88A8,
+	.read_idle_ctrl = 0x00050000,
+	.zq_config = 0x5007190B,
+	.temp_alert_config = 0x00000000,
+	.emif_rd_wr_lvl_rmp_ctl = 0x80000000,
+	.emif_rd_wr_lvl_ctl = 0x00000000,
+	.emif_ddr_phy_ctlr_1_init = 0x0024400B,
+	.emif_ddr_phy_ctlr_1 = 0x0E24400B,
+	.emif_rd_wr_exec_thresh = 0x00000305,
+
+	.emif_ddr_ext_phy_ctrl_1 = 0x04040100,
+	.emif_ddr_ext_phy_ctrl_2 = 0x006B00A2,
+	.emif_ddr_ext_phy_ctrl_3 = 0x006B00A2,
+	.emif_ddr_ext_phy_ctrl_4 = 0x006B00A6,
+	.emif_ddr_ext_phy_ctrl_5 = 0x006B00A6
 };
 
 static const u32 tqma572x_emif1_ddr3_ext_phy_ctrl_const_regs[] = {
@@ -78,28 +78,28 @@ static const u32 tqma572x_emif1_ddr3_ext_phy_ctrl_const_regs[] = {
 };
 
 static const struct emif_regs tqma572x_emif2_ddr3_532mhz_emif_regs = {
-	.sdram_config_init              = 0x61851b32,
-	.sdram_config                   = 0x61851b32,
-	.sdram_config2                  = 0x08000000,
-	.ref_ctrl                       = 0x000040F1,
-	.ref_ctrl_final                 = 0x00001035,
-	.sdram_tim1                     = 0xcccf36b3,
-	.sdram_tim2                     = 0x308f7fda,
-	.sdram_tim3                     = 0x407f88a8,
-	.read_idle_ctrl                 = 0x00050000,
-	.zq_config                      = 0x5007190b,
-	.temp_alert_config              = 0x00000000,
-	.emif_ddr_phy_ctlr_1_init       = 0x0024400b,
-	.emif_ddr_phy_ctlr_1            = 0x0e24400b,
-	.emif_ddr_ext_phy_ctrl_1        = 0x10040100,
-	.emif_ddr_ext_phy_ctrl_2        = 0x00910091,
-	.emif_ddr_ext_phy_ctrl_3        = 0x00950095,
-	.emif_ddr_ext_phy_ctrl_4        = 0x009b009b,
-	.emif_ddr_ext_phy_ctrl_5        = 0x009e009e,
-	.emif_rd_wr_lvl_rmp_win         = 0x00000000,
-	.emif_rd_wr_lvl_rmp_ctl         = 0x80000000,
-	.emif_rd_wr_lvl_ctl             = 0x00000000,
-	.emif_rd_wr_exec_thresh         = 0x00000305
+	.sdram_config_init = 0x61851B32,
+	.sdram_config = 0x61851B32,
+	.sdram_config2 = 0x00000000,
+	.ref_ctrl = 0x100040F1,
+	.ref_ctrl_final = 0x1000081A,
+	.sdram_tim1 = 0xCEEF2663,
+	.sdram_tim2 = 0x308F7FDA,
+	.sdram_tim3 = 0x407F88A8,
+	.read_idle_ctrl = 0x00050000,
+	.zq_config = 0x5007190B,
+	.temp_alert_config = 0x00000000,
+	.emif_rd_wr_lvl_rmp_ctl = 0x80000000,
+	.emif_rd_wr_lvl_ctl = 0x00000000,
+	.emif_ddr_phy_ctlr_1_init = 0x0024400B,
+	.emif_ddr_phy_ctlr_1 = 0x0E24400B,
+	.emif_rd_wr_exec_thresh = 0x00000305,
+
+	.emif_ddr_ext_phy_ctrl_1 = 0x04040100,
+	.emif_ddr_ext_phy_ctrl_2 = 0x006B009B,
+	.emif_ddr_ext_phy_ctrl_3 = 0x006B009A,
+	.emif_ddr_ext_phy_ctrl_4 = 0x006B0091,
+	.emif_ddr_ext_phy_ctrl_5 = 0x006B0090
 };
 
 static const u32 tqma572x_emif2_ddr3_ext_phy_ctrl_const_regs[] = {
