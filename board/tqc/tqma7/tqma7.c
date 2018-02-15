@@ -114,6 +114,26 @@ struct fsl_esdhc_cfg tqma7_usdhc_cfg = {
 	.max_bus_width = 8,
 };
 
+bool tqma7_emmc_needs_dsr(struct mmc *mmc)
+{
+	struct mmc *emmc = find_mmc_device(0);
+
+	if (!emmc) {
+		puts("e-MMC: not present?\n");
+		return false;
+	}
+
+	if (mmc && (emmc != mmc))
+		return false;
+
+	if ((!mmc) && (mmc_init(emmc))) {
+		puts("e-MMC: not present?\n");
+		return false;
+	}
+
+	return (tqc_emmc_need_dsr(emmc) > 0) ? true : false;
+}
+
 int board_mmc_getcd(struct mmc *mmc)
 {
 	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
@@ -158,11 +178,7 @@ int board_mmc_init(bd_t *bis)
 /* board-specific MMC card detection / modification */
 void board_mmc_detect_card_type(struct mmc *mmc)
 {
-	struct mmc *emmc = find_mmc_device(0);
-	if (emmc != mmc)
-		return;
-
-	if (tqc_emmc_need_dsr(mmc) > 0)
+	if (tqma7_emmc_needs_dsr(mmc) > 0)
 		mmc_set_dsr(mmc, tqma7_emmc_dsr);
 	else
 		imx_iomux_v3_setup_multiple_pads(tqma7_usdhc3_r0200_pads,
@@ -400,8 +416,6 @@ static void tqma7_ft_qspi_setup(void *blob, bd_t *bd)
 #define MODELSTRLEN 32u
 int ft_board_setup(void *blob, bd_t *bd)
 {
-	struct mmc *mmc = find_mmc_device(0);
-	int off;
 	char modelstr[MODELSTRLEN];
 
 	snprintf(modelstr, MODELSTRLEN, "TQ %s on %s", tqma7_get_boardname(),
@@ -410,14 +424,10 @@ int ft_board_setup(void *blob, bd_t *bd)
 	fdt_fixup_memory(blob, (u64)PHYS_SDRAM, (u64)gd->ram_size);
 
 	/* bring in eMMC dsr settings if needed */
-	if (mmc && (!mmc_init(mmc))) {
-		if (tqc_emmc_need_dsr(mmc) > 0) {
-			tqc_ft_fixup_emmc_dsr(blob,
-					      "/soc/aips-bus@30800000/usdhc@30b60000",
-					      tqma7_emmc_dsr);
-		}
-	} else {
-		puts("e-MMC: not present?\n");
+	if (tqma7_emmc_needs_dsr(0) > 0) {
+		tqc_ft_fixup_emmc_dsr(blob,
+				      "/soc/aips-bus@30800000/usdhc@30b60000",
+				      tqma7_emmc_dsr);
 	}
 
 	tqma7_ft_qspi_setup(blob, bd);
