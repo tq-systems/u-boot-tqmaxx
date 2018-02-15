@@ -504,7 +504,7 @@
 #error "No baseboard for the TQMa7 SOM defined!"
 #endif
 
-/* Support at least the sensor on TQMa SOM */
+/* Support at least the sensor on TQMa7 SOM */
 #if !defined(CONFIG_DTT_SENSORS)
 #define CONFIG_DTT_SENSORS		{ 0 }
 #endif
