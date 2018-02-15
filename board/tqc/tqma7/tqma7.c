@@ -344,10 +344,15 @@ int board_late_init(void)
 	return 0;
 }
 
+u32 get_board_rev(void)
+{
+	return (tqma7_emmc_needs_dsr(0) ? 100 : 200);
+}
+
 int checkboard(void)
 {
-	printf("Board: %s on a %s\n", tqma7_get_boardname(),
-	       tqc_bb_get_boardname());
+	printf("Board: %s rev 0%u on %s\n", tqma7_get_boardname(),
+	       get_board_rev(), tqc_bb_get_boardname());
 	return 0;
 }
 
