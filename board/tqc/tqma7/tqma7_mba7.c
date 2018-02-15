@@ -630,13 +630,16 @@ int tqc_bb_board_late_init(void)
 	/* provide default setting for fdt_file if nothing in env is set */
 	if (NULL == getenv("fdt_file")) {
 		u32 cpurev = get_cpu_rev();
+		u32 bdrev = get_board_rev();
 
 		switch ((cpurev & 0xFF000) >> 12) {
 		case MXC_CPU_MX7S:
-			setenv("fdt_file", "imx7s-mba7.dtb");
+			setenv("fdt_file", (100 == bdrev) ?
+				"imx7s-mba7-r0100.dtb" : "imx7s-mba7.dtb");
 			break;
 		case MXC_CPU_MX7D:
-			setenv("fdt_file", "imx7d-mba7.dtb");
+			setenv("fdt_file", (100 == bdrev) ?
+				"imx7d-mba7-r0100.dtb" : "imx7d-mba7.dtb");
 			break;
 		default:
 			debug("unknown CPU");
