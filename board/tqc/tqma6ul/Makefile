@@ -7,3 +7,4 @@
 obj-y  := tqma6ul.o
 
 obj-$(CONFIG_MBA6UL) += tqma6ul_mba6ul.o
+obj-$(CONFIG_MBA6ULXL) += tqma6ul_mba6ulxl.o

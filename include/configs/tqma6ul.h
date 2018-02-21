@@ -463,8 +463,10 @@ unsigned imx_ddr_size(void);
  *
  * Now include the baseboard specific configuration
  */
-#ifdef CONFIG_MBA6UL
+#if defined(CONFIG_MBA6UL)
 #include "tqma6ul_mba6ul.h"
+#elif defined(CONFIG_MBA6ULXL)
+#include "tqma6ul_mba6ulxl.h"
 #else
 #error "No baseboard for the TQMa6UL SOM defined!"
 #endif

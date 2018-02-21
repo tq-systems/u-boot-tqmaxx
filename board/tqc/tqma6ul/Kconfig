@@ -15,6 +15,7 @@ config SYS_CONFIG_NAME
 config TQMA6UL_COMMON
 	bool
 	select SPI_FLASH if MBA6UL || TQMA6UL_QSPI_BOOT
+	select SPI_FLASH if MBA6ULXL || TQMA6UL_QSPI_BOOT
 	select SPI_FLASH_STMICRO if SPI_FLASH
 	select SPI_FLASH_WINBOND if SPI_FLASH
 	select SPI_FLASH_SPANSION if SPI_FLASH
@@ -89,6 +90,12 @@ choice
 
 config MBA6UL
 	bool "TQMa6UL on MBa6UL Starterkit"
+	help
+	  Select the MBa6UL starterkit.
+
+config MBA6ULXL
+	bool "TQMa6ULxL on MBa6ULxL base board"
+	depends on TQMA6UL_VARIANT_LGA
 	help
 	  Select the MBa6UL starterkit.
 

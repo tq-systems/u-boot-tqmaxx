@@ -12,6 +12,7 @@ The following hardwarerevisions are supported:
 TQMa6ULx:	REV.030x
 TQMa6ULxL:	REV.020x
 MBa6ULx:	REV.020x
+MBa6ULxL:	REV.010x
 
 Hardware on modules TQMa6ULx and TQMa6ULxL:
 
@@ -29,6 +30,10 @@ supported hardware on Starterkit MBa6ULx:
 - SD-Card slot
 - UART
 - USB
+
+supported hardware on SBC MBa6ULxL:
+
+
 
 1. Boot source
 --------------
@@ -52,6 +57,7 @@ tqma6ulxl	TQMa6ULxL
 
 baseboard is a placeholder for the mainboard to compile for:
 mba6ul		MBa6ULx
+mba6ulxl	MBa6ULxL
 
 boot is a placeholder for the boot device:
 mmc - means eMMC
@@ -63,4 +69,7 @@ tqma6ulx_mba6ul_mmc_defconfig
 tqma6ulx_mba6ul_qspi_defconfig
 tqma6ulxl_mba6ul_mmc_defconfig
 tqma6ulxl_mba6ul_qspi_defconfig
+
+tqma6ulxl_mba6ulxl_mmc_defconfig
+tqma6ulxl_mba6ulxl_qspi_defconfig
 
