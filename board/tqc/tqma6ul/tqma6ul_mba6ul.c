@@ -300,39 +300,6 @@ int tqc_bb_board_mmc_init(bd_t *bis)
 	return 0;
 }
 
-#ifdef CONFIG_MBA6UL_I2C2
-static struct i2c_pads_info mba6ul_i2c2_pads = {
-/* I2C2: MBa6UL */
-	.scl = {
-		.i2c_mode = NEW_PAD_CTRL(MX6_PAD_CSI_HSYNC__I2C2_SCL,
-					 I2C_PAD_CTRL),
-		.gpio_mode = NEW_PAD_CTRL(MX6_PAD_CSI_HSYNC__GPIO4_IO20,
-					  I2C_PAD_CTRL),
-		.gp = IMX_GPIO_NR(4, 20)
-	},
-	.sda = {
-		.i2c_mode = NEW_PAD_CTRL(MX6_PAD_CSI_VSYNC__I2C2_SDA,
-					 I2C_PAD_CTRL),
-		.gpio_mode = NEW_PAD_CTRL(MX6_PAD_CSI_VSYNC__GPIO4_IO19,
-					  I2C_PAD_CTRL),
-		.gp = IMX_GPIO_NR(4, 19)
-	}
-};
-
-static void mba6ul_setup_i2c(void)
-{
-	int ret;
-
-	/*
-	 * use logical index for bus, e.g. I2C2 -> 1
-	 * warn on error
-	 */
-	ret = setup_i2c(1, CONFIG_SYS_I2C_SPEED, 0x7f, &mba6ul_i2c2_pads);
-	if (ret)
-		printf("setup I2C2 failed: %d\n", ret);
-}
-#endif
-
 #ifdef CONFIG_USB_EHCI_MX6
 #define USB_OTHERREGS_OFFSET	0x800
 #define UCTRL_PWR_POL		BIT(9)
@@ -446,15 +413,6 @@ int tqc_bb_board_early_init_f(void)
 int tqc_bb_board_init(void)
 {
 	int old_bus;
-
-#ifdef CONFIG_MBA6UL_I2C2
-	/*
-	 * The I2C2 Signals and the UART6 RTS/CTS Signals sharing the
-	 * same MX6UL pins. We configured the kernel to use these pins
-	 * as rts/cts signals.
-	 */
-	mba6ul_setup_i2c();
-#endif
 
 	/*
 	 * init GPIO expander here to have all in place
