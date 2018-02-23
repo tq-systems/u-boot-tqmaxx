@@ -427,8 +427,8 @@ int tqc_bb_board_init(void)
 	i2c_set_bus_num(3);
 
 	/* 2, 5 .. 7 out, port 2 -> BOOT_CFG_EN# hi */
-	pca953x_set_val(0x22, 0xff, 0x04);
-	pca953x_set_dir(0x22, 0xff, 0x1b);
+	pca953x_set_val(0x22, 0xff, 0x14);
+	pca953x_set_dir(0x22, 0xff, 0x00);
 
 	i2c_set_bus_num(old_bus);
 
