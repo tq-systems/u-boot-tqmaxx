@@ -233,14 +233,10 @@ static iomux_v3_cfg_t const mba6ulxl_usdhc1_pads[] = {
 	/* VSELECT not usable in standard variant, signal is used as USB OTG ID */
 	/* MX6_PAD_GPIO1_IO05__USDHC1_VSELECT | MUX_PAD_CTRL(USDHC_PAD_CTRL), */
 	/* CD */
-	NEW_PAD_CTRL(MX6_PAD_UART1_RTS_B__GPIO1_IO19,	GPIO_IN_PAD_CTRL),
-	/* WP */
-	/* TODO: should we mux it as MX6_PAD_UART1_CTS_B__USDHC1_WP? */
 	NEW_PAD_CTRL(MX6_PAD_UART1_CTS_B__GPIO1_IO18,	GPIO_IN_PAD_CTRL),
 };
 
-#define USDHC1_CD_GPIO	IMX_GPIO_NR(1, 19)
-#define USDHC1_WP_GPIO	IMX_GPIO_NR(1, 18)
+#define USDHC1_CD_GPIO	IMX_GPIO_NR(1, 18)
 
 int tqc_bb_board_mmc_getcd(struct mmc *mmc)
 {
@@ -255,13 +251,7 @@ int tqc_bb_board_mmc_getcd(struct mmc *mmc)
 
 int tqc_bb_board_mmc_getwp(struct mmc *mmc)
 {
-	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
-	int ret = 0;
-
-	if (cfg->esdhc_base == USDHC1_BASE_ADDR)
-		ret = gpio_get_value(USDHC1_WP_GPIO);
-
-	return ret;
+	return 0;
 }
 
 static struct fsl_esdhc_cfg mba6ulxl_usdhc_cfg = {
@@ -274,9 +264,7 @@ int tqc_bb_board_mmc_init(bd_t *bis)
 	imx_iomux_v3_setup_multiple_pads(mba6ulxl_usdhc1_pads,
 					 ARRAY_SIZE(mba6ulxl_usdhc1_pads));
 	gpio_request(USDHC1_CD_GPIO, "usdhc1-cd");
-	gpio_request(USDHC1_WP_GPIO, "usdhc1-wp");
 	gpio_direction_input(USDHC1_CD_GPIO);
-	gpio_direction_input(USDHC1_WP_GPIO);
 
 	mba6ulxl_usdhc_cfg.sdhc_clk = mxc_get_clock(MXC_ESDHC_CLK);
 	if (fsl_esdhc_initialize(bis, &mba6ulxl_usdhc_cfg))
