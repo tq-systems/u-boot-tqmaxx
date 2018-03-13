@@ -307,7 +307,7 @@
 	"loadfdt=sf probe 0; sf read ${fdt_addr} ${fdt_mtdpart}\0"             \
 
 #define CONFIG_BOOTCOMMAND                                                     \
-	"sf probe; run mmcboot; run netboot; run panicboot"                    \
+	"sf probe; run qspiboot; run netboot; run panicboot"                   \
 
 #else
 
@@ -400,6 +400,18 @@
 			"${boot_type}; "                                       \
 		"fi;\0"                                                        \
 		"setenv bootargs \0"                                           \
+	"qspiboot=echo Booting from qspi ...; "                                \
+		"setenv bootargs; "                                            \
+		"run qspiargs; "                                               \
+		"if run loadimage; then "                                      \
+			"if run loadfdt; then "                                \
+				"echo boot device tree kernel ...; "           \
+				"${boot_type} ${loadaddr} - ${fdt_addr}; "     \
+			"fi; "                                                 \
+		"else "                                                        \
+			"${boot_type}; "                                       \
+		"fi;\0"                                                        \
+		"setenv bootargs \0"                                           \
 	"netdev=eth0\0"                                                        \
 	"rootpath=/srv/nfs/tqma6\0"                                            \
 	"ipmode=static\0"                                                      \
@@ -431,7 +443,7 @@
 	"rootfs_mtddev=5\0"                                                    \
 	"addqspi=setenv bootargs ${bootargs} root=ubi0:root ${rootfsmode} "    \
 		"rootfstype=ubifs ubi.mtd=${rootfs_mtddev}\0"                  \
-	"qspiargs=run addqspi addtty addfb addcma\0"                           \
+	"qspiargs=run addqspi addtty addcma\0"                                 \
 	"uboot_mtdpart=U-Boot\0"                                               \
 	"fdt_mtdpart=DTB\0"                                                    \
 	"kernel_mtdpart=Linux\0"                                               \
