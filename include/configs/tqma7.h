@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Freescale Semiconductor, Inc.
+ * Copyright (C) 2016-2018 TQ Systems GmbH
  * Configuration settings for the TQ Systems TQMa7x SOM
  *
  * SPDX-License-Identifier:	GPL-2.0+

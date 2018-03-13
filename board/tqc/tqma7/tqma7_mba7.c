@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016-2017 TQ Systems
- * Author: Markus Niebel <markus.niebel@tq-group.com>
+ * Copyright (C) 2016-2018 TQ Systems GmbH
+ * Author: Markus Niebel <Markus.Niebel@tq-group.com>
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
