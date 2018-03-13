@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 TQ Systems
+ * Copyright (C) 2016-2018 TQ Systems GmbH
  * Author: Marco Felsch <Marco.Felsch@tq-group.com>
  * Configuration settings for the TQ Systems TQMa6UL SOM.
  *

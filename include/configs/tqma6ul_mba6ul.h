@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Markus Niebel <Markus.Niebel@tq-group.com>
+ * Copyright (C) 2016-2018 Markus Niebel <Markus.Niebel@tq-group.com>
  *
  * Configuration settings for the TQ Systems MBa6UL Carrier board for TQMa6UL.
  * Configuration settings for the TQ Systems MBa6UL Carrier board for TQMa6ULx,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 TQ Systems
+ * Copyright (C) 2016-2018 TQ Systems GmbH
  * Author: Marco Felsch <Marco.Felsch@tq-group.com>
  *
  * SPDX-License-Identifier:	GPL-2.0+
