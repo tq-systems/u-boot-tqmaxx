@@ -21,6 +21,8 @@
 
 #define CONFIG_NR_DRAM_BANKS		2
 
+#define CONFIG_SYS_OMAP_ABE_SYSCK
+
 /* MMC ENV related defines */
 #define CONFIG_SYS_MMC_ENV_DEV		1		/* eMMC */
 #define CONFIG_SYS_MMC_ENV_PART		0
@@ -29,17 +31,19 @@
 #define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
 #define CONFIG_SYS_REDUNDAND_ENVIRONMENT
 
+/* console */
 #define CONSOLEDEV			"ttyO2"
 #define CONFIG_SYS_NS16550_COM1		UART1_BASE	/* Base EVM has UART0 */
 #define CONFIG_SYS_NS16550_COM2		UART2_BASE	/* UART2 */
 #define CONFIG_SYS_NS16550_COM3		UART3_BASE	/* UART3 */
 
+/* i2c eeprom */
 #define CONFIG_ENV_EEPROM_IS_ON_I2C
 #define CONFIG_SYS_I2C_EEPROM_ADDR	0x50	/* Main EEPROM */
 #define CONFIG_SYS_I2C_EEPROM_ADDR_LEN	2
 
-#define CONFIG_SYS_OMAP_ABE_SYSCK
-
+/* PMIC I2C bus number */
+#define CONFIG_SYS_SPD_BUS_NUM 1
 /* PMIC I2C address */
 #define TQMA57XX_TPS65903X_CHIP_P1 0x48
 
@@ -76,7 +80,8 @@
 
 #include <configs/ti_omap5_common.h>
 
-/* Enhance our eMMC support / experience. */
+/* SD/eMMC */
+#define CONFIG_SUPPORT_EMMC_BOOT
 #define CONFIG_HSMMC2_8BIT
 
 /* CPSW Ethernet */
@@ -90,11 +95,8 @@
 #define CONFIG_MII			/* Required in net/eth.c */
 #define PHY_ANEG_TIMEOUT	8000	/* PHY needs longer aneg time at 1G */
 
-#define CONFIG_SUPPORT_EMMC_BOOT
-
 /* USB xHCI HOST */
 #define CONFIG_USB_XHCI_OMAP
-
 #define CONFIG_OMAP_USB_PHY
 #define CONFIG_OMAP_USB3PHY1_HOST
 
