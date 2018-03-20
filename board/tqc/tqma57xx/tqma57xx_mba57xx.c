@@ -18,6 +18,7 @@
 #include <asm/arch/dra7xx_iodelay.h>
 #include <asm/arch/mmc_host_def.h>
 #include <asm/arch/mux_dra7xx.h>
+#include <spl.h>
 
 #ifdef CONFIG_DRIVER_TI_CPSW
 #include <cpsw.h>
@@ -481,3 +482,13 @@ int tqma57xx_bb_board_eth_init(bd_t *bis)
 	return ret;
 }
 #endif /* CONFIG_DRIVER_TI_CPSW */
+
+#ifdef CONFIG_SPL_BUILD
+void board_boot_order(u32 *spl_boot_list)
+{
+	/* primary boot device */
+	spl_boot_list[0] = BOOT_DEVICE_MMC1;
+	/* secondary boot device */
+	spl_boot_list[1] = BOOT_DEVICE_MMC2;
+}
+#endif /* CONFIG_SPL_BUILD */
