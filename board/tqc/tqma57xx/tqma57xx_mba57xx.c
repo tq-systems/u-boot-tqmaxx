@@ -22,6 +22,7 @@
 
 #ifdef CONFIG_DRIVER_TI_CPSW
 #include <cpsw.h>
+#include <miiphy.h>
 #endif
 
 const struct pad_conf_entry core_padconf_array_bb_tqma57xx[] = {
@@ -37,8 +38,8 @@ const struct pad_conf_entry core_padconf_array_bb_tqma57xx[] = {
 	/* UART3: see earlypadconf */
 
 	/* GMAC MDIO */
-	{VIN2A_D10, (M3 | PIN_OUTPUT)},	/* vin2a_d10.mdio_mclk */
-	{VIN2A_D11, (M3 | PIN_OUTPUT)},	/* vin2a_d11.mdio_d */
+	{VIN2A_D10, (M3 | PIN_OUTPUT_PULLUP | SLEWCONTROL)},	/* vin2a_d10.mdio_mclk */
+	{VIN2A_D11, (M3 | PIN_INPUT_PULLUP | SLEWCONTROL)},	/* vin2a_d11.mdio_d */
 
 	/* GMAC SW0 RGMII0 */
 	{RGMII0_TXC, (M0 | PIN_OUTPUT | MANUAL_MODE)},		/* rgmii0_txc.rgmii0_txc */
@@ -433,27 +434,29 @@ static void cpsw_control(int enabled)
 	/* VTP can be added here */
 }
 
-static struct cpsw_slave_data cpsw_slaves[] = {
+static struct cpsw_slave_data tqma57xx_cpsw_slaves[] = {
 	{
 		.slave_reg_ofs	= 0x208,
 		.sliver_reg_ofs	= 0xd80,
 		.phy_addr	= 2,
+		.phy_if         = PHY_INTERFACE_MODE_RGMII,
 	},
 	{
 		.slave_reg_ofs	= 0x308,
 		.sliver_reg_ofs	= 0xdc0,
 		.phy_addr	= 3,
+		.phy_if         = PHY_INTERFACE_MODE_RGMII,
 	},
 };
 
-static struct cpsw_platform_data cpsw_data = {
+static struct cpsw_platform_data tqma57xx_cpsw_data = {
 	.mdio_base		= CPSW_MDIO_BASE,
 	.cpsw_base		= CPSW_BASE,
 	.mdio_div		= 0xff,
 	.channels		= 8,
 	.cpdma_reg_ofs		= 0x800,
-	.slaves			= 1,
-	.slave_data		= cpsw_slaves,
+	.slaves			= 2,
+	.slave_data		= tqma57xx_cpsw_slaves,
 	.ale_reg_ofs		= 0xd00,
 	.ale_entries		= 1024,
 	.host_port_reg_ofs	= 0x108,
@@ -474,8 +477,9 @@ int tqma57xx_bb_board_eth_init(bd_t *bis)
 	ctrl_val = readl((*ctrl)->control_core_control_io1) & (~0x33);
 	ctrl_val |= 0x22;
 	writel(ctrl_val, (*ctrl)->control_core_control_io1);
+	mdelay(10);
 
-	ret = cpsw_register(&cpsw_data);
+	ret = cpsw_register(&tqma57xx_cpsw_data);
 	if (ret < 0)
 		printf("Error %d registering CPSW switch\n", ret);
 
