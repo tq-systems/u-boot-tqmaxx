@@ -46,7 +46,7 @@ DECLARE_GLOBAL_DATA_PTR;
 #define TPS65903X_PAD2_POWERHOLD_MASK		0x20
 
 const struct omap_sysinfo sysinfo = {
-	"Board: TQMa57xx\n"
+	"Board: UNKNOWN TQMa57xx ??? REV UNKNOWN ?????\n"
 };
 
 static const struct dmm_lisa_map_regs tqma57xx_lisa_regs = {
