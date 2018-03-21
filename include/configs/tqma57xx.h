@@ -43,9 +43,7 @@
 #define CONFIG_SYS_I2C_EEPROM_ADDR_LEN	2
 
 /* PMIC I2C bus number */
-#define CONFIG_SYS_SPD_BUS_NUM 1
-/* PMIC I2C address */
-#define TQMA57XX_TPS65903X_CHIP_P1 0x48
+#define CONFIG_SYS_SPD_BUS_NUM		0
 
 /* Define the default GPT table for eMMC */
 #define PARTS_DEFAULT \

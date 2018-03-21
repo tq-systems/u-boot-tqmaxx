@@ -54,21 +54,6 @@ static const struct dmm_lisa_map_regs tqma57xx_lisa_regs = {
 	.is_ma_present  = 0x1
 };
 
-/* define pmic struct here due to different I2C address than TI eval kits */
-struct pmic_data tqma57xx_tps659037 = {
-	.base_offset = PALMAS_SMPS_BASE_VOLT_UV,
-	.step = 10000, /* 10 mV represented in uV */
-    /*
-     * Offset codes 1-6 all give the base voltage in Palmas
-     * Offset code 0 switches OFF the SMPS
-     */
-	.start_code = 6,
-	.i2c_slave_addr = TQMA57XX_TPS65903X_CHIP_P1,
-	.pmic_bus_init  = gpi2c_init,
-	.pmic_write = palmas_i2c_write_u8,
-	.gpio_en = 0,
-};
-
 void emif_get_dmm_regs(const struct dmm_lisa_map_regs **dmm_lisa_regs)
 {
 		*dmm_lisa_regs = &tqma57xx_lisa_regs;
@@ -113,7 +98,7 @@ struct vcores_data tqma57xx_volts = {
 	.mpu.efuse.reg[OPP_NOM]	= STD_FUSE_OPP_VMIN_MPU_NOM,
 	.mpu.efuse.reg_bits     = DRA752_EFUSE_REGBITS,
 	.mpu.addr		= TPS659038_REG_ADDR_SMPS12,
-	.mpu.pmic		= &tqma57xx_tps659037,
+	.mpu.pmic		= &tps659038,
 	.mpu.abb_tx_done_mask	= OMAP_ABB_MPU_TXDONE_MASK,
 
 	.eve.value[OPP_NOM]	= VDD_EVE_DRA7_NOM,
@@ -124,7 +109,7 @@ struct vcores_data tqma57xx_volts = {
 	.eve.efuse.reg[OPP_HIGH]	= STD_FUSE_OPP_VMIN_DSPEVE_HIGH,
 	.eve.efuse.reg_bits	= DRA752_EFUSE_REGBITS,
 	.eve.addr		= TPS659038_REG_ADDR_SMPS45,
-	.eve.pmic		= &tqma57xx_tps659037,
+	.eve.pmic		= &tps659038,
 	.eve.abb_tx_done_mask	= OMAP_ABB_EVE_TXDONE_MASK,
 
 	.gpu.value[OPP_NOM]	= VDD_GPU_DRA7_NOM,
@@ -135,14 +120,14 @@ struct vcores_data tqma57xx_volts = {
 	.gpu.efuse.reg[OPP_HIGH]	= STD_FUSE_OPP_VMIN_GPU_HIGH,
 	.gpu.efuse.reg_bits	= DRA752_EFUSE_REGBITS,
 	.gpu.addr		= TPS659038_REG_ADDR_SMPS6,
-	.gpu.pmic		= &tqma57xx_tps659037,
+	.gpu.pmic		= &tps659038,
 	.gpu.abb_tx_done_mask	= OMAP_ABB_GPU_TXDONE_MASK,
 
 	.core.value[OPP_NOM]	= VDD_CORE_DRA7_NOM,
 	.core.efuse.reg[OPP_NOM]	= STD_FUSE_OPP_VMIN_CORE_NOM,
 	.core.efuse.reg_bits	= DRA752_EFUSE_REGBITS,
 	.core.addr		= TPS659038_REG_ADDR_SMPS7,
-	.core.pmic		= &tqma57xx_tps659037,
+	.core.pmic		= &tps659038,
 
 	.iva.value[OPP_NOM]	= VDD_IVA_DRA7_NOM,
 	.iva.value[OPP_OD]	= VDD_IVA_DRA7_OD,
@@ -152,7 +137,7 @@ struct vcores_data tqma57xx_volts = {
 	.iva.efuse.reg[OPP_HIGH]	= STD_FUSE_OPP_VMIN_IVA_HIGH,
 	.iva.efuse.reg_bits	= DRA752_EFUSE_REGBITS,
 	.iva.addr		= TPS659038_REG_ADDR_SMPS8,
-	.iva.pmic		= &tqma57xx_tps659037,
+	.iva.pmic		= &tps659038,
 	.iva.abb_tx_done_mask	= OMAP_ABB_IVA_TXDONE_MASK,
 };
 
@@ -232,7 +217,7 @@ int board_late_init(void)
 	 * DEV_CTRL.DEV_ON = 1 please - else palmas switches off in 8 seconds
 	 * This is the POWERHOLD-in-Low behavior.
 	 */
-	palmas_i2c_write_u8(TQMA57XX_TPS65903X_CHIP_P1, 0xA0, 0x1);
+	palmas_i2c_write_u8(TPS65903X_CHIP_P1, 0xA0, 0x1);
 
 	/*
 	 * Default FIT boot on HS devices. Non FIT images are not allowed
@@ -247,10 +232,10 @@ int board_late_init(void)
 	 * PMIC Power off. So to be on the safer side set it back
 	 * to POWERHOLD mode irrespective of the current state.
 	 */
-	palmas_i2c_read_u8(TQMA57XX_TPS65903X_CHIP_P1,
+	palmas_i2c_read_u8(TPS65903X_CHIP_P1,
 			   TPS65903X_PRIMARY_SECONDARY_PAD2, &val);
 	val = val | TPS65903X_PAD2_POWERHOLD_MASK;
-	palmas_i2c_write_u8(TQMA57XX_TPS65903X_CHIP_P1,
+	palmas_i2c_write_u8(TPS65903X_CHIP_P1,
 			    TPS65903X_PRIMARY_SECONDARY_PAD2, val);
 
 	omap_die_id_serial();
