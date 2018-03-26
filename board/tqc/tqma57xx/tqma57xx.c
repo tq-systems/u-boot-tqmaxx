@@ -288,9 +288,9 @@ err:
 #if defined(CONFIG_MMC)
 int board_mmc_init(bd_t *bis)
 {
+	tqma57xx_bb_board_mmc_init(bis);
 	/* MMC2: eMMC */
 	omap_mmc_init(1, 0, 0, -1, -1);
-	tqma57xx_bb_board_mmc_init(bis);
 	return 0;
 }
 #endif
