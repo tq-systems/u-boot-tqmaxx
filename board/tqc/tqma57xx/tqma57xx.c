@@ -347,7 +347,15 @@ int usb_gadget_handle_interrupts(int index)
 #if defined(CONFIG_USB_DWC3) || defined(CONFIG_USB_XHCI_OMAP)
 int omap_xhci_board_usb_init(int index, enum usb_init_type init)
 {
+	int ret;
+
+	/* do baseboard-specific usb initialisation */
+	ret = tqma57xx_bb_board_usb_init();
+	if (ret)
+		printf("error on tqma57xx_bb_board_usb_init\n");
+
 	enable_usb_clocks(index);
+
 	switch (index) {
 	case 0:
 		if (init == USB_INIT_DEVICE) {

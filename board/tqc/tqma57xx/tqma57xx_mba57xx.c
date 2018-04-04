@@ -19,6 +19,8 @@
 #include <asm/arch/mmc_host_def.h>
 #include <asm/arch/mux_dra7xx.h>
 #include <spl.h>
+#include <i2c.h>
+#include <pca953x.h>
 
 #ifdef CONFIG_DRIVER_TI_CPSW
 #include <cpsw.h>
@@ -427,6 +429,64 @@ int tqma57xx_bb_board_mmc_init(bd_t *bis)
 	return 0;
 }
 #endif /* CONFIG_MMC */
+
+/*Define for building port exp gpio, pin starts from 0*/
+#define PORTEXP_IO_NR(chip, pin) \
+	((chip << 5) + pin)
+
+/*Get the chip addr from a ioexp gpio*/
+#define PORTEXP_IO_TO_CHIP(gpio_nr) \
+	(gpio_nr >> 5)
+
+/*Get the pin number from a ioexp gpio*/
+#define PORTEXP_IO_TO_PIN(gpio_nr) \
+	(gpio_nr & 0x1f)
+
+#define PORTEXP_I2C_BUS_NR	3
+
+static int port_exp_direction_output(unsigned int gpio, int value)
+{
+	int ret;
+
+	i2c_set_bus_num(PORTEXP_I2C_BUS_NR);
+
+	ret = i2c_probe(PORTEXP_IO_TO_CHIP(gpio));
+	if (ret)
+		return ret;
+
+	ret = pca953x_set_dir(PORTEXP_IO_TO_CHIP(gpio),
+			      (1 << PORTEXP_IO_TO_PIN(gpio)),
+			      (PCA953X_DIR_OUT << PORTEXP_IO_TO_PIN(gpio)));
+
+	if (ret)
+		return ret;
+
+	ret = pca953x_set_val(PORTEXP_IO_TO_CHIP(gpio),
+			      (1 << PORTEXP_IO_TO_PIN(gpio)),
+			      (value << PORTEXP_IO_TO_PIN(gpio)));
+
+	if (ret)
+		return ret;
+
+	return 0;
+}
+
+#if defined(CONFIG_USB_DWC3) || defined(CONFIG_USB_XHCI_OMAP)
+#define PWR_EN_1V1     PORTEXP_IO_NR(0x21, 2)
+
+int tqma57xx_bb_board_usb_init(void)
+{
+	int ret;
+
+	/* enable 1V1 voltage rail for usb hub */
+	ret = port_exp_direction_output(PWR_EN_1V1, 1);
+
+	if (ret)
+		printf("Error %d enabling 1V1 voltage rail\n", ret);
+
+	return ret;
+}
+#endif
 
 #ifdef CONFIG_DRIVER_TI_CPSW
 static void cpsw_control(int enabled)
