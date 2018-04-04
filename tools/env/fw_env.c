@@ -114,7 +114,7 @@ static unsigned char obsolete_flag = 0;
 #define DEFAULT_ENV_INSTANCE_STATIC
 #include <env_default.h>
 
-static int flash_io (int mode);
+static int flash_io (int mode, bool protect);
 static char *envmatch (char * s1, char * s2);
 static int parse_config (void);
 
@@ -313,7 +313,7 @@ int fw_env_close(void)
 	*environment.crc = crc32(0, (uint8_t *) environment.data, ENV_SIZE);
 
 	/* write environment back to flash */
-	if (flash_io(O_RDWR)) {
+	if (flash_io(O_RDWR, setenv_args.do_lock_flash)) {
 		fprintf(stderr,
 			"Error: can't write fw_env to flash\n");
 			return -1;
@@ -751,7 +751,7 @@ static int flash_read_buf (int dev, int fd, void *buf, size_t count,
  * erase and write the whole data at once.
  */
 static int flash_write_buf (int dev, int fd, void *buf, size_t count,
-			    off_t offset, uint8_t mtd_type)
+			    off_t offset, uint8_t mtd_type, bool protect)
 {
 	void *data;
 	struct erase_info_user erase;
@@ -877,7 +877,8 @@ static int flash_write_buf (int dev, int fd, void *buf, size_t count,
 
 		if (mtd_type != MTD_ABSENT) {
 			erase.start = blockstart;
-			ioctl(fd, MEMUNLOCK, &erase);
+			if (protect)
+				ioctl(fd, MEMUNLOCK, &erase);
 			/* These do not need an explicit erase cycle */
 			if (mtd_type != MTD_DATAFLASH)
 				if (ioctl(fd, MEMERASE, &erase) != 0) {
@@ -905,7 +906,7 @@ static int flash_write_buf (int dev, int fd, void *buf, size_t count,
 			return -1;
 		}
 
-		if (mtd_type != MTD_ABSENT)
+		if ((DEVTYPE(dev) != MTD_ABSENT) && protect)
 			ioctl(fd, MEMLOCK, &erase);
 
 		processed  += erasesize;
@@ -922,7 +923,7 @@ static int flash_write_buf (int dev, int fd, void *buf, size_t count,
 /*
  * Set obsolete flag at offset - NOR flash only
  */
-static int flash_flag_obsolete (int dev, int fd, off_t offset)
+static int flash_flag_obsolete (int dev, int fd, off_t offset, bool protect)
 {
 	int rc;
 	struct erase_info_user erase;
@@ -936,9 +937,11 @@ static int flash_flag_obsolete (int dev, int fd, off_t offset)
 			 DEVNAME (dev));
 		return rc;
 	}
-	ioctl (fd, MEMUNLOCK, &erase);
+	if (protect)
+		ioctl (fd, MEMUNLOCK, &erase);
 	rc = write (fd, &obsolete_flag, sizeof (obsolete_flag));
-	ioctl (fd, MEMLOCK, &erase);
+	if (protect)
+		ioctl (fd, MEMLOCK, &erase);
 	if (rc < 0)
 		perror ("Could not set obsolete flag");
 
@@ -967,7 +970,7 @@ static int env_aes_cbc_crypt(char *payload, const int enc)
 	return 0;
 }
 
-static int flash_write (int fd_current, int fd_target, int dev_target)
+static int flash_write (int fd_current, int fd_target, int dev_target, bool protect)
 {
 	int rc;
 
@@ -993,7 +996,7 @@ static int flash_write (int fd_current, int fd_target, int dev_target)
 
 	rc = flash_write_buf(dev_target, fd_target, environment.image,
 			      CUR_ENVSIZE, DEVOFFSET(dev_target),
-			      DEVTYPE(dev_target));
+			      DEVTYPE(dev_target), protect);
 	if (rc < 0)
 		return rc;
 
@@ -1006,7 +1009,7 @@ static int flash_write (int fd_current, int fd_target, int dev_target)
 			"Setting obsolete flag in environment at 0x%lx on %s\n",
 			DEVOFFSET (dev_current), DEVNAME (dev_current));
 #endif
-		flash_flag_obsolete (dev_current, fd_current, offset);
+		flash_flag_obsolete (dev_current, fd_current, offset, protect);
 	}
 
 	return 0;
@@ -1055,7 +1058,7 @@ static int flash_read (int fd)
 	return 0;
 }
 
-static int flash_io (int mode)
+static int flash_io (int mode, bool protect)
 {
 	int fd_current, fd_target, rc, dev_target;
 
@@ -1087,7 +1090,7 @@ static int flash_io (int mode)
 			fd_target = fd_current;
 		}
 
-		rc = flash_write (fd_current, fd_target, dev_target);
+		rc = flash_write (fd_current, fd_target, dev_target, protect);
 
 		if (HaveRedundEnv) {
 			if (close (fd_target)) {
@@ -1177,7 +1180,7 @@ int fw_env_open(void)
 	}
 
 	dev_current = 0;
-	if (flash_io (O_RDONLY))
+	if (flash_io (O_RDONLY, false))
 		return -1;
 
 	crc0 = crc32 (0, (uint8_t *) environment.data, ENV_SIZE);
@@ -1213,7 +1216,7 @@ int fw_env_open(void)
 		 * other pointers in environment still point inside addr0
 		 */
 		environment.image = addr1;
-		if (flash_io (O_RDONLY))
+		if (flash_io (O_RDONLY, false))
 			return -1;
 
 		/* Check flag scheme compatibility */

@@ -7,6 +7,7 @@
 
 #include <aes.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 /* Pull in the current config to define the default environment */
 #include <linux/kconfig.h>
@@ -73,6 +74,7 @@ extern struct printenv_args printenv_args;
 
 struct setenv_args {
 	char *script_file;
+	bool do_lock_flash;
 };
 extern struct setenv_args setenv_args;
 

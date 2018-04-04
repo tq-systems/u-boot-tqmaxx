@@ -46,12 +46,15 @@ static struct option long_options[] = {
 	{"help", no_argument, NULL, 'h'},
 	{"script", required_argument, NULL, 's'},
 	{"noheader", required_argument, NULL, 'n'},
+	{"noprotect", no_argument, NULL, 'u'},
 	{NULL, 0, NULL, 0}
 };
 
 struct common_args common_args;
 struct printenv_args printenv_args;
-struct setenv_args setenv_args;
+struct setenv_args setenv_args = {
+	.do_lock_flash = true,
+};
 
 void usage_printenv(void)
 {
@@ -85,6 +88,7 @@ void usage_setenv(void)
 		" -c, --config         configuration file, default:" CONFIG_FILE "\n"
 #endif
 		" -s, --script         batch mode to minimize writes\n"
+		" -u, --noprotect      do not try to lock flash\n"
 		"\n"
 		"Examples:\n"
 		"  fw_setenv foo bar   set variable foo equal bar\n"
@@ -151,7 +155,7 @@ int parse_printenv_args(int argc, char *argv[])
 
 	parse_common_args(argc, argv);
 
-	while ((c = getopt_long(argc, argv, "a:c:ns:h", long_options, NULL)) !=
+	while ((c = getopt_long(argc, argv, "a:c:ns:hu", long_options, NULL)) !=
 	       EOF) {
 		switch (c) {
 		case 'n':
@@ -177,11 +181,14 @@ int parse_setenv_args(int argc, char *argv[])
 
 	parse_common_args(argc, argv);
 
-	while ((c = getopt_long(argc, argv, "a:c:ns:h", long_options, NULL)) !=
+	while ((c = getopt_long(argc, argv, "a:c:ns:hu", long_options, NULL)) !=
 	       EOF) {
 		switch (c) {
 		case 's':
 			setenv_args.script_file = optarg;
+			break;
+		case 'u':
+			setenv_args.do_lock_flash = false;
 			break;
 		case 'a':
 		case 'c':
