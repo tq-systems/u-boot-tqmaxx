@@ -49,6 +49,9 @@
 /* PMIC I2C bus number */
 #define CONFIG_SYS_SPD_BUS_NUM		0
 
+/* PCA9555 GPIO expander support */
+#define CONFIG_PCA953X
+
 /* Define the default GPT table for eMMC */
 #define PARTS_DEFAULT \
 	/* Linux partitions */ \
