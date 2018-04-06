@@ -547,14 +547,6 @@ int tqma57xx_bb_board_eth_init(bd_t *bis)
 
 	devname = miiphy_get_current_dev();
 
-	/* emac0 phy: activate port mirror due to
-	 * wrong mdi connection in hardware
-	 */
-	miiphy_write(devname, 0x2, 0xd, 0x1f);
-	miiphy_write(devname, 0x2, 0xe, 0x31);
-	miiphy_write(devname, 0x2, 0xd, 0x401f);
-	miiphy_write(devname, 0x2, 0xe, 0x10b1);
-
 	/* emac0 phy: set rgmii driverstrength to max. value */
 	miiphy_write(devname, 0x2, 0xd, 0x1f);
 	miiphy_write(devname, 0x2, 0xe, 0x0170);
@@ -574,14 +566,6 @@ int tqma57xx_bb_board_eth_init(bd_t *bis)
 	miiphy_write(devname, 0x2, 0xe, 0x86);
 	miiphy_write(devname, 0x2, 0xd, 0x401f);
 	miiphy_write(devname, 0x2, 0xe, 0x000a);
-
-	/* emac1 phy: activate port mirror due to
-	 * wrong mdi connection in hardware
-	 */
-	miiphy_write(devname, 0x3, 0xd, 0x1f);
-	miiphy_write(devname, 0x3, 0xe, 0x31);
-	miiphy_write(devname, 0x3, 0xd, 0x401f);
-	miiphy_write(devname, 0x3, 0xe, 0x10b1);
 
 	/* emac1 phy: set rgmii driverstrength to max. value */
 	miiphy_write(devname, 0x3, 0xd, 0x1f);
