@@ -77,16 +77,18 @@
 
 /* SPI */
 #define CONFIG_TI_SPI_MMAP
-#define CONFIG_SF_DEFAULT_SPEED                76800000
+#define CONFIG_SF_DEFAULT_SPEED                15360000
 #define CONFIG_SF_DEFAULT_MODE                 SPI_MODE_0
 #define CONFIG_QSPI_QUAD_SUPPORT
+#define TQMA57XX_SPI_FLASH_SECTOR_SIZE		SZ_64K
 
 /* SPI SPL */
 #define CONFIG_TI_EDMA3
 #define CONFIG_SPL_SPI_LOAD
-#define CONFIG_SYS_SPI_U_BOOT_OFFS     0x40000
 
 /*
+ * QSPI flash map
+ *
  * Default to using SPI for environment, etc.
  * 0x000000 - 0x040000 : QSPI.SPL (256KiB)
  * 0x040000 - 0x140000 : QSPI.u-boot (1MiB)
@@ -96,16 +98,23 @@
  * 0x1E0000 - 0x9E0000 : QSPI.kernel (8MiB)
  * 0x9E0000 - 0x2000000 : USERLAND
  */
+#define CONFIG_SYS_SPI_U_BOOT_OFFS	0x40000
+#define TQMA57XX_SPI_ENV_OFFS		0x1C0000
 #define CONFIG_SYS_SPI_KERNEL_OFFS      0x1E0000
 #define CONFIG_SYS_SPI_ARGS_OFFS        0x140000
 #define CONFIG_SYS_SPI_ARGS_SIZE        0x80000
 
-/* MMC ENV related defines */
-#define CONFIG_SYS_MMC_ENV_DEV          1               /* eMMC */
-#define CONFIG_SYS_MMC_ENV_PART         0
-#define CONFIG_ENV_SIZE                 SZ_128K
-#define CONFIG_ENV_OFFSET               0x260000
-#define CONFIG_ENV_OFFSET_REDUND        (CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
+/* SPI ENV */
+#define CONFIG_ENV_SPI_BUS              (CONFIG_SF_DEFAULT_BUS)
+#define CONFIG_ENV_SPI_CS               (CONFIG_SF_DEFAULT_CS)
+#define CONFIG_ENV_SPI_MAX_HZ           (CONFIG_SF_DEFAULT_SPEED)
+#define CONFIG_ENV_SPI_MODE             (CONFIG_SF_DEFAULT_MODE)
+
+#define CONFIG_ENV_OFFSET		(TQMA57XX_SPI_ENV_OFFS)
+#define CONFIG_ENV_SIZE                 SZ_64K
+#define CONFIG_ENV_SECT_SIZE            TQMA57XX_SPI_FLASH_SECTOR_SIZE
 #define CONFIG_SYS_REDUNDAND_ENVIRONMENT
+#define CONFIG_ENV_OFFSET_REDUND        (CONFIG_ENV_OFFSET + \
+					 CONFIG_ENV_SECT_SIZE)
 
 #endif /* __CONFIG_TQMA57XX_H */
