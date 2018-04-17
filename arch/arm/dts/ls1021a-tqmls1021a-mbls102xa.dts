@@ -1,0 +1,138 @@
+/*
+ * Copyright 2013-2014 Freescale Semiconductor, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ */
+
+/dts-v1/;
+#include <dt-bindings/net/ti-dp83867.h>
+#include <dt-bindings/gpio/gpio.h>
+#include "ls1021a-tqmls1021a.dtsi"
+
+/ {
+	model = "TQMLS102xA SOM on MBLS102xA";
+
+	aliases {
+		enet0_rgmii_phy = &rgmii_phy0c;
+		enet1_sgmii_phy = &sgmii_phy03;
+		enet2_rgmii_phy = &rgmii_phy04;
+		spi1 = &dspi0;
+		i2c1 = &i2c1;
+	};
+
+	regulators {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		reg_3p3v: regulator@1 {
+			compatible = "regulator-fixed";
+			reg = <1>;
+			regulator-name = "3P3V";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+		};
+	};
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&uart1 {
+	status = "okay";
+};
+
+&i2c0 {
+	status = "okay";
+
+	pca9554_0: pca9554@20 {
+		compatible = "nxp,pca9554";
+		reg = <0x20>;
+
+		interrupt-controller;
+		#interrupt-cells = <2>;
+
+		gpio-controller;
+		#gpio-cells = <2>;
+
+		status = "okay";
+	};
+
+	pca9554_1: pca9554@21 {
+		compatible = "nxp,pca9554";
+		reg = <0x21>;
+
+		interrupt-controller;
+		#interrupt-cells = <2>;
+
+		gpio-controller;
+		#gpio-cells = <2>;
+
+		status = "okay";
+	};
+
+	pca9554_2: pca9554@22 {
+		compatible = "nxp,pca9554";
+		reg = <0x22>;
+
+		gpio-controller;
+		#gpio-cells = <2>;
+
+		status = "okay";
+	};
+};
+
+&i2c1 {
+	status = "okay";
+};
+
+&mdio0 {
+	rgmii_phy0c: ethernet-phy@0c {
+		compatible = "ethernet-phy-id2000.a230",
+			"ethernet-phy-ieee802.3-c22";
+		reg = <0x0c>;
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+		ti,led-cfg1 = <0x6b90>;
+		ti,led-cfg2 = <0x0000>;
+		ti,led-cfg3 = <0x0001>;
+		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+	};
+	sgmii_phy03: ethernet-phy@03 {
+		compatible = "ethernet-phy-id2000.a230",
+			"ethernet-phy-ieee802.3-c22";
+		reg = <0x03>;
+		ti,led-cfg1 = <0x6b90>;
+		ti,led-cfg2 = <0x0000>;
+		ti,led-cfg3 = <0x0001>;
+		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+		ti,dp83867-rxctrl-strap-quirk;
+	};
+	rgmii_phy04: ethernet-phy@04 {
+		compatible = "ethernet-phy-id2000.a230",
+			"ethernet-phy-ieee802.3-c22";
+		reg = <0x04>;
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+		ti,led-cfg1 = <0x6b90>;
+		ti,led-cfg2 = <0x0000>;
+		ti,led-cfg3 = <0x0001>;
+		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+	};
+};
+
+&dspi0 {
+	bus-num = <0>;
+	status = "okay";
+
+	spidev0: spidev@0 {
+		compatible = "rohm,dh2228fv";
+		reg = <0>;
+		spi-max-frequency = <100000>;
+	};
+};

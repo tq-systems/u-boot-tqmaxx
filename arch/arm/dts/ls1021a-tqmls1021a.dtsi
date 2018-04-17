@@ -1,0 +1,133 @@
+/*
+ * Copyright 2013-2014 Freescale Semiconductor, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ */
+
+#include "ls1021a.dtsi"
+
+/ {
+	model = "TQMLS102xA SOM";
+
+	aliases {
+		spi0 = &qspi;
+		i2c0 = &i2c0;
+	};
+
+	clocks {
+		sys_mclk: clock {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <24576000>;
+		};
+	};
+
+	regulators {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		reg_3p3v_som: regulator@0 {
+			compatible = "regulator-fixed";
+			reg = <0>;
+			regulator-name = "3P3V_SOM";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+		};
+	};
+
+	timer {
+		always-on;
+	};
+};
+
+&esdhc {
+	compatible = "fsl,esdhc", "fsl,ls1021a-esdhc";
+	/* e-MMC over 8 data lines */
+	bus-width = <8>;
+	status = "okay";
+};
+
+&i2c0 {
+	status = "okay";
+
+	eeprom0: 24c64@54 {
+		compatible = "atmel,24c64";
+		reg = <0x54>;
+		u-boot,i2c-offset-len = <2>;
+		status = "okay";
+	};
+};
+
+&mdio0 {
+	tbi1: tbi-phy@8 {
+		compatible = "fsl,gianfar-tbi";
+		reg = <0x8>;
+		device_type = "tbi-phy";
+	};
+};
+
+&qspi {
+	bus-num = <0>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	qflash0: mt25ql512@0 {
+		compatible = "n25q512a", "cfi-flash";
+		spi-max-frequency = <20000000>;
+		reg = <0>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			uboot@0 {
+				label = "U-Boot-PBL";
+				reg = <0x0 0xe0000>;
+			};
+
+			env@e0000 {
+				label = "U-Boot Environment";
+				reg = <0xe0000 0x10000>;
+			};
+
+			dtb@f0000 {
+				label = "DTB";
+				reg = <0xf0000 0x10000>;
+			};
+
+			linux@100000 {
+				label = "Linux";
+				reg = <0x100000 0x700000>;
+			};
+
+			rootfs@800000 {
+				label = "RootFS";
+				reg = <0x800000 0x3800000>;
+			};
+		};
+	};
+
+	qflash1: mt25ql512@1 {
+		compatible = "n25q512a", "cfi-flash";
+		spi-max-frequency = <20000000>;
+		reg = <1>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			rootfs@0 {
+				label = "Spare";
+				reg = <0x0 0x4000000>;
+			};
+		};
+	};
+};
