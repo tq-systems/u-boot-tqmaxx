@@ -224,6 +224,19 @@ int board_init(void)
 	return 0;
 }
 
+void board_quiesce_devices(void)
+{
+	const char *power_on_devices[] = {
+		"dma_lpuart0",
+
+		/* HIFI DSP boot */
+		"audio_sai0",
+		"audio_ocram",
+	};
+
+	imx8_power_off_pd_devices(power_on_devices, ARRAY_SIZE(power_on_devices));
+}
+
 #ifdef CONFIG_OF_BOARD_SETUP
 int ft_board_setup(void *blob, struct bd_info *bd)
 {
