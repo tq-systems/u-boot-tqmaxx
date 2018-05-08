@@ -241,6 +241,12 @@ int board_late_init(void)
 	omap_die_id_serial();
 	omap_set_fastboot_vars();
 
+	/* Enable PCIe clock output 'ljcb_clk' =>
+	 * CTRL_CORE_SMA_SW_6.PCIE_TX_RX_CONTROL = 1
+	 */
+	unsigned int *CTRL_CORE_SMA_SW_6 = (unsigned int *)0x4A003C14;
+	*CTRL_CORE_SMA_SW_6 = ((*CTRL_CORE_SMA_SW_6) & ~0x30000) | 0x10000;
+
 	return 0;
 }
 
