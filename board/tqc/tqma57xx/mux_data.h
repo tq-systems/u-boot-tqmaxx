@@ -16,6 +16,8 @@
 
 #include <asm/arch/mux_dra7xx.h>
 
+#define WAKEUP_ENA                (1 << 24)
+
 /*
  * Only TQMa57xx pad configs defined here
  * For baseboard relevant pad configs see respective baseboard file
@@ -45,7 +47,7 @@ const struct pad_conf_entry core_padconf_array_essential_tqma57xx[] = {
 	{GPMC_CS1, (M1 | PIN_INPUT_PULLUP | MANUAL_MODE)},    /* gpmc_cs1.mmc2_cmd */
 
 	/* control */
-	{WAKEUP0, (M0 | PIN_INPUT)},    /* Wakeup0.Wakeup0, from RTC */
+	{WAKEUP0, (M14 | PIN_INPUT | WAKEUP_ENA)},    /* Wakeup0.gpio1_0, from RTC */
 	{ON_OFF, (M0 | PIN_OUTPUT)},    /* on_off.on_off */
 	{RTC_PORZ, (M0 | PIN_INPUT)},   /* rtc_porz.rtc_porz */
 
