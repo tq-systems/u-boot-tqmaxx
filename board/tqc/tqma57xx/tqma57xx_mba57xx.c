@@ -27,6 +27,8 @@
 #include <miiphy.h>
 #endif
 
+#define WAKEUP_ENA	(1 << 24)
+
 const struct pad_conf_entry core_padconf_array_bb_tqma57xx[] = {
 	/* UART */
 	{VIN1A_D0, (M5 | PIN_INPUT)},	/* vin1a_d0.uart8_rxd */
@@ -277,7 +279,7 @@ const struct pad_conf_entry core_padconf_array_bb_tqma57xx[] = {
 	{GPMC_A9, (M14 | PIN_INPUT)},    /* gpmc_a9.gpio1_31 */
 	{GPMC_A10, (M14 | PIN_INPUT)},    /* gpmc_a10.gpio2_0 */
 	{GPMC_A11, (M14 | PIN_INPUT)},    /* gpmc_a11.gpio2_1 */
-	{GPMC_A12, (M14 | PIN_INPUT)},    /* gpmc_a12.gpio2_2 */
+	{GPMC_A12, (M14 | PIN_INPUT | WAKEUP_ENA)},    /* gpmc_a12.gpio2_2 I2C GPIO exp int*/
 	{GPMC_CS0, (M14 | PIN_INPUT)},    /* gpmc_cs0.gpio2_19 */
 	{GPMC_CLK, (M14 | PIN_INPUT)},    /* gpmc_clk.gpio2_22 */
 	{GPMC_ADVN_ALE, (M14 | PIN_INPUT)},    /* gpmc_advn_ale.gpio2_23 */
