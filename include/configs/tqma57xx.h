@@ -212,6 +212,18 @@
 #define NETARGS_TQMA57XX ""
 #endif
 
+#ifdef CONFIG_TQMA572X
+#define BOOTFILES_TQMA57XX \
+	"fdtfile=tqma572x-mba57xx.dtb \0" \
+	"u-boot=u-boot_tqma572x.img \0" \
+	"MLO=MLO_tqma572x \0"
+#elif CONFIG_TQMA571X
+#define BOOTFILES_TQMA57XX \
+	"fdtfile=tqma571x-mba57xx.dtb \0" \
+	"u-boot=u-boot_tqma571x.img \0" \
+	"MLO=MLO_tqma571x \0"
+#endif
+
 #define CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	DEFAULT_LINUX_BOOT_ENV \
@@ -219,20 +231,20 @@
 	DEFAULT_COMMON_BOOT_TI_ARGS \
 	DEFAULT_FIT_TI_ARGS \
 	NETARGS_TQMA57XX \
+	BOOTFILES_TQMA57XX \
 	"bootfile=zImage_tqma572x-mba57xx.bin \0" \
-	"fdtfile=tqma572x-mba57xx.dtb \0" \
 	"devtype=mmc \0" \
-	"upd_sd=if tftp u-boot/u-boot_tqma572x.img; " \
+	"upd_sd=if tftp u-boot/${u-boot}; " \
 		"then echo updating u-boot on sd card...; " \
 		"fatwrite mmc 0:1 $loadaddr u-boot.img $filesize; " \
-		"tftp u-boot/MLO_tqma572x; " \
+		"tftp u-boot/${MLO}; " \
 		"fatwrite mmc 0:1 $loadaddr MLO $filesize; " \
 		" else echo u-boot file not found!; fi \0" \
-	"upd_spi=if tftp u-boot/u-boot_tqma572x.img; " \
+	"upd_spi=if tftp u-boot/${u-boot}; " \
 		"then echo updating u-boot on spi flash...; " \
 		"sf probe 0; sf erase 0x00000 0x100000; " \
 		"sf write ${loadaddr} 0x40000 ${filesize}; " \
-		"tftp u-boot/MLO_tqma572x; " \
+		"tftp u-boot/${MLO}; " \
 		"sf write ${loadaddr} 0x00000 ${filesize}; " \
 		"else echo u-boot file not found!; fi \0" \
 	"bootcmd=if test ${dofastboot} -eq 1; then echo " \
