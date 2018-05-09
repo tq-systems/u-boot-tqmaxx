@@ -214,12 +214,12 @@
 
 #ifdef CONFIG_TQMA572X
 #define BOOTFILES_TQMA57XX \
-	"fdtfile=tqma572x-mba57xx.dtb \0" \
+	"fdtfile=zImage-tqma572x-mba57xx.dtb \0" \
 	"u-boot=u-boot_tqma572x.img \0" \
 	"MLO=MLO_tqma572x \0"
 #elif CONFIG_TQMA571X
 #define BOOTFILES_TQMA57XX \
-	"fdtfile=tqma571x-mba57xx.dtb \0" \
+	"fdtfile=zImage-tqma571x-mba57xx.dtb \0" \
 	"u-boot=u-boot_tqma571x.img \0" \
 	"MLO=MLO_tqma571x \0"
 #endif
