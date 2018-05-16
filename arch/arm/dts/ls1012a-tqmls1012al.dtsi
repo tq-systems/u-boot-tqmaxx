@@ -30,6 +30,14 @@
 
 &i2c0 {
 	status = "okay";
+
+	eeprom: 24c64@50 {
+		compatible = "atmel,24c64";
+		reg = <0x50>;
+		pagesize = <32>;
+		u-boot,i2c-offset-len = <2>;
+		status = "okay";
+	};
 };
 
 &duart0 {

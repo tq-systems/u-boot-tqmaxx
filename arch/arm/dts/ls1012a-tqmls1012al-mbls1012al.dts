@@ -10,7 +10,30 @@
 #include "ls1012a-tqmls1012al.dtsi"
 
 / {
+	aliases {
+		i2c0 = &i2c0;
+		mmc0 = &esdhc0;
+	};
+
 	chosen {
 		stdout-path = &duart0;
+	};
+};
+
+&i2c0 {
+	status = "okay";
+
+	pca9555: pca9555@20 {
+		compatible = "nxp,pca9555";
+		reg = <0x20>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+
+	pca9538: pca9538@70 {
+		compatible = "nxp,pca9538";
+		reg = <0x70>;
+		gpio-controller;
+		#gpio-cells = <2>;
 	};
 };
