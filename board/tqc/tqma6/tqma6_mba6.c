@@ -448,6 +448,9 @@ int tqma6_bb_board_late_init(void)
 			env_set("fdt_file",
 				(enw) ? "imx6q-mba6a.dtb" : "imx6q-mba6b.dtb");
 			break;
+		case MXC_CPU_MX6QP:
+			env_set("fdt_file", "imx6qp-mba6b.dtb");
+			break;
 		default:
 			debug("unknown CPU");
 		}
