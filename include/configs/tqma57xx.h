@@ -214,12 +214,12 @@
 
 #ifdef CONFIG_TQMA572X
 #define BOOTFILES_TQMA57XX \
-	"fdtfile=zImage-tqma572x-mba57xx.dtb \0" \
+	"fdtfile=tqma572x-mba57xx.dtb\0" \
 	"u-boot=u-boot_tqma572x.img \0" \
 	"MLO=MLO_tqma572x \0"
 #elif CONFIG_TQMA571X
 #define BOOTFILES_TQMA57XX \
-	"fdtfile=zImage-tqma571x-mba57xx.dtb \0" \
+	"fdtfile=tqma571x-mba57xx.dtb\0" \
 	"u-boot=u-boot_tqma571x.img \0" \
 	"MLO=MLO_tqma571x \0"
 #endif
@@ -232,7 +232,7 @@
 	DEFAULT_FIT_TI_ARGS \
 	NETARGS_TQMA57XX \
 	BOOTFILES_TQMA57XX \
-	"bootfile=zImage_tqma572x-mba57xx.bin \0" \
+	"bootfile=zImage\0" \
 	"devtype=mmc \0" \
 	"upd_sd=if tftp u-boot/${u-boot}; " \
 		"then echo updating u-boot on sd card...; " \
