@@ -20,6 +20,15 @@
 	};
 };
 
+&esdhc0 {
+	status = "okay";
+	non-removable;
+};
+
+&esdhc1 {
+	status ="disabled";
+};
+
 &i2c0 {
 	status = "okay";
 
