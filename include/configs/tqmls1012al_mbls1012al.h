@@ -13,8 +13,13 @@
 /* e-MMC / SD */
 #define CONFIG_FSL_ESDHC
 
-/* ENET */
-#define CONFIG_TSEC_ENET
+/* PFE Ethernet */
+#ifdef CONFIG_FSL_PFE
+#define EMAC1_PHY_ADDR          0x9
+#define EMAC2_PHY_ADDR          0x1
+#define DEFAULT_PFE_MDIO_NAME "PFE_MDIO"
+#define DEFAULT_PFE_MDIO1_NAME "PFE_MDIO1"
+#endif
 
 /* SATA */
 #define CONFIG_LIBATA

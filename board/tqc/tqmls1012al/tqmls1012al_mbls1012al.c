@@ -23,12 +23,20 @@ int checkboard(void)
 	return 0;
 }
 
-#ifdef CONFIG_TSEC_ENET
+#define MASK_ETH_PHY_RST	0x00000100
+
+void reset_phy(void)
+{
+	/* No PHY reset control from LS1012A */
+}
+
 int board_eth_init(bd_t *bis)
 {
+#ifdef CONFIG_FSL_PFE
+	return cpu_eth_init(bis);
+#endif
 	return pci_eth_init(bis);
 }
-#endif
 
 void tqmls1012al_bb_late_init(void)
 {
