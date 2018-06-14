@@ -23,6 +23,24 @@ int checkboard(void)
 	return 0;
 }
 
+int get_gpio_number(const char *gpio_name, unsigned int *gpio_number)
+{
+	int ret = 0;
+
+#if defined(CONFIG_DM_GPIO)
+	/*
+	 * TODO:Once all GPIO drivers are converted to driver model,
+	 * we can change the code here to use the GPIO uclass interface.
+	 */
+	ret = gpio_lookup_name(gpio_name, NULL, NULL, gpio_number);
+#else
+	/* turn the gpio name into a gpio number */
+	gpio_number = name_to_gpio(gpio_name);
+#endif
+
+	return ret;
+}
+
 #define MASK_ETH_PHY_RST	0x00000100
 
 void reset_phy(void)
@@ -41,23 +59,11 @@ int board_eth_init(bd_t *bis)
 void tqmls1012al_bb_late_init(void)
 {
 	/* USB */
-	int ret = 0;
 	unsigned int gpio_number;
 	const char *gpio_name_usb = "gpio@20_6";
 
-#if defined(CONFIG_DM_GPIO)
-	/*
-	 * TODO:Once all GPIO drivers are converted to driver model,
-	 * we can change the code here to use the GPIO uclass interface.
-	 */
-	ret = gpio_lookup_name(gpio_name_usb, NULL, NULL, &gpio_number);
-#else
-	/* turn the gpio name into a gpio number */
-	gpio_number = name_to_gpio(gpio_name_usb);
-#endif
-
-	if (ret) {
-		printf("GPIO: '%s' not found\n", gpio_name_usb);
+	if (get_gpio_number(gpio_name_usb, &gpio_number)) {
+		printf("USB: GPIO '%s' not found\n", gpio_name_usb);
 	} else {
 		gpio_request(gpio_number, "USB_rst");
 		gpio_direction_output(gpio_number, 1);
