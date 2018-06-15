@@ -41,18 +41,62 @@ int get_gpio_number(const char *gpio_name, unsigned int *gpio_number)
 	return ret;
 }
 
-#define MASK_ETH_PHY_RST	0x00000100
-
 void reset_phy(void)
 {
-	/* No PHY reset control from LS1012A */
+	/* reset#	->	reset: low >= 1 us*/
+	/* PWRDWN#	->	power-down mode: low */
 }
 
 int board_eth_init(bd_t *bis)
 {
-#ifdef CONFIG_FSL_PFE
-	return cpu_eth_init(bis);
-#endif
+	struct mii_dev *bus;
+	struct mdio_info mac_mdio_info;
+
+	unsigned int gpio_number_RST, gpio_number_PWRDWN;
+	const char *gpio_name_RST = "gpio@20_8";
+	const char *gpio_name_PWRDWN = "gpio@70_3";
+
+	if (get_gpio_number(gpio_name_PWRDWN, &gpio_number_PWRDWN)) {
+		printf("ETH: GPIO '%s' not found\n", gpio_name_PWRDWN);
+	} else {
+		gpio_request(gpio_number_PWRDWN, "eth_PWRDWN");
+		gpio_direction_output(gpio_number_PWRDWN, 1);
+	}
+
+	if (get_gpio_number(gpio_name_RST, &gpio_number_RST)) {
+		printf("ETH: GPIO '%s' not found\n", gpio_name_RST);
+	} else {
+		gpio_request(gpio_number_RST, "eth_reset");
+		gpio_direction_output(gpio_number_RST, 1);
+	}
+
+	init_pfe_scfg_dcfg_regs();
+
+	/* Initialize SGMIIA on MDIO1 */
+	mac_mdio_info.reg_base = (void *)EMAC1_BASE_ADDR;
+	mac_mdio_info.name = DEFAULT_PFE_MDIO_NAME;
+
+	bus = pfe_mdio_init(&mac_mdio_info);
+	if (!bus) {
+		printf("Failed to register mdio\n");
+		return -1;
+	}
+
+	/* Initialize PHYs on MDIO1 */
+	pfe_set_mdio(0, miiphy_get_dev_by_name(DEFAULT_PFE_MDIO_NAME));
+	pfe_set_phy_address_mode(0, EMAC1_PHY_ADDR,
+				 PHY_INTERFACE_MODE_SGMII);
+
+	/* Initialize TI DP83867CS PHY LEDs as:
+	 * LED_3 = 0x0: Link established (not connected)
+	 * LED_2 = 0x0: Link established (not connected)
+	 * LED_1 = 0xB: Link established, blink for activity (green LED)
+	 * LED_0 = 0x5: 1000BT link established (orange LED)
+	 */
+	miiphy_write(DEFAULT_PFE_MDIO_NAME, EMAC1_PHY_ADDR, 0x18, 0x00B5);
+
+	cpu_eth_init(bis);
+
 	return pci_eth_init(bis);
 }
 
