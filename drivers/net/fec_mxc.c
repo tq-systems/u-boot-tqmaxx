@@ -16,7 +16,6 @@
 #include <miiphy.h>
 #include <net.h>
 #include <netdev.h>
-#include "fec_mxc.h"
 
 #include <asm/io.h>
 #include <linux/errno.h>
@@ -26,6 +25,9 @@
 #include <asm/arch/imx-regs.h>
 #include <asm/imx-common/sys_proto.h>
 #include <asm/arch/sys_proto.h>
+#include <asm-generic/gpio.h>
+
+#include "fec_mxc.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -1266,6 +1268,19 @@ static int fec_phy_init(struct fec_priv *priv, struct udevice *dev)
 	return 0;
 }
 
+#ifdef CONFIG_DM_GPIO
+/* FEC GPIO reset */
+static void fec_gpio_reset(struct fec_priv *priv)
+{
+	debug("fec_gpio_reset: fec_gpio_reset(dev)\n");
+	if (dm_gpio_is_valid(&priv->phy_reset_gpio)) {
+		dm_gpio_set_value(&priv->phy_reset_gpio, 1);
+		udelay(priv->reset_delay);
+		dm_gpio_set_value(&priv->phy_reset_gpio, 0);
+	}
+}
+#endif
+
 static int fecmxc_probe(struct udevice *dev)
 {
 	struct eth_pdata *pdata = dev_get_platdata(dev);
@@ -1289,6 +1304,10 @@ printf("%s +++\n", __func__);
 		return ret;
 
 	priv->xcv_type = CONFIG_FEC_XCV_TYPE;
+
+#ifdef CONFIG_DM_GPIO
+	fec_gpio_reset(priv);
+#endif
 
 	/* Reset chip. */
 	writel(readl(&priv->eth->ecntrl) | FEC_ECNTRL_RESET,
@@ -1348,6 +1367,7 @@ static int fecmxc_remove(struct udevice *dev)
 
 static int fecmxc_ofdata_to_platdata(struct udevice *dev)
 {
+	int ret = 0;
 	struct eth_pdata *pdata = dev_get_platdata(dev);
 	struct fec_priv *priv = dev_get_priv(dev);
 	const char *phy_mode;
@@ -1367,14 +1387,32 @@ printf("%s +++\n", __func__);
 		return -EINVAL;
 	}
 
-	/* TODO
-	 * Need to get the reset-gpio and related properties from DT
-	 * and implemet the enet reset code on .probe call
-	 */
+#ifdef CONFIG_DM_GPIO
+	ret = gpio_request_by_name(dev, "phy-reset-gpios", 0,
+			     &priv->phy_reset_gpio, GPIOD_IS_OUT);
+	if (ret == 0) {
+		const u32 *cell;
+		int len;
+
+		cell = fdt_getprop(gd->fdt_blob, dev_of_offset(dev), 
+				   "phy-reset-duration", &len);
+		if (!cell || len != sizeof(*cell))
+			priv->reset_delay = 1;
+		else
+			priv->reset_delay = fdt32_to_cpu(*cell);
+	} else if (ret == -ENOENT) {
+		priv->reset_delay = 1000;
+		ret = 0;
+	}
+
+	if (priv->reset_delay > 1000) {
+		printf("FEX MXC: gpio reset timeout should be less the 1000\n");
+		priv->reset_delay = 1000;
+	}
+#endif
 
 printf("%s ---\n", __func__);
-
-	return 0;
+	return ret;
 }
 
 static const struct udevice_id fecmxc_ids[] = {
