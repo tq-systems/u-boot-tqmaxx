@@ -26,6 +26,23 @@ config MBLS1012AL
 
 endchoice
 
+choice
+	prompt "TQMLS1012AL RAM variant"
+	help
+	  Select RAM variant for TQMLS1012AL module
+
+config TQMLS1012AL_256MB
+	bool "TQMLS1012AL with 256 MB RAM"
+	help
+	  Select the TQMLS1012AL moduel with 256 MB RAM.
+
+config TQMLS1012AL_512MB
+	bool "TQMLS1012AL with 512 MB RAM"
+	help
+	  Select the TQMLS1012AL moduel with 512 MB RAM.
+
+endchoice
+
 if FSL_PFE
 config SYS_LS_PFE_FW_ADDR
 	hex "Flash address of PFE firmware"
