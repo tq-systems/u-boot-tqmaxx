@@ -47,16 +47,136 @@
 #define CONFIG_SYS_MEMTEST_START	0x80000000
 #define CONFIG_SYS_MEMTEST_END		0x9fffffff
 
+#define MTDIDS_DEFAULT "nor0=nor0\0"
+#define MTDPARTS_DEFAULT \
+	"mtdparts=nor0:"                                               \
+		"64K@0M(RCW),"                                         \
+		"2M@64K(U-Boot),"                                      \
+		"1M(U-Boot env),"                                      \
+		"2M@4M(PPA FIT image),"                                \
+		"64K@10M(PFE),"                                        \
+		"1M@15M(DTB),"                                         \
+		"48M@16M(Linux),"                                      \
+
+#define TQMLS1012AL_FDT_ADDRESS		0x00f00000
+
+#if defined(CONFIG_DEFAULT_FDT_FILE)
+#define TQMLS1012AL_FDT_FILE_ENV	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"
+#else
+#define TQMLS1012AL_FDT_FILE_ENV
+#endif
+
+#define TQMLS1012AL_EXTRA_UPDATE_ENV_SETTINGS                                  \
+	"loadimage=sf probe 0; sf read ${loadaddr} ${kernel_mtdpart}\0"        \
+	"loadfdt=sf probe 0; sf read ${fdt_addr} ${fdt_mtdpart}\0"             \
+	"mmcblkdev=0\0"                                                        \
+	"update_uboot=run set_getcmd; if ${getcmd} ${uboot}; then "            \
+		"if itest ${filesize} > 0; then "                              \
+			"sf probe 0; "                                         \
+			"sf update ${loadaddr} ${uboot_mtdpart} ${filesize}; " \
+		"fi; fi; "                                                     \
+		"setenv filesize; setenv getcmd \0"                            \
+	"update_kernel=run set_getcmd; "                                       \
+		"if ${getcmd} ${kernel}; then "                                \
+			"if itest ${filesize} > 0; then "                      \
+				"sf probe 0; "                                 \
+				"sf update ${loadaddr} ${kernel_mtdpart} "     \
+					"${filesize};"                         \
+		"fi; fi; "                                                     \
+		"setenv filesize; setenv getcmd; setenv kernel \0"             \
+	"update_fdt=run set_getcmd; if ${getcmd} ${fdt_file}; then "           \
+		"if itest ${filesize} > 0; then "                              \
+			"sf probe 0; "                                         \
+			"sf update ${loadaddr} ${fdt_mtdpart} ${filesize}; "   \
+		"fi; fi; "                                                     \
+		"setenv filesize; setenv getcmd \0"                            \
+
+#define TQMLS1012AL_EXTRA_BOOT_ENV_SETTINGS                                    \
+	"kernel_addr_r=0x80080000\0"                                           \
+	"fdt_addr_r=0x83000000\0"                                              \
+	"ramfs_addr_r=0x81ffffb0\0"                                            \
+	"mmcboot=echo Booting from mmc ...; "                                  \
+		"run set_getcmd; "                                             \
+		"setenv bootargs; "                                            \
+		"run mmcargs; "                                                \
+		"load mmc 0:1 ${kernel_addr_r} ${kernel}; "                    \
+		"load mmc 0:1 ${fdt_addr_r} ${fdt_file}; "                     \
+		"pfe stop; "                                                   \
+		"booti ${kernel_addr_r} - ${fdt_addr_r};\0"                    \
+	"qspiboot=echo Booting from qspi ...; "                                \
+		"setenv bootargs; "                                            \
+		"run qspiargs; "                                               \
+		"if run loadimage; then "                                      \
+			"if run loadfdt; then "                                \
+				"echo boot device tree kernel ...; "           \
+				"pfe stop; "                                   \
+				"booti ${loadaddr} - ${fdt_addr}; "            \
+			"fi; "                                                 \
+		"else "                                                        \
+			"pfe stop; "                                           \
+			"bootm; "                                              \
+		"fi;\0"                                                        \
+		"setenv bootargs \0"                                           \
+	"ramboot=echo Booting from tftp ...; "                                 \
+		"run set_getcmd; "                                             \
+		"setenv bootargs; "                                            \
+		"run ramargs; "                                                \
+		"tftp ${kernel_addr_r} ${kernel}; "                            \
+		"tftp ${fdt_addr_r} ${fdt_file}; "                             \
+		"tftp ${ramfs_addr_r} ${ramfs}; "                              \
+		"pfe stop; "                                                   \
+		"booti ${kernel_addr_r} ${ramfs_addr_r} ${fdt_addr_r};\0"      \
+	"panicboot=echo No boot device !!! reset\0"                            \
+
 #undef CONFIG_EXTRA_ENV_SETTINGS
-#define CONFIG_EXTRA_ENV_SETTINGS              \
-       "verify=no\0"                           \
-       "loadaddr=0x82000000\0"                 \
-       "kernel_addr=0x100000\0"                \
-       "fdt_high=0xffffffffffffffff\0"         \
-       "initrd_high=0xffffffffffffffff\0"      \
-       "kernel_start=0xa00000\0"               \
-       "kernel_load=0x96000000\0"              \
-       "kernel_size=0x2800000\0"
+#define CONFIG_EXTRA_ENV_SETTINGS                                              \
+	"verify=no\0"                                                          \
+	"loadaddr=0x82000000\0"                                                \
+	"fdt_high=0xffffffffffffffff\0"                                        \
+	"initrd_high=0xffffffffffffffff\0"                                     \
+	"kernel_addr=0x01000000\0"                                             \
+	"kernel_start=0x01000000\0"                                            \
+	"kernel_load=0xa0000000\0"                                             \
+	"kernel_size=0x2800000\0"                                              \
+	"board=tqmls1012al\0"                                                  \
+	"fdt_addr=" __stringify(TQMLS1012AL_FDT_ADDRESS)"\0"                   \
+	"kernel=Image.bin\0"                                                   \
+	"uboot=u-boot.imx\0"                                                   \
+	"netdev=eth0\0"                                                        \
+	"ipmode=static\0"                                                      \
+	"rootfsmode=ro\0"                                                      \
+	"rootpath=/srv/nfs/tqmls1012al\0"                                      \
+	"rootfs_mtddev=RootFS\0"                                               \
+	"fdt_mtdpart=DTB\0"                                                    \
+	"kernel_mtdpart=Linux\0"                                               \
+	"uboot_mtdpart=U-Boot\0"                                               \
+	"mmcargs=run addtty addmmc econ\0"                                     \
+	"ramargs= run addtty econ\0"                                           \
+	"ramfs=rd.img\0"                                                       \
+	"addip_static=setenv bootargs ${bootargs} "                            \
+		"ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:"            \
+		"${hostname}:${netdev}:off\0"                                  \
+	"addip_dynamic=setenv bootargs ${bootargs} ip=dhcp\0"                  \
+	"addip=if test \"${ipmode}\" != static; then "                         \
+		"run addip_dynamic; else run addip_static; fi\0"               \
+	"addqspi=setenv bootargs ${bootargs} root=ubi0:root ${rootfsmode} "    \
+		"rootfstype=ubifs ubi.mtd=${rootfs_mtddev}\0"                  \
+	"addtty=setenv bootargs ${bootargs} console=${console},${baudrate} "   \
+		"consoleblank=0\0"                                             \
+	"addmmc=setenv bootargs ${bootargs} root=/dev/mmcblk0p2 "              \
+		"rootfstype=ext4 rootdelay=5\0"                                \
+	"qspiargs=run addqspi addtty econ\0"                                   \
+	"econ=setenv bootargs ${bootargs} earlycon=uart8250,mmio,0x21c0500\0"  \
+	"console=ttyS0\0"                                                      \
+	"set_getcmd=if test \"${ipmode}\" != static; then "                    \
+		"setenv getcmd dhcp; setenv autoload yes; "                    \
+		"else setenv getcmd tftp; setenv autoload no; fi\0"            \
+	TQMLS1012AL_FDT_FILE_ENV                                               \
+	TQMLS1012AL_EXTRA_UPDATE_ENV_SETTINGS                                  \
+	TQMLS1012AL_EXTRA_BOOT_ENV_SETTINGS                                    \
+
+#undef CONFIG_BOOTCOMMAND
+#define CONFIG_BOOTCOMMAND "sf probe; run mmcboot; run panicboot"
 
 #define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls1012al/ls1012a_rcw_qspi.cfg
 #define CONFIG_SYS_FSL_PBL_PBI	board/tqc/tqmls1012al/ls1012a_pbi_qspi.cfg
