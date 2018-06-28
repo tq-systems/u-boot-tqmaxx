@@ -12,7 +12,7 @@ The following hardwarerevisions are supported:
 TQMa6ULx:	REV.030x
 TQMa6ULxL:	REV.020x
 MBa6ULx:	REV.020x
-MBa6ULxL:	REV.010x
+MBa6ULxL:	REV.010x,REV.020x
 
 Hardware on modules TQMa6ULx and TQMa6ULxL:
 

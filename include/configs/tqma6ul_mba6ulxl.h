@@ -24,9 +24,9 @@
 #define CONFIG_ETHPRIME			"FEC"
 #define CONFIG_PHY_SMSC
 
-#define CONFIG_MXC_UART_BASE		MX6UL_UART6_BASE_ADDR
+#define CONFIG_MXC_UART_BASE		UART1_BASE
 /* TODO: for kernel command line */
-#define CONFIG_CONSOLE_DEV		"ttymxc5"
+#define CONFIG_CONSOLE_DEV		"ttymxc0"
 
 #define MTDIDS_DEFAULT \
 	"nor0=nor0\0"

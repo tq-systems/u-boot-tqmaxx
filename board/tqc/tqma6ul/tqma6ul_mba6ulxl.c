@@ -115,6 +115,8 @@ static iomux_v3_cfg_t const mba6ulxl_fec_common_pads[] = {
 
 static void mba6ulxl_setup_iomuxc_enet(void)
 {
+	int old_bus;
+
 	/*
 	 * we do not use enet IRQ, so no need to config port expander
 	 */
@@ -124,6 +126,21 @@ static void mba6ulxl_setup_iomuxc_enet(void)
 					 ARRAY_SIZE(mba6ulxl_fec1_pads));
 	imx_iomux_v3_setup_multiple_pads(mba6ulxl_fec2_pads,
 					 ARRAY_SIZE(mba6ulxl_fec2_pads));
+
+	/*
+	 * init GPIO expander here to have all in place
+	 */
+	old_bus = i2c_get_bus_num();
+	i2c_set_bus_num(3);
+
+	/* #0: ENET_1RST# */
+	/* #1: ENET_2RST# */
+	pca953x_set_val(0x22, 0x03, 0x00);
+	/* lan8720: 5.5.3 reset time should be 25ms */
+	udelay(27000);
+	pca953x_set_val(0x22, 0x03, 0x03);
+
+	i2c_set_bus_num(old_bus);
 }
 
 int board_eth_init(bd_t *bis)
@@ -218,8 +235,8 @@ static iomux_v3_cfg_t const mba6ulxl_uart6_pads[] = {
 
 static void mba6ulxl_setup_iomuxc_uart(void)
 {
-	imx_iomux_v3_setup_multiple_pads(mba6ulxl_uart6_pads,
-					 ARRAY_SIZE(mba6ulxl_uart6_pads));
+	imx_iomux_v3_setup_multiple_pads(mba6ulxl_uart1_pads,
+					 ARRAY_SIZE(mba6ulxl_uart1_pads));
 }
 
 static iomux_v3_cfg_t const mba6ulxl_usdhc1_pads[] = {
@@ -233,10 +250,10 @@ static iomux_v3_cfg_t const mba6ulxl_usdhc1_pads[] = {
 	/* VSELECT not usable in standard variant, signal is used as USB OTG ID */
 	/* MX6_PAD_GPIO1_IO05__USDHC1_VSELECT | MUX_PAD_CTRL(USDHC_PAD_CTRL), */
 	/* CD */
-	NEW_PAD_CTRL(MX6_PAD_UART1_CTS_B__GPIO1_IO18,	GPIO_IN_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_UART1_RTS_B__GPIO1_IO19,	GPIO_IN_PAD_CTRL),
 };
 
-#define USDHC1_CD_GPIO	IMX_GPIO_NR(1, 18)
+#define USDHC1_CD_GPIO	IMX_GPIO_NR(1, 19)
 
 int tqc_bb_board_mmc_getcd(struct mmc *mmc)
 {
@@ -414,15 +431,16 @@ int tqc_bb_board_init(void)
 	old_bus = i2c_get_bus_num();
 	i2c_set_bus_num(3);
 
-	/* 2, 5 .. 7 out, port 2 -> BOOT_CFG_EN# hi */
-	pca953x_set_val(0x22, 0xff, 0x14);
-	pca953x_set_dir(0x22, 0xff, 0x00);
+	/* 1 .. 2, 5 .. 7 out, port 2 -> BOOT_CFG_EN# hi, rest should be low */
+	pca953x_set_val(0x22, 0xff, 0x04);
+	pca953x_set_dir(0x22, 0xff, 0x18); 
 
 	i2c_set_bus_num(old_bus);
 
 	/* do it here - to have reset completed */
 	mba6ulxl_setup_iomuxc_enet();
-	/* Only ENET2_MII can manage multiple phy's so we need to
+	/*
+	 * Only ENET2_MII can manage multiple phy's so we need to
 	 * init FEC1 first.
 	 */
 	mba6ulxl_setup_fec(FEC1);
@@ -491,7 +509,7 @@ int tqc_bb_board_late_init(void)
 
 const char *tqc_bb_get_boardname(void)
 {
-	return "MBa6ULxL";
+	return "MBa6ULxL REV.020x";
 }
 
 int board_mmc_get_env_dev(int devno)
