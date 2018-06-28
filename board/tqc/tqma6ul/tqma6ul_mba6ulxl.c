@@ -331,14 +331,28 @@ static iomux_v3_cfg_t const usb_otg1_pads[] = {
 	NEW_PAD_CTRL(MX6_PAD_GPIO1_IO01__USB_OTG1_OC,	USB_OC_PAD_CTRL),
 	NEW_PAD_CTRL(MX6_PAD_GPIO1_IO00__ANATOP_OTG1_ID, USB_ID_PAD_CTRL),
 	/* OTG1_PWR */
-	NEW_PAD_CTRL(MX6_PAD_GPIO1_IO04__GPIO1_IO04,	GPIO_OUT_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_GPIO1_IO04__GPIO1_IO04,	GPIO_OUT_PAD_CTRL) & ~(MUX_MODE_SION),
 };
 #define USB_OTG1_PWR	IMX_GPIO_NR(1, 4)
+
+static iomux_v3_cfg_t const usb_host_pads[] = {
+	/* Hub Reset */
+	NEW_PAD_CTRL(MX6_PAD_LCD_DATA16__GPIO3_IO21,	GPIO_OUT_PAD_CTRL) & ~(MUX_MODE_SION),
+};
+#define USB_HUB_RST	IMX_GPIO_NR(3, 21)
+
 
 static void mba6ulxl_setup_usb(void)
 {
 	imx_iomux_v3_setup_multiple_pads(usb_otg1_pads,
 					 ARRAY_SIZE(usb_otg1_pads));
+	gpio_request(USB_OTG1_PWR, "usb-otg1-pwr");
+	gpio_direction_output(USB_OTG1_PWR , 0);
+
+	imx_iomux_v3_setup_multiple_pads(usb_host_pads,
+					 ARRAY_SIZE(usb_host_pads));
+	gpio_request(USB_HUB_RST, "usb-hub-rst#");
+	gpio_direction_output(USB_HUB_RST , 0);
 }
 
 int board_usb_phy_mode(int port)
@@ -389,19 +403,17 @@ int board_ehci_power(int port, int on)
 	if (port > (CONFIG_USB_MAX_CONTROLLER_COUNT - 1) || port < 0)
 		return -EINVAL;
 
+	printf ("USB%d: Powering %d\n", port, (on) ? 1 : 0);
+
 	switch (port) {
 		case 0:
-			gpio_request(USB_OTG1_PWR, "usb-otg1-pwr");
-			if (on) {
-				/* enable usb-otg */
-				gpio_direction_output(USB_OTG1_PWR , 1);
-			} else {
-				/* disable usb-otg */
-				gpio_direction_output(USB_OTG1_PWR , 0);
-			}
+			/* enable / disable usb-otg */
+			gpio_direction_output(USB_OTG1_PWR , (on) ? 1 : 0);
 			break;
 		case 1:
 			/* power managed by 2517i 7port usb hub */
+			gpio_direction_output(USB_HUB_RST , (on) ? 1 : 0);
+			udelay(100);
 			break;
 		default:
 			printf ("USB%d: Powering port is not supported\n", port);
