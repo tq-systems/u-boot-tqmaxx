@@ -139,6 +139,8 @@
 #define PHYS_SDRAM_SIZE			SZ_512M
 #elif defined(CONFIG_TQMA7_1GB)
 #define PHYS_SDRAM_SIZE			SZ_1G
+#elif defined(CONFIG_TQMA7_2GB)
+#define PHYS_SDRAM_SIZE			SZ_2G
 #endif
 
 #define CONFIG_FEC_MXC
@@ -175,6 +177,8 @@
 #define CONFIG_SYS_TEXT_BASE		0x9fc00000
 #elif defined(CONFIG_TQMA7_1GB)
 #define CONFIG_SYS_TEXT_BASE		0xbfc00000
+#elif defined(CONFIG_TQMA7_2GB)
+#define CONFIG_SYS_TEXT_BASE		0xffc00000
 #endif
 
 

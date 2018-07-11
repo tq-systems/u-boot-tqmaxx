@@ -58,6 +58,11 @@ config TQMA7_1GB
 	help
 	  configure for variant with 1 GB DRAM
 
+config TQMA7_2GB
+	bool "2 GB DRAM"
+	help
+	  configure for variant with 2 GB DRAM
+
 endchoice
 
 
