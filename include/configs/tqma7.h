@@ -169,7 +169,7 @@
 #endif
 #define CONFIG_LOADADDR			0x82000000
 
-/* place code in last 4 MiB of RAM of RAM */
+/* place code in last 4 MiB of RAM */
 #if defined(CONFIG_SYS_TEXT_BASE)
 #undef CONFIG_SYS_TEXT_BASE
 #endif
