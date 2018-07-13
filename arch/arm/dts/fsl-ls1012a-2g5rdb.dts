@@ -41,3 +41,7 @@
 &duart0 {
 	status = "okay";
 };
+
+&sata {
+	status = "okay";
+};

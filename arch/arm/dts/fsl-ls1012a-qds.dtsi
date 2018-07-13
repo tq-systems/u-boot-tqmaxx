@@ -126,3 +126,7 @@
 	status = "okay";
 	phy_type = "ulpi";
 };
+
+&sata {
+	status = "okay";
+};
