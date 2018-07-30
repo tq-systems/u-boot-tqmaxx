@@ -202,6 +202,10 @@ static void tqma6ul_setup_i2c(void)
 {
 	int ret;
 
+	if (check_module_fused(MX6_MODULE_I2C4)) {
+		puts("I2C4: fused\n");
+		return;
+	}
 	/*
 	 * use logical index for bus, e.g. I2C4 -> 3
 	 * warn on error
