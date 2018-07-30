@@ -109,8 +109,8 @@ static iomux_v3_cfg_t const mba6ul_fec2_pads[] = {
 
 static iomux_v3_cfg_t const mba6ul_fec_common_pads[] = {
 	/* MDIO */
-	NEW_PAD_CTRL(MX6_PAD_GPIO1_IO06__ENET2_MDIO, ENET_MDIO_PAD_CTRL),
-	NEW_PAD_CTRL(MX6_PAD_GPIO1_IO07__ENET2_MDC, ENET_MDIO_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_GPIO1_IO06__ENET1_MDIO, ENET_MDIO_PAD_CTRL),
+	NEW_PAD_CTRL(MX6_PAD_GPIO1_IO07__ENET1_MDC, ENET_MDIO_PAD_CTRL),
 };
 
 static void mba6ul_setup_iomuxc_enet(void)
@@ -138,26 +138,33 @@ static void mba6ul_setup_iomuxc_enet(void)
 
 int board_eth_init(bd_t *bis)
 {
-	int ret;
+	int ret = 0;
 
 	/*
-	 * FEC0 and FEC1 shares the mdio bus therefore the
+	 * FEC0 and FEC1 shares the mdio bus. Therefore the
 	 * CONFIG_FEC_MXC_MDIO_BASE macro is used to specify the bus.
 	 * This makes the ENET_BASE_ADDR and ENET2_BASE_ADDR macro
 	 * useless for the fecmxc_initialize_multi function.
-	 * also not, that dev_id param is used internally to pick up the
+	 * also note, that dev_id param is used internally to pick up the
 	 * correct fused MAC address - renaming can be done under linux
 	 * using udev / systemd
 	 */
-	ret = fecmxc_initialize_multi(bis, 0, TQMA6UL_ENET1_PHYADDR,
-				      ENET_BASE_ADDR);
-	if (ret)
-		printf("FEC0 MXC: %s:failed %i\n", __func__, ret);
-
-	ret = fecmxc_initialize_multi(bis, 1, TQMA6UL_ENET2_PHYADDR,
-				      ENET2_BASE_ADDR);
-	if (ret)
-		printf("FEC1 MXC: %s:failed %i\n", __func__, ret);
+	if (check_module_fused(MX6_MODULE_ENET1)) {
+		puts("FEC0: fused\n");
+	} else {
+		ret = fecmxc_initialize_multi(bis, 0, TQMA6UL_ENET1_PHYADDR,
+					      ENET_BASE_ADDR);
+		if (ret)
+			printf("FEC0 MXC: %s:failed %i\n", __func__, ret);
+	}
+	if (check_module_fused(MX6_MODULE_ENET2)) {
+		puts("FEC1: fused\n");
+	} else {
+		ret = fecmxc_initialize_multi(bis, 1, TQMA6UL_ENET2_PHYADDR,
+					      ENET2_BASE_ADDR);
+		if (ret)
+			printf("FEC1 MXC: %s:failed %i\n", __func__, ret);
+	}
 
 	return ret;
 }
@@ -175,9 +182,10 @@ static int mba6ul_setup_fec(int fec_id)
 
 	switch (fec_id) {
 	case FEC0:
-		if (check_module_fused(MX6_MODULE_ENET1))
+		if (check_module_fused(MX6_MODULE_ENET1)) {
+			puts("FEC0: fused\n");
 			return -1;
-
+		}
 		/*
 		 * Use 50M anatop loopback REF_CLK1 for ENET1,
 		 * clear gpr1[13], set gpr1[17]
@@ -186,8 +194,10 @@ static int mba6ul_setup_fec(int fec_id)
 				IOMUX_GPR1_FEC1_CLOCK_MUX1_SEL_MASK);
 		break;
 	case FEC1:
-		if (check_module_fused(MX6_MODULE_ENET2))
+		if (check_module_fused(MX6_MODULE_ENET2)) {
+			puts("FEC1: fused\n");
 			return -1;
+		}
 		/*
 		 * Use 50M anatop loopback REF_CLK1 for ENET2,
 		 * clear gpr1[13], set gpr1[17]

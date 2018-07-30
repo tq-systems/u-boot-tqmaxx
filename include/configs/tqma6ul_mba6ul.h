@@ -25,7 +25,12 @@
 #define CONFIG_CMD_PCA953X_INFO
 
 /* FEC */
-#define CONFIG_FEC_MXC_MDIO_BASE	ENET2_BASE_ADDR
+/* to help usinga single U-boot image for TQMa6UL / TQMa6ULL with or without
+ * ENET2 IP core, use ENET1 as MDIO bus controller, which is always present.
+ * Note: this maybe will change when switching to device tree. Take care of
+ * correct pin multiplexing
+ */
+#define CONFIG_FEC_MXC_MDIO_BASE	ENET_BASE_ADDR
 #define TQMA6UL_ENET1_PHYADDR		0x00
 #define TQMA6UL_ENET2_PHYADDR		0x01
 #define CONFIG_FEC_XCV_TYPE		RMII
