@@ -479,13 +479,14 @@ int tqc_bb_board_init(void)
 
 	/* do it here - to have reset completed */
 	mba6ul_setup_iomuxc_enet();
-	/* Only ENET2_MII can manage multiple phy's so we need to
+	/*
+	 * Only ENET2_MII can manage multiple phy's so we need to
 	 * init FEC1 first.
 	 * TODO:
 	 *   Check if we can change this with MBa6UL-REV.0200
 	 */
-	mba6ul_setup_fec(FEC1);
 	mba6ul_setup_fec(FEC0);
+	mba6ul_setup_fec(FEC1);
 	mba6ul_setup_usb();
 
 	return 0;
