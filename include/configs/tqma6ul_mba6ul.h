@@ -2,6 +2,8 @@
  * Copyright (C) 2016 Markus Niebel <Markus.Niebel@tq-group.com>
  *
  * Configuration settings for the TQ Systems MBa6UL Carrier board for TQMa6UL.
+ * Configuration settings for the TQ Systems MBa6UL Carrier board for TQMa6ULx,
+ * TQMa6ULxL, TQMa6ULLx and TQMa6ULLxL.
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
@@ -9,12 +11,26 @@
 #ifndef __CONFIG_TQMA6UL_MB6UL_H
 #define __CONFIG_TQMA6UL_MBA6UL_H
 
+#if defined(CONFIG_TQMA6UL)
+
 #if defined(CONFIG_TQMA6UL_VARIANT_STANDARD)
 #define CONFIG_DEFAULT_FDT_FILE		"imx6ul-mba6ulx.dtb"
 #elif defined(CONFIG_TQMA6UL_VARIANT_LGA)
 #define CONFIG_DEFAULT_FDT_FILE		"imx6ul-mba6ulx-lga.dtb"
 #else
 #error
+#endif
+
+#elif defined(CONFIG_TQMA6ULL)
+
+#if defined(CONFIG_TQMA6UL_VARIANT_STANDARD)
+#define CONFIG_DEFAULT_FDT_FILE		"imx6ull-mba6ulx.dtb"
+#elif defined(CONFIG_TQMA6UL_VARIANT_LGA)
+#define CONFIG_DEFAULT_FDT_FILE		"imx6ull-mba6ulx-lga.dtb"
+#else
+#error
+#endif
+
 #endif
 
 #define CONFIG_SYS_I2C_MXC_I2C1		/* enable I2C bus 1 */

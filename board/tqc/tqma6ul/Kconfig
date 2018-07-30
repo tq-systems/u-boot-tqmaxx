@@ -12,17 +12,38 @@ config SYS_SOC
 config SYS_CONFIG_NAME
 	default "tqma6ul"
 
-config TQMA6UL
+config TQMA6UL_COMMON
 	bool
-	select MX6UL
 	select SPI_FLASH if MBA6UL || TQMA6UL_QSPI_BOOT
 	select SPI_FLASH_STMICRO if SPI_FLASH
 	select SPI_FLASH_WINBOND if SPI_FLASH
 	select SPI_FLASH_SPANSION if SPI_FLASH
 	select SPI_FLASH_MTD if SPI_FLASH
 	select SPI_FLASH_BAR if SPI_FLASH
+
+choice
+	prompt "TQMa6UL CPU variant"
+	default TQMA6UL
+	help
+	  Configure module variant.
+
+config TQMA6UL
+	bool
+	prompt "TQMa6ULx with i.MX6UL"
+	select MX6UL
+	select TQMA6UL_COMMON
 	help
 	  select TQMa6UL with i.MX6UL and 256 MiB DRAM
+
+config TQMA6ULL
+	bool
+	prompt "TQMa6ULLx with i.MX6ULL"
+	select MX6ULL
+	select TQMA6UL_COMMON
+	help
+	  select TQMa6ULL with i.MX6ULL and 256 MiB DRAM
+
+endchoice
 
 choice
 	prompt "TQMa6UL module variant"
@@ -75,6 +96,7 @@ endchoice
 
 config IMX_CONFIG
 	default "board/tqc/tqma6ul/tqma6ul.cfg" if TQMA6UL
+	default "board/tqc/tqma6ul/tqma6ul.cfg" if TQMA6ULL
 
 source "board/tqc/common/Kconfig"
 

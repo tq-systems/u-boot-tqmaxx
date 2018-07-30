@@ -267,6 +267,15 @@ static const char *tqma6ul_get_boardname(void)
 #error
 #endif
 		break;
+	case MXC_CPU_MX6ULL:
+#if defined(CONFIG_TQMA6UL_VARIANT_STANDARD)
+		return "TQMa6ULL REV.030x";
+#elif defined(CONFIG_TQMA6UL_VARIANT_LGA)
+		return "TQMa6ULxLL REV.020x";
+#else
+#error
+#endif
+		break;
 	default:
 		return "??";
 	};
