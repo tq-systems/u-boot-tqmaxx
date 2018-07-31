@@ -542,6 +542,39 @@ int tqc_bb_board_late_init(void)
 		setenv("mmcdev", "");
 	}
 
+	/* provide default setting for fdt_file if nothing in env is set */
+	if (NULL == getenv("fdt_file")) {
+		u32 cpurev = get_cpu_rev();
+		int use_g1 = check_module_fused(MX6_MODULE_ENET2);
+
+		switch ((cpurev & 0xFF000) >> 12) {
+		case MXC_CPU_MX6UL:
+			setenv("fdt_file", (use_g1) ?
+#if defined(CONFIG_TQMA6UL_VARIANT_STANDARD)
+				"imx6ul-mba6ulx-g1.dtb" : "imx6ul-mba6ulx.dtb"
+#elif defined(CONFIG_TQMA6UL_VARIANT_LGA)
+				"imx6ul-mba6ulx-g1-lga.dtb" : "imx6ul-mba6ulx-lga.dtb"
+#else
+#error
+#endif
+			);
+			break;
+		case MXC_CPU_MX6ULL:
+			setenv("fdt_file", (use_g1) ?
+#if defined(CONFIG_TQMA6UL_VARIANT_STANDARD)
+				"imx6ull-mba6ulx-y1.dtb" : "imx6ull-mba6ulx.dtb"
+#elif defined(CONFIG_TQMA6UL_VARIANT_LGA)
+				"imx6ull-mba6ulx-y1-lga.dtb" : "imx6ull-mba6ulx-lga.dtb"
+#else
+#error
+#endif
+			);
+			break;
+		default:
+			debug("unknown CPU");
+		}
+	}
+
 	imx_iomux_v3_setup_multiple_pads(mba6ul_wdog_pads,
 					 ARRAY_SIZE(mba6ul_wdog_pads));
 	set_wdog_reset((struct wdog_regs *)WDOG1_BASE_ADDR);
