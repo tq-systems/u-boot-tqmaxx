@@ -200,7 +200,7 @@ static int mba6ul_setup_fec(int fec_id)
 		}
 		/*
 		 * Use 50M anatop loopback REF_CLK1 for ENET2,
-		 * clear gpr1[13], set gpr1[17]
+		 * clear gpr1[14], set gpr1[18]
 		 */
 		clrsetbits_le32(&iomuxc_gpr_regs->gpr[1], IOMUX_GPR1_FEC2_MASK,
 				IOMUX_GPR1_FEC2_CLOCK_MUX1_SEL_MASK);
