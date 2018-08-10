@@ -769,7 +769,12 @@ int fsl_esdhc_initialize(bd_t *bis, struct fsl_esdhc_cfg *cfg)
 #endif
 
 	cfg->cfg.f_min = 400000;
+#ifdef CONFIG_MX6ULL
+	/* fixes ESDHC_FLAG_ERR010450 for i.MX6ULL */
+	cfg->cfg.f_max = min(cfg->sdhc_clk, (u32)45000000);
+#else
 	cfg->cfg.f_max = min(cfg->sdhc_clk, (u32)52000000);
+#endif
 
 	cfg->cfg.b_max = CONFIG_SYS_MMC_MAX_BLK_COUNT;
 
