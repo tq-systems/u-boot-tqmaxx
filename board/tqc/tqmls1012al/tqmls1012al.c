@@ -10,6 +10,19 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+int esdhc_status_fixup(void *blob, const char *compat)
+{
+	char esdhc0_path[] = "/soc/esdhc@1560000";
+	char esdhc1_path[] = "/soc/esdhc@1580000";
+
+	do_fixup_by_path(blob, esdhc0_path, "status", "okay",
+			 sizeof("okay"), 1);
+
+	do_fixup_by_path(blob, esdhc1_path, "status", "disabled",
+			 sizeof("disabled"), 1);
+	return 0;
+}
+
 int dram_init(void)
 {
 #if (!defined(CONFIG_SPL) || defined(CONFIG_SPL_BUILD))
