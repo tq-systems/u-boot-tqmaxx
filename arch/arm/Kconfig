@@ -1180,6 +1180,20 @@ config TARGET_LS1046ARDB
 	  development platform that supports the QorIQ LS1046A
 	  Layerscape Architecture processor.
 
+config TARGET_TQMLS1046A
+	bool "Support tqmls1046a"
+	select ARCH_LS1046A
+	select ARM64
+	select ARMV8_MULTIENTRY
+	select BOARD_LATE_INIT
+	select SUPPORT_SPL
+	select DM_SPI_FLASH if DM_SPI
+	select BOARD_EARLY_INIT_F
+	imply SCSI
+	help
+	  Support for TQ-Systems GmbH TQMLS1046A SOM based on the
+	  QorIQ LS1046A Layerscape Architecture processor.
+
 config TARGET_H2200
 	bool "Support h2200"
 	select CPU_PXA
@@ -1444,6 +1458,7 @@ source "board/spear/spear600/Kconfig"
 source "board/spear/x600/Kconfig"
 source "board/st/stv0991/Kconfig"
 source "board/tcl/sl50/Kconfig"
+source "board/tqc/tqmls1046a/Kconfig"
 source "board/birdland/bav335x/Kconfig"
 source "board/timll/devkit3250/Kconfig"
 source "board/toradex/colibri_pxa270/Kconfig"

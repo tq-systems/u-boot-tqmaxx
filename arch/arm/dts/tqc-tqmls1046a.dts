@@ -1,0 +1,40 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Device Tree file for TQ Systems TQMLS1046A SoC module.
+ *
+ * Copyright 2018 TQ-Systems GmbH
+ */
+
+/dts-v1/;
+/include/ "fsl-ls1046a.dtsi"
+
+/ {
+	model = "TQMLS1046A Board";
+
+	aliases {
+		spi0 = &qspi;
+	};
+
+};
+
+&qspi {
+	bus-num = <0>;
+	spi-max-frequency = <50000000>;
+	status = "okay";
+
+	qflash0: mx66u51235f@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "spi-flash";
+		spi-max-frequency = <50000000>;
+		reg = <0>;
+	};
+
+	qflash1: mx66u51235f@1 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "spi-flash";
+		spi-max-frequency = <50000000>;
+		reg = <1>;
+	 };
+};
