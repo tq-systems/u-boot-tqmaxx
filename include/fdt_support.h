@@ -96,6 +96,19 @@ int fdt_fixup_memory(void *blob, u64 start, u64 size);
 int fdt_fixup_memory_banks(void *blob, u64 start[], u64 size[], int banks);
 
 int fdt_set_usable_memory(void *blob, u64 start[], u64 size[], int banks);
+
+/**
+ * Create / Replace reg property of DT node
+ *
+ * @param blob		FDT blob to update
+ * @param nodeoffset
+ * @param start		start address of region.
+ * @param size		size of region.
+ *
+ * @return 0 if ok, or -1 or -FDT_ERR_... on error
+ */
+int fdt_fixup_reg_property(void *blob, int nodeoffset, u64 start, u64 size);
+
 void fdt_fixup_ethernet(void *fdt);
 int fdt_find_and_setprop(void *fdt, const char *node, const char *prop,
 			 const void *val, int len, int create);

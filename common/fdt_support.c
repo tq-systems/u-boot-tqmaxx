@@ -501,6 +501,19 @@ int fdt_fixup_memory(void *blob, u64 start, u64 size)
 	return fdt_fixup_memory_banks(blob, &start, &size, 1);
 }
 
+int fdt_fixup_reg_property(void *blob, int nodeoffset, u64 start, u64 size)
+{
+	int err;
+	u8 tmp[2 * 16]; /* Up to 64-bit address + 64-bit size */
+	int len = fdt_pack_reg(blob, tmp, &start, &size, 1);
+
+	err = fdt_setprop(blob, nodeoffset, "reg", tmp, len);
+	if (err < 0)
+		return err;
+
+	return 0;
+}
+
 void fdt_fixup_ethernet(void *fdt)
 {
 	int node, i, j;
