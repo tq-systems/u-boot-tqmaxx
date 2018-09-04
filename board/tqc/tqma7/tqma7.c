@@ -418,6 +418,62 @@ static void tqma7_ft_qspi_setup(void *blob, bd_t *bd)
 				    0);
 }
 
+#if defined(CONFIG_IMX_BOOTAUX)
+ulong board_get_usable_ram_top(ulong total_size)
+{
+	/* Reserve last 2MiB for M4 on modules with 512MiB RAM */
+	if (gd->ram_size == SZ_512M)
+		return gd->ram_top - SZ_2M;
+	else
+		return gd->ram_top;
+}
+
+int tqma7_ft_m4_setup(void *blob, bd_t *bd)
+{
+	int ret;
+	int off;
+
+	off = fdt_node_offset_by_compatible(blob, -1, "fsl,imx7d-rpmsg");
+
+	ret = arch_auxiliary_core_check_up(0);
+	if (ret) {
+		int areas = 1;
+		u64 start[2], size[2];
+
+		/*
+		 * Reserve 2MiB of memory for M4 (1MiB is also the minimum
+		 * alignment for Linux due to MMU section size restrictions).
+		 */
+		start[0] = gd->bd->bi_dram[0].start;
+		size[0] = SZ_512M - SZ_2M;
+
+		/* If needed, create a second entry for memory beyond 512M */
+		if (gd->bd->bi_dram[0].size > SZ_512M) {
+			start[1] = gd->bd->bi_dram[0].start + SZ_512M;
+			size[1] = gd->bd->bi_dram[0].size - SZ_512M;
+			areas = 2;
+		}
+
+		ret = fdt_set_usable_memory(blob, start, size, areas);
+		if (ret) {
+			eprintf("Cannot set usable memory\n");
+			return ret;
+		}
+
+		if (off > 0)
+			fdt_fixup_reg_property(blob, off,
+					      (u64)(gd->bd->bi_dram[0].start +
+					      SZ_512M - SZ_1M),
+			(u64)SZ_1M);
+	} else {
+		if (off > 0)
+			fdt_status_disabled(blob, off);
+	}
+}
+#else
+inline tqma7_ft_m4_setup(void *blob, bd_t *bd) {}
+#endif
+
 #define MODELSTRLEN 32u
 int ft_board_setup(void *blob, bd_t *bd)
 {
@@ -427,6 +483,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 		 tqc_bb_get_boardname());
 	do_fixup_by_path_string(blob, "/", "model", modelstr);
 	fdt_fixup_memory(blob, (u64)PHYS_SDRAM, (u64)gd->ram_size);
+	tqma7_ft_m4_setup(blob, bd);
 
 	/* bring in eMMC dsr settings if needed */
 	if (tqma7_emmc_needs_dsr(0) > 0) {
