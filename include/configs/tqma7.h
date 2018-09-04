@@ -169,18 +169,17 @@
 #endif
 #define CONFIG_LOADADDR			0x82000000
 
-/* place code in last 4 MiB of RAM */
+/* place code in last 8 MiB of RAM */
 #if defined(CONFIG_SYS_TEXT_BASE)
 #undef CONFIG_SYS_TEXT_BASE
 #endif
 #if defined(CONFIG_TQMA7_512MB)
-#define CONFIG_SYS_TEXT_BASE		0x9fc00000
+#define CONFIG_SYS_TEXT_BASE		0x9f800000
 #elif defined(CONFIG_TQMA7_1GB)
-#define CONFIG_SYS_TEXT_BASE		0xbfc00000
+#define CONFIG_SYS_TEXT_BASE		0xbf800000
 #elif defined(CONFIG_TQMA7_2GB)
-#define CONFIG_SYS_TEXT_BASE		0xffc00000
+#define CONFIG_SYS_TEXT_BASE		0xff800000
 #endif
-
 
 #define CONFIG_ENV_SIZE			(SZ_8K)
 /* Size of malloc() pool */
