@@ -318,39 +318,24 @@
 
 #endif
 
-#ifdef CONFIG_SYS_USE_QSPI
-#define CONFIG_SYS_AUXCORE_BOOTDATA 0x60100000 /* Set to QSPI1 A flash, offset 1M */
-#else
-#define CONFIG_SYS_AUXCORE_BOOTDATA 0x7F8000 /* Set to TCML address */
-#endif
 #define CONFIG_CMD_BOOTAUX /* Boot M4 */
 
 #ifdef CONFIG_CMD_BOOTAUX
+
+#define CONFIG_SYS_AUXCORE_BOOTDATA 0x7F8000 /* Set to TCML address */
+
 #define CONFIG_MXC_RDC /* Enable RDC to isolate the peripherals for A7 and M4 */
 
-#ifdef CONFIG_SYS_USE_QSPI
-#define UPDATE_M4_ENV \
-	"m4image=m4_qspi.bin\0" \
-	"loadm4image=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${m4image}\0" \
-	"update_m4_from_sd=" \
-		"if sf probe 0:0; then " \
-			"if run loadm4image; then " \
-				"setexpr fw_sz ${filesize} + 0xffff; " \
-				"setexpr fw_sz ${fw_sz} / 0x10000; "	\
-				"setexpr fw_sz ${fw_sz} * 0x10000; "	\
-				"sf erase 0x100000 ${fw_sz}; " \
-				"sf write ${loadaddr} 0x100000 ${filesize}; " \
-			"fi; " \
-		"fi\0" \
-	"m4boot=sf probe 0:0; bootaux "__stringify(CONFIG_SYS_AUXCORE_BOOTDATA)"\0"
+#define TQMA7_M4_ENV \
+	"m4image=m4.bin\0"                                                     \
+	"loadm4image=load mmc ${mmcdev}:${firmwarepart} "                      \
+		__stringify(CONFIG_SYS_AUXCORE_BOOTDATA)" ${m4image}\0"        \
+	"m4boot=run loadm4image; "                                             \
+		"bootaux "__stringify(CONFIG_SYS_AUXCORE_BOOTDATA)"\0"         \
+	"m4netboot=tftp ${m4image}; "                                          \
+		"bootaux "__stringify(CONFIG_SYS_AUXCORE_BOOTDATA)"\0"
 #else
-#define UPDATE_M4_ENV \
-	"m4image=m4_qspi.bin\0" \
-	"loadm4image=fatload mmc ${mmcdev}:${mmcpart} "__stringify(CONFIG_SYS_AUXCORE_BOOTDATA)" ${m4image}\0" \
-	"m4boot=run loadm4image; bootaux "__stringify(CONFIG_SYS_AUXCORE_BOOTDATA)"\0"
-#endif
-#else
-#define UPDATE_M4_ENV ""
+#define TQMA7_M4_ENV
 #endif
 
 /* 128 MiB offset as in ARM related docu for linux suggested */
@@ -366,7 +351,7 @@
 #endif
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
-	UPDATE_M4_ENV \
+	TQMA7_M4_ENV                                                           \
 	"board=tqma7\0"                                                        \
 	"uimage=uImage\0"                                                      \
 	"zimage=linuximage\0"                                                  \
