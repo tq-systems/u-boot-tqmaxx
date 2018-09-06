@@ -126,6 +126,16 @@
 		"tftp ${ramfs_addr_r} ${ramfs}; "                              \
 		"pfe stop; "                                                   \
 		"booti ${kernel_addr_r} ${ramfs_addr_r} ${fdt_addr_r};\0"      \
+	"usbboot=echo Booting from usb ...; "                                  \
+		"run set_getcmd; "                                             \
+		"usb reset; "                                                  \
+		"usb reset; "                                                  \
+		"setenv bootargs; "                                            \
+		"run usbargs; "                                                \
+		"load usb 0:1 ${kernel_addr_r} ${kernel}; "                    \
+		"load usb 0:1 ${fdt_addr_r} ${fdt_file}; "                     \
+		"pfe stop; "                                                   \
+		"booti ${kernel_addr_r} - ${fdt_addr_r};\0"                    \
 	"panicboot=echo No boot device !!! reset\0"                            \
 
 #undef CONFIG_EXTRA_ENV_SETTINGS
@@ -152,6 +162,7 @@
 	"uboot_mtdpart=U-Boot\0"                                               \
 	"mmcargs=run addtty addmmc econ\0"                                     \
 	"ramargs= run addtty econ\0"                                           \
+	"usbargs=run addtty addusb econ\0"                                     \
 	"ramfs=rd.img\0"                                                       \
 	"addip_static=setenv bootargs ${bootargs} "                            \
 		"ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:"            \
@@ -164,6 +175,8 @@
 	"addtty=setenv bootargs ${bootargs} console=${console},${baudrate} "   \
 		"consoleblank=0\0"                                             \
 	"addmmc=setenv bootargs ${bootargs} root=/dev/mmcblk0p2 "              \
+		"rootfstype=ext4 rootdelay=5\0"                                \
+	"addusb=setenv bootargs ${bootargs} root=/dev/sda2 "                   \
 		"rootfstype=ext4 rootdelay=5\0"                                \
 	"qspiargs=run addqspi addtty econ\0"                                   \
 	"econ=setenv bootargs ${bootargs} earlycon=uart8250,mmio,0x21c0500\0"  \
