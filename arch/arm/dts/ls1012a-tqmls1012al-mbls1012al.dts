@@ -46,3 +46,7 @@
 		#gpio-cells = <2>;
 	};
 };
+
+&sata {
+	status = "okay";
+};
