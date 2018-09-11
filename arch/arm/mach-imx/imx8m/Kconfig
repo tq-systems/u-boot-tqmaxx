@@ -91,6 +91,7 @@ config TARGET_TQMA8MX
 	select MISC
 	select SUPPORT_SPL
 	select SPL
+	select TQC_EEPROM
 
 endchoice
 
