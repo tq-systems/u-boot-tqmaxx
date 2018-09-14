@@ -105,11 +105,23 @@ void tqmls1012al_bb_late_init(void)
 	/* USB */
 	unsigned int gpio_number;
 	const char *gpio_name_usb = "gpio@20_6";
+	const char *gpio_name_pcie_clk_pd = "gpio@70_0";
 
 	if (get_gpio_number(gpio_name_usb, &gpio_number)) {
 		printf("USB: GPIO '%s' not found\n", gpio_name_usb);
 	} else {
 		gpio_request(gpio_number, "USB_rst");
+		gpio_direction_output(gpio_number, 1);
+	}
+
+	/* PCIE_CLK_PD - Do not change */
+	if(get_gpio_number(gpio_name_pcie_clk_pd,&gpio_number))
+	{
+		printf("PCIE: GPIO '%s' not found\n", gpio_name_pcie_clk_pd);
+	}
+	else
+	{
+		gpio_request(gpio_number, "PCIE_CLK_PD");
 		gpio_direction_output(gpio_number, 1);
 	}
 }
