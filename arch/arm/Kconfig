@@ -1189,6 +1189,7 @@ config TARGET_TQMLS1046A
 	select SUPPORT_SPL
 	select DM_SPI_FLASH if DM_SPI
 	select BOARD_EARLY_INIT_F
+	select TQC_EEPROM
 	imply SCSI
 	help
 	  Support for TQ-Systems GmbH TQMLS1046A SOM based on the

@@ -20,9 +20,9 @@
 #include <fsl_esdhc.h>
 #include <fsl_sec.h>
 #include "tqmls1046a_bb.h"
+#include "../common/tqc_eeprom.h"
 
 DECLARE_GLOBAL_DATA_PTR;
-
 
 int board_early_init_f(void)
 {
@@ -100,6 +100,28 @@ int power_init_board(void)
 #ifdef CONFIG_MISC_INIT_R
 int misc_init_r(void)
 {
+	struct tqc_eeprom_data eedat;
+	char safe_string[0x41]; /* must hold largest field of eeprom data */
+	int ret;
+
+	ret = tqc_read_eeprom(CONFIG_SYS_EEPROM_BUS_NUM,
+			CONFIG_SYS_I2C_EEPROM_ADDR, &eedat);
+
+	if(!ret) {
+		/* ID */
+		tqc_parse_eeprom_id(&eedat, safe_string, ARRAY_SIZE(safe_string));
+		if (0 == strncmp(safe_string, "TQMLS1046A", strlen("TQMLS1046A")))
+			env_set("boardtype", safe_string);
+		if (0 == tqc_parse_eeprom_serial(&eedat, safe_string,
+					ARRAY_SIZE(safe_string)))
+			env_set("serial#", safe_string);
+		else
+			env_set("serial#", "???");
+		tqc_show_eeprom(&eedat, "TQMLS1046A");
+	} else {
+		printf("EEPROM: err %d\n", ret);
+	}
+
 	return tqmls1046a_bb_misc_init_r();
 }
 #endif
