@@ -1,0 +1,31 @@
+if TARGET_TQMA8XX
+
+config SYS_BOARD
+	default "tqma8xx"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_CONFIG_NAME
+	default "tqma8xx"
+
+choice
+	prompt "TQMa8xX base board variant"
+	default MBA8XX
+	help
+	  Select base board for TQMa8xX
+
+config MBA8XX
+	bool "TQMa8xX on MBa8xX Starterkit"
+	select TQC_SDMMC
+	select DM_ETH
+	select NETDEVICES
+	help
+	  Select the MBa8xX starterkit. This features a GigE Phy, USB, SD-Card
+	  etc.
+
+endchoice
+
+source "board/tqc/common/Kconfig"
+
+endif
