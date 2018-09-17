@@ -113,6 +113,55 @@ int tqmls1046a_bb_board_eth_init(bd_t *bis)
 }
 #endif
 
+static uint16_t _rgmii_phy_read_indirect(struct phy_device *phydev,
+					uint8_t addr)
+{
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x0d, 0x001f);
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x0e, addr);
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x0d, 0x401f);
+	return phy_read(phydev, MDIO_DEVAD_NONE, 0x0e);
+}
+
+static void _rgmii_phy_write_indirect(struct phy_device *phydev,
+					uint8_t addr, uint16_t value)
+{
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x0d, 0x001f);
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x0e, addr);
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x0d, 0x401f);
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x0e, value);
+}
+
+int board_phy_config(struct phy_device *phydev)
+{
+	uint16_t val;
+	int ret = 0;
+
+	if (phydev->drv->config)
+		ret = phydev->drv->config(phydev);
+
+	if(!ret) {
+		switch(phydev->addr) {
+		case RGMII_PHY1_ADDR:
+		case RGMII_PHY2_ADDR:
+			/* enable RGMII delay in both directions */
+			val = _rgmii_phy_read_indirect(phydev, 0x32);
+			val |= 0x0003;
+			_rgmii_phy_write_indirect(phydev, 0x32, val);
+
+			/* set RGMII delay in both directions to 1,5ns */
+			val = _rgmii_phy_read_indirect(phydev, 0x86);
+			val = (val & 0xFF00) | 0x0055;
+			_rgmii_phy_write_indirect(phydev, 0x86, val);
+			break;
+		default:
+			break;
+		}
+	}
+
+	return ret;
+}
+
+
 #if defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT)
 int tqmls1046a_bb_ft_board_setup(void *blob, bd_t *bd)
 {
