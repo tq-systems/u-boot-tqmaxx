@@ -125,6 +125,26 @@ void tqmls102xa_bb_early_init(void)
 #endif
 }
 
+/* DIP Switch on Board is big-endian */
+static char *mbls102xa_cpld_muxmodes[] = {
+	"#1 EC1+HDMI",
+	"#9 SAI+HDMI",
+	"#5 CAN+HDMI",
+	"#13 reserved",
+	"#3 EC1+UCC",
+	"#11 SAI+UCC",
+	"#7 CAN+UCC",
+	"#15 reserved",
+	"#2 EC1+LVDS",
+	"#10 SAI+LVDS",
+	"#6 CAN+LVDS",
+	"#14 reserved",
+	"#4 EC1+LVDS_RGBINV",
+	"#12 SAI+LVDS_RGBINV",
+	"#8 CAN+LVDS_RGBINV",
+	"#16 reserved",
+};
+
 void mbls102xa_cpld_config(void)
 {
 	unsigned int oldbus, i;
@@ -134,7 +154,11 @@ void mbls102xa_cpld_config(void)
 	oldbus = i2c_get_bus_num();
 	i2c_set_bus_num(0);
 	i2c_read(0x22, 0, 1, &pca_in, 1);
+	pca_in = pca_in & 0x0f;
 	/* assign input values to led outputs */
+	/* PCA_OUT[7..0]: PCA_IN[0], PCA_IN[1], PCA_IN[2], PCA_IN[3],
+	 *                NC, NC, NC, NC
+	 */
 	pca_out = (pca_in & 0x01) << 7 | (pca_in & 0x02) << 5 |
 		  (pca_in & 0x04) << 3 | (pca_in & 0x08) << 1;
 	/* set direction */
@@ -142,10 +166,10 @@ void mbls102xa_cpld_config(void)
 	/* set output */
 	i2c_write(0x22, 1, 1, &pca_out, 1);
 
-	printf("CPLD:  ");
+	printf("CPLD: %s (", mbls102xa_cpld_muxmodes[pca_in]);
 	for(i = 0; i <= 3; i++)
 		printf("%d",(pca_in>>i) & 0x01);
-	printf("\n");
+	printf(")\n");
 
 	i2c_set_bus_num(oldbus);
 }
