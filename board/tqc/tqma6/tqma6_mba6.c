@@ -401,9 +401,9 @@ int tqma6_bb_board_late_init(void)
 	case BOOT_DEVICE_MMC1:
 		printf("ESDHC%u\n", imx_boot_device_instance() + 1);
 		env_set("boot_dev", "mmc");
-		switch (mmc_get_env_devno()) {
+		switch (imx_boot_device_instance()) {
 		/* eMMC (USDHC3)*/
-		case 0:
+		case 2:
 			env_set("mmcblkdev", "0");
 			env_set("mmcdev", "0");
 			break;
@@ -464,25 +464,14 @@ const char *tqma6_bb_get_boardname(void)
 	return "MBa6x";
 }
 
-int mmc_get_env_devno(void)
+int board_mmc_get_env_dev(int devno)
 {
-#if defined(CONFIG_SPL_BUILD)
-	return 0;
-#else
-	u32 dev = imx_boot_device();
-
-	if (BOOT_DEVICE_MMC1 == dev) {
-		u32 inst = imx_boot_device_instance();
-		/*
-		 * This assumes that the baseboard registered
-		 * the boot device first ...
-		 * Note: SDHC3 == idx2
-		 */
-		return (2 == inst) ? 0 : 1;
-	}
-
-	return -1;
-#endif
+	/*
+	 * This assumes that the baseboard registered
+	 * the boot device first ...
+	 * Note: SDHC3 == idx2
+	 */
+	return (2 == devno) ? 0 : 1;
 }
 
 /*
