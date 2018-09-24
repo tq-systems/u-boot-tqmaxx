@@ -16,7 +16,7 @@
 #define CONFIG_ARCH_MISC_INIT
 
 /* Flat Device Tree Definitions */
-#define CONFIG_OF_BOARD_SETUP
+/* #define CONFIG_OF_BOARD_SETUP */
 
 #undef CONFIG_CMD_EXPORTENV
 #undef CONFIG_CMD_IMPORTENV
@@ -147,7 +147,7 @@
 
 /* Monitor Command Prompt */
 #define CONFIG_SYS_LONGHELP
-#define CONFIG_HUSH_PARSER
+/* #define CONFIG_HUSH_PARSER */
 #define CONFIG_SYS_PROMPT_HUSH_PS2     "> "
 #define CONFIG_AUTO_COMPLETE
 #define CONFIG_SYS_CBSIZE              1024
@@ -163,7 +163,7 @@
 #define CONFIG_IMX_SMMU
 
 
-#define CONFIG_OF_SYSTEM_SETUP
+/* #define CONFIG_OF_SYSTEM_SETUP */
 
 #define BOOTAUX_RESERVED_MEM_BASE 0x88000000
 #define BOOTAUX_RESERVED_MEM_SIZE 0x08000000 /* Reserve from second 128MB */
