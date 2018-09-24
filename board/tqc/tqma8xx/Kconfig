@@ -18,8 +18,8 @@ choice
 config MBA8XX
 	bool "TQMa8xX on MBa8xX Starterkit"
 	select TQC_SDMMC
-	select DM_ETH
-	select NETDEVICES
+#	select DM_ETH
+#	select NETDEVICES
 	help
 	  Select the MBa8xX starterkit. This features a GigE Phy, USB, SD-Card
 	  etc.

@@ -73,9 +73,9 @@ config TARGET_TQMA8XX
 	select ARM64_SUPPORT_AARCH32
 	select SYS_MALLOC_F
 	select ARCH_FIXUP_FDT_MEMORY
-	select MMC
-	select GENERIC_MMC
-	select DM_MMC
+#	select MMC
+#	select GENERIC_MMC
+#	select DM_MMC
 	select PINCTRL
 	select PINCTRL_FULL
 	select PINCTRL_GENERIC
