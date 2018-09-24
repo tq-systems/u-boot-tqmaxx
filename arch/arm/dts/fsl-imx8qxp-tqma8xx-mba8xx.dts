@@ -28,30 +28,8 @@
 	};
 
 	chosen {
-		bootargs = "console=ttyLP0,115200 earlycon=lpuart32,0x5a060000,115200";
-		stdout-path = &lpuart0;
-	};
-
-	regulators {
-		reg_usdhc2_vmmc: usdhc2_vmmc {
-			compatible = "regulator-fixed";
-			regulator-name = "SD1_SPWR";
-			regulator-min-microvolt = <3000000>;
-			regulator-max-microvolt = <3000000>;
-			gpio = <&gpio4 19 GPIO_ACTIVE_HIGH>;
-			enable-active-high;
-			startup-delay-us = <100>;
-			off-on-delay-us = <12000>;
-		};
-
-		reg_usb_otg1_vbus: regulator@0 {
-			compatible = "regulator-fixed";
-			reg = <0>;
-			regulator-name = "usb_otg1_vbus";
-			regulator-min-microvolt = <5000000>;
-			regulator-max-microvolt = <5000000>;
-		};
-
+		bootargs = "console=ttyLP1,115200 earlycon=lpuart32,5a070000,115200";
+		stdout-path = &lpuart1;
 	};
 };
 
@@ -59,7 +37,7 @@
 	pinctrl-names = "default";
 	tqma8xx-mba8xx {
 
-		pinctrl_lpuart0: lpuart0grp {
+		pinctrl_lpuart1: lpuart1grp {
 			fsl,pins = <
 				SC_P_UART1_RX_ADMA_UART1_RX	0x06000020
 				SC_P_UART1_TX_ADMA_UART1_TX	0x06000020
@@ -82,30 +60,6 @@
 				SC_P_ENET0_RGMII_RXD1_CONN_ENET0_RGMII_RXD1	0x06000048
 				SC_P_ENET0_RGMII_RXD2_CONN_ENET0_RGMII_RXD2	0x06000048
 				SC_P_ENET0_RGMII_RXD3_CONN_ENET0_RGMII_RXD3	0x06000048
-			>;
-		};
-
-		pinctrl_fec2: fec2grp {
-			fsl,pins = <
-				SC_P_ESAI0_SCKR_CONN_ENET1_RGMII_TX_CTL		0x06000048
-				SC_P_ESAI0_FSR_CONN_ENET1_RGMII_TXC		0x06000048
-				SC_P_ESAI0_TX4_RX1_CONN_ENET1_RGMII_TXD0	0x06000048
-				SC_P_ESAI0_TX5_RX0_CONN_ENET1_RGMII_TXD1	0x06000048
-				SC_P_ESAI0_FST_CONN_ENET1_RGMII_TXD2		0x06000048
-				SC_P_ESAI0_SCKT_CONN_ENET1_RGMII_TXD3		0x06000048
-				SC_P_ESAI0_TX0_CONN_ENET1_RGMII_RXC		0x06000048
-				SC_P_SPDIF0_TX_CONN_ENET1_RGMII_RX_CTL		0x06000048
-				SC_P_SPDIF0_RX_CONN_ENET1_RGMII_RXD0		0x06000048
-				SC_P_ESAI0_TX3_RX2_CONN_ENET1_RGMII_RXD1	0x06000048
-				SC_P_ESAI0_TX2_RX3_CONN_ENET1_RGMII_RXD2	0x06000048
-				SC_P_ESAI0_TX1_CONN_ENET1_RGMII_RXD3		0x06000048
-			>;
-		};
-
-		pinctrl_lpi2c1: lpi1cgrp {
-			fsl,pins = <
-				SC_P_USB_SS3_TC1_ADMA_I2C1_SCL	0x06000020
-				SC_P_USB_SS3_TC3_ADMA_I2C1_SDA	0x06000020
 			>;
 		};
 
@@ -156,69 +110,9 @@
 	};
 };
 
-&lpuart0 {
+&lpuart1 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_lpuart0>;
-	status = "okay";
-};
-
-&gpio0 {
-	status = "okay";
-};
-
-&gpio1 {
-	status = "okay";
-};
-
-&gpio3 {
-	status = "okay";
-};
-
-&gpio4 {
-	status = "okay";
-};
-
-&fec1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_fec1>;
-	phy-mode = "rgmii";
-	phy-handle = <&ethphy0>;
-	fsl,ar8031-phy-fixup;
-	fsl,magic-packet;
-	status = "okay";
-
-	mdio {
-		#address-cells = <1>;
-		#size-cells = <0>;
-
-		ethphy0: ethernet-phy@0 {
-			compatible = "ethernet-phy-ieee802.3-c22";
-			reg = <0>;
-		};
-
-		ethphy1: ethernet-phy@1 {
-			compatible = "ethernet-phy-ieee802.3-c22";
-			reg = <1>;
-		};
-	};
-};
-
-&fec2 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_fec2>;
-	phy-mode = "rgmii";
-	phy-handle = <&ethphy1>;
-	fsl,ar8031-phy-fixup;
-	fsl,magic-packet;
-	status = "okay";
-};
-
-&i2c1 {
-	#address-cells = <1>;
-	#size-cells = <0>;
-	clock-frequency = <100000>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_lpi2c1>;
+	pinctrl-0 = <&pinctrl_lpuart1>;
 	status = "okay";
 };
 
@@ -230,20 +124,5 @@
 	bus-width = <4>;
 	cd-gpios = <&gpio4 22 GPIO_ACTIVE_LOW>;
 	wp-gpios = <&gpio4 21 GPIO_ACTIVE_HIGH>;
-	vmmc-supply = <&reg_usdhc2_vmmc>;
-	status = "okay";
-};
-
-&usbotg1 {
-	vbus-supply = <&reg_usb_otg1_vbus>;
-	srp-disable;
-	hnp-disable;
-	adp-disable;
-	power-polarity-active-high;
-	disable-over-current;
-	status = "okay";
-};
-
-&usb2 {
 	status = "okay";
 };
