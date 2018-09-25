@@ -79,40 +79,40 @@ const struct pad_conf_entry core_padconf_array_bb_tqma57xx[] = {
 
 	/* PRUSS2 MII0 */
 	{RMII_MHZ_50_CLK, (M0 | PIN_OUTPUT | MANUAL_MODE)},    /* RMII_MHZ_50_CLK.rmii_mhz_50_clk */
-	{MCASP1_AXR8, (M11 | PIN_OUTPUT_SLEW)}, /* mcasp1_axr8.pr2_mii0_txen */
-	{MCASP1_AXR9, (M11 | PIN_OUTPUT_SLEW)}, /* mcasp1_axr9.pr2_mii0_txd3 */
-	{MCASP1_AXR10, (M11 | PIN_OUTPUT_SLEW)},        /* mcasp1_axr10.pr2_mii0_txd2 */
-	{MCASP1_AXR11, (M11 | PIN_OUTPUT_SLEW)},        /* mcasp1_axr11.pr2_mii0_txd1 */
-	{MCASP1_AXR12, (M11 | PIN_OUTPUT_SLEW)},        /* mcasp1_axr12.pr2_mii0_txd0 */
-	{MCASP1_AXR13, (M11 | PIN_INPUT_SLEW)}, /* mcasp1_axr13.pr2_mii_mr0_clk */
-	{MCASP1_AXR14, (M11 | PIN_INPUT_SLEW)}, /* mcasp1_axr14.pr2_mii0_rxdv */
-	{MCASP1_AXR15, (M11 | PIN_INPUT_SLEW)}, /* mcasp1_axr15.pr2_mii0_rxd3 */
-	{MCASP2_ACLKX, (M11 | PIN_INPUT_SLEW)},     /* mcasp2_aclkx.pr2_mii0_rxd2 */
-	{MCASP2_FSX, (M11 | PIN_INPUT_SLEW)},   /* mcasp2_fsx.pr2_mii0_rxd1 */
-	{MCASP2_AXR2, (M11 | PIN_INPUT_SLEW)},  /* mcasp2_axr2.pr2_mii0_rxd0 */
-	{MCASP2_AXR3, (M11 | PIN_INPUT_SLEW)},  /* mcasp2_axr3.pr2_mii0_rxlink */
-	{MCASP3_ACLKX, (M11 | PIN_INPUT_SLEW)},     /* mcasp3_aclkx.pr2_mii0_crs */
-	{MCASP3_FSX, (M11 | PIN_INPUT_SLEW)},   /* mcasp3_fsx.pr2_mii0_col */
-	{MCASP1_AXR0, (M11 | PIN_INPUT_SLEW)},  /* mcasp1_axr0.pr2_mii0_rxer */
-	{MCASP1_AXR1, (M11 | PIN_INPUT_SLEW)},  /* mcasp1_axr1.pr2_mii_mt0_clk */
+	{MCASP1_AXR8, (M11 | PIN_OUTPUT | SLEWCONTROL)}, /* mcasp1_axr8.pr2_mii0_txen */
+	{MCASP1_AXR9, (M11 | PIN_OUTPUT | SLEWCONTROL)}, /* mcasp1_axr9.pr2_mii0_txd3 */
+	{MCASP1_AXR10, (M11 | PIN_OUTPUT | SLEWCONTROL)},        /* mcasp1_axr10.pr2_mii0_txd2 */
+	{MCASP1_AXR11, (M11 | PIN_OUTPUT | SLEWCONTROL)},        /* mcasp1_axr11.pr2_mii0_txd1 */
+	{MCASP1_AXR12, (M11 | PIN_OUTPUT | SLEWCONTROL)},        /* mcasp1_axr12.pr2_mii0_txd0 */
+	{MCASP1_AXR13, (M11 | PIN_INPUT | SLEWCONTROL)}, /* mcasp1_axr13.pr2_mii_mr0_clk */
+	{MCASP1_AXR14, (M11 | PIN_INPUT | SLEWCONTROL)}, /* mcasp1_axr14.pr2_mii0_rxdv */
+	{MCASP1_AXR15, (M11 | PIN_INPUT | SLEWCONTROL)}, /* mcasp1_axr15.pr2_mii0_rxd3 */
+	{MCASP2_ACLKX, (M11 | PIN_INPUT | SLEWCONTROL)},     /* mcasp2_aclkx.pr2_mii0_rxd2 */
+	{MCASP2_FSX, (M11 | PIN_INPUT | SLEWCONTROL)},   /* mcasp2_fsx.pr2_mii0_rxd1 */
+	{MCASP2_AXR2, (M11 | PIN_INPUT | SLEWCONTROL)},  /* mcasp2_axr2.pr2_mii0_rxd0 */
+	{MCASP2_AXR3, (M11 | PIN_INPUT | SLEWCONTROL)},  /* mcasp2_axr3.pr2_mii0_rxlink */
+	{MCASP3_ACLKX, (M11 | PIN_INPUT | SLEWCONTROL)},     /* mcasp3_aclkx.pr2_mii0_crs */
+	{MCASP3_FSX, (M11 | PIN_INPUT | SLEWCONTROL)},   /* mcasp3_fsx.pr2_mii0_col */
+	{MCASP1_AXR0, (M11 | PIN_INPUT | SLEWCONTROL)},  /* mcasp1_axr0.pr2_mii0_rxer */
+	{MCASP1_AXR1, (M11 | PIN_INPUT | SLEWCONTROL)},  /* mcasp1_axr1.pr2_mii_mt0_clk */
 
 	/* PRUSS2 MII1 */
-	{GPIO6_11, (M11 | PIN_OUTPUT_SLEW)},  /* gpio6_11.pr2_mii1_txen */
-	{MMC3_CLK, (M11 | PIN_OUTPUT_SLEW)},  /* mmc3_clk.pr2_mii1_txd3 */
-	{MMC3_CMD, (M11 | PIN_OUTPUT_SLEW)},  /* mmc3_cmd.pr2_mii1_txd2 */
-	{MMC3_DAT0, (M11 | PIN_OUTPUT_SLEW)}, /* mmc3_dat0.pr2_mii1_txd1 */
-	{MMC3_DAT1, (M11 | PIN_OUTPUT_SLEW)}, /* mmc3_dat1.pr2_mii1_txd0 */
-	{MMC3_DAT2, (M11 | PIN_INPUT_SLEW)},  /* mmc3_dat2.pr2_mii_mr1_clk */
-	{MMC3_DAT3, (M11 | PIN_INPUT_SLEW)},        /* mmc3_dat3.pr2_mii1_rxdv */
-	{MMC3_DAT4, (M11 | PIN_INPUT_SLEW)},        /* mmc3_dat4.pr2_mii1_rxd3 */
-	{MMC3_DAT5, (M11 | PIN_INPUT_SLEW)},        /* mmc3_dat5.pr2_mii1_rxd2 */
-	{MMC3_DAT6, (M11 | PIN_INPUT_SLEW)},        /* mmc3_dat6.pr2_mii1_rxd1 */
-	{MMC3_DAT7, (M11 | PIN_INPUT_SLEW)},        /* mmc3_dat7.pr2_mii1_rxd0 */
-	{MCASP3_AXR1, (M11 | PIN_INPUT_SLEW)},  /* mcasp3_axr1.pr2_mii1_rxlink */
-	{XREF_CLK0, (M11 | PIN_INPUT_SLEW)},        /* xref_clk0.pr2_mii1_col */
-	{XREF_CLK1, (M11 | PIN_INPUT_SLEW)},        /* xref_clk1.pr2_mii1_crs */
-	{MCASP3_AXR0, (M11 | PIN_INPUT_SLEW)},  /* mcasp3_axr0.pr2_mii1_rxer */
-	{GPIO6_10, (M11 | PIN_INPUT_SLEW)},   /* gpio6_10.pr2_mii_mt1_clk */
+	{GPIO6_11, (M11 | PIN_OUTPUT | SLEWCONTROL)},  /* gpio6_11.pr2_mii1_txen */
+	{MMC3_CLK, (M11 | PIN_OUTPUT | SLEWCONTROL)},  /* mmc3_clk.pr2_mii1_txd3 */
+	{MMC3_CMD, (M11 | PIN_OUTPUT | SLEWCONTROL)},  /* mmc3_cmd.pr2_mii1_txd2 */
+	{MMC3_DAT0, (M11 | PIN_OUTPUT | SLEWCONTROL)}, /* mmc3_dat0.pr2_mii1_txd1 */
+	{MMC3_DAT1, (M11 | PIN_OUTPUT | SLEWCONTROL)}, /* mmc3_dat1.pr2_mii1_txd0 */
+	{MMC3_DAT2, (M11 | PIN_INPUT | SLEWCONTROL)},  /* mmc3_dat2.pr2_mii_mr1_clk */
+	{MMC3_DAT3, (M11 | PIN_INPUT | SLEWCONTROL)},        /* mmc3_dat3.pr2_mii1_rxdv */
+	{MMC3_DAT4, (M11 | PIN_INPUT | SLEWCONTROL)},        /* mmc3_dat4.pr2_mii1_rxd3 */
+	{MMC3_DAT5, (M11 | PIN_INPUT | SLEWCONTROL)},        /* mmc3_dat5.pr2_mii1_rxd2 */
+	{MMC3_DAT6, (M11 | PIN_INPUT | SLEWCONTROL)},        /* mmc3_dat6.pr2_mii1_rxd1 */
+	{MMC3_DAT7, (M11 | PIN_INPUT | SLEWCONTROL)},        /* mmc3_dat7.pr2_mii1_rxd0 */
+	{MCASP3_AXR1, (M11 | PIN_INPUT | SLEWCONTROL)},  /* mcasp3_axr1.pr2_mii1_rxlink */
+	{XREF_CLK0, (M11 | PIN_INPUT | SLEWCONTROL)},        /* xref_clk0.pr2_mii1_col */
+	{XREF_CLK1, (M11 | PIN_INPUT | SLEWCONTROL)},        /* xref_clk1.pr2_mii1_crs */
+	{MCASP3_AXR0, (M11 | PIN_INPUT | SLEWCONTROL)},  /* mcasp3_axr0.pr2_mii1_rxer */
+	{GPIO6_10, (M11 | PIN_INPUT | SLEWCONTROL)},   /* gpio6_10.pr2_mii_mt1_clk */
 
 	/* DCAN */
 	{GPIO6_14, (M15 | PULL_UP)},  /* gpio6_14.safe for dcan2_tx */
