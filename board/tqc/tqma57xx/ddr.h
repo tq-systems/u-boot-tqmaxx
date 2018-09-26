@@ -207,3 +207,135 @@ static const u32 tqma571x_emif1_ddr3_ext_phy_ctrl_const_regs[] = {
 	0x0030005C,	// EMIF1_EXT_PHY_CTRL_35
 	0x00000077	// EMIF1_EXT_PHY_CTRL_36
 };
+
+/*
+ * DDR timings for TQMa57xx module variant with AM574x and 2GiB DRAM + ECC
+ * DDR clock: 666 MHz
+ */
+static const struct emif_regs tqma574x_emif1_ddr3_666mhz_emif_regs = {
+	.sdram_config_init = 0x61851B32,
+	.sdram_config = 0x61851B32,
+	.sdram_config2 = 0x00000000,
+	.ref_ctrl = 0x1000514D,
+	.ref_ctrl_final = 0x1000144A,
+	.sdram_tim1 = 0xD113887C,
+	.sdram_tim2 = 0x40EF7FE3,
+	.sdram_tim3 = 0x407F8E98,
+	.read_idle_ctrl = 0x00050000,
+	.zq_config = 0x5007190B,
+	.temp_alert_config = 0x00000000,
+	.emif_rd_wr_lvl_rmp_ctl = 0x80000000,
+	.emif_rd_wr_lvl_ctl = 0x00000000,
+	.emif_ddr_phy_ctlr_1_init = 0x0024400C,
+	.emif_ddr_phy_ctlr_1 = 0x0E24400C,
+	.emif_rd_wr_exec_thresh = 0x00000305,
+
+	.emif_ddr_ext_phy_ctrl_1 = 0x04040100,
+	.emif_ddr_ext_phy_ctrl_2 = 0x006B00B0,
+	.emif_ddr_ext_phy_ctrl_3 = 0x006B00B0,
+	.emif_ddr_ext_phy_ctrl_4 = 0x006B00B5,
+	.emif_ddr_ext_phy_ctrl_5 = 0x006B00B6
+};
+
+static const u32 tqma574x_emif1_ddr3_ext_phy_ctrl_const_regs[] = {
+	0x04040100,	// EMIF1_EXT_PHY_CTRL_1
+	0x006B00B0,	// EMIF1_EXT_PHY_CTRL_2
+	0x006B00B0,	// EMIF1_EXT_PHY_CTRL_3
+	0x006B00B5,	// EMIF1_EXT_PHY_CTRL_4
+	0x006B00B6,	// EMIF1_EXT_PHY_CTRL_5
+	0x006B00B9,	// EMIF1_EXT_PHY_CTRL_6
+	0x002F002F,	// EMIF1_EXT_PHY_CTRL_7
+	0x002F002F,	// EMIF1_EXT_PHY_CTRL_8
+	0x002F002F,	// EMIF1_EXT_PHY_CTRL_9
+	0x002F002F,	// EMIF1_EXT_PHY_CTRL_10
+	0x002F002F,	// EMIF1_EXT_PHY_CTRL_11
+	0x00600073,	// EMIF1_EXT_PHY_CTRL_12
+	0x00600073,	// EMIF1_EXT_PHY_CTRL_13
+	0x0060007F,	// EMIF1_EXT_PHY_CTRL_14
+	0x0060007F,	// EMIF1_EXT_PHY_CTRL_15
+	0x0060008C,	// EMIF1_EXT_PHY_CTRL_16
+	0x00400053,	// EMIF1_EXT_PHY_CTRL_17
+	0x00400053,	// EMIF1_EXT_PHY_CTRL_18
+	0x0040005F,	// EMIF1_EXT_PHY_CTRL_19
+	0x0040005F,	// EMIF1_EXT_PHY_CTRL_20
+	0x0040006C,	// EMIF1_EXT_PHY_CTRL_21
+	0x00800080,	// EMIF1_EXT_PHY_CTRL_22
+	0x00800080,	// EMIF1_EXT_PHY_CTRL_23
+	0x40010080,	// EMIF1_EXT_PHY_CTRL_24
+	0x08102040,	// EMIF1_EXT_PHY_CTRL_25
+	0x005B00A0,	// EMIF1_EXT_PHY_CTRL_26
+	0x005B00A0,	// EMIF1_EXT_PHY_CTRL_27
+	0x005B00A5,	// EMIF1_EXT_PHY_CTRL_28
+	0x005B00A6,	// EMIF1_EXT_PHY_CTRL_29
+	0x005B00A9,	// EMIF1_EXT_PHY_CTRL_30
+	0x00300043,	// EMIF1_EXT_PHY_CTRL_31
+	0x00300043,	// EMIF1_EXT_PHY_CTRL_32
+	0x0030004F,	// EMIF1_EXT_PHY_CTRL_33
+	0x0030004F,	// EMIF1_EXT_PHY_CTRL_34
+	0x0030005C,	// EMIF1_EXT_PHY_CTRL_35
+	0x00000077	// EMIF1_EXT_PHY_CTRL_36
+};
+
+static const struct emif_regs tqma574x_emif2_ddr3_666mhz_emif_regs = {
+	.sdram_config_init = 0x61851B32,
+	.sdram_config = 0x61851B32,
+	.sdram_config2 = 0x00000000,
+	.ref_ctrl = 0x1000514D,
+	.ref_ctrl_final = 0x1000144A,
+	.sdram_tim1 = 0xD113887C,
+	.sdram_tim2 = 0x40EF7FE3,
+	.sdram_tim3 = 0x407F8E98,
+	.read_idle_ctrl = 0x00050000,
+	.zq_config = 0x5007190B,
+	.temp_alert_config = 0x00000000,
+	.emif_rd_wr_lvl_rmp_ctl = 0x80000000,
+	.emif_rd_wr_lvl_ctl = 0x00000000,
+	.emif_ddr_phy_ctlr_1_init = 0x0024400C,
+	.emif_ddr_phy_ctlr_1 = 0x0E24400C,
+	.emif_rd_wr_exec_thresh = 0x00000305,
+
+	.emif_ddr_ext_phy_ctrl_1 = 0x04040100,
+	.emif_ddr_ext_phy_ctrl_2 = 0x006B00A7,
+	.emif_ddr_ext_phy_ctrl_3 = 0x006B00A6,
+	.emif_ddr_ext_phy_ctrl_4 = 0x006B009B,
+	.emif_ddr_ext_phy_ctrl_5 = 0x006B0099
+};
+
+static const u32 tqma574x_emif2_ddr3_ext_phy_ctrl_const_regs[] = {
+	0x04040100,	// EMIF2_EXT_PHY_CTRL_1
+	0x006B00A7,	// EMIF2_EXT_PHY_CTRL_2
+	0x006B00A6,	// EMIF2_EXT_PHY_CTRL_3
+	0x006B009B,	// EMIF2_EXT_PHY_CTRL_4
+	0x006B0099,	// EMIF2_EXT_PHY_CTRL_5
+	0x006B006B,	// EMIF2_EXT_PHY_CTRL_6
+	0x002F002F,	// EMIF2_EXT_PHY_CTRL_7
+	0x002F002F,	// EMIF2_EXT_PHY_CTRL_8
+	0x002F002F,	// EMIF2_EXT_PHY_CTRL_9
+	0x002F002F,	// EMIF2_EXT_PHY_CTRL_10
+	0x002F002F,	// EMIF2_EXT_PHY_CTRL_11
+	0x0060006E,	// EMIF2_EXT_PHY_CTRL_12
+	0x0060006C,	// EMIF2_EXT_PHY_CTRL_13
+	0x00600068,	// EMIF2_EXT_PHY_CTRL_14
+	0x00600067,	// EMIF2_EXT_PHY_CTRL_15
+	0x00600060,	// EMIF2_EXT_PHY_CTRL_16
+	0x0040004E,	// EMIF2_EXT_PHY_CTRL_17
+	0x0040004C,	// EMIF2_EXT_PHY_CTRL_18
+	0x00400048,	// EMIF2_EXT_PHY_CTRL_19
+	0x00400047,	// EMIF2_EXT_PHY_CTRL_20
+	0x00400040,	// EMIF2_EXT_PHY_CTRL_21
+	0x00800080,	// EMIF2_EXT_PHY_CTRL_22
+	0x00800080,	// EMIF2_EXT_PHY_CTRL_23
+	0x40010080,	// EMIF2_EXT_PHY_CTRL_24
+	0x08102040,	// EMIF2_EXT_PHY_CTRL_25
+	0x005B0097,	// EMIF2_EXT_PHY_CTRL_26
+	0x005B0096,	// EMIF2_EXT_PHY_CTRL_27
+	0x005B008B,	// EMIF2_EXT_PHY_CTRL_28
+	0x005B0089,	// EMIF2_EXT_PHY_CTRL_29
+	0x005B005B,	// EMIF2_EXT_PHY_CTRL_30
+	0x0030003E,	// EMIF2_EXT_PHY_CTRL_31
+	0x0030003C,	// EMIF2_EXT_PHY_CTRL_32
+	0x00300038,	// EMIF2_EXT_PHY_CTRL_33
+	0x00300037,	// EMIF2_EXT_PHY_CTRL_34
+	0x00300030,	// EMIF2_EXT_PHY_CTRL_35
+	0x00000077	// EMIF2_EXT_PHY_CTRL_36
+};
