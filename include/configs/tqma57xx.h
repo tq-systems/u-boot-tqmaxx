@@ -222,6 +222,11 @@
 	"fdtfile=am571x-mba57xx.dtb\0" \
 	"u-boot=u-boot_tqma571x.img \0" \
 	"MLO=MLO_tqma571x \0"
+#elif CONFIG_TQMA574X
+#define BOOTFILES_TQMA57XX \
+	"fdtfile=am574x-mba57xx.dtb\0" \
+	"u-boot=u-boot_tqma574x.img \0" \
+	"MLO=MLO_tqma574x \0"
 #endif
 
 #define CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG

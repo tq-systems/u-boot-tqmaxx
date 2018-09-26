@@ -26,6 +26,11 @@ config TQMA571X
 	help
 		Select TQMa571x with AM571x and 1GiB DRAM
 
+config TQMA574X
+        bool "TQMa574x"
+        help
+                Select TQMa574x with AM574x and 2GiB DRAM + ECC
+
 endchoice
 
 choice
