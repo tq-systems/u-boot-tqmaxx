@@ -76,7 +76,9 @@ static void announce_and_cleanup(int fake)
 	 * dm_remove_devices_active() ensures that vital devices are removed in
 	 * a second round.
 	 */
+#ifndef CONFIG_POWER_DOMAIN
 	dm_remove_devices_active();
+#endif
 
 	cleanup_before_linux();
 }
