@@ -42,36 +42,6 @@
 /* GPIO configs */
 #define CONFIG_MXC_GPIO
 
-/* ENET Config */
-#define CONFIG_MII
-
-#define CONFIG_FEC_MXC
-#define CONFIG_FEC_XCV_TYPE             RGMII
-#define FEC_QUIRK_ENET_MAC
-
-#define CONFIG_PHY_GIGE /* Support for 1000BASE-X */
-#define CONFIG_PHYLIB
-#define CONFIG_PHY_ATHEROS
-
-/* ENET0 connects AR8031 on CPU board, ENET1 connects to base board and MUX with ESAI, default is ESAI */
-#define CONFIG_FEC_ENET_DEV 0
-
-#if (CONFIG_FEC_ENET_DEV == 0)
-#define IMX_FEC_BASE			0x5B040000
-#define CONFIG_FEC_MXC_PHYADDR          0x0
-#define CONFIG_ETHPRIME                 "eth0"
-#elif (CONFIG_FEC_ENET_DEV == 1)
-#define IMX_FEC_BASE			0x5B050000
-#define CONFIG_FEC_MXC_PHYADDR          0x1
-#define CONFIG_ETHPRIME                 "eth1"
-#endif
-
-/* ENET0 MDIO are shared */
-#define CONFIG_FEC_MXC_MDIO_BASE	0x5B040000
-
-#define CONFIG_LIB_RAND
-#define CONFIG_NET_RANDOM_ETHADDR
-
 #ifdef CONFIG_AHAB_BOOT
 #define AHAB_ENV "sec_boot=yes\0"
 #else
@@ -84,19 +54,12 @@
 	"loadm4image_0=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${m4_0_image}\0" \
 	"m4boot_0=run loadm4image_0; dcache flush; bootaux ${loadaddr} 0\0" \
 
-#ifdef CONFIG_NAND_BOOT
-#define MFG_NAND_PARTITION "mtdparts=gpmi-nand:64m(boot),16m(kernel),16m(dtb),1m(misc),-(rootfs) "
-#else
-#define MFG_NAND_PARTITION ""
-#endif
-
 #define CONFIG_MFG_ENV_SETTINGS \
 	"mfgtool_args=setenv bootargs console=${console},${baudrate} " \
 		"rdinit=/linuxrc " \
 		"g_mass_storage.stall=0 g_mass_storage.removable=1 " \
 		"g_mass_storage.idVendor=0x066F g_mass_storage.idProduct=0x37FF "\
 		"g_mass_storage.iSerialNumber=\"\" "\
-		MFG_NAND_PARTITION \
 		"video=imxdpufb5:off video=imxdpufb6:off video=imxdpufb7:off "\
 		"clk_ignore_unused "\
 		"\0" \
@@ -312,28 +275,6 @@
 #define FSPI0_BASE_ADDR			0x5d120000
 #define FSPI0_AMBA_BASE			0
 #define CONFIG_SYS_FSL_FSPI_AHB
-#endif
-
-/* USB Config */
-#ifdef CONFIG_CMD_USB
-#define CONFIG_USB_MAX_CONTROLLER_COUNT 2
-
-/* USB 3.0 controller configs */
-#ifdef CONFIG_USB_XHCI_IMX8
-#define CONFIG_SYS_USB_XHCI_MAX_ROOT_PORTS	2
-#endif
-
-/* USB OTG controller configs */
-#ifdef CONFIG_USB_EHCI_HCD
-#define CONFIG_USB_HOST_ETHER
-#define CONFIG_USB_ETHER_ASIX
-#define CONFIG_MXC_USB_PORTSC		(PORT_PTS_UTMI | PORT_PTS_PTW)
-#endif
-#endif /* CONFIG_CMD_USB */
-
-#ifdef CONFIG_USB_GADGET
-#define CONFIG_USBD_HS
-#define CONFIG_USB_FUNCTION_MASS_STORAGE
 #endif
 
 #define CONFIG_OF_SYSTEM_SETUP
