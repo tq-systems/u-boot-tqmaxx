@@ -4,11 +4,11 @@ config SYS_BOARD
 	default "tqma8qx"
 
 config SYS_VENDOR
-	default "freescale"
+	default "tqc"
 
 config SYS_CONFIG_NAME
 	default "tqma8qx"
 
-source "board/freescale/common/Kconfig"
+source "board/tqc/common/Kconfig"
 
 endif

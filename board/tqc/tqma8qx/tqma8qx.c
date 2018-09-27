@@ -22,7 +22,6 @@
 #include <asm/arch/iomux.h>
 #include <asm/arch/sys_proto.h>
 #include <power-domain.h>
-#include "../common/tcpc.h"
 #include <cdns3-uboot.h>
 
 DECLARE_GLOBAL_DATA_PTR;
