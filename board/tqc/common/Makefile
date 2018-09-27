@@ -7,3 +7,5 @@ obj- := __dummy__.o
 
 obj-$(CONFIG_TQC_EEPROM) += tqc_eeprom.o
 obj-$(CONFIG_LAYERSCAPE_NS_ACCESS)	+= ns_access.o
+
+obj-$(CONFIG_TQC_MBLS10XXA) += tqc_mbls10xxa.o
