@@ -197,6 +197,7 @@ static iomux_cfg_t board_gpios[] = {
 
 static void board_gpio_init(void)
 {
+#if 0
 	int ret;
 	struct gpio_desc desc;
 
@@ -218,6 +219,7 @@ static void board_gpio_init(void)
 	/* enable i2c port expander assert reset line */
 	gpio_request(IOEXP_RESET, "ioexp_rst");
 	gpio_direction_output(IOEXP_RESET, 1);
+#endif
 }
 #endif
 
