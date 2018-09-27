@@ -1,13 +1,13 @@
-if TARGET_TQMTEST
+if TARGET_TQMA8QX
 
 config SYS_BOARD
-	default "tqmtest"
+	default "tqma8qx"
 
 config SYS_VENDOR
 	default "freescale"
 
 config SYS_CONFIG_NAME
-	default "tqmtest"
+	default "tqma8qx"
 
 source "board/freescale/common/Kconfig"
 

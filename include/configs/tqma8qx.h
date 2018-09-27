@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 NXP
+ * Copyright 2018 TQ Systems GmbH
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
@@ -278,13 +278,5 @@
 #define CONFIG_OF_SYSTEM_SETUP
 #define BOOTAUX_RESERVED_MEM_BASE 0x88000000
 #define BOOTAUX_RESERVED_MEM_SIZE 0x08000000 /* Reserve from second 128MB */
-
-#if 0
-#if defined(CONFIG_ANDROID_SUPPORT)
-#include "imx8qxp_mek_android.h"
-#elif defined (CONFIG_ANDROID_AUTO_SUPPORT)
-#include "imx8qxp_mek_android_auto.h"
-#endif
-#endif
 
 #endif /* __IMX8QXP_MEK_H */

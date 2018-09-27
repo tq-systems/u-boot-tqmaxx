@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 NXP
+ * Copyright 2018 TQ Systems GmbH
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
@@ -12,8 +12,6 @@
 #include <libfdt.h>
 #include <environment.h>
 #include <fsl_esdhc.h>
-#include <i2c.h>
-#include "pca953x.h"
 
 #include <asm/io.h>
 #include <asm/gpio.h>
@@ -21,11 +19,8 @@
 #include <asm/imx-common/sci/sci.h>
 #include <asm/arch/imx8-pins.h>
 #include <dm.h>
-#include <usb.h>
 #include <asm/arch/iomux.h>
 #include <asm/arch/sys_proto.h>
-#include <asm/imx-common/video.h>
-#include <asm/arch/video_common.h>
 #include <power-domain.h>
 #include "../common/tcpc.h"
 #include <cdns3-uboot.h>
@@ -197,35 +192,13 @@ static iomux_cfg_t board_gpios[] = {
 
 static void board_gpio_init(void)
 {
-#if 0
-	int ret;
-	struct gpio_desc desc;
 
-	ret = dm_gpio_lookup_name("gpio@1a_3", &desc);
-	if (ret)
-		return;
-
-	ret = dm_gpio_request(&desc, "bb_per_rst_b");
-	if (ret)
-		return;
-
-	dm_gpio_set_dir_flags(&desc, GPIOD_IS_OUT);
-	dm_gpio_set_value(&desc, 0);
-	udelay(50);
-	dm_gpio_set_value(&desc, 1);
-
-	imx8_iomux_setup_multiple_pads(board_gpios, ARRAY_SIZE(board_gpios));
-
-	/* enable i2c port expander assert reset line */
-	gpio_request(IOEXP_RESET, "ioexp_rst");
-	gpio_direction_output(IOEXP_RESET, 1);
-#endif
 }
 #endif
 
 int checkboard(void)
 {
-	puts("Board: TQMTEST\n");
+	puts("Board: TQMa8QX\n");
 
 	print_bootinfo();
 
@@ -305,7 +278,7 @@ int board_mmc_get_env_dev(int devno)
 int board_late_init(void)
 {
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
-	setenv("board_name", "TQMTEST");
+	setenv("board_name", "TQMa8QX");
 	setenv("board_rev", "iMX8QXP");
 #endif
 
@@ -320,13 +293,4 @@ int board_late_init(void)
 
 	return 0;
 }
-
-#ifdef CONFIG_FSL_FASTBOOT
-#ifdef CONFIG_ANDROID_RECOVERY
-int is_recovery_key_pressing(void)
-{
-	return 0; /*TODO*/
-}
-#endif /*CONFIG_ANDROID_RECOVERY*/
-#endif /*CONFIG_FSL_FASTBOOT*/
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 NXP
+ * Copyright 2018 TQ Systems GmbH
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,8 +21,8 @@
 #include "fsl-imx8qxp.dtsi"
 
 / {
-	model = "Freescale i.MX8QXP MEK";
-	compatible = "fsl,tqmtest", "fsl,imx8qxp";
+	model = "TQ Systems i.MX8QXP TQMa8xX";
+	compatible = "fsl,tqma8qx", "fsl,imx8qxp";
 
 	chosen {
 		bootargs = "console=ttyLP1,115200 earlycon=lpuart32,0x5a070000,115200";
