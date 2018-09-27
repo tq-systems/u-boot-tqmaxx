@@ -20,6 +20,7 @@ choice
 
 config TQMLS1046A_BB_MBLS10XXA
 	bool "TQMLS1046A on MBLS10xxA Starterkit"
+	select TQC_MBLS10XXA
 	help
 	  Select the MBLS10XXA starterkit.
 

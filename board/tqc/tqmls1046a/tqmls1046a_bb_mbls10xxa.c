@@ -11,6 +11,7 @@
 #include <fsl_mdio.h>
 #include <malloc.h>
 #include "tqmls1046a_bb.h"
+#include "../common/tqc_mbls10xxa.h"
 
 
 int tqmls1046a_bb_board_early_init_f(void)
@@ -47,6 +48,9 @@ int tqmls1046a_bb_misc_init_r(void)
 #endif
 	out_be32(&scfg->usbpwrfault_selcr, usb_pwrfault);
 #endif
+
+	/* initialize baseboard io's */
+	ret = tqc_mbls10xxa_i2c_gpios_init();
 
 	return 0;
 }
