@@ -33,9 +33,7 @@ static const struct board_specific_parameters udimm0[] = {
 	 * ranks| mhz| GB  |adjst| start |   ctl2    |  ctl3  |      |delay |
 	 */
 #ifdef CONFIG_SYS_FSL_DDR4
-	{1,  1666, 0, 12,     7, 0x07090800, 0x00000000,},
-	{1,  1900, 0, 12,     7, 0x07090800, 0x00000000,},
-	{1,  2200, 0, 12,     7, 0x07090800, 0x00000000,},
+	{1,  2100, 0, 8,     9, 0x09080806, 0x07060606,},
 #endif
 	{}
 };

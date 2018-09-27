@@ -86,8 +86,8 @@ found:
 	/* Enable ZQ calibration */
 	popts->zq_en = 1;
 
-	popts->ddr_cdr1 = DDR_CDR1_DHC_EN | DDR_CDR1_ODT(DDR_CDR_ODT_80ohm);
-	popts->ddr_cdr2 = DDR_CDR2_ODT(DDR_CDR_ODT_80ohm) |
+	popts->ddr_cdr1 = DDR_CDR1_DHC_EN | DDR_CDR1_ODT(DDR_CDR_ODT_60ohm);
+	popts->ddr_cdr2 = DDR_CDR2_ODT(DDR_CDR_ODT_60ohm) |
 			  DDR_CDR2_VREF_TRAIN_EN | DDR_CDR2_VREF_RANGE_2;
 
 	/* optimize cpo for erratum A-009942 */
@@ -155,8 +155,7 @@ int fsl_ddr_get_dimm_params(dimm_params_t *pdimm,
 {
 	static const char dimm_model[] = "Fixed DDR on board";
 
-	if (((controller_number == 0) && (dimm_number == 0)) ||
-	    ((controller_number == 1) && (dimm_number == 0))) {
+	if ((controller_number == 0) && (dimm_number == 0)) {
 		memcpy(pdimm, &ddr_raw_timing, sizeof(dimm_params_t));
 		memset(pdimm->mpart, 0, sizeof(pdimm->mpart));
 		memcpy(pdimm->mpart, dimm_model, sizeof(dimm_model) - 1);
