@@ -64,6 +64,11 @@ config TARGET_IMX8QXP_MEK
 	select BOARD_LATE_INIT
 	select IMX8QXP
 
+config TARGET_TQMTEST
+	bool "TQ test board"
+	select BOARD_LATE_INIT
+	select IMX8QXP
+
 config TARGET_TQMA8XX
 	bool "Support TQMa8xX board"
 	select BOARD_LATE_INIT
@@ -89,6 +94,7 @@ source "board/freescale/imx8qm_arm2/Kconfig"
 source "board/freescale/imx8qm_mek/Kconfig"
 source "board/freescale/imx8qxp_arm2/Kconfig"
 source "board/freescale/imx8qxp_mek/Kconfig"
+source "board/freescale/tqmtest/Kconfig"
 source "board/tqc/tqma8xx/Kconfig"
 
 endif

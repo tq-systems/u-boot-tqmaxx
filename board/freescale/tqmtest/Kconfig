@@ -1,0 +1,14 @@
+if TARGET_TQMTEST
+
+config SYS_BOARD
+	default "tqmtest"
+
+config SYS_VENDOR
+	default "freescale"
+
+config SYS_CONFIG_NAME
+	default "tqmtest"
+
+source "board/freescale/common/Kconfig"
+
+endif
