@@ -101,6 +101,11 @@ u32 __weak get_lpuart_clk(void)
 	return CONFIG_SYS_CLK_FREQ;
 }
 
+u32 __weak get_lpuart_clk_n(void *reg)
+{
+	return get_lpuart_clk();
+}
+
 static bool is_lpuart32(struct udevice *dev)
 {
 	struct lpuart_serial_platdata *plat = dev->platdata;
@@ -112,7 +117,7 @@ static void _lpuart_serial_setbrg(struct lpuart_serial_platdata *plat,
 				  int baudrate)
 {
 	struct lpuart_fsl *base = plat->reg;
-	u32 clk = get_lpuart_clk();
+	u32 clk = get_lpuart_clk_n(plat->reg);
 	u16 sbr;
 
 	sbr = (u16)(clk / (16 * baudrate));
@@ -191,7 +196,7 @@ static void _lpuart32_serial_setbrg_7ulp(struct lpuart_serial_platdata *plat,
 {
 	struct lpuart_fsl_reg32 *base = plat->reg;
 	u32 sbr, osr, baud_diff, tmp_osr, tmp_sbr, tmp_diff, tmp;
-	u32 clk = get_lpuart_clk();
+	u32 clk = get_lpuart_clk_n(plat->reg);
 
 	baud_diff = baudrate;
 	osr = 0;
@@ -249,7 +254,7 @@ static void _lpuart32_serial_setbrg(struct lpuart_serial_platdata *plat,
 				    int baudrate)
 {
 	struct lpuart_fsl_reg32 *base = plat->reg;
-	u32 clk = get_lpuart_clk();
+	u32 clk = get_lpuart_clk_n(plat->reg);
 	u32 sbr;
 
 	sbr = (clk / (16 * baudrate));
