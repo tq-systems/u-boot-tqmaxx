@@ -37,6 +37,13 @@ config TQMA6Q
 	help
 	  select TQMa6Q / TQMa6D with i.MX6Q/D and 1GiB DRAM
 
+config TQMA6Q_2GB
+	bool "TQMa6Q / TQMa6D (2GiB RAM)"
+	select MX6QDL
+	select MX6Q
+	help
+	  select TQMa6Q / TQMa6D with i.MX6Q/D and 2GiB DRAM
+
 config TQMA6DL
 	bool "TQMa6DL"
 	select MX6QDL
@@ -95,6 +102,7 @@ config IMX_CONFIG
 	default "board/tqc/tqma6/tqma6spl.cfg" if TQMA6QDL
 	default "board/tqc/tqma6/tqma6qp.cfg" if TQMA6QP && !SPL
 	default "board/tqc/tqma6/tqma6q.cfg" if TQMA6Q && !SPL
+	default "board/tqc/tqma6/tqma6q-2gb.cfg" if TQMA6Q_2GB && !SPL
 	default "board/tqc/tqma6/tqma6dl.cfg" if TQMA6DL && !SPL
 	default "board/tqc/tqma6/tqma6s.cfg" if TQMA6S && !SPL
 
