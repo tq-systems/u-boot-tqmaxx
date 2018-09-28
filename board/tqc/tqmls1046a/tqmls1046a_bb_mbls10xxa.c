@@ -14,20 +14,217 @@
 #include "../common/tqc_mbls10xxa.h"
 
 
+#define TQMLS1046A_SRDS1_PROTO(cfg, lane)	((cfg >> 4*(3-lane)) & 0xF)
+#define TQMLS1046A_SRDS2_PROTO(cfg, lane)	((cfg >> 4*(3-lane)) & 0xF)
+
+const char *serdes_rcw_str[] = {
+	"Unused    ",   // 0
+	"XFI       ",   // 1
+	"2.5G SGMII",   // 2
+	"SGMII     ",   // 3
+	"QSGMII    ",   // 4
+	"PCIe x1   ",   // 5
+	"PCIe x1   ",   // 6
+	"PCIe x2   ",   // 7
+	"PCIe x4   ",   // 8
+	"SATA      ",   // 9
+	"SGMII     ",   // a
+	"Undefined ",   // b
+	"Undefined ",   // c
+	"Undefined ",   // d
+	"Undefined ",   // e
+	"Undefined "    // f
+};
+
+static int _tqmls1046a_bb_check_serdes_mux(void)
+{
+	u32 srds_s1, srds_s2;
+	struct ccsr_gur *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
+	int mux_val1, mux_val2;
+	int mux_stat = 0;
+	int rcw_proto;
+
+	/* read SerDes configuration from RCW */
+	srds_s1 = in_be32(&gur->rcwsr[4]) &
+			FSL_CHASSIS2_RCWSR4_SRDS1_PRTCL_MASK;
+	srds_s1 >>= FSL_CHASSIS2_RCWSR4_SRDS1_PRTCL_SHIFT;
+	srds_s2 = in_be32(&gur->rcwsr[4]) &
+			FSL_CHASSIS2_RCWSR4_SRDS2_PRTCL_MASK;
+	srds_s2 >>= FSL_CHASSIS2_RCWSR4_SRDS2_PRTCL_SHIFT;
+
+	printf("Checking baseboard SerDes muxing:\n");
+	
+	/* TODO: update when SerDes mapping on MBLS10xxA baseboard is fixed */
+	/* check config for SD1 - LANE D */
+	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd1_0_lane_a_mux");
+	rcw_proto = TQMLS1046A_SRDS1_PROTO(srds_s1, 0);
+	if(mux_val1 >= 0) {
+		printf("   SD1-0 Lane D: MUX=%s | RCW=%s -> ",
+		   (mux_val1)?("QSGMII "):("SGMII  "),
+		   serdes_rcw_str[rcw_proto]);
+
+		if((rcw_proto == 0x0) ||
+		   (!mux_val1 && (rcw_proto == 0x3))
+		  ) {
+			printf(" OK\n");
+		} else {
+			mux_stat++;
+			printf(" FAIL\n");
+		}
+	}
+
+	/* check config for SD1 - LANE C */
+	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd1_1_lane_b_mux");
+	rcw_proto = TQMLS1046A_SRDS1_PROTO(srds_s1, 1);
+	if(mux_val1 >= 0) {
+		printf("   SD1-1 Lane C: MUX=%s | RCW=%s -> ",
+		   (mux_val1)?("QSGMII "):("SGMII  "),
+		   serdes_rcw_str[rcw_proto]);
+
+		if((rcw_proto == 0x0) ||
+		   (!mux_val1 && (rcw_proto == 0x3)) ||
+		   (mux_val1 && (rcw_proto == 0x4))
+		  ) {
+			printf(" OK\n");
+		} else {
+			mux_stat++;
+			printf(" FAIL\n");
+		}
+	}
+
+	/* check config for SD1 - LANE B */
+	rcw_proto = TQMLS1046A_SRDS1_PROTO(srds_s1, 2);
+	printf("   SD1-2 Lane B: XFI         | RCW=%s -> ",
+	   serdes_rcw_str[rcw_proto]);
+
+	if((rcw_proto == 0x0) ||
+	   (rcw_proto == 0x1)
+	  ) {
+		printf(" OK\n");
+	} else {
+		mux_stat++;
+		printf(" FAIL\n");
+	}
+
+	/* check config for SD1 - LANE A */
+	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd1_3_lane_d_mux");
+	rcw_proto = TQMLS1046A_SRDS1_PROTO(srds_s1, 3);
+	if(mux_val1 >= 0) {
+		printf("   SD1-3 Lane A: MUX=%s | RCW=%s -> ",
+		   (mux_val1)?("XFI    "):("SGMII  "),
+		   serdes_rcw_str[rcw_proto]);
+
+		if((rcw_proto == 0x0) ||
+		   (!mux_val1 && (rcw_proto == 0x3)) ||
+		   (mux_val1 && (rcw_proto == 0x1))
+		  ) {
+			printf(" OK\n");
+		} else {
+			mux_stat++;
+			printf(" FAIL\n");
+		}
+	}
+
+	/* check config for SD2 - LANE A */
+	rcw_proto = TQMLS1046A_SRDS2_PROTO(srds_s2, 0);
+	printf("   SD2-0 Lane A: PCIe        | RCW=%s -> ",
+	   serdes_rcw_str[rcw_proto]);
+
+	if((rcw_proto == 0x0) ||
+	   (rcw_proto == 0x5)
+	  ) {
+		printf(" OK\n");
+	} else {
+		mux_stat++;
+		printf(" FAIL\n");
+	}
+
+	/* check config for SD2 - LANE B */
+	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd2_1_lane_b_mux");
+	rcw_proto = TQMLS1046A_SRDS2_PROTO(srds_s2, 1);
+	if(mux_val1 >= 0) {
+		printf("   SD2-1 Lane B: MUX=%s | RCW=%s -> ",
+		   (mux_val1)?("SGMII  "):("PCIe   "),
+		   serdes_rcw_str[rcw_proto]);
+
+		if((rcw_proto == 0x0) ||
+		   (!mux_val1 && (rcw_proto == 0x5)) ||
+		   (mux_val1 && (rcw_proto == 0xA))
+		  ) {
+			printf(" OK\n");
+		} else {
+			mux_stat++;
+			printf(" FAIL\n");
+		}
+	}
+
+	/* check config for SD2 - LANE C */
+	rcw_proto = TQMLS1046A_SRDS2_PROTO(srds_s2, 2);
+	printf("   SD2-2 Lane C: PCIe        | RCW=%s -> ",
+	   serdes_rcw_str[rcw_proto]);
+
+	if((rcw_proto == 0x0) ||
+	   (rcw_proto == 0x5) ||
+	   (rcw_proto == 0x7)
+	  ) {
+		printf(" OK\n");
+	} else {
+		mux_stat++;
+		printf(" FAIL\n");
+	}
+
+	/* check config for SD2 - LANE D */
+	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd2_3_lane_d_mux1");
+	mux_val2 = tqc_mbls10xxa_i2c_gpio_get("sd2_3_lane_d_mux2");
+	rcw_proto = TQMLS1046A_SRDS2_PROTO(srds_s2, 3);
+	if((mux_val1 >= 0) && (mux_val2 >= 0)){
+		printf("   SD2-3 Lane D: MUX=%s | RCW=%s -> ",
+		   (mux_val1)?((mux_val2)?("PCIe   "):("SATA   ")):("PCIe x2"),
+		   serdes_rcw_str[rcw_proto]);
+
+		if((rcw_proto == 0x0) ||
+		   (!mux_val1 && (rcw_proto == 0x7)) ||
+		   (mux_val1 && !mux_val2 && (rcw_proto == 0x9)) ||
+		   (mux_val1 && mux_val2 && (rcw_proto == 0x6))
+		  ) {
+			printf(" OK\n");
+		} else {
+			mux_stat++;
+			printf(" FAIL\n");
+		}
+	}
+
+	if(mux_stat) {
+		printf("!!! ATTENTION: Some SerDes lanes are misconfigured,\n");
+		printf("!!! this may cause some interfaces to be inoperable.\n");
+		printf("!!! Check SerDes muxing DIP switch settings!\n");
+
+		return -1;
+	}
+
+	return 0;
+}
+
+
 int tqmls1046a_bb_board_early_init_f(void)
 {
+	int ret = 0;
+
 	/* nothing to do */
-	return 0;
+	return ret;
 }
 
 int tqmls1046a_bb_board_init(void)
 {
+	int ret = 0;
+
 	/* nothing to do */
-	return 0;
+	return ret;
 }
 
 int tqmls1046a_bb_misc_init_r(void)
 {
+	int ret = 0;
 #ifdef CONFIG_HAS_FSL_XHCI_USB
 	struct ccsr_scfg *scfg = (struct ccsr_scfg *)CONFIG_SYS_FSL_SCFG_ADDR;
 	u32 usb_pwrfault;
@@ -52,14 +249,16 @@ int tqmls1046a_bb_misc_init_r(void)
 	/* initialize baseboard io's */
 	ret = tqc_mbls10xxa_i2c_gpios_init();
 
+	/* check if SerDes mux settings match RCW */
+	if(!ret)
+		ret = _tqmls1046a_bb_check_serdes_mux();
+
 	return 0;
 }
 
 int tqmls1046a_bb_checkboard(void)
 {
-	/*
-	 * TODO: add further baseboard specific information (e.g. serdes clocks, ...)
-	 */
+	/* nothing to do */
 	return 0;
 }
 
