@@ -13,10 +13,8 @@
 
 #define RGMII_PHY1_ADDR			0x0E
 #define RGMII_PHY2_ADDR			0x0C
-#define SGMII_PHY1_ADDR			0x3
-#define SGMII_PHY2_ADDR			0x4
-
-#define FM1_10GEC1_PHY_ADDR		0x0
+#define QSGMII_PHY1_ADDR_BASE	0x1C
+#define QSGMII_PHY2_ADDR_BASE	0x00
 
 #define CONFIG_ETHPRIME			"FM1@DTSEC3"
 #endif
