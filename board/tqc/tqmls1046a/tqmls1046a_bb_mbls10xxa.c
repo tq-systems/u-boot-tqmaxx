@@ -385,6 +385,20 @@ int board_phy_config(struct phy_device *phydev)
 			val = (val & 0xFF00) | 0x0055;
 			_rgmii_phy_write_indirect(phydev, 0x86, val);
 			break;
+		case (QSGMII_PHY1_ADDR_BASE & 0x1C):
+		case (QSGMII_PHY2_ADDR_BASE & 0x1C):
+			/* executte marvell specified initialization */
+			/* see MV-S301615 release note */
+			/* PHY initialization #1 */
+			phy_write(phydev, MDIO_DEVAD_NONE, 0x16, 0x00ff);
+			phy_write(phydev, MDIO_DEVAD_NONE, 0x18, 0x2800);
+			phy_write(phydev, MDIO_DEVAD_NONE, 0x17, 0x2001);
+			phy_write(phydev, MDIO_DEVAD_NONE, 0x16, 0x0000);
+			/* PHY initialization #2 */
+			phy_write(phydev, MDIO_DEVAD_NONE, 0x16, 0x0000);
+			phy_write(phydev, MDIO_DEVAD_NONE, 0x1D, 0x0003);
+			phy_write(phydev, MDIO_DEVAD_NONE, 0x1E, 0x0002);
+			phy_write(phydev, MDIO_DEVAD_NONE, 0x16, 0x0000);
 		default:
 			break;
 		}
