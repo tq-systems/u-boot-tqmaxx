@@ -24,6 +24,8 @@
 #include <power-domain.h>
 #include <cdns3-uboot.h>
 
+#include "../common/tqc_bb.h"
+
 DECLARE_GLOBAL_DATA_PTR;
 
 #define ESDHC_PAD_CTRL	((SC_PAD_CONFIG_NORMAL << PADRING_CONFIG_SHIFT) | (SC_PAD_ISO_OFF << PADRING_LPCONFIG_SHIFT) \
@@ -38,46 +40,13 @@ DECLARE_GLOBAL_DATA_PTR;
 #define GPIO_PAD_CTRL	((SC_PAD_CONFIG_NORMAL << PADRING_CONFIG_SHIFT) | (SC_PAD_ISO_OFF << PADRING_LPCONFIG_SHIFT) \
 						| (SC_PAD_28FDSOI_DSE_DV_HIGH << PADRING_DSE_SHIFT) | (SC_PAD_28FDSOI_PS_PU << PADRING_PULL_SHIFT))
 
+
 #define I2C_PAD_CTRL	((SC_PAD_CONFIG_OUT_IN << PADRING_CONFIG_SHIFT) | (SC_PAD_ISO_OFF << PADRING_LPCONFIG_SHIFT) \
 						| (SC_PAD_28FDSOI_DSE_DV_LOW << PADRING_DSE_SHIFT) | (SC_PAD_28FDSOI_PS_PU << PADRING_PULL_SHIFT))
 
-#define UART_PAD_CTRL	((SC_PAD_CONFIG_OUT_IN << PADRING_CONFIG_SHIFT) | (SC_PAD_ISO_OFF << PADRING_LPCONFIG_SHIFT) \
-						| (SC_PAD_28FDSOI_DSE_DV_HIGH << PADRING_DSE_SHIFT) | (SC_PAD_28FDSOI_PS_PU << PADRING_PULL_SHIFT))
-
-static iomux_cfg_t uart1_pads[] = {
-	SC_P_UART1_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
-	SC_P_UART1_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
-};
-
-static void setup_iomux_uart(void)
-{
-	imx8_iomux_setup_multiple_pads(uart1_pads, ARRAY_SIZE(uart1_pads));
-}
-
 int board_early_init_f(void)
 {
-	sc_ipc_t ipcHndl = 0;
-	sc_err_t sciErr = 0;
-
-	ipcHndl = gd->arch.ipc_channel_handle;
-
-	/* Power up UART1 */
-	sciErr = sc_pm_set_resource_power_mode(ipcHndl, SC_R_UART_1, SC_PM_PW_MODE_ON);
-	if (sciErr != SC_ERR_NONE)
-		return 0;
-
-	/* Set UART1 clock root to 80 MHz */
-	sc_pm_clock_rate_t rate = 80000000;
-	sciErr = sc_pm_set_clock_rate(ipcHndl, SC_R_UART_1, 2, &rate);
-	if (sciErr != SC_ERR_NONE)
-		return 0;
-
-	/* Enable UART1 clock root */
-	sciErr = sc_pm_clock_enable(ipcHndl, SC_R_UART_1, 2, true, false);
-	if (sciErr != SC_ERR_NONE)
-		return 0;
-
-	setup_iomux_uart();
+	tqc_bb_board_early_init_f();
 
 	return 0;
 }
@@ -86,9 +55,8 @@ int board_early_init_f(void)
 
 #define USDHC1_CD_GPIO	IMX_GPIO_NR(4, 22)
 
-static struct fsl_esdhc_cfg usdhc_cfg[CONFIG_SYS_FSL_USDHC_NUM] = {
-	{USDHC1_BASE_ADDR, 0, 8},
-	{USDHC2_BASE_ADDR, 0, 4},
+static struct fsl_esdhc_cfg usdhc_cfg = {
+	USDHC1_BASE_ADDR, 0, 8,
 };
 
 static iomux_cfg_t emmc0[] = {
@@ -105,19 +73,6 @@ static iomux_cfg_t emmc0[] = {
 	SC_P_EMMC0_STROBE | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
 };
 
-static iomux_cfg_t usdhc1_sd[] = {
-	SC_P_USDHC1_CLK | MUX_PAD_CTRL(ESDHC_CLK_PAD_CTRL),
-	SC_P_USDHC1_CMD | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
-	SC_P_USDHC1_DATA0 | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
-	SC_P_USDHC1_DATA1 | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
-	SC_P_USDHC1_DATA2 | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
-	SC_P_USDHC1_DATA3 | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
-	SC_P_USDHC1_WP    | MUX_PAD_CTRL(ESDHC_PAD_CTRL), /* Mux for WP */
-	SC_P_USDHC1_CD_B  | MUX_MODE_ALT(4) | MUX_PAD_CTRL(ESDHC_PAD_CTRL), /* Mux for CD,  GPIO4 IO22 */
-	SC_P_USDHC1_RESET_B | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
-	SC_P_USDHC1_VSELECT | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
-};
-
 int board_mmc_init(bd_t *bis)
 {
 	int i, ret;
@@ -129,37 +84,19 @@ int board_mmc_init(bd_t *bis)
 	 * mmc0                    USDHC1
 	 * mmc1                    USDHC2
 	 */
-	for (i = 0; i < CONFIG_SYS_FSL_USDHC_NUM; i++) {
-		switch (i) {
-		case 0:
-			if (!power_domain_lookup_name("conn_sdhc0", &pd))
-				power_domain_on(&pd);
-			imx8_iomux_setup_multiple_pads(emmc0, ARRAY_SIZE(emmc0));
-			init_clk_usdhc(0);
-			usdhc_cfg[i].sdhc_clk = mxc_get_clock(MXC_ESDHC_CLK);
-			break;
-		case 1:
-			if (!power_domain_lookup_name("conn_sdhc1", &pd))
-				power_domain_on(&pd);
-			imx8_iomux_setup_multiple_pads(usdhc1_sd, ARRAY_SIZE(usdhc1_sd));
-			init_clk_usdhc(1);
-			usdhc_cfg[i].sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
-			gpio_request(USDHC1_CD_GPIO, "sd1_cd");
-			gpio_direction_input(USDHC1_CD_GPIO);
-			break;
-		default:
-			printf("Warning: you configured more USDHC controllers"
-				"(%d) than supported by the board\n", i + 1);
-			return 0;
-		}
-		ret = fsl_esdhc_initialize(bis, &usdhc_cfg[i]);
-		if (ret) {
-			printf("Warning: failed to initialize mmc dev %d\n", i);
-			return ret;
-		}
+	if (!power_domain_lookup_name("conn_sdhc0", &pd))
+		power_domain_on(&pd);
+	imx8_iomux_setup_multiple_pads(emmc0, ARRAY_SIZE(emmc0));
+	init_clk_usdhc(0);
+	usdhc_cfg.sdhc_clk = mxc_get_clock(MXC_ESDHC_CLK);
+
+	ret = fsl_esdhc_initialize(bis, &usdhc_cfg);
+	if (ret) {
+		printf("Warning: failed to initialize mmc dev %d\n", i);
+		return ret;
 	}
 
-	return 0;
+	return tqc_bb_board_mmc_init(bis);
 }
 
 int board_mmc_getcd(struct mmc *mmc)
@@ -209,7 +146,6 @@ int checkboard(void)
 		printf("\nSCI error! Invalid handle\n");
 
 #ifdef SCI_FORCE_ABORT
-#error
 	sc_rpc_msg_t abort_msg;
 
 	puts("Send abort request\n");
@@ -221,7 +157,7 @@ int checkboard(void)
 	sc_ipc_close(SC_IPC_CH);
 #endif /* SCI_FORCE_ABORT */
 
-	return 0;
+	return tqc_bb_checkboard();
 }
 
 int board_init(void)
@@ -229,6 +165,8 @@ int board_init(void)
 #ifdef CONFIG_MXC_GPIO
 	board_gpio_init();
 #endif
+
+	tqc_bb_board_init();
 
 	return 0;
 }
@@ -265,14 +203,9 @@ void reset_cpu(ulong addr)
 #ifdef CONFIG_OF_BOARD_SETUP
 int ft_board_setup(void *blob, bd_t *bd)
 {
-	return 0;
+	return tqc_bb_ft_board_setup(blob, bd);
 }
 #endif
-
-int board_mmc_get_env_dev(int devno)
-{
-	return devno;
-}
 
 int board_late_init(void)
 {
@@ -281,13 +214,11 @@ int board_late_init(void)
 	setenv("board_rev", "iMX8QXP");
 #endif
 
+	tqc_bb_board_late_init();
+
 	setenv("sec_boot", "no");
 #ifdef CONFIG_AHAB_BOOT
 	setenv("sec_boot", "yes");
-#endif
-
-#ifdef CONFIG_ENV_IS_IN_MMC
-	board_late_mmc_env_init();
 #endif
 
 	return 0;
