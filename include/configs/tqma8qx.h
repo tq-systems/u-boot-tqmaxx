@@ -279,4 +279,10 @@
 #define BOOTAUX_RESERVED_MEM_BASE 0x88000000
 #define BOOTAUX_RESERVED_MEM_SIZE 0x08000000 /* Reserve from second 128MB */
 
-#endif /* __IMX8QXP_MEK_H */
+#if defined(CONFIG_MBA8QX)
+#include "tqma8qx-mba8qx.h"
+#else
+#error
+#endif
+
+#endif /* __TQMA8QX_H */
