@@ -296,6 +296,9 @@ int tqmls1046a_bb_misc_init_r(void)
 	if(!ret)
 		ret = _tqmls1046a_bb_check_serdes_mux();
 
+	/* enable USB-C power-controller */
+	tqc_mbls10xxa_i2c_gpio_set("usb_c_pwron", 1);
+
 	return 0;
 }
 
