@@ -53,6 +53,13 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 	srds_s2 >>= FSL_CHASSIS2_RCWSR4_SRDS2_PRTCL_SHIFT;
 
 	printf("Checking baseboard SerDes muxing:\n");
+
+	/* check state of SD_MUX_SHDN */
+	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd_mux_shdn");
+	if(mux_val1) {
+		printf("!!! ATTENTION: SerDes MUXes disabled,\n");
+		printf("!!! muxed SerDes interfaces won't work\n");
+	}
 	
 	/* TODO: update when SerDes mapping on MBLS10xxA baseboard is fixed */
 	/* check config for SD1 - LANE D */
