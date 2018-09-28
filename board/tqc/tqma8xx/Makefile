@@ -1,9 +1,0 @@
-#
-# Copyright 2018 TQ Systems GmbH
-#
-# SPDX-License-Identifier:	GPL-2.0+
-#
-
-obj-y += tqma8xx.o
-obj-$(CONFIG_MBA8XX) += tqma8xx-mba8xx.o
-
