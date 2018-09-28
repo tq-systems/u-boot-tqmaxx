@@ -113,6 +113,15 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 		printf(" FAIL\n");
 	}
 
+	/* enable XFI transmitter when XFI selected and SFP is available
+	 * (MOD-DEF[0] (SFP pin 6) is grounded)
+	 */
+	mux_val2 = tqc_mbls10xxa_i2c_gpio_get("xfi1_moddef_det");
+	if((rcw_proto == 0x1) && !mux_val2)
+		tqc_mbls10xxa_i2c_gpio_set("xfi1_tx_dis", 0);
+	else
+		tqc_mbls10xxa_i2c_gpio_set("xfi1_tx_dis", 1);
+
 	/* check config for SD1 - LANE A */
 	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd1_3_lane_d_mux");
 	rcw_proto = TQMLS1046A_SRDS1_PROTO(srds_s1, 3);
@@ -130,6 +139,15 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 			mux_stat++;
 			printf(" FAIL\n");
 		}
+
+		/* enable XFI transmitter when XFI selected and SFP is available
+		 * (MOD-DEF[0] (SFP pin 6) is grounded)
+		 */
+		mux_val2 = tqc_mbls10xxa_i2c_gpio_get("xfi2_moddef_det");
+		if(mux_val1 && (rcw_proto == 0x1) && !mux_val2)
+			tqc_mbls10xxa_i2c_gpio_set("xfi2_tx_dis", 0);
+		else
+			tqc_mbls10xxa_i2c_gpio_set("xfi2_tx_dis", 1);
 	}
 
 	/* check config for SD2 - LANE A */
@@ -163,6 +181,12 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 			mux_stat++;
 			printf(" FAIL\n");
 		}
+
+		/* enable miniPCIe-Slot when selected */
+		if(!mux_val1 && (rcw_proto == 0x5))
+			tqc_mbls10xxa_i2c_gpio_set("mpcie2_disable#", 1);
+		else
+			tqc_mbls10xxa_i2c_gpio_set("mpcie2_disable#", 0);
 	}
 
 	/* check config for SD2 - LANE C */
@@ -179,6 +203,12 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 		mux_stat++;
 		printf(" FAIL\n");
 	}
+
+	/* get M.2 slot out of reset when lane (SD2-2) is configured as PCIe */
+	if((rcw_proto == 0x5) || (rcw_proto == 0x7))
+		tqc_mbls10xxa_i2c_gpio_set("pcie_rst_3v3#", 1);
+	else
+		tqc_mbls10xxa_i2c_gpio_set("pcie_rst_3v3#", 0);
 
 	/* check config for SD2 - LANE D */
 	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd2_3_lane_d_mux1");
@@ -199,6 +229,12 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 			mux_stat++;
 			printf(" FAIL\n");
 		}
+
+		/* enable miniPCIe-Slot when selected */
+		if(mux_val1 && mux_val2 && (rcw_proto == 0x6))
+			tqc_mbls10xxa_i2c_gpio_set("mpcie1_disable#", 1);
+		else
+			tqc_mbls10xxa_i2c_gpio_set("mpcie1_disable#", 0);
 	}
 
 	if(mux_stat) {
