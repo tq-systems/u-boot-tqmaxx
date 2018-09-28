@@ -24,9 +24,9 @@ struct tqc_mbls10xxa_i2c_gpio tqc_mbls10xxa_i2c_gpios[] =
 	{"sd2_3_lane_d_mux2",   0x20,  5, PCA953X_DIR_IN, -1},
 	{"sd_mux_shdn",         0x20,  6, PCA953X_DIR_IN, -1},
 	{"sd1_ref_clk2_sel",    0x20,  7, PCA953X_DIR_IN, -1},
-	{"mpcie1_disable#",     0x20,  8, PCA953X_DIR_IN, -1},
+	{"mpcie1_disable#",     0x20,  8, PCA953X_DIR_OUT, 0},
 	{"mpcie1_wake#",        0x20,  9, PCA953X_DIR_IN, -1},
-	{"mpcie2_disable#",     0x20, 10, PCA953X_DIR_IN, -1},
+	{"mpcie2_disable#",     0x20, 10, PCA953X_DIR_OUT, 0},
 	{"mpcie2_wake#",        0x20, 11, PCA953X_DIR_IN, -1},
 	{"prsnt#",              0x20, 12, PCA953X_DIR_IN, -1},
 	{"pcie_pwr_en",         0x20, 13, PCA953X_DIR_OUT, 1},
@@ -62,7 +62,7 @@ struct tqc_mbls10xxa_i2c_gpio tqc_mbls10xxa_i2c_gpios[] =
 	{"spi_int#",            0x22, 11, PCA953X_DIR_IN, -1},
 	{"can_sel",             0x22, 12, PCA953X_DIR_OUT, 0},
 	{"led#",                0x22, 13, PCA953X_DIR_OUT, 1},
-	{"pcie_rst_3v3#",       0x22, 14, PCA953X_DIR_OUT, 1},
+	{"pcie_rst_3v3#",       0x22, 14, PCA953X_DIR_OUT, 0},
 	{"pcie_wake_3v3#",      0x22, 15, PCA953X_DIR_IN, -1},
 };
 
