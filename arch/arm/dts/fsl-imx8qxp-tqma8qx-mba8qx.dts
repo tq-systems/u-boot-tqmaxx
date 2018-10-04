@@ -160,9 +160,8 @@
 	pinctrl-0 = <&pinctrl_fec1>;
 	phy-mode = "rgmii";
 	phy-handle = <&ethphy0>;
-	fsl,ar8031-phy-fixup;
-	fsl,magic-packet;
-	status = "disabled";
+/*	fsl,magic-packet; */
+	status = "okay";
 
 	mdio {
 		#address-cells = <1>;
@@ -173,9 +172,9 @@
 			reg = <0>;
 		};
 
-		ethphy1: ethernet-phy@1 {
+		ethphy3: ethernet-phy@3 {
 			compatible = "ethernet-phy-ieee802.3-c22";
-			reg = <1>;
+			reg = <3>;
 		};
 	};
 };
@@ -184,9 +183,8 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_fec2>;
 	phy-mode = "rgmii";
-	phy-handle = <&ethphy1>;
-	fsl,ar8031-phy-fixup;
-	fsl,magic-packet;
+	phy-handle = <&ethphy3>;
+/*	fsl,magic-packet; */
 	status = "okay";
 };
 
