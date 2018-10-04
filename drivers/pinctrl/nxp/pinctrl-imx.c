@@ -28,7 +28,7 @@ static int imx_pinctrl_set_state(struct udevice *dev, struct udevice *config)
 	u32 mux_shift = info->mux_mask ? ffs(info->mux_mask) - 1 : 0;
 	int i, j = 0;
 
-	dev_dbg(dev, "%s: %s\n", __func__, config->name);
+	dev_info(dev, "%s: %s\n", __func__, config->name);
 
 	if (info->flags & IMX8_USE_SCU)
 		pin_size = SHARE_IMX8_PIN_SIZE;

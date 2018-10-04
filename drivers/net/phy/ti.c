@@ -177,6 +177,8 @@ static int dp83867_of_init(struct phy_device *phydev)
 	int node = dev->of_offset;
 	const void *fdt = gd->fdt_blob;
 
+printf("%s +++\n", __func__);
+
 	if (fdtdec_get_bool(fdt, node, "ti,max-output-impedance"))
 		dp83867->io_impedance = DP83867_IO_MUX_CFG_IO_IMPEDANCE_MAX;
 	else if (fdtdec_get_bool(fdt, node, "ti,min-output-impedance"))
@@ -192,6 +194,8 @@ static int dp83867_of_init(struct phy_device *phydev)
 
 	dp83867->fifo_depth = fdtdec_get_uint(gd->fdt_blob, dev_of_offset(dev),
 				 "ti,fifo-depth", -1);
+
+printf("%s ---\n", __func__);
 
 	return 0;
 }
@@ -214,6 +218,8 @@ static int dp83867_config(struct phy_device *phydev)
 	struct dp83867_private *dp83867;
 	unsigned int val, delay, cfg2;
 	int ret;
+
+printf("%s +++\n", __func__);
 
 	if (!phydev->priv) {
 		dp83867 = kzalloc(sizeof(*dp83867), GFP_KERNEL);
@@ -302,10 +308,16 @@ static int dp83867_config(struct phy_device *phydev)
 	}
 
 	genphy_config_aneg(phydev);
+
+printf("%s ---\n", __func__);
+
 	return 0;
 
 err_out:
 	kfree(dp83867);
+
+printf("%s (err) ---\n", __func__);
+
 	return ret;
 }
 
@@ -321,6 +333,10 @@ static struct phy_driver DP83867_driver = {
 
 int phy_ti_init(void)
 {
+printf("%s +++\n", __func__);
+
 	phy_register(&DP83867_driver);
+
+printf("%s ---\n", __func__);
 	return 0;
 }

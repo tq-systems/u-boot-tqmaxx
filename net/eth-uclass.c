@@ -397,7 +397,10 @@ int eth_initialize(void)
 	int num_devices = 0;
 	struct udevice *dev;
 
+printf("%s +++\n", __func__);
+printf("->eth_common_init\n");
 	eth_common_init();
+printf("<-eth_common_init\n");
 
 	/*
 	 * Devices need to write the hwaddr even if not started so that Linux
@@ -440,6 +443,8 @@ int eth_initialize(void)
 
 		putc('\n');
 	}
+
+printf("%s ---\n", __func__);
 
 	return num_devices;
 }

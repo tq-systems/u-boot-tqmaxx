@@ -252,7 +252,7 @@ int genphy_update_link(struct phy_device *phydev)
 			}
 
 			if (ctrlc()) {
-				puts("user interrupt!\n");
+				printf("user interrupt!\n");
 				phydev->link = 0;
 				return -EINTR;
 			}
@@ -461,6 +461,7 @@ static LIST_HEAD(phy_drivers);
 
 int phy_init(void)
 {
+printf("%s +++\n", __func__);
 #ifdef CONFIG_MV88E61XX_SWITCH
 	phy_mv88e61xx_init();
 #endif
@@ -515,12 +516,15 @@ int phy_init(void)
 #ifdef CONFIG_PHY_MSCC
 	phy_mscc_init();
 #endif
+printf("%s ---\n", __func__);
 
 	return 0;
 }
 
 int phy_register(struct phy_driver *drv)
 {
+printf("%s +++\n", __func__);
+
 	INIT_LIST_HEAD(&drv->list);
 	list_add_tail(&drv->list, &phy_drivers);
 
@@ -538,6 +542,8 @@ int phy_register(struct phy_driver *drv)
 	if (drv->writeext)
 		drv->writeext += gd->reloc_off;
 #endif
+printf("%s ---\n", __func__);
+
 	return 0;
 }
 
@@ -709,6 +715,7 @@ static struct phy_device *get_phy_device_by_mask(struct mii_dev *bus,
 {
 	int i;
 	struct phy_device *phydev;
+printf("%s +++\n", __func__);
 
 	phydev = search_for_existing_phy(bus, phy_mask, interface);
 	if (phydev)
@@ -793,7 +800,7 @@ int phy_reset(struct phy_device *phydev)
 	}
 
 	if (reg & BMCR_RESET) {
-		puts("PHY reset timed out\n");
+		printf("PHY reset timed out\n");
 		return -1;
 	}
 

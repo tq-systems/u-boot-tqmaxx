@@ -239,16 +239,22 @@ static iomux_cfg_t pad_enet0[] = {
 
 static void setup_iomux_fec(void)
 {
+printf("%s +++\n", __func__);
+
 	if (0 == CONFIG_FEC_ENET_DEV)
 		imx8_iomux_setup_multiple_pads(pad_enet0, ARRAY_SIZE(pad_enet0));
 	else
 		imx8_iomux_setup_multiple_pads(pad_enet1, ARRAY_SIZE(pad_enet1));
+
+printf("%s --\n", __func__);
 }
 
 static void enet_device_phy_reset(void)
 {
 	struct gpio_desc desc;
 	int ret;
+
+printf("%s +++\n", __func__);
 
 	/* The BB_PER_RST_B will reset the ENET1 PHY */
 	if (0 == CONFIG_FEC_ENET_DEV) {
@@ -268,12 +274,16 @@ static void enet_device_phy_reset(void)
 
 	/* The board has a long delay for this reset to become stable */
 	mdelay(200);
+
+printf("%s ---\n", __func__);
 }
 
 int board_eth_init(bd_t *bis)
 {
 	int ret;
 	struct power_domain pd;
+
+printf("%s +++\n", __func__);
 
 	printf("[%s] %d\n", __func__, __LINE__);
 
@@ -292,11 +302,15 @@ int board_eth_init(bd_t *bis)
 	if (ret)
 		printf("FEC1 MXC: %s:failed\n", __func__);
 
+printf("%s ---\n", __func__);
+
 	return ret;
 }
 
 int board_phy_config(struct phy_device *phydev)
 {
+printf("%s +++\n", __func__);
+
 	phy_write(phydev, MDIO_DEVAD_NONE, 0x1d, 0x1f);
 	phy_write(phydev, MDIO_DEVAD_NONE, 0x1e, 0x8);
 
@@ -308,13 +322,17 @@ int board_phy_config(struct phy_device *phydev)
 	if (phydev->drv->config)
 		phydev->drv->config(phydev);
 
+printf("%s ---\n", __func__);
+
 	return 0;
 }
 
 static int setup_fec(int ind)
 {
+printf("%s +++\n", __func__);
 	/* Reset ENET PHY */
 	enet_device_phy_reset();
+printf("%s ---\n", __func__);
 
 	return 0;
 }
@@ -560,7 +578,9 @@ int board_init(void)
 #endif
 
 #ifdef CONFIG_FEC_MXC
+printf("-> setup_fec\n");
 	setup_fec(CONFIG_FEC_ENET_DEV);
+printf("<- setup_fec\n");
 #endif
 
 #ifdef CONFIG_USB_XHCI_IMX8

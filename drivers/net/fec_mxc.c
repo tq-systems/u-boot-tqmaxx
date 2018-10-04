@@ -1274,6 +1274,8 @@ static int fecmxc_probe(struct udevice *dev)
 	uint32_t start;
 	int ret;
 
+printf("%s +++\n", __func__);
+
 #ifdef CONFIG_MX6
 	if (mx6_enet_fused((uint32_t)priv->eth)) {
 		printf("Ethernet@0x%x is fused, disable it\n", (uint32_t)priv->eth);
@@ -1318,6 +1320,9 @@ static int fecmxc_probe(struct udevice *dev)
 
 	priv->dev_id = dev->seq;
 
+
+printf("%s ---\n", __func__);
+
 	return 0;
 
 err_phy:
@@ -1347,6 +1352,8 @@ static int fecmxc_ofdata_to_platdata(struct udevice *dev)
 	struct fec_priv *priv = dev_get_priv(dev);
 	const char *phy_mode;
 
+printf("%s +++\n", __func__);
+
 	pdata->iobase = (phys_addr_t)dev_get_addr(dev);
 	priv->eth = (struct ethernet_regs *)pdata->iobase;
 
@@ -1364,6 +1371,8 @@ static int fecmxc_ofdata_to_platdata(struct udevice *dev)
 	 * Need to get the reset-gpio and related properties from DT
 	 * and implemet the enet reset code on .probe call
 	 */
+
+printf("%s ---\n", __func__);
 
 	return 0;
 }

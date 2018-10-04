@@ -238,17 +238,23 @@ int eth_unregister(struct eth_device *dev)
 int eth_initialize(void)
 {
 	int num_devices = 0;
-
+#error
 	eth_devices = NULL;
 	eth_current = NULL;
+
+printf("%s +++\n", __func__);
+printf("->eth_common_init\n");
 	eth_common_init();
+printf("<-eth_common_init\n");
 	/*
 	 * If board-specific initialization exists, call it.
 	 * If not, call a CPU-specific one
 	 */
+printf("->board_eth_init\n");
 	if (board_eth_init != __def_eth_init) {
 		if (board_eth_init(gd->bd) < 0)
 			printf("Board Net Initialization Failed\n");
+printf("->cpu_eth_init\n");
 	} else if (cpu_eth_init != __def_eth_init) {
 		if (cpu_eth_init(gd->bd) < 0)
 			printf("CPU Net Initialization Failed\n");
