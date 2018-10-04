@@ -1245,7 +1245,18 @@ static int fec_phy_init(struct fec_priv *priv, struct udevice *dev)
 	int mask = 0xffffffff;
 
 #ifdef CONFIG_PHYLIB
-	mask = 1 << CONFIG_FEC_MXC_PHYADDR;
+	int offset = 0;
+	int reg = 0;
+
+	offset = fdtdec_lookup_phandle(gd->fdt_blob, dev_of_offset(dev),
+				       "phy-handle");
+	if (offset > 0) {
+		reg = fdtdec_get_int(gd->fdt_blob, offset, "reg", 0);
+		mask = 1 << reg;
+	} else {
+		printf("phy-handle does not exist under fec %s\n", dev->name);
+		mask = 1 << CONFIG_FEC_MXC_PHYADDR;
+	}
 #endif
 
 	phydev = phy_find_by_mask(priv->bus, mask, priv->interface);
