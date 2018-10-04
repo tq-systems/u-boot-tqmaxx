@@ -97,7 +97,7 @@ static iomux_cfg_t usdhc1_sd[] = {
 	SC_P_USDHC1_DATA1 | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
 	SC_P_USDHC1_DATA2 | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
 	SC_P_USDHC1_DATA3 | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
-	SC_P_USDHC1_WP    | MUX_PAD_CTRL(ESDHC_PAD_CTRL), /* Mux for WP */
+	SC_P_USDHC1_WP    | MUX_PAD_CTRL(ESDHC_PAD_CTRL), /* Mux for WP, GPIO4,21 in MUX_MODE_ALT(4) */
 	SC_P_USDHC1_CD_B  | MUX_MODE_ALT(4) | MUX_PAD_CTRL(ESDHC_PAD_CTRL), /* Mux for CD,  GPIO4 IO22 */
 	SC_P_USDHC1_RESET_B | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
 	SC_P_USDHC1_VSELECT | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
@@ -111,7 +111,7 @@ static struct fsl_esdhc_cfg usdhc_cfg = {
 
 int tqc_bb_board_mmc_init(bd_t *bis)
 {
-	int i, ret;
+	int ret;
 	struct power_domain pd;
 
 	/*

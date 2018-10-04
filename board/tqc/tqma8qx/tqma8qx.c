@@ -75,7 +75,7 @@ static iomux_cfg_t emmc0[] = {
 
 int board_mmc_init(bd_t *bis)
 {
-	int i, ret;
+	int ret;
 	struct power_domain pd;
 
 	/*
@@ -92,7 +92,7 @@ int board_mmc_init(bd_t *bis)
 
 	ret = fsl_esdhc_initialize(bis, &usdhc_cfg);
 	if (ret) {
-		printf("Warning: failed to initialize mmc dev %d\n", i);
+		printf("Warning: failed to initialize mmc dev 0\n");
 		return ret;
 	}
 
