@@ -102,6 +102,10 @@
 	M4_BOOT_ENV \
 	XEN_BOOT_ENV \
 	AHAB_ENV \
+	"ethaddr=00:0D:03:44:44:44\0" \
+	"eth1addr=00:0D:03:44:44:45\0" \
+	"ipaddr=10.250.109.22\0" \
+	"serverip=10.250.109.1\0" \
 	"script=boot.scr\0" \
 	"image=Image\0" \
 	"panel=NULL\0" \
