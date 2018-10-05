@@ -297,12 +297,21 @@ static int dp83867_config(struct phy_device *phydev)
 
 		phy_write_mmd_indirect(phydev, DP83867_RGMIICTL,
 				       DP83867_DEVADDR, phydev->addr, val);
+		val = phy_read_mmd_indirect(phydev, DP83867_RGMIICTL,
+				       DP83867_DEVADDR, phydev->addr);
+		printf("DP83867_RGMIICTL %x\n", val);
 
+		val = phy_read_mmd_indirect(phydev, DP83867_RGMIIDCTL,
+				       DP83867_DEVADDR, phydev->addr);
 		delay = (dp83867->rx_id_delay |
 			 (dp83867->tx_id_delay << DP83867_RGMII_TX_CLK_DELAY_SHIFT));
-
+		val &= (~0xffu);
+		delay |= val;
 		phy_write_mmd_indirect(phydev, DP83867_RGMIIDCTL,
 				       DP83867_DEVADDR, phydev->addr, delay);
+		val = phy_read_mmd_indirect(phydev, DP83867_RGMIIDCTL,
+					    DP83867_DEVADDR, phydev->addr);
+		printf("DP83867_RGMIIDCTL %x\n", val);
 
 		if (dp83867->io_impedance >= 0) {
 			val = phy_read_mmd_indirect(phydev,
