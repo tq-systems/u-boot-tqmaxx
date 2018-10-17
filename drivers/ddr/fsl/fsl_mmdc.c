@@ -66,8 +66,13 @@ void mmdc_init(const struct fsl_mmdc_info *priv)
 #endif
 
 	/* 8a. dram init sequence: update MRs for ZQ, ODT, PRE, etc */
+#ifdef RAM_ARS_AUTO_MODE
+	out_be32(&mmdc->mdscr,  CMD_ADDR_LSB_MR_ADDR(0x48) |
+		 MDSCR_ENABLE_CON_REQ | CMD_LOAD_MODE_REG | CMD_BANK_ADDR_2);
+#else
 	out_be32(&mmdc->mdscr,  CMD_ADDR_LSB_MR_ADDR(8) | MDSCR_ENABLE_CON_REQ |
 				CMD_LOAD_MODE_REG | CMD_BANK_ADDR_2);
+#endif
 
 	out_be32(&mmdc->mdscr,  CMD_ADDR_LSB_MR_ADDR(0) | MDSCR_ENABLE_CON_REQ |
 				CMD_LOAD_MODE_REG | CMD_BANK_ADDR_3);
