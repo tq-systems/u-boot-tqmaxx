@@ -42,6 +42,9 @@
 #define CONFIG_SYS_SDRAM_SIZE		SZ_512M
 #endif
 
+/* use ASR auto mode */
+#define RAM_ARS_AUTO_MODE
+
 #define CONFIG_CMD_MEMINFO
 #define CONFIG_CMD_MEMTEST
 #define CONFIG_SYS_MEMTEST_START	0x80000000
