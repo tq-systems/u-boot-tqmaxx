@@ -50,7 +50,7 @@ void reset_phy(void)
 int board_eth_init(bd_t *bis)
 {
 	struct mii_dev *bus;
-	struct mdio_info mac_mdio_info;
+	struct mdio_info mac_mdio_info, mac_mdio1_info;
 
 	unsigned int gpio_number_SW_RST, gpio_number_RST, gpio_number_PWRDWN;
 	const char *gpio_name_SW_RST = "gpio@20_7";
@@ -80,17 +80,27 @@ int board_eth_init(bd_t *bis)
 
 	init_pfe_scfg_dcfg_regs();
 
-	/* Initialize SGMIIA on MDIO1 */
+	/* Initialize bus on MDIO0 */
 	mac_mdio_info.reg_base = (void *)EMAC1_BASE_ADDR;
 	mac_mdio_info.name = DEFAULT_PFE_MDIO_NAME;
 
 	bus = pfe_mdio_init(&mac_mdio_info);
 	if (!bus) {
-		printf("Failed to register mdio\n");
+		printf("Failed to register mdio0\n");
 		return -1;
 	}
 
-	/* Initialize PHYs on MDIO1 */
+	/* Initialize bus on MDIO1 */
+	mac_mdio1_info.reg_base = (void *)EMAC2_BASE_ADDR;
+	mac_mdio1_info.name = DEFAULT_PFE_MDIO1_NAME;
+
+	bus = pfe_mdio_init(&mac_mdio1_info);
+	if (!bus) {
+		printf("Failed to register mdio1\n");
+		return -1;
+	}
+
+	/* Initialize SGMII PHYs on MDIO0 */
 	pfe_set_mdio(0, miiphy_get_dev_by_name(DEFAULT_PFE_MDIO_NAME));
 	pfe_set_phy_address_mode(0, EMAC1_PHY_ADDR,
 				 PHY_INTERFACE_MODE_SGMII);
@@ -102,6 +112,12 @@ int board_eth_init(bd_t *bis)
 	 * LED_0 = 0x5: 1000BT link established (orange LED)
 	 */
 	miiphy_write(DEFAULT_PFE_MDIO_NAME, EMAC1_PHY_ADDR, 0x18, 0x00B5);
+
+	/* MAC1 */
+	pfe_set_mdio(1, miiphy_get_dev_by_name(DEFAULT_PFE_MDIO1_NAME));
+	pfe_set_phy_address_mode(1, EMAC2_PHY_ADDR,
+				 PHY_INTERFACE_MODE_RGMII);
+
 
 	cpu_eth_init(bis);
 
