@@ -149,7 +149,8 @@ config PHY_XILINX
 
 config PHY_FIXED
 	bool "Fixed-Link PHY"
-	depends on DM_ETH
+# HACK:
+#	depends on DM_ETH
 	help
 	  Fixed PHY is used for having a 'fixed-link' to another MAC with a direct
 	  connection (MII, RGMII, ...).

@@ -9,14 +9,19 @@
 #include <config.h>
 #include <common.h>
 #include <phy.h>
+#include <malloc.h>
+
+#if defined(CONFIG_DM_ETH)
 #include <dm.h>
 #include <fdt_support.h>
+#endif
 
 DECLARE_GLOBAL_DATA_PTR;
 
 int fixedphy_probe(struct phy_device *phydev)
 {
 	struct fixed_link *priv;
+#if defined(CONFIG_DM_ETH)
 	int ofnode = phydev->addr;
 	u32 val;
 
@@ -39,7 +44,19 @@ int fixedphy_probe(struct phy_device *phydev)
 	priv->duplex = fdtdec_get_bool(gd->fdt_blob, ofnode, "full-duplex");
 	priv->pause = fdtdec_get_bool(gd->fdt_blob, ofnode, "pause");
 	priv->asym_pause = fdtdec_get_bool(gd->fdt_blob, ofnode, "asym-pause");
+#else
+	priv = malloc(sizeof(*priv));
+	if (!priv)
+		return -ENOMEM;
+	memset(priv, 0, sizeof(*priv));
 
+	phydev->priv = priv;
+
+	priv->link_speed = FIXED_LINK_SPEED;
+	priv->duplex = FIXED_LINK_FULL_DUPLEX;
+	priv->pause = FIXED_LINK_PAUSE;
+	priv->asym_pause = FIXED_LINK_ASYM_PAUSE;
+#endif
 	/* fixed-link phy must not be reset by core phy code */
 	phydev->flags |= PHY_FLAG_BROKEN_RESET;
 

@@ -861,6 +861,7 @@ struct phy_device *phy_connect(struct mii_dev *bus, int addr,
 {
 	struct phy_device *phydev = NULL;
 #ifdef CONFIG_PHY_FIXED
+#ifdef CONFIG_DM_ETH
 	int sn;
 	const char *name;
 	sn = fdt_first_subnode(gd->fdt_blob, dev_of_offset(dev));
@@ -873,6 +874,11 @@ struct phy_device *phy_connect(struct mii_dev *bus, int addr,
 		}
 		sn = fdt_next_subnode(gd->fdt_blob, sn);
 	}
+#else
+	/* HACK: */
+	if ((addr == FIXED_LINK_ADDR) && (interface == FIXED_LINK_INTERFACE))
+		phydev = phy_device_create(bus, addr, PHY_FIXED_ID, interface);
+#endif
 #endif
 	if (phydev == NULL)
 		phydev = phy_find_by_mask(bus, 1 << addr, interface);
