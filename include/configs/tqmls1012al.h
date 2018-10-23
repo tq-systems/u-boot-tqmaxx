@@ -90,6 +90,13 @@
 			"sf update ${loadaddr} ${fdt_mtdpart} ${filesize}; "   \
 		"fi; fi; "                                                     \
 		"setenv filesize; setenv getcmd \0"                            \
+	"usb_update_uboot=run set_getcmd; usb reset; "                         \
+		"load usb 0 ${loadaddr} ${uboot}; "                            \
+		"if itest ${filesize} > 0; then "                              \
+			"sf probe 0; "                                         \
+			"sf update ${loadaddr} ${uboot_mtdpart} ${filesize}; " \
+		"fi; fi; "                                                     \
+		"setenv filesize; setenv getcmd \0"                            \
 
 #define TQMLS1012AL_EXTRA_BOOT_ENV_SETTINGS                                    \
 	"kernel_addr_r=0x80080000\0"                                           \
