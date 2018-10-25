@@ -173,6 +173,11 @@
 		pagesize = <32>;
 		status = "okay";
 	};
+
+	rtc1: ds1339@68 {
+		compatible = "ds1339", "dallas,ds1339", "dallas,ds1337";
+		reg = <0x68>;
+	};
 };
 
 &usdhc1 {
