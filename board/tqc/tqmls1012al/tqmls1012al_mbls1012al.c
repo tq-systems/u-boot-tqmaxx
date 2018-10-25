@@ -57,6 +57,9 @@ int board_eth_init(bd_t *bis)
 	const char *gpio_name_RST = "gpio@20_8";
 	const char *gpio_name_PWRDWN = "gpio@70_3";
 
+	struct udevice *i2c_bus_dev, *eth_switch_dev;
+	int ret;
+
 	if (get_gpio_number(gpio_name_PWRDWN, &gpio_number_PWRDWN)) {
 		printf("ETH: GPIO '%s' not found\n", gpio_name_PWRDWN);
 	} else {
@@ -77,6 +80,30 @@ int board_eth_init(bd_t *bis)
 		gpio_request(gpio_number_RST, "eth_reset");
 		gpio_direction_output(gpio_number_RST, 1);
 	}
+
+	/*
+	 * KSZ9897
+	 * Set Minimum 1.5 ns delay for RGMII Ingress Internal Delay and
+	 * RGMII Egress Internal Delay in XMII Port Control 1 Register
+	 */
+	ret = uclass_get_device_by_name(UCLASS_I2C, TQMLS1012AL_I2C_BUS_NAME,
+					&i2c_bus_dev);
+	if (!ret) {
+		ret = dm_i2c_probe(i2c_bus_dev, MBLS1012AL_KSZ_I2C_ADDR, 0,
+				   &eth_switch_dev);
+		if (!ret) {
+			ret = i2c_set_chip_offset_len(eth_switch_dev, 2);
+			if (!ret) {
+				ret = dm_i2c_reg_write(eth_switch_dev,
+						       MBLS1012AL_KSZ_ADDR,
+						       MBLS1012AL_KSZ_VALUE);
+			}
+		}
+	}
+
+	if (ret)
+		printf("%s: could not write to ethernet switch register",
+		       __func__);
 
 	init_pfe_scfg_dcfg_regs();
 
@@ -117,7 +144,6 @@ int board_eth_init(bd_t *bis)
 	pfe_set_mdio(1, miiphy_get_dev_by_name(DEFAULT_PFE_MDIO1_NAME));
 	pfe_set_phy_address_mode(1, EMAC2_PHY_ADDR,
 				 PHY_INTERFACE_MODE_RGMII);
-
 
 	cpu_eth_init(bis);
 

@@ -13,7 +13,11 @@
 /* e-MMC / SD */
 #define CONFIG_FSL_ESDHC
 
-/* PFE Ethernet */
+/* Ethernet */
+#define MBLS1012AL_KSZ_I2C_ADDR	0x5f
+#define MBLS1012AL_KSZ_ADDR		0x7301
+#define MBLS1012AL_KSZ_VALUE		0x18
+
 #ifdef CONFIG_FSL_PFE
 #define EMAC1_PHY_ADDR          0x9
 #define EMAC2_PHY_ADDR          0x1
