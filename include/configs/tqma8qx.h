@@ -44,6 +44,8 @@
 #endif
 #endif /* CONFIG_CMD_USB */
 
+/* #define CONFIG_CMD_DATE */
+
 #define CONFIG_ENV_OVERWRITE
 
 #define CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
