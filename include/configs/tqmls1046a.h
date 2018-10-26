@@ -35,7 +35,11 @@
 #endif
 
 #ifdef CONFIG_SD_BOOT
+#ifdef CONFIG_EMMC_BOOT
+#define CONFIG_SYS_FSL_PBL_RCW board/tqc/tqmls1046a/tqmls1046a_rcw_emmc.cfg
+#else
 #define CONFIG_SYS_FSL_PBL_RCW board/tqc/tqmls1046a/tqmls1046a_rcw_sd.cfg
+#endif
 #endif
 
 #ifndef SPL_NO_IFC
