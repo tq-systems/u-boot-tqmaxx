@@ -12,6 +12,7 @@
 #include "tqmls1046a_bb.h"
 #include "../common/tqc_eeprom.h"
 
+#ifndef CONFIG_SPL_BUILD
 int board_eth_init(bd_t *bis)
 {
 	struct tqc_eeprom_data eedat;
@@ -56,4 +57,5 @@ int fdt_update_ethernet_dt(void *blob)
 
 	return 0;
 }
+#endif
 #endif

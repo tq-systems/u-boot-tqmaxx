@@ -36,6 +36,7 @@ const char *serdes_rcw_str[] = {
 	"Undefined "    // f
 };
 
+#ifndef CONFIG_SPL_BUILD
 static int _tqmls1046a_bb_check_serdes_mux(void)
 {
 	u32 srds_s1, srds_s2;
@@ -247,6 +248,7 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 
 	return 0;
 }
+#endif /* !CONFIG_SPL_BUILD */
 
 
 int tqmls1046a_bb_board_early_init_f(void)
@@ -257,6 +259,7 @@ int tqmls1046a_bb_board_early_init_f(void)
 	return ret;
 }
 
+#ifndef CONFIG_SPL_BUILD
 int tqmls1046a_bb_board_init(void)
 {
 	int ret = 0;
@@ -461,4 +464,4 @@ int tqmls1046a_bb_ft_board_setup(void *blob, bd_t *bd)
 	return 0;
 }
 #endif /* defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT) */
-
+#endif /* !CONFIG_SPL_BUILD */
