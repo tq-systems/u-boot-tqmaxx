@@ -897,7 +897,8 @@ static int do_mem_mtest(cmd_tbl_t *cmdtp, int flag, int argc,
 		return -1;
 	}
 
-	printf("Testing %08lx ... %08lx:\n", start, end);
+	printf("Testing (%s) %08lx ... %08lx:\n", (alt_test) ? "ext" : "quick",
+		start, end);
 	debug("%s:%d: start %#08lx end %#08lx\n", __func__, __LINE__,
 	      start, end);
 
