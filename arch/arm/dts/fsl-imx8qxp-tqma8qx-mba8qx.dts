@@ -253,7 +253,7 @@
 	adp-disable;
 	power-polarity-active-high;
 	disable-over-current;
-	dr_mode = "host";
+/*	dr_mode = "host"; */
 	status = "okay";
 };
 
