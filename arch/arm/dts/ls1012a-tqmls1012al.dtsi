@@ -36,7 +36,12 @@
 		reg = <0x50>;
 		pagesize = <32>;
 		u-boot,i2c-offset-len = <2>;
-		status = "okay";
+	};
+
+	se97btp: 24c02@51 {
+		compatible = "atmel,24c02";
+		pagesize = <16>;
+		reg = <0x51>;
 	};
 };
 
