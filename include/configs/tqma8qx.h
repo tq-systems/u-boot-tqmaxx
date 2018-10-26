@@ -272,7 +272,7 @@
 #define CONFIG_SYS_SDRAM_BASE		0x80000000
 #define CONFIG_NR_DRAM_BANKS		1
 #define PHYS_SDRAM_1			0x80000000
-#define PHYS_SDRAM_1_SIZE		0x80000000	/* 2 GB */
+#define PHYS_SDRAM_1_SIZE		SZ_1G	/* 1 GB */
 /* needed for loop in CPU code */
 #define PHYS_SDRAM_2			0x800000000
 #define PHYS_SDRAM_2_SIZE		0x0000000	/* not placed */
