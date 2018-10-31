@@ -32,7 +32,7 @@
 
 #ifdef CONFIG_SD_BOOT
 #ifdef CONFIG_RAMBOOT_PBL
-#define CONFIG_SYS_FSL_PBL_PBI board/tqc/tqmls1046a/tqmls1046a_pbi.cfg
+#define CONFIG_SYS_FSL_PBL_PBI board/tqc/tqmls1046a/tqmls1046a_pbi_sd.cfg
 #endif
 #ifdef CONFIG_EMMC_BOOT
 #define CONFIG_SYS_FSL_PBL_RCW board/tqc/tqmls1046a/tqmls1046a_rcw_emmc.cfg
