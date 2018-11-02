@@ -1,0 +1,11 @@
+TQMLS102xa BOARD
+M:	Michael Krummsdorf <michael.krummsdorf@tq-group.com>
+S:	Maintained
+F:	arch/arm/dts/ls1021a-tqmls1021a.dtsi
+F:	arch/arm/dts/ls1021a-tqmls1021a-mbls102xa.dts
+F:	board/tqc/tqmls102xa/
+F:	include/configs/tqmls102xa.h
+F:	configs/tqmls102xa_mbls102xa_ecc_mmcsd_defconfig
+F:	configs/tqmls102xa_mbls102xa_ecc_qspi_defconfig
+F:	configs/tqmls102xa_mbls102xa_mmcsd_defconfig
+F:	configs/tqmls102xa_mbls102xa_qspi_defconfig
