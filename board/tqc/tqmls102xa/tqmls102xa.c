@@ -381,7 +381,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 
 	/* Detect second qspi flash chip */
 	present = tqmls102xa_qspi_has_second_chip();
-	if (present > 0) {
+	if (present == 0) {
 		int offset, ret = 0;
 
 		printf("ft_board_setup: single qspi flash found");
