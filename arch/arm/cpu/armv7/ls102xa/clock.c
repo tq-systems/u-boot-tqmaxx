@@ -121,3 +121,10 @@ unsigned int mxc_get_clock(enum mxc_clock clk)
 	}
 	return 0;
 }
+
+#ifdef CONFIG_DM_I2C
+int enable_i2c_clk(unsigned char enable, unsigned i2c_num)
+{
+	return 1;
+}
+#endif
