@@ -83,7 +83,7 @@ config CPLD_MUX_DIP_MASK
 
 config CPLD_MUX_MATCH_COMMAND
 	string "Command to run on match"
-	default "setenv bootargs ${bootargs} video=HDMI-A-1:d video=LVDS-1:800x480-32" if TQMLS102XA_MBLS102XA
+	default "setenv bootargs ${bootargs} fsl-dcu-drm.legacyfb_depth=32" if TQMLS102XA_MBLS102XA
 
 endmenu
 endif

@@ -104,7 +104,7 @@
 
 #ifdef CONFIG_SD_BOOT
 #define CONFIG_SPL_FRAMEWORK
-#define CONFIG_SPL_LDSCRIPT	"arch/$(ARCH)/cpu/u-boot-spl.lds"
+#define CONFIG_SPL_LDSCRIPT		"arch/$(ARCH)/cpu/u-boot-spl.lds"
 #define CONFIG_SPL_TEXT_BASE		0x10000000
 #define CONFIG_SPL_MAX_SIZE		0x1a000
 #define CONFIG_SPL_STACK		0x1001d000
@@ -112,7 +112,7 @@
 #define CONFIG_SYS_TEXT_BASE		0x82000000
 
 #define CONFIG_SYS_SPL_MALLOC_START	(CONFIG_SYS_TEXT_BASE + \
-		CONFIG_SYS_MONITOR_LEN)
+					 CONFIG_SYS_MONITOR_LEN)
 #define CONFIG_SYS_SPL_MALLOC_SIZE	0x100000
 #define CONFIG_SPL_BSS_START_ADDR	0x80100000
 #define CONFIG_SPL_BSS_MAX_SIZE		0x80000
@@ -136,8 +136,8 @@
   #define PHYS_SDRAM_SIZE		(2u * 1024 * 1024 * 1024)
 #endif
 
-#define CONFIG_SYS_DDR_SDRAM_BASE      0x80000000UL
-#define CONFIG_SYS_SDRAM_BASE          CONFIG_SYS_DDR_SDRAM_BASE
+#define CONFIG_SYS_DDR_SDRAM_BASE	0x80000000UL
+#define CONFIG_SYS_SDRAM_BASE		CONFIG_SYS_DDR_SDRAM_BASE
 
 #if !defined(CONFIG_SD_BOOT) && !defined(CONFIG_NAND_BOOT) && \
 	!defined(CONFIG_QSPI_BOOT)
@@ -169,7 +169,7 @@
 #define CONFIG_SYS_I2C_MXC_I2C3		/* enable I2C bus 3 */
 
 /* I2C EEPROM (M24C64) */
-#define CONFIG_SYS_EEPROM_BUS_NUM		0
+#define CONFIG_SYS_EEPROM_BUS_NUM	0
 
 /*
  * MMC
@@ -191,8 +191,8 @@
   #endif
 #endif
 #elif defined(CONFIG_SD_BOOT)
-#define CONFIG_SYS_FSL_PBL_PBI	board/tqc/tqmls102xa/ls102xa_pbi_sd.cfg
-#define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_sd.cfg
+#define CONFIG_SYS_FSL_PBL_PBI		board/tqc/tqmls102xa/ls102xa_pbi_sd.cfg
+#define CONFIG_SYS_FSL_PBL_RCW		board/tqc/tqmls102xa/ls102xa_rcw_sd.cfg
 #endif
 
 #define QSPI0_AMBA_BASE			0x40000000
@@ -375,10 +375,11 @@
 /* 128 MiB offset as in ARM related docu for linux suggested */
 #define TQMLS102X_FDT_ADDRESS		0x88000000
 
-#if defined(CONFIG_TQMLS102XA_MBLS102XA)
+#if defined(CONFIG_TQMLS102XA_MBLS102XA) && \
+	defined(CONFIG_CMD_CPLD_MUX)
 #define BASEBOARD_EXTRA_ENV_SETTINGS	"addplatform=cpld_mux\0"
 #else
-#define BASEBOARD_EXTRA_ENV_SETTINGS	"addplatform=\0"
+#define BASEBOARD_EXTRA_ENV_SETTINGS	"addplatform=echo \"\\\\c\"\0"
 #endif
 
 #define TQMLS102X_EXTRA_BOOTDEV_ENV_SETTINGS                                   \
@@ -430,7 +431,7 @@
 	"run mmcboot; run spiboot; run netboot; run panicboot"
 
 #define CONFIG_EXTRA_ENV_SETTINGS                                              \
-	"addmisc=setenv bootargs ${bootargs} hdmi\0"                           \
+	"addmisc=setenv bootargs ${bootargs}\0"                                \
 	"board=tqmls102x\0"                                                    \
 	"uimage=uImage\0"                                                      \
 	"zimage=linuximage\0"                                                  \
@@ -438,7 +439,7 @@
 	"kernel_name=if test \"${boot_type}\" != bootz; then "                 \
 		"setenv kernel ${uimage}; "                                    \
 		"else setenv kernel ${zimage}; fi\0"                           \
-	"uboot=" TQMLS102X_UBOOT_MMCSD_IMAGE_FILE "\0"                            \
+	"uboot=" TQMLS102X_UBOOT_MMCSD_IMAGE_FILE "\0"                         \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"                               \
 	"fdt_addr="__stringify(TQMLS102X_FDT_ADDRESS)"\0"                      \
 	"console=" TQMLS102X_CONSOLE_DEV "\0"                                  \
@@ -465,7 +466,7 @@
 	"netdev=eth0\0"                                                        \
 	"rootpath=/srv/nfs/tqmls1021a\0"                                       \
 	"ipmode=static\0"                                                      \
-	"netargs=run addnfs addip addtty addmisc\0"                            \
+	"netargs=run addnfs addip addtty addmisc addplatform\0"                \
 	"addnfs=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/nfs rw "                                            \
 		"nfsroot=${serverip}:${rootpath},v3,tcp;\0"                    \
@@ -492,7 +493,7 @@
 	"panicboot=echo No boot device !!! reset\0"                            \
 	"addspi=setenv bootargs ${bootargs} root=ubi0:root rw "                \
 		"rootfstype=ubifs ubi.mtd=4\0"                                 \
-	"spiargs=run addspi addtty addmisc\0"                                  \
+	"spiargs=run addspi addtty addmisc addplatform\0"                      \
 	"loadspiimage=sf probe 0; sf read ${loadaddr} Linux\0"                 \
 	"loadspifdt=sf probe 0; sf read ${fdt_addr} DTB\0"                     \
 	"spiboot=echo Booting from SPI NOR flash...; setenv bootargs; "        \
@@ -502,7 +503,7 @@
 		"else "                                                        \
 			"${boot_type}; "                                       \
 		"fi;\0"                                                        \
-	"uboot-qspi=" TQMLS102X_UBOOT_QSPI_IMAGE_FILE "\0"                        \
+	"uboot-qspi=" TQMLS102X_UBOOT_QSPI_IMAGE_FILE "\0"                     \
 	"rootfs-qspi=root.ubi\0"                                               \
 	"update_rcw=run update_uboot-qspi\0"                                   \
 	"update_uboot-qspi=if tftp ${uboot-qspi}; then "                       \
