@@ -443,7 +443,7 @@
 	"run mmcboot; run spiboot; run netboot; run panicboot"
 
 #define CONFIG_EXTRA_ENV_SETTINGS                                              \
-	"addmisc=setenv bootargs ${bootargs}\0"                                \
+	"addmisc=setenv bootargs ${bootargs} fsl-dcu-drm.legacyfb_depth=32\0"  \
 	"board=tqmls102x\0"                                                    \
 	"uimage=uImage\0"                                                      \
 	"zimage=linuximage\0"                                                  \
