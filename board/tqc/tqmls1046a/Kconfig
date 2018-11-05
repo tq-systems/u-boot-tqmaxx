@@ -12,6 +12,8 @@ config SYS_SOC
 config SYS_CONFIG_NAME
 	default "tqmls1046a"
 
+source "board/tqc/tqmls1046a/pbi_rcw/Kconfig"
+
 choice
 	prompt "TQMLS1046A base board variant"
 	default TQMLS1046A_BB_MBLS10XXA
@@ -41,5 +43,6 @@ endif
 endif
 
 source "board/tqc/common/Kconfig"
+
 
 endif

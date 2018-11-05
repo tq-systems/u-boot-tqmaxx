@@ -30,22 +30,6 @@
 #define CONFIG_MEM_INIT_VALUE           0xdeadbeef
 #define CONFIG_FSL_DDR_BIST	/* enable built-in memory test */
 
-#ifdef CONFIG_SD_BOOT
-#ifdef CONFIG_RAMBOOT_PBL
-#define CONFIG_SYS_FSL_PBL_PBI board/tqc/tqmls1046a/tqmls1046a_pbi_sd.cfg
-#endif
-#ifdef CONFIG_EMMC_BOOT
-#define CONFIG_SYS_FSL_PBL_RCW board/tqc/tqmls1046a/tqmls1046a_rcw_emmc.cfg
-#else
-#define CONFIG_SYS_FSL_PBL_RCW board/tqc/tqmls1046a/tqmls1046a_rcw_sd.cfg
-#endif
-#elif defined(CONFIG_QSPI_BOOT)
-#if defined(CONFIG_RAMBOOT_PBL) || defined(CONFIG_RAMBOOT_PBL_BIN)
-#define CONFIG_SYS_FSL_PBL_PBI board/tqc/tqmls1046a/tqmls1046a_pbi_qspi.cfg
-#define CONFIG_SYS_FSL_PBL_RCW board/tqc/tqmls1046a/tqmls1046a_rcw_qspi.cfg
-#endif
-#endif
-
 #if defined(CONFIG_QSPI_BOOT)
 #define CONFIG_SPL_PAD_TO       0x10000
 #endif

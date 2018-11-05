@@ -1,0 +1,18 @@
+if TARGET_TQMLS1046A
+
+config SYS_FSL_PBL_RCW
+	string
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_emmc.cfg" \
+	  if SD_BOOT && SYS_TQMLS1046A_EMMC
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_sd.cfg" \
+	  if SD_BOOT && !SYS_TQMLS1046A_EMMC
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_qspi.cfg" \
+	  if QSPI_BOOT
+
+config SYS_FSL_PBL_PBI
+	string
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_pbi_sd.cfg" \
+	  if SD_BOOT
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_pbi_qspi.cfg" \
+	  if QSPI_BOOT
+endif
