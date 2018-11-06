@@ -96,7 +96,7 @@ endchoice
 
 config IMX_CONFIG
 	default "board/tqc/tqma6ul/tqma6ul.cfg" if TQMA6UL
-	default "board/tqc/tqma6ul/tqma6ul.cfg" if TQMA6ULL
+	default "board/tqc/tqma6ul/tqma6ull.cfg" if TQMA6ULL
 
 source "board/tqc/common/Kconfig"
 
