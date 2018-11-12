@@ -4,8 +4,8 @@
  * SPDX-License-Identifier:	GPL-2.0+
  */
 
-#ifndef __TQMTEST_H
-#define __TQMTEST_H
+#ifndef __TQMA8QX_H
+#define __TQMA8QX_H
 
 #include <linux/sizes.h>
 #include <asm/arch/imx-regs.h>
