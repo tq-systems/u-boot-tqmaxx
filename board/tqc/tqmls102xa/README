@@ -16,8 +16,13 @@ The following boot source is supported:
 
 To build U-Boot for the TQ Systems TQMLS102xA modules:
 
-	make tqmls102xa_<baseboard>_[ecc]_<boot>_defconfig
+	make <module>_<baseboard>_[ecc]_<mux>_<boot>_defconfig
 	make
+
+<module> is a placeholder for the module variant:
+tqmls102xa	- generic TQMLS102xA build (1.0 GHz, 1 GiB DDR)
+tqmls1021a-ae	- build for variant TQMLS1021A-AE (1.2 GHz, 2 GiB DDR)
+		  (not all combinations available)
 
 <baseboard> is a placeholder for the board the module is plugged into:
 mbls102xa	- Starter kit STKLS102xA by TQ
@@ -26,13 +31,23 @@ mbls102xa	- Starter kit STKLS102xA by TQ
 ecc		- ECC enabled
 -not given-	- ECC disabled
 
+<mux> is a boolean parameter that selects RGMII or CAN muxing on EC1 pins
+can		- EC1 pins muxed to CAN1_TX/CAN1_RX/CAN2_TX/CAN2_RX
+rgmii		- EC1 pins muxed to RGMII1
+
 <boot> is a placeholder for the boot device
 mmcsd		- build to boot from device on esDHC (eMMC or SD card)
 qspi		- build to boot from flash on QSPI interface
 
 This gives the following configurations:
 
-tqmls102xa_mbls102xa_ecc_mmcsd_defconfig
-tqmls102xa_mbls102xa_ecc_qspi_defconfig
-tqmls102xa_mbls102xa_mmcsd_defconfig
-tqmls102xa_mbls102xa_qspi_defconfig
+tqmls102xa_mbls102xa_can_mmcsd_defconfig
+tqmls102xa_mbls102xa_can_qspi_defconfig
+tqmls102xa_mbls102xa_ecc_can_mmcsd_defconfig
+tqmls102xa_mbls102xa_ecc_can_qspi_defconfig
+tqmls102xa_mbls102xa_ecc_rgmii_mmcsd_defconfig
+tqmls102xa_mbls102xa_ecc_rgmii_qspi_defconfig
+tqmls102xa_mbls102xa_rgmii_mmcsd_defconfig
+tqmls102xa_mbls102xa_rgmii_qspi_defconfig
+tqmls1021a-ae_mbls102xa_ecc_can_qspi_defconfig
+tqmls1021a-ae_mbls102xa_ecc_rgmii_qspi_defconfig

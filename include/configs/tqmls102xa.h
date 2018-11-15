@@ -184,15 +184,27 @@
 #if defined(CONFIG_QSPI_BOOT)
 #if defined(CONFIG_RAMBOOT_PBL) || defined(CONFIG_RAMBOOT_PBL_BIN)
   #define CONFIG_SYS_FSL_PBL_PBI	board/tqc/tqmls102xa/ls102xa_pbi_qspi.cfg
-  #if defined(CONFIG_SYS_CPU_1200)
-    #define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_qspi_1200.cfg
-  #else
-    #define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_qspi_1000.cfg
+  #if defined(CONFIG_SYS_CPU_1200) && \
+      defined(CONFIG_MBLS102XA_RGMII)
+    #define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_rgmii_qspi_1200.cfg
+  #elif defined(CONFIG_SYS_CPU_1200) && \
+        defined(CONFIG_MBLS102XA_CAN)
+    #define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_can_qspi_1200.cfg
+  #elif defined(CONFIG_SYS_CPU_1000) && \
+        defined(CONFIG_MBLS102XA_RGMII)
+    #define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_rgmii_qspi_1000.cfg
+  #elif defined(CONFIG_SYS_CPU_1000) && \
+        defined(CONFIG_MBLS102XA_CAN)
+    #define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_can_qspi_1000.cfg
   #endif
 #endif
 #elif defined(CONFIG_SD_BOOT)
 #define CONFIG_SYS_FSL_PBL_PBI		board/tqc/tqmls102xa/ls102xa_pbi_sd.cfg
-#define CONFIG_SYS_FSL_PBL_RCW		board/tqc/tqmls102xa/ls102xa_rcw_sd.cfg
+  #if defined(CONFIG_MBLS102XA_RGMII)
+    #define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_rgmii_sd.cfg
+  #elif defined(CONFIG_MBLS102XA_CAN)
+    #define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_can_sd.cfg
+  #endif
 #endif
 
 #define QSPI0_AMBA_BASE			0x40000000
