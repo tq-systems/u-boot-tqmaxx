@@ -940,6 +940,14 @@ config TARGET_LS1012AFRDM
 	  development platform that supports the QorIQ LS1012A
 	  Layerscape Architecture processor.
 
+config TARGET_TQMLS1012AL
+	bool "Support tqmls1012al"
+	select ARCH_LS1012A
+	select ARM64
+	select BOARD_LATE_INIT
+	imply SCSI
+	help
+
 config TARGET_LS1088ARDB
 	bool "Support ls1088ardb"
 	select ARCH_LS1088A
@@ -1286,6 +1294,7 @@ source "board/birdland/bav335x/Kconfig"
 source "board/timll/devkit3250/Kconfig"
 source "board/toradex/colibri_pxa270/Kconfig"
 source "board/technologic/ts4600/Kconfig"
+source "board/tqc/tqmls1012al/Kconfig"
 source "board/vscom/baltos/Kconfig"
 source "board/woodburn/Kconfig"
 source "board/work-microwave/work_92105/Kconfig"

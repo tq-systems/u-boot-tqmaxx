@@ -1,0 +1,29 @@
+if TARGET_TQMLS1012AL
+
+config SYS_BOARD
+	default "tqmls1012al"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_SOC
+	default "fsl-layerscape"
+
+config SYS_CONFIG_NAME
+	default "tqmls1012al"
+
+choice
+	prompt "TQMLS1012AL base board variant"
+	default MBLS1012AL
+	help
+	  Select base board for TQMLS1012AL module
+
+config MBLS1012AL
+	bool "TQMLS1012AL on MBLS1012AL Starterkit"
+	help
+	  Select the MBLS1012AL starterkit.
+	  This features a Ethernet, USB, SD-Card, etc.
+
+endchoice
+
+endif

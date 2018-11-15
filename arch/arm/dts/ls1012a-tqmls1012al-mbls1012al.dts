@@ -1,0 +1,16 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
+/*
+ * Device Tree file for TQMLS1012AL base board MBLS1012AL
+ *
+ * (C) Copyright 2018 TQ Systems GmbH
+ * Max Merchel <Max.Merchel@tq-group.com>
+ */
+
+/dts-v1/;
+#include "ls1012a-tqmls1012al.dtsi"
+
+/ {
+	chosen {
+		stdout-path = &duart0;
+	};
+};

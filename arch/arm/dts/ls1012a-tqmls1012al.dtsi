@@ -1,0 +1,37 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
+/*
+ * Device Tree file for TQMLS1012AL
+ *
+ * (C) Copyright 2018 TQ Systems GmbH
+ * Max Merchel <Max.Merchel@tq-group.com>
+ */
+
+/include/ "fsl-ls1012a.dtsi"
+
+/ {
+	model = "TQMLS1012AL";
+	aliases {
+		spi0 = &qspi;
+	};
+};
+
+&qspi {
+	bus-num = <0>;
+	status = "okay";
+
+	qflash0: n25q512a@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "spi-flash";
+		spi-max-frequency = <20000000>;
+		reg = <0>;
+	};
+};
+
+&i2c0 {
+	status = "okay";
+};
+
+&duart0 {
+	status = "okay";
+};

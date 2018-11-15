@@ -1,0 +1,9 @@
+TQ SYSTEMS TQMLS1012AL BOARD
+M:	Max Merchel <Max.Merchel@tq-group.com>
+S:	Maintained
+F:	arch/arm/dts/ls1021a-tqmls1012al.dtsi
+F:	arch/arm/dts/ls1021a-tqmls1012al*.dts
+F:	board/tqc/tqmls1012al/*
+F:	include/configs/tqmls1012al.h
+F:	include/configs/tqmls1012al_mbls1012al.h
+F:	configs/tqmls1012al*_defconfig
