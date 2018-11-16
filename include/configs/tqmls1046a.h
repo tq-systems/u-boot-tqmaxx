@@ -90,12 +90,135 @@
 #ifndef SPL_NO_MISC
 #undef CONFIG_BOOTCOMMAND
 #if defined(CONFIG_QSPI_BOOT)
-#define CONFIG_BOOTCOMMAND "run distro_bootcmd; run qspi_bootcmd; "	\
-			   "env exists secureboot && esbc_halt;;"
+#define CONFIG_BOOTCOMMAND "run distro_bootcmd; run spiboot; run netboot; "	\
+							"run panicboot"
 #elif defined(CONFIG_SD_BOOT)
-#define CONFIG_BOOTCOMMAND "run distro_bootcmd;run sd_bootcmd; "	\
-			   "env exists secureboot && esbc_halt;"
+#define CONFIG_BOOTCOMMAND "run distro_bootcmd; run mmcboot; run netboot; "	\
+							"run panicboot"
 #endif
+#endif
+
+/* eMMC/SD partitioning */
+#define TQMLS1046A_UBOOT_MMC_SECT_START		0x8
+#define TQMLS1046A_UBOOT_MMC_SECT_SIZE		0x17f8
+#define TQMLS1046A_FMUCODE_MMC_SECT_START	0x4800
+#define TQMLS1046A_FMUCODE_MMC_SECT_SIZE	0x3800
+
+#ifndef CONFIG_SPL_BUILD
+#undef BOOT_TARGET_DEVICES
+#define BOOT_TARGET_DEVICES(func) \
+	func(SCSI, scsi, 0) \
+	func(USB, usb, 0)
+#include <config_distro_bootcmd.h>
+#endif
+
+#ifndef SPL_NO_MISC
+#undef CONFIG_EXTRA_ENV_SETTINGS
+/* Initial environment variables */
+#define CONFIG_EXTRA_ENV_SETTINGS		\
+	"hwconfig=fsl_ddr:bank_intlv=auto\0"	\
+	"addmisc=setenv bootargs ${bootargs}\0"	\
+	"addmtd=setenv bootargs ${bootargs} mtdparts=${mtdparts}\0"	\
+	"consdev=ttyS1\0"	\
+	"addtty=setenv bootargs ${bootargs} earlycon=uart8250,mmio,0x21c0600 "	\
+		"console=${consdev},${baudrate}\0"	\
+	"mmcblkdev=0\0"	\
+	"mmcpart=2\0"	\
+	"addmmc=setenv bootargs ${bootargs} "	\
+		"root=/dev/mmcblk${mmcblkdev}p${mmcpart} rw rootwait\0"	\
+	"mmcargs=run addmmc addtty addmtd addmisc\0"	\
+	"mmcdev=0\0"	\
+	"firmwarepart=1\0"	\
+	"loadaddr=0x81000000\0"	\
+	"kernel=linuximage\0"	\
+	"fdt_addr=0x90000000\0"	\
+	"fdt_file=fsl-tqmls1046a-mbls10xxa.dtb\0"	\
+	"loadimage=load mmc ${mmcdev}:${firmwarepart} ${loadaddr} ${kernel} \0"	\
+	"loadfdt=load mmc ${mmcdev}:${firmwarepart} ${fdt_addr} ${fdt_file} \0" \
+	CONFIG_MTDPARTS_DEFAULT "\0"	\
+	BOOTENV	\
+	"mmcboot=echo Booting from mmc ...; "	\
+		"setenv bootargs; "	\
+		"run mmcargs; "	\
+		"run loadimage; "	\
+		"run loadfdt; "	\
+		"booti ${loadaddr} - ${fdt_addr};\0"	\
+	"spiboot=echo Booting from QSPI is currently unsupported!; \0"	\
+	"rootpath=/srv/nfs/tqmls1046a\0"	\
+	"addnfs=setenv bootargs ${bootargs} "	\
+		"root=/dev/nfs rw "	\
+		"nfsroot=${serverip}:${rootpath},v3,tcp;\0"	\
+	"netdev=eth0\0"	\
+	"addip_static=setenv bootargs ${bootargs} "	\
+		"ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:"	\
+		"${hostname}:${netdev}:off\0"	\
+	"addip_dynamic=setenv bootargs ${bootargs} ip=dhcp\0"	\
+	"ipmode=static\0"	\
+	"addip=if test \"${ipmode}\" != static; then "	\
+		"run addip_dynamic; else run addip_static; fi\0"	\
+	"set_getcmd=if test \"${ipmode}\" != static; then "	\
+		"setenv getcmd dhcp; setenv autoload yes; "	\
+		"else setenv getcmd tftp; setenv autoload no; fi\0"	\
+	"netargs=run addnfs addip addtty addmisc\0"	\
+	"netboot=echo Booting from net ...; "	\
+		"run set_getcmd; "	\
+		"setenv bootargs; "	\
+		"run netargs; "	\
+		"if ${getcmd} ${kernel}; then "	\
+			"if ${getcmd} ${fdt_addr} ${fdt_file}; then "	\
+				"booti ${loadaddr} - ${fdt_addr}; "    \
+			"fi; "	\
+		"fi; "	\
+		"echo ... failed\0"	\
+	"panicboot=echo No boot device !!! reset\0"	\
+	"uboot_mmc=u-boot-with-spl-pbl.bin\0"	\
+	"uboot_mmc_start="__stringify(TQMLS1046A_UBOOT_MMC_SECT_START)"\0"	\
+	"uboot_mmc_size="__stringify(TQMLS1046A_UBOOT_MMC_SECT_SIZE)"\0"	\
+	"uboot_qspi=u-boot-pbl.bin.bswap\0"	\
+	"uboot_qspi_start=0x0\0"	\
+	"update_uboot_mmc=run set_getcmd; "	\
+		"if ${getcmd} ${uboot_mmc}; then "	\
+			"if itest ${filesize} > 0; then "	\
+				"mmc dev ${mmcdev}; mmc rescan; "	\
+				"setexpr blkc ${filesize} + 0x1ff; "	\
+				"setexpr blkc ${blkc} / 0x200; "	\
+				"if itest ${blkc} <= ${uboot_mmc_size}; then "	\
+					"mmc write ${loadaddr} ${uboot_mmc_start} ${blkc}; "	\
+				"fi; "	\
+			"fi; "	\
+		"fi;\0"	\
+	"update_uboot_qspi=run set_getcmd; "	\
+		"if ${getcmd} ${uboot_qspi}; then "	\
+			"if itest ${filesize} > 0; then "	\
+				"sf probe 0; "	\
+				"sf update ${loadaddr} ${uboot_qspi_start} ${filesize}; "	\
+			"fi; "	\
+		"fi; "	\
+		"setenv filesize;\0"	\
+	"fmucode=fsl_fman_ucode_ls1046_r1.0_106_4_18.bin\0"	\
+	"fmucode_mmc_start="__stringify(TQMLS1046A_FMUCODE_MMC_SECT_START)"\0"	\
+	"fmucode_mmc_size="__stringify(TQMLS1046A_FMUCODE_MMC_SECT_SIZE)"\0"	\
+	"fmucode_qspi_start=0x900000\0"	\
+	"update_fmucode_mmc=run set_getcmd; "	\
+		"if ${getcmd} ${fmucode}; then "	\
+			"if itest ${filesize} > 0; then "	\
+				"mmc dev ${mmcdev}; mmc rescan; "	\
+				"setexpr blkc ${filesize} + 0x1ff; "	\
+				"setexpr blkc ${blkc} / 0x200; "	\
+				"if itest ${blkc} <= ${fmucode_mmc_size}; then "	\
+					"mmc write ${loadaddr} ${fmucode_mmc_start} ${blkc}; "	\
+				"fi; "	\
+			"fi; "	\
+		"fi;\0"	\
+	"update_fmucode_qspi=run set_getcmd; "	\
+		"if ${getcmd} ${fmucode}; then "	\
+			"if itest ${filesize} > 0; then "	\
+				"sf probe 0; "	\
+				"sf update ${loadaddr} ${fmucode_qspi_start} ${filesize}; "	\
+			"fi; "	\
+		"fi; "	\
+		"setenv filesize;\0"	\
+	""
 #endif
 
 #include <asm/fsl_secure_boot.h>
