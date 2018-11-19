@@ -31,5 +31,4 @@ int tqmaxx_show_eeprom(struct tqmaxx_eeprom_data *eeprom, const char *id);
 int tqmaxx_read_eeprom(unsigned int bus, unsigned int addr,
 		       struct tqmaxx_eeprom_data *eeprom);
 
-
 #endif

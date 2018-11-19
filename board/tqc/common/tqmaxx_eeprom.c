@@ -35,7 +35,7 @@ int tqmaxx_parse_eeprom_mac(struct tqmaxx_eeprom_data *eeprom, char *buf,
 int tqmaxx_parse_eeprom_serial(struct tqmaxx_eeprom_data *eeprom, char *buf,
 			       size_t len)
 {
-	unsigned i;
+	unsigned int i;
 
 	if (!buf || !eeprom)
 		return -1;
@@ -43,7 +43,7 @@ int tqmaxx_parse_eeprom_serial(struct tqmaxx_eeprom_data *eeprom, char *buf,
 		return -1;
 
 	for (i = 0; i < (sizeof(eeprom->serial)) &&
-		isdigit(eeprom->serial[i]); i++)
+	     isdigit(eeprom->serial[i]); i++)
 		buf[i] = eeprom->serial[i];
 	buf[i] = '\0';
 	if (sizeof(eeprom->serial) != strlen(buf))
@@ -55,15 +55,15 @@ int tqmaxx_parse_eeprom_serial(struct tqmaxx_eeprom_data *eeprom, char *buf,
 int tqmaxx_parse_eeprom_id(struct tqmaxx_eeprom_data *eeprom, char *buf,
 			   size_t len)
 {
-	unsigned i;
+	unsigned int i;
 
 	if (!buf || !eeprom)
 		return -1;
 	if (len < (sizeof(eeprom->id) + 1))
 		return -1;
 
-	for (i = 0; i < sizeof(eeprom->id) &&
-		isprint(eeprom->id[i]) && isascii(eeprom->id[i]); ++i)
+	for (i = 0; i < sizeof(eeprom->id) && isprint(eeprom->id[i]) &&
+	     isascii(eeprom->id[i]); ++i)
 		buf[i] = eeprom->id[i];
 	buf[i] = '\0';
 
@@ -86,20 +86,20 @@ int tqmaxx_show_eeprom(struct tqmaxx_eeprom_data *eeprom, const char *id)
 	/* ID */
 	tqmaxx_parse_eeprom_id(eeprom, safe_string,
 			       ARRAY_SIZE(safe_string));
-	if (0 == strncmp(safe_string, id, strlen(id)))
+	if (strncmp(safe_string, id, strlen(id)) == 0)
 		printf("  ID: %s\n", safe_string);
 	else
 		puts("  unknown hardware variant\n");
 
 	/* Serial number */
-	if (0 == tqmaxx_parse_eeprom_serial(eeprom, safe_string,
-					    ARRAY_SIZE(safe_string)))
+	if (tqmaxx_parse_eeprom_serial(eeprom, safe_string,
+				       ARRAY_SIZE(safe_string)) == 0)
 		printf("  SN: %s\n", safe_string);
 	else
 		puts("  unknown serial number\n");
 	/* MAC address */
-	if (0 == tqmaxx_parse_eeprom_mac(eeprom, safe_string,
-					 ARRAY_SIZE(safe_string)))
+	if (tqmaxx_parse_eeprom_mac(eeprom, safe_string,
+				    ARRAY_SIZE(safe_string)) == 0)
 		printf("  MAC: %s\n", safe_string);
 	else
 		puts("  invalid MAC\n");
@@ -111,7 +111,7 @@ int tqmaxx_show_eeprom(struct tqmaxx_eeprom_data *eeprom, const char *id)
  * read_eeprom - read the given EEPROM into memory
  */
 int tqmaxx_read_eeprom(unsigned int bus, unsigned int addr,
-			   struct tqmaxx_eeprom_data *eeprom)
+		       struct tqmaxx_eeprom_data *eeprom)
 {
 	int ret;
 #ifdef CONFIG_DM_I2C
@@ -124,7 +124,8 @@ int tqmaxx_read_eeprom(unsigned int bus, unsigned int addr,
 		return -1;
 
 #ifdef CONFIG_DM_I2C
-	ret = i2c_get_chip_for_busnum(bus, addr, CONFIG_SYS_I2C_EEPROM_ADDR_LEN, &dev);
+	ret = i2c_get_chip_for_busnum(bus, addr, CONFIG_SYS_I2C_EEPROM_ADDR_LEN,
+				      &dev);
 	if (ret) {
 		debug("%s: Cannot find I2C chip for bus %d\n", __func__, bus);
 		return ret;
