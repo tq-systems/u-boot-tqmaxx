@@ -91,9 +91,24 @@
 			>;
 		};
 
+		pinctrl_hog: mba8qxhoggrp {
+			fsl,pins = <
+				SC_P_MIPI_CSI0_I2C0_SCL_LSIO_GPIO3_IO05		0x06000048
+				SC_P_MIPI_CSI0_I2C0_SDA_LSIO_GPIO3_IO06		0x06000048
+				SC_P_MIPI_CSI0_GPIO0_01_LSIO_GPIO3_IO07		0x06000048
+			>;
+		};
+
 		pinctrl_pca9538: pca9538grp {
 			fsl,pins = <
 				SC_P_MIPI_CSI0_GPIO0_00_LSIO_GPIO3_IO08		0x06000020
+			>;
+		};
+
+		pinctrl_usbotg1: usbotg1grp {
+			fsl,pins = <
+				SC_P_USB_SS3_TC0_CONN_USB_OTG1_PWR	0x06000020
+				SC_P_USB_SS3_TC2_CONN_USB_OTG1_OC	0x06000020
 			>;
 		};
 
@@ -140,20 +155,7 @@
 				SC_P_USDHC1_VSELECT_CONN_USDHC1_VSELECT	0x06000020
 			>;
 		};
-
-		pinctrl_usbotg1: usbotg1grp {
-			fsl,pins = <
-				SC_P_USB_SS3_TC0_CONN_USB_OTG1_PWR	0x06000020
-				SC_P_USB_SS3_TC2_CONN_USB_OTG1_OC	0x06000020
-			>;
-		};
 	};
-};
-
-&lpuart1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_lpuart1>;
-	status = "okay";
 };
 
 &fec1 {
@@ -175,6 +177,9 @@
 			reg = <0>;
 			ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
 			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+			ti,dp83867-rxctrl-strap-quirk;
+			ti,led-function = <0xc100>; /* LED1: Link, LED2: activity */
+			ti,led-ctrl = <0x1001>;     /* active low, LED1/2 driven by phy */
 		};
 
 		ethphy3: ethernet-phy@3 {
@@ -182,6 +187,9 @@
 			reg = <3>;
 			ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
 			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+			ti,dp83867-rxctrl-strap-quirk;
+			ti,led-function = <0xc100>; /* LED1: Link, LED2: activity */
+			ti,led-ctrl = <0x1001>;     /* active low, LED1/2 driven by phy */
 		};
 	};
 };
@@ -216,15 +224,10 @@
 	};
 };
 
-&usdhc2 {
-	pinctrl-names = "default", "state_100mhz", "state_200mhz";
-	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
-	bus-width = <4>;
-	cd-gpios = <&gpio4 22 GPIO_ACTIVE_LOW>;
-	wp-gpios = <&gpio4 21 GPIO_ACTIVE_HIGH>;
-	vmmc-supply = <&reg_usdhc2_vmmc>;
+
+&lpuart1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpuart1>;
 	status = "okay";
 };
 
@@ -242,4 +245,16 @@
 
 &usb2 {
 	status = "disabled";
+};
+
+&usdhc2 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
+	bus-width = <4>;
+	cd-gpios = <&gpio4 22 GPIO_ACTIVE_LOW>;
+	wp-gpios = <&gpio4 21 GPIO_ACTIVE_HIGH>;
+	vmmc-supply = <&reg_usdhc2_vmmc>;
+	status = "okay";
 };
