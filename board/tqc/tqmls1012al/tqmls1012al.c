@@ -7,6 +7,7 @@
 #include "tqmls1012al_bb.h"
 #include <spi.h>
 #include <spi_flash.h>
+#include <i2c_eeprom.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -128,10 +129,10 @@ int misc_init_r(void)
 	char safe_string[0x41];
 
 	ret = tqmaxx_read_eeprom(CONFIG_SYS_I2C_EEPROM_BUS,
-				 CONFIG_SYS_I2C_EEPROM_ADDR, &eedat);
+				 TQMLS1012AL_I2C_EEPROM1_ADDR, &eedat);
 
 	if (ret) {
-		printf("EEPROM: (0x%x) err %d\n", CONFIG_SYS_I2C_EEPROM_ADDR,
+		printf("EEPROM: (0x%x) err %d\n", TQMLS1012AL_I2C_EEPROM1_ADDR,
 		       ret);
 	} else {
 		/* ID */
