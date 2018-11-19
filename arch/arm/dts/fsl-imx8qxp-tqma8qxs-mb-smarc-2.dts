@@ -40,6 +40,13 @@
 			startup-delay-us = <100>;
 			off-on-delay-us = <12000>;
 		};
+
+		reg_usdhc2_vqmmc: usdhc2_vqmmc {
+			compatible = "regulator-fixed";
+			regulator-name = "SD1_VQMMC";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <3300000>;
+		};
 	};
 };
 
@@ -241,5 +248,7 @@
 	wp-gpios = <&gpio4 21 GPIO_ACTIVE_HIGH>;
 	no-1-8-v;
 	vmmc-supply = <&reg_usdhc2_vmmc>;
+/* TODO: does not work (yet) */
+/*	vqmmc-supply = <&reg_usdhc2_vqmmc>; */
 	status = "okay";
 };
