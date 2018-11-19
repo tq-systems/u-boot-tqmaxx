@@ -52,7 +52,8 @@ int board_eth_init(bd_t *bis)
 	struct mii_dev *bus;
 	struct mdio_info mac_mdio_info;
 
-	unsigned int gpio_number_RST, gpio_number_PWRDWN;
+	unsigned int gpio_number_SW_RST, gpio_number_RST, gpio_number_PWRDWN;
+	const char *gpio_name_SW_RST = "gpio@20_7";
 	const char *gpio_name_RST = "gpio@20_8";
 	const char *gpio_name_PWRDWN = "gpio@70_3";
 
@@ -61,6 +62,13 @@ int board_eth_init(bd_t *bis)
 	} else {
 		gpio_request(gpio_number_PWRDWN, "eth_PWRDWN");
 		gpio_direction_output(gpio_number_PWRDWN, 1);
+	}
+
+	if (get_gpio_number(gpio_name_SW_RST, &gpio_number_SW_RST)) {
+		printf("ETH: GPIO '%s' not found\n", gpio_name_SW_RST);
+	} else {
+		gpio_request(gpio_number_SW_RST, "eth_SW_reset");
+		gpio_direction_output(gpio_number_SW_RST, 1);
 	}
 
 	if (get_gpio_number(gpio_name_RST, &gpio_number_RST)) {
@@ -115,12 +123,9 @@ void tqmls1012al_bb_late_init(void)
 	}
 
 	/* PCIE_CLK_PD - Do not change */
-	if(get_gpio_number(gpio_name_pcie_clk_pd,&gpio_number))
-	{
+	if (get_gpio_number(gpio_name_pcie_clk_pd, &gpio_number)) {
 		printf("PCIE: GPIO '%s' not found\n", gpio_name_pcie_clk_pd);
-	}
-	else
-	{
+	} else {
 		gpio_request(gpio_number, "PCIE_CLK_PD");
 		gpio_direction_output(gpio_number, 1);
 	}
