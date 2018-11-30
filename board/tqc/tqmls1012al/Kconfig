@@ -43,6 +43,24 @@ config TQMLS1012AL_512MB
 
 endchoice
 
+choice
+	prompt "TQMLS1012AL MMC variant"
+	default TQMLS1012AL_SD
+	help
+	  Select RAM variant for TQMLS1012AL module
+
+config TQMLS1012AL_SD
+	bool "TQMLS1012AL with SD card"
+	help
+	  Select the TQMLS1012AL moduel with SD card.
+
+config TQMLS1012AL_EMMC
+	bool "TQMLS1012AL with emmc"
+	help
+	  Select the TQMLS1012AL moduel with emmc.
+
+endchoice
+
 if FSL_PFE
 config SYS_LS_PFE_FW_ADDR
 	hex "Flash address of PFE firmware"

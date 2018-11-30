@@ -205,7 +205,12 @@
 #undef CONFIG_BOOTCOMMAND
 #define CONFIG_BOOTCOMMAND "sf probe; run mmcboot; run panicboot"
 
-#define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls1012al/ls1012a_rcw_qspi.cfg
+#ifdef CONFIG_TQMLS1012AL_EMMC
+#define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls1012al/ls1012a_rcw_qspi_emmc.cfg
+#else
+#define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls1012al/ls1012a_rcw_qspi_sd.cfg
+#endif
+
 #define CONFIG_SYS_FSL_PBL_PBI	board/tqc/tqmls1012al/ls1012a_pbi_qspi.cfg
 #define CONFIG_SPL_PAD_TO		0x10000
 
