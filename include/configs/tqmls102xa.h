@@ -536,10 +536,18 @@
 		"setenv filesize;\0"                                           \
 	"init_rootfs-qspi=if tftp ${rootfs-qspi}; then "                       \
 		"if itest ${filesize} > 0; then "                              \
-			"sf probe 0; sf erase RootFS 3800000; "                \
-			"sf write ${loadaddr} RootFS ${filesize}; "            \
+			"sf probe 0 && sf erase RootFS 3800000 && "            \
+			"sf write ${loadaddr} RootFS ${filesize} && "          \
+			"setenv init_rootfs-qspi run note_init_rootfs_once && "\
+			"setenv .flags init_rootfs-qspi:sr,.flags:sr && "      \
+			"saveenv && run note_init_rootfs_once;"                \
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"                                           \
+	"note_init_rootfs_once="                                               \
+		"echo init_rootfs-qspi: RootFS initialized with File ${rootfs-qspi}; "      \
+		"echo Another init-cycle would reset erase counters vital to; "             \
+		"echo proper wear leveling. Therefore disabling script init_rootfs-qspi.; " \
+		"echo Use ubiupdatevol (mtd-utils) in Linux to update ubifs image.;\0"   \
 	TQMLS102X_EXTRA_BOOTDEV_ENV_SETTINGS                                   \
 
 #define CONFIG_MISC_INIT_R
