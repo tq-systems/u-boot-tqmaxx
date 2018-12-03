@@ -18,10 +18,28 @@
 	chosen {
 		stdout-path = &duart0;
 	};
+
+	reg_mbls1012al_1p8v: regulator_1p8v {
+		compatible = "regulator-fixed";
+		regulator-name = "supply-1p8v";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-always-on;
+	};
+
+	reg_mbls1012al_3p3v: regulator_3p3v {
+		compatible = "regulator-fixed";
+		regulator-name = "supply-3p3v";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+	};
 };
 
 &esdhc0 {
 	status = "okay";
+	vmmc-supply = <&reg_mbls1012al_3p3v>;
+	vqmmc-supply = <&reg_mbls1012al_1p8v>;
 	non-removable;
 };
 
