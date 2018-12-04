@@ -13,6 +13,15 @@
 	aliases {
 		spi0 = &qspi;
 	};
+
+	wdog0: wdog@2ad0000 {
+		compatible = "fsl,ls1012a-wdt", "fsl,imx21-wdt";
+		reg = <0x2ad0000 0x10000>;
+		interrupts = <0 83 4>;
+		clocks = <&clockgen 4 0>;
+		big-endian;
+		status = "okay";
+	};
 };
 
 &qspi {
