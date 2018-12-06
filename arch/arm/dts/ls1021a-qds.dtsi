@@ -213,3 +213,7 @@
 &uart1 {
 	status = "okay";
 };
+
+&sata {
+	status = "okay";
+};
