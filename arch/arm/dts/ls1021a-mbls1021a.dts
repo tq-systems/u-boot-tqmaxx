@@ -172,3 +172,7 @@
 		spi-max-frequency = <100000>;
 	};
 };
+
+&sata {
+	status = "okay";
+};
