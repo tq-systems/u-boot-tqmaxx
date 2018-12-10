@@ -13,6 +13,10 @@
 /* e-MMC / SD */
 #define CONFIG_FSL_ESDHC
 
+#ifdef CONFIG_TQMLS1012AL_EMMC
+#define ESDHC_FIXED_HOSTCAPBLT_VS18
+#endif
+
 /* Ethernet */
 #define MBLS1012AL_KSZ_I2C_ADDR	0x5f
 #define MBLS1012AL_KSZ_ADDR		0x7301
