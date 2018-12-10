@@ -679,7 +679,16 @@ static int esdhc_init_common(struct fsl_esdhc_priv *priv, struct mmc *mmc)
 	esdhc_clrbits32(&regs->irqstaten, IRQSTATEN_BRR | IRQSTATEN_BWR);
 
 	/* Put the PROCTL reg back to the default */
+
+#ifdef ESDHC_FIXED_HOSTCAPBLT_VS18
+	if (priv->vs18_enable)
+		esdhc_write32(&regs->proctl, PROCTL_INIT | ESDHC_FIXED_VS18);
+	else
+		esdhc_write32(&regs->proctl, PROCTL_INIT);
+#else
 	esdhc_write32(&regs->proctl, PROCTL_INIT);
+#endif
+
 
 	/* Set timout to the maximum value */
 	esdhc_clrsetbits32(&regs->sysctl, SYSCTL_TIMEOUT_MASK, 14 << 16);

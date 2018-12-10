@@ -173,6 +173,8 @@
 
 #define ESDHC_VENDORSPEC_VSELECT 0x00000002 /* Use 1.8V */
 
+#define ESDHC_FIXED_VS18	0x00000400	/* Use fixed 1.8V */
+
 struct fsl_esdhc_cfg {
 	phys_addr_t esdhc_base;
 	u32	sdhc_clk;
