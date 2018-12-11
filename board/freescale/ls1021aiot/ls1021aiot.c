@@ -12,7 +12,6 @@
 
 #include <asm/arch/ls102xa_devdis.h>
 #include <asm/arch/ls102xa_soc.h>
-#include <asm/arch/ls102xa_sata.h>
 #include <fsl_csu.h>
 #include <fsl_esdhc.h>
 #include <fsl_immap.h>
@@ -207,10 +206,6 @@ int board_init(void)
 #ifdef CONFIG_BOARD_LATE_INIT
 int board_late_init(void)
 {
-#ifdef CONFIG_SCSI_AHCI_PLAT
-	ls1021a_sata_init();
-#endif
-
 	return 0;
 }
 #endif

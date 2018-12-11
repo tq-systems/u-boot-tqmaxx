@@ -177,7 +177,5 @@ void mbls102xa_cpld_config(void)
 void tqmls102xa_bb_late_init(void)
 {
 	mbls102xa_cpld_config();
-
-	ls1021a_sata_init();
 }
 #endif

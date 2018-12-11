@@ -12,7 +12,6 @@
 #include <asm/arch/clock.h>
 #include <asm/arch/fsl_serdes.h>
 #include <asm/arch/ls102xa_soc.h>
-#include <asm/arch/ls102xa_sata.h>
 #include <libfdt.h>
 #include <fdt_support.h>
 #include <mmc.h>
