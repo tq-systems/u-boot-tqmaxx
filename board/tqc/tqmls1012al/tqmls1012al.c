@@ -27,19 +27,19 @@ int esdhc_status_fixup(void *blob, const char *compat)
 int dram_init(void)
 {
 #if (!defined(CONFIG_SPL) || defined(CONFIG_SPL_BUILD))
-	/* RAM timing rev 0006 */
+	/* RAM timing rev 0007 */
 #ifdef CONFIG_TQMLS1012AL_512MB
 	static const struct fsl_mmdc_info mparam = {
 		0x04180000,	/* mdctl 512MB RAM */
-		0x0002002D,	/* mdpdc */
-		0x09444040,	/* mdotc */
-		0xBABF7954,	/* mdcfg0 (RDB)*/
-		0xDB328F64,	/* mdcfg1 */
-		0x01FF00DB,	/* mdcfg2 */
+		0x00030036,	/* mdpdc */
+		0x12444040,	/* mdotc */
+		0x8A9079A4,	/* mdcfg0 */
+		0xDB538FA4,	/* mdcfg1 */
+		0x01FF0125,	/* mdcfg2 */
 		0x00000680,	/* mdmisc */
 		0x079E8000,	/* mdref */
 		0x00002000,	/* mdrwd */
-		0x00551023,	/* mdor */
+		0x00901023,	/* mdor */
 		0x0000003f,	/* mdasp (not used)*/
 		0x0000022A,	/* mpodtctrl */
 		0xA1390003,	/* mpzqhwctrl */
@@ -47,15 +47,15 @@ int dram_init(void)
 #elif CONFIG_TQMLS1012AL_256MB
 	static const struct fsl_mmdc_info mparam = {
 		0x03180000,	/* mdctl 256MB RAM */
-		0x0002002D,	/* mdpdc */
-		0x09444040,	/* mdotc */
-		0xBABF7954,	/* mdcfg0 (RDB)*/
-		0xDB328F64,	/* mdcfg1 */
-		0x01FF00DB,	/* mdcfg2 */
+		0x00030036,	/* mdpdc */
+		0x12444040,	/* mdotc */
+		0x555A79A4,	/* mdcfg0 */
+		0xDB538FA4,	/* mdcfg1 */
+		0x01FF0125,	/* mdcfg2 */
 		0x00000680,	/* mdmisc */
 		0x079E8000,	/* mdref */
 		0x00002000,	/* mdrwd */
-		0x00551023,	/* mdor */
+		0x005A1023,	/* mdor */
 		0x0000003f,	/* mdasp (not used)*/
 		0x0000022A,	/* mpodtctrl */
 		0xA1390003,	/* mpzqhwctrl */
