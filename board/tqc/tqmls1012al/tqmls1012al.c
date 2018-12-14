@@ -89,6 +89,11 @@ int board_init(void)
 	struct ccsr_cci400 *cci = (struct ccsr_cci400 *)(CONFIG_SYS_IMMR +
 					CONFIG_SYS_CCI400_OFFSET);
 
+#ifdef CONFIG_HW_WATCHDOG
+	/* restore wd timeout */
+	hw_watchdog_set_timeout();
+#endif
+
 	/*
 	 * Set CCI-400 control override register to enable barrier
 	 * transaction
