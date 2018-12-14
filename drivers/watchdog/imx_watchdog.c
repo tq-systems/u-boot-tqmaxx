@@ -32,6 +32,7 @@ void hw_watchdog_init(void)
 {
 	struct watchdog_regs *wdog = (struct watchdog_regs *)WDOG1_BASE_ADDR;
 	u16 timeout;
+	u16 reg_read;
 
 	/*
 	 * The timer watchdog can be set between
@@ -41,7 +42,13 @@ void hw_watchdog_init(void)
 #ifndef CONFIG_WATCHDOG_TIMEOUT_MSECS
 #define CONFIG_WATCHDOG_TIMEOUT_MSECS 128000
 #endif
-	timeout = (CONFIG_WATCHDOG_TIMEOUT_MSECS / 500) - 1;
+
+#ifndef CONFIG_WATCHDOG_INIT_MSECS
+#define CONFIG_WATCHDOG_INIT_MSECS CONFIG_WATCHDOG_TIMEOUT_MSECS
+#endif
+
+	timeout = (CONFIG_WATCHDOG_INIT_MSECS / 500) - 1;
+
 #ifdef CONFIG_FSL_LAYERSCAPE
 	writew((WCR_WDA | WCR_SRS | WCR_WDE) << 8 | timeout, &wdog->wcr);
 #else
@@ -49,6 +56,26 @@ void hw_watchdog_init(void)
 		WCR_WDA | SET_WCR_WT(timeout), &wdog->wcr);
 #endif /* CONFIG_FSL_LAYERSCAPE*/
 	hw_watchdog_reset();
+}
+
+void hw_watchdog_set_timeout(void)
+{
+	struct watchdog_regs *wdog = (struct watchdog_regs *)WDOG1_BASE_ADDR;
+	u16 timeout;
+	u16 timeout_init;
+	u16 reg_read;
+	u16 wt;
+
+	timeout = (CONFIG_WATCHDOG_TIMEOUT_MSECS / 500) - 1;
+	timeout_init = (CONFIG_WATCHDOG_INIT_MSECS / 500) - 1;
+
+	if (timeout != timeout_init) {
+		reg_read = readw(&wdog->wcr);
+		wt = (reg_read & 0xFF00) | timeout;
+		writew(wt, &wdog->wcr);
+
+	hw_watchdog_reset();
+	}
 }
 #endif
 

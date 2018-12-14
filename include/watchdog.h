@@ -79,6 +79,7 @@ int init_func_watchdog_reset(void);
 
 #if defined(CONFIG_HW_WATCHDOG) && !defined(__ASSEMBLY__)
 	void hw_watchdog_init(void);
+	void hw_watchdog_set_timeout(void);
 #endif
 
 #if defined(CONFIG_MPC85xx) && !defined(__ASSEMBLY__)
