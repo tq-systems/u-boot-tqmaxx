@@ -1,38 +1,96 @@
-U-Boot for the TQ Systems TQMLS102xA modules
+U-Boot for the TQ Systems TQMLS1012AL modules
 
 This file contains information for the port of
-U-Boot to the TQ Systems TQMLS102xA modules.
+U-Boot to the TQ Systems TQMLS1012AL modules.
 
 1. Boot source
 --------------
 
 The following boot source is supported:
 
-- e-MMC/SD
 - QSPI NOR
 
 2. Building
 ------------
 
-To build U-Boot for the TQ Systems TQMLS102xA modules:
+To build U-Boot for the TQ Systems TQMLS1012al modules:
 
-	make tqmls102xa_<baseboard>_[ecc]_<boot>_defconfig
+	make tqmls1012al_<baseboard>_<boot>_defconfig
 	make
 
 <baseboard> is a placeholder for the board the module is plugged into:
-mbls102xa	- Starter kit STKLS102xA by TQ
-
-[ecc] is an optional boolean parameter that enables usage of ECC RAM:
-ecc		- ECC enabled
--not given-	- ECC disabled
+mbls1012al	- Starter kit STKLS1012AL by TQ
 
 <boot> is a placeholder for the boot device
-mmcsd		- build to boot from device on esDHC (eMMC or SD card)
-qspi		- build to boot from flash on QSPI interface
+256mb_qspi[_emmc/sd]	- build with 256MB RAM to boot from flash on QSPI interface
+512mb_qspi[_emmc/sd]	- build with 512MB RAM to boot from flash on QSPI interface
 
 This gives the following configurations:
 
-tqmls102xa_mbls102xa_ecc_mmcsd_defconfig
-tqmls102xa_mbls102xa_ecc_qspi_defconfig
-tqmls102xa_mbls102xa_mmcsd_defconfig
-tqmls102xa_mbls102xa_qspi_defconfig
+tqmls1012al_mbls1012al_256mb_qspi_emmc_defconfig
+tqmls1012al_mbls1012al_256mb_qspi_sd_defconfig
+tqmls1012al_mbls1012al_512mb_qspi_emmc_defconfig
+tqmls1012al_mbls1012al_512mb_qspi_sd_defconfig
+
+
+Make gives the following binaries:
+
+u-boot[-256mb/512mb]-qspi[-emmc/sd]-2017.11-rc0.bin	- image with dtb
+u-boot-pbl[-256/512mb]-qspi[-emmc/sd].bin		- image with rcw, pbl and dtb
+pbl[-256/512mb]-qspi[-emmc/sd].bin			- rcw and pbl
+
+
+SD card and USB stick format
+# The disk layout used is:
+#  -- -------- ------------- ---
+# |  | /boot  |    rootfs   |
+#  -- -------- ------------- ---
+# ^  ^        ^             ^
+# |  |        |             |
+# 0 4MiB    68MiB        324MiB
+
+use the followring as image:
+core-image-minimal-tqmls1012al-mbls1012al-{DATETIME}.rootfs.wic
+
+========================================================================
+
+QSPI Offset:
+
+RCW & PBL:	0x0		(0)	-> 1M
+U-Boot:		0x00010000	(64K)	-> 1M
+U-Boot ENV:	0x00300000	(3M)	-> 1M
+PPA:		0x00400000	(4M)	-> 2M
+PFE-Firmware:	0x00A00000	(10M)	-> 20K
+Kernel ITB:	0x01000000	(16M)	-> 48M
+========================================================================
+
+How to:
+
+Update:
+
+Update from USB:
+usb start
+load usb 0 $loadaddr <filename>
+sf probe
+sf update ${loadaddr} <offset> ${filesize}
+
+Upadate via tftp:
+setenv ipaddt <ipaddr>
+setenv serverip <serverip>
+
+u-boot
+setenv uboot <filename>		- u-boot file name
+run update_uboot		- update u-boot
+
+kernel
+setenv kernel <filename>	- kernel file name
+run update_kernel		- update kernel
+
+fdt
+setenv fdt_file <filename>	- fdt file name
+run update_fdt			- update fdt
+
+Start Linux from U-Boot:
+
+run mmcboot		- boot from eMMC / SD card
+run usbboot		- boot from USB stick
