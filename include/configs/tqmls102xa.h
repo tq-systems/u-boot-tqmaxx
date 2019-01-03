@@ -534,20 +534,30 @@
 			"sf probe 0; sf update ${loadaddr} DTB ${filesize}; "  \
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"                                           \
+	"update_rootfs-qspi=if tftp ${rootfs-qspi}; then "                     \
+		"if itest ${filesize} > 0; then "                              \
+			"sf probe 0 && ubi part RootFS && "                    \
+			"if ubi check root; then; else "                       \
+				"ubi create root -; "                          \
+			"fi && "                                               \
+			"ubi write ${loadaddr} root ${filesize} && "           \
+			"fi; fi; setenv filesize;\0"                           \
 	"init_rootfs-qspi=if tftp ${rootfs-qspi}; then "                       \
 		"if itest ${filesize} > 0; then "                              \
 			"sf probe 0 && sf erase RootFS 3800000 && "            \
 			"sf write ${loadaddr} RootFS ${filesize} && "          \
 			"setenv init_rootfs-qspi run note_init_rootfs_once && "\
 			"setenv .flags init_rootfs-qspi:sr,.flags:sr && "      \
+			"setenv init_rfs_fname ${rootfs-qspi} && "             \
+			"setenv rootfs-qspi root.ubifs && "                    \
 			"saveenv && run note_init_rootfs_once;"                \
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"                                           \
 	"note_init_rootfs_once="                                               \
-		"echo init_rootfs-qspi: RootFS initialized with File ${rootfs-qspi}; "      \
+		"echo init_rootfs-qspi: RootFS initialized with File ${init_rfs_fname}; "   \
 		"echo Another init-cycle would reset erase counters vital to; "             \
 		"echo proper wear leveling. Therefore disabling script init_rootfs-qspi.; " \
-		"echo Use ubiupdatevol (mtd-utils) in Linux to update ubifs image.;\0"   \
+		"echo Use update_rootfs-qspi to update ubifs volume.;\0"       \
 	TQMLS102X_EXTRA_BOOTDEV_ENV_SETTINGS                                   \
 
 #define CONFIG_MISC_INIT_R
