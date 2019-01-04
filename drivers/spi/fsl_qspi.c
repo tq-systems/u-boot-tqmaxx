@@ -1318,7 +1318,6 @@ static int fsl_qspi_claim_bus(struct udevice *dev)
 
 	/* make sure controller is not busy anywhere */
 	ret = wait_for_bit(__func__, &priv->regs->sr,
-			   QSPI_SR_BUSY_MASK |
 			   QSPI_SR_AHB_ACC_MASK |
 			   QSPI_SR_IP_ACC_MASK,
 			   false, 100, false);
