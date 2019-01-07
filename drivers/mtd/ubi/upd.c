@@ -122,6 +122,7 @@ int ubi_start_update(struct ubi_device *ubi, struct ubi_volume *vol,
 		     long long bytes)
 {
 	int i, err;
+	ulong last_update = 0;
 
 	dbg_gen("start update of volume %d, %llu bytes", vol->vol_id, bytes);
 	ubi_assert(!vol->updating && !vol->changing_leb);
@@ -137,10 +138,18 @@ int ubi_start_update(struct ubi_device *ubi, struct ubi_volume *vol,
 
 	/* Before updating - wipe out the volume */
 	for (i = 0; i < vol->reserved_pebs; i++) {
+		if ((get_timer(last_update) > 100) ||
+		    ((i+1) == vol->reserved_pebs)) {
+			printf("\rUnmapping LEBs: %d%% [%d/%d] ",
+				100 * (i+1) / vol->reserved_pebs,
+				(i+1), vol->reserved_pebs);
+			last_update = get_timer(0);
+		}
 		err = ubi_eba_unmap_leb(ubi, vol, i);
 		if (err)
 			return err;
 	}
+	printf("\n");
 
 	if (bytes == 0) {
 		err = ubi_wl_flush(ubi, UBI_ALL, UBI_ALL);
@@ -277,6 +286,7 @@ int ubi_more_update_data(struct ubi_device *ubi, struct ubi_volume *vol,
 #else
 	int lnum, err = 0, len, to_write = count;
 	u32 offs;
+	ulong last_update = 0;
 #endif
 
 	dbg_gen("write %d of %lld bytes, %lld already passed",
@@ -352,6 +362,11 @@ int ubi_more_update_data(struct ubi_device *ubi, struct ubi_volume *vol,
 				break;
 		}
 
+		if(get_timer(last_update) > 1000) {
+			printf("Updating, %lld%%\r",
+				lldiv(vol->upd_received * 100, vol->upd_bytes));
+			last_update = get_timer(0);
+		}
 		vol->upd_received += len;
 		count -= len;
 		lnum += 1;
