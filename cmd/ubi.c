@@ -502,6 +502,7 @@ int ubi_part(char *part_name, const char *vid_header_offset)
 		       mtd_dev);
 		return 1;
 	}
+	put_mtd_device(ubi_dev.mtd_info);
 
 	ubi_dev.selected = 1;
 
