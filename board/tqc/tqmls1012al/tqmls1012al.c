@@ -181,12 +181,6 @@ int misc_init_r(void)
 				addr[4] = (uint8_t)(mac >>  8);
 				addr[5] = (uint8_t)(mac >>  0);
 				eth_env_set_enetaddr("eth1addr", addr);
-
-				mac++;
-				addr[3] = (uint8_t)(mac >> 16);
-				addr[4] = (uint8_t)(mac >>  8);
-				addr[5] = (uint8_t)(mac >>  0);
-				eth_env_set_enetaddr("eth2addr", addr);
 			}
 		}
 
