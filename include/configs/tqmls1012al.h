@@ -155,10 +155,12 @@
 		"usb reset; "                                                  \
 		"setenv bootargs; "                                            \
 		"run usbargs; "                                                \
-		"load usb 0:1 ${kernel_addr_r} ${kernel}; "                    \
-		"load usb 0:1 ${fdt_addr_r} ${fdt_file}; "                     \
-		"pfe stop; "                                                   \
-		"booti ${kernel_addr_r} - ${fdt_addr_r};\0"                    \
+		"if load usb 0:1 ${kernel_addr_r} ${kernel}; then "            \
+			"if load usb 0:1 ${fdt_addr_r} ${fdt_file}; then "     \
+				"pfe stop; "                                   \
+				"booti ${kernel_addr_r} - ${fdt_addr_r};"      \
+			"fi; "                                                 \
+		"fi;\0"                                                        \
 	"panicboot=echo No boot device !!! reset\0"                            \
 
 #undef CONFIG_EXTRA_ENV_SETTINGS
