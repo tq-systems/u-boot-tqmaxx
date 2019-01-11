@@ -148,10 +148,20 @@
 		"setenv bootargs; "                                            \
 		"run ramargs; "                                                \
 		"tftp ${kernel_addr_r} ${kernel}; "                            \
-		"tftp ${fdt_addr_r} ${fdt_file}; "                             \
-		"tftp ${ramfs_addr_r} ${ramfs}; "                              \
-		"pfe stop; "                                                   \
-		"booti ${kernel_addr_r} ${ramfs_addr_r} ${fdt_addr_r};\0"      \
+		"if itest ${filesize} > 0; then "                              \
+			"setenv filesize; "                                    \
+			"tftp ${fdt_addr_r} ${fdt_file}; "                     \
+			"if itest ${filesize} > 0; then "                      \
+				"setenv filesize; "                            \
+				"tftp ${ramfs_addr_r} ${ramfs}; "              \
+				"if itest ${filesize} > 0; then "              \
+					"pfe stop; "                           \
+					"booti ${kernel_addr_r} "              \
+					      "${ramfs_addr_r} ${fdt_addr_r}; "\
+				"fi; "                                         \
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; \0"                                          \
 	"usbboot=echo Booting from usb ...; "                                  \
 		"run set_getcmd; "                                             \
 		"usb reset; "                                                  \
