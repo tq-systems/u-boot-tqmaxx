@@ -23,7 +23,7 @@ int checkboard(void)
 	return 0;
 }
 
-int get_gpio_number(const char *gpio_name, unsigned int *gpio_number)
+static int get_gpio_number(const char *gpio_name, unsigned int *gpio_number)
 {
 	int ret = 0;
 
