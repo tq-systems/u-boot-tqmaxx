@@ -123,10 +123,12 @@
 		"run set_getcmd; "                                             \
 		"setenv bootargs; "                                            \
 		"run mmcargs; "                                                \
-		"load mmc 0:1 ${kernel_addr_r} ${kernel}; "                    \
-		"load mmc 0:1 ${fdt_addr_r} ${fdt_file}; "                     \
-		"pfe stop; "                                                   \
-		"booti ${kernel_addr_r} - ${fdt_addr_r};\0"                    \
+		"if load mmc 0:1 ${kernel_addr_r} ${kernel}; then "            \
+			"if load mmc 0:1 ${fdt_addr_r} ${fdt_file}; then "     \
+				"pfe stop; "                                   \
+				"booti ${kernel_addr_r} - ${fdt_addr_r};"      \
+			"fi; "                                                 \
+		"fi;\0"                                                        \
 	"qspiboot=echo Booting from qspi ...; "                                \
 		"setenv bootargs; "                                            \
 		"run qspiargs; "                                               \
