@@ -153,7 +153,6 @@
 	"usbboot=echo Booting from usb ...; "                                  \
 		"run set_getcmd; "                                             \
 		"usb reset; "                                                  \
-		"usb reset; "                                                  \
 		"setenv bootargs; "                                            \
 		"run usbargs; "                                                \
 		"load usb 0:1 ${kernel_addr_r} ${kernel}; "                    \
