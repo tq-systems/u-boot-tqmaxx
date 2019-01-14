@@ -109,8 +109,9 @@ int tqmaxx_show_eeprom(struct tqmaxx_eeprom_data *eeprom, const char *id)
 /*
  * read_eeprom - read the given EEPROM into memory
  */
-int tqmaxx_read_eeprom(unsigned int bus, unsigned int addr,
-		       struct tqmaxx_eeprom_data *eeprom)
+int tqmaxx_read_eeprom_at(unsigned int bus, unsigned int addr,
+			  struct tqmaxx_eeprom_data *eeprom,
+			  unsigned int offset)
 {
 	int ret;
 #ifdef CONFIG_DM_I2C
@@ -130,13 +131,19 @@ int tqmaxx_read_eeprom(unsigned int bus, unsigned int addr,
 		return ret;
 	}
 
-	ret = dm_i2c_read(dev, 0, (uchar *)eeprom, sizeof(*eeprom));
+	ret = dm_i2c_read(dev, offset, (uchar *)eeprom, sizeof(*eeprom));
 #else
 	oldbus = i2c_get_bus_num();
 	i2c_set_bus_num(bus);
-	ret = i2c_read(addr, 0, CONFIG_SYS_I2C_EEPROM_ADDR_LEN,
+	ret = i2c_read(addr, offset, CONFIG_SYS_I2C_EEPROM_ADDR_LEN,
 		       (uchar *)eeprom, sizeof(*eeprom));
 	i2c_set_bus_num(oldbus);
 #endif
 	return ret;
+}
+
+int tqmaxx_read_eeprom(unsigned int bus, unsigned int addr,
+		       struct tqmaxx_eeprom_data *eeprom)
+{
+	return tqmaxx_read_eeprom_at(bus, addr, eeprom, 0);
 }

@@ -27,6 +27,9 @@ int tqmaxx_parse_eeprom_serial(struct tqmaxx_eeprom_data *eeprom, char *buf,
 int tqmaxx_parse_eeprom_id(struct tqmaxx_eeprom_data *eeprom, char *buf,
 			   size_t len);
 int tqmaxx_show_eeprom(struct tqmaxx_eeprom_data *eeprom, const char *id);
+int tqmaxx_read_eeprom_at(unsigned int bus, unsigned int addr,
+			  struct tqmaxx_eeprom_data *eeprom,
+			  unsigned int offset);
 int tqmaxx_read_eeprom(unsigned int bus, unsigned int addr,
 		       struct tqmaxx_eeprom_data *eeprom);
 
