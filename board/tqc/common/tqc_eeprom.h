@@ -27,6 +27,9 @@ int tqc_parse_eeprom_serial(struct tqc_eeprom_data *eeprom, char *buf,
 int tqc_parse_eeprom_id(struct tqc_eeprom_data *eeprom, char *buf,
 			size_t len);
 int tqc_show_eeprom(struct tqc_eeprom_data *eeprom, const char *id);
+int tqc_read_eeprom_at(unsigned int bus, unsigned int addr,
+		       struct tqc_eeprom_data *eeprom,
+		       unsigned int offset);
 int tqc_read_eeprom(unsigned int bus, unsigned int addr,
 		    struct tqc_eeprom_data *eeprom);
 
