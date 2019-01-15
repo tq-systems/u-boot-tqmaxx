@@ -18,7 +18,7 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#if CONFIG_IS_ENABLED(PMIC_CHILDREN)
+#ifdef CONFIG_PMIC_CHILDREN
 int pmic_bind_children(struct udevice *pmic, ofnode parent,
 		       const struct pmic_child_info *child_info)
 {
