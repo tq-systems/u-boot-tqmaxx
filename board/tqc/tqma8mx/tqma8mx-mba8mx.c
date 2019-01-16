@@ -64,6 +64,16 @@ int tqc_bb_ft_board_setup(void *blob, bd_t *bd)
 }
 #endif
 
+#ifdef CONFIG_FEC_MXC
+static int setup_fec(void)
+{
+	/* Use 125M anatop REF_CLK1 for ENET1, not from external */
+	clrsetbits_le32(IOMUXC_GPR1,
+			BIT(13) | BIT(17), 0);
+	return set_clk_enet(ENET_125MHz);
+}
+#endif
+
 #ifdef CONFIG_USB_DWC3
 
 #define USB_PHY_CTRL0			0xF0040
@@ -159,6 +169,10 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 
 int tqc_bb_board_init(void)
 {
+#ifdef CONFIG_FEC_MXC
+	setup_fec();
+#endif
+
 #ifdef CONFIG_USB_TCPC
 	setup_typec();
 #endif
