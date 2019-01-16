@@ -41,6 +41,9 @@ static iomux_v3_cfg_t const uart_pads[] = {
 	IMX8MQ_PAD_UART1_TXD__UART1_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
 };
 
+/*
+ * NOTE: this is also used by SPL
+ */
 int tqc_bb_board_early_init_f(void)
 {
 	struct wdog_regs *wdog = (struct wdog_regs *)WDOG1_BASE_ADDR;
