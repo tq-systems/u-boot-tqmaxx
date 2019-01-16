@@ -12,4 +12,5 @@ ifdef CONFIG_SPL_BUILD
 obj-y += spl.o
 obj-y += lpddr4_timing_2gs.o
 obj-y += lpddr4_timing_2gm.o
+obj-$(CONFIG_MBA8MX) += spl-mba8mx.o
 endif

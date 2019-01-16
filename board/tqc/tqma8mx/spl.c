@@ -23,6 +23,8 @@
 #include <mmc.h>
 #include <asm/arch/imx8m_ddr.h>
 
+#include "../common/tqc_bb.h"
+
 DECLARE_GLOBAL_DATA_PTR;
 
 extern struct dram_timing_info dram_timing_2gs;
@@ -57,9 +59,7 @@ struct i2c_pads_info i2c_pad_info1 = {
 	},
 };
 
-#define USDHC2_CD_GPIO	IMX_GPIO_NR(2, 12)
 #define USDHC1_PWR_GPIO IMX_GPIO_NR(2, 10)
-#define USDHC2_PWR_GPIO IMX_GPIO_NR(2, 19)
 
 int board_mmc_getcd(struct mmc *mmc)
 {
@@ -70,12 +70,11 @@ int board_mmc_getcd(struct mmc *mmc)
 	case USDHC1_BASE_ADDR:
 		ret = 1;
 		break;
-	case USDHC2_BASE_ADDR:
-		ret = !gpio_get_value(USDHC2_CD_GPIO);
-		return ret;
+	default:
+		ret = tqc_bb_board_mmc_getcd(mmc);
 	}
 
-	return 1;
+	return ret;
 }
 
 #define USDHC_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS | PAD_CTL_PUE | \
@@ -96,63 +95,34 @@ static iomux_v3_cfg_t const usdhc1_pads[] = {
 	IMX8MQ_PAD_SD1_RESET_B__GPIO2_IO10 | MUX_PAD_CTRL(NO_PAD_CTRL),
 };
 
-static iomux_v3_cfg_t const usdhc2_pads[] = {
-	IMX8MQ_PAD_SD2_CLK__USDHC2_CLK | MUX_PAD_CTRL(USDHC_PAD_CTRL), /* 0xd6 */
-	IMX8MQ_PAD_SD2_CMD__USDHC2_CMD | MUX_PAD_CTRL(USDHC_PAD_CTRL), /* 0xd6 */
-	IMX8MQ_PAD_SD2_DATA0__USDHC2_DATA0 | MUX_PAD_CTRL(USDHC_PAD_CTRL), /* 0xd6 */
-	IMX8MQ_PAD_SD2_DATA1__USDHC2_DATA1 | MUX_PAD_CTRL(USDHC_PAD_CTRL), /* 0xd6 */
-	IMX8MQ_PAD_SD2_DATA2__USDHC2_DATA2 | MUX_PAD_CTRL(USDHC_PAD_CTRL), /* 0x16 */
-	IMX8MQ_PAD_SD2_DATA3__USDHC2_DATA3 | MUX_PAD_CTRL(USDHC_PAD_CTRL), /* 0xd6 */
-	IMX8MQ_PAD_SD2_CD_B__GPIO2_IO12 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
-	IMX8MQ_PAD_SD2_RESET_B__GPIO2_IO19 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
-};
-
-static struct fsl_esdhc_cfg usdhc_cfg[2] = {
-	{USDHC1_BASE_ADDR, 0, 8},
-	{USDHC2_BASE_ADDR, 0, 4},
+static struct fsl_esdhc_cfg usdhc1_cfg = {
+	USDHC1_BASE_ADDR, 0, 8,
 };
 
 int board_mmc_init(bd_t *bis)
 {
-	int i, ret;
+	int ret;
 	/*
 	 * According to the board_mmc_init() the following map is done:
 	 * (U-Boot device node)    (Physical Port)
 	 * mmc0                    USDHC1
 	 * mmc1                    USDHC2
 	 */
-	for (i = 0; i < CONFIG_SYS_FSL_USDHC_NUM; i++) {
-		switch (i) {
-		case 0:
-			usdhc_cfg[0].sdhc_clk = mxc_get_clock(USDHC1_CLK_ROOT);
-			imx_iomux_v3_setup_multiple_pads(
-				usdhc1_pads, ARRAY_SIZE(usdhc1_pads));
-			gpio_request(USDHC1_PWR_GPIO, "usdhc1_reset");
-			gpio_direction_output(USDHC1_PWR_GPIO, 0);
-			udelay(500);
-			gpio_direction_output(USDHC1_PWR_GPIO, 1);
-			break;
-		case 1:
-			usdhc_cfg[1].sdhc_clk = mxc_get_clock(USDHC2_CLK_ROOT);
-			imx_iomux_v3_setup_multiple_pads(
-				usdhc2_pads, ARRAY_SIZE(usdhc2_pads));
-			gpio_request(USDHC2_PWR_GPIO, "usdhc2_reset");
-			gpio_direction_output(USDHC2_PWR_GPIO, 0);
-			udelay(500);
-			gpio_direction_output(USDHC2_PWR_GPIO, 1);
-			break;
-		default:
-			printf("Warning: you configured more USDHC controllers"
-				"(%d) than supported by the board\n", i + 1);
-			return -EINVAL;
-		}
+	usdhc1_cfg.sdhc_clk = mxc_get_clock(USDHC1_CLK_ROOT);
+	imx_iomux_v3_setup_multiple_pads(
+		usdhc1_pads, ARRAY_SIZE(usdhc1_pads));
+	gpio_request(USDHC1_PWR_GPIO, "usdhc1_reset");
+	gpio_direction_output(USDHC1_PWR_GPIO, 0);
+	udelay(500);
+	gpio_direction_output(USDHC1_PWR_GPIO, 1);
 
-		ret = fsl_esdhc_initialize(bis, &usdhc_cfg[i]);
-		if (ret)
-			return ret;
-	}
+	ret = fsl_esdhc_initialize(bis, &usdhc1_cfg);
+	if (ret)
+		return ret;
 
-	return 0;
+	ret = tqc_bb_board_mmc_init(bis);
+
+	return ret;
 }
 
 #ifdef CONFIG_POWER
@@ -210,6 +180,8 @@ void spl_board_init(void)
 
 	init_usb_clk();
 
+	tqc_bb_spl_board_init();
+
 	puts("Normal Boot\n");
 }
 
@@ -223,6 +195,9 @@ int board_fit_config_name_match(const char *name)
 }
 #endif
 
+/*
+ * TODO: to use DM and device tree, need to call spl_init()
+ */
 void board_init_f(ulong dummy)
 {
 	int ret;
@@ -258,6 +233,8 @@ void board_init_f(ulong dummy)
 
 	/* DDR initialization */
 	spl_dram_init();
+
+	tqc_bb_board_init_f(dummy);
 
 	board_init_r(NULL, 0);
 }
