@@ -40,6 +40,13 @@ config MBA8MX
 	select FEC_MXC
 	select PHYLIB
 	select PHY_TI
+	select CMD_MMC
+	select CMD_SF
+	select CMD_FAT
+	select CMD_EXT2
+	select CMD_EXT4
+	select CMD_EXT4_WRITE
+	select CONFIG_DOS_PARTITION
 	help
 	  Select the MBa8MX starterkit. This features a GigE Phy, USB, SD-Card
 	  etc.
