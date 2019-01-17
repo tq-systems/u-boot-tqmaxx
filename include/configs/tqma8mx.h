@@ -245,19 +245,27 @@
 
 #define CONFIG_IMX_BOOTAUX
 
-#define CONFIG_CMD_MMC
+/* #define CONFIG_CMD_MMC */
 #define CONFIG_FSL_ESDHC
 #define CONFIG_FSL_USDHC
 
-#define CONFIG_SYS_FSL_USDHC_NUM	2
+/* #define CONFIG_SYS_FSL_USDHC_NUM	2 */
 #define CONFIG_SYS_FSL_ESDHC_ADDR       0
+
+/*
+#define CONFIG_DOS_PARTITION
+#define CONFIG_CMD_EXT2
+#define CONFIG_CMD_EXT4
+#define CONFIG_CMD_EXT4_WRITE
+#define CONFIG_CMD_FAT
+*/
 
 #define CONFIG_SUPPORT_EMMC_BOOT	/* eMMC specific */
 #define CONFIG_SYS_MMC_IMG_LOAD_PART	1
 
 #define CONFIG_FSL_QSPI    /* enable the QUADSPI driver */
 #ifdef CONFIG_FSL_QSPI
-#define CONFIG_CMD_SF
+/* #define CONFIG_CMD_SF */
 #define	CONFIG_SPI_FLASH
 #define	CONFIG_SPI_FLASH_STMICRO
 #define	CONFIG_SPI_FLASH_BAR
@@ -287,7 +295,7 @@
 /* USB configs */
 #ifndef CONFIG_SPL_BUILD
 
-#define CONFIG_CMD_USB
+/* #define CONFIG_CMD_USB */
 /* #define CONFIG_USB_STORAGE */
 
 /* #define CONFIG_CMD_USB_MASS_STORAGE */
@@ -296,7 +304,6 @@
 
 #endif
 
-#define CONFIG_CMD_EXT2
 #define CONFIG_USB_MAX_CONTROLLER_COUNT         2
 /* #define CONFIG_SYS_USB_XHCI_MAX_ROOT_PORTS      2 */
 
