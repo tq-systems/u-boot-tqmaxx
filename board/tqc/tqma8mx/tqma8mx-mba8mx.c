@@ -134,8 +134,15 @@ static void dwc3_nxp_usb_phy_init(struct dwc3_device *dwc3)
 int board_usb_init(int index, enum usb_init_type init)
 {
 	int ret = 0;
+
+	if (index == 0) {
+		puts("USB0/OTG not supported yet\n");
+		return 1;
+	}
+
 	imx8m_usb_power(index, true);
 
+#if 0
 	if (index == 0 && init == USB_INIT_DEVICE) {
 #ifdef CONFIG_USB_TCPC
 		ret = tcpc_setup_ufp_mode(&port);
@@ -148,6 +155,7 @@ int board_usb_init(int index, enum usb_init_type init)
 #endif
 		return ret;
 	}
+#endif
 
 	return 0;
 }
@@ -155,6 +163,10 @@ int board_usb_init(int index, enum usb_init_type init)
 int board_usb_cleanup(int index, enum usb_init_type init)
 {
 	int ret = 0;
+
+	if (index == 0)
+		return 0;
+
 	if (index == 0 && init == USB_INIT_DEVICE) {
 		dwc3_uboot_exit(index);
 	} else if (index == 0 && init == USB_INIT_HOST) {
