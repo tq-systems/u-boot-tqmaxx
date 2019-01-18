@@ -161,6 +161,7 @@
 		"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
 	"netboot=echo Booting from net ...; " \
 		"run netargs;  " \
+		"run set_getcmd; " \
 		"if test ${ip_dyn} = yes; then " \
 			"setenv get_cmd dhcp; " \
 		"else " \
@@ -175,7 +176,30 @@
 			"fi; " \
 		"else " \
 			"booti; " \
-		"fi;\0"
+		"fi;\0" \
+	"update_kernel=run set_getcmd; "                                       \
+		"if ${get_cmd} ${image}; then "                                \
+			"if itest ${filesize} > 0; then "                      \
+				"echo Write kernel image to mmc ${mmcdev}:${firmwarepart}...; " \
+				"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} " \
+					"${image} ${filesize}; "               \
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; setenv get_cmd \0"                           \
+	"update_fdt=run set_getcmd; "                                          \
+		"if ${get_cmd} ${fdt_file}; then "                             \
+			"if itest ${filesize} > 0; then "                      \
+				"echo Write fdt image to mmc ${mmcdev}:${firmwarepart}...; " \
+				"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} " \
+					"${fdt_file} ${filesize}; "            \
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; setenv get_cmd \0"                           \
+	"set_getcmd=if test \"${ip_dyn}\" = yes; then "                        \
+			"setenv get_cmd dhcp; "                                \
+		"else "                                                        \
+			"setenv get_cmd tftp; "                                \
+		"fi; \0"
 
 #define CONFIG_BOOTCOMMAND \
 	   "mmc dev ${mmcdev}; if mmc rescan; then " \
