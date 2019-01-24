@@ -52,6 +52,7 @@ config MBA8MX
 	select CMD_EXT4
 	select CMD_EXT4_WRITE
 	select CONFIG_DOS_PARTITION
+	select CFB_CONSOLE
 	help
 	  Select the MBa8MX starterkit. This features a GigE Phy, USB, SD-Card
 	  etc.
