@@ -1,11 +1,17 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * (C) Copyright 2014 - 2018 TQ Systems GmbH
+ * Copyright (C) 2014 - 2018 TQ Systems GmbH
  * Markus Niebel <Markus.Niebel@tq-group.com>
  */
 
 #ifndef __TQC_EEPROM_H__
 #define __TQC_EEPROM_H__
+
+int tqc_read_eeprom_buf(unsigned int bus, unsigned int i2c_addr,
+			unsigned int alen, unsigned int addr,
+			size_t bsize, uchar *buf);
+
+#if !defined(CONFIG_SPL_BUILD)
 
 /*
  * static EEPROM layout
@@ -33,6 +39,8 @@ int tqc_read_eeprom_at(unsigned int bus, unsigned int i2c_addr,
 #if defined(CONFIG_SYS_I2C_EEPROM_ADDR_LEN)
 int tqc_read_eeprom(unsigned int bus, unsigned int i2c_addr,
 		    struct tqc_eeprom_data *eeprom);
-#endif
+#endif /* CONFIG_SYS_I2C_EEPROM_ADDR_LEN */
+
+#endif /* CONFIG_SPL_BUILD */
 
 #endif
