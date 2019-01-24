@@ -109,8 +109,9 @@ int tqc_show_eeprom(struct tqc_eeprom_data *eeprom, const char *id)
 /*
  * read_eeprom - read the given EEPROM into memory
  */
-int tqc_read_eeprom(unsigned int bus, unsigned int addr,
-		    struct tqc_eeprom_data *eeprom)
+int tqc_read_eeprom_at(unsigned int bus, unsigned int i2c_addr,
+		       unsigned int alen, unsigned int addr,
+		       struct tqc_eeprom_data *eeprom)
 {
 	int ret;
 #ifdef CONFIG_DM_I2C
@@ -123,20 +124,27 @@ int tqc_read_eeprom(unsigned int bus, unsigned int addr,
 		return -1;
 
 #ifdef CONFIG_DM_I2C
-	ret = i2c_get_chip_for_busnum(bus, addr, CONFIG_SYS_I2C_EEPROM_ADDR_LEN,
-				      &dev);
+	ret = i2c_get_chip_for_busnum(bus, i2c_addr, alen, &dev);
 	if (ret) {
 		debug("%s: Cannot find I2C chip for bus %d\n", __func__, bus);
 		return ret;
 	}
 
-	ret = dm_i2c_read(dev, 0, (uchar *)eeprom, sizeof(*eeprom));
+	ret = dm_i2c_read(dev, addr, (uchar *)eeprom, sizeof(*eeprom));
 #else
 	oldbus = i2c_get_bus_num();
 	i2c_set_bus_num(bus);
-	ret = i2c_read(addr, 0, CONFIG_SYS_I2C_EEPROM_ADDR_LEN,
-		       (uchar *)eeprom, sizeof(*eeprom));
+	ret = i2c_read(i2c_addr, addr, alen, (uchar *)eeprom, sizeof(*eeprom));
 	i2c_set_bus_num(oldbus);
 #endif
 	return ret;
 }
+
+#if defined(CONFIG_SYS_I2C_EEPROM_ADDR_LEN)
+int tqmaxx_read_eeprom(unsigned int bus, unsigned int addr,
+		       struct tqmaxx_eeprom_data *eeprom)
+{
+	return tqmaxx_read_eeprom_at(bus, i2c_addr,
+				     CONFIG_SYS_I2C_EEPROM_ADDR_LEN, addr eeprom);
+}
+#endif
