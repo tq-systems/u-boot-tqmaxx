@@ -595,8 +595,10 @@ usb_modify_speed:
 
 	if (is_imx8mql()) {
 		disable_vpu_nodes(blob);
-		disable_dcss_nodes(blob);
-		check_mipi_dsi_nodes(blob);
+		/* TODO: in fact we have HDMI, so we have also DCSS */
+		/* disable_dcss_nodes(blob); */
+		/* TODO: need to verify, if muxing from DCSS is possible */
+		/* check_mipi_dsi_nodes(blob); */
 	}
 
 	if (is_imx8md())
