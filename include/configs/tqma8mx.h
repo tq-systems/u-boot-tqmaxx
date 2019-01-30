@@ -259,9 +259,18 @@
 
 #define CONFIG_NR_DRAM_BANKS		1
 
+#if defined(CONFIG_CMD_MEMTEST)
+/*
+ * Use alternative / extended memtest,
+ * leave 128 MiB free at start
+ * U-Boot is loaded to 0x40200000 (offset 2 MiB)
+ * and relocated at end of configured RAM
+ */
+#define CONFIG_SYS_ALT_MEMTEST
 #define CONFIG_SYS_MEMTEST_START	(CONFIG_SYS_SDRAM_BASE + SZ_128M)
-#define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + SZ_512M)
-
+#define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + (PHYS_SDRAM_SIZE / 4) * 3)
+#define CONFIG_SYS_MEMTEST_SCRATCH CONFIG_SYS_MEMTEST_END
+#endif
 
 #define CONFIG_BAUDRATE			115200
 
