@@ -1136,6 +1136,7 @@ int spi_flash_scan(struct spi_flash *flash)
 
 #ifdef CONFIG_SPI_FLASH_4BYTES_ADDR
 		if (flash->size > SPI_FLASH_16MB_BOUN) {
+			printf("SF : select 4B addr cmd set\n");
 			flash->read_cmd = CMD_READ_ARRAY_FAST_4B;
 			flash->write_cmd = CMD_PAGE_PROGRAM_4B;
 
@@ -1143,8 +1144,6 @@ int spi_flash_scan(struct spi_flash *flash)
 				flash->erase_cmd = CMD_ERASE_4K_4B;
 			else
 				flash->erase_cmd = CMD_ERASE_64K_4B;
-
-			enter_4bytes_addr(flash);
 		}
 #endif
 
