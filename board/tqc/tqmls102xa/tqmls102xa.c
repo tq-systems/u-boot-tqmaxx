@@ -318,6 +318,11 @@ int board_late_init(void)
 }
 #endif
 
+#if 0
+/* Disable code to detect presence of second spi flash chip
+ * because Linux DTB has the node for second spi flash removed anyway.
+ * TODO: Update code to use DM functions when reenabling.
+ */
 int tqmls102xa_qspi_has_second_chip(void)
 {
 	struct spi_slave *spi;
@@ -346,6 +351,12 @@ int tqmls102xa_qspi_has_second_chip(void)
 
 	return -1;
 }
+#else
+int tqmls102xa_qspi_has_second_chip(void)
+{
+	return 1;
+}
+#endif
 
 int ft_board_setup(void *blob, bd_t *bd)
 {
