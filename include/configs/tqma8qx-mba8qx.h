@@ -11,9 +11,9 @@
 #define CONFIG_FEC_XCV_TYPE		RGMII
 #define FEC_QUIRK_ENET_MAC
 
-#define CONFIG_PHY_GIGE /* Support for 1000BASE-X */
-#define CONFIG_PHYLIB
-#define CONFIG_PHY_TI
+/* #define CONFIG_PHY_GIGE */ /* Support for 1000BASE-X */
+/* #define CONFIG_PHYLIB */
+/* #define CONFIG_PHY_TI */
 #define CONFIG_MII
 
 #define MX8QX_FEC1_BASE			0x5B040000U
