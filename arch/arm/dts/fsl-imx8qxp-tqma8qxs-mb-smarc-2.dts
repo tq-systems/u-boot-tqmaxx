@@ -14,8 +14,8 @@
 
 /dts-v1/;
 
-#include "fsl-imx8qxp-tqma8qxs.dtsi"
 #include <dt-bindings/net/ti-dp83867.h>
+#include "fsl-imx8qxp-tqma8qxs.dtsi"
 
 / {
 	model = "TQ Systems i.MX8QXP TQMa8xXS on MB-SMARC-2";
@@ -39,6 +39,8 @@
 			gpio = <&gpio4 19 GPIO_ACTIVE_LOW>;
 			startup-delay-us = <100>;
 			off-on-delay-us = <12000>;
+			regulator-always-on;
+			regulator-boot-on;
 		};
 
 		reg_usdhc2_vqmmc: usdhc2_vqmmc {
