@@ -21,6 +21,7 @@
 #include <asm/mach-imx/sci/sci.h>
 #include <asm/arch/imx8-pins.h>
 #include <asm/arch/iomux.h>
+#include <asm/arch/lpcg.h>
 #include <asm/arch/sys_proto.h>
 #include <power-domain.h>
 
@@ -87,6 +88,8 @@ int tqc_bb_board_early_init_f(void)
 	sciErr = sc_pm_clock_enable(ipcHndl, SC_R_UART_1, 2, true, false);
 	if (sciErr != SC_ERR_NONE)
 		return 0;
+
+	LPCG_AllClockOn(LPUART_1_LPCG);
 
 	setup_iomux_uart();
 
