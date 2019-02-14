@@ -175,6 +175,7 @@
 			"fi;" \
 		"fi;\0"
 
+#if !defined(CONFIG_BOOTCOMMAND)
 #define CONFIG_BOOTCOMMAND \
 	   "mmc dev ${mmcdev}; if mmc rescan; then " \
 		   "if run loadbootscript; then " \
@@ -193,6 +194,7 @@
 			 "fi; " \
 		   "fi; " \
 	   "else booti ${loadaddr} - ${fdt_addr}; fi"
+#endif
 
 /* Link Definitions */
 #define CONFIG_LOADADDR			0x80280000
@@ -244,18 +246,19 @@
 #define CONFIG_BAUDRATE			115200
 
 /* Monitor Command Prompt */
-#define CONFIG_SYS_LONGHELP
 /*
+#define CONFIG_SYS_LONGHELP
 #define CONFIG_HUSH_PARSER
 #define CONFIG_SYS_PROMPT_HUSH_PS2     "> "
-*/
 #define CONFIG_AUTO_COMPLETE
+*/
+
 #define CONFIG_SYS_CBSIZE              2048
 #define CONFIG_SYS_MAXARGS             64
 #define CONFIG_SYS_BARGSIZE CONFIG_SYS_CBSIZE
 #define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
 					sizeof(CONFIG_SYS_PROMPT) + 16)
-#define CONFIG_CMDLINE_EDITING
+/* #define CONFIG_CMDLINE_EDITING */
 
 /* Generic Timer Definitions */
 #define COUNTER_FREQUENCY		8000000	/* 8MHz */
