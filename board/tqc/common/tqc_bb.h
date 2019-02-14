@@ -18,9 +18,11 @@ int tqc_bb_board_early_init_f(void);
 int tqc_bb_board_init(void);
 int tqc_bb_board_late_init(void);
 int tqc_bb_checkboard(void);
-void tqc_bb_board_quiesce_devices();
-
 const char *tqc_bb_get_boardname(void);
+
+#if defined(MX8QX)
+void tqc_bb_board_quiesce_devices(void);
+#endif
 
 /*
  * Device Tree Support
