@@ -9,14 +9,14 @@
 #include <malloc.h>
 #include <errno.h>
 #include <asm/io.h>
-#include <asm/imx-common/iomux-v3.h>
+#include <asm/mach-imx/iomux-v3.h>
 #include <asm-generic/gpio.h>
 #include <fsl_esdhc.h>
 #include <mmc.h>
 #include <asm/arch/imx8mq_pins.h>
 #include <asm/arch/sys_proto.h>
-#include <asm/imx-common/gpio.h>
-#include <asm/imx-common/mxc_i2c.h>
+#include <asm/mach-imx/gpio.h>
+#include <asm/mach-imx/mxc_i2c.h>
 #include <asm/arch/clock.h>
 #include <spl.h>
 #include <power/pmic.h>
