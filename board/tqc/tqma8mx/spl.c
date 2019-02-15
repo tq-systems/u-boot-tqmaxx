@@ -5,30 +5,39 @@
  */
 
 #include <common.h>
-#include <asm/arch/clock.h>
-#include <asm/arch/ddr_memory_map.h>
-#include <asm/arch/imx8mq_pins.h>
-#include <asm/arch/sys_proto.h>
-#include <asm/imx-common/gpio.h>
-#include <asm/imx-common/iomux-v3.h>
-#include <asm/imx-common/mxc_i2c.h>
+#include <spl.h>
 #include <asm/io.h>
 #include <errno.h>
-#include <fsl_esdhc.h>
-#include <mmc.h>
+#include <asm/io.h>
+#include <asm/mach-imx/iomux-v3.h>
+#include <asm/arch/ddr.h>
+#include <asm/arch/imx8mq_pins.h>
+#include <asm/arch/sys_proto.h>
 #include <power/pmic.h>
 #include <power/pfuze100_pmic.h>
 /* #include "../common/pfuze.h" */
-#include <spl.h>
-
-#include "ddr/ddr.h"
+#include <asm/arch/clock.h>
+#include <asm/mach-imx/gpio.h>
+#include <asm/mach-imx/mxc_i2c.h>
+#include <fsl_esdhc.h>
+#include <mmc.h>
+#include <asm/arch/imx8m_ddr.h>
 
 DECLARE_GLOBAL_DATA_PTR;
+
+/* extern struct dram_timing_info dram_timing_b0; */
 
 void spl_dram_init(void)
 {
 	/* ddr init */
-	ddr_init();
+	if ((get_cpu_rev() & 0xfff) == CHIP_REV_2_1)
+		ddr_init(&dram_timing);
+	else {
+		debug("spl_init() - not timing fpor this chip rev: %x\n",
+		      (get_cpu_rev() & 0xfff));
+		hang();
+		/* ddr_init(&dram_timing_b0); */
+	}
 }
 
 #define I2C_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS | PAD_CTL_PUE)
@@ -189,21 +198,16 @@ int power_init_board(void)
 
 void spl_board_init(void)
 {
-	enable_tzc380();
-
-	/* Adjust pmic voltage to 1.0V for 800M */
-	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info1);
-
-	power_init_board();
-
-	/* DDR initialization */
-	spl_dram_init();
-
+#ifndef CONFIG_SPL_USB_SDP_SUPPORT
 	/* Serial download mode */
 	if (is_usb_boot()) {
 		puts("Back to ROM, SDP\n");
 		restore_boot_params();
 	}
+#endif
+
+	init_usb_clk();
+
 	puts("Normal Boot\n");
 }
 
@@ -219,10 +223,14 @@ int board_fit_config_name_match(const char *name)
 
 void board_init_f(ulong dummy)
 {
+	int ret;
+
 	/* Clear global data */
 	memset((void *)gd, 0, sizeof(gd_t));
 
 	arch_cpu_init();
+
+	init_uart_clk(0); /* Init UART0 clock */
 
 	board_early_init_f();
 
@@ -232,6 +240,22 @@ void board_init_f(ulong dummy)
 
 	/* Clear the BSS. */
 	memset(__bss_start, 0, __bss_end - __bss_start);
+
+	ret = spl_init();
+	if (ret) {
+		debug("spl_init() failed: %d\n", ret);
+		hang();
+	}
+
+	enable_tzc380();
+
+	/* Adjust pmic voltage to 1.0V for 800M */
+	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info1);
+
+	power_init_board();
+
+	/* DDR initialization */
+	spl_dram_init();
 
 	board_init_r(NULL, 0);
 }

@@ -15,7 +15,7 @@
 #define CONFIG_CSF_SIZE			0x2000 /* 8K region */
 #endif
 
-#define CONFIG_SPL_FRAMEWORK
+/* #define CONFIG_SPL_FRAMEWORK */
 #define CONFIG_SPL_TEXT_BASE		0x7E1000
 #define CONFIG_SPL_MAX_SIZE		(124 * 1024)
 #define CONFIG_SYS_MONITOR_LEN		(512 * 1024)
@@ -208,15 +208,15 @@
 /* Monitor Command Prompt */
 #undef CONFIG_SYS_PROMPT
 #define CONFIG_SYS_PROMPT		"u-boot=> "
-#define CONFIG_SYS_LONGHELP
+/* #define CONFIG_SYS_LONGHELP */
 #define CONFIG_SYS_PROMPT_HUSH_PS2     "> "
-#define CONFIG_AUTO_COMPLETE
+/* #define CONFIG_AUTO_COMPLETE */
 #define CONFIG_SYS_CBSIZE              2048
 #define CONFIG_SYS_MAXARGS             64
 #define CONFIG_SYS_BARGSIZE CONFIG_SYS_CBSIZE
 #define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
 					sizeof(CONFIG_SYS_PROMPT) + 16)
-#define CONFIG_CMDLINE_EDITING
+/* #define CONFIG_CMDLINE_EDITING */
 
 #define CONFIG_IMX_BOOTAUX
 
@@ -251,7 +251,7 @@
 #define FSL_QSPI_FLASH_NUM		1
 
 /* needed for UBI support */
-#define CONFIG_CMD_MTDPARTS
+/* #define CONFIG_CMD_MTDPARTS */
 #define CONFIG_MTD_PARTITIONS
 #define CONFIG_MTD_DEVICE
 
@@ -274,11 +274,11 @@
 #define CONFIG_USB_XHCI_DWC3
 #define CONFIG_USB_XHCI_HCD
 #define CONFIG_USB_MAX_CONTROLLER_COUNT         2
-#define CONFIG_SYS_USB_XHCI_MAX_ROOT_PORTS      2
+/* #define CONFIG_SYS_USB_XHCI_MAX_ROOT_PORTS      2 */
 #endif
 
 #define CONFIG_CMD_USB
-#define CONFIG_USB_STORAGE
+/* #define CONFIG_USB_STORAGE */
 #define CONFIG_CMD_EXT2
 
 #define CONFIG_USB_DWC3
