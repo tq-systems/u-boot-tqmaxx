@@ -1,0 +1,58 @@
+if TARGET_TQMA8QX
+
+config SYS_BOARD
+	default "tqma8qx"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_CONFIG_NAME
+	default "tqma8qx"
+
+choice
+	prompt "TQMa8QX CPU variant"
+	default TQMA8QX_MX8QXP
+	help
+	  Select cpu variant for TQMa8QX
+
+config TQMA8QX_MX8QXP
+	bool "TQMa8QX with i.MX8QXP"
+	help
+	  Select the CPU variant
+
+endchoice
+
+
+choice
+	prompt "TQMa8QX base board variant"
+	default MBA8QX
+	help
+	  Select base board for TQMa8QX
+
+config MBA8QX
+	bool "TQMa8QX on MBa8QX Starterkit"
+	select TQC_SDMMC
+	help
+	  Select the MBa8QX starterkit. This features a GigE Phy, USB, SD-Card
+	  etc.
+
+endchoice
+
+choice
+	prompt "TQMa8QX boot device"
+	default TQMBA8QX_SDCARD
+	help
+	  Select boot device for TQMa8QX
+
+config TQMBA8QX_SDCARD
+	bool "TQMa8QX from SD / e-MMC"
+	select SD_BOOT
+	help
+	  Select booting from SD / e-MMC
+
+endchoice
+
+
+source "board/tqc/common/Kconfig"
+
+endif
