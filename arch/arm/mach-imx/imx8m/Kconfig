@@ -83,6 +83,7 @@ config TARGET_TQMA8MX
 	select IMX8MQ
 	select BOARD_LATE_INIT
 	select BOARD_EARLY_INIT_F
+	select IMX8M_LPDDR4
 	select PINCTRL
 	select PINCTRL_IMX8M
 	select DM_THERMAL
