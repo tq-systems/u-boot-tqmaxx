@@ -25,6 +25,9 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+extern struct dram_timing_info dram_timing_2gs;
+extern struct dram_timing_info dram_timing_2gm;
+
 void spl_dram_init(void)
 {
 	u32 rev = get_cpu_rev() & 0xfff;
@@ -35,7 +38,7 @@ void spl_dram_init(void)
 		printf("SPL: no timing for this chip rev\n");
 		hang();
 	} else {
-		ddr_init(&dram_timing);
+		ddr_init(&dram_timing_2gs);
 	}
 }
 

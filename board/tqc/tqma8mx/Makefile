@@ -11,5 +11,5 @@ obj-$(CONFIG_MBA8MX) += tqma8mx-mba8mx.o
 ifdef CONFIG_SPL_BUILD
 obj-y += spl.o
 obj-y += lpddr4_timing_2gs.o
-### /* obj-y += lpddr4_timing_2gm.o */
+obj-y += lpddr4_timing_2gm.o
 endif
