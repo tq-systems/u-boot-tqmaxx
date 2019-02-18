@@ -1,5 +1,4 @@
 /*
- * Copyright 2017 NXP
  * Copyright 2019 TQ Systems GmbH
  *
  * SPDX-License-Identifier:	GPL-2.0+
@@ -15,9 +14,8 @@
 #define CONFIG_CSF_SIZE			0x2000 /* 8K region */
 #endif
 
-/* #define CONFIG_SPL_FRAMEWORK */
 #define CONFIG_SPL_TEXT_BASE		0x7E1000
-#define CONFIG_SPL_MAX_SIZE		(124 * 1024)
+#define CONFIG_SPL_MAX_SIZE		(148 * 1024)
 #define CONFIG_SYS_MONITOR_LEN		(512 * 1024)
 #if defined(CONFIG_SD_BOOT)
 #define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_USE_SECTOR
@@ -33,7 +31,7 @@
 #define CONFIG_SPL_DRIVERS_MISC_SUPPORT
 #define CONFIG_SPL_POWER_SUPPORT
 #define CONFIG_SPL_I2C_SUPPORT
-#define CONFIG_SPL_BOARD_INIT
+/* #define CONFIG_SPL_BOARD_INIT */
 #define CONFIG_SPL_LDSCRIPT		"arch/arm/cpu/armv8/u-boot-spl.lds"
 #define CONFIG_SPL_STACK		0x187FF0
 #define CONFIG_SPL_LIBCOMMON_SUPPORT
@@ -58,6 +56,7 @@
 #undef CONFIG_DM_PMIC_PFUZE100
 
 #define CONFIG_SYS_I2C
+#define CONFIG_SYS_I2C_SPEED		100000
 #define CONFIG_SYS_I2C_MXC_I2C1		/* enable I2C bus 1 */
 #define CONFIG_SYS_I2C_MXC_I2C2		/* enable I2C bus 2 */
 #define CONFIG_SYS_I2C_MXC_I2C3		/* enable I2C bus 3 */
@@ -68,6 +67,33 @@
 #define CONFIG_POWER_I2C
 #define CONFIG_POWER_PFUZE100
 #define CONFIG_POWER_PFUZE100_I2C_ADDR 0x08
+
+#else
+
+/*
+ * TODO: DM stuff here to prevent SPL messing with missing stuff
+ * - pmic support
+ * - gpio expander support via dt
+ * - i2c eeprom support via dt
+ */
+#if 0
+#define CONFIG_CMD_PMIC
+#define CONFIG_CMD_REGULATOR
+
+#define CONFIG_DM_I2C
+#define CONFIG_DM_GPIO
+#define CONFIG_DM_MMC
+
+#define CONFIG_DM_PMIC
+#define CONFIG_DM_PMIC_PFUZE100
+#define CONFIG_PMIC_CHILDREN
+#define CONFIG_DM_REGULATOR
+#define CONFIG_DM_REGULATOR_PFUZE100
+#define CONFIG_DM_REGULATOR_FIXED
+#define CONFIG_DM_REGULATOR_GPIO
+#endif
+#define CONFIG_I2C_EEPROM
+
 #endif
 
 #define CONFIG_REMAKE_ELF
@@ -165,7 +191,7 @@
 
 /* Link Definitions */
 #define CONFIG_LOADADDR			0x40480000
-#define CONFIG_SYS_TEXT_BASE		0x40200000
+/* #define CONFIG_SYS_TEXT_BASE		0x40200000 */
 
 #define CONFIG_SYS_LOAD_ADDR           CONFIG_LOADADDR
 
@@ -181,7 +207,6 @@
 #if defined(CONFIG_SD_BOOT)
 #define CONFIG_ENV_OFFSET		(64 * SZ_64K)
 #define CONFIG_ENV_SIZE			0x1000
-#define CONFIG_ENV_IS_IN_MMC
 #define CONFIG_SYS_MMC_ENV_DEV		1   /* USDHC2 */
 #elif defined(CONFIG_QSPI_BOOT)
 #error
@@ -211,15 +236,12 @@
 /* Monitor Command Prompt */
 #undef CONFIG_SYS_PROMPT
 #define CONFIG_SYS_PROMPT		"u-boot=> "
-/* #define CONFIG_SYS_LONGHELP */
 #define CONFIG_SYS_PROMPT_HUSH_PS2     "> "
-/* #define CONFIG_AUTO_COMPLETE */
 #define CONFIG_SYS_CBSIZE              2048
 #define CONFIG_SYS_MAXARGS             64
 #define CONFIG_SYS_BARGSIZE CONFIG_SYS_CBSIZE
 #define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
 					sizeof(CONFIG_SYS_PROMPT) + 16)
-/* #define CONFIG_CMDLINE_EDITING */
 
 #define CONFIG_IMX_BOOTAUX
 
@@ -229,12 +251,6 @@
 
 #define CONFIG_SYS_FSL_USDHC_NUM	2
 #define CONFIG_SYS_FSL_ESDHC_ADDR       0
-
-#define CONFIG_DOS_PARTITION
-#define CONFIG_CMD_EXT2
-#define CONFIG_CMD_EXT4
-#define CONFIG_CMD_EXT4_WRITE
-#define CONFIG_CMD_FAT
 
 #define CONFIG_SUPPORT_EMMC_BOOT	/* eMMC specific */
 #define CONFIG_SYS_MMC_IMG_LOAD_PART	1
@@ -266,29 +282,25 @@
 #define CONFIG_CMD_FUSE
 
 /* I2C Configs */
-#define CONFIG_SYS_I2C_SPEED		  100000
+/* #define CONFIG_SYS_I2C_SPEED		  100000 */
 
 /* USB configs */
 #ifndef CONFIG_SPL_BUILD
-#define CONFIG_HAS_FSL_XHCI_USB
-
-#ifdef CONFIG_HAS_FSL_XHCI_USB
-#define CONFIG_USB_XHCI_IMX8M
-#define CONFIG_USB_XHCI_DWC3
-#define CONFIG_USB_XHCI_HCD
-#define CONFIG_USB_MAX_CONTROLLER_COUNT         2
-/* #define CONFIG_SYS_USB_XHCI_MAX_ROOT_PORTS      2 */
-#endif
 
 #define CONFIG_CMD_USB
 /* #define CONFIG_USB_STORAGE */
-#define CONFIG_CMD_EXT2
 
-#define CONFIG_USB_DWC3
-#define CONFIG_USB_DWC3_GADGET
-#define CONFIG_USBD_HS
+/* #define CONFIG_CMD_USB_MASS_STORAGE */
+
+#define CONFIG_CMD_READ
 
 #endif
+
+#define CONFIG_CMD_EXT2
+#define CONFIG_USB_MAX_CONTROLLER_COUNT         2
+/* #define CONFIG_SYS_USB_XHCI_MAX_ROOT_PORTS      2 */
+
+#define CONFIG_USBD_HS
 
 #define CONFIG_OF_SYSTEM_SETUP
 
