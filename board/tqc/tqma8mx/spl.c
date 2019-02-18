@@ -24,13 +24,14 @@
 #include <asm/arch/imx8m_ddr.h>
 
 #include "../common/tqc_bb.h"
+#include "../common/tqc_eeprom.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
 extern struct dram_timing_info dram_timing_2gs;
 extern struct dram_timing_info dram_timing_2gm;
 
-void spl_dram_init(void)
+static void spl_dram_init(void)
 {
 	u32 rev = get_cpu_rev() & 0xfff;
 
@@ -40,13 +41,19 @@ void spl_dram_init(void)
 		printf("SPL: no timing for this chip rev\n");
 		hang();
 	} else {
+#if defined(CONFIG_TQMA8MX_2G_SAMSUNG)
 		ddr_init(&dram_timing_2gs);
+#elif defined(CONFIG_TQMA8MX_2G_MICRON)
+		ddr_init(&dram_timing_2gm);
+#else
+#error
+#endif
 	}
 }
 
 #define I2C_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS | PAD_CTL_PUE)
 #define PC MUX_PAD_CTRL(I2C_PAD_CTRL)
-struct i2c_pads_info i2c_pad_info1 = {
+static struct i2c_pads_info i2c_pad_info1 = {
 	.scl = {
 		.i2c_mode = IMX8MQ_PAD_I2C1_SCL__I2C1_SCL | PC,
 		.gpio_mode = IMX8MQ_PAD_I2C1_SCL__GPIO5_IO14 | PC,
@@ -200,6 +207,8 @@ int board_fit_config_name_match(const char *name)
  */
 void board_init_f(ulong dummy)
 {
+	uchar rcw[32];
+	char *ram_type;
 	int ret;
 
 	/* Clear global data */
