@@ -10,15 +10,20 @@ config SYS_CONFIG_NAME
 	default "tqma8mx"
 
 choice
-	prompt "TQMa8MX CPU variant"
-	default TQMA8MX_MX8MQ
+	prompt "TQMa8MX Memory variant"
+	default TQMA8MX_2G_SAMSUNG
 	help
 	  Select cpu variant for TQMa8MX
 
-config TQMA8MX_MX8MQ
-	bool "TQMa8MX with i.MX8MQ"
+config TQMA8MX_2G_SAMSUNG
+	bool "TQMa8MX with 2GB LPDDR4 Samsung"
 	help
-	  Select the CPU variant
+	  Select module with 2GB LPDDR4 Samsung"
+
+config TQMA8MX_2G_MICRON
+	bool "TQMa8MX with 2GB LPDDR4 Micron"
+	help
+	  Select module with 2GB LPDDR4 Micron"
 
 endchoice
 
