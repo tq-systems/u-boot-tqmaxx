@@ -25,18 +25,17 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-/* extern struct dram_timing_info dram_timing_b0; */
-
 void spl_dram_init(void)
 {
+	u32 rev = get_cpu_rev() & 0xfff;
+
+	printf("SPL: CPU rev. %u.%u\n", (rev & 0xf0) >> 4, rev & 0xf);
 	/* ddr init */
-	if ((get_cpu_rev() & 0xfff) == CHIP_REV_2_1)
-		ddr_init(&dram_timing);
-	else {
-		debug("spl_init() - not timing fpor this chip rev: %x\n",
-		      (get_cpu_rev() & 0xfff));
+	if (rev == CHIP_REV_2_1) {
+		printf("SPL: no timing for this chip rev\n");
 		hang();
-		/* ddr_init(&dram_timing_b0); */
+	} else {
+		ddr_init(&dram_timing);
 	}
 }
 
