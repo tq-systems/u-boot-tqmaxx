@@ -709,10 +709,12 @@ int imx8m_fb_init(struct fb_videomode const *mode,
 {
 	debug("entering %s()\n", __func__);
 
+#if 0
 	if (is_imx8mql()) {
 		printf("dcss is diabled on i.MX8MQL\n");
 		return -EPERM;
 	}
+#endif
 
 	if (disp > 1) {
 		debug("Invalid disp parameter %d for imxdcss_fb_init()\n",
