@@ -891,6 +891,8 @@ int do_mx8m_showclocks(cmd_tbl_t *cmdtp, int flag, int argc,
 	printf("UART1          %8d MHz\n", freq / 1000000);
 	freq = mxc_get_clock(USDHC1_CLK_ROOT);
 	printf("USDHC1         %8d MHz\n", freq / 1000000);
+	freq = mxc_get_clock(USDHC2_CLK_ROOT);
+	printf("USDHC2         %8d MHz\n", freq / 1000000);
 	freq = mxc_get_clock(QSPI_CLK_ROOT);
 	printf("QSPI           %8d MHz\n", freq / 1000000);
 	return 0;
