@@ -339,4 +339,11 @@
 #error
 #endif
 
+#ifndef CONFIG_SPL_BUILD
+#define BOOT_TARGET_DEVICES(func) \
+	func(MMC, mmc, 0) \
+	func(USB, usb, 0)
+#include <config_distro_bootcmd.h>
+#endif
+
 #endif /* __TQMA8QX_H */
