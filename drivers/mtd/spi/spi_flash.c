@@ -1207,6 +1207,10 @@ int spi_flash_scan(struct spi_flash *flash)
 	if (flash->memory_map)
 		printf(", mapped at %p", flash->memory_map);
 	puts("\n");
+
+	printf("SF: read_cmd %x\n", (u32)flash->read_cmd);
+	printf("SF: erase_cmd %x\n", (u32)flash->erase_cmd);
+	printf("SF: write_cmd %x\n", (u32)flash->write_cmd);
 #endif
 
 #if !defined(CONFIG_SPI_FLASH_BAR) && !defined(CONFIG_SPI_FLASH_4BYTES_ADDR)
