@@ -25,6 +25,11 @@ config TQMA8MX_2G_MICRON
 	help
 	  Select module with 2GB LPDDR4 Micron"
 
+config TQMA8MX_1G
+	bool "TQMa8MX with 1GB LPDDR4"
+	help
+	  Select module with 1GB LPDDR4"
+
 endchoice
 
 choice

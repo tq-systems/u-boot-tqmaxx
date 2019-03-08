@@ -1,5 +1,6 @@
 /*
  * Copyright 2017 NXP
+ * Copyright 2019 TQ Systems GmbH
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
@@ -30,6 +31,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 extern struct dram_timing_info dram_timing_2gs;
 extern struct dram_timing_info dram_timing_2gm;
+extern struct dram_timing_info dram_timing_1g;
 
 static void spl_dram_init(void)
 {
@@ -45,6 +47,8 @@ static void spl_dram_init(void)
 		ddr_init(&dram_timing_2gs);
 #elif defined(CONFIG_TQMA8MX_2G_MICRON)
 		ddr_init(&dram_timing_2gm);
+#elif defined(CONFIG_TQMA8MX_1G)
+		ddr_init(&dram_timing_1g);
 #else
 #error
 #endif

@@ -1,6 +1,6 @@
 #
 # Copyright 2016 Freescale Semiconductor
-# Copyright 2018 TQ Systems GmbH
+# Copyright 2019 TQ Systems GmbH
 #
 # SPDX-License-Identifier:      GPL-2.0+
 #
@@ -12,5 +12,6 @@ ifdef CONFIG_SPL_BUILD
 obj-y += spl.o
 obj-y += lpddr4_timing_2gs.o
 obj-y += lpddr4_timing_2gm.o
+obj-y += lpddr4_timing_1g.o
 obj-$(CONFIG_MBA8MX) += spl-mba8mx.o
 endif

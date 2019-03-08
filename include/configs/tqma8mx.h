@@ -252,8 +252,9 @@
 
 #if defined(CONFIG_TQMA8MX_2G_MICRON) || defined(CONFIG_TQMA8MX_2G_SAMSUNG)
 #define PHYS_SDRAM_SIZE			0x80000000 /* 2GB LPDDR4 */
-#else
+#elif defined (CONFIG_TQMA8MX_1G)
 #define PHYS_SDRAM_SIZE			0x40000000 /* 1GB LPDDR4 */
+#else
 #error
 #endif
 
