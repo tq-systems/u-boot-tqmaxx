@@ -99,17 +99,19 @@ void mmdc_init(const struct fsl_mmdc_info *priv)
 
 	out_be32(&mmdc->mdscr,  MDSCR_ENABLE_CON_REQ | MDSCR_WL_EN |
 				CMD_NORMAL);
+				
+	mdelay(10);
 
 	set_wait_for_bits_clear(&mmdc->mpwlgcr, MPWLGCR_HW_WL_EN,
 				MPWLGCR_HW_WL_EN);
 
-	mdelay(1);
+	mdelay(10);
 
 	out_be32(&mmdc->mdscr,  CMD_ADDR_LSB_MR_ADDR(4) | MDSCR_ENABLE_CON_REQ |
 				CMD_LOAD_MODE_REG | CMD_BANK_ADDR_1);
 	out_be32(&mmdc->mdscr, MDSCR_ENABLE_CON_REQ);
 
-	mdelay(1);
+	mdelay(10);
 
 	/* 9b. read DQS gating calibration */
 	out_be32(&mmdc->mdscr,  CMD_ADDR_MSB_MR_OP(4) | MDSCR_ENABLE_CON_REQ |
