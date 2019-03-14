@@ -5,8 +5,20 @@
 #
 
 # necessary to create built-in.o
-obj- := __dummy__.o
 
+MINIMAL=
+
+ifdef CONFIG_SPL_BUILD
+ifdef CONFIG_SPL_INIT_MINIMAL
+MINIMAL=y
+endif
+endif
+
+ifdef MINIMAL
+# necessary to create built-in.o
+obj- := __dummy__.o
+else
 obj-$(CONFIG_TQC_EEPROM) += tqc_eeprom.o
 obj-$(CONFIG_TQC_EMMC) += tqc_emmc.o
-obj-$(CONFIG_TQC_SDMMC) += tqc_sdmmc.o
+obj-y += tqc_sdmmc.o
+endif
