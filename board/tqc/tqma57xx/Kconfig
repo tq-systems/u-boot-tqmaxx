@@ -18,16 +18,19 @@ choice
 
 config TQMA572X
 	bool "TQMa572x"
+	select TQC_EEPROM
 	help
 		Select TQMa572x with AM572x and 2GiB DRAM
 
 config TQMA571X
 	bool "TQMa571x"
+	select TQC_EEPROM
 	help
 		Select TQMa571x with AM571x and 1GiB DRAM
 
 config TQMA574X
         bool "TQMa574x"
+        select TQC_EEPROM
         help
                 Select TQMa574x with AM574x and 2GiB DRAM + ECC
 
@@ -56,5 +59,6 @@ config CONS_INDEX
 		it. Depending on your specific board you may want something
 		other than UART3 here.
 
-endif
+source "board/tqc/common/Kconfig"
 
+endif

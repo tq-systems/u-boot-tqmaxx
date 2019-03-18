@@ -27,10 +27,12 @@ int tqc_parse_eeprom_serial(struct tqc_eeprom_data *eeprom, char *buf,
 int tqc_parse_eeprom_id(struct tqc_eeprom_data *eeprom, char *buf,
 			size_t len);
 int tqc_show_eeprom(struct tqc_eeprom_data *eeprom, const char *id);
-int tqc_read_eeprom_at(unsigned int bus, unsigned int addr,
-		       struct tqc_eeprom_data *eeprom,
-		       unsigned int offset);
-int tqc_read_eeprom(unsigned int bus, unsigned int addr,
-		    struct tqc_eeprom_data *eeprom);
+int tqc_read_eeprom_at(unsigned int bus, unsigned int i2c_addr,
+		       unsigned int alen, unsigned int addr,
+		       struct tqc_eeprom_data *eeprom);
+#if defined(CONFIG_SYS_I2C_EEPROM_ADDR_LEN)
+int tqc_read_eeprom(unsigned int bus, unsigned int i2c_addr,
+		    unsigned int addr, struct tqc_eeprom_data *eeprom);
+#endif /* CONFIG_SYS_I2C_EEPROM_ADDR_LEN */
 
 #endif
