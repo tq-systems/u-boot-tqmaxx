@@ -20,7 +20,7 @@
 
 / {
 	model = "TQ Systems i.MX8QXP TQMa8xX";
-	compatible = "tq,tqma8qx", "fsl,imx8qxp";
+	compatible = "tq,tqma8qxp", "fsl,imx8qxp";
 };
 
 &iomuxc {
