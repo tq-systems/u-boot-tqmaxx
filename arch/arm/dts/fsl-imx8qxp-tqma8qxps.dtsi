@@ -20,7 +20,7 @@
 
 / {
 	model = "TQ Systems i.MX8QXP TQMa8xXS";
-	compatible = "tq,tqma8qxs", "fsl,imx8qxp";
+	compatible = "tq,tqma8qxps", "fsl,imx8qxp";
 
 	regulators {
 		compatible = "simple-bus";
