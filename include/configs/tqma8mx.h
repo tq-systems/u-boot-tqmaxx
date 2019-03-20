@@ -128,15 +128,13 @@
 	"initrd_high=0xffffffff\0" \
 	"bootcmd_mfg=run mfgtool_args;booti ${loadaddr} ${initrd_addr} ${fdt_addr};\0" \
 /* Initial environment variables */
-#define CONFIG_EXTRA_ENV_SETTINGS		\
+#define TQMA8MX_MODULE_ENV_SETTINGS		\
 	CONFIG_MFG_ENV_SETTINGS \
 	"script=boot.scr\0" \
 	"image=Image\0" \
-	"console=ttymxc0,115200 earlycon=ec_imx6q,0x30860000,115200\0" \
 	"fdt_addr=0x43000000\0"			\
 	"fdt_high=0xffffffffffffffff\0"		\
 	"boot_fdt=try\0" \
-	"fdt_file=fsl-imx8mq-tqma8mq-mba8mx.dtb\0" \
 	"initrd_addr=0x43800000\0"		\
 	"initrd_high=0xffffffffffffffff\0" \
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
@@ -372,6 +370,10 @@
 #else
 #error
 #endif
+
+#define CONFIG_EXTRA_ENV_SETTINGS		\
+	TQMA8MX_MODULE_ENV_SETTINGS		\
+	BB_ENV_SETTINGS
 
 #ifndef CONFIG_SPL_BUILD
 #define BOOT_TARGET_DEVICES(func) \
