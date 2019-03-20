@@ -114,7 +114,7 @@
             "\0" \
 
 /* Initial environment variables */
-#define CONFIG_EXTRA_ENV_SETTINGS		\
+#define TQMA8QX_MODULE_ENV_SETTINGS		\
 	CONFIG_MFG_ENV_SETTINGS \
 	M4_BOOT_ENV \
 	XEN_BOOT_ENV \
@@ -126,13 +126,11 @@
 	"script=boot.scr\0" \
 	"image=Image\0" \
 	"panel=NULL\0" \
-	"console=ttyLP1,115200 earlycon=lpuart32,5a070000,115200\0" \
 	"fdt_addr=0x83000000\0"			\
 	"fdt_high=0xffffffffffffffff\0"		\
 	"cntr_addr=0x88000000\0"			\
 	"cntr_file=os_cntr_signed.bin\0" \
 	"boot_fdt=try\0" \
-	"fdt_file=fsl-imx8qxp-tqma8qx-mba8qx.dtb\0" \
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
 	"mmcautodetect=yes\0" \
@@ -351,6 +349,10 @@
 #else
 #error
 #endif
+
+#define CONFIG_EXTRA_ENV_SETTINGS		\
+	TQMA8QX_MODULE_ENV_SETTINGS		\
+	BB_ENV_SETTINGS
 
 #ifndef CONFIG_SPL_BUILD
 #define BOOT_TARGET_DEVICES(func) \
