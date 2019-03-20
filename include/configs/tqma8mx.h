@@ -191,6 +191,21 @@
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"setenv filesize; setenv get_cmd \0"                           \
+	"uboot_start=0x42\0"                                                   \
+	"uboot_size=0xfbe\0"                                                   \
+	"uboot=bootstream.bin\0"                                               \
+	"update_uboot=run set_getcmd; if ${get_cmd} ${uboot}; then "           \
+		"if itest ${filesize} > 0; then "                              \
+			"echo Write u-boot image to mmc ${mmcdev} ...; "       \
+			"mmc dev ${mmcdev}; mmc rescan; "                      \
+			"setexpr blkc ${filesize} + 0x1ff; "                   \
+			"setexpr blkc ${blkc} / 0x200; "                       \
+			"if itest ${blkc} <= ${uboot_size}; then "             \
+				"mmc write ${loadaddr} ${uboot_start} "        \
+					"${blkc}; "                            \
+			"fi; "                                                 \
+		"fi; fi; "                                                     \
+		"setenv filesize; setenv blkc \0"                              \
 	"set_getcmd=if test \"${ip_dyn}\" = yes; then "                        \
 			"setenv get_cmd dhcp; "                                \
 		"else "                                                        \
