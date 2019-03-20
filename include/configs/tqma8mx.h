@@ -141,7 +141,6 @@
 	"initrd_high=0xffffffffffffffff\0" \
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
-	"mmcroot=" CONFIG_MMCROOT " rootwait rw\0" \
 	"mmcautodetect=yes\0" \
 	"loadbootscript=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
@@ -198,8 +197,13 @@
 		"else "                                                        \
 			"setenv get_cmd tftp; "                                \
 		"fi; \0"                                                       \
-	"addtty=setenv bootargs ${bootargs} console=${console},${baudrate}\0"  \
-	"mmcargs=setenv bootargs ${bootargs} root=${mmcroot}\0 "               \
+	"rootfsmode=ro\0"                                                      \
+	"addtty=setenv bootargs ${bootargs} console=${console}\0"              \
+	"mmcrootpart=2\0"                                                      \
+	"addmmc=setenv bootargs ${bootargs} "                                  \
+		"root=/dev/mmcblk${mmcblkdev}p${mmcrootpart} ${rootfsmode} "   \
+		"rootwait\0"                                                   \
+	"mmcargs=run addtty addmmc\0"                                          \
 	"netargs=run addnfs addip addtty\0"                                    \
 	"addnfs=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/nfs rw "                                            \
@@ -249,8 +253,6 @@
 #else
 #error
 #endif
-
-#define CONFIG_MMCROOT			"/dev/mmcblk1p2"  /* USDHC2 */
 
 /* Size of malloc() pool */
 #define CONFIG_SYS_MALLOC_LEN		((CONFIG_ENV_SIZE + (2*1024) + (16*1024)) * 1024)
