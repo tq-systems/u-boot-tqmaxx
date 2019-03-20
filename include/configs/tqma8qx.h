@@ -135,7 +135,6 @@
 	"fdt_file=fsl-imx8qxp-tqma8qx-mba8qx.dtb\0" \
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
-	"mmcroot=" CONFIG_MMCROOT " rootwait rw\0" \
 	"mmcautodetect=yes\0" \
 	"video=imxdpufb5:off video=imxdpufb6:off video=imxdpufb7:off\0" \
 	"loadbootscript=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};\0" \
@@ -212,8 +211,13 @@
 		"else "                                                        \
 			"setenv get_cmd tftp; "                                \
 		"fi; \0"                                                       \
-	"addtty=setenv bootargs ${bootargs} console=${console},${baudrate}\0"  \
-	"mmcargs=setenv bootargs ${bootargs} root=${mmcroot}\0 "               \
+	"rootfsmode=ro\0"                                                      \
+	"addtty=setenv bootargs ${bootargs} console=${console}\0"              \
+	"mmcargs=run addmmc addtty\0"                                          \
+	"mmcrootpart=2\0"                                                      \
+	"addmmc=setenv bootargs ${bootargs} "                                  \
+		"root=/dev/mmcblk${mmcblkdev}p${mmcrootpart} ${rootfsmode} "   \
+		"rootwait\0"                                                   \
 	"netargs=run addnfs addip addtty\0"                                    \
 	"addnfs=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/nfs rw "                                            \
@@ -278,7 +282,6 @@
 /* On LPDDR4 board, USDHC1 is for eMMC, USDHC2 is for SD on CPU board
   */
 #define CONFIG_SYS_MMC_ENV_DEV		1   /* USDHC2 */
-#define CONFIG_MMCROOT			"/dev/mmcblk1p2"  /* USDHC2 */
 #define CONFIG_SYS_FSL_USDHC_NUM	2
 
 /* Size of malloc() pool */
