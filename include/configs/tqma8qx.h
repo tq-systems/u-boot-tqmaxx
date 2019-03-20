@@ -165,6 +165,7 @@
 			"fi;" \
 		"fi;\0" \
 	"netboot=echo Booting from net ...; " \
+		"setenv bootargs; " \
 		"run netargs;  " \
 		"run set_getcmd; " \
 		"if test ${sec_boot} = yes; then " \
@@ -220,6 +221,9 @@
 	"addnfs=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/nfs rw "                                            \
 		"nfsroot=${serverip}:${rootpath},v3,tcp;\0"                    \
+	"netdev=eth0\0"                                                        \
+	"rootpath=/srv/nfs\0"                                                  \
+	"ipmode=static\0"                                                      \
 	"addip_static=setenv bootargs ${bootargs} "                            \
 		"ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:"            \
 		"${hostname}:${netdev}:off\0"                                  \
