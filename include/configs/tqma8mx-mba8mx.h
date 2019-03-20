@@ -38,4 +38,8 @@
 #define CONFIG_IMX_VIDEO_SKIP
 #endif
 
+#define BB_ENV_SETTINGS \
+	"console=ttymxc0,115200 earlycon=ec_imx6q,0x30860000,115200\0" \
+	"fdt_file=fsl-imx8mq-tqma8mq-mba8mx.dtb\0"
+
 #endif /* __TQMA8MX_MBA8MX_H */
