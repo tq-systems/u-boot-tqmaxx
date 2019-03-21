@@ -37,6 +37,7 @@
 #include "mux_data.h"
 #include "ddr.h"
 #include "tqma57xx_bb.h"
+#include "../common/tqc_eeprom.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -347,6 +348,21 @@ int spl_start_uboot(void)
 #endif
 
 	return 0;
+}
+
+void spl_board_prepare_for_boot(void)
+{
+	if (tqc_has_feature1(TQC_VARD_FEATURES1_EMMC))
+		printf("MMC present\n");
+
+	if (tqc_has_feature1(TQC_VARD_FEATURES1_EEPROM))
+		printf("EEPROM present\n");
+
+	if (tqc_has_feature1(TQC_VARD_FEATURES1_SPINOR))
+		printf("SPINOR present\n");
+
+	if (tqc_has_feature2(TQC_VARD_FEATURES2_RTC))
+		printf("RTC present\n");
 }
 #endif
 

@@ -5,6 +5,8 @@
  */
 
 #include <common.h>
+#include <console.h>
+#include <crc.h>
 #include <i2c.h>
 #include <malloc.h>
 #include <linux/ctype.h>
@@ -44,6 +46,90 @@ int tqc_read_eeprom_buf(unsigned int bus, unsigned int i2c_addr,
 #endif
 	return ret;
 }
+
+static struct tqc_eeprom_data eeprom;
+static int tqc_vard_has_been_read = 0;
+
+static int tqc_vard_is_crc_valid(struct tqc_eeprom_data *data, uint16_t *cp)
+{
+	void *crc_offs;
+	int crc_len;
+	uint16_t crc;
+
+	/* calculate crc over all vard data except checksum */
+	crc_offs = (void *)(&data->crc + sizeof(data->crc));
+	crc_len = 0x20 - sizeof(data->crc);
+	crc = crc16_ccitt(0, crc_offs, crc_len);
+
+	if (cp)
+		*cp = crc;
+
+	if (crc != data->crc) {
+		printf("TQC_VARD: CRC mismatch (%04x != %04x)\n",
+			data->crc, crc);
+		return 0;
+	}
+
+	return 1;
+}
+
+static int tqc_vard_read_eeprom(void)
+{
+	int ret = 0;
+
+	ret = tqc_read_eeprom_buf(TQC_VARD_BUS, TQC_VARD_ADDR, 1, 0,
+				  sizeof(eeprom), (void *)&eeprom);
+	if (ret) {
+		printf("Error reading VARD eeprom\n");
+		return -1;
+	}
+
+	if (tqc_vard_is_crc_valid(&eeprom, NULL))
+		tqc_vard_has_been_read = 1;
+
+	return 0;
+}
+
+static inline void tqc_get_eeprom_if_not_done(void)
+{
+	if (!tqc_vard_has_been_read)
+		tqc_vard_read_eeprom();
+};
+
+int tqc_has_hwrev(u8 rev)
+{
+	tqc_get_eeprom_if_not_done();
+
+	return (eeprom.hwrev & be32_to_cpu(rev));
+};
+
+int tqc_has_memsize(u8 size)
+{
+	tqc_get_eeprom_if_not_done();
+
+	return (eeprom.memsize & be32_to_cpu(size));
+};
+
+int tqc_has_memtype(u8 type)
+{
+	tqc_get_eeprom_if_not_done();
+
+	return (eeprom.memtype & be32_to_cpu(type));
+};
+
+int tqc_has_feature1(u32 mask)
+{
+	tqc_get_eeprom_if_not_done();
+
+	return ((eeprom.features1 & be32_to_cpu(mask)) == 0);
+};
+
+int tqc_has_feature2(u32 mask)
+{
+	tqc_get_eeprom_if_not_done();
+
+	return ((eeprom.features2 & be32_to_cpu(mask)) == 0);
+};
 
 #if !defined(CONFIG_SPL_BUILD)
 
@@ -164,4 +250,116 @@ int tqc_read_eeprom(unsigned int bus, unsigned int i2c_addr,
 }
 #endif
 
+static int do_tqeeprom(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+{
+	if (argc < 2)
+		return CMD_RET_USAGE;
+	if (argc > 3)
+		return CMD_RET_USAGE;
+
+	if (strncmp(argv[1], "write", 5) == 0) {
+		ulong addr = simple_strtoul(argv[2], NULL, 16);
+		int ret;
+#ifdef CONFIG_DM_I2C
+		struct udevice *dev;
+#else
+		unsigned int oldbus;
+#endif
+
+		if (!addr)
+			return -1;
+
+#ifdef CONFIG_DM_I2C
+		ret = i2c_get_chip_for_busnum(TQC_VARD_BUS,
+					      TQC_VARD_ADDR, 1, &dev);
+		if (ret) {
+			debug("%s: Cannot find I2C chip for bus %d\n",
+			      __func__, bus);
+			return ret;
+		}
+
+		ret = dm_i2c_write(dev, 0, addr,
+				   sizeof(struct tqc_eeprom_data));
+#else
+		oldbus = i2c_get_bus_num();
+		i2c_set_bus_num(TQC_VARD_BUS);
+		ret = i2c_write(TQC_VARD_ADDR, 0, 1, (void *)addr,
+				sizeof(struct tqc_eeprom_data));
+		i2c_set_bus_num(oldbus);
+#endif
+		return ret;
+	}
+
+	if (strncmp(argv[1], "read", 4) == 0) {
+		ulong addr = simple_strtoul(argv[2], NULL, 16);
+
+		return tqc_read_eeprom_buf(TQC_VARD_BUS, TQC_VARD_ADDR,
+				  1, 0,
+				  sizeof(struct tqc_eeprom_data),
+				  (void *)addr);
+	}
+
+	if (strncmp(argv[1], "crc", 3) == 0) {
+		int ret;
+		struct tqc_eeprom_data eeprom_for_crc;
+		uint16_t crc;
+
+		ret = tqc_read_eeprom_buf(TQC_VARD_BUS, TQC_VARD_ADDR,
+				  1, 0,
+				  sizeof(struct tqc_eeprom_data),
+				  (void *)&eeprom_for_crc);
+		if (ret)
+			return ret;
+
+		if (tqc_vard_is_crc_valid(&eeprom_for_crc, &crc))
+			printf("CRC16 stored: %04x, calculated: %04x\n",
+				eeprom_for_crc.crc, crc);
+		return 0;
+	}
+
+	if (strncmp(argv[1], "protect", 7) == 0) {
+		printf("WARNING! Write-protection is permanent and\n");
+		printf("cannot be released by any command or power-cycle!\n");
+		printf("Device will stop ACK'ing on address 0x37.\n");
+		printf("Really enable permanent write-protection?\n");
+		
+		if (confirm_yesno()) {
+			int dummy = 0;
+#ifdef CONFIG_DM_I2C
+			struct udevice *dev;
+			int ret = i2c_get_chip_for_busnum(TQC_VARD_BUS,
+							0x37, 1, &dev);
+			if (ret) {
+				debug("%s: Cannot find I2C chip for bus %d\n",
+			              __func__, bus);
+				return ret;
+			}
+
+			/* ret = dm_i2c_write(dev, 0, &dummy, sizeof(dummy)); */
+			printf("dm_i2c_write(dev, 0, &dummy, sizeof(dummy))\n");
+#else
+			unsigned int oldbus = i2c_get_bus_num();
+			i2c_set_bus_num(TQC_VARD_BUS);
+			/* ret = i2c_write(0x37, 0, 1, &dummy, sizeof(dummy)); */
+			printf("ret = i2c_write(0x37, 0, 1, &dummy, sizeof(dummy));\n");
+			i2c_set_bus_num(oldbus);
+#endif
+			printf("Write-protection enabled\n");
+			return 0;
+		}
+		printf("Abort - Write-protection NOT enabled\n");
+		return CMD_RET_FAILURE;
+	}
+
+	return CMD_RET_USAGE;
+}
+
+U_BOOT_CMD(tqeeprom, 3, 0, do_tqeeprom,
+	   "manage TQ module eeprom",
+	   "<cmd>:\n"
+	   "write <addr> - write full image to eeprom\n"
+	   "read <addr>  - read whole eeprom to memory\n"
+	   "crc          - calculate and compare CRC16\n"
+	   "protect      - write-protect lower 128 byte (PERMANENT!)\n"
+);
 #endif
