@@ -22,11 +22,19 @@
 #include "tqmls1046a_bb.h"
 #include "../common/tqc_eeprom.h"
 
+#define SCFG_QSPI_CLKSEL_DIV_24	0x30100000
+
 DECLARE_GLOBAL_DATA_PTR;
 
 int board_early_init_f(void)
 {
+	struct ccsr_scfg *scfg = (struct ccsr_scfg *)CONFIG_SYS_FSL_SCFG_ADDR;
+
 	fsl_lsch2_early_init_f();
+#ifdef CONFIG_FSL_QSPI
+	/* divide CGA1/CGA2 PLL by 24 to get QSPI interface clock */
+	out_be32(&scfg->qspi_cfg, SCFG_QSPI_CLKSEL_DIV_24);
+#endif
 
 	return tqmls1046a_bb_board_early_init_f();
 }
