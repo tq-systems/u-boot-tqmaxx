@@ -467,7 +467,8 @@ dtb-$(CONFIG_RCAR_GEN3) += \
 	r8a77970-eagle-u-boot.dtb \
 	r8a77990-ebisu-u-boot.dtb \
 	r8a77990-ebisu-4d-u-boot.dtb \
-	r8a77995-draak-u-boot.dtb
+	r8a77995-draak-u-boot.dtb \
+	r8a774c0-ek874-u-boot.dtb \
 
 dtb-$(CONFIG_SOC_KEYSTONE) += keystone-k2hk-evm.dtb \
 	keystone-k2l-evm.dtb \

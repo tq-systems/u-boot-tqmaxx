@@ -18,6 +18,9 @@ config R8A77990
 config R8A77995
 	bool "Renesas SoC R8A77995"
 
+config R8A774C0
+	bool "Renesas SoC R8A774C0"
+
 endchoice
 
 choice
@@ -49,6 +52,11 @@ config TARGET_ULCB
 	help
           Support for Renesas R-Car Gen3 ULCB platform
 
+config TARGET_EK874
+	bool "EK874 board"
+	help
+          Support for Renesas RZG2E EK874 platform
+
 endchoice
 
 config SYS_SOC
@@ -59,5 +67,6 @@ source "board/renesas/eagle/Kconfig"
 source "board/renesas/ebisu/Kconfig"
 source "board/renesas/salvator-x/Kconfig"
 source "board/renesas/ulcb/Kconfig"
+source "board/renesas/ek874/Kconfig"
 
 endif
