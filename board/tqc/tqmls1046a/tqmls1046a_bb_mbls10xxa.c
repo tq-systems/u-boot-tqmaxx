@@ -331,7 +331,7 @@ int tqmls1046a_bb_board_eth_init(bd_t *bis)
 #ifdef CONFIG_FMAN_ENET
 	struct memac_mdio_info dtsec_mdio1_info;
 	struct memac_mdio_info dtsec_mdio2_info;
-	struct mii_dev *dev_mdio1, *dev_mdio2;
+	struct mii_dev *dev_mdio1;
 	u32 srds_s1, srds_s2;
 	struct ccsr_gur *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
 
@@ -345,42 +345,40 @@ int tqmls1046a_bb_board_eth_init(bd_t *bis)
 
 	/* register the MDIO bus 1 */
 	dtsec_mdio1_info.regs =
-		(struct memac_mdio_controller *)FM_MDIO1_ADDR;
-	dtsec_mdio1_info.name = FM_MDIO1_NAME;
+		(struct memac_mdio_controller *)CONFIG_SYS_FM1_DTSEC_MDIO_ADDR;
+	dtsec_mdio1_info.name = DEFAULT_FM_MDIO_NAME;
 	fm_memac_mdio_init(bis, &dtsec_mdio1_info);
 
 	/* register the MDIO bus 2 */
 	dtsec_mdio2_info.regs =
-		(struct memac_mdio_controller *)FM_MDIO2_ADDR;
-	dtsec_mdio2_info.name = FM_MDIO2_NAME;
+		(struct memac_mdio_controller *)CONFIG_SYS_FM1_TGEC_MDIO_ADDR;
+	dtsec_mdio2_info.name = DEFAULT_FM_TGEC_MDIO_NAME;
 	fm_memac_mdio_init(bis, &dtsec_mdio2_info);
 
-	/* get MDIO bus devices */
-	dev_mdio1 = miiphy_get_dev_by_name(FM_MDIO1_NAME);
-	dev_mdio2 = miiphy_get_dev_by_name(FM_MDIO2_NAME);
+	/* get MDIO bus device */
+	dev_mdio1 = miiphy_get_dev_by_name(DEFAULT_FM_MDIO_NAME);
 
 	/* set the two on-board RGMII PHY address */
 	fm_info_set_phy_address(FM1_DTSEC3, RGMII_PHY1_ADDR);
 	fm_info_set_mdio(FM1_DTSEC3, dev_mdio1);
 	fm_info_set_phy_address(FM1_DTSEC4, RGMII_PHY2_ADDR);
-	fm_info_set_mdio(FM1_DTSEC4, dev_mdio2);
+	fm_info_set_mdio(FM1_DTSEC4, dev_mdio1);
 
 	/* set SGMII/QSGMII PHY addresses based on RCW */
-	/* TODO: update when SerDes mapping on MBLS10xxA baseboard is fixed */
-	if(TQMLS1046A_SRDS1_PROTO(srds_s1, 0) == 0x3) {
-		/* SD1 - LANE A in SGMII.9 mode */
-		fm_info_set_phy_address(FM1_DTSEC9, QSGMII_PHY1_ADDR_BASE+0);
-		fm_info_set_mdio(FM1_DTSEC9, dev_mdio1);
-	}
-	if(TQMLS1046A_SRDS1_PROTO(srds_s1, 1) == 0x3) {
-		/* SD1 - LANE B in SGMII.10 mode */
-		fm_info_set_phy_address(FM1_DTSEC10, QSGMII_PHY2_ADDR_BASE+0);
-		fm_info_set_mdio(FM1_DTSEC10, dev_mdio2);
-	}
 	if(TQMLS1046A_SRDS1_PROTO(srds_s1, 3) == 0x3) {
-		/* SD1 - LANE D in SGMII mode.6 */
-		fm_info_set_phy_address(FM1_DTSEC6, QSGMII_PHY2_ADDR_BASE+1);
-		fm_info_set_mdio(FM1_DTSEC6, dev_mdio2);
+		/* SD1 - LANE A in SGMII.6 mode */
+		fm_info_set_phy_address(FM1_DTSEC6, QSGMII_PHY1_ADDR_BASE+0);
+		fm_info_set_mdio(FM1_DTSEC6, dev_mdio1);
+	}
+	if(TQMLS1046A_SRDS1_PROTO(srds_s1, 2) == 0x3) {
+		/* SD1 - LANE B in SGMII.5 mode */
+		fm_info_set_phy_address(FM1_DTSEC5, QSGMII_PHY2_ADDR_BASE+0);
+		fm_info_set_mdio(FM1_DTSEC5, dev_mdio1);
+	}
+	if(TQMLS1046A_SRDS1_PROTO(srds_s1, 0) == 0x3) {
+		/* SD1 - LANE D in SGMII mode.9 */
+		fm_info_set_phy_address(FM1_DTSEC9, QSGMII_PHY2_ADDR_BASE+1);
+		fm_info_set_mdio(FM1_DTSEC9, dev_mdio1);
 	}
 	if(TQMLS1046A_SRDS2_PROTO(srds_s2, 1) == 0xA) {
 		/* SD2 - LANE B in SGMII mode.2 */
