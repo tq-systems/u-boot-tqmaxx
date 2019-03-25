@@ -62,12 +62,11 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 		printf("!!! muxed SerDes interfaces won't work\n");
 	}
 	
-	/* TODO: update when SerDes mapping on MBLS10xxA baseboard is fixed */
-	/* check config for SD1 - LANE D */
-	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd1_0_lane_a_mux");
-	rcw_proto = TQMLS1046A_SRDS1_PROTO(srds_s1, 0);
+	/* check config for SD1 - LANE A */
+	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd1_3_lane_a_mux");
+	rcw_proto = TQMLS1046A_SRDS1_PROTO(srds_s1, 3);
 	if(mux_val1 >= 0) {
-		printf("   SD1-0 Lane D: MUX=%s | RCW=%s -> ",
+		printf("   SD1-3 Lane A: MUX=%s | RCW=%s -> ",
 		   (mux_val1)?("QSGMII "):("SGMII  "),
 		   serdes_rcw_str[rcw_proto]);
 
@@ -81,11 +80,11 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 		}
 	}
 
-	/* check config for SD1 - LANE C */
-	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd1_1_lane_b_mux");
-	rcw_proto = TQMLS1046A_SRDS1_PROTO(srds_s1, 1);
+	/* check config for SD1 - LANE B */
+	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd1_2_lane_b_mux");
+	rcw_proto = TQMLS1046A_SRDS1_PROTO(srds_s1, 2);
 	if(mux_val1 >= 0) {
-		printf("   SD1-1 Lane C: MUX=%s | RCW=%s -> ",
+		printf("   SD1-2 Lane B: MUX=%s | RCW=%s -> ",
 		   (mux_val1)?("QSGMII "):("SGMII  "),
 		   serdes_rcw_str[rcw_proto]);
 
@@ -100,9 +99,9 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 		}
 	}
 
-	/* check config for SD1 - LANE B */
-	rcw_proto = TQMLS1046A_SRDS1_PROTO(srds_s1, 2);
-	printf("   SD1-2 Lane B: XFI         | RCW=%s -> ",
+	/* check config for SD1 - LANE C */
+	rcw_proto = TQMLS1046A_SRDS1_PROTO(srds_s1, 1);
+	printf("   SD1-1 Lane C: XFI         | RCW=%s -> ",
 	   serdes_rcw_str[rcw_proto]);
 
 	if((rcw_proto == 0x0) ||
@@ -123,11 +122,11 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 	else
 		tqc_mbls10xxa_i2c_gpio_set("xfi1_tx_dis", 1);
 
-	/* check config for SD1 - LANE A */
-	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd1_3_lane_d_mux");
-	rcw_proto = TQMLS1046A_SRDS1_PROTO(srds_s1, 3);
+	/* check config for SD1 - LANE D */
+	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd1_0_lane_d_mux");
+	rcw_proto = TQMLS1046A_SRDS1_PROTO(srds_s1, 0);
 	if(mux_val1 >= 0) {
-		printf("   SD1-3 Lane A: MUX=%s | RCW=%s -> ",
+		printf("   SD1-0 Lane D: MUX=%s | RCW=%s -> ",
 		   (mux_val1)?("XFI    "):("SGMII  "),
 		   serdes_rcw_str[rcw_proto]);
 

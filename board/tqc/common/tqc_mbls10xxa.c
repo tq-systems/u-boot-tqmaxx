@@ -16,9 +16,9 @@ struct tqc_mbls10xxa_i2c_gpio {
 
 struct tqc_mbls10xxa_i2c_gpio tqc_mbls10xxa_i2c_gpios[] =
 {
-	{"sd1_0_lane_a_mux",    0x20,  0, PCA953X_DIR_IN, -1},
-	{"sd1_1_lane_b_mux",    0x20,  1, PCA953X_DIR_IN, -1},
-	{"sd1_3_lane_d_mux",    0x20,  2, PCA953X_DIR_IN, -1},
+	{"sd1_3_lane_a_mux",    0x20,  0, PCA953X_DIR_IN, -1},
+	{"sd1_2_lane_b_mux",    0x20,  1, PCA953X_DIR_IN, -1},
+	{"sd1_0_lane_d_mux",    0x20,  2, PCA953X_DIR_IN, -1},
 	{"sd2_1_lane_b_mux",    0x20,  3, PCA953X_DIR_IN, -1},
 	{"sd2_3_lane_d_mux1",   0x20,  4, PCA953X_DIR_IN, -1},
 	{"sd2_3_lane_d_mux2",   0x20,  5, PCA953X_DIR_IN, -1},
