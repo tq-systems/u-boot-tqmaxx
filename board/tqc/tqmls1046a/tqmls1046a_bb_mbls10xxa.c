@@ -59,14 +59,14 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd_mux_shdn");
 	if(mux_val1) {
 		printf("!!! ATTENTION: SerDes MUXes disabled,\n");
-		printf("!!! muxed SerDes interfaces won't work\n");
+		printf("!!!  muxed SerDes interfaces won't work\n");
 	}
 	
 	/* check config for SD1 - LANE A */
 	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd1_3_lane_a_mux");
 	rcw_proto = TQMLS1046A_SRDS1_PROTO(srds_s1, 3);
 	if(mux_val1 >= 0) {
-		printf("   SD1-3 Lane A: MUX=%s | RCW=%s -> ",
+		printf("  SD1-3 Lane A: MUX=%s | RCW=%s -> ",
 		   (mux_val1)?("QSGMII "):("SGMII  "),
 		   serdes_rcw_str[rcw_proto]);
 
@@ -84,7 +84,7 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd1_2_lane_b_mux");
 	rcw_proto = TQMLS1046A_SRDS1_PROTO(srds_s1, 2);
 	if(mux_val1 >= 0) {
-		printf("   SD1-2 Lane B: MUX=%s | RCW=%s -> ",
+		printf("  SD1-2 Lane B: MUX=%s | RCW=%s -> ",
 		   (mux_val1)?("QSGMII "):("SGMII  "),
 		   serdes_rcw_str[rcw_proto]);
 
@@ -101,7 +101,7 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 
 	/* check config for SD1 - LANE C */
 	rcw_proto = TQMLS1046A_SRDS1_PROTO(srds_s1, 1);
-	printf("   SD1-1 Lane C: XFI         | RCW=%s -> ",
+	printf("  SD1-1 Lane C: XFI         | RCW=%s -> ",
 	   serdes_rcw_str[rcw_proto]);
 
 	if((rcw_proto == 0x0) ||
@@ -126,7 +126,7 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd1_0_lane_d_mux");
 	rcw_proto = TQMLS1046A_SRDS1_PROTO(srds_s1, 0);
 	if(mux_val1 >= 0) {
-		printf("   SD1-0 Lane D: MUX=%s | RCW=%s -> ",
+		printf("  SD1-0 Lane D: MUX=%s | RCW=%s -> ",
 		   (mux_val1)?("XFI    "):("SGMII  "),
 		   serdes_rcw_str[rcw_proto]);
 
@@ -152,7 +152,7 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 
 	/* check config for SD2 - LANE A */
 	rcw_proto = TQMLS1046A_SRDS2_PROTO(srds_s2, 0);
-	printf("   SD2-0 Lane A: PCIe        | RCW=%s -> ",
+	printf("  SD2-0 Lane A: PCIe        | RCW=%s -> ",
 	   serdes_rcw_str[rcw_proto]);
 
 	if((rcw_proto == 0x0) ||
@@ -168,7 +168,7 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd2_1_lane_b_mux");
 	rcw_proto = TQMLS1046A_SRDS2_PROTO(srds_s2, 1);
 	if(mux_val1 >= 0) {
-		printf("   SD2-1 Lane B: MUX=%s | RCW=%s -> ",
+		printf("  SD2-1 Lane B: MUX=%s | RCW=%s -> ",
 		   (mux_val1)?("SGMII  "):("PCIe   "),
 		   serdes_rcw_str[rcw_proto]);
 
@@ -191,7 +191,7 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 
 	/* check config for SD2 - LANE C */
 	rcw_proto = TQMLS1046A_SRDS2_PROTO(srds_s2, 2);
-	printf("   SD2-2 Lane C: PCIe        | RCW=%s -> ",
+	printf("  SD2-2 Lane C: PCIe        | RCW=%s -> ",
 	   serdes_rcw_str[rcw_proto]);
 
 	if((rcw_proto == 0x0) ||
@@ -215,7 +215,7 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 	mux_val2 = tqc_mbls10xxa_i2c_gpio_get("sd2_3_lane_d_mux2");
 	rcw_proto = TQMLS1046A_SRDS2_PROTO(srds_s2, 3);
 	if((mux_val1 >= 0) && (mux_val2 >= 0)){
-		printf("   SD2-3 Lane D: MUX=%s | RCW=%s -> ",
+		printf("  SD2-3 Lane D: MUX=%s | RCW=%s -> ",
 		   (mux_val1)?((mux_val2)?("PCIe   "):("SATA   ")):("PCIe x2"),
 		   serdes_rcw_str[rcw_proto]);
 
@@ -237,10 +237,11 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 			tqc_mbls10xxa_i2c_gpio_set("mpcie1_disable#", 0);
 	}
 
+	/* print error message when muxing is invalid */
 	if(mux_stat) {
 		printf("!!! ATTENTION: Some SerDes lanes are misconfigured,\n");
-		printf("!!! this may cause some interfaces to be inoperable.\n");
-		printf("!!! Check SerDes muxing DIP switch settings!\n");
+		printf("!!!  this may cause some interfaces to be inoperable.\n");
+		printf("!!!  Check SerDes muxing DIP switch settings!\n");
 
 		return -1;
 	}
