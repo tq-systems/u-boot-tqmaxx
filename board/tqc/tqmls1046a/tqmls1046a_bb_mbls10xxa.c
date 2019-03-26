@@ -113,15 +113,6 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 		printf(" FAIL\n");
 	}
 
-	/* enable XFI transmitter when XFI selected and SFP is available
-	 * (MOD-DEF[0] (SFP pin 6) is grounded)
-	 */
-	mux_val2 = tqc_mbls10xxa_i2c_gpio_get("xfi1_moddef_det");
-	if((rcw_proto == 0x1) && !mux_val2)
-		tqc_mbls10xxa_i2c_gpio_set("xfi1_tx_dis", 0);
-	else
-		tqc_mbls10xxa_i2c_gpio_set("xfi1_tx_dis", 1);
-
 	/* check config for SD1 - LANE D */
 	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd1_0_lane_d_mux");
 	rcw_proto = TQMLS1046A_SRDS1_PROTO(srds_s1, 0);
@@ -139,15 +130,6 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 			mux_stat++;
 			printf(" FAIL\n");
 		}
-
-		/* enable XFI transmitter when XFI selected and SFP is available
-		 * (MOD-DEF[0] (SFP pin 6) is grounded)
-		 */
-		mux_val2 = tqc_mbls10xxa_i2c_gpio_get("xfi2_moddef_det");
-		if(mux_val1 && (rcw_proto == 0x1) && !mux_val2)
-			tqc_mbls10xxa_i2c_gpio_set("xfi2_tx_dis", 0);
-		else
-			tqc_mbls10xxa_i2c_gpio_set("xfi2_tx_dis", 1);
 	}
 
 	/* check config for SD2 - LANE A */
@@ -335,6 +317,7 @@ int tqmls1046a_bb_board_eth_init(bd_t *bis)
 	struct mii_dev *dev_mdio1;
 	u32 srds_s1, srds_s2;
 	struct ccsr_gur *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
+	int moddef_det;
 
 	/* read SerDes configuration from RCW */
 	srds_s1 = in_be32(&gur->rcwsr[4]) &
@@ -376,10 +359,31 @@ int tqmls1046a_bb_board_eth_init(bd_t *bis)
 		fm_info_set_phy_address(FM1_DTSEC5, QSGMII_PHY2_ADDR_BASE+0);
 		fm_info_set_mdio(FM1_DTSEC5, dev_mdio1);
 	}
+	if(TQMLS1046A_SRDS1_PROTO(srds_s1, 1) == 0x1) {
+		/* SD1 - LANE C in XFI mode.10 */
+		/* enable XFI transmitter when XFI selected and SFP is available
+		 * (MOD-DEF[0] (SFP pin 6) is grounded)
+		 */
+		moddef_det = tqc_mbls10xxa_i2c_gpio_get("xfi1_moddef_det");
+		if(!moddef_det)
+			tqc_mbls10xxa_i2c_gpio_set("xfi1_tx_dis", 0);
+		else
+			tqc_mbls10xxa_i2c_gpio_set("xfi1_tx_dis", 1);
+	}
 	if(TQMLS1046A_SRDS1_PROTO(srds_s1, 0) == 0x3) {
 		/* SD1 - LANE D in SGMII mode.9 */
 		fm_info_set_phy_address(FM1_DTSEC9, QSGMII_PHY2_ADDR_BASE+1);
 		fm_info_set_mdio(FM1_DTSEC9, dev_mdio1);
+	} else if(TQMLS1046A_SRDS1_PROTO(srds_s1, 0) == 0x1) {
+		/* SD1 - LANE D in XFI mode.9 */
+		/* enable XFI transmitter when XFI selected and SFP is available
+		 * (MOD-DEF[0] (SFP pin 6) is grounded)
+		 */
+		moddef_det = tqc_mbls10xxa_i2c_gpio_get("xfi2_moddef_det");
+		if(!moddef_det)
+			tqc_mbls10xxa_i2c_gpio_set("xfi2_tx_dis", 0);
+		else
+			tqc_mbls10xxa_i2c_gpio_set("xfi2_tx_dis", 1);
 	}
 	if(TQMLS1046A_SRDS2_PROTO(srds_s2, 1) == 0xA) {
 		/* SD2 - LANE B in SGMII mode.2 */
