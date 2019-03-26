@@ -372,6 +372,16 @@ int tqmls1046a_bb_board_eth_init(bd_t *bis)
 		/* SD1 - LANE B in SGMII.5 mode */
 		fm_info_set_phy_address(FM1_DTSEC5, QSGMII_PHY2_ADDR_BASE+0);
 		fm_info_set_mdio(FM1_DTSEC5, dev_mdio1);
+	} else if(TQMLS1046A_SRDS1_PROTO(srds_s1, 2) == 0x4) {
+		/* SD1 - LANE B in QSGMII.6,5,10,1 mode */
+		fm_info_set_phy_address(FM1_DTSEC6, QSGMII_PHY2_ADDR_BASE+0);
+		fm_info_set_mdio(FM1_DTSEC6, dev_mdio1);
+		fm_info_set_phy_address(FM1_DTSEC5, QSGMII_PHY2_ADDR_BASE+1);
+		fm_info_set_mdio(FM1_DTSEC5, dev_mdio1);
+		fm_info_set_phy_address(FM1_DTSEC10, QSGMII_PHY2_ADDR_BASE+2);
+		fm_info_set_mdio(FM1_DTSEC1, dev_mdio1);
+		fm_info_set_phy_address(FM1_DTSEC1, QSGMII_PHY2_ADDR_BASE+3);
+		fm_info_set_mdio(FM1_DTSEC10, dev_mdio1);
 	}
 	if(TQMLS1046A_SRDS1_PROTO(srds_s1, 1) == 0x1) {
 		/* SD1 - LANE C in XFI mode.10 */
