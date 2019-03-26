@@ -163,3 +163,24 @@ int tqc_mbls10xxa_i2c_gpio_set(const char *name, int val)
 	return ret;
 }
 
+int tqc_mbls10xxa_clk_cfg_init(void)
+{
+	int ret = 0;
+	unsigned int oldbus;
+	uint8_t buf[4];
+	int i;
+
+	oldbus = i2c_get_bus_num();
+	i2c_set_bus_num(TQC_MBLS10XXA_I2C_CLKBUF_BUS_NUM);
+
+	/* set LVDS output on channels 4 and 5 in all configurations */
+	for(i=0; i<4; i++)
+		buf[i] = 0xC0;
+	ret = i2c_write(TQC_MBLS10xxA_I2C_CLKBUF_ADDR, 12, 1, buf, 4);
+	if(ret != 0)
+		printf("unable to set clock buffer\n");
+
+	i2c_set_bus_num(oldbus);
+	return ret;
+}
+

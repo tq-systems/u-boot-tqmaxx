@@ -285,6 +285,9 @@ int tqmls1046a_bb_misc_init_r(void)
 	out_be32(&scfg->usbpwrfault_selcr, usb_pwrfault);
 #endif
 
+	/* configure baseboard clock buffer */
+	tqc_mbls10xxa_clk_cfg_init();
+
 	/* initialize baseboard io's */
 	ret = tqc_mbls10xxa_i2c_gpios_init();
 
@@ -449,7 +452,13 @@ int board_phy_config(struct phy_device *phydev)
 			break;
 		case (QSGMII_PHY1_ADDR_BASE & 0x1C):
 		case (QSGMII_PHY2_ADDR_BASE & 0x1C):
-			/* execute marvell specified initialization if not already done */
+			/* reset PHY because clock input may have changed */
+			phy_write(phydev, MDIO_DEVAD_NONE, 0x16, 0x0004);
+			phy_write(phydev, MDIO_DEVAD_NONE, 0x1B, 0x8000);
+			/* wait for 50ms for reset to complete */
+			mdelay(50);
+
+			/* execute marvell specified initialization */
 			/* see MV-S301615 release note */
 			/* PHY initialization #1 */
 			phy_write(phydev, MDIO_DEVAD_NONE, 0x16, 0x00ff);

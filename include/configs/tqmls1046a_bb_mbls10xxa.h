@@ -36,5 +36,9 @@
 #define CONFIG_PCA953X
 #define CONFIG_SYS_I2C_PCA953X_WIDTH    { {0x20, 16}, {0x21, 16}, {0x22, 16} }
 
+/* I2C clock buffer on baseboard (8T49N006A) */
+#define TQC_MBLS10XXA_I2C_CLKBUF_BUS_NUM  3
+#define TQC_MBLS10xxA_I2C_CLKBUF_ADDR     0x6e
+
 #endif /* __TQMLS1046A_BB_MBLS10XX_H__ */
 
