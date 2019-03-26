@@ -481,6 +481,19 @@ int board_phy_config(struct phy_device *phydev)
 			phy_write(phydev, MDIO_DEVAD_NONE, 0x1E, 0x0002);
 			phy_write(phydev, MDIO_DEVAD_NONE, 0x16, 0x0000);
 
+			/* check configuration of PHY device */
+			printf("QSGMII ethernet PHY 0x%02x configuration: ", phydev->addr);
+			phy_write(phydev, MDIO_DEVAD_NONE, 0x16, 0x0006);
+			val = phy_read(phydev, MDIO_DEVAD_NONE, 0x14);
+			phy_write(phydev, MDIO_DEVAD_NONE, 0x16, 0x0000);
+			if((val & 0x7) == 0) {
+				printf("QSGMII to Copper\n");
+			} else if((val & 0x7) == 1) {
+				printf("SGMII to Copper\n");
+			} else {
+				printf("unsupported\n");
+			}
+
 			/* mark PHY as initialized */
 			if((phydev->addr & 0x1C) == QSGMII_PHY1_ADDR_BASE)
 				qsgmii1_initdone = true;
