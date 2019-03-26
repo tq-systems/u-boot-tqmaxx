@@ -54,7 +54,7 @@ static iomux_v3_cfg_t const usdhc2_pads[] = {
 	IMX8MQ_PAD_SD2_DATA2__USDHC2_DATA2 | MUX_PAD_CTRL(USDHC_PAD_CTRL), /* 0x16 */
 	IMX8MQ_PAD_SD2_DATA3__USDHC2_DATA3 | MUX_PAD_CTRL(USDHC_PAD_CTRL), /* 0xd6 */
 	IMX8MQ_PAD_SD2_CD_B__GPIO2_IO12 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
-	IMX8MQ_PAD_SD2_RESET_B__GPIO2_IO19 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
+	IMX8MQ_PAD_GPIO1_IO04__USDHC2_VSELECT | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
 };
 
 static struct fsl_esdhc_cfg usdhc2_cfg = {
@@ -75,7 +75,6 @@ int tqc_bb_board_mmc_init(bd_t *bis)
 	usdhc2_cfg.sdhc_clk = mxc_get_clock(USDHC2_CLK_ROOT);
 	imx_iomux_v3_setup_multiple_pads(
 		usdhc2_pads, ARRAY_SIZE(usdhc2_pads));
-
 	ret = fsl_esdhc_initialize(bis, &usdhc2_cfg);
 	if (ret)
 		return ret;
