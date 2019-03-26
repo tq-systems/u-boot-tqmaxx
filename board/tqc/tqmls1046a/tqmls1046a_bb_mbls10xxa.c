@@ -432,14 +432,16 @@ int board_phy_config(struct phy_device *phydev)
 {
 	uint16_t val;
 	int ret = 0;
+	static bool qsgmii1_initdone = false;
+	static bool qsgmii2_initdone = false;
 
 	if (phydev->drv->config)
 		ret = phydev->drv->config(phydev);
 
+
 	if(!ret) {
-		switch(phydev->addr) {
-		case RGMII_PHY1_ADDR:
-		case RGMII_PHY2_ADDR:
+		if((phydev->addr == RGMII_PHY1_ADDR) ||
+		   (phydev->addr == RGMII_PHY2_ADDR)) {
 			/* enable RGMII delay in both directions */
 			val = _rgmii_phy_read_indirect(phydev, 0x32);
 			val |= 0x0003;
@@ -449,9 +451,17 @@ int board_phy_config(struct phy_device *phydev)
 			val = _rgmii_phy_read_indirect(phydev, 0x86);
 			val = (val & 0xFF00) | 0x0055;
 			_rgmii_phy_write_indirect(phydev, 0x86, val);
-			break;
-		case (QSGMII_PHY1_ADDR_BASE):
-		case (QSGMII_PHY2_ADDR_BASE):
+		} else if(((phydev->addr & 0x1C) == QSGMII_PHY1_ADDR_BASE) ||
+		          ((phydev->addr & 0x1C) == QSGMII_PHY2_ADDR_BASE)) {
+			/* check if initialization has already been done */
+			if((((phydev->addr & 0x1C) == QSGMII_PHY1_ADDR_BASE) &&
+			    qsgmii1_initdone) ||
+			   (((phydev->addr & 0x1C) == QSGMII_PHY2_ADDR_BASE) &&
+			    qsgmii2_initdone)) {
+				/* initialization already done, skip */
+				return ret;
+			}
+
 			/* reset PHY because clock input may have changed */
 			phy_write(phydev, MDIO_DEVAD_NONE, 0x16, 0x0004);
 			phy_write(phydev, MDIO_DEVAD_NONE, 0x1B, 0x8000);
@@ -470,9 +480,12 @@ int board_phy_config(struct phy_device *phydev)
 			phy_write(phydev, MDIO_DEVAD_NONE, 0x1D, 0x0003);
 			phy_write(phydev, MDIO_DEVAD_NONE, 0x1E, 0x0002);
 			phy_write(phydev, MDIO_DEVAD_NONE, 0x16, 0x0000);
-			break;
-		default:
-			break;
+
+			/* mark PHY as initialized */
+			if((phydev->addr & 0x1C) == QSGMII_PHY1_ADDR_BASE)
+				qsgmii1_initdone = true;
+			if((phydev->addr & 0x1C) == QSGMII_PHY2_ADDR_BASE)
+				qsgmii2_initdone = true;
 		}
 	}
 
