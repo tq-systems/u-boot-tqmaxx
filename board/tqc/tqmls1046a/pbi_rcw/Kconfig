@@ -6,6 +6,16 @@ choice
 	help
 	  Select the RCW configuration file to be used for TQMLS1046A
 
+config TQMLS1046A_RCW_1040_5A06
+	bool "TQMLS1046A RCW configuration for SERDES mode 1040_5A06"
+	help
+	  Select SERDES mode 1040_5A06 in reset configuration word
+
+config TQMLS1046A_RCW_1133_5A06
+	bool "TQMLS1046A RCW configuration for SERDES mode 1133_5A06"
+	help
+	  Select SERDES mode 1133_5A06 in reset configuration word
+
 config TQMLS1046A_RCW_3333_5506
 	bool "TQMLS1046A RCW configuration for SERDES mode 3333_5506"
 	help
@@ -35,6 +45,18 @@ endchoice
 
 config SYS_FSL_PBL_RCW
 	string
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_emmc_1040_5A06.cfg" \
+	  if TQMLS1046A_RCW_1040_5A06 && SD_BOOT && SYS_TQMLS1046A_EMMC
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_sd_1040_5A06.cfg" \
+	  if TQMLS1046A_RCW_1040_5A06 && SD_BOOT && !SYS_TQMLS1046A_EMMC
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_qspi_1040_5A06.cfg" \
+	  if TQMLS1046A_RCW_1040_5A06 && QSPI_BOOT
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_emmc_1133_5A06.cfg" \
+	  if TQMLS1046A_RCW_1133_5A06 && SD_BOOT && SYS_TQMLS1046A_EMMC
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_sd_1133_5A06.cfg" \
+	  if TQMLS1046A_RCW_1133_5A06 && SD_BOOT && !SYS_TQMLS1046A_EMMC
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_qspi_1133_5A06.cfg" \
+	  if TQMLS1046A_RCW_1133_5A06 && QSPI_BOOT
 	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_emmc_3333_5506.cfg" \
 	  if TQMLS1046A_RCW_3333_5506 && SD_BOOT && SYS_TQMLS1046A_EMMC
 	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_sd_3333_5506.cfg" \
