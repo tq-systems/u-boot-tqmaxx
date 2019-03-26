@@ -515,6 +515,96 @@ int board_phy_config(struct phy_device *phydev)
 	return ret;
 }
 
+static int fdt_set_phy_handle(void *fdt, char *compat, phys_addr_t addr,
+			const char *alias)
+{
+	int offset;
+	unsigned int ph;
+	const char *path;
+
+	/* Get a path to the node that 'alias' points to */
+	path = fdt_get_alias(fdt, alias);
+	if (!path)
+		return -FDT_ERR_BADPATH;
+
+	/* Get the offset of that node */
+	offset = fdt_path_offset(fdt, path);
+	if (offset < 0)
+		return offset;
+
+	ph = fdt_create_phandle(fdt, offset);
+	if (!ph)
+		return -FDT_ERR_BADPHANDLE;
+
+	ph = cpu_to_fdt32(ph);
+
+	offset = fdt_node_offset_by_compat_reg(fdt, compat, addr);
+	if (offset < 0)
+		return offset;
+
+	return fdt_setprop(fdt, offset, "phy-handle", &ph, sizeof(ph));
+}
+
+void board_ft_fman_fixup_port(void *fdt, char *compat, phys_addr_t addr,
+			      enum fm_port port, int offset)
+{
+	struct fixed_link f_link;
+
+	printf("%s: port = %d, mode = %d\n", __func__, port, fm_info_get_enet_if(port));
+
+	if (fm_info_get_enet_if(port) == PHY_INTERFACE_MODE_SGMII) {
+		switch (port) {
+		case FM1_DTSEC2:
+			fdt_set_phy_handle(fdt, compat, addr, "qsgmii_s1_p2");
+			break;
+		case FM1_DTSEC5:
+			fdt_set_phy_handle(fdt, compat, addr, "qsgmii_s2_p1");
+			break;
+		case FM1_DTSEC6:
+			fdt_set_phy_handle(fdt, compat, addr, "qsgmii_s1_p1");
+			break;
+		case FM1_DTSEC9:
+			fdt_set_phy_handle(fdt, compat, addr, "qsgmii_s2_p2");
+			break;
+		default:
+			break;
+		fdt_delprop(fdt, offset, "phy-connection-type");
+		fdt_setprop_string(fdt, offset, "phy-connection-type", "sgmii");
+		}
+	} else if (fm_info_get_enet_if(port) == PHY_INTERFACE_MODE_QSGMII) {
+		switch (port) {
+		case FM1_DTSEC1:
+			fdt_set_phy_handle(fdt, compat, addr, "qsgmii_s2_p4");
+			break;
+		case FM1_DTSEC5:
+			fdt_set_phy_handle(fdt, compat, addr, "qsgmii_s2_p2");
+			break;
+		case FM1_DTSEC6:
+			fdt_set_phy_handle(fdt, compat, addr, "qsgmii_s2_p1");
+			break;
+		case FM1_DTSEC10:
+			fdt_set_phy_handle(fdt, compat, addr, "qsgmii_s2_p3");
+			break;
+		default:
+			break;
+		}
+		fdt_delprop(fdt, offset, "phy-connection-type");
+		fdt_setprop_string(fdt, offset, "phy-connection-type", "qsgmii");
+	} else if (fm_info_get_enet_if(port) == PHY_INTERFACE_MODE_XGMII &&
+		   (port == FM1_10GEC1 || port == FM1_10GEC2)) {
+		/* XFI interface */
+		f_link.phy_id = cpu_to_fdt32(port);
+		f_link.duplex = cpu_to_fdt32(1);
+		f_link.link_speed = cpu_to_fdt32(1000);
+		f_link.pause = 0;
+		f_link.asym_pause = 0;
+		/* no PHY for XFI */
+		fdt_delprop(fdt, offset, "phy-handle");
+		fdt_delprop(fdt, offset, "phy-connection-type");
+		fdt_setprop(fdt, offset, "fixed-link", &f_link, sizeof(f_link));
+		fdt_setprop_string(fdt, offset, "phy-connection-type", "xgmii");
+	}
+}
 
 #if defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT)
 int tqmls1046a_bb_ft_board_setup(void *blob, bd_t *bd)
