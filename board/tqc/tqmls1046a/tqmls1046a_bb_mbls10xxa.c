@@ -550,8 +550,6 @@ void board_ft_fman_fixup_port(void *fdt, char *compat, phys_addr_t addr,
 {
 	struct fixed_link f_link;
 
-	printf("%s: port = %d, mode = %d\n", __func__, port, fm_info_get_enet_if(port));
-
 	if (fm_info_get_enet_if(port) == PHY_INTERFACE_MODE_SGMII) {
 		switch (port) {
 		case FM1_DTSEC2:
