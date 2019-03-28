@@ -58,7 +58,8 @@ static iomux_v3_cfg_t const usdhc2_pads[] = {
 };
 
 static struct fsl_esdhc_cfg usdhc2_cfg = {
-	USDHC2_BASE_ADDR, 0, 4,
+	.esdhc_base = USDHC2_BASE_ADDR,
+	.max_bus_width = 4,
 };
 
 int tqc_bb_board_mmc_init(bd_t *bis)
