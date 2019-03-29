@@ -49,13 +49,4 @@ int board_eth_init(bd_t *bis)
 
 	return pci_eth_init(bis);
 }
-
-#ifdef CONFIG_FMAN_ENET
-int fdt_update_ethernet_dt(void *blob)
-{
-	/* TODO: add device-tree fixup for ethernet devices */ 
-
-	return 0;
-}
-#endif
 #endif
