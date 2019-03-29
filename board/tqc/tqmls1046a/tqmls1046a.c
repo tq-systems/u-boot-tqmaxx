@@ -24,6 +24,13 @@
 
 #define SCFG_QSPI_CLKSEL_DIV_24	0x30100000
 
+#define TQMLS1046A_SYSC_BUS_NUM 0
+#define TQMLS1046A_SYSC_ADDR    0x11
+
+#define SYSC_REG_SYSC_FW_VERS   0x02
+#define SYSC_REG_BOOT_SRC       0x03
+#define SYSC_REG_CPLD_FW_VERS   0xE1
+
 DECLARE_GLOBAL_DATA_PTR;
 
 int board_early_init_f(void)
@@ -42,12 +49,40 @@ int board_early_init_f(void)
 #ifndef CONFIG_SPL_BUILD
 int checkboard(void)
 {
-	printf("Board: TQMLS1046A on a %s\n", tqmls1046a_bb_get_boardname());
+	unsigned int oldbus;
+	uint8_t bootsrc, syscrev, cpldrev;
 
-	/*
-	 * TODO: add further information (e.g. boot source, CPLD & SysC firmware
-	 * version, ...)
-	 */
+	/* get further information from SysC */
+	oldbus = i2c_get_bus_num();
+	i2c_set_bus_num(TQMLS1046A_SYSC_BUS_NUM);
+	bootsrc = i2c_reg_read(TQMLS1046A_SYSC_ADDR, SYSC_REG_BOOT_SRC);
+	syscrev = i2c_reg_read(TQMLS1046A_SYSC_ADDR, SYSC_REG_SYSC_FW_VERS);
+	cpldrev = i2c_reg_read(TQMLS1046A_SYSC_ADDR, SYSC_REG_CPLD_FW_VERS);
+	i2c_set_bus_num(oldbus);
+
+	/* print SoM and baseboard name */
+	printf("Board: TQMLS1046A on a %s ", tqmls1046a_bb_get_boardname());
+	switch(bootsrc & 0x0F) {
+		case 0x0:
+			printf("(Boot from QSPI)\n");
+			break;
+		case 0x2:
+			printf("(Boot from SD)\n");
+			break;
+		case 0x3:
+			printf("(Boot from eMMC)\n");
+			break;
+		case 0xe:
+			printf("(Boot from Hard Coded RCW)\n");
+			break;
+		default:
+			printf("(Bootsource unknown)\n");
+			break;
+	}
+	printf("         SysC FW Rev: %2d.%02d\n",
+		(syscrev >> 4) & 0xF, syscrev & 0xF);
+	printf("         CPLD FW Rev: %2d.%02d\n", 
+		(cpldrev >> 4) & 0xF, cpldrev & 0xF);
  
 	return tqmls1046a_bb_checkboard();
 }
