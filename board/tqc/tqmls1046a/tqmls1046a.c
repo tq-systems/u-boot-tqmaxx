@@ -114,32 +114,6 @@ int board_init(void)
 	return tqmls1046a_bb_board_init();
 }
 
-int board_setup_core_volt(u32 vdd)
-{
-	/* TODO: core voltage could be changed from SysC on TQMLS10xxA */
-	return 0;
-}
-
-int get_serdes_volt(void)
-{
-	/* TODO: serdes voltage is connected to core voltage on TQMLS10xxA */
-	return 1000;
-}
-
-int set_serdes_volt(int svdd)
-{
-	/* TODO: serdes voltage is connected to core voltage on TQMLS10xxA */
-	return 0;
-}
-
-int power_init_board(void)
-{
-	/* TODO: anything to do here? */
-	setup_chip_volt();
-
-	return 0;
-}
-
 #ifdef CONFIG_MISC_INIT_R
 int misc_init_r(void)
 {
