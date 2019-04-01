@@ -114,7 +114,7 @@
             "\0" \
 
 /* Initial environment variables */
-#define CONFIG_EXTRA_ENV_SETTINGS		\
+#define TQMA8QXS_MODULE_ENV_SETTINGS		\
 	CONFIG_MFG_ENV_SETTINGS \
 	M4_BOOT_ENV \
 	XEN_BOOT_ENV \
@@ -132,7 +132,6 @@
 	"cntr_addr=0x88000000\0"			\
 	"cntr_file=os_cntr_signed.bin\0" \
 	"boot_fdt=try\0" \
-	"fdt_file=fsl-imx8qxp-tqma8qxs-mb-smarc-2.dtb\0" \
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
 	"mmcroot=" CONFIG_MMCROOT " rootwait rw\0" \
@@ -337,6 +336,10 @@
 #else
 #error
 #endif
+
+#define CONFIG_EXTRA_ENV_SETTINGS		\
+	TQMA8QXS_MODULE_ENV_SETTINGS		\
+	BB_ENV_SETTINGS
 
 #ifndef CONFIG_SPL_BUILD
 #define BOOT_TARGET_DEVICES(func) \
