@@ -27,4 +27,7 @@
 
 #define CONFIG_FEC_MXC_PHYADDR		0x1F
 
+#define BB_ENV_SETTINGS \
+	"fdt_file=fsl-imx8qxp-tqma8qxps-mb-smarc-2.dtb\0"
+
 #endif /* __TQMA8QXS_MB_SMARC_2_H */
