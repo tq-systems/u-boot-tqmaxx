@@ -134,9 +134,7 @@
 	"boot_fdt=try\0" \
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
-	"mmcroot=" CONFIG_MMCROOT " rootwait rw\0" \
 	"mmcautodetect=yes\0" \
-	"mmcargs=setenv bootargs console=${console},${baudrate} root=${mmcroot} " \
 	"video=imxdpufb5:off video=imxdpufb6:off video=imxdpufb7:off\0" \
 	"loadbootscript=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
@@ -167,11 +165,8 @@
 				"echo wait for boot; " \
 			"fi;" \
 		"fi;\0" \
-	"netargs=setenv bootargs console=${console} " \
-		"root=/dev/nfs " \
-		"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp " \
-		"video=imxdpufb5:off video=imxdpufb6:off video=imxdpufb7:off\0" \
 	"netboot=echo Booting from net ...; " \
+		"setenv bootargs; " \
 		"run netargs;  " \
 		"run set_getcmd; " \
 		"if test ${sec_boot} = yes; then " \
@@ -215,7 +210,27 @@
 			"setenv get_cmd dhcp; "                                \
 		"else "                                                        \
 			"setenv get_cmd tftp; "                                \
-		"fi; \0"
+		"fi; \0"                                                       \
+	"rootfsmode=ro\0"                                                      \
+	"addtty=setenv bootargs ${bootargs} console=${console}\0"              \
+	"mmcrootpart=2\0"                                                      \
+	"addmmc=setenv bootargs ${bootargs} "                                  \
+		"root=/dev/mmcblk${mmcblkdev}p${mmcrootpart} ${rootfsmode} "   \
+		"rootwait\0"                                                   \
+	"mmcargs=run addtty addmmc\0"                                          \
+	"netargs=run addnfs addip addtty\0"                                    \
+	"addnfs=setenv bootargs ${bootargs} "                                  \
+		"root=/dev/nfs rw "                                            \
+		"nfsroot=${serverip}:${rootpath},v3,tcp;\0"                    \
+	"rootpath=/srv/nfs\0"                                                  \
+	"netdev=eth0\0"                                                        \
+	"ipmode=static\0"                                                      \
+	"addip_static=setenv bootargs ${bootargs} "                            \
+		"ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:"            \
+		"${hostname}:${netdev}:off\0"                                  \
+	"addip_dynamic=setenv bootargs ${bootargs} ip=dhcp\0"                  \
+	"addip=if test \"${ipmode}\" != static; then "                         \
+		"run addip_dynamic; else run addip_static; fi\0"
 
 #if !defined(CONFIG_BOOTCOMMAND)
 #define CONFIG_BOOTCOMMAND \
@@ -270,7 +285,6 @@
 /* On LPDDR4 board, USDHC1 is for eMMC, USDHC2 is for SD on CPU board
   */
 #define CONFIG_SYS_MMC_ENV_DEV		1   /* USDHC2 */
-#define CONFIG_MMCROOT			"/dev/mmcblk1p2"  /* USDHC2 */
 #define CONFIG_SYS_FSL_USDHC_NUM	2
 
 /* Size of malloc() pool */
