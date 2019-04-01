@@ -47,6 +47,7 @@ choice
 config TQMA8QXS_BOOT_SDCARD
 	bool "TQMa8QXS from SD / e-MMC"
 	select SD_BOOT
+	select ENV_IS_IN_MMC
 	help
 	  Select booting from SD / e-MMC
 
