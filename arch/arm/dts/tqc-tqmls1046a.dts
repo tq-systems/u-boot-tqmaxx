@@ -19,14 +19,14 @@
 
 &qspi {
 	bus-num = <0>;
-	spi-max-frequency = <50000000>;
+	spi-max-frequency = <62500000>;
 	status = "okay";
 
 	qflash0: mx66u51235f@0 {
 		#address-cells = <1>;
 		#size-cells = <1>;
 		compatible = "spi-flash";
-		spi-max-frequency = <50000000>;
+		spi-max-frequency = <62500000>;
 		reg = <0>;
 	};
 
@@ -34,7 +34,7 @@
 		#address-cells = <1>;
 		#size-cells = <1>;
 		compatible = "spi-flash";
-		spi-max-frequency = <50000000>;
+		spi-max-frequency = <62500000>;
 		reg = <1>;
 	 };
 };
