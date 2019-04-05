@@ -420,6 +420,16 @@ int tqmls1046a_bb_board_eth_init(bd_t *bis)
 }
 #endif
 
+int tqmls1046a_bb_board_mmc_getcd(struct mmc *mmc)
+{
+	return 0;
+}
+
+int tqmls1046a_bb_board_mmc_getwp(struct mmc *mmc)
+{
+	return 1;
+}
+
 static uint16_t _rgmii_phy_read_indirect(struct phy_device *phydev,
 					uint8_t addr)
 {

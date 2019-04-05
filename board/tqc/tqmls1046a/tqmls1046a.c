@@ -144,6 +144,80 @@ int misc_init_r(void)
 }
 #endif
 
+int board_mmc_getcd(struct mmc *mmc)
+{
+	struct ccsr_gur *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
+	u32 rcw_iic2_ext;
+	unsigned int oldbus;
+	uint8_t bootsrc;
+	int ret;
+
+	/* get sdhc mux information from SysC */
+	oldbus = i2c_get_bus_num();
+	i2c_set_bus_num(TQMLS1046A_SYSC_BUS_NUM);
+	bootsrc = i2c_reg_read(TQMLS1046A_SYSC_ADDR, SYSC_REG_BOOT_SRC);
+	i2c_set_bus_num(oldbus);
+
+	/* check if eMMC or sd-card selected */
+	if(!(bootsrc & SYSC_REG_BOOT_SRC_SDSEL_MSK)) {
+		/* card alway present when eMMC selected */
+		ret = 1;
+	} else {
+		/* read IIC2_EXT configuration from RCW */
+		rcw_iic2_ext = in_be32(&gur->rcwsr[13]) & 0x00000007;
+
+		/* check if hardware card detection should be used (RCW) */
+		if(rcw_iic2_ext == 0x1) {
+			/* CD mapped to hardware function */
+			ret = -1;
+		} else {
+			/* sd-card selected without hardware card detection pin,
+			 * check baseboard specific function
+			 */
+			ret = tqmls1046a_bb_board_mmc_getcd(mmc);
+		}
+	}
+
+	return ret;
+}
+
+int board_mmc_getwp(struct mmc *mmc)
+{
+	struct ccsr_gur *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
+	u32 rcw_iic2_ext;
+	unsigned int oldbus;
+	uint8_t bootsrc;
+	int ret;
+
+	/* get sdhc mux information from SysC */
+	oldbus = i2c_get_bus_num();
+	i2c_set_bus_num(TQMLS1046A_SYSC_BUS_NUM);
+	bootsrc = i2c_reg_read(TQMLS1046A_SYSC_ADDR, SYSC_REG_BOOT_SRC);
+	i2c_set_bus_num(oldbus);
+
+	/* check if eMMC or sd-card selected */
+	if(!(bootsrc & SYSC_REG_BOOT_SRC_SDSEL_MSK)) {
+		/* card always writeable when eMMC selected */
+		ret = 0;
+	} else {
+		/* read IIC2_EXT configuration from RCW */
+		rcw_iic2_ext = in_be32(&gur->rcwsr[13]) & 0x00000007;
+
+		/* check if hardware write protection should be used (RCW) */
+		if(rcw_iic2_ext == 0x1) {
+			/* CD mapped to hardware function */
+			ret = -1;
+		} else {
+			/* sd-card selected without hardware write protection pin,
+			 * check baseboard specific function
+			 */
+			ret = tqmls1046a_bb_board_mmc_getcd(mmc);
+		}
+	}
+
+	return ret;
+}
+
 int ft_board_setup(void *blob, bd_t *bd)
 {
 	int offset;
