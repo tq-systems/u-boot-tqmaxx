@@ -22,14 +22,15 @@
 #include "tqmls1046a_bb.h"
 #include "../common/tqc_eeprom.h"
 
-#define SCFG_QSPI_CLKSEL_DIV_24	0x30100000
+#define SCFG_QSPI_CLKSEL_DIV_24	    0x30100000
 
-#define TQMLS1046A_SYSC_BUS_NUM 0
-#define TQMLS1046A_SYSC_ADDR    0x11
+#define TQMLS1046A_SYSC_BUS_NUM     0
+#define TQMLS1046A_SYSC_ADDR        0x11
 
-#define SYSC_REG_SYSC_FW_VERS   0x02
-#define SYSC_REG_BOOT_SRC       0x03
-#define SYSC_REG_CPLD_FW_VERS   0xE1
+#define SYSC_REG_SYSC_FW_VERS       0x02
+#define SYSC_REG_BOOT_SRC           0x03
+#define SYSC_REG_BOOT_SRC_SDSEL_MSK 0x80
+#define SYSC_REG_CPLD_FW_VERS       0xE1
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -145,11 +146,34 @@ int misc_init_r(void)
 
 int ft_board_setup(void *blob, bd_t *bd)
 {
+	int offset;
+	unsigned int oldbus;
+	uint8_t bootsrc;
+
 	ft_cpu_setup(blob, bd);
 
 #ifdef CONFIG_SYS_DPAA_FMAN
 	fdt_fixup_fman_ethernet(blob);
 #endif
+
+	/* get sdhc mux information from SysC */
+	oldbus = i2c_get_bus_num();
+	i2c_set_bus_num(TQMLS1046A_SYSC_BUS_NUM);
+	bootsrc = i2c_reg_read(TQMLS1046A_SYSC_ADDR, SYSC_REG_BOOT_SRC);
+	i2c_set_bus_num(oldbus);
+
+	/* get offset of sdhc node */
+	offset = fdt_path_offset(blob, "/soc/esdhc@1560000");
+	if (offset < 0)
+		return offset;
+
+	/* delete eMMC specific properties if sd-card selected */
+	if(bootsrc & SYSC_REG_BOOT_SRC_SDSEL_MSK) {
+		/* SDHC_EXT_SEL = 1 => sd-card */
+		fdt_delprop(blob, offset, "non-removable");
+		fdt_delprop(blob, offset, "disable-wp");
+		fdt_delprop(blob, offset, "mmc-hs200-1_8v");
+	}
 
 	return tqmls1046a_bb_ft_board_setup(blob, bd);
 }
