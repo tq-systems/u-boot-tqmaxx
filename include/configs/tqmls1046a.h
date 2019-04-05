@@ -57,13 +57,13 @@
 #endif
 
 #if defined(CONFIG_SD_BOOT)
-#define CONFIG_SYS_MMC_ENV_DEV		0
-#define CONFIG_ENV_OFFSET			(3 * 1024 * 1024)
-#define CONFIG_ENV_SIZE				0x2000
+#define CONFIG_SYS_MMC_ENV_DEV      0
+#define CONFIG_ENV_OFFSET           (3 * 1024 * 1024)
+#define CONFIG_ENV_SIZE             0x2000
 #else
-#define CONFIG_ENV_SIZE				0x2000		/* 8KB */
-#define CONFIG_ENV_OFFSET			0x300000	/* 3MB */
-#define CONFIG_ENV_SECT_SIZE		0x40000		/* 256KB */
+#define CONFIG_ENV_SIZE             0x2000  /* 8KB */
+#define CONFIG_ENV_OFFSET           0xd0000 /* 832KB */
+#define CONFIG_ENV_SECT_SIZE        0x10000 /* 64KB */
 #endif
 
 /* FMan */
@@ -71,6 +71,11 @@
 #ifdef CONFIG_SYS_DPAA_FMAN
 #define CONFIG_FMAN_ENET
 #define FDT_SEQ_MACADDR_FROM_ENV
+#endif
+
+#if defined(CONFIG_QSPI_BOOT)
+#undef CONFIG_SYS_FMAN_FW_ADDR
+#define CONFIG_SYS_FMAN_FW_ADDR     0x400e0000
 #endif
 #endif
 
@@ -195,7 +200,7 @@
 	"fmucode=fsl_fman_ucode_ls1046_r1.0_106_4_18.bin\0"	\
 	"fmucode_mmc_start="__stringify(TQMLS1046A_FMUCODE_MMC_SECT_START)"\0"	\
 	"fmucode_mmc_size="__stringify(TQMLS1046A_FMUCODE_MMC_SECT_SIZE)"\0"	\
-	"fmucode_qspi_start=0x900000\0"	\
+	"fmucode_qspi_start=0xe0000\0"	\
 	"update_fmucode_mmc=run set_getcmd; "	\
 		"if ${getcmd} ${fmucode}; then "	\
 			"if itest ${filesize} > 0; then "	\
