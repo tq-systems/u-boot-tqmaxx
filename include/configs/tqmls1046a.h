@@ -120,7 +120,8 @@
 #define CONFIG_EXTRA_ENV_SETTINGS		\
 	"hwconfig=fsl_ddr:bank_intlv=auto\0"	\
 	"addmisc=setenv bootargs ${bootargs}\0"	\
-	"addmtd=setenv bootargs ${bootargs} mtdparts=${mtdparts}\0"	\
+	"mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0"	\
+	"mtdids=" CONFIG_MTDIDS_DEFAULT "\0"	\
 	"consdev=ttyS1\0"	\
 	"addtty=setenv bootargs ${bootargs} earlycon=uart8250,mmio,0x21c0600 "	\
 		"console=${consdev},${baudrate}\0"	\
@@ -128,16 +129,15 @@
 	"mmcpart=2\0"	\
 	"addmmc=setenv bootargs ${bootargs} "	\
 		"root=/dev/mmcblk${mmcblkdev}p${mmcpart} rw rootwait\0"	\
-	"mmcargs=run addmmc addtty addmtd addmisc\0"	\
+	"mmcargs=run addmmc addtty addmisc\0"	\
 	"mmcdev=0\0"	\
 	"firmwarepart=1\0"	\
 	"loadaddr=0x81000000\0"	\
 	"kernel=linuximage\0"	\
 	"fdt_addr=0x90000000\0"	\
-	"fdt_file=fsl-tqmls1046a-mbls10xxa.dtb\0"	\
+	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"	\
 	"loadimage=load mmc ${mmcdev}:${firmwarepart} ${loadaddr} ${kernel} \0"	\
 	"loadfdt=load mmc ${mmcdev}:${firmwarepart} ${fdt_addr} ${fdt_file} \0" \
-	CONFIG_MTDPARTS_DEFAULT "\0"	\
 	BOOTENV	\
 	"mmcboot=echo Booting from mmc ...; "	\
 		"setenv bootargs; "	\
@@ -177,7 +177,6 @@
 	"uboot_mmc_start="__stringify(TQMLS1046A_UBOOT_MMC_SECT_START)"\0"	\
 	"uboot_mmc_size="__stringify(TQMLS1046A_UBOOT_MMC_SECT_SIZE)"\0"	\
 	"uboot_qspi=u-boot-pbl.bin.bswap\0"	\
-	"uboot_qspi_start=0x0\0"	\
 	"update_uboot_mmc=run set_getcmd; "	\
 		"if ${getcmd} ${uboot_mmc}; then "	\
 			"if itest ${filesize} > 0; then "	\
@@ -193,14 +192,13 @@
 		"if ${getcmd} ${uboot_qspi}; then "	\
 			"if itest ${filesize} > 0; then "	\
 				"sf probe 0; "	\
-				"sf update ${loadaddr} ${uboot_qspi_start} ${filesize}; "	\
+				"sf update ${loadaddr} rcw_uboot ${filesize}; "	\
 			"fi; "	\
 		"fi; "	\
 		"setenv filesize;\0"	\
 	"fmucode=fsl_fman_ucode_ls1046_r1.0_106_4_18.bin\0"	\
 	"fmucode_mmc_start="__stringify(TQMLS1046A_FMUCODE_MMC_SECT_START)"\0"	\
 	"fmucode_mmc_size="__stringify(TQMLS1046A_FMUCODE_MMC_SECT_SIZE)"\0"	\
-	"fmucode_qspi_start=0xe0000\0"	\
 	"update_fmucode_mmc=run set_getcmd; "	\
 		"if ${getcmd} ${fmucode}; then "	\
 			"if itest ${filesize} > 0; then "	\
@@ -216,7 +214,7 @@
 		"if ${getcmd} ${fmucode}; then "	\
 			"if itest ${filesize} > 0; then "	\
 				"sf probe 0; "	\
-				"sf update ${loadaddr} ${fmucode_qspi_start} ${filesize}; "	\
+				"sf update ${loadaddr} fmucode ${filesize}; "	\
 			"fi; "	\
 		"fi; "	\
 		"setenv filesize;\0"	\
