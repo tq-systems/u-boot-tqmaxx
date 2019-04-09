@@ -145,7 +145,17 @@
 		"run loadimage; "	\
 		"run loadfdt; "	\
 		"booti ${loadaddr} - ${fdt_addr};\0"	\
-	"spiboot=echo Booting from QSPI is currently unsupported!; \0"	\
+	"addspi=setenv bootargs ${bootargs} "   \
+		"root=ubi0:root rw rootfstype=ubifs ubi.mtd=5\0"	\
+	"spiargs=run addspi addtty addmisc\0"	\
+	"loadspiimage=sf probe 0; sf read ${loadaddr} kernel\0"	\
+	"loadspifdt=sf probe 0; sf read ${fdt_addr} dtb\0"	\
+	"spiboot=echo Booting from SPI NOR flash ...;"	\
+		"setenv bootargs; "	\
+		"run spiargs; "	\
+		"run loadspiimage; "	\
+		"run loadspifdt; "	\
+		"booti ${loadaddr} - ${fdt_addr};\0"	\
 	"rootpath=/srv/nfs/tqmls1046a\0"	\
 	"addnfs=setenv bootargs ${bootargs} "	\
 		"root=/dev/nfs rw "	\
@@ -215,6 +225,32 @@
 			"if itest ${filesize} > 0; then "	\
 				"sf probe 0; "	\
 				"sf update ${loadaddr} fmucode ${filesize}; "	\
+			"fi; "	\
+		"fi; "	\
+		"setenv filesize;\0"	\
+	"update_kernel_qspi=run set_getcmd; "	\
+		"if ${getcmd} ${kernel}; then "	\
+			"if itest ${filesize} > 0; then "	\
+				"sf probe 0; "	\
+				"sf update ${loadaddr} kernel ${filesize}; "	\
+			"fi; "	\
+		"fi; "	\
+		"setenv filesize;\0"	\
+	"update_fdt_qspi=run set_getcmd; "	\
+		"if ${getcmd} ${fdt_file}; then "	\
+			"if itest ${filesize} > 0; then "	\
+				"sf probe 0; "	\
+				"sf update ${loadaddr} dtb ${filesize}; "	\
+			"fi; "	\
+		"fi; "	\
+		"setenv filesize;\0"	\
+	"rootfs-qspi=root.ubi\0"	\
+	"init_rootfs_qspi=run set_getcmd; "	\
+		"if ${getcmd} ${rootfs-qspi}; then "	\
+			"if itest ${filesize} > 0; then "	\
+				"sf probe 0; "	\
+				"sf erase rootfs 2800000; "	\
+				"sf write ${loadaddr} rootfs ${filesize}; "	\
 			"fi; "	\
 		"fi; "	\
 		"setenv filesize;\0"	\
