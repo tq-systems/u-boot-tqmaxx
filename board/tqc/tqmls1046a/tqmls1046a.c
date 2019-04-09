@@ -247,6 +247,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 		fdt_delprop(blob, offset, "non-removable");
 		fdt_delprop(blob, offset, "disable-wp");
 		fdt_delprop(blob, offset, "mmc-hs200-1_8v");
+		fdt_setprop_empty(blob, offset, "no-1-8-v");
 	}
 
 	return tqmls1046a_bb_ft_board_setup(blob, bd);
