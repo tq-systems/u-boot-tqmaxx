@@ -228,6 +228,14 @@
 			"fi; "	\
 		"fi; "	\
 		"setenv filesize;\0"	\
+	"update_kernel_mmc=run set_getcmd; "   \
+		"if ${getcmd} ${kernel}; then " \
+			"if itest ${filesize} > 0; then "   \
+				"mmc dev ${mmcdev}; mmc rescan; "   \
+				"echo Write kernel image to mmc ${mmcdev}:${firmwarepart}...; "	\
+				"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} ${kernel} ${filesize}; "	\
+			"fi; "  \
+		"fi;\0" \
 	"update_kernel_qspi=run set_getcmd; "	\
 		"if ${getcmd} ${kernel}; then "	\
 			"if itest ${filesize} > 0; then "	\
@@ -236,6 +244,14 @@
 			"fi; "	\
 		"fi; "	\
 		"setenv filesize;\0"	\
+	"update_fdt_mmc=run set_getcmd; "	\
+		"if ${getcmd} ${fdt_file}; then " \
+			"if itest ${filesize} > 0; then "   \
+				"mmc dev ${mmcdev}; mmc rescan; "   \
+				"echo Write fdt image to mmc ${mmcdev}:${firmwarepart}...; "	\
+				"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} ${fdt_file} ${filesize}; "	\
+			"fi; "  \
+		"fi;\0" \
 	"update_fdt_qspi=run set_getcmd; "	\
 		"if ${getcmd} ${fdt_file}; then "	\
 			"if itest ${filesize} > 0; then "	\
