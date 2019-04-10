@@ -99,7 +99,7 @@ int tqc_bb_board_early_init_f(void)
 
 int tqc_bb_checkboard(void)
 {
-	puts("Board: TQMa8QX on MBa8QX (iMX8QXP)\n");
+	puts("Board: " TQMA8_BOARD_NAME " on MBa8Xx (" TQMA8_BOARD_REV ")\n");
 
 	return 0;
 }

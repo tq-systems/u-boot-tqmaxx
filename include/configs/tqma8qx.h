@@ -363,6 +363,16 @@
 #define CONFIG_SYS_MEMTEST_SCRATCH CONFIG_SYS_MEMTEST_END
 #endif
 
+#if defined(CONFIG_TQMA8QX_MX8QXP)
+#define TQMA8_BOARD_NAME	"TQMa8QXP"
+#define TQMA8_BOARD_REV		"iMX8QXP"
+#elif defined(CONFIG_TQMA8QX_MX8DX)
+#define TQMA8_BOARD_NAME	"TQMa8DX"
+#define TQMA8_BOARD_REV		"iMX8DX"
+#else
+#error
+#endif
+
 #if defined(CONFIG_TQMA8QX_MBA8XX)
 #include "tqma8qx-mba8xx.h"
 #else

@@ -42,8 +42,6 @@ static void board_gpio_init(void)
 
 int checkboard(void)
 {
-	puts("Board: TQMa8QX\n");
-
 	print_bootinfo();
 
 	/* Note:  After reloc, ipcHndl will no longer be valid.  If handle
@@ -105,8 +103,8 @@ int ft_board_setup(void *blob, bd_t *bd)
 int board_late_init(void)
 {
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
-	env_set("board_name", "TQMa8QX");
-	env_set("board_rev", "iMX8QXP");
+	env_set("board_name", TQMA8_BOARD_NAME);
+	env_set("board_rev", TQMA8_BOARD_REV);
 #endif
 
 	tqc_bb_board_late_init();
