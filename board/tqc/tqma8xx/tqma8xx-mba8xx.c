@@ -131,6 +131,8 @@ int tqc_bb_board_late_init(void)
 #ifdef CONFIG_ENV_IS_IN_MMC
 	board_late_mmc_env_init();
 #endif
+
+	return 0;
 }
 
 void board_quiesce_devices()
