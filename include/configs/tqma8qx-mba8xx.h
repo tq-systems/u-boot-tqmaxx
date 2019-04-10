@@ -24,6 +24,6 @@
 
 #define BB_ENV_SETTINGS \
 	"console=ttyLP1,115200 earlycon=lpuart32,5a070000,115200\0" \
-	"fdt_file=fsl-imx8qxp-tqma8qxp-mba8xx.dtb\0"
+	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"
 
 #endif /* __TQMA8QX_MBA8XX_H */
