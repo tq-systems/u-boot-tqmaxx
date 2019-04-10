@@ -43,6 +43,14 @@ config TQMA8QX_MBA8XX
 
 endchoice
 
+config DEFAULT_DEVICE_TREE
+	default "fsl-imx8dx-tqma8dx-mba8xx" if TQMA8QX_MX8DX && TQMA8QX_MBA8XX
+	default "fsl-imx8qxp-tqma8qxp-mba8xx" if TQMA8QX_MX8QXP && TQMA8QX_MBA8XX
+
+config DEFAULT_FDT_FILE
+	default "fsl-imx8dx-tqma8dx-mba8xx.dtb" if TQMA8QX_MX8DX && TQMA8QX_MBA8XX
+	default "fsl-imx8qxp-tqma8qxp-mba8xx.dtb" if TQMA8QX_MX8QXP && TQMA8QX_MBA8XX
+
 choice
 	prompt "TQMa8QX boot device"
 	default TQMBA8QX_SDCARD
