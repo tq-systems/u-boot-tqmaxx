@@ -107,7 +107,6 @@ int tqc_bb_board_late_init(void)
 	env_set("board_name", "MBa8QX");
 	env_set("board_rev", "iMX8QXP");
 #endif
-	return 0;
 
 #ifdef CONFIG_ENV_IS_IN_MMC
 	board_late_mmc_env_init();
