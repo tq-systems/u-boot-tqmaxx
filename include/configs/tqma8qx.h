@@ -363,8 +363,8 @@
 #define CONFIG_SYS_MEMTEST_SCRATCH CONFIG_SYS_MEMTEST_END
 #endif
 
-#if defined(CONFIG_MBA8QX)
-#include "tqma8qx-mba8qx.h"
+#if defined(CONFIG_TQMA8QX_MBA8XX)
+#include "tqma8qx-mba8xx.h"
 #else
 #error
 #endif

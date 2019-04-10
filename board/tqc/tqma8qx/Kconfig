@@ -29,12 +29,12 @@ endchoice
 
 choice
 	prompt "TQMa8QX base board variant"
-	default MBA8QX
+	default TQMA8QX_MBA8XX
 	help
 	  Select base board for TQMa8QX
 
-config MBA8QX
-	bool "TQMa8QX on MBa8QX Starterkit"
+config TQMA8QX_MBA8XX
+	bool "TQMa8QX on MBa8xX Starterkit"
 	select TQC_SDMMC
 	select DM_ETH
 	help
