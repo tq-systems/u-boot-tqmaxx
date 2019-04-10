@@ -5,5 +5,5 @@
 #
 
 obj-y += tqma8qx.o
-obj-$(CONFIG_MBA8QX) += tqma8qx-mba8qx.o
+obj-$(CONFIG_TQMA8QX_MBA8XX) += tqma8qx-mba8xx.o
 
