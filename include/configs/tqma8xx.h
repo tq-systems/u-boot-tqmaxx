@@ -4,8 +4,8 @@
  * SPDX-License-Identifier:	GPL-2.0+
  */
 
-#ifndef __TQMA8QX_H
-#define __TQMA8QX_H
+#ifndef __TQMA8XX_H
+#define __TQMA8XX_H
 
 #include <linux/sizes.h>
 #include <asm/arch/imx-regs.h>
@@ -114,7 +114,7 @@
             "\0" \
 
 /* Initial environment variables */
-#define TQMA8QX_MODULE_ENV_SETTINGS		\
+#define TQMA8XX_MODULE_ENV_SETTINGS		\
 	CONFIG_MFG_ENV_SETTINGS \
 	M4_BOOT_ENV \
 	XEN_BOOT_ENV \
@@ -308,11 +308,11 @@
 #define CONFIG_NR_DRAM_BANKS		1
 #define PHYS_SDRAM_1			0x80000000
 
-#if defined(CONFIG_TQMA8QX_RAM_512MB)
+#if defined(CONFIG_TQMA8XX_RAM_512MB)
 #define PHYS_SDRAM_1_SIZE		SZ_512M
-#elif defined(CONFIG_TQMA8QX_RAM_1014MB)
+#elif defined(CONFIG_TQMA8XX_RAM_1024MB)
 #define PHYS_SDRAM_1_SIZE		SZ_1G
-#elif defined(CONFIG_TQMA8QX_RAM_2048MB)
+#elif defined(CONFIG_TQMA8XX_RAM_2048MB)
 #define PHYS_SDRAM_1_SIZE		SZ_2G
 #else
 #error
@@ -373,24 +373,24 @@
 #define CONFIG_SYS_MEMTEST_SCRATCH CONFIG_SYS_MEMTEST_END
 #endif
 
-#if defined(CONFIG_TQMA8QX_MX8QXP)
-#define TQMA8_BOARD_NAME	"TQMa8QXP"
+#if defined(CONFIG_TQMA8XX_CPU_MX8QXP)
+#define TQMA8_BOARD_NAME	"TQMa8XQP"
 #define TQMA8_BOARD_REV		"iMX8QXP"
-#elif defined(CONFIG_TQMA8QX_MX8DX)
-#define TQMA8_BOARD_NAME	"TQMa8DX"
+#elif defined(CONFIG_TQMA8XX_CPU_MX8DX)
+#define TQMA8_BOARD_NAME	"TQMa8XD"
 #define TQMA8_BOARD_REV		"iMX8DX"
 #else
 #error
 #endif
 
-#if defined(CONFIG_TQMA8QX_MBA8XX)
-#include "tqma8qx-mba8xx.h"
+#if defined(CONFIG_TQMA8XX_BB_MBA8XX)
+#include "tqma8xx-mba8xx.h"
 #else
 #error
 #endif
 
 #define CONFIG_EXTRA_ENV_SETTINGS		\
-	TQMA8QX_MODULE_ENV_SETTINGS		\
+	TQMA8XX_MODULE_ENV_SETTINGS		\
 	BB_ENV_SETTINGS
 
 #ifndef CONFIG_SPL_BUILD
@@ -400,4 +400,4 @@
 #include <config_distro_bootcmd.h>
 #endif
 
-#endif /* __TQMA8QX_H */
+#endif /* __TQMA8X_H */
