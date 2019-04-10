@@ -6,15 +6,55 @@ choice
 	help
 	  Select the RCW configuration file to be used for TQMLS1046A
 
+config TQMLS1046A_RCW_1040_5506
+	bool "TQMLS1046A RCW configuration for SERDES mode 1040_5506"
+	help
+	  Select SERDES mode 1040_5506 in reset configuration word
+
+config TQMLS1046A_RCW_1040_5559
+	bool "TQMLS1046A RCW configuration for SERDES mode 1040_5559"
+	help
+	  Select SERDES mode 1040_5559 in reset configuration word
+
+config TQMLS1046A_RCW_1040_5577
+	bool "TQMLS1046A RCW configuration for SERDES mode 1040_5577"
+	help
+	  Select SERDES mode 1040_5577 in reset configuration word
+
 config TQMLS1046A_RCW_1040_5A06
 	bool "TQMLS1046A RCW configuration for SERDES mode 1040_5A06"
 	help
 	  Select SERDES mode 1040_5A06 in reset configuration word
 
+config TQMLS1046A_RCW_1040_5A59
+	bool "TQMLS1046A RCW configuration for SERDES mode 1040_5A59"
+	help
+	  Select SERDES mode 1040_5A59 in reset configuration word
+
+config TQMLS1046A_RCW_1133_5506
+	bool "TQMLS1046A RCW configuration for SERDES mode 1133_5506"
+	help
+	  Select SERDES mode 1133_5506 in reset configuration word
+
+config TQMLS1046A_RCW_1133_5559
+	bool "TQMLS1046A RCW configuration for SERDES mode 1133_5559"
+	help
+	  Select SERDES mode 1133_5559 in reset configuration word
+
+config TQMLS1046A_RCW_1133_5577
+	bool "TQMLS1046A RCW configuration for SERDES mode 1133_5577"
+	help
+	  Select SERDES mode 1133_5577 in reset configuration word
+
 config TQMLS1046A_RCW_1133_5A06
 	bool "TQMLS1046A RCW configuration for SERDES mode 1133_5A06"
 	help
 	  Select SERDES mode 1133_5A06 in reset configuration word
+
+config TQMLS1046A_RCW_1133_5A59
+	bool "TQMLS1046A RCW configuration for SERDES mode 1133_5A59"
+	help
+	  Select SERDES mode 1133_5A59 in reset configuration word
 
 config TQMLS1046A_RCW_3333_5506
 	bool "TQMLS1046A RCW configuration for SERDES mode 3333_5506"
@@ -45,14 +85,46 @@ endchoice
 
 config SYS_FSL_PBL_RCW
 	string
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_sd_1040_5506.cfg" \
+	  if TQMLS1046A_RCW_1040_5506 && SD_BOOT
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_qspi_1040_5506.cfg" \
+	  if TQMLS1046A_RCW_1040_5506 && QSPI_BOOT
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_sd_1040_5559.cfg" \
+	  if TQMLS1046A_RCW_1040_5559 && SD_BOOT
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_qspi_1040_5559.cfg" \
+	  if TQMLS1046A_RCW_1040_5559 && QSPI_BOOT
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_sd_1040_5577.cfg" \
+	  if TQMLS1046A_RCW_1040_5577 && SD_BOOT
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_qspi_1040_5577.cfg" \
+	  if TQMLS1046A_RCW_1040_5577 && QSPI_BOOT
 	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_sd_1040_5A06.cfg" \
 	  if TQMLS1046A_RCW_1040_5A06 && SD_BOOT
 	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_qspi_1040_5A06.cfg" \
 	  if TQMLS1046A_RCW_1040_5A06 && QSPI_BOOT
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_sd_1040_5A59.cfg" \
+	  if TQMLS1046A_RCW_1040_5A59 && SD_BOOT
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_qspi_1040_5A59.cfg" \
+	  if TQMLS1046A_RCW_1040_5A59 && QSPI_BOOT
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_sd_1133_5506.cfg" \
+	  if TQMLS1046A_RCW_1133_5506 && SD_BOOT
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_qspi_1133_5506.cfg" \
+	  if TQMLS1046A_RCW_1133_5506 && QSPI_BOOT
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_sd_1133_5559.cfg" \
+	  if TQMLS1046A_RCW_1133_5559 && SD_BOOT
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_qspi_1133_5559.cfg" \
+	  if TQMLS1046A_RCW_1133_5559 && QSPI_BOOT
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_sd_1133_5577.cfg" \
+	  if TQMLS1046A_RCW_1133_5577 && SD_BOOT
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_qspi_1133_5577.cfg" \
+	  if TQMLS1046A_RCW_1133_5577 && QSPI_BOOT
 	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_sd_1133_5A06.cfg" \
 	  if TQMLS1046A_RCW_1133_5A06 && SD_BOOT
 	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_qspi_1133_5A06.cfg" \
 	  if TQMLS1046A_RCW_1133_5A06 && QSPI_BOOT
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_sd_1133_5A59.cfg" \
+	  if TQMLS1046A_RCW_1133_5A59 && SD_BOOT
+	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_qspi_1133_5A59.cfg" \
+	  if TQMLS1046A_RCW_1133_5A59 && QSPI_BOOT
 	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_sd_3333_5506.cfg" \
 	  if TQMLS1046A_RCW_3333_5506 && SD_BOOT
 	default "board/tqc/tqmls1046a/pbi_rcw/tqmls1046a_rcw_qspi_3333_5506.cfg" \
