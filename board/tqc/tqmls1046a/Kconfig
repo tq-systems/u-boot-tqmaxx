@@ -12,9 +12,6 @@ config SYS_SOC
 config SYS_CONFIG_NAME
 	default "tqmls1046a"
 
-config SYS_TQMLS1046A_EMMC
-	bool "TQMLS1046A uses eMMC instead of SD"
-
 source "board/tqc/tqmls1046a/pbi_rcw/Kconfig"
 
 choice
