@@ -37,6 +37,24 @@ DECLARE_GLOBAL_DATA_PTR;
 #define UART_PAD_CTRL	((SC_PAD_CONFIG_OUT_IN << PADRING_CONFIG_SHIFT) | (SC_PAD_ISO_OFF << PADRING_LPCONFIG_SHIFT) \
 						| (SC_PAD_28FDSOI_DSE_DV_HIGH << PADRING_DSE_SHIFT) | (SC_PAD_28FDSOI_PS_PU << PADRING_PULL_SHIFT))
 
+#define PCIE_PAD_CTRL	((SC_PAD_CONFIG_OD_IN << PADRING_CONFIG_SHIFT))
+
+static const iomux_cfg_t board_pcie_pins[] = {
+/*
+	SC_P_PCIE_CTRL0_PERST_B | MUX_MODE_ALT(4) | MUX_PAD_CTRL(PCIE_PAD_CTRL),
+	SC_P_PCIE_CTRL0_CLKREQ_B | MUX_MODE_ALT(4) | MUX_PAD_CTRL(PCIE_PAD_CTRL),
+	SC_P_PCIE_CTRL0_WAKE_B  | MUX_MODE_ALT(4) | MUX_PAD_CTRL(PCIE_PAD_CTRL),
+*/
+	SC_P_PCIE_CTRL0_CLKREQ_B | MUX_MODE_ALT(0) | MUX_PAD_CTRL(PCIE_PAD_CTRL),
+	SC_P_PCIE_CTRL0_WAKE_B | MUX_MODE_ALT(0) | MUX_PAD_CTRL(PCIE_PAD_CTRL),
+	SC_P_PCIE_CTRL0_PERST_B | MUX_MODE_ALT(0) | MUX_PAD_CTRL(PCIE_PAD_CTRL),
+};
+
+static void setup_iomux_pcie(void)
+{
+	imx8_iomux_setup_multiple_pads(board_pcie_pins, ARRAY_SIZE(board_pcie_pins));
+}
+
 static iomux_cfg_t uart1_pads[] = {
 	SC_P_UART1_RX | MUX_MODE_ALT(0) | MUX_PAD_CTRL(UART_PAD_CTRL),
 	SC_P_UART1_TX | MUX_MODE_ALT(0) | MUX_PAD_CTRL(UART_PAD_CTRL),
@@ -73,6 +91,8 @@ int tqc_bb_board_early_init_f(void)
 	LPCG_AllClockOn(LPUART_1_LPCG);
 
 	setup_iomux_uart();
+
+	setup_iomux_pcie();
 
 	return 0;
 }
