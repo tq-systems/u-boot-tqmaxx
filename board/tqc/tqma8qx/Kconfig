@@ -18,7 +18,12 @@ choice
 config TQMA8QX_MX8QXP
 	bool "TQMa8QX with i.MX8QXP"
 	help
-	  Select the CPU variant
+	  Select the CPU i.MX8QXP / i.MX8DXP
+
+config TQMA8QX_MX8DX
+	bool "TQMa8QX with i.MX8QXP"
+	help
+	  Select the CPU i.MX8QXP / i.MX8DXP
 
 endchoice
 
