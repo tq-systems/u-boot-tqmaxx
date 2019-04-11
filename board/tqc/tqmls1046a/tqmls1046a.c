@@ -211,7 +211,7 @@ int board_mmc_getwp(struct mmc *mmc)
 			/* sd-card selected without hardware write protection pin,
 			 * check baseboard specific function
 			 */
-			ret = tqmls1046a_bb_board_mmc_getcd(mmc);
+			ret = tqmls1046a_bb_board_mmc_getwp(mmc);
 		}
 	}
 
