@@ -246,7 +246,15 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 
 int tqmls1046a_bb_board_early_init_f(void)
 {
+	struct ccsr_gpio *ccsr = (void *)(GPIO4_BASE_ADDR);
+	uint32_t reg;
 	int ret = 0;
+
+	/* configure sd card detect and write protect GPIOs as input */
+	/* CD = GPIO4_2, WP = GPIO4_3 */
+	reg = in_be32(&ccsr->gpdir);
+	reg &= ~(0x30000000);
+	out_be32(&ccsr->gpdir, reg);
 
 	/* nothing to do */
 	return ret;
@@ -429,12 +437,16 @@ int tqmls1046a_bb_board_eth_init(bd_t *bis)
 
 int tqmls1046a_bb_board_mmc_getcd(struct mmc *mmc)
 {
-	return 0;
+	struct ccsr_gpio *ccsr = (void *)(GPIO4_BASE_ADDR);
+
+	return !(in_be32(&ccsr->gpdat) & (1 << (31-2)));
 }
 
 int tqmls1046a_bb_board_mmc_getwp(struct mmc *mmc)
 {
-	return 1;
+	struct ccsr_gpio *ccsr = (void *)(GPIO4_BASE_ADDR);
+
+	return !!(in_be32(&ccsr->gpdat) & (1 << (31-3)));
 }
 
 static uint16_t _rgmii_phy_read_indirect(struct phy_device *phydev,
