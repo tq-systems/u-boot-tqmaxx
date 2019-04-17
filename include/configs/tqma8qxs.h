@@ -303,7 +303,17 @@
 #define CONFIG_SYS_SDRAM_BASE		0x80000000
 #define CONFIG_NR_DRAM_BANKS		1
 #define PHYS_SDRAM_1			0x80000000
-#define PHYS_SDRAM_1_SIZE		SZ_1G	/* 1 GB */
+
+#if defined(CONFIG_TQMA8QXS_RAM_512MB)
+#define PHYS_SDRAM_1_SIZE		SZ_512M
+#elif defined(CONFIG_TQMA8QXS_RAM_1014MB)
+#define PHYS_SDRAM_1_SIZE		SZ_1G
+#elif defined(CONFIG_TQMA8QXS_RAM_2048MB)
+#define PHYS_SDRAM_1_SIZE		SZ_2G
+#else
+#error
+#endif
+
 /* needed for loop in CPU code */
 #define PHYS_SDRAM_2			0x800000000
 #define PHYS_SDRAM_2_SIZE		0x0000000	/* not placed */

@@ -27,6 +27,29 @@ config TQMA8QXS_CPU_MX8DX
 
 endchoice
 
+choice
+	prompt "TQMa8XxS RAM size"
+	default TQMA8QXS_RAM_1014MB if TQMA8QX_CPU_MX8QXP
+	default TQMA8QXS_RAM_512MB if TQMA8QXS_CPU_MX8DX
+	help
+	  Select RAM size for TQMa8XxS
+
+config TQMA8QXS_RAM_512MB
+	bool "TQMa8XxS with 512 MiB RAM"
+	help
+	  Select variant with 512 MiB RAM
+
+config TQMA8QXS_RAM_1014MB
+	bool "TQMa8XxS with 1024 MiB RAM"
+	help
+	  Select variant with 1024 MiB RAM
+
+config TQMA8QXS_RAM_2048MB
+	bool "TQMa8XxS with 2048 MiB RAM"
+	help
+	  Select variant with 2048 MiB RAM
+
+endchoice
 
 choice
 	prompt "TQMa8QXS base board variant"
