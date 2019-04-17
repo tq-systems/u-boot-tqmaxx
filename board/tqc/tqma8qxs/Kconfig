@@ -11,12 +11,17 @@ config SYS_CONFIG_NAME
 
 choice
 	prompt "TQMa8QXS CPU variant"
-	default TQMA8QXS_MX8QXP
+	default TQMA8QXS_CPU_MX8QXP
 	help
 	  Select cpu variant for TQMa8QXS
 
-config TQMA8QXS_MX8QXP
-	bool "TQMa8QXS with i.MX8QXP"
+config TQMA8QXS_CPU_MX8QXP
+	bool "TQMa8XQPS with i.MX8QXP"
+	help
+	  Select the CPU variant
+
+config TQMA8QXS_CPU_MX8DX
+	bool "TQMa8XDS with i.MX8DX"
 	help
 	  Select the CPU variant
 
