@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
 
-#include "fsl-imx8qxp-tqma8qxps-mb-smarc-2.dts"
+#include "fsl-imx8qxp-tqma8xqps-mb-smarc-2.dts"
 
 / {
 	model = "TQ Systems i.MX8DX TQMa8XDS on MB-SMARC-2";

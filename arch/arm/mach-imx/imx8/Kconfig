@@ -115,8 +115,8 @@ config TARGET_TQMA8XX
 	select SPI_FLASH_SST
 	select SPI_FLASH_WINBOND
 
-config TARGET_TQMA8QXS
-	bool "Support TQMa8xXS board"
+config TARGET_TQMA8XXS
+	bool "Support TQMa8XxS board"
 	select BOARD_LATE_INIT
 	select IMX8QXP
 	select ARCH_MISC_INIT
@@ -151,6 +151,6 @@ source "board/freescale/imx8qm_mek/Kconfig"
 source "board/freescale/imx8qxp_arm2/Kconfig"
 source "board/freescale/imx8qxp_mek/Kconfig"
 source "board/tqc/tqma8xx/Kconfig"
-source "board/tqc/tqma8qxs/Kconfig"
+source "board/tqc/tqma8xxs/Kconfig"
 
 endif
