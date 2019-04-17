@@ -30,11 +30,11 @@ endchoice
 
 choice
 	prompt "TQMa8QXS base board variant"
-	default TQMa8QXS_MB_SMARC_2
+	default TQMA8QXS_MB_SMARC_2
 	help
 	  Select base board for TQMa8QXS
 
-config TQMa8QXS_MB_SMARC_2
+config TQMA8QXS_MB_SMARC_2
 	bool "TQMa8QXS on MB_SMARC_2 Board"
 	select TQC_SDMMC
 	help
@@ -42,6 +42,14 @@ config TQMa8QXS_MB_SMARC_2
 	  etc.
 
 endchoice
+
+config DEFAULT_DEVICE_TREE
+	default "fsl-imx8dx-tqma8dxs-mb-smarc-2" if TQMA8QXS_CPU_MX8DX && TQMA8QXS_MB_SMARC_2
+	default "fsl-imx8qxp-tqma8qxps-mb-smarc-2" if TQMA8QXS_CPU_MX8QXP && TQMA8QXS_MB_SMARC_2
+
+config DEFAULT_FDT_FILE
+	default "fsl-imx8dx-tqma8dxs-mb-smarc-2.dtb" if TQMA8QXS_CPU_MX8DX && TQMA8QXS_MB_SMARC_2
+	default "fsl-imx8qxp-tqma8qxps-mb-smarc-2.dtb" if TQMA8QXS_CPU_MX8QXP && TQMA8QXS_MB_SMARC_2
 
 choice
 	prompt "TQMa8QXS boot device"
