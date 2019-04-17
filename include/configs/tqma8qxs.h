@@ -355,7 +355,7 @@
 #define CONFIG_SYS_MEMTEST_SCRATCH CONFIG_SYS_MEMTEST_END
 #endif
 
-#if defined(CONFIG_TQMa8QXS_MB_SMARC_2)
+#if defined(CONFIG_TQMA8QXS_MB_SMARC_2)
 #include "tqma8qxs-mb-smarc-2.h"
 #else
 #error
