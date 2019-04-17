@@ -79,7 +79,7 @@ int tqc_bb_board_early_init_f(void)
 
 int tqc_bb_checkboard(void)
 {
-	puts("Board: TQMa8QXS on MB-SMARC-2 (iMX8QXP)\n");
+	puts("Board: " TQMA8_BOARD_NAME " on MB-SMARC-2 (" TQMA8_BOARD_REV ")\n");
 
 	return 0;
 }
