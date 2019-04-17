@@ -1,11 +1,11 @@
 /*
- * Copyright 2018 TQ Systems GmbH
+ * Copyright 2018 - 2019 TQ Systems GmbH
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
 
-#ifndef __TQMA8QXS_H
-#define __TQMA8QXS_H
+#ifndef __TQMA8XXS_H
+#define __TQMA8XXS_H
 
 #include <linux/sizes.h>
 #include <asm/arch/imx-regs.h>
@@ -304,11 +304,11 @@
 #define CONFIG_NR_DRAM_BANKS		1
 #define PHYS_SDRAM_1			0x80000000
 
-#if defined(CONFIG_TQMA8QXS_RAM_512MB)
+#if defined(CONFIG_TQMA8XXS_RAM_512MB)
 #define PHYS_SDRAM_1_SIZE		SZ_512M
-#elif defined(CONFIG_TQMA8QXS_RAM_1014MB)
+#elif defined(CONFIG_TQMA8XXS_RAM_1014MB)
 #define PHYS_SDRAM_1_SIZE		SZ_1G
-#elif defined(CONFIG_TQMA8QXS_RAM_2048MB)
+#elif defined(CONFIG_TQMA8XXS_RAM_2048MB)
 #define PHYS_SDRAM_1_SIZE		SZ_2G
 #else
 #error
@@ -365,18 +365,18 @@
 #define CONFIG_SYS_MEMTEST_SCRATCH CONFIG_SYS_MEMTEST_END
 #endif
 
-#if defined(CONFIG_TQMA8QXS_CPU_MX8QXP)
+#if defined(CONFIG_TQMA8XXS_CPU_MX8QXP)
 #define TQMA8_BOARD_NAME	"TQMa8XQPS"
 #define TQMA8_BOARD_REV		"iMX8XQPS"
-#elif defined(CONFIG_TQMA8QXS_CPU_MX8DX)
+#elif defined(CONFIG_TQMA8XXS_CPU_MX8DX)
 #define TQMA8_BOARD_NAME	"TQMa8XDS"
 #define TQMA8_BOARD_REV		"iMX8XDS"
 #else
 #error
 #endif
 
-#if defined(CONFIG_TQMA8QXS_MB_SMARC_2)
-#include "tqma8qxs-mb-smarc-2.h"
+#if defined(CONFIG_TQMA8XXS_BB_MB_SMARC_2)
+#include "tqma8xxs-mb-smarc-2.h"
 #else
 #error
 #endif
@@ -392,4 +392,4 @@
 #include <config_distro_bootcmd.h>
 #endif
 
-#endif /* __TQMA8QXS_H */
+#endif /* __TQMA8XXS_H */

@@ -1,0 +1,95 @@
+if TARGET_TQMA8XXS
+
+config SYS_BOARD
+	default "tqma8xxs"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_CONFIG_NAME
+	default "tqma8xxs"
+
+choice
+	prompt "TQMa8XxS CPU variant"
+	default TQMA8XXS_CPU_MX8QXP
+	help
+	  Select cpu variant for TQMa8QXS
+
+config TQMA8XXS_CPU_MX8QXP
+	bool "TQMa8XQPS with i.MX8QXP"
+	help
+	  Select the CPU variant
+
+config TQMA8XXS_CPU_MX8DX
+	bool "TQMa8XDS with i.MX8DX"
+	help
+	  Select the CPU variant
+
+endchoice
+
+choice
+	prompt "TQMa8XxS RAM size"
+	default TQMA8XXS_RAM_1014MB if TQMA8XXS_CPU_MX8QXP
+	default TQMA8XXS_RAM_512MB if TQMA8XXS_CPU_MX8DX
+	help
+	  Select RAM size for TQMa8XxS
+
+config TQMA8XXS_RAM_512MB
+	bool "TQMa8XxS with 512 MiB RAM"
+	help
+	  Select variant with 512 MiB RAM
+
+config TQMA8XXS_RAM_1014MB
+	bool "TQMa8XxS with 1024 MiB RAM"
+	help
+	  Select variant with 1024 MiB RAM
+
+config TQMA8XXS_RAM_2048MB
+	bool "TQMa8XxS with 2048 MiB RAM"
+	help
+	  Select variant with 2048 MiB RAM
+
+endchoice
+
+choice
+	prompt "TQMa8XxS base board variant"
+	default TQMA8XXS_BB_MB_SMARC_2
+	help
+	  Select base board for TQMa8XxS
+
+config TQMA8XXS_BB_MB_SMARC_2
+	bool "TQMa8XxS on MB_SMARC_2 Board"
+	select TQC_SDMMC
+	help
+	  Select the MB_SMARC_2 board. This is a SMARC2 mainboard
+	  etc.
+
+endchoice
+
+config DEFAULT_DEVICE_TREE
+	default "fsl-imx8dx-tqma8xds-mb-smarc-2" if TQMA8XXS_CPU_MX8DX && TQMA8XXS_BB_MB_SMARC_2
+	default "fsl-imx8qxp-tqma8xqps-mb-smarc-2" if TQMA8XXS_CPU_MX8QXP && TQMA8XXS_BB_MB_SMARC_2
+
+config DEFAULT_FDT_FILE
+	default "fsl-imx8dx-tqma8xds-mb-smarc-2.dtb" if TQMA8XXS_CPU_MX8DX && TQMA8XXS_BB_MB_SMARC_2
+	default "fsl-imx8qxp-tqma8xqps-mb-smarc-2.dtb" if TQMA8XXS_CPU_MX8QXP && TQMA8XXS_BB_MB_SMARC_2
+
+choice
+	prompt "TQMa8XxS boot device"
+	default TQMA8XXS_BOOT_SDCARD
+	help
+	  Select boot device for TQMa8QXS
+
+config TQMA8XXS_BOOT_SDCARD
+	bool "TQMa8XxS from SD / e-MMC"
+	select SD_BOOT
+	select ENV_IS_IN_MMC
+	help
+	  Select booting from SD / e-MMC
+
+endchoice
+
+
+source "board/tqc/common/Kconfig"
+
+endif

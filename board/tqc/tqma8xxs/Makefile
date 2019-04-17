@@ -1,0 +1,9 @@
+#
+# Copyright 2018 - 2019 TQ Systems GmbH
+#
+# SPDX-License-Identifier:	GPL-2.0+
+#
+
+obj-y += tqma8xxs.o
+obj-$(CONFIG_TQMA8XXS_BB_MB_SMARC_2) += tqma8xxs-mb-smarc-2.o
+

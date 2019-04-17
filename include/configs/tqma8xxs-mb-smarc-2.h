@@ -1,11 +1,11 @@
 /*
- * Copyright 2018 TQ Systems GmbH
+ * Copyright 2018 - 2019 TQ Systems GmbH
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
 
-#if !defined(__TQMA8QXS_MB_SMARC_2_H)
-#define __TQMA8QXS_MB_SMARC_2_H
+#if !defined(__TQMA8XXS_MB_SMARC_2_H)
+#define __TQMA8XXS_MB_SMARC_2_H
 
 /* TODO: move to module ... */
 
@@ -30,4 +30,4 @@
 #define BB_ENV_SETTINGS \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"
 
-#endif /* __TQMA8QXS_MB_SMARC_2_H */
+#endif /* __TQMA8XXS_MB_SMARC_2_H */
