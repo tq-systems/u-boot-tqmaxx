@@ -355,6 +355,16 @@
 #define CONFIG_SYS_MEMTEST_SCRATCH CONFIG_SYS_MEMTEST_END
 #endif
 
+#if defined(CONFIG_TQMA8QXS_CPU_MX8QXP)
+#define TQMA8_BOARD_NAME	"TQMa8XQPS"
+#define TQMA8_BOARD_REV		"iMX8XQPS"
+#elif defined(CONFIG_TQMA8QXS_CPU_MX8DX)
+#define TQMA8_BOARD_NAME	"TQMa8XDS"
+#define TQMA8_BOARD_REV		"iMX8XDS"
+#else
+#error
+#endif
+
 #if defined(CONFIG_TQMA8QXS_MB_SMARC_2)
 #include "tqma8qxs-mb-smarc-2.h"
 #else
