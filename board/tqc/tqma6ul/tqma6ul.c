@@ -436,7 +436,7 @@ int board_get_rtc_bus(void)
  */
 #if defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT)
 
-#define MODELSTRLEN 32u
+#define MODELSTRLEN 48u
 
 static void tqma6ul_ft_qspi_setup(void *blob, bd_t *bd)
 {
