@@ -25,6 +25,18 @@
 #include <linux/sizes.h>
 #include "mx6_common.h"
 
+/*
+ * include the baseboard specific configuration
+ * since we require it below (DEFAULT_FDT_FILE)
+ */
+#if defined(CONFIG_MBA6UL)
+#include "tqma6ul_mba6ul.h"
+#elif defined(CONFIG_MBA6ULXL)
+#include "tqma6ul_mba6ulxl.h"
+#else
+#error "No baseboard for the TQMa6UL SOM defined!"
+#endif
+
 #define CONFIG_DISPLAY_CPUINFO
 #define CONFIG_DISPLAY_BOARDINFO
 
@@ -456,19 +468,6 @@ unsigned imx_ddr_size(void);
 
 #ifndef CONFIG_SYS_DCACHE_OFF
 #define CONFIG_CMD_CACHE
-#endif
-
-/*
- * All the defines above are for the TQMa6UL SoM
- *
- * Now include the baseboard specific configuration
- */
-#if defined(CONFIG_MBA6UL)
-#include "tqma6ul_mba6ul.h"
-#elif defined(CONFIG_MBA6ULXL)
-#include "tqma6ul_mba6ulxl.h"
-#else
-#error "No baseboard for the TQMa6UL SOM defined!"
 #endif
 
 #endif /* __TQMA6UL_CONFIG_H */
