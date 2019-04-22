@@ -78,7 +78,6 @@ config PINCTRL_IMX8ULP
 config PINCTRL_IMX8
 	bool "IMX8 pinctrl driver"
 	depends on ARCH_IMX8 && PINCTRL_FULL
-	select DEVRES
 	select PINCTRL_IMX
 	help
 	  Say Y here to enable the imx8 pinctrl driver
