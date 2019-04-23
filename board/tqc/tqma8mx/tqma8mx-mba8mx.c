@@ -194,6 +194,20 @@ int tqc_bb_board_init(void)
 	return 0;
 }
 
+/*
+ * SD1 -> mmc0 / mmcblk0
+ * SD2 -> mmc1 / mmcblk1
+ */
+int board_mmc_get_env_dev(int devno)
+{
+	return devno;
+}
+
+int mmc_map_to_kernel_blk(int dev_no)
+{
+	return dev_no;
+}
+
 int tqc_bb_board_late_init(void)
 {
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
