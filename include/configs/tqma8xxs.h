@@ -294,7 +294,7 @@
 
 /* On LPDDR4 board, USDHC1 is for eMMC, USDHC2 is for SD on CPU board
   */
-#define CONFIG_SYS_MMC_ENV_DEV		1   /* USDHC2 */
+#define CONFIG_SYS_MMC_ENV_DEV		-1   /* invalid */
 #define CONFIG_SYS_FSL_USDHC_NUM	2
 
 /* Size of malloc() pool */

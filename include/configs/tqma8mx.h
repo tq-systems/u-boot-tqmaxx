@@ -264,7 +264,7 @@
 #if defined(CONFIG_SD_BOOT)
 #define CONFIG_ENV_OFFSET		(64 * SZ_64K)
 #define CONFIG_ENV_SIZE			0x1000
-#define CONFIG_SYS_MMC_ENV_DEV		1   /* USDHC2 */
+#define CONFIG_SYS_MMC_ENV_DEV		-1   /* invalid */
 #elif defined(CONFIG_QSPI_BOOT)
 #error
 #else
