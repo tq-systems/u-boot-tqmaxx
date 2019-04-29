@@ -5,6 +5,6 @@ F:	board/tqc/tqmls1046a/
 F:	include/configs/tqmls1046a.h
 F:	include/configs/tqmls1046a_baseboard.h
 F:	include/configs/tqmls1046a_bb_mbls10xxa.h
-F:	configs/tqmls1046a_sdcard_defconfig
+F:	configs/tqmls1046a_esdhc_defconfig
 F:	configs/tqmls1046a_qspi_defconfig
 
