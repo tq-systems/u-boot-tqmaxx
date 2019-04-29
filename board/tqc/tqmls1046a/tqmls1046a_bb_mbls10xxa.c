@@ -328,16 +328,6 @@ const char *tqmls1046a_bb_get_boardname(void)
 }
 
 #ifdef CONFIG_NET
-/* 
- * both MDIO busses on MBLS10xxA are used for gigabit PHYs (clause 22),
- * normally MDIO2 is used to access ten-gig PHYs (clause 45),
- * rename MDIO2 to address this issue.
- */
-#define FM_MDIO1_NAME			"FSL_MDIO0" /* = DEFAULT_FM_MDIO_NAME */
-#define FM_MDIO1_ADDR           CONFIG_SYS_FM1_DTSEC_MDIO_ADDR
-#define FM_MDIO2_NAME           "FSL_MDIO1"
-#define FM_MDIO2_ADDR           CONFIG_SYS_FM1_TGEC_MDIO_ADDR
-
 int tqmls1046a_bb_board_eth_init(bd_t *bis)
 {
 #ifdef CONFIG_FMAN_ENET
@@ -399,7 +389,7 @@ int tqmls1046a_bb_board_eth_init(bd_t *bis)
 		fm_info_set_mdio(FM1_DTSEC10, dev_mdio1);
 	}
 	if(TQMLS1046A_SRDS1_PROTO(srds_s1, 1) == 0x1) {
-		/* SD1 - LANE C in XFI mode.10 */
+		/* SD1 - LANE C in XFI.10 mode */
 		/* enable XFI transmitter when XFI selected and SFP is available
 		 * (MOD-DEF[0] (SFP pin 6) is grounded)
 		 */
@@ -410,11 +400,11 @@ int tqmls1046a_bb_board_eth_init(bd_t *bis)
 			tqc_mbls10xxa_i2c_gpio_set("xfi1_tx_dis", 1);
 	}
 	if(TQMLS1046A_SRDS1_PROTO(srds_s1, 0) == 0x3) {
-		/* SD1 - LANE D in SGMII mode.9 */
+		/* SD1 - LANE D in SGMII.9 mode */
 		fm_info_set_phy_address(FM1_DTSEC9, QSGMII_PHY2_ADDR_BASE+1);
 		fm_info_set_mdio(FM1_DTSEC9, dev_mdio1);
 	} else if(TQMLS1046A_SRDS1_PROTO(srds_s1, 0) == 0x1) {
-		/* SD1 - LANE D in XFI mode.9 */
+		/* SD1 - LANE D in XFI.9 mode */
 		/* enable XFI transmitter when XFI selected and SFP is available
 		 * (MOD-DEF[0] (SFP pin 6) is grounded)
 		 */
@@ -425,7 +415,7 @@ int tqmls1046a_bb_board_eth_init(bd_t *bis)
 			tqc_mbls10xxa_i2c_gpio_set("xfi2_tx_dis", 1);
 	}
 	if(TQMLS1046A_SRDS2_PROTO(srds_s2, 1) == 0xA) {
-		/* SD2 - LANE B in SGMII mode.2 */
+		/* SD2 - LANE B in SGMII.2 mode */
 		fm_info_set_phy_address(FM1_DTSEC2, QSGMII_PHY1_ADDR_BASE+1);
 		fm_info_set_mdio(FM1_DTSEC2, dev_mdio1);
 	}
