@@ -231,8 +231,8 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 	/* check serdes clock muxing */
 	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd1_ref_clk2_sel");
 	if(mux_val1 >= 0) {
-		if(((TQMLS1046A_SRDS2_PROTO(srds_s1, 1) == 0x1) ||
-		    (TQMLS1046A_SRDS2_PROTO(srds_s1, 0) == 0x1)) &&
+		if(((TQMLS1046A_SRDS1_PROTO(srds_s1, 1) == 0x1) ||
+		    (TQMLS1046A_SRDS1_PROTO(srds_s1, 0) == 0x1)) &&
 		   (mux_val1)) {
 		   printf("!!! ATTENTON: SerDes1 RefClk2 is not 156.25MHz,\n");
 		   printf("!!!  but this is needed for XFI operation!\n");
