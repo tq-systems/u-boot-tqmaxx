@@ -1,0 +1,65 @@
+if TARGET_TQMLS1043A
+
+choice
+	prompt "TQMLS1043A RCW configuration file"
+	default TQMLS1043A_RCW_3358
+	help
+	  Select the RCW configuration file to be used for TQMLS1043A
+
+config TQMLS1043A_RCW_1355
+	bool "TQMLS1043A RCW configuration for SERDES mode 1355"
+	help
+	  Select SERDES mode 1355 in reset configuration word
+
+config TQMLS1043A_RCW_3335
+	bool "TQMLS1043A RCW configuration for SERDES mode 3335"
+	help
+	  Select SERDES mode 3335 in reset configuration word
+
+config TQMLS1043A_RCW_3355
+	bool "TQMLS1043A RCW configuration for SERDES mode 3355"
+	help
+	  Select SERDES mode 3355 in reset configuration word
+
+config TQMLS1043A_RCW_3358
+	bool "TQMLS1043A RCW configuration for SERDES mode 3358 (default)"
+	help
+	  Select SERDES mode 3358 in reset configuration word
+
+config TQMLS1043A_RCW_1455
+	bool "TQMLS1043A RCW configuration for SERDES mode 1455"
+	help
+	  Select SERDES mode 1455 in reset configuration word
+
+endchoice
+
+config SYS_FSL_PBL_RCW
+	string
+	default "board/tqc/tqmls1043a/pbi_rcw/tqmls1043a_rcw_sd_1355.cfg" \
+	  if TQMLS1043A_RCW_1355 && SD_BOOT
+	default "board/tqc/tqmls1043a/pbi_rcw/tqmls1043a_rcw_qspi_1355.cfg" \
+	  if TQMLS1043A_RCW_1355 && QSPI_BOOT
+	default "board/tqc/tqmls1043a/pbi_rcw/tqmls1043a_rcw_sd_3335.cfg" \
+	  if TQMLS1043A_RCW_3335 && SD_BOOT
+	default "board/tqc/tqmls1043a/pbi_rcw/tqmls1043a_rcw_qspi_3335.cfg" \
+	  if TQMLS1043A_RCW_3335 && QSPI_BOOT
+	default "board/tqc/tqmls1043a/pbi_rcw/tqmls1043a_rcw_sd_3355.cfg" \
+	  if TQMLS1043A_RCW_3355 && SD_BOOT
+	default "board/tqc/tqmls1043a/pbi_rcw/tqmls1043a_rcw_qspi_3355.cfg" \
+	  if TQMLS1043A_RCW_3355 && QSPI_BOOT
+	default "board/tqc/tqmls1043a/pbi_rcw/tqmls1043a_rcw_sd_3358.cfg" \
+	  if TQMLS1043A_RCW_3358 && SD_BOOT
+	default "board/tqc/tqmls1043a/pbi_rcw/tqmls1043a_rcw_qspi_3358.cfg" \
+	  if TQMLS1043A_RCW_3358 && QSPI_BOOT
+	default "board/tqc/tqmls1043a/pbi_rcw/tqmls1043a_rcw_sd_1455.cfg" \
+	  if TQMLS1043A_RCW_1455 && SD_BOOT
+	default "board/tqc/tqmls1043a/pbi_rcw/tqmls1043a_rcw_qspi_1455.cfg" \
+	  if TQMLS1043A_RCW_1455 && QSPI_BOOT
+
+config SYS_FSL_PBL_PBI
+	string
+	default "board/tqc/tqmls1043a/pbi_rcw/tqmls1043a_pbi_sd.cfg" \
+	  if SD_BOOT
+	default "board/tqc/tqmls1043a/pbi_rcw/tqmls1043a_pbi_qspi.cfg" \
+	  if QSPI_BOOT
+endif

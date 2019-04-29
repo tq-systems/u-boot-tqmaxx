@@ -1,0 +1,47 @@
+if TARGET_TQMLS1043A
+
+config SYS_BOARD
+	default "tqmls1043a"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_SOC
+	default "fsl-layerscape"
+
+config SYS_CONFIG_NAME
+	default "tqmls1043a"
+
+source "board/tqc/tqmls1043a/pbi_rcw/Kconfig"
+
+choice
+	prompt "TQMLS1043A base board variant"
+	default TQMLS1043A_BB_MBLS10XXA
+	help
+	  Select base board for TQMLS1043A
+
+config TQMLS1043A_BB_MBLS10XXA
+	bool "TQMLS1043A on MBLS10xxA Starterkit"
+	select TQC_MBLS10XXA
+	help
+	  Select the MBLS10XXA starterkit.
+
+endchoice
+
+if FSL_LS_PPA
+config SYS_LS_PPA_FW_ADDR
+	hex "PPA Firmware Addr"
+	default 0x40400000 if SYS_LS_PPA_FW_IN_XIP && QSPI_BOOT
+	default 0x400000 if SYS_LS_PPA_FW_IN_MMC
+
+if CHAIN_OF_TRUST
+config SYS_LS_PPA_ESBC_ADDR
+	hex "PPA Firmware HDR Addr"
+	default 0x40680000 if SYS_LS_PPA_FW_IN_XIP && QSPI_BOOT
+	default 0x680000 if SYS_LS_PPA_FW_IN_MMC
+endif
+endif
+
+source "board/tqc/common/Kconfig"
+
+endif

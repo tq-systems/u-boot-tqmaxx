@@ -1147,6 +1147,20 @@ config TARGET_LS1043ARDB
 	help
 	  Support for Freescale LS1043ARDB platform.
 
+config TARGET_TQMLS1043A
+	bool "Support tqmls1043a"
+	select ARCH_LS1043A
+	select ARM64
+	select ARMV8_MULTIENTRY
+	select BOARD_LATE_INIT
+	select SUPPORT_SPL
+	select BOARD_EARLY_INIT_F
+	select TQC_EEPROM
+	imply SCSI
+	help
+	  Support for TQ-Systems GmbH TQMLS1043A SOM based on the
+	  QorIQ LS1043A Layerscape Architecture processor.
+
 config TARGET_LS1046AQDS
 	bool "Support ls1046aqds"
 	select ARCH_LS1046A
@@ -1459,6 +1473,7 @@ source "board/spear/spear600/Kconfig"
 source "board/spear/x600/Kconfig"
 source "board/st/stv0991/Kconfig"
 source "board/tcl/sl50/Kconfig"
+source "board/tqc/tqmls1043a/Kconfig"
 source "board/tqc/tqmls1046a/Kconfig"
 source "board/birdland/bav335x/Kconfig"
 source "board/timll/devkit3250/Kconfig"

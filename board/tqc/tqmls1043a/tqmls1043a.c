@@ -1,0 +1,261 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Copyright 2019 TQ-Systems GmbH
+ */
+
+#include <common.h>
+#include <i2c.h>
+#include <fdt_support.h>
+#include <asm/io.h>
+#include <asm/arch/clock.h>
+#include <asm/arch/fsl_serdes.h>
+#include <asm/arch/ppa.h>
+#include <asm/arch/soc.h>
+#include <hwconfig.h>
+#include <ahci.h>
+#include <mmc.h>
+#include <scsi.h>
+#include <fm_eth.h>
+#include <fsl_csu.h>
+#include <fsl_esdhc.h>
+#include <fsl_sec.h>
+#include <fsl_ifc.h>
+#include <fsl_qe.h>
+#include "tqmls1043a_bb.h"
+#include "../common/tqc_eeprom.h"
+
+#define SCFG_QSPI_CLKSEL_DIV_24	    0x30100000
+
+#define TQMLS1043A_SYSC_BUS_NUM     0
+#define TQMLS1043A_SYSC_ADDR        0x11
+
+#define SYSC_REG_SYSC_FW_VERS       0x02
+#define SYSC_REG_BOOT_SRC           0x03
+#define SYSC_REG_BOOT_SRC_SDSEL_MSK 0x80
+#define SYSC_REG_CPLD_FW_VERS       0xE1
+
+DECLARE_GLOBAL_DATA_PTR;
+
+int board_early_init_f(void)
+{
+	struct ccsr_scfg *scfg = (struct ccsr_scfg *)CONFIG_SYS_FSL_SCFG_ADDR;
+
+	fsl_lsch2_early_init_f();
+#ifdef CONFIG_FSL_QSPI
+	/* divide CGA1/CGA2 PLL by 24 to get QSPI interface clock */
+	out_be32(&scfg->qspi_cfg, SCFG_QSPI_CLKSEL_DIV_24);
+#endif
+
+	return tqmls1043a_bb_board_early_init_f();
+}
+
+#ifndef CONFIG_SPL_BUILD
+int checkboard(void)
+{
+	unsigned int oldbus;
+	uint8_t bootsrc, syscrev, cpldrev;
+
+	/* get further information from SysC */
+	oldbus = i2c_get_bus_num();
+	i2c_set_bus_num(TQMLS1043A_SYSC_BUS_NUM);
+	bootsrc = i2c_reg_read(TQMLS1043A_SYSC_ADDR, SYSC_REG_BOOT_SRC);
+	syscrev = i2c_reg_read(TQMLS1043A_SYSC_ADDR, SYSC_REG_SYSC_FW_VERS);
+	cpldrev = i2c_reg_read(TQMLS1043A_SYSC_ADDR, SYSC_REG_CPLD_FW_VERS);
+	i2c_set_bus_num(oldbus);
+
+	/* print SoM and baseboard name */
+	printf("Board: TQMLS1043A on a %s ", tqmls1043a_bb_get_boardname());
+	switch(bootsrc & 0x0F) {
+		case 0x0:
+			printf("(Boot from QSPI)\n");
+			break;
+		case 0x2:
+			printf("(Boot from SD)\n");
+			break;
+		case 0x3:
+			printf("(Boot from eMMC)\n");
+			break;
+		case 0xe:
+			printf("(Boot from Hard Coded RCW)\n");
+			break;
+		default:
+			printf("(Bootsource unknown)\n");
+			break;
+	}
+	printf("         SysC FW Rev: %2d.%02d\n",
+		(syscrev >> 4) & 0xF, syscrev & 0xF);
+	printf("         CPLD FW Rev: %2d.%02d\n", 
+		(cpldrev >> 4) & 0xF, cpldrev & 0xF);
+ 
+	return tqmls1043a_bb_checkboard();
+}
+
+int board_init(void)
+{
+#ifdef CONFIG_SYS_FSL_ERRATUM_A010315
+    erratum_a010315();
+#endif
+
+#ifdef CONFIG_SECURE_BOOT
+	/*
+	 * In case of Secure Boot, the IBR configures the SMMU
+	 * to allow only Secure transactions.
+	 * SMMU must be reset in bypass mode.
+	 * Set the ClientPD bit and Clear the USFCFG Bit
+	 */
+	u32 val;
+	val = (in_le32(SMMU_SCR0) | SCR0_CLIENTPD_MASK) & ~(SCR0_USFCFG_MASK);
+	out_le32(SMMU_SCR0, val);
+	val = (in_le32(SMMU_NSCR0) | SCR0_CLIENTPD_MASK) & ~(SCR0_USFCFG_MASK);
+	out_le32(SMMU_NSCR0, val);
+#endif
+
+#ifdef CONFIG_FSL_CAAM
+	sec_init();
+#endif
+
+#ifdef CONFIG_FSL_LS_PPA
+	ppa_init();
+#endif
+
+	return tqmls1043a_bb_board_init();
+}
+
+#ifdef CONFIG_MISC_INIT_R
+int misc_init_r(void)
+{
+	struct tqc_eeprom_data eedat;
+	char safe_string[0x41]; /* must hold largest field of eeprom data */
+	int ret;
+
+	ret = tqc_read_eeprom(CONFIG_SYS_EEPROM_BUS_NUM,
+			CONFIG_SYS_I2C_EEPROM_ADDR, &eedat);
+
+	if(!ret) {
+		/* ID */
+		tqc_parse_eeprom_id(&eedat, safe_string, ARRAY_SIZE(safe_string));
+		if (0 == strncmp(safe_string, "TQMLS1043A", strlen("TQMLS1043A")))
+			env_set("boardtype", safe_string);
+		if (0 == tqc_parse_eeprom_serial(&eedat, safe_string,
+					ARRAY_SIZE(safe_string)))
+			env_set("serial#", safe_string);
+		else
+			env_set("serial#", "???");
+		tqc_show_eeprom(&eedat, "TQMLS1043A");
+	} else {
+		printf("EEPROM: err %d\n", ret);
+	}
+
+	return tqmls1043a_bb_misc_init_r();
+}
+#endif
+
+int board_mmc_getcd(struct mmc *mmc)
+{
+	struct ccsr_gur *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
+	u32 rcw_iic2_ext;
+	unsigned int oldbus;
+	uint8_t bootsrc;
+	int ret;
+
+	/* get sdhc mux information from SysC */
+	oldbus = i2c_get_bus_num();
+	i2c_set_bus_num(TQMLS1043A_SYSC_BUS_NUM);
+	bootsrc = i2c_reg_read(TQMLS1043A_SYSC_ADDR, SYSC_REG_BOOT_SRC);
+	i2c_set_bus_num(oldbus);
+
+	/* check if eMMC or sd-card selected */
+	if(!(bootsrc & SYSC_REG_BOOT_SRC_SDSEL_MSK)) {
+		/* card alway present when eMMC selected */
+		ret = 1;
+	} else {
+		/* read IIC2_EXT configuration from RCW */
+		rcw_iic2_ext = in_be32(&gur->rcwsr[13]) & 0x00000007;
+
+		/* check if hardware card detection should be used (RCW) */
+		if(rcw_iic2_ext == 0x1) {
+			/* CD mapped to hardware function */
+			ret = -1;
+		} else {
+			/* sd-card selected without hardware card detection pin,
+			 * check baseboard specific function
+			 */
+			ret = tqmls1043a_bb_board_mmc_getcd(mmc);
+		}
+	}
+
+	return ret;
+}
+
+int board_mmc_getwp(struct mmc *mmc)
+{
+	struct ccsr_gur *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
+	u32 rcw_iic2_ext;
+	unsigned int oldbus;
+	uint8_t bootsrc;
+	int ret;
+
+	/* get sdhc mux information from SysC */
+	oldbus = i2c_get_bus_num();
+	i2c_set_bus_num(TQMLS1043A_SYSC_BUS_NUM);
+	bootsrc = i2c_reg_read(TQMLS1043A_SYSC_ADDR, SYSC_REG_BOOT_SRC);
+	i2c_set_bus_num(oldbus);
+
+	/* check if eMMC or sd-card selected */
+	if(!(bootsrc & SYSC_REG_BOOT_SRC_SDSEL_MSK)) {
+		/* card always writeable when eMMC selected */
+		ret = 0;
+	} else {
+		/* read IIC2_EXT configuration from RCW */
+		rcw_iic2_ext = in_be32(&gur->rcwsr[13]) & 0x00000007;
+
+		/* check if hardware write protection should be used (RCW) */
+		if(rcw_iic2_ext == 0x1) {
+			/* CD mapped to hardware function */
+			ret = -1;
+		} else {
+			/* sd-card selected without hardware write protection pin,
+			 * check baseboard specific function
+			 */
+			ret = tqmls1043a_bb_board_mmc_getwp(mmc);
+		}
+	}
+
+	return ret;
+}
+
+int ft_board_setup(void *blob, bd_t *bd)
+{
+	int offset;
+	unsigned int oldbus;
+	uint8_t bootsrc;
+
+	ft_cpu_setup(blob, bd);
+
+#ifdef CONFIG_SYS_DPAA_FMAN
+	fdt_fixup_fman_ethernet(blob);
+#endif
+
+	/* get sdhc mux information from SysC */
+	oldbus = i2c_get_bus_num();
+	i2c_set_bus_num(TQMLS1043A_SYSC_BUS_NUM);
+	bootsrc = i2c_reg_read(TQMLS1043A_SYSC_ADDR, SYSC_REG_BOOT_SRC);
+	i2c_set_bus_num(oldbus);
+
+	/* get offset of sdhc node */
+	offset = fdt_path_offset(blob, "/soc/esdhc@1560000");
+	if (offset < 0)
+		return offset;
+
+	/* delete eMMC specific properties if sd-card selected */
+	if(bootsrc & SYSC_REG_BOOT_SRC_SDSEL_MSK) {
+		/* SDHC_EXT_SEL = 1 => sd-card */
+		fdt_delprop(blob, offset, "non-removable");
+		fdt_delprop(blob, offset, "disable-wp");
+		fdt_delprop(blob, offset, "mmc-hs200-1_8v");
+		fdt_setprop_empty(blob, offset, "no-1-8-v");
+	}
+
+	return tqmls1043a_bb_ft_board_setup(blob, bd);
+}
+#endif

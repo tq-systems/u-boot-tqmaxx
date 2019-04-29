@@ -1,0 +1,10 @@
+TQMLS1043A BOARD
+M:	Timo Herbrecher <t.herbrecher@gateware.de>
+S:	Maintained
+F:	board/tqc/tqmls1043a/
+F:	include/configs/tqmls1043a.h
+F:	include/configs/tqmls1043a_baseboard.h
+F:	include/configs/tqmls1043a_bb_mbls10xxa.h
+F:	configs/tqmls1043a_esdhc_defconfig
+F:	configs/tqmls1043a_qspi_defconfig
+
