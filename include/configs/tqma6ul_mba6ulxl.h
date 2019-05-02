@@ -10,6 +10,7 @@
 #define __CONFIG_TQMA6UL_MBA6ULXL_H
 
 #define CONFIG_DEFAULT_FDT_FILE		"imx6ul-mba6ulxl.dtb"
+#define CONFIG_MISC_INIT_R
 
 #define CONFIG_PCA953X
 #define CONFIG_SYS_I2C_PCA953X_WIDTH	{ {22, 8} }

@@ -316,10 +316,17 @@ static void mba6ulxl_setup_i2c(void)
 	 * use logical index for bus, e.g. I2C2 -> 1
 	 * warn on error
 	 */
-	ret = setup_i2c(1, CONFIG_SYS_I2C_SPEED, 0x7f, &mba6ulxl_i2c2_pads);
+	ret = setup_i2c(3, CONFIG_SYS_I2C_SPEED, 0x7f, &mba6ulxl_i2c2_pads);
 	if (ret)
 		printf("setup I2C2 failed: %d\n", ret);
 }
+
+#ifdef CONFIG_MISC_INIT_R
+int misc_init_r(void)
+{
+	return i2c_set_bus_num(3);
+}
+#endif
 
 #ifdef CONFIG_USB_EHCI_MX6
 #define USB_OTHERREGS_OFFSET	0x800
