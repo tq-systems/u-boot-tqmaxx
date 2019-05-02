@@ -81,8 +81,6 @@ int ft_board_setup(void *blob, bd_t *bd)
 	/* fixup DT for the two GPP DDR banks */
 	base[0] = gd->bd->bi_dram[0].start;
 	size[0] = gd->bd->bi_dram[0].size;
-	base[1] = gd->bd->bi_dram[1].start;
-	size[1] = gd->bd->bi_dram[1].size;
 
 #ifdef CONFIG_RESV_RAM
 	/* reduce size if reserved memory is within this bank */
