@@ -4,3 +4,4 @@ S:	Maintained
 F:	board/tqc/tqmls1028a/
 F:	include/configs/tqmls1028a.h
 F:	configs/tqmls1028a_mbls1028a_sdcard_defconfig
+F:	arch/arm/dts/tqmls1028a_mbls1028a.dts

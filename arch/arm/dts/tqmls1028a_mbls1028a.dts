@@ -1,0 +1,72 @@
+/*
+ * MBLS1028A with TQMLS1028a device tree source
+ *
+ * Copyright 2019 TQ Systems GmbH
+ * Gregor Herburger <gregor.herburger@tq-group.com>
+ *
+ * SPDX-License-Identifier:	GPL-2.0+
+ */
+
+/dts-v1/;
+
+#include "fsl-ls1028a.dtsi"
+
+/ {
+	model = "TQMLS1028A on MBLS1028A";
+	compatible = "tqc,tqmls1028a", "fsl,ls1028a";
+	aliases {
+		spi0 = &fspi;
+	};
+
+	qixis: qixis {
+		#address-cells=<0>;
+		#size-cells=<1>;
+	};
+};
+
+&fspi {
+	bus-num = <0>;
+	status = "okay";
+
+	qflash0: mt35xu512g@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "spi-flash";
+		spi-max-frequency = <20000000>; /* TODO Need to chk*/
+		reg = <0>;
+	 };
+};
+
+&enetc_pcie {
+	ethernet@1 {
+		phy-mode = "rgmii";
+		phy-handle = <&enetc_phy1>;
+	};
+	netc_mdio0: netc_mdio {
+		#address-cells=<0>;
+		#size-cells=<1>;
+	};
+};
+
+&qixis {
+	mdio-mux@54 {
+		#address-cells=<1>;
+		#size-cells = <0>;
+		reg = <0x54>;
+		mux-mask = <0xf0>;
+		mdio-parent-bus = <&netc_mdio0>;
+		/* on-board RGMII PHY */
+		mdio@00 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x00>;
+			enetc_phy1: mdio0_phy@0 {
+				reg = <0>;
+			};
+		};
+	};
+};
+
+&sata {
+	status = "okay";
+};
