@@ -6,14 +6,14 @@
  * SPDX-License-Identifier:	GPL-2.0+
  */
 
-#ifndef __CONFIG_TQMA6UL_MB6ULXL_H
+#ifndef __CONFIG_TQMA6UL_MBA6ULXL_H
 #define __CONFIG_TQMA6UL_MBA6ULXL_H
 
 #define CONFIG_DEFAULT_FDT_FILE		"imx6ul-mba6ulxl.dtb"
 #define CONFIG_MISC_INIT_R
 
 #define CONFIG_PCA953X
-#define CONFIG_SYS_I2C_PCA953X_WIDTH	{ {22, 8} }
+#define CONFIG_SYS_I2C_PCA953X_WIDTH	{ {0x22, 8} }
 #define CONFIG_CMD_PCA953X
 #define CONFIG_CMD_PCA953X_INFO
 

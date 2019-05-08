@@ -8,13 +8,13 @@
  * SPDX-License-Identifier:	GPL-2.0+
  */
 
-#ifndef __CONFIG_TQMA6UL_MB6UL_H
+#ifndef __CONFIG_TQMA6UL_MBA6UL_H
 #define __CONFIG_TQMA6UL_MBA6UL_H
 
 #define CONFIG_SYS_I2C_MXC_I2C1		/* enable I2C bus 1 */
 
 #define CONFIG_PCA953X
-#define CONFIG_SYS_I2C_PCA953X_WIDTH	{ {0x20, 8}, {21, 8}, {22, 8} }
+#define CONFIG_SYS_I2C_PCA953X_WIDTH	{ {0x20, 8}, {0x21, 8}, {0x22, 8} }
 #define CONFIG_CMD_PCA953X
 #define CONFIG_CMD_PCA953X_INFO
 
