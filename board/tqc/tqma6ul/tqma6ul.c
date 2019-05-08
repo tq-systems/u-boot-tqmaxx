@@ -467,7 +467,7 @@ static void tqma6ul_ft_qspi_setup(void *blob, bd_t *bd)
 			device_unbind(new);
 			enable_flash = 1;
 		}
-#else
+#elif defined(CONFIG_SPI_FLASH)
 		struct spi_flash *new;
 
 		new = spi_flash_probe(bus, cs, speed, mode);
