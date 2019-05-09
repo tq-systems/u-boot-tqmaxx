@@ -105,14 +105,10 @@ int last_stage_init(void)
 {
 	tqmls1028a_bb_late_init();
 
+
 	return 0;
 }
 #endif
-
-int checkboard(void)
-{
-	return 0;
-}
 
 void *video_hw_init(void)
 {

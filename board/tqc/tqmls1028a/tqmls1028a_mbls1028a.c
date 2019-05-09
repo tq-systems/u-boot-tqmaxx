@@ -1,12 +1,24 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * Copyright 2018 TQ Systems GmbH
+ * Copyright 2019 TQ Systems GmbH
  */
 
 #include <common.h>
 #include <asm/io.h>
 #include <miiphy.h>
 #include "tqmls1028a_bb.h"
+
+int checkboard(void)
+{
+	printf("Board: MBLS1028A Booting from: ");
+#ifdef CONFIG_SD_BOOT
+	puts("SD\n");
+#else
+	puts("\n");
+#endif
+
+	return 0;
+}
 
 #define PCS_INF(fmt, args...)  printf("PCS: " fmt, ##args)
 #define PCS_ERR(fmt, args...)  printf("PCS: " fmt, ##args)
