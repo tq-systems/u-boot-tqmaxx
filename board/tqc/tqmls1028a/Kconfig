@@ -12,6 +12,19 @@ config SYS_SOC
 config SYS_CONFIG_NAME
 	default "tqmls1028a"
 
+choice
+	prompt "TQMLS1028A base board variant"
+	default MBLS1028A
+	help
+	  Select base board for TQMLS1028A module
+
+config MBLS1028A
+	bool "TQMLS1028A on MBLS1028A Starterkit"
+	help
+	  Select the MBLS1028A starterkit.
+	  This features a Ethernet, USB, SD-Card, etc.
+endchoice
+
 config EMU
 	bool "Emulator Support"
 	default n

@@ -107,4 +107,15 @@
 #define CONFIG_SYS_SATA1                        AHCI_BASE_ADDR1
 #endif
 
+/*
+ * All the defines above are for the TQMLS1028a SoM
+ *
+ * Now include the baseboard specific configuration
+ */
+#ifdef CONFIG_MBLS1028A
+#include "tqmls1028a_mbls1028a.h"
+#else
+#error "No baseboard for the TQMLS1028A SOM defined!"
+#endif
+
 #endif /* __TQMLS1028A_H */
