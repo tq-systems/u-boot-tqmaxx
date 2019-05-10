@@ -220,11 +220,6 @@ int board_init(void)
 	return 0;
 }
 
-int board_mmc_get_env_dev(int devno)
-{
-	return devno;
-}
-
 int board_late_init(void)
 {
 #if CONFIG_IS_ENABLED(ENV_IS_IN_MMC)
