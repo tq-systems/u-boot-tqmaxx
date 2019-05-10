@@ -107,6 +107,25 @@
 #define CONFIG_SYS_SATA1                        AHCI_BASE_ADDR1
 #endif
 
+#undef BOOT_ENV_SETTINGS
+#define BOOT_ENV_SETTINGS \
+	"loadaddr=0x82000000\0 " \
+	"fdtaddr=0x88000000\0 " \
+	"bootcmd=setenv bootargs root=/dev/mmcblk0p2 rootwait rw earlycon=uart8250,0x21c0500 console=ttyS0,115200 cma=256M video=1920x1080-32@60; fatload mmc 0:1 ${fdtaddr} Image.gz; unzip $fdtaddr $loadaddr; fatload mmc 0:1 ${fdtaddr} ls1028a-mbls1028a.dtb; booti ${loadaddr} - ${fdtaddr}\0"
+
+#undef CONFIG_EXTRA_ENV_SETTINGS
+#define CONFIG_EXTRA_ENV_SETTINGS \
+	"baudrate=115200\0" \
+	"bootdelay=3\0" \
+	BOOT_ENV_SETTINGS \
+	"ethact=enetc\#1\0" \
+	"ethprime=enetc\#1\0" \
+	"hwconfig=fsl_ddr:bank_intlv=auto\0" \
+	"stderr=serial\0" \
+	"stdin=serial\0" \
+	"stdout=serial\0" \
+	"board=tqmls1028a_mbls1028a\0"
+
 /*
  * All the defines above are for the TQMLS1028a SoM
  *
