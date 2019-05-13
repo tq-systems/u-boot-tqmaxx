@@ -481,6 +481,7 @@ dtb-$(CONFIG_ARCH_IMX8) += fsl-imx8dx-ddr3-arm2.dtb \
 		fsl-imx8qxp-lpddr4-arm2.dtb \
 		fsl-imx8qxp-mek.dtb \
 		fsl-imx8qxp-tqma8xqp-mba8xx.dtb \
+		fsl-imx8qxp-tqma8xqp-mbpa8xx.dtb \
 		fsl-imx8qxp-tqma8xqps-mb-smarc-2.dtb
 
 dtb-$(CONFIG_RCAR_GEN3) += \

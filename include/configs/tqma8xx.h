@@ -381,6 +381,8 @@
 
 #if defined(CONFIG_TQMA8XX_BB_MBA8XX)
 #include "tqma8xx-mba8xx.h"
+#elif defined(CONFIG_TQMA8XX_BB_MBPA8XX)
+#include "tqma8xx-mbpa8xx.h"
 #else
 #error
 #endif

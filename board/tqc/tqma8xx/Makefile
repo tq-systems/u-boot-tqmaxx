@@ -6,3 +6,4 @@
 
 obj-y += tqma8xx.o
 obj-$(CONFIG_TQMA8XX_BB_MBA8XX) += tqma8xx-mba8xx.o
+obj-$(CONFIG_TQMA8XX_BB_MBPA8XX) += tqma8xx-mbpa8xx.o

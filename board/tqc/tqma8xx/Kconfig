@@ -65,15 +65,26 @@ config TQMA8XX_BB_MBA8XX
 	  Select the MBa8Xx starterkit. This features a GigE Phy, USB, SD-Card
 	  etc.
 
+config TQMA8XX_BB_MBPA8XX
+	bool "TQMa8Xx on MBpa8Xx board"
+	select TQMA8XX_CPU_MX8QXP
+	select TQC_SDMMC
+	select DM_ETH
+	help
+	  Select the MBpa8xX board. This features a GigE Phy, USB, SD-Card
+	  etc.
+
 endchoice
 
 config DEFAULT_DEVICE_TREE
 	default "fsl-imx8dx-tqma8xd-mba8xx" if TQMA8XX_CPU_MX8DX && TQMA8XX_BB_MBA8XX
 	default "fsl-imx8qxp-tqma8xqp-mba8xx" if TQMA8XX_CPU_MX8QXP && TQMA8XX_BB_MBA8XX
+	default "fsl-imx8qxp-tqma8xqp-mbpa8xx" if TQMA8XX_CPU_MX8QXP && TQMA8XX_BB_MBPA8XX
 
 config DEFAULT_FDT_FILE
 	default "fsl-imx8dx-tqma8xd-mba8xx.dtb" if TQMA8XX_CPU_MX8DX && TQMA8XX_BB_MBA8XX
 	default "fsl-imx8qxp-tqma8xqp-mba8xx.dtb" if TQMA8XX_CPU_MX8QXP && TQMA8XX_BB_MBA8XX
+	default "fsl-imx8qxp-tqma8xqp-mbpa8xx.dtb" if TQMA8XX_CPU_MX8QXP && TQMA8XX_BB_MBPA8XX
 
 choice
 	prompt "TQMa8Xx boot device"
