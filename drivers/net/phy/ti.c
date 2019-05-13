@@ -22,6 +22,9 @@ DECLARE_GLOBAL_DATA_PTR;
 #define MII_DP83867_MICR	0x12
 #define MII_DP83867_CFG2	0x14
 #define MII_DP83867_BISCR	0x16
+#define DP83867_LEDCR1		0x18
+#define DP83867_LEDCR2		0x19
+#define DP83867_LEDCR3		0x1A
 #define DP83867_CTRL		0x1f
 
 /* Extended Registers */
@@ -96,6 +99,9 @@ struct dp83867_private {
 	int tx_id_delay;
 	int fifo_depth;
 	int io_impedance;
+	unsigned int led_cfg1;
+	unsigned int led_cfg2;
+	unsigned int led_cfg3;
 };
 
 /**
@@ -210,6 +216,13 @@ static int dp83867_of_init(struct phy_device *phydev)
 	dp83867->fifo_depth = fdtdec_get_uint(gd->fdt_blob, dev_of_offset(dev),
 				 "ti,fifo-depth", -1);
 
+	dp83867->led_cfg1 = fdtdec_get_uint(gd->fdt_blob, dev_of_offset(dev),
+				 "ti,led-cfg1", -EINVAL);
+	dp83867->led_cfg2 = fdtdec_get_uint(gd->fdt_blob, dev_of_offset(dev),
+				 "ti,led-cfg2", -EINVAL);
+	dp83867->led_cfg3 = fdtdec_get_uint(gd->fdt_blob, dev_of_offset(dev),
+				 "ti,led-cfg3", -EINVAL);
+
 	return 0;
 }
 #else
@@ -221,6 +234,9 @@ static int dp83867_of_init(struct phy_device *phydev)
 	dp83867->tx_id_delay = DEFAULT_TX_ID_DELAY;
 	dp83867->fifo_depth = DEFAULT_FIFO_DEPTH;
 	dp83867->io_impedance = -EINVAL;
+	dp83867->led_cfg1 = -EINVAL;
+	dp83867->led_cfg2 = -EINVAL;
+	dp83867->led_cfg3 = -EINVAL;
 
 	return 0;
 }
@@ -326,6 +342,16 @@ static int dp83867_config(struct phy_device *phydev)
 					       val);
 		}
 	}
+
+	if (dp83867->led_cfg1 >= 0)
+		phy_write(phydev, MDIO_DEVAD_NONE, DP83867_LEDCR1,
+			  dp83867->led_cfg1);
+	if (dp83867->led_cfg2 >= 0)
+		phy_write(phydev, MDIO_DEVAD_NONE, DP83867_LEDCR2,
+			  dp83867->led_cfg2);
+	if (dp83867->led_cfg3 >= 0)
+		phy_write(phydev, MDIO_DEVAD_NONE, DP83867_LEDCR3,
+			  dp83867->led_cfg3);
 
 	genphy_config_aneg(phydev);
 	return 0;
