@@ -69,7 +69,7 @@
 
 &iomuxc {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_hog>;
+	pinctrl-0 = <&pinctrl_hog>, <&pinctrl_rstgpio>;
 
 	tqma8xx-mbpa8xx {
 		pinctrl_lpuart1: lpuart1grp {
@@ -115,6 +115,15 @@
 				SC_P_MIPI_CSI0_I2C0_SCL_LSIO_GPIO3_IO05		0x06000048
 				SC_P_MIPI_CSI0_I2C0_SDA_LSIO_GPIO3_IO06		0x06000048
 				SC_P_MIPI_CSI0_GPIO0_01_LSIO_GPIO3_IO07		0x06000048
+			>;
+		};
+
+		pinctrl_rstgpio: rstgpiogrp {
+			fsl,pins = <
+				/* GNSS_RST */
+				SC_P_SPI0_CS1_LSIO_GPIO1_IO07			0x06000041
+				/* WWAN_RST */
+				SC_P_ADC_IN5_LSIO_GPIO1_IO13			0x06000041
 			>;
 		};
 
