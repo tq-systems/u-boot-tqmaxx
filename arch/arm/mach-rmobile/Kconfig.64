@@ -18,6 +18,9 @@ config R8A77990
 config R8A77995
 	bool "Renesas SoC R8A77995"
 
+config R8A774A1
+	bool "Renesas SoC R8A774A1"
+
 config R8A774C0
 	bool "Renesas SoC R8A774C0"
 
@@ -57,6 +60,11 @@ config TARGET_EK874
 	help
           Support for Renesas RZG2E EK874 platform
 
+config TARGET_HIHOPE_RZG2M
+	bool "HiHope RZ/G2M board"
+	help
+          Support for RZG2M HiHope platform
+
 endchoice
 
 config SYS_SOC
@@ -68,5 +76,6 @@ source "board/renesas/ebisu/Kconfig"
 source "board/renesas/salvator-x/Kconfig"
 source "board/renesas/ulcb/Kconfig"
 source "board/renesas/ek874/Kconfig"
+source "board/renesas/hihope-rzg2m/Kconfig"
 
 endif
