@@ -94,77 +94,6 @@ found:
 	popts->cpo_sample = 0x61;
 }
 
-/* DDR model number: MT40A256M16GE-083E */
-#ifdef CONFIG_SYS_DDR_RAW_TIMING
-dimm_params_t ddr_raw_timing = {
-	.n_ranks = 1,
-	.rank_density = 2147483648u,
-	.capacity = 2147483648u,
-	.primary_sdram_width = 64,
-	.ec_sdram_width = 8,
-	.registered_dimm = 0,
-	.mirrored_dimm = 0,
-	.n_row_addr = 15,
-	.n_col_addr = 10,
-	.bank_addr_bits = 2,
-	.bank_group_bits = 0,
-	.edc_config = 2,
-	.burst_lengths_bitmask = 0x0c,
-
-	.tckmin_x_ps = 833,
-	.tckmax_ps = 1900,
-	.caslat_x = 0x000DFA00, //
-	.taa_ps = 13320,
-	.trcd_ps = 13320,
-	.trp_ps = 13320,
-	.tras_ps = 32000,
-	.trc_ps = 45320,
-	.trfc1_ps = 260000,
-	.trfc2_ps = 160000,
-	.trfc4_ps = 110000,
-	.tfaw_ps = 21000,
-	.trrds_ps = 3300,
-	.trrdl_ps = 4900,
-	.tccdl_ps = 5000,
-	.trfc_slr_ps = 3500000,
-	.refresh_rate_ps = 7800000,
-	.dq_mapping[0] = 0x0,
-	.dq_mapping[1] = 0x0,
-	.dq_mapping[2] = 0x0,
-	.dq_mapping[3] = 0x0,
-	.dq_mapping[4] = 0x0,
-	.dq_mapping[5] = 0x0,
-	.dq_mapping[6] = 0x0,
-	.dq_mapping[7] = 0x0,
-	.dq_mapping[8] = 0x0,
-	.dq_mapping[9] = 0x0,
-	.dq_mapping[10] = 0x0,
-	.dq_mapping[11] = 0x0,
-	.dq_mapping[12] = 0x0,
-	.dq_mapping[13] = 0x0,
-	.dq_mapping[14] = 0x0,
-	.dq_mapping[15] = 0x0,
-	.dq_mapping[16] = 0x0,
-	.dq_mapping[17] = 0x0,
-	.dq_mapping_ors = 0,
-};
-
-int fsl_ddr_get_dimm_params(dimm_params_t *pdimm,
-			    unsigned int controller_number,
-			    unsigned int dimm_number)
-{
-	static const char dimm_model[] = "Fixed DDR on board";
-
-	if ((controller_number == 0) && (dimm_number == 0)) {
-		memcpy(pdimm, &ddr_raw_timing, sizeof(dimm_params_t));
-		memset(pdimm->mpart, 0, sizeof(pdimm->mpart));
-		memcpy(pdimm->mpart, dimm_model, sizeof(dimm_model) - 1);
-	}
-
-	return 0;
-}
-#else
-
 phys_size_t fixed_sdram(void)
 {
 	int i;
@@ -198,20 +127,11 @@ phys_size_t fixed_sdram(void)
 
 	return ddr_size;
 }
-#endif
 
 int fsl_initdram(void)
 {
 	phys_size_t dram_size;
 
-#ifdef CONFIG_SYS_DDR_RAW_TIMING
-#if defined(CONFIG_SPL_BUILD) || !defined(CONFIG_SPL)
-	puts("Initializing DDR....\n");
-	dram_size = fsl_ddr_sdram();
-#else
-	dram_size =  fsl_ddr_sdram_size();
-#endif
-#else
 #if defined(CONFIG_SPL_BUILD) || !defined(CONFIG_SPL)
 	puts("Initialzing DDR using fixed setting\n");
 	dram_size = fixed_sdram();
@@ -219,7 +139,6 @@ int fsl_initdram(void)
 	gd->ram_size = 0x80000000;
 
 	return 0;
-#endif
 #endif
 	erratum_a008850_post();
 

@@ -42,7 +42,6 @@ static const struct board_specific_parameters *udimms[] = {
 	udimm0,
 };
 
-#ifndef CONFIG_SYS_DDR_RAW_TIMING
 fsl_ddr_cfg_regs_t ddr_cfg_regs_2000 = {
 	.cs[0].bnds         = 0x0000007F,
 	.cs[0].config       = 0x80010312,
@@ -113,5 +112,4 @@ fixed_ddr_parm_t fixed_ddr_parm_0[] = {
 	{0, 0, NULL}
 };
 
-#endif
 #endif
