@@ -33,13 +33,6 @@
 
 /* Link Definitions */
 
-#ifdef CONFIG_QSPI_BOOT
-#define CONFIG_SYS_FSL_QSPI_BASE	0x20000000
-#define CONFIG_ENV_OFFSET		0x300000        /* 3MB */
-#define CONFIG_ENV_ADDR			(CONFIG_SYS_FSL_QSPI_BASE + \
-						CONFIG_ENV_OFFSET)
-#endif
-
 #define CONFIG_SKIP_LOWLEVEL_INIT
 
 #if !defined(CONFIG_SD_BOOT)
@@ -56,10 +49,6 @@
  * SMP Definitinos
  */
 #define CPU_RELEASE_ADDR		secondary_boot_func
-
-#ifdef CONFIG_PCI
-#define CONFIG_CMD_PCI
-#endif
 
 /* Size of malloc() pool */
 #define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 2048 * 1024)
@@ -147,8 +136,6 @@ unsigned long long get_qixis_addr(void);
 #if defined(CONFIG_FSL_MC_ENET)
 #define CONFIG_SYS_LS_MC_DRAM_BLOCK_MIN_SIZE		(512UL * 1024 * 1024)
 #endif
-/* Command line configuration */
-#define CONFIG_CMD_CACHE
 
 /* Miscellaneous configurable options */
 #define CONFIG_SYS_LOAD_ADDR	(CONFIG_SYS_DDR_SDRAM_BASE + 0x10000000)
@@ -166,8 +153,6 @@ unsigned long long get_qixis_addr(void);
 
 /* Physical Memory Map */
 #define CONFIG_CHIP_SELECTS_PER_CTRL	4
-
-#define CONFIG_NR_DRAM_BANKS		2
 
 #define CONFIG_HWCONFIG
 #define HWCONFIG_BUFFER_SIZE		128
@@ -194,22 +179,6 @@ unsigned long long get_qixis_addr(void);
 	"mcinitcmd=fsl_mc start mc 0x580a00000"	\
 	" 0x580e00000 \0"
 
-#if defined(CONFIG_QSPI_BOOT)
-#define CONFIG_BOOTCOMMAND	"sf probe 0:0;" \
-				"sf read 0x80200000 0xd00000 0x100000;"\
-				" fsl_mc apply dpl 0x80200000 &&" \
-				" sf read $kernel_load $kernel_start" \
-				" $kernel_size && bootm $kernel_load"
-#elif defined(CONFIG_SD_BOOT)
-#define CONFIG_BOOTCOMMAND	"mmcinfo;mmc read 0x80200000 0x6800 0x800;"\
-				" fsl_mc apply dpl 0x80200000 &&" \
-				" mmc read $kernel_load $kernel_start" \
-				" $kernel_size && bootm $kernel_load"
-#else /* NOR BOOT*/
-#define CONFIG_BOOTCOMMAND	"fsl_mc apply dpl 0x580d00000 &&" \
-				" cp.b $kernel_start $kernel_load" \
-				" $kernel_size && bootm $kernel_load"
-#endif
 #endif
 
 /* Monitor Command Prompt */

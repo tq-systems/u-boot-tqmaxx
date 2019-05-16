@@ -18,6 +18,9 @@ unsigned long get_board_ddr_clk(void);
 #if defined(CONFIG_QSPI_BOOT)
 #define CONFIG_ENV_SIZE			0x2000          /* 8KB */
 #define CONFIG_ENV_SECT_SIZE		0x40000
+#define CONFIG_ENV_OFFSET		0x300000        /* 3MB */
+#define CONFIG_ENV_ADDR			(CONFIG_SYS_FSL_QSPI_BASE1 + \
+						CONFIG_ENV_OFFSET)
 #elif defined(CONFIG_SD_BOOT)
 #define CONFIG_ENV_OFFSET		(3 * 1024 * 1024)
 #define CONFIG_SYS_MMC_ENV_DEV		0
@@ -53,6 +56,8 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_MEM_INIT_VALUE           0xdeadbeef
 #define SPD_EEPROM_ADDRESS		0x51
 #define CONFIG_SYS_SPD_BUS_NUM		0
+#define CONFIG_NR_DRAM_BANKS		2
+
 
 
 /*
@@ -354,6 +359,25 @@ unsigned long get_board_ddr_clk(void);
 #endif
 
 #define CONFIG_FSL_MEMAC
+
+#ifndef SPL_NO_ENV
+#if defined(CONFIG_QSPI_BOOT)
+#define CONFIG_BOOTCOMMAND	"sf probe 0:0;" \
+				"sf read 0x80200000 0xd00000 0x100000;"\
+				" fsl_mc apply dpl 0x80200000 &&" \
+				" sf read $kernel_load $kernel_start" \
+				" $kernel_size && bootm $kernel_load"
+#elif defined(CONFIG_SD_BOOT)
+#define CONFIG_BOOTCOMMAND	"mmcinfo;mmc read 0x80200000 0x6800 0x800;"\
+				" fsl_mc apply dpl 0x80200000 &&" \
+				" mmc read $kernel_load $kernel_start" \
+				" $kernel_size && bootm $kernel_load"
+#else /* NOR BOOT*/
+#define CONFIG_BOOTCOMMAND	"fsl_mc apply dpl 0x580d00000 &&" \
+				" cp.b $kernel_start $kernel_load" \
+				" $kernel_size && bootm $kernel_load"
+#endif
+#endif
 
 /*  MMC  */
 #define CONFIG_SYS_FSL_MMC_HAS_CAPBLT_VS33
