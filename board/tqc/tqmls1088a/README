@@ -1,0 +1,61 @@
+Overview
+--------
+The TQMLS1088A SOM is a high-performance computing platform that supports the
+QorIQ LS1088A LayerScape Architecture processor.
+
+LS1088A SoC Overview
+--------------------
+Please refer arch/arm/cpu/armv8/fsl-layerscape/doc/README.soc for LS1088A
+SoC overview.
+
+TQMLS1088A board Overview
+------------------------
+ - SERDES Connections, 8 lanes supporting:
+      - PCI Express - 3.0
+      - SGMII, SGMII 2.5
+      - QSGMII
+      - SATA 3.0
+      - XFI
+ - DDR Controller:
+     - 2GB 64bits DDR4 SDRAM. Support rates of up to 2133MT/s
+ - USB 3.0:
+    - Two high speed USB 3.0 ports
+ - SDHC:
+    - eMMC memory devices
+    - alternative SD slot for SD, SDHC (1x, 4x) on baseboard
+ - DSPI:
+    - Onboard support for two SPI flash memory devices
+ - 4 I2C controllers
+ - ARM JTAG support
+
+Memory map from core's view
+----------------------------
+Start Address    End Address     Description        Size
+0x00_0000_0000 - 0x00_000F_FFFF  Secure Boot ROM    1MB
+0x00_0100_0000 - 0x00_0FFF_FFFF  CCSRBAR            240MB
+0x00_1800_0000 - 0x00_181F_FFFF  OCRAM              2MB
+0x00_8000_0000 - 0x00_FFFF_FFFF  DRAM               2GB
+0x07_0000_0000 - 0x07_3FFF_FFFF  DCSR               1GB
+0x08_0C00_0000 - 0x08_0FFF_FFFF  MC S/W Portals     64MB
+0x08_1800_0000 - 0x08_1FFF_FFFF  QBMAN S/W Portal   128MB
+0x20_0000_0000 - 0x27_FFFF_FFFF  PCI Express1       32G
+0x28_0000_0000 - 0x2F_FFFF_FFFF  PCI Express2       32G
+0x30_0000_0000 - 0x37_FFFF_FFFF  PCI Express3       32G
+
+QSPI flash map:
+Start Address    End Address     Description		Size
+0x00_4000_0000 - 0x00_4000_FFFF  RCW,PBI            64KB
+0x00_4001_0000 - 0x00_400C_FFFF  U-Boot             768KB
+0x00_400D_0000 - 0x00_400D_FFFF  U-Boot Env         64KB
+0x00_400E_0000 - 0x00_400E_FFFF  DPAA2 MC DPL       64KB
+0x00_400F_0000 - 0x00_400F_FFFF  DPAA2 MC DPC       64KB
+0x00_4010_0000 - 0x00_402E_FFFF  DPAA2 MC Microcode 1984KB
+0x00_402F_0000 - 0x00_402F_FFFF  Linux device-tree  64KB
+0x00_4030_0000 - 0x00_417F_FFFF  Linux Image        21MB
+0x00_4180_0000 - 0x00_43FF_FFFF  Linux UBI rootfs	40MB
+
+Booting Options
+---------------
+a) QSPI boot
+b) SD boot
+c) eMMC boot

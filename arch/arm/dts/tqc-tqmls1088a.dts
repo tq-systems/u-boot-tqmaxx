@@ -1,0 +1,40 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Device Tree file for TQ Systems TQMLS1088A SoC module.
+ *
+ * Copyright 2019 TQ-Systems GmbH
+ */
+
+/dts-v1/;
+/include/ "fsl-ls1088a.dtsi"
+
+/ {
+	model = "TQMLS1088A Board";
+
+	aliases {
+		spi0 = &qspi;
+	};
+
+};
+
+&qspi {
+	bus-num = <0>;
+	spi-max-frequency = <62500000>;
+	status = "okay";
+
+	qflash0: mx66u51235f@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "spi-flash";
+		spi-max-frequency = <62500000>;
+		reg = <0>;
+	};
+
+	qflash1: mx66u51235f@1 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "spi-flash";
+		spi-max-frequency = <62500000>;
+		reg = <1>;
+	 };
+};

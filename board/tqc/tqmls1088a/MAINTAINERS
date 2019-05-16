@@ -1,0 +1,10 @@
+TQMLS1088A BOARD
+M:	Timo Herbrecher <t.herbrecher@gateware.de>
+S:	Maintained
+F:	board/tqc/tqmls1088a/
+F:	include/configs/tqmls1088a.h
+F:	include/configs/tqmls1088a_baseboard.h
+F:	include/configs/tqmls1088a_bb_mbls10xxa.h
+F:	configs/tqmls1088a_esdhc_defconfig
+F:	configs/tqmls1088a_qspi_defconfig
+

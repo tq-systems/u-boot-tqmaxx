@@ -8,7 +8,7 @@
 #define __TQC_BB_MBLS10XX_H__
 
 /* Fman ethernet settings */
-#ifdef CONFIG_FMAN_ENET
+#if defined(CONFIG_FMAN_ENET) || defined(CONFIG_FSL_MC_ENET)
 #define CONFIG_PHY_TI
 #define CONFIG_PHYLIB_10G
 
@@ -16,8 +16,13 @@
 #define RGMII_PHY2_ADDR			0x0C
 #define QSGMII_PHY1_ADDR_BASE	0x1C
 #define QSGMII_PHY2_ADDR_BASE	0x00
+#endif
 
+
+#if defined(CONFIG_FMAN_ENET)
 #define CONFIG_ETHPRIME			"FM1@DTSEC3"
+#elif defined(CONFIG_FSL_MC_ENET)
+#define CONFIG_ETHPRIME			"DPMAC4@rgmii-id"
 #endif
 
 /* I2C bus muxing */

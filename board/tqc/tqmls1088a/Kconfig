@@ -1,0 +1,46 @@
+if TARGET_TQMLS1088A
+
+config SYS_BOARD
+	default "tqmls1088a"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_SOC
+	default "fsl-layerscape"
+
+config SYS_CONFIG_NAME
+	default "tqmls1088a"
+
+choice
+	prompt "TQMLS1088A base board variant"
+	default TQMLS1088A_BB_MBLS10XXA
+	help
+	  Select base board for TQMLS1088A
+
+config TQMLS1088A_BB_MBLS10XXA
+	bool "TQMLS1088A on MBLS10xxA Starterkit"
+	select TQC_MBLS10XXA
+	help
+	  Select the MBLS10XXA starterkit.
+
+endchoice
+
+if FSL_LS_PPA
+config SYS_LS_PPA_FW_ADDR
+	hex "PPA Firmware Addr"
+	default 0x20400000 if SYS_LS_PPA_FW_IN_XIP && QSPI_BOOT
+	default 0x400000 if SYS_LS_PPA_FW_IN_MMC
+
+if CHAIN_OF_TRUST
+config SYS_LS_PPA_ESBC_ADDR
+	hex "PPA Firmware HDR Addr"
+	default 0x20680000 if SYS_LS_PPA_FW_IN_XIP && QSPI_BOOT
+	default 0x680000 if SYS_LS_PPA_FW_IN_MMC
+endif
+endif
+
+source "board/tqc/common/Kconfig"
+
+
+endif
