@@ -108,10 +108,21 @@
 #endif
 
 #undef BOOT_ENV_SETTINGS
+#ifdef CONFIG_SD_BOOT
 #define BOOT_ENV_SETTINGS \
+	"boot=SD\0" \
 	"loadaddr=0x82000000\0 " \
 	"fdtaddr=0x88000000\0 " \
 	"bootcmd=setenv bootargs root=/dev/mmcblk0p2 rootwait rw earlycon=uart8250,0x21c0500 console=ttyS0,115200 cma=256M video=1920x1080-32@60; fatload mmc 0:1 ${fdtaddr} Image.gz; unzip $fdtaddr $loadaddr; fatload mmc 0:1 ${fdtaddr} ls1028a-mbls1028a.dtb; booti ${loadaddr} - ${fdtaddr}\0"
+#elif CONFIG_EMMC_BOOT
+#define BOOT_ENV_SETTINGS \
+	"boot=MMC\0" \
+	"loadaddr=0x82000000\0 " \
+	"fdtaddr=0x88000000\0 " \
+	"bootcmd=setenv bootargs root=/dev/mmcblk1p2 rootwait rw earlycon=uart8250,0x21c0500 console=ttyS0,115200 cma=256M video=1920x1080-32@60; fatload mmc 1:1 ${fdtaddr} Image.gz; unzip $fdtaddr $loadaddr; fatload mmc 1:1 ${fdtaddr} ls1028a-mbls1028a.dtb; booti ${loadaddr} - ${fdtaddr}\0"
+#else
+#define BOOT_ENV_SETTINGS
+#endif
 
 #undef CONFIG_EXTRA_ENV_SETTINGS
 #define CONFIG_EXTRA_ENV_SETTINGS \
