@@ -10,5 +10,5 @@
 #define __CONFIG_TQMLS1028A_MBLS1028AL_H__
 
 #define RGMII_PHY_DEV_ADDR 0x00
-#define RGMII_MDIO_NAME "mdio@00"
+#define RGMII_MDIO_NAME "netc_mdio"
 #endif /* __CONFIG_TQMLS1028A_MBLS1028AL_H__ */

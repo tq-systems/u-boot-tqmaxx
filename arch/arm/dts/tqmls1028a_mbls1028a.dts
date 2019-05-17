@@ -42,27 +42,14 @@
 		phy-mode = "rgmii";
 		phy-handle = <&enetc_phy1>;
 	};
-	netc_mdio0: netc_mdio {
+	netc_mdio {
 		#address-cells=<0>;
 		#size-cells=<1>;
-	};
-};
-
-&qixis {
-	mdio-mux@54 {
-		#address-cells=<1>;
-		#size-cells = <0>;
-		reg = <0x54>;
-		mux-mask = <0xf0>;
-		mdio-parent-bus = <&netc_mdio0>;
-		/* on-board RGMII PHY */
-		mdio@00 {
-			#address-cells = <1>;
-			#size-cells = <0>;
-			reg = <0x00>;
-			enetc_phy1: mdio0_phy@0 {
-				reg = <0>;
-			};
+		enetc_phy0: phy@3 {
+			reg = <3>;
+		};
+		enetc_phy1: phy@0 {
+			reg = <0>;
 		};
 	};
 };
