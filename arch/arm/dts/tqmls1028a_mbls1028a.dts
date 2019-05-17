@@ -28,11 +28,11 @@
 	bus-num = <0>;
 	status = "okay";
 
-	qflash0: mt35xu512g@0 {
+	qflash0: mt25qu02g@0 {
 		#address-cells = <1>;
 		#size-cells = <1>;
 		compatible = "spi-flash";
-		spi-max-frequency = <20000000>; /* TODO Need to chk*/
+		spi-max-frequency = <20000000>;
 		reg = <0>;
 	 };
 };
