@@ -236,6 +236,11 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 		   (mux_val1)) {
 		   printf("!!! ATTENTON: SerDes1 RefClk2 is not 156.25MHz,\n");
 		   printf("!!!  but this is needed for XFI operation!\n");
+		} else if((TQMLS1046A_SRDS1_PROTO(srds_s1, 1) != 0x1) &&
+		    (TQMLS1046A_SRDS1_PROTO(srds_s1, 0) != 0x1) &&
+		   !(mux_val1)) {
+		   printf("!!! ATTENTON: SerDes1 RefClk2 is 156.25MHz,\n");
+		   printf("!!!  but this is only valid for XFI operation!\n");
 		}
 	}
 
