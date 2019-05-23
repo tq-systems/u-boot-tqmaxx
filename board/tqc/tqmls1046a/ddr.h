@@ -8,6 +8,7 @@
 
 extern void erratum_a008850_post(void);
 
+#if defined(CONFIG_SYS_DDR_RAW_TIMING) || defined(CONFIG_FSL_DDR_INTERACTIVE)
 struct board_specific_parameters {
 	u32 n_ranks;
 	u32 datarate_mhz_high;
@@ -41,6 +42,7 @@ static const struct board_specific_parameters udimm0[] = {
 static const struct board_specific_parameters *udimms[] = {
 	udimm0,
 };
+#endif
 
 fsl_ddr_cfg_regs_t ddr_cfg_regs_2000 = {
 	.cs[0].bnds         = 0x0000007F,

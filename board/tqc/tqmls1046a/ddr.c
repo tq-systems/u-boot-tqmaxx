@@ -14,6 +14,7 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#if defined(CONFIG_SYS_DDR_RAW_TIMING) || defined(CONFIG_FSL_DDR_INTERACTIVE)
 void fsl_ddr_board_options(memctl_options_t *popts,
 			   dimm_params_t *pdimm,
 			   unsigned int ctrl_num)
@@ -93,6 +94,7 @@ found:
 	/* optimize cpo for erratum A-009942 */
 	popts->cpo_sample = 0x61;
 }
+#endif
 
 phys_size_t fixed_sdram(void)
 {
