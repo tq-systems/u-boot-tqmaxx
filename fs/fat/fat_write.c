@@ -210,7 +210,8 @@ name11_12:
 	return 1;
 }
 
-static int flush_dir_table(fat_itr *itr);
+static int new_dir_table(fat_itr *itr);
+static int flush_dir(fat_itr *itr);
 
 /*
  * Fill dir_slot entries with appropriate name, id, and attr
@@ -243,18 +244,14 @@ fill_dir_slot(fat_itr *itr, const char *l_name)
 		memcpy(itr->dent, slotptr, sizeof(dir_slot));
 		slotptr--;
 		counter--;
+
+		if (itr->remaining == 0)
+			flush_dir(itr);
+
 		if (!fat_itr_next(itr))
-			if (!itr->dent && !itr->is_root && flush_dir_table(itr))
+			if (!itr->dent && !itr->is_root && new_dir_table(itr))
 				return -1;
 	}
-
-	if (!itr->dent && !itr->is_root)
-		/*
-		 * don't care return value here because we have already
-		 * finished completing an entry with name, only ending up
-		 * no more entry left
-		 */
-		flush_dir_table(itr);
 
 	return 0;
 }
@@ -622,25 +619,22 @@ static int find_empty_cluster(fsdata *mydata)
 }
 
 /*
- * Write directory entries in itr's buffer to block device
+ * Allocate a cluster for additional directory entries
  */
-static int flush_dir_table(fat_itr *itr)
+static int new_dir_table(fat_itr *itr)
 {
 	fsdata *mydata = itr->fsdata;
 	int dir_newclust = 0;
 	unsigned int bytesperclust = mydata->clust_size * mydata->sect_size;
 
-	if (mydata->fatsize == 32) {
-		dir_newclust = find_empty_cluster(mydata);
-		set_fatent_value(mydata, itr->clust, dir_newclust);
+	dir_newclust = find_empty_cluster(mydata);
+	set_fatent_value(mydata, itr->clust, dir_newclust);
+	if (mydata->fatsize == 32)
 		set_fatent_value(mydata, dir_newclust, 0xffffff8);
-	} else {
-		dir_newclust = itr->clust + 1;
-		if (dir_newclust > 1) {
-			printf("error: fail to get empty clust for directory entry\n");
-			return -1;
-		}
-	}
+	else if (mydata->fatsize == 16)
+		set_fatent_value(mydata, dir_newclust, 0xfff8);
+	else if (mydata->fatsize == 12)
+		set_fatent_value(mydata, dir_newclust, 0xff8);
 
 	itr->clust = dir_newclust;
 	itr->next_clust = dir_newclust;
@@ -989,7 +983,7 @@ static dir_entry *find_directory_entry(fat_itr *itr, char *filename)
 			return itr->dent;
 	}
 
-	if (!itr->dent && !itr->is_root && flush_dir_table(itr))
+	if (!itr->dent && !itr->is_root && new_dir_table(itr))
 		/* indicate that allocating dent failed */
 		itr->dent = NULL;
 
@@ -1166,14 +1160,16 @@ int file_fat_write_at(const char *filename, loff_t pos, void *buffer,
 
 		memset(itr->dent, 0, sizeof(*itr->dent));
 
-		/* Set short name to set alias checksum field in dir_slot */
+		/* Calculate checksum for short name */
 		set_name(itr->dent, filename);
+
+		/* Set long name entries */
 		if (fill_dir_slot(itr, filename)) {
 			ret = -EIO;
 			goto exit;
 		}
 
-		/* Set attribute as archive for regular file */
+		/* Set short name entry */
 		fill_dentry(itr->fsdata, itr->dent, filename, 0, size, 0x20);
 
 		retdent = itr->dent;
