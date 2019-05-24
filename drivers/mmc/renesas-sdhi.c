@@ -453,7 +453,7 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 	/* HS400 is not supported on H3 ES1.x and M3W ES1.0,ES1.1 */
 	if (((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7795) &&
 	    (rmobile_get_cpu_rev_integer() <= 1)) ||
-	    ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7796) &&
+	    ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774A1) &&
 	    (rmobile_get_cpu_rev_integer() == 1) &&
 	    (rmobile_get_cpu_rev_fraction() <= 1)))
 		plat->cfg.host_caps &= ~MMC_MODE_HS400;
