@@ -444,7 +444,7 @@ struct spi_slave *spi_setup_slave(unsigned int bus, unsigned int cs,
 		DSPI_MCR_CRXF | DSPI_MCR_CTXF;
 	fsl_dspi_init_mcr(&dspi->priv, mcr_cfg_val);
 
-	for (i = 0; i < FSL_DSPI_MAX_CHIPSELECT; i++)
+	for (size_t i = 0; i < FSL_DSPI_MAX_CHIPSELECT; i++)
 		dspi->priv.ctar_val[i] = DSPI_CTAR_DEFAULT_VALUE;
 
 #ifdef CONFIG_SYS_DSPI_CTAR0
@@ -520,7 +520,7 @@ void spi_release_bus(struct spi_slave *slave)
 	struct fsl_dspi *dspi = (struct fsl_dspi *)slave;
 
 	dspi_halt(&dspi->priv, 1);
-	cpu_dspi_release_bus(slave->bus.slave->cs);
+	cpu_dspi_release_bus(slave->bus, slave->cs);
 }
 
 int spi_xfer(struct spi_slave *slave, unsigned int bitlen, const void *dout,
