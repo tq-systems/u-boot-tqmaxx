@@ -22,6 +22,7 @@
 
 /*  */
 #define CONFIG_SYS_RTC_BUS_NUM         0
+#define CONFIG_MISC_INIT_R
 
 /* DDR */
 /* #define CONFIG_SYS_DDR_RAW_TIMING */
@@ -30,6 +31,10 @@
 #define CONFIG_MEM_INIT_VALUE		0xdeadbeef
 #define CONFIG_DIMM_SLOTS_PER_CTLR		1
 #define DDR_RAM_SIZE	0x40000000 /* 1GB */
+
+/* EEPROM */
+#define I2C_EEPROM_ADDR 0x57
+#define I2C_EEPROM_ADDR_LEN 2
 
 /* FlexSPI */
 #ifdef CONFIG_NXP_FSPI

@@ -25,6 +25,8 @@
 
 #include <fdtdec.h>
 #include <miiphy.h>
+#include "../common/tqmaxx_eeprom.h"
+#include "tqmls1028a_bb.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -98,6 +100,43 @@ int ft_board_setup(void *blob, bd_t *bd)
 #ifdef CONFIG_FSL_ENETC
 	enetc_setup(blob);
 #endif
+	return 0;
+}
+#endif
+
+#ifdef CONFIG_MISC_INIT_R
+int misc_init_r(void)
+{
+	int ret = -1;
+	struct tqmaxx_eeprom_data eepromdata;
+	char safe_string[0x41];
+	char ethaddrstring[9];
+
+	ret = tqmaxx_read_eeprom(0, I2C_EEPROM_ADDR, &eepromdata);
+
+	if (ret) {
+		printf("Error reading eeprom.\n");
+		return ret;
+	}
+
+	ret = tqmaxx_parse_eeprom_mac(&eepromdata, safe_string,
+				      ARRAY_SIZE(safe_string));
+	if (!ret) {
+		env_set("ethaddr", safe_string);
+		eth_env_set_enetaddr("ethaddr", (uchar *)safe_string);
+
+		for (size_t i = 1; i <= 4; i++) {
+			ret = tqmaxx_parse_eeprom_mac_additional(&eepromdata,
+				safe_string, ARRAY_SIZE(safe_string), i);
+			if (!ret) {
+				snprintf(ethaddrstring, 9, "eth%luaddr", i);
+				env_set(ethaddrstring, safe_string);
+				eth_env_set_enetaddr(ethaddrstring,
+						(uchar *)safe_string);
+			}
+		}
+		tqmaxx_show_eeprom(&eepromdata, "TQMLS1028A");
+	}
 	return 0;
 }
 #endif

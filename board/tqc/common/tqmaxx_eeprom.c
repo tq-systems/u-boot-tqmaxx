@@ -156,8 +156,7 @@ int tqmaxx_read_eeprom(unsigned int bus, unsigned int addr,
 		return -1;
 
 #ifdef CONFIG_DM_I2C
-	ret = i2c_get_chip_for_busnum(bus, addr, CONFIG_SYS_I2C_EEPROM_ADDR_LEN
-				      , &dev);
+	ret = i2c_get_chip_for_busnum(bus, addr, I2C_EEPROM_ADDR_LEN, &dev);
 	if (ret) {
 		debug("%s: Cannot find I2C chip for bus %d\n", __func__, bus);
 		return ret;
@@ -167,7 +166,7 @@ int tqmaxx_read_eeprom(unsigned int bus, unsigned int addr,
 #else
 	oldbus = i2c_get_bus_num();
 	i2c_set_bus_num(bus);
-	ret = i2c_read(addr, 0, CONFIG_SYS_I2C_EEPROM_ADDR_LEN,
+	ret = i2c_read(addr, 0, I2C_EEPROM_ADDR_LEN,
 		       (uchar *)eeprom, sizeof(*eeprom));
 	i2c_set_bus_num(oldbus);
 #endif
