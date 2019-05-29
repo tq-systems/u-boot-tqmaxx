@@ -41,6 +41,12 @@
 #define NXP_FSPI_FLASH_NUM              1
 #endif
 
+#define CONFIG_SYS_UBOOT_BASE 0x20116000
+#define CONFIG_SPL_SPI_LOAD
+#define CONFIG_SYS_SPI_U_BOOT_OFFS 0x16000
+#define MMAP_DSPI 0x12000000
+#define CONFIG_SPL_PAD_TO	0x16000
+
 /* Store environment at top of flash */
 #ifdef CONFIG_EMU_PXP
 #define CONFIG_ENV_SIZE			0x1000

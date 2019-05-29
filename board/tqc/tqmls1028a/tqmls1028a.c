@@ -87,6 +87,13 @@ int board_early_init_f(void)
 	return 0;
 }
 
+#ifdef CONFIG_QSPI_BOOT
+void board_boot_order(u32 *spl_boot_list)
+{
+	spl_boot_list[0] = 6;
+}
+#endif
+
 #ifdef CONFIG_OF_BOARD_SETUP
 #ifdef CONFIG_FSL_ENETC
 extern void enetc_setup(void *blob);

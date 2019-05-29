@@ -60,7 +60,7 @@ static int spl_nor_load_image(struct spl_image_info *spl_image,
 		return ret;
 
 	memcpy((void *)(unsigned long)spl_image->load_addr,
-	       (void *)(CONFIG_SYS_UBOOT_BASE + sizeof(struct image_header)),
+	       (void *)(CONFIG_SYS_UBOOT_BASE),
 	       spl_image->size);
 
 	return 0;
