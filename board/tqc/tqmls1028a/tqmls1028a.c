@@ -103,7 +103,15 @@ int ft_board_setup(void *blob, bd_t *bd)
 #ifdef CONFIG_LAST_STAGE_INIT
 int last_stage_init(void)
 {
+	u8 val;
+
 	tqmls1028a_bb_late_init();
+
+	/* Set Bit 0 of Register 0 of RTC to adjust to 12.5 pF */
+	val = i2c_reg_read(CONFIG_SYS_I2C_RTC_ADDR, 0x00);
+
+	if (!(val & 0x01))
+		i2c_reg_write(CONFIG_SYS_I2C_RTC_ADDR, 0x00, val | 0x01);
 
 
 	return 0;
