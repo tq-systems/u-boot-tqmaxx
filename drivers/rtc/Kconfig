@@ -42,4 +42,10 @@ config RTC_S35392A
 	help
 	  Enable s35392a driver which provides rtc get and set function.
 
+config RTC_PCF85063
+       bool "PCF85063 RTC"
+       help
+	  Enable driver for the PCF85063 RTC.
+	  Real Time Clock
+
 endmenu

@@ -274,7 +274,7 @@
 #define I2C_MUX_CH_DEFAULT              0x8
 
 /* RTC */
-#define CONFIG_RTC_PCF2127
+#define CONFIG_RTC_PCF85063
 #define CONFIG_SYS_I2C_RTC_ADDR                0x51  /* Channel 3*/
 #define CONFIG_CMD_DATE
 
