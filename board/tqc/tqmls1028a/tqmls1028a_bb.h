@@ -6,4 +6,5 @@
 #define __TQMLS1028AL_BB_H__
 
 void tqmls1028a_bb_late_init(void);
+int board_bb_init(void);
 #endif /* __TQMLS1028AL_BB_H__ */

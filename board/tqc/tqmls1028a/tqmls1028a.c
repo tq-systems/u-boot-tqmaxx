@@ -38,6 +38,8 @@ int board_init(void)
 	ppa_init();
 #endif
 
+	board_bb_init();
+
 #ifndef CONFIG_SYS_EARLY_PCI_INIT
 	/* run PCI init to kick off ENETC */
 	pci_init();
