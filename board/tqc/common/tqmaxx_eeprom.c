@@ -32,6 +32,38 @@ int tqmaxx_parse_eeprom_mac(struct tqmaxx_eeprom_data *eeprom, char *buf,
 	return !(is_valid_ethaddr(p));
 }
 
+int tqmaxx_parse_eeprom_mac_additional(struct tqmaxx_eeprom_data *eeprom,
+				       char *buf, size_t len,
+				       size_t additional)
+{
+	u8 *p;
+	int ret = -1;
+	u32 addr;
+
+	if (!buf || !eeprom)
+		return -1;
+
+	p = eeprom->mac;
+
+	if (additional == 0)
+		return ret;
+
+	addr = p[3] << 16 | p[4] << 8 | p[5];
+	addr += additional;
+	addr = addr & 0x00ffffff;
+
+	ret = snprintf(buf, len, "%02x:%02x:%02x:%02x:%02x:%02x",
+		       p[0], p[1], p[2], (addr >> 16) & 0xff,
+		       (addr >> 8) & 0xff, addr & 0xff);
+
+	if (ret < 0)
+		return ret;
+	if (ret >= len)
+		return ret;
+
+	return !(is_valid_ethaddr(p));
+}
+
 int tqmaxx_parse_eeprom_serial(struct tqmaxx_eeprom_data *eeprom, char *buf,
 			       size_t len)
 {
