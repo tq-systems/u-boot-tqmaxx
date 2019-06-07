@@ -47,8 +47,10 @@ DECLARE_GLOBAL_DATA_PTR;
 #endif
 #define SEQID_WRAR		13
 #define SEQID_RDAR		14
+#define SEQID_WRSR		15
 
 /* QSPI CMD */
+#define QSPI_CMD_WRSR		0x01	/* Write status/config register */
 #define QSPI_CMD_PP		0x02	/* Page program (up to 256 bytes) */
 #define QSPI_CMD_RDSR		0x05	/* Read status register */
 #define QSPI_CMD_WREN		0x06	/* Write enable */
@@ -371,6 +373,12 @@ static void qspi_set_lut(struct fsl_qspi_priv *priv)
 	qspi_write32(priv->flags, &regs->lut[lut_base + 1],
 		     OPRND0(1) | PAD0(LUT_PAD1) | INSTR0(LUT_WRITE));
 
+	/* Write Status Register */
+	lut_base = SEQID_WRSR * 4;
+	qspi_write32(priv->flags, &regs->lut[lut_base], OPRND0(QSPI_CMD_WRSR) |
+		     PAD0(LUT_PAD1) | INSTR0(LUT_CMD) | OPRND1(2) |
+			 PAD1(LUT_PAD1) | INSTR1(LUT_WRITE));
+
 	/* Lock the LUT */
 	qspi_write32(priv->flags, &regs->lutkey, LUT_KEY_VALUE);
 	qspi_write32(priv->flags, &regs->lckcr, QSPI_LCKCR_LOCK);
@@ -676,6 +684,8 @@ static void qspi_op_write(struct fsl_qspi_priv *priv, u8 *txbuf, u32 len)
 	else if (priv->cur_seqid == QSPI_CMD_WREAR)
 		seqid = SEQID_WREAR;
 #endif
+	else if (priv->cur_seqid == QSPI_CMD_WRSR)
+		seqid = SEQID_WRSR;
 
 	to_or_from = priv->sf_addr + priv->cur_amba_base;
 
