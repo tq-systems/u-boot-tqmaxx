@@ -764,6 +764,8 @@ int dram_init_banksize(void)
 #endif
 	} else {
 		gd->bd->bi_dram[0].size = gd->ram_size;
+		gd->bd->bi_dram[1].start = 0;
+		gd->bd->bi_dram[1].size = 0;
 	}
 #ifdef CONFIG_SYS_MEM_RESERVE_SECURE
 	if (gd->bd->bi_dram[0].size >
