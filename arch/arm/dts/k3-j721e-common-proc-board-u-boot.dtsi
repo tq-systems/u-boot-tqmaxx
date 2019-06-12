@@ -311,3 +311,11 @@
 		reg-names = "gmii-sel";
 	};
 };
+
+&wkup_i2c0_pins_default {
+	u-boot,dm-spl;
+};
+
+&wkup_i2c0 {
+	u-boot,dm-spl;
+};
