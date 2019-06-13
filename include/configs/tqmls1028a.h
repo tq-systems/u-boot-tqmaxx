@@ -118,7 +118,7 @@
 	"boot=SD\0" \
 	"loadaddr=0x82000000\0 " \
 	"fdtaddr=0x88000000\0 " \
-	"bootcmd=setenv bootargs root=/dev/mmcblk0p2 rootwait rw earlycon=uart8250,0x21c0500 console=ttyS0,115200 cma=256M video=1920x1080-32@60; fatload mmc 0:1 ${fdtaddr} Image.gz; unzip $fdtaddr $loadaddr; fatload mmc 0:1 ${fdtaddr} ls1028a-mbls1028a.dtb; booti ${loadaddr} - ${fdtaddr}\0"
+	"bootcmd=setenv bootargs root=/dev/mmcblk0p2 rootwait rw earlycon=uart8250,0x21c0500 console=ttyS0,115200 cma=256M video=1920x1080-32@60; fatload mmc 0:1 ${loadaddr} ls1028a-dp-fw.bin; hdp load ${loadaddr}; fatload mmc 0:1 ${fdtaddr} Image.gz; unzip $fdtaddr $loadaddr; fatload mmc 0:1 ${fdtaddr} ls1028a-mbls1028a.dtb; booti ${loadaddr} - ${fdtaddr}\0"
 #elif CONFIG_EMMC_BOOT
 #define BOOT_ENV_SETTINGS \
 	"boot=MMC\0" \
