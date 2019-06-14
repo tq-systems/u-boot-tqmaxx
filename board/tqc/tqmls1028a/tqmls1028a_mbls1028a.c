@@ -141,6 +141,11 @@ static void setup_RGMII(void)
 		return;
 	}
 
+	/* Set RGMII PHY LEDs Led1 and Led2 to active low */
+	val = ext_bus->read(ext_bus, RGMII_PHY_DEV_ADDR, MDIO_DEVAD_NONE, 0x19);
+	val &= 0xFBBF;
+	ext_bus->write(ext_bus, RGMII_PHY_DEV_ADDR, MDIO_DEVAD_NONE, 0x19, val);
+
 	/* enable RGMII delay in both directions */
 	val = _rgmii_phy_read_indirect(ext_bus, 0x32);
 	val |= 0x0003;
