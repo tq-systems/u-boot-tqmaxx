@@ -61,6 +61,9 @@ config MBLS102XA_RGMII
 config MBLS102XA_CAN
 	bool "CAN1/2"
 
+config MBLS102XA_SAI
+	bool "SAI1/2"
+
 endchoice
 
 source "board/tqc/common/Kconfig"

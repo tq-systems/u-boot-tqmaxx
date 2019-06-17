@@ -190,12 +190,18 @@
   #elif defined(CONFIG_SYS_CPU_1200) && \
         defined(CONFIG_MBLS102XA_CAN)
     #define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_can_qspi_1200.cfg
+  #elif defined(CONFIG_SYS_CPU_1200) && \
+        defined(CONFIG_MBLS102XA_SAI)
+    #define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_sai_qspi_1200.cfg
   #elif defined(CONFIG_SYS_CPU_1000) && \
         defined(CONFIG_MBLS102XA_RGMII)
     #define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_rgmii_qspi_1000.cfg
   #elif defined(CONFIG_SYS_CPU_1000) && \
         defined(CONFIG_MBLS102XA_CAN)
     #define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_can_qspi_1000.cfg
+  #elif defined(CONFIG_SYS_CPU_1000) && \
+        defined(CONFIG_MBLS102XA_SAI)
+    #define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_sai_qspi_1000.cfg
   #endif
 #endif
 #elif defined(CONFIG_SD_BOOT)
@@ -204,6 +210,8 @@
     #define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_rgmii_sd.cfg
   #elif defined(CONFIG_MBLS102XA_CAN)
     #define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_can_sd.cfg
+  #elif defined(CONFIG_MBLS102XA_SAI)
+    #define CONFIG_SYS_FSL_PBL_RCW	board/tqc/tqmls102xa/ls102xa_rcw_sai_sd.cfg
   #endif
 #endif
 

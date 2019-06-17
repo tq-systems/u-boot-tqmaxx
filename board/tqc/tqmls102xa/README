@@ -34,6 +34,7 @@ ecc		- ECC enabled
 <mux> is a boolean parameter that selects RGMII or CAN muxing on EC1 pins
 can		- EC1 pins muxed to CAN1_TX/CAN1_RX/CAN2_TX/CAN2_RX
 rgmii		- EC1 pins muxed to RGMII1
+sai		- EC1 pins muxed to SAI1/SAI2
 
 <boot> is a placeholder for the boot device
 mmcsd		- build to boot from device on esDHC (eMMC or SD card)
@@ -47,7 +48,12 @@ tqmls102xa_mbls102xa_ecc_can_mmcsd_defconfig
 tqmls102xa_mbls102xa_ecc_can_qspi_defconfig
 tqmls102xa_mbls102xa_ecc_rgmii_mmcsd_defconfig
 tqmls102xa_mbls102xa_ecc_rgmii_qspi_defconfig
+tqmls102xa_mbls102xa_ecc_sai_mmcsd_defconfig
+tqmls102xa_mbls102xa_ecc_sai_qspi_defconfig
 tqmls102xa_mbls102xa_rgmii_mmcsd_defconfig
 tqmls102xa_mbls102xa_rgmii_qspi_defconfig
+tqmls102xa_mbls102xa_sai_mmcsd_defconfig
+tqmls102xa_mbls102xa_sai_qspi_defconfig
 tqmls1021a-ae_mbls102xa_ecc_can_qspi_defconfig
 tqmls1021a-ae_mbls102xa_ecc_rgmii_qspi_defconfig
+tqmls1021a-ae_mbls102xa_ecc_sai_qspi_defconfig
