@@ -87,13 +87,6 @@ int board_early_init_f(void)
 	return 0;
 }
 
-void detail_board_ddr_info(void)
-{
-	puts("\nDDR    ");
-	print_size(gd->bd->bi_dram[0].size + gd->bd->bi_dram[1].size, "");
-	print_ddr_info(0);
-}
-
 #ifdef CONFIG_OF_BOARD_SETUP
 #ifdef CONFIG_FSL_ENETC
 extern void enetc_setup(void *blob);
