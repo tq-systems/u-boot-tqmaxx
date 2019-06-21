@@ -13,6 +13,8 @@ int checkboard(void)
 	printf("Board: MBLS1028A Booting from: ");
 #ifdef CONFIG_SD_BOOT
 	puts("SD\n");
+#elif CONFIG_EMMC_BOOT
+	puts("EMMC\n");
 #else
 	puts("\n");
 #endif
