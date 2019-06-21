@@ -308,6 +308,9 @@ struct spl_image_info {
 	uint *stack_prot;
 	ulong reloc_offset;
 #endif
+#ifdef CONFIG_DUAL_BOOTLOADER
+	uint64_t rbindex;
+#endif
 };
 
 /* function to jump to an image from SPL */

@@ -40,6 +40,8 @@ static __maybe_unused unsigned long spl_mmc_raw_uboot_offset(int part)
 #if defined(CONFIG_IMX_TRUSTY_OS)
 /* Pre-declaration of check_rpmb_blob. */
 int check_rpmb_blob(struct mmc *mmc);
+int mmc_load_image_raw_sector_dual_uboot(struct spl_image_info *spl_image,
+					 struct spl_boot_device *bootdev, struct mmc *mmc);
 #endif
 
 static __maybe_unused
@@ -59,20 +61,9 @@ int mmc_load_image_raw_sector(struct spl_image_info *spl_image,
 		return ret;
 	}
 
-	/* Images loaded, now check the rpmb keyblob for Trusty OS.
-	 * Skip this step when the dual bootloader feature is enabled
-	 * since the blob should be checked earlier.
-	 */
-#if defined(CONFIG_IMX_TRUSTY_OS)
-	if (IS_ENABLED(CONFIG_SPL_LOAD_IMX_CONTAINER)) {
-#if !defined(CONFIG_DUAL_BOOTLOADER)
+	/* Images loaded, now check the rpmb keyblob for Trusty OS. */
+#if defined(CONFIG_IMX_TRUSTY_OS) && !defined(CONFIG_AVB_ATX)
 		ret = check_rpmb_blob(mmc);
-#endif
-	} else {
-#if !defined(CONFIG_AVB_ATX)
-		ret = check_rpmb_blob(mmc);
-#endif
-	}
 #endif
 
 	return ret;
@@ -332,10 +323,18 @@ int default_spl_mmc_emmc_boot_partition(struct mmc *mmc)
 	 * 1 and 2 match up to boot0 / boot1 and 7 is user data
 	 * which is the first physical partition (0).
 	 */
+#ifdef CONFIG_DUAL_BOOTLOADER
+		/* Bootloader is stored in eMMC user partition for
+		 * dual bootloader.
+		 */
+		part = 0;
+#else
 	part = EXT_CSD_EXTRACT_BOOT_PART(mmc->part_config);
 	if (part == EMMC_BOOT_PART_USER)
 		part = EMMC_HWPART_DEFAULT;
 #endif
+#endif
+
 	return part;
 }
 
@@ -415,7 +414,9 @@ int spl_mmc_load(struct spl_image_info *spl_image,
 				return 0;
 		}
 
+#ifndef CONFIG_DUAL_BOOTLOADER
 		raw_sect = spl_mmc_get_uboot_raw_sector(mmc, raw_sect);
+#endif
 
 #ifdef CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_USE_PARTITION
 		ret = mmc_load_image_raw_partition(spl_image, bootdev,
@@ -425,9 +426,13 @@ int spl_mmc_load(struct spl_image_info *spl_image,
 			return 0;
 #endif
 #ifdef CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_USE_SECTOR
+#ifdef CONFIG_DUAL_BOOTLOADER
+		ret = mmc_load_image_raw_sector_dual_uboot(spl_image, bootdev, mmc);
+#else
 		ret = mmc_load_image_raw_sector(spl_image, bootdev, mmc,
 						raw_sect +
 						spl_mmc_raw_uboot_offset(part));
+#endif
 		if (!ret)
 			return 0;
 #endif
