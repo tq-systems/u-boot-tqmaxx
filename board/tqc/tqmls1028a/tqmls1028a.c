@@ -30,6 +30,23 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+void serdes_pll_reset(void)
+{
+	#define RSTCTL_RSTREQ		0x80000000
+	#define RSTCTL_RST_DONE		0x40000000
+	#define RSTCTL_RSTERR		0x20000000
+
+	u32 reg;
+
+	/* if error in PLL initiate reset */
+	reg = in_le32(0x1EA0000);
+	if (reg & RSTCTL_RSTERR)
+		setbits_le32(0x1EA0000, RSTCTL_RSTREQ);
+
+	reg = in_le32(0x1EA0020);
+	if (reg & RSTCTL_RSTERR)
+		setbits_le32(0x1EA0020, RSTCTL_RSTREQ);
+}
 int board_init(void)
 {
 #ifdef CONFIG_ENV_IS_NOWHERE
@@ -41,6 +58,8 @@ int board_init(void)
 #endif
 
 	board_bb_init();
+
+	serdes_pll_reset();
 
 #ifndef CONFIG_SYS_EARLY_PCI_INIT
 	/* run PCI init to kick off ENETC */
