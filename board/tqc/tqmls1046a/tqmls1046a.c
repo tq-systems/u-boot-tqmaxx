@@ -19,7 +19,7 @@
 #include <fsl_csu.h>
 #include <fsl_esdhc.h>
 #include <fsl_sec.h>
-#include "tqmls1046a_bb.h"
+#include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
 
 #define SCFG_QSPI_CLKSEL_DIV_24	    0x30100000
@@ -44,7 +44,7 @@ int board_early_init_f(void)
 	out_be32(&scfg->qspi_cfg, SCFG_QSPI_CLKSEL_DIV_24);
 #endif
 
-	return tqmls1046a_bb_board_early_init_f();
+	return tqc_bb_board_early_init_f();
 }
 
 #ifndef CONFIG_SPL_BUILD
@@ -62,7 +62,7 @@ int checkboard(void)
 	i2c_set_bus_num(oldbus);
 
 	/* print SoM and baseboard name */
-	printf("Board: TQMLS1046A on a %s ", tqmls1046a_bb_get_boardname());
+	printf("Board: TQMLS1046A on a %s ", tqc_bb_get_boardname());
 	switch(bootsrc & 0x0F) {
 		case 0x0:
 			printf("(Boot from QSPI)\n");
@@ -85,7 +85,7 @@ int checkboard(void)
 	printf("         CPLD FW Rev: %2d.%02d\n", 
 		(cpldrev >> 4) & 0xF, cpldrev & 0xF);
  
-	return tqmls1046a_bb_checkboard();
+	return tqc_bb_checkboard();
 }
 
 int board_init(void)
@@ -112,7 +112,7 @@ int board_init(void)
 	ppa_init();
 #endif
 
-	return tqmls1046a_bb_board_init();
+	return tqc_bb_board_init();
 }
 
 #ifdef CONFIG_MISC_INIT_R
@@ -140,7 +140,7 @@ int misc_init_r(void)
 		printf("EEPROM: err %d\n", ret);
 	}
 
-	return tqmls1046a_bb_misc_init_r();
+	return tqc_bb_misc_init_r();
 }
 #endif
 
@@ -174,7 +174,7 @@ int board_mmc_getcd(struct mmc *mmc)
 			/* sd-card selected without hardware card detection pin,
 			 * check baseboard specific function
 			 */
-			ret = tqmls1046a_bb_board_mmc_getcd(mmc);
+			ret = tqc_bb_board_mmc_getcd(mmc);
 		}
 	}
 
@@ -211,7 +211,7 @@ int board_mmc_getwp(struct mmc *mmc)
 			/* sd-card selected without hardware write protection pin,
 			 * check baseboard specific function
 			 */
-			ret = tqmls1046a_bb_board_mmc_getwp(mmc);
+			ret = tqc_bb_board_mmc_getwp(mmc);
 		}
 	}
 
@@ -250,6 +250,6 @@ int ft_board_setup(void *blob, bd_t *bd)
 		fdt_setprop_empty(blob, offset, "no-1-8-v");
 	}
 
-	return tqmls1046a_bb_ft_board_setup(blob, bd);
+	return tqc_bb_ft_board_setup(blob, bd);
 }
 #endif

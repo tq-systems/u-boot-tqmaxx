@@ -10,7 +10,7 @@
 #include <fsl_dtsec.h>
 #include <fsl_mdio.h>
 #include <malloc.h>
-#include "tqmls1046a_bb.h"
+#include "../common/tqc_bb.h"
 #include "../common/tqc_mbls10xxa.h"
 
 
@@ -249,7 +249,7 @@ static int _tqmls1046a_bb_check_serdes_mux(void)
 #endif /* !CONFIG_SPL_BUILD */
 
 
-int tqmls1046a_bb_board_early_init_f(void)
+int tqc_bb_board_early_init_f(void)
 {
 	struct ccsr_gpio *ccsr = (void *)(GPIO4_BASE_ADDR);
 	uint32_t reg;
@@ -261,12 +261,11 @@ int tqmls1046a_bb_board_early_init_f(void)
 	reg &= ~(0x30000000);
 	out_be32(&ccsr->gpdir, reg);
 
-	/* nothing to do */
 	return ret;
 }
 
 #ifndef CONFIG_SPL_BUILD
-int tqmls1046a_bb_board_init(void)
+int tqc_bb_board_init(void)
 {
 	int ret = 0;
 
@@ -274,7 +273,7 @@ int tqmls1046a_bb_board_init(void)
 	return ret;
 }
 
-int tqmls1046a_bb_misc_init_r(void)
+int tqc_bb_misc_init_r(void)
 {
 	int ret = 0;
 #ifdef CONFIG_HAS_FSL_XHCI_USB
@@ -321,19 +320,19 @@ int tqmls1046a_bb_misc_init_r(void)
 	return 0;
 }
 
-int tqmls1046a_bb_checkboard(void)
+int tqc_bb_checkboard(void)
 {
 	/* nothing to do */
 	return 0;
 }
 
-const char *tqmls1046a_bb_get_boardname(void)
+const char *tqc_bb_get_boardname(void)
 {
 	return "MBLS10xxA";
 }
 
 #ifdef CONFIG_NET
-int tqmls1046a_bb_board_eth_init(bd_t *bis)
+int tqc_bb_board_eth_init(bd_t *bis)
 {
 #ifdef CONFIG_FMAN_ENET
 	struct memac_mdio_info dtsec_mdio1_info;
@@ -430,14 +429,28 @@ int tqmls1046a_bb_board_eth_init(bd_t *bis)
 }
 #endif
 
-int tqmls1046a_bb_board_mmc_getcd(struct mmc *mmc)
+int tqc_bb_board_mmc_init(bd_t *bis)
+{
+	struct ccsr_gpio *ccsr = (void *)(GPIO4_BASE_ADDR);
+	uint32_t reg;
+
+	/* configure sd card detect and write protect GPIOs as input */
+	/* CD = GPIO4_2, WP = GPIO4_3 */
+	reg = in_be32(&ccsr->gpdir);
+	reg &= ~(0x30000000);
+	out_be32(&ccsr->gpdir, reg);
+
+	return 0;
+}
+
+int tqc_bb_board_mmc_getcd(struct mmc *mmc)
 {
 	struct ccsr_gpio *ccsr = (void *)(GPIO4_BASE_ADDR);
 
 	return !(in_be32(&ccsr->gpdat) & (1 << (31-2)));
 }
 
-int tqmls1046a_bb_board_mmc_getwp(struct mmc *mmc)
+int tqc_bb_board_mmc_getwp(struct mmc *mmc)
 {
 	struct ccsr_gpio *ccsr = (void *)(GPIO4_BASE_ADDR);
 
@@ -629,7 +642,7 @@ void board_ft_fman_fixup_port(void *fdt, char *compat, phys_addr_t addr,
 }
 
 #if defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT)
-int tqmls1046a_bb_ft_board_setup(void *blob, bd_t *bd)
+int tqc_bb_ft_board_setup(void *blob, bd_t *bd)
 {
 	/* nothing to do */
 	return 0;

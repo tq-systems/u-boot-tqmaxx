@@ -9,7 +9,7 @@
 #include <fsl_dtsec.h>
 #include <fsl_mdio.h>
 #include <malloc.h>
-#include "tqmls1043a_bb.h"
+#include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
 
 #ifndef CONFIG_SPL_BUILD
@@ -38,7 +38,7 @@ int board_eth_init(bd_t *bis)
 		printf("Could not read EEPROM! err: %d\n", ret);
 	}
 
-	ret = tqmls1043a_bb_board_eth_init(bis);
+	ret = tqc_bb_board_eth_init(bis);
 	if(ret != 0) {
 		return ret;
 	}
