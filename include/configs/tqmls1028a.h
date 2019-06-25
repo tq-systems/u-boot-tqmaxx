@@ -74,21 +74,29 @@
 #endif
 
 #undef BOOT_ENV_SETTINGS
-#ifdef CONFIG_SD_BOOT
 #define BOOT_ENV_SETTINGS \
 	"boot=SD\0" \
 	"loadaddr=0x82000000\0 " \
 	"fdtaddr=0x88000000\0 " \
-	"bootcmd=setenv bootargs root=/dev/mmcblk0p2 rootwait rw earlycon=uart8250,0x21c0500 console=ttyS0,115200 cma=256M video=1920x1080-32@60; fatload mmc 0:1 ${loadaddr} ls1028a-dp-fw.bin; hdp load ${loadaddr}; fatload mmc 0:1 ${fdtaddr} Image.gz; unzip $fdtaddr $loadaddr; fatload mmc 0:1 ${fdtaddr} ls1028a-mbls1028a.dtb; booti ${loadaddr} - ${fdtaddr}\0"
-#elif CONFIG_EMMC_BOOT
-#define BOOT_ENV_SETTINGS \
-	"boot=MMC\0" \
-	"loadaddr=0x82000000\0 " \
-	"fdtaddr=0x88000000\0 " \
-	"bootcmd=setenv bootargs root=/dev/mmcblk1p2 rootwait rw earlycon=uart8250,0x21c0500 console=ttyS0,115200 cma=256M video=1920x1080-32@60; fatload mmc 1:1 ${fdtaddr} Image.gz; unzip $fdtaddr $loadaddr; fatload mmc 1:1 ${fdtaddr} ls1028a-mbls1028a.dtb; booti ${loadaddr} - ${fdtaddr}\0"
-#else
-#define BOOT_ENV_SETTINGS
-#endif
+	"addtty=setenv bootargs ${bootargs} console=ttyS0,115200\0" \
+	"addvideo=setenv bootargs ${bootargs} cma=256M video=1920x1080-32@60\0"	\
+	"addsd=setenv bootargs ${bootargs} root=/dev/mmcblk0p2 "               \
+		"rootfstype=ext4\0"                                \
+	"sdhdpload=fatload mmc 0:1 ${loadaddr} ls1028a-dp-fw.bin; hdp load ${loadaddr};\0" \
+	"sdimageload=fatload mmc 0:1 ${fdtaddr} Image.gz; unzip $fdtaddr $loadaddr\0" \
+	"sdfdtload=fatload mmc 0:1 ${fdtaddr} ls1028a-mbls1028a.dtb;\0" \
+	"sdargs=run addsd addtty addvideo\0"                      \
+	"sdboot=echo Booting from sd card ...; " \
+		"setenv bootargs; " \
+		"run sdargs; " \
+		"run sdhdpload; " \
+		"run sdimageload; "\
+		"run sdfdtload;" \
+		"booti ${loadaddr} - ${fdtaddr}\0" \
+	"panicboot=echo No boot device !!! reset\0"
+
+#undef CONFIG_BOOTCOMMAND
+#define CONFIG_BOOTCOMMAND "run sdboot; run panicboot"
 
 #undef CONFIG_EXTRA_ENV_SETTINGS
 #define CONFIG_EXTRA_ENV_SETTINGS \
