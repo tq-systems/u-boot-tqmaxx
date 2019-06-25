@@ -82,6 +82,10 @@
 	"addvideo=setenv bootargs ${bootargs} cma=256M video=1920x1080-32@60\0"	\
 	"addsd=setenv bootargs ${bootargs} root=/dev/mmcblk0p2 "               \
 		"rootfstype=ext4\0"                                \
+	"resetusb=i2c dev 5; i2c mw 0x25 0x6.1 0xfd; i2c mw 0x25 0x2.1 0xfd; "\
+		"sleep 0.1; i2c mw 0x25 0x2.1 0xff;\0 " \
+	"resetphy=i2c dev 5; i2c mw 0x70 0x3 0xd5; i2c mw 0x70 0x1 0xd5; " \
+		"sleep 0.1; i2c mw 0x70 0x1 0xff;\0" \
 	"sdhdpload=fatload mmc 0:1 ${loadaddr} ls1028a-dp-fw.bin; hdp load ${loadaddr};\0" \
 	"sdimageload=fatload mmc 0:1 ${fdtaddr} Image.gz; unzip $fdtaddr $loadaddr\0" \
 	"sdfdtload=fatload mmc 0:1 ${fdtaddr} ls1028a-mbls1028a.dtb;\0" \
