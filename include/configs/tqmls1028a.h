@@ -25,7 +25,6 @@
 #define CONFIG_MISC_INIT_R
 
 /* DDR */
-/* #define CONFIG_SYS_DDR_RAW_TIMING */
 #define CONFIG_DDR_ECC
 #define CONFIG_ECC_INIT_VIA_DDRCONTROLLER
 #define CONFIG_MEM_INIT_VALUE		0xdeadbeef
