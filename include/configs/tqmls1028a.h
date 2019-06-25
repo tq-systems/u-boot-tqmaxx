@@ -73,6 +73,29 @@
 #define CONFIG_SYS_SATA1                        AHCI_BASE_ADDR1
 #endif
 
+#define TQMLS1028_SD_RCW_FILE_NAME	"rcw_1300_sd.bin"
+#define MAX_RCW_SIZE 1024
+#define SD_RCW_OFFSET 0x8 /* Blocks */
+
+#define TQMLS1028_UPDATE_ENV_SETTINGS                                          \
+	"rcw_sd_file="TQMLS1028_SD_RCW_FILE_NAME"\0"                           \
+	"rcw_max_size="__stringify(MAX_RCW_SIZE)"\0"                           \
+	"rcw_sd_offset="__stringify(SD_RCW_OFFSET)"\0"                         \
+	"firmwarepart=1\0"                                                     \
+	"mmcsddev=0\0"								\
+	"update_rcw_sd=run set_getcmd; "                                       \
+		"if ${getcmd} ${rcw_sd_file}; then "                           \
+			"if itest ${filesize} > 0; then "                      \
+				"mmc dev ${mmcsddev}; mmc rescan; "		       \
+				"setexpr blkc ${filesize} + 0x1ff; "           \
+				"setexpr blkc ${blkc} / 0x200; "               \
+				"if itest ${filesize} <= ${rcw_max_size}; then "\
+					"mmc write ${loadaddr} ${rcw_sd_offset} ${blkc}; "\
+				"fi; "                                         \
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; setenv blkc; setenv getcmd \0"               \
+
 #undef BOOT_ENV_SETTINGS
 #define BOOT_ENV_SETTINGS \
 	"boot=SD\0" \
@@ -113,7 +136,11 @@
 	"stderr=serial\0" \
 	"stdin=serial\0" \
 	"stdout=serial\0" \
-	"board=tqmls1028a_mbls1028a\0"
+	"board=tqmls1028a_mbls1028a\0" \
+	"set_getcmd=if test \"${ipmode}\" != static; then "                    \
+		"setenv getcmd dhcp; setenv autoload yes; "                    \
+		"else setenv getcmd tftp; setenv autoload no; fi\0"            \
+		TQMLS1028_UPDATE_ENV_SETTINGS
 
 /*
  * All the defines above are for the TQMLS1028a SoM
