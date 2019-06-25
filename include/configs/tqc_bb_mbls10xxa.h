@@ -1,10 +1,11 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
+
 /*
- * Copyright 2018 TQ-Systems GmbH
+ * Copyright 2019 TQ-Systems GmbH
  */
 
-#ifndef __TQMLS1046A_BB_MBLS10XX_H__
-#define __TQMLS1046A_BB_MBLS10XX_H__
+#ifndef __TQC_BB_MBLS10XX_H__
+#define __TQC_BB_MBLS10XX_H__
 
 /* Fman ethernet settings */
 #ifdef CONFIG_FMAN_ENET
@@ -40,5 +41,5 @@
 #define TQC_MBLS10XXA_I2C_CLKBUF_BUS_NUM  3
 #define TQC_MBLS10xxA_I2C_CLKBUF_ADDR     0x6e
 
-#endif /* __TQMLS1046A_BB_MBLS10XX_H__ */
+#endif /* __TQC_BB_MBLS10XX_H__ */
 
