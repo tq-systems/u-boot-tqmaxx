@@ -74,6 +74,7 @@
 #endif
 
 #define TQMLS1028_SD_RCW_FILE_NAME	"rcw_1300_sd.bin"
+#define TQMLS1028_EMMC_RCW_FILE_NAME	"rcw_1300_emmc.bin"
 #define TQMLS1028_SD_UBOOT_FILE_NAME	"u-boot-with-spl.bin"
 #define TQMLS1028_SD_KERNEL_FILE_NAME	"Image.gz"
 #define MAX_RCW_SIZE 1024
@@ -85,6 +86,7 @@
 	"rcw_sd_file="TQMLS1028_SD_RCW_FILE_NAME"\0"                           \
 	"rcw_max_size="__stringify(MAX_RCW_SIZE)"\0"                           \
 	"rcw_sd_offset="__stringify(SD_RCW_OFFSET)"\0"                         \
+	"rcw_emmc_file="TQMLS1028_EMMC_RCW_FILE_NAME"\0"                           \
 	"uboot_sd_file="TQMLS1028_SD_UBOOT_FILE_NAME"\0"                           \
 	"uboot_max_size="__stringify(MAX_UBOOT_SIZE)"\0"                           \
 	"uboot_sd_offset="__stringify(SD_UBOOT_OFFSET)"\0"                         \
