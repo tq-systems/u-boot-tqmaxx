@@ -14,160 +14,83 @@
 #include "../common/tqc_mbls10xxa.h"
 
 
+#ifndef CONFIG_SPL_BUILD
 #define TQMLS1043A_SRDS1_PROTO(cfg, lane)	((cfg >> 4*(3-lane)) & 0xF)
 
-const char *serdes_rcw_str[] = {
-	"Unused    ",   // 0
-	"XFI       ",   // 1
-	"2.5G SGMII",   // 2
-	"SGMII     ",   // 3
-	"QSGMII    ",   // 4
-	"PCIe x1   ",   // 5
-	"PCIe x2   ",   // 6
-	"PCIe x4   ",   // 7
-	"SATA      ",   // 8
-	"PCIe x1   ",   // 9
-	"Undefined ",   // a
-	"Undefined ",   // b
-	"Undefined ",   // c
-	"Undefined ",   // d
-	"Undefined "    // e
-	"Undefined "    // f
-};
+static int _tqmls1043a_bb_set_lane(struct tqc_mbls10xxa_serdes *serdes, int port, int lane, int proto)
+{
+	serdes->port = port;
+	serdes->lane = lane;
+	switch(proto) {
+		case 0: /* Unused */
+			serdes->proto = TQC_MBLS10xxA_SRDS_PROTO_UNUSED;
+			break;
+		case 1: /* XFI */
+			serdes->proto = TQC_MBLS10xxA_SRDS_PROTO_XFI;
+			break;
+		case 2: /* 2.5G SGMII */
+			serdes->proto = TQC_MBLS10xxA_SRDS_PROTO_SGMII2G5;
+			break;
+		case 3: /* SGMII */
+			serdes->proto = TQC_MBLS10xxA_SRDS_PROTO_SGMII;
+			break;
+		case 4: /* QSGMII */
+			serdes->proto = TQC_MBLS10xxA_SRDS_PROTO_QSGMII;
+			break;
+		case 5: /* PCIe x1 */
+		case 9: /* PCIe x1 (alternate) */
+			serdes->proto = TQC_MBLS10xxA_SRDS_PROTO_PCIEx1;
+			break;
+		case 6: /* PCIe x2 */
+			serdes->proto = TQC_MBLS10xxA_SRDS_PROTO_PCIEx2;
+			break;
+		case 7: /* PCIe x4 */
+			serdes->proto = TQC_MBLS10xxA_SRDS_PROTO_PCIEx4;
+			break;
+		case 8: /* SATA */
+			serdes->proto = TQC_MBLS10xxA_SRDS_PROTO_SATA;
+			break;
+		default: /* Undefined */
+			serdes->proto = -1;
+			break;
+	}
 
-#ifndef CONFIG_SPL_BUILD
+	return 0;
+}
+
 static int _tqmls1043a_bb_check_serdes_mux(void)
 {
 	u32 srds_s1;
 	struct ccsr_gur *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
-	int mux_val1, mux_val2;
-	int mux_stat = 0;
-	int rcw_proto;
+	struct tqc_mbls10xxa_serdes lanes[8];
+	int clk_freq;
 
 	/* read SerDes configuration from RCW */
 	srds_s1 = in_be32(&gur->rcwsr[4]) &
 			FSL_CHASSIS2_RCWSR4_SRDS1_PRTCL_MASK;
 	srds_s1 >>= FSL_CHASSIS2_RCWSR4_SRDS1_PRTCL_SHIFT;
 
-	printf("Checking baseboard SerDes muxing:\n");
+	/* fill lane usage table */
+	_tqmls1043a_bb_set_lane(&(lanes[0]), 1, 0, TQMLS1043A_SRDS1_PROTO(srds_s1, 0));
+	_tqmls1043a_bb_set_lane(&(lanes[1]), 0, 0, 0);
+	_tqmls1043a_bb_set_lane(&(lanes[2]), 1, 1, TQMLS1043A_SRDS1_PROTO(srds_s1, 1));
+	_tqmls1043a_bb_set_lane(&(lanes[3]), 0, 0, 0);
+	_tqmls1043a_bb_set_lane(&(lanes[4]), 0, 0, 0);
+	_tqmls1043a_bb_set_lane(&(lanes[5]), 1, 2, TQMLS1043A_SRDS1_PROTO(srds_s1, 2));
+	_tqmls1043a_bb_set_lane(&(lanes[6]), 0, 0, 0);
+	_tqmls1043a_bb_set_lane(&(lanes[7]), 1, 3, TQMLS1043A_SRDS1_PROTO(srds_s1, 3));
 
-	/* check state of SD_MUX_SHDN */
-	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd_mux_shdn");
-	if(mux_val1) {
-		printf("!!! ATTENTION: SerDes MUXes disabled,\n");
-		printf("!!!  muxed SerDes interfaces won't work\n");
-	}
-	
-	/* check config for SD1 - LANE A (name on board SD1_0_LANE_D) */
-	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd1_0_lane_d_mux");
-	rcw_proto = TQMLS1043A_SRDS1_PROTO(srds_s1, 0);
-	if(mux_val1 >= 0) {
-		printf("  SD1-0 Lane A: MUX=%s | RCW=%s -> ",
-		   (mux_val1)?("XFI    "):("SGMII  "),
-		   serdes_rcw_str[rcw_proto]);
-
-		if((rcw_proto == 0x0) ||
-		   (!mux_val1 && (rcw_proto == 0x3)) ||
-		   (mux_val1 && (rcw_proto == 0x1))
-		  ) {
-			printf(" OK\n");
-		} else {
-			mux_stat++;
-			printf(" FAIL\n");
-		}
-	}
-
-	/* check config for SD1 - LANE B (name on board SD1_2_LANE_B) */
-	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd1_2_lane_b_mux");
-	rcw_proto = TQMLS1043A_SRDS1_PROTO(srds_s1, 1);
-	if(mux_val1 >= 0) {
-		printf("  SD1-1 Lane B: MUX=%s | RCW=%s -> ",
-		   (mux_val1)?("QSGMII "):("SGMII  "),
-		   serdes_rcw_str[rcw_proto]);
-
-		if((rcw_proto == 0x0) ||
-		   (!mux_val1 && (rcw_proto == 0x3)) ||
-		   (mux_val1 && (rcw_proto == 0x4))
-		  ) {
-			printf(" OK\n");
-		} else {
-			mux_stat++;
-			printf(" FAIL\n");
-		}
-	}
-
-	/* check config for SD1 - LANE C (name on board SD2_1_LANE_B) */
-	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd2_1_lane_b_mux");
-	rcw_proto = TQMLS1043A_SRDS1_PROTO(srds_s1, 2);
-	if(mux_val1 >= 0) {
-		printf("  SD1-2 Lane C: MUX=%s | RCW=%s -> ",
-		   (mux_val1)?("SGMII  "):("PCIe   "),
-		   serdes_rcw_str[rcw_proto]);
-
-		if((rcw_proto == 0x0) ||
-		   (!mux_val1 && (rcw_proto == 0x5)) ||
-		   (mux_val1 && (rcw_proto == 0x3))
-		  ) {
-			printf(" OK\n");
-		} else {
-			mux_stat++;
-			printf(" FAIL\n");
-		}
-
-		/* enable miniPCIe-Slot when selected */
-		if(!mux_val1 && (rcw_proto == 0x5))
-			tqc_mbls10xxa_i2c_gpio_set("mpcie2_disable#", 1);
-		else
-			tqc_mbls10xxa_i2c_gpio_set("mpcie2_disable#", 0);
-	}
-
-	/* check config for SD1 - LANE D (name on board SD2_3_LANE_D) */
-	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd2_3_lane_d_mux1");
-	mux_val2 = tqc_mbls10xxa_i2c_gpio_get("sd2_3_lane_d_mux2");
-	rcw_proto = TQMLS1043A_SRDS1_PROTO(srds_s1, 3);
-	if((mux_val1 >= 0) && (mux_val2 >= 0)){
-		printf("  SD1-3 Lane D: MUX=%s | RCW=%s -> ",
-		   (mux_val1)?((mux_val2)?("PCIe   "):("SATA   ")):("PCIe x2"),
-		   serdes_rcw_str[rcw_proto]);
-
-		if((rcw_proto == 0x0) ||
-		   (mux_val1 && !mux_val2 && (rcw_proto == 0x8)) ||
-		   (mux_val1 && mux_val2 && (rcw_proto == 0x5))
-		  ) {
-			printf(" OK\n");
-		} else {
-			mux_stat++;
-			printf(" FAIL\n");
-		}
-
-		/* enable miniPCIe-Slot when selected */
-		if(mux_val1 && mux_val2 && (rcw_proto == 0x5))
-			tqc_mbls10xxa_i2c_gpio_set("mpcie1_disable#", 1);
-		else
-			tqc_mbls10xxa_i2c_gpio_set("mpcie1_disable#", 0);
-	}
-
-	/* print error message when muxing is invalid */
-	if(mux_stat) {
-		printf("!!! ATTENTION: Some SerDes lanes are misconfigured,\n");
-		printf("!!!  this may cause some interfaces to be inoperable.\n");
-		printf("!!!  Check SerDes muxing DIP switch settings!\n");
-
-		return -1;
-	}
+	/* check and init lane usage */
+	tqc_mbls10xxa_serdes_init(lanes);
 
 	/* check serdes clock muxing */
-	mux_val1 = tqc_mbls10xxa_i2c_gpio_get("sd1_ref_clk2_sel");
-	if(mux_val1 >= 0) {
-		if((TQMLS1043A_SRDS1_PROTO(srds_s1, 0) == 0x1) &&
-		   (mux_val1)) {
-		   printf("!!! ATTENTON: SerDes1 RefClk1 is not 156.25MHz,\n");
-		   printf("!!!  but this is needed for XFI operation!\n");
-		} else if((TQMLS1043A_SRDS1_PROTO(srds_s1, 0) != 0x1) &&
-		   !(mux_val1)) {
-		   printf("!!! ATTENTON: SerDes1 RefClk1 is 156.25MHz,\n");
-		   printf("!!!  but this is only valid for XFI operation!\n");
-		}
+	clk_freq = tqc_mbls10xxa_serdes_clk_get(TQC_MBLS10xxA_SRDS_CLK_1_2);
+	if((clk_freq == 125000000) && (TQMLS1043A_SRDS1_PROTO(srds_s1, 0) == 0x1)) {
+	   printf("!!! ATTENTON: SerDes1 RefClk1 is not 156.25MHz,\n");
+	   printf("!!!  but this is needed for XFI operation!\n");
+	} else if((clk_freq == 156250000) && (TQMLS1043A_SRDS1_PROTO(srds_s1, 0) != 0x1)) {
+	   printf("!!! ATTENTON: SerDes1 RefClk1 is 156.25MHz,\n");
+	   printf("!!!  but this is only valid for XFI operation!\n");
 	}
 
 	return 0;
@@ -364,99 +287,10 @@ int tqc_bb_board_mmc_init(bd_t *bis)
 	return 0;
 }
 
-static uint16_t _rgmii_phy_read_indirect(struct phy_device *phydev,
-					uint8_t addr)
-{
-	phy_write(phydev, MDIO_DEVAD_NONE, 0x0d, 0x001f);
-	phy_write(phydev, MDIO_DEVAD_NONE, 0x0e, addr);
-	phy_write(phydev, MDIO_DEVAD_NONE, 0x0d, 0x401f);
-	return phy_read(phydev, MDIO_DEVAD_NONE, 0x0e);
-}
-
-static void _rgmii_phy_write_indirect(struct phy_device *phydev,
-					uint8_t addr, uint16_t value)
-{
-	phy_write(phydev, MDIO_DEVAD_NONE, 0x0d, 0x001f);
-	phy_write(phydev, MDIO_DEVAD_NONE, 0x0e, addr);
-	phy_write(phydev, MDIO_DEVAD_NONE, 0x0d, 0x401f);
-	phy_write(phydev, MDIO_DEVAD_NONE, 0x0e, value);
-}
-
 int board_phy_config(struct phy_device *phydev)
 {
-	uint16_t val;
-	int ret = 0;
-	static bool qsgmii1_initdone = false;
-	static bool qsgmii2_initdone = false;
-
-	if (phydev->drv->config)
-		ret = phydev->drv->config(phydev);
-
-
-	if(!ret) {
-		if((phydev->addr == RGMII_PHY1_ADDR) ||
-		   (phydev->addr == RGMII_PHY2_ADDR)) {
-			/* enable RGMII delay in both directions */
-			val = _rgmii_phy_read_indirect(phydev, 0x32);
-			val |= 0x0003;
-			_rgmii_phy_write_indirect(phydev, 0x32, val);
-
-			/* set RGMII delay in both directions to 1,5ns */
-			val = _rgmii_phy_read_indirect(phydev, 0x86);
-			val = (val & 0xFF00) | 0x0055;
-			_rgmii_phy_write_indirect(phydev, 0x86, val);
-		} else if(((phydev->addr & 0x1C) == QSGMII_PHY1_ADDR_BASE) ||
-		          ((phydev->addr & 0x1C) == QSGMII_PHY2_ADDR_BASE)) {
-			/* check if initialization has already been done */
-			if((((phydev->addr & 0x1C) == QSGMII_PHY1_ADDR_BASE) &&
-			    qsgmii1_initdone) ||
-			   (((phydev->addr & 0x1C) == QSGMII_PHY2_ADDR_BASE) &&
-			    qsgmii2_initdone)) {
-				/* initialization already done, skip */
-				return ret;
-			}
-
-			/* reset PHY because clock input may have changed */
-			phy_write(phydev, MDIO_DEVAD_NONE, 0x16, 0x0004);
-			phy_write(phydev, MDIO_DEVAD_NONE, 0x1B, 0x8000);
-			/* wait for 50ms for reset to complete */
-			mdelay(50);
-
-			/* execute marvell specified initialization */
-			/* see MV-S301615 release note */
-			/* PHY initialization #1 */
-			phy_write(phydev, MDIO_DEVAD_NONE, 0x16, 0x00ff);
-			phy_write(phydev, MDIO_DEVAD_NONE, 0x18, 0x2800);
-			phy_write(phydev, MDIO_DEVAD_NONE, 0x17, 0x2001);
-			phy_write(phydev, MDIO_DEVAD_NONE, 0x16, 0x0000);
-			/* PHY initialization #2 */
-			phy_write(phydev, MDIO_DEVAD_NONE, 0x16, 0x0000);
-			phy_write(phydev, MDIO_DEVAD_NONE, 0x1D, 0x0003);
-			phy_write(phydev, MDIO_DEVAD_NONE, 0x1E, 0x0002);
-			phy_write(phydev, MDIO_DEVAD_NONE, 0x16, 0x0000);
-
-			/* check configuration of PHY device */
-			printf("QSGMII ethernet PHY 0x%02x configuration: ", phydev->addr);
-			phy_write(phydev, MDIO_DEVAD_NONE, 0x16, 0x0006);
-			val = phy_read(phydev, MDIO_DEVAD_NONE, 0x14);
-			phy_write(phydev, MDIO_DEVAD_NONE, 0x16, 0x0000);
-			if((val & 0x7) == 0) {
-				printf("QSGMII to Copper\n");
-			} else if((val & 0x7) == 1) {
-				printf("SGMII to Copper\n");
-			} else {
-				printf("unsupported\n");
-			}
-
-			/* mark PHY as initialized */
-			if((phydev->addr & 0x1C) == QSGMII_PHY1_ADDR_BASE)
-				qsgmii1_initdone = true;
-			if((phydev->addr & 0x1C) == QSGMII_PHY2_ADDR_BASE)
-				qsgmii2_initdone = true;
-		}
-	}
-
-	return ret;
+	/* call baseboard common function */
+	return tqc_mbls10xxa_board_phy_config(phydev);
 }
 
 static int fdt_set_phy_handle(void *fdt, char *compat, phys_addr_t addr,
