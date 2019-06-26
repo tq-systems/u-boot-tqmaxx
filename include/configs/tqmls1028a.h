@@ -92,6 +92,7 @@
 	"kernel_file="TQMLS1028_SD_KERNEL_FILE_NAME"\0"\
 	"firmwarepart=1\0"                                                     \
 	"mmcsddev=0\0"								\
+	"mmcdev=1\0"								\
 	"update_rcw_sd=run set_getcmd; "                                       \
 		"if ${getcmd} ${rcw_sd_file}; then "                           \
 			"if itest ${filesize} > 0; then "                      \
@@ -136,6 +137,30 @@
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"setenv filesize; setenv getcmd \0"                            \
+	"update_rcw_emmc=run set_getcmd; "                                       \
+		"if ${getcmd} ${rcw_emmc_file}; then "                           \
+			"if itest ${filesize} > 0; then "                      \
+				"mmc dev ${mmcdev}; mmc rescan; "		       \
+				"setexpr blkc ${filesize} + 0x1ff; "           \
+				"setexpr blkc ${blkc} / 0x200; "               \
+				"if itest ${filesize} <= ${rcw_max_size}; then "\
+					"mmc write ${loadaddr} ${rcw_sd_offset} ${blkc}; "\
+				"fi; "                                         \
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; setenv blkc; setenv getcmd \0"               \
+	"update_uboot_emmc=run set_getcmd; "                                     \
+		"if ${getcmd} ${uboot_sd_file}; then "                         \
+			"if itest ${filesize} > 0; then "                      \
+				"mmc dev ${mmcdev}; mmc rescan; "		       \
+				"setexpr blkc ${filesize} + 0x1ff; "           \
+				"setexpr blkc ${blkc} / 0x200; "               \
+				"if itest ${filesize} <= ${uboot_max_size}; then "	       \
+					"mmc write ${loadaddr} ${uboot_sd_offset} ${blkc}; "\
+				"fi; "                                         \
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; setenv blkc; setenv getcmd \0"               \
 
 #undef BOOT_ENV_SETTINGS
 #define BOOT_ENV_SETTINGS \
