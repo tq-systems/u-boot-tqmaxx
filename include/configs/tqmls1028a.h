@@ -74,19 +74,28 @@
 #endif
 
 #define TQMLS1028_SD_RCW_FILE_NAME	"rcw_1300_sd.bin"
+#define TQMLS1028_SD_UBOOT_FILE_NAME	"u-boot-with-spl.bin"
+#define TQMLS1028_SD_KERNEL_FILE_NAME	"Image.gz"
 #define MAX_RCW_SIZE 1024
 #define SD_RCW_OFFSET 0x8 /* Blocks */
+#define MAX_UBOOT_SIZE 0x300000
+#define SD_UBOOT_OFFSET 0x800 /* Blocks */
 
 #define TQMLS1028_UPDATE_ENV_SETTINGS                                          \
 	"rcw_sd_file="TQMLS1028_SD_RCW_FILE_NAME"\0"                           \
 	"rcw_max_size="__stringify(MAX_RCW_SIZE)"\0"                           \
 	"rcw_sd_offset="__stringify(SD_RCW_OFFSET)"\0"                         \
+	"uboot_sd_file="TQMLS1028_SD_UBOOT_FILE_NAME"\0"                           \
+	"uboot_max_size="__stringify(MAX_UBOOT_SIZE)"\0"                           \
+	"uboot_sd_offset="__stringify(SD_UBOOT_OFFSET)"\0"                         \
+	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"                               \
+	"kernel_file="TQMLS1028_SD_KERNEL_FILE_NAME"\0"\
 	"firmwarepart=1\0"                                                     \
 	"mmcsddev=0\0"								\
 	"update_rcw_sd=run set_getcmd; "                                       \
 		"if ${getcmd} ${rcw_sd_file}; then "                           \
 			"if itest ${filesize} > 0; then "                      \
-				"mmc dev ${mmcsddev}; mmc rescan; "		       \
+				"mmc dev 0; mmc rescan; "		       \
 				"setexpr blkc ${filesize} + 0x1ff; "           \
 				"setexpr blkc ${blkc} / 0x200; "               \
 				"if itest ${filesize} <= ${rcw_max_size}; then "\
@@ -95,6 +104,38 @@
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"setenv filesize; setenv blkc; setenv getcmd \0"               \
+	"update_uboot_sd=run set_getcmd; "                                     \
+		"if ${getcmd} ${uboot_sd_file}; then "                         \
+			"if itest ${filesize} > 0; then "                      \
+				"mmc dev ${mmcsddev}; mmc rescan; "		       \
+				"setexpr blkc ${filesize} + 0x1ff; "           \
+				"setexpr blkc ${blkc} / 0x200; "               \
+				"if itest ${filesize} <= ${uboot_max_size}; then "	       \
+					"mmc write ${loadaddr} ${uboot_sd_offset} ${blkc}; "\
+				"fi; "                                         \
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; setenv blkc; setenv getcmd \0"               \
+	"update_fdt_sd=run set_getcmd; "                                          \
+		"if ${getcmd} ${fdt_file}; then "                              \
+			"if itest ${filesize} > 0; then "                      \
+				"mmc dev ${mmcsddev}; mmc rescan; "              \
+				"echo Write fdt image to mmc ${mmcsddev}:${firmwarepart}...; " \
+				"save mmc ${mmcsddev}:${firmwarepart} ${loadaddr} " \
+					"${fdt_file} ${filesize}; "            \
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; setenv getcmd \0"                            \
+	"update_kernel_sd=run set_getcmd; "                                          \
+		"if ${getcmd} ${kernel_file}; then "                              \
+			"if itest ${filesize} > 0; then "                      \
+				"mmc dev ${mmcsddev}; mmc rescan; "              \
+				"echo Write kernel image to mmc ${mmcsddev}:${firmwarepart}...; " \
+				"save mmc ${mmcsddev}:${firmwarepart} ${loadaddr} " \
+					"${kernel_file} ${filesize}; "            \
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; setenv getcmd \0"                            \
 
 #undef BOOT_ENV_SETTINGS
 #define BOOT_ENV_SETTINGS \
