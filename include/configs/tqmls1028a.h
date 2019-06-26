@@ -193,6 +193,8 @@
 	"addvideo=setenv bootargs ${bootargs} cma=256M video=1920x1080-32@60\0"	\
 	"addsd=setenv bootargs ${bootargs} root=/dev/mmcblk0p2 "               \
 		"rootfstype=ext4\0"                                \
+	"addemmc=setenv bootargs ${bootargs} root=/dev/mmcblk1p2 "               \
+		"rootfstype=ext4\0"                                \
 	"resetusb=i2c dev 5; i2c mw 0x25 0x6.1 0xfd; i2c mw 0x25 0x2.1 0xfd; "\
 		"sleep 0.1; i2c mw 0x25 0x2.1 0xff;\0 " \
 	"resetphy=i2c dev 5; i2c mw 0x70 0x3 0xd5; i2c mw 0x70 0x1 0xd5; " \
@@ -208,10 +210,21 @@
 		"run sdimageload; "\
 		"run sdfdtload;" \
 		"booti ${loadaddr} - ${fdtaddr}\0" \
+	"emmchdpload=fatload mmc 1:1 ${loadaddr} ls1028a-dp-fw.bin; hdp load ${loadaddr};\0" \
+	"emmcimageload=fatload mmc 1:1 ${fdtaddr} Image.gz; unzip $fdtaddr $loadaddr\0" \
+	"emmcfdtload=fatload mmc 1:1 ${fdtaddr} ls1028a-mbls1028a.dtb;\0" \
+	"emmcargs=run addemmc addtty addvideo\0"                      \
+	"emmcboot=echo Booting from emmc ...; " \
+		"setenv bootargs; " \
+		"run emmcargs; " \
+		"run emmchdpload; " \
+		"run emmcimageload; "\
+		"run emmcfdtload;" \
+		"booti ${loadaddr} - ${fdtaddr}\0" \
 	"panicboot=echo No boot device !!! reset\0"
 
 #undef CONFIG_BOOTCOMMAND
-#define CONFIG_BOOTCOMMAND "run sdboot; run panicboot"
+#define CONFIG_BOOTCOMMAND "run sdboot; run emmcboot; run panicboot"
 
 #undef CONFIG_EXTRA_ENV_SETTINGS
 #define CONFIG_EXTRA_ENV_SETTINGS \
