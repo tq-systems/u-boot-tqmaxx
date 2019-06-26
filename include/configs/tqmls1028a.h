@@ -163,6 +163,26 @@
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"setenv filesize; setenv blkc; setenv getcmd \0"               \
+	"update_fdt_emmc=run set_getcmd; "                                          \
+		"if ${getcmd} ${fdt_file}; then "                              \
+			"if itest ${filesize} > 0; then "                      \
+				"mmc dev ${mmcdev}; mmc rescan; "              \
+				"echo Write fdt image to mmc ${mmcdev}:${firmwarepart}...; " \
+				"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} " \
+					"${fdt_file} ${filesize}; "            \
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; setenv getcmd \0"                            \
+	"update_kernel_emmc=run set_getcmd; "                                          \
+		"if ${getcmd} ${kernel_file}; then "                              \
+			"if itest ${filesize} > 0; then "                      \
+				"mmc dev ${mmcdev}; mmc rescan; "              \
+				"echo Write kernel image to mmc ${mmcdev}:${firmwarepart}...; " \
+				"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} " \
+					"${kernel_file} ${filesize}; "            \
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; setenv getcmd \0"                            \
 
 #undef BOOT_ENV_SETTINGS
 #define BOOT_ENV_SETTINGS \
