@@ -340,6 +340,7 @@ static const struct dm_i2c_ops rcar_i2c_ops = {
 
 static const struct udevice_id rcar_i2c_ids[] = {
 	{ .compatible = "renesas,rcar-gen2-i2c" },
+	{ .compatible = "renesas,rcar-gen3-i2c" },
 	{ }
 };
 
