@@ -484,7 +484,8 @@ static void ls_pcie_setup_ep(struct ls_pcie *pcie)
 			writel(0, pcie->dbi + PCIE_MISC_CONTROL_1_OFF);
 
 			bar_base = pcie->dbi +
-				   PCIE_MASK_OFFSET(pcie->cfg2_flag, pf);
+				   PCIE_MASK_OFFSET(pcie->cfg2_flag, pf,
+						    pcie->pf1_offset);
 
 			if (pcie->cfg2_flag) {
 				ctrl_writel(pcie,
@@ -602,6 +603,14 @@ static int ls_pcie_probe(struct udevice *dev)
 		pcie->cfg2_flag = 1;
 	else
 		pcie->cfg2_flag = 0;
+
+	if (svr == SVR_LX2160A) {
+		if (IS_SVR_REV(get_svr(), 1, 0))
+			return -ENODEV;
+		pcie->pf1_offset = LX2160_PCIE_PF1_OFFSET;
+	} else {
+		pcie->pf1_offset = LS_PCIE_PF1_OFFSET;
+	}
 #endif
 
 	pcie->cfg0 = map_physmem(pcie->cfg_res.start,
