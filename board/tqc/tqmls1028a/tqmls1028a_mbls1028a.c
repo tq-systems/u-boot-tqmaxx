@@ -16,6 +16,8 @@ int checkboard(void)
 	puts("SD\n");
 #elif CONFIG_EMMC_BOOT
 	puts("EMMC\n");
+#elif CONFIG_QSPI_BOOT
+	puts("QSPI-NOR\n");
 #else
 	puts("\n");
 #endif
