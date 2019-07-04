@@ -233,6 +233,20 @@
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"setenv filesize; setenv blkc; setenv getcmd \0"               \
+	"update_fdt_qspi=run set_getcmd; "                                     \
+		"if ${getcmd} ${fdt_file}; then "                              \
+			"if itest ${filesize} > 0; then "                      \
+				"sf probe; sf update ${loadaddr} DTB ${filesize};"\
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; setenv blkc; setenv getcmd \0"               \
+	"update_kernel_qspi=run set_getcmd; "                                  \
+		"if ${getcmd} ${kernel_file}; then "                           \
+			"if itest ${filesize} > 0; then "                      \
+				"sf probe; sf update ${loadaddr} Linux ${filesize};"\
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; setenv blkc; setenv getcmd \0"               \
 
 #undef BOOT_ENV_SETTINGS
 #define BOOT_ENV_SETTINGS \
@@ -271,6 +285,17 @@
 		"run emmcimageload; "\
 		"run emmcfdtload;" \
 		"booti ${loadaddr} - ${fdtaddr}\0" \
+	"rootfs_mtddev=RootFS\0"                                               \
+	"addspi=setenv bootargs ${bootargs} root=ubi0:root rw "                \
+		"rootfstype=ubifs ubi.mtd=4\0"                                 \
+	"spiargs=run addspi addtty addvideo\0"                                 \
+	"spikernelload=sf probe 0; sf read ${fdtaddr} Linux\; "		       \
+		"unzip ${fdtaddr} ${loadaddr}\0"			       \
+	"spifdtload=sf probe 0; sf read ${fdtaddr} DTB\0"                      \
+	"spihdpload=sf probe; sf read ${loadaddr} HDP; hdp load ${loadaddr};\0" \
+	"spiboot=echo Booting from SPI NOR flash...; setenv bootargs; "        \
+		"run spiargs; run spihdpload spikernelload spifdtload ; "       \
+		"booti ${loadaddr} - ${fdtaddr};\0"                            \
 	"panicboot=echo No boot device !!! reset\0"
 
 #undef CONFIG_BOOTCOMMAND
