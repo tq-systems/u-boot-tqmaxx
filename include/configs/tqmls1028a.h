@@ -219,7 +219,7 @@
 		"if ${getcmd} ${rcw_qspi_file}; then "                           \
 			"if itest ${filesize} > 0; then "                      \
 				"if itest ${filesize} <= ${uboot_max_size}; then "	       \
-					"sf probe; sf update ${loadaddr} 0x0 ${filesize};"\
+					"sf probe; sf update ${loadaddr} RCW ${filesize};"\
 				"fi; "                                         \
 			"fi; "                                                 \
 		"fi; "                                                         \
@@ -228,7 +228,7 @@
 		"if ${getcmd} ${uboot_sd_file}; then "                         \
 			"if itest ${filesize} > 0; then "                      \
 				"if itest ${filesize} <= ${uboot_max_size}; then "	       \
-					"sf probe; sf update ${loadaddr} 0x100000 ${filesize};"\
+					"sf probe; sf update ${loadaddr} U-Boot-PBL ${filesize};"\
 				"fi; "                                         \
 			"fi; "                                                 \
 		"fi; "                                                         \
