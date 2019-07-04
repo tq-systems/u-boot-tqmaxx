@@ -60,6 +60,33 @@
 #define CONFIG_QIXIS_I2C_ACCESS
 #define CONFIG_SYS_I2C_EARLY_INIT
 
+#define CONFIG_SYS_FLASH_BASE 0x20000000
+
+
+/* filesystem on flash */
+#define CONFIG_SYS_MAX_FLASH_BANKS_DETECT	2
+#define CONFIG_FLASH_CFI_DRIVER
+#define CONFIG_SYS_FLASH_CFI
+#define CONFIG_CMD_MTDPARTS
+#define CONFIG_MTD_DEVICE
+#define CONFIG_MTD_PARTITIONS
+#define CONFIG_RBTREE
+#define CONFIG_MTD_UBI_WL_THRESHOLD	4096
+#define CONFIG_LZO
+#define MTDIDS_DEFAULT \
+	"nor0=nor0\0"
+
+#define MTDPARTS_DEFAULT \
+	"mtdparts=nor0:"                                                       \
+		"512k@0k(RCW),"                                                \
+		"512k@512k(PPA),"                                              \
+		"3M@1M(U-Boot-PBL),"                                           \
+		"64k@4M(DTB),"                                                 \
+		"512k@4608k(HDP),"                                             \
+		"10M@5M(Linux),"                                               \
+		"49M@12M(RootFS)\0"                                            \
+
+
 /* SATA */
 #ifndef SPL_NO_SATA
 #ifndef CONFIG_CMD_EXT2
@@ -78,7 +105,7 @@
 
 #define TQMLS1028_SD_RCW_FILE_NAME	"rcw_1300_sd.bin"
 #define TQMLS1028_EMMC_RCW_FILE_NAME	"rcw_1300_emmc.bin"
-#define TQMLS1028_QSPI_RCW_FILE_NAME	"rcw_1300_spi.bin"
+#define TQMLS1028_QSPI_RCW_FILE_NAME	"rcw_1300_spi_nor.bin"
 #define TQMLS1028_SD_UBOOT_FILE_NAME	"u-boot-with-spl.bin"
 #define TQMLS1028_SD_KERNEL_FILE_NAME	"Image.gz"
 #define MAX_RCW_SIZE 1024
