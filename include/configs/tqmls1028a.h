@@ -84,7 +84,7 @@
 		"64k@4M(DTB),"                                                 \
 		"512k@4608k(HDP),"                                             \
 		"10M@5M(Linux),"                                               \
-		"49M@12M(RootFS)\0"                                            \
+		"32M@15M(RootFS)\0"                                            \
 
 
 /* SATA */
