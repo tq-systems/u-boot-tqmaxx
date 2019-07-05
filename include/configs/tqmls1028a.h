@@ -117,16 +117,16 @@
 	"rcw_sd_file="TQMLS1028_SD_RCW_FILE_NAME"\0"                           \
 	"rcw_max_size="__stringify(MAX_RCW_SIZE)"\0"                           \
 	"rcw_sd_offset="__stringify(SD_RCW_OFFSET)"\0"                         \
-	"rcw_emmc_file="TQMLS1028_EMMC_RCW_FILE_NAME"\0"                           \
-	"rcw_qspi_file="TQMLS1028_QSPI_RCW_FILE_NAME"\0"                           \
-	"uboot_sd_file="TQMLS1028_SD_UBOOT_FILE_NAME"\0"                           \
-	"uboot_max_size="__stringify(MAX_UBOOT_SIZE)"\0"                           \
-	"uboot_sd_offset="__stringify(SD_UBOOT_OFFSET)"\0"                         \
+	"rcw_emmc_file="TQMLS1028_EMMC_RCW_FILE_NAME"\0"                       \
+	"rcw_qspi_file="TQMLS1028_QSPI_RCW_FILE_NAME"\0"                       \
+	"uboot_sd_file="TQMLS1028_SD_UBOOT_FILE_NAME"\0"                       \
+	"uboot_max_size="__stringify(MAX_UBOOT_SIZE)"\0"                       \
+	"uboot_sd_offset="__stringify(SD_UBOOT_OFFSET)"\0"                     \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"                               \
 	"kernel_file="TQMLS1028_SD_KERNEL_FILE_NAME"\0"\
 	"firmwarepart=1\0"                                                     \
-	"mmcsddev=0\0"								\
-	"mmcdev=1\0"								\
+	"mmcsddev=0\0"							       \
+	"mmcdev=1\0"							       \
 	"update_rcw_sd=run set_getcmd; "                                       \
 		"if ${getcmd} ${rcw_sd_file}; then "                           \
 			"if itest ${filesize} > 0; then "                      \
@@ -142,7 +142,7 @@
 	"update_uboot_sd=run set_getcmd; "                                     \
 		"if ${getcmd} ${uboot_sd_file}; then "                         \
 			"if itest ${filesize} > 0; then "                      \
-				"mmc dev ${mmcsddev}; mmc rescan; "		       \
+				"mmc dev ${mmcsddev}; mmc rescan; "	       \
 				"setexpr blkc ${filesize} + 0x1ff; "           \
 				"setexpr blkc ${blkc} / 0x200; "               \
 				"if itest ${filesize} <= ${uboot_max_size}; then "	       \
