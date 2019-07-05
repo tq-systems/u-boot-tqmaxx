@@ -286,8 +286,8 @@
 		"run emmcfdtload;" \
 		"booti ${loadaddr} - ${fdtaddr}\0" \
 	"rootfs_mtddev=RootFS\0"                                               \
-	"addspi=setenv bootargs ${bootargs} root=ubi0:root rw "                \
-		"rootfstype=ubifs ubi.mtd=4\0"                                 \
+	"addspi=setenv bootargs ${bootargs} root=ubi0_0 rw "                \
+		"rootfstype=ubifs ubi.mtd=6\0"                                 \
 	"spiargs=run addspi addtty addvideo\0"                                 \
 	"spikernelload=sf probe 0; sf read ${fdtaddr} Linux\; "		       \
 		"unzip ${fdtaddr} ${loadaddr}\0"			       \
