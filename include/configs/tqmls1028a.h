@@ -299,7 +299,15 @@
 	"panicboot=echo No boot device !!! reset\0"
 
 #undef CONFIG_BOOTCOMMAND
-#define CONFIG_BOOTCOMMAND "run sdboot; run emmcboot; run panicboot"
+#ifdef CONFIG_SD_BOOT
+#define CONFIG_BOOTCOMMAND "run sdboot; run emmcboot; run spiboot; run panicboot"
+#elif CONFIG_EMMC_BOOT
+#define CONFIG_BOOTCOMMAND "run emmcboot; run sdboot; run spiboot; run panicboot"
+#elif CONFIG_QSPI_BOOT
+#define CONFIG_BOOTCOMMAND "run spiboot; run sdboot; run emmcboot; run panicboot"
+#else
+#define CONFIG_BOOTCOMMAND "run sdboot; run emmcboot; run spiboot; run panicboot"
+#endif
 
 #undef CONFIG_EXTRA_ENV_SETTINGS
 #define CONFIG_EXTRA_ENV_SETTINGS \
