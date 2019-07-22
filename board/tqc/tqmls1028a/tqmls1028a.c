@@ -80,6 +80,9 @@ int board_eth_init(bd_t *bis)
 
 int board_early_init_f(void)
 {
+	out_le32(0x1e00900, 0x3);
+
+
 #ifdef CONFIG_SYS_I2C_EARLY_INIT
 	i2c_early_init_f();
 #endif
