@@ -28,6 +28,7 @@
 #include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
 
+#define MBA8XX_BOARD_NAME "MBa8Xx"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -96,7 +97,7 @@ int tqc_bb_board_early_init_f(void)
 
 int tqc_bb_checkboard(void)
 {
-	puts("Board: " TQMA8_BOARD_NAME " on MBa8Xx (" TQMA8_BOARD_REV ")\n");
+	puts("Board: " TQMA8_BOARD_NAME " on " MBA8XX_BOARD_NAME " (" TQMA8_BOARD_REV ")\n");
 
 	return 0;
 }
@@ -130,7 +131,7 @@ int mmc_map_to_kernel_blk(int dev_no)
 int tqc_bb_board_late_init(void)
 {
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
-	env_set("board_name", "MBa8QX");
+	env_set("board_name", "MBA8XX_BOARD_NAME");
 	env_set("board_rev", "iMX8QXP");
 #endif
 
