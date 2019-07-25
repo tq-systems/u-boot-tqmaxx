@@ -1,0 +1,26 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
+/*
+ * Copyright (C) 2019 TQ Systems GmbH
+ * Markus Niebel <Markus.Niebel@tq-group.com>
+ */
+
+#ifndef __TQC_BOARD_GPIO_H__
+#define __TQC_BOARD_GPIO_H__
+
+struct tqc_gpio_init_data {
+	const char* name;
+	const char* label;
+	unsigned long flags;
+};
+
+#if defined(CONFIG_DM_GPIO)
+int tqc_board_gpio_init(const struct tqc_gpio_init_data *data, int count);
+#else
+static inline int tqc_board_gpio_init(const struct tqc_gpio_init_data *data,
+				      int count)
+{
+	return 0;
+}
+#endif
+
+#endif
