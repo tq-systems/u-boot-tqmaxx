@@ -27,6 +27,7 @@
 #include <power-domain.h>
 
 #include "../common/tqc_bb.h"
+#include "../common/tqc_board_gpio.h"
 #include "../common/tqc_eeprom.h"
 
 
@@ -87,14 +88,7 @@ int tqc_bb_checkboard(void)
 	return 0;
 }
 
-#ifdef CONFIG_MXC_GPIO
-struct gpio_init_data {
-	const char* name;
-	const char* label;
-	unsigned long flags;
-};
-
-static const struct gpio_init_data mbpa8xx_gid[] = {
+static const struct tqc_gpio_init_data mbpa8xx_gid[] = {
 	{
 		.name = "GPIO1_0",
 		.label = "REV_0",
@@ -118,35 +112,9 @@ static const struct gpio_init_data mbpa8xx_gid[] = {
 	},
 };
 
-static void board_gpio_init(void)
-{
-	int i;
-	int ret;
-	struct gpio_desc desc;
-
-
-	for (i = 0; i < ARRAY_SIZE(mbpa8xx_gid); ++i) {
-		ret = dm_gpio_lookup_name(mbpa8xx_gid[i].name, &desc);
-		if (ret) {
-			printf("error: gpio lookup %s", mbpa8xx_gid[i].name);
-		} else {
-			ret = dm_gpio_request(&desc, mbpa8xx_gid[i].label);
-			if (ret)
-				printf("error: gpio REQ %s", mbpa8xx_gid[i].label);
-			else
-				dm_gpio_set_dir_flags(&desc, mbpa8xx_gid[i].flags);
-		}
-	}
-}
-#else
-static inline void board_gpio_init(void) {}
-#endif
-
 int tqc_bb_board_init(void)
 {
-	board_gpio_init();
-
-	return 0;
+	return tqc_board_gpio_init(mbpa8xx_gid, ARRAY_SIZE(mbpa8xx_gid));
 }
 
 #ifdef CONFIG_OF_BOARD_SETUP
