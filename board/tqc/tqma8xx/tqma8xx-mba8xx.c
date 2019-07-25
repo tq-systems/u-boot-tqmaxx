@@ -26,6 +26,7 @@
 #include <power-domain.h>
 
 #include "../common/tqc_bb.h"
+#include "../common/tqc_board_gpio.h"
 #include "../common/tqc_eeprom.h"
 
 #define MBA8XX_BOARD_NAME "MBa8Xx"
@@ -102,9 +103,42 @@ int tqc_bb_checkboard(void)
 	return 0;
 }
 
+static const struct tqc_gpio_init_data mba8xx_gid[] = {
+	{
+		.name = "GPIO3_5",
+		.label = "REV_0",
+		.flags = GPIOD_IS_IN,
+	}, {
+		.name = "GPIO3_6",
+		.label = "REV_1",
+		.flags = GPIOD_IS_IN,
+	}, {
+		.name = "GPIO3_7",
+		.label = "REV_2",
+		.flags = GPIOD_IS_IN,
+	}, {
+		.name = "GPIO1_13",
+		.label = "KEY_A#",
+		.flags = GPIOD_IS_IN,
+	}, {
+		.name = "GPIO1_14",
+		.label = "KEY_B#",
+		.flags = GPIOD_IS_IN,
+	}, {
+		.name = "GPIO1_26",
+		.label = "GPIO1_26",
+		.flags = GPIOD_IS_IN,
+	}, {
+		.name = "GPIO4_19",
+		.label = "GPIO4_19",
+		.flags = GPIOD_IS_IN,
+	},
+};
+
 int tqc_bb_board_init(void)
 {
-	return 0;
+	return tqc_board_gpio_init(mba8xx_gid, ARRAY_SIZE(mba8xx_gid));
+
 }
 
 #ifdef CONFIG_OF_BOARD_SETUP
