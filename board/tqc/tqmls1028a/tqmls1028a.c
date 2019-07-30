@@ -162,6 +162,12 @@ int misc_init_r(void)
 						    (uchar *)safe_string);
 			}
 		}
+
+		ret = tqmaxx_parse_eeprom_mac_additional(&eepromdata, safe_string,
+			ARRAY_SIZE(safe_string), 5, "[%02x %02x %02x %02x %02x %02x]");
+		if (!ret)
+			env_set("switch_mac_addr", safe_string);
+
 		tqmaxx_show_eeprom(&eepromdata, "TQMLS1028A");
 	}
 	return 0;
