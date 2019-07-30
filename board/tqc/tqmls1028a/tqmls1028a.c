@@ -153,12 +153,13 @@ int misc_init_r(void)
 
 		for (size_t i = 1; i <= 4; i++) {
 			ret = tqmaxx_parse_eeprom_mac_additional(&eepromdata,
-				safe_string, ARRAY_SIZE(safe_string), i);
+					safe_string, ARRAY_SIZE(safe_string),
+					i, "%02x:%02x:%02x:%02x:%02x:%02x");
 			if (!ret) {
 				snprintf(ethaddrstring, 9, "eth%luaddr", i);
 				env_set(ethaddrstring, safe_string);
 				eth_env_set_enetaddr(ethaddrstring,
-						(uchar *)safe_string);
+						    (uchar *)safe_string);
 			}
 		}
 		tqmaxx_show_eeprom(&eepromdata, "TQMLS1028A");

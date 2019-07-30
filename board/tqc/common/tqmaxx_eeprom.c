@@ -34,7 +34,7 @@ int tqmaxx_parse_eeprom_mac(struct tqmaxx_eeprom_data *eeprom, char *buf,
 
 int tqmaxx_parse_eeprom_mac_additional(struct tqmaxx_eeprom_data *eeprom,
 				       char *buf, size_t len,
-				       size_t additional)
+				       size_t additional, char *format_string)
 {
 	u8 *p;
 	int ret = -1;
@@ -52,7 +52,7 @@ int tqmaxx_parse_eeprom_mac_additional(struct tqmaxx_eeprom_data *eeprom,
 	addr += additional;
 	addr = addr & 0x00ffffff;
 
-	ret = snprintf(buf, len, "%02x:%02x:%02x:%02x:%02x:%02x",
+	ret = snprintf(buf, len, format_string,
 		       p[0], p[1], p[2], (addr >> 16) & 0xff,
 		       (addr >> 8) & 0xff, addr & 0xff);
 

@@ -24,7 +24,7 @@ int tqmaxx_parse_eeprom_mac(struct tqmaxx_eeprom_data *eeprom, char *buf,
 			    size_t len);
 int tqmaxx_parse_eeprom_mac_additional(struct tqmaxx_eeprom_data *eeprom,
 				       char *buf, size_t len,
-				       size_t additional);
+				       size_t additional, char *format_string);
 int tqmaxx_parse_eeprom_serial(struct tqmaxx_eeprom_data *eeprom, char *buf,
 			       size_t len);
 int tqmaxx_parse_eeprom_id(struct tqmaxx_eeprom_data *eeprom, char *buf,
