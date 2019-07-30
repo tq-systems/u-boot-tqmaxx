@@ -273,6 +273,7 @@
 		"run sdhdpload; " \
 		"run sdimageload; "\
 		"run sdfdtload;" \
+		"run setmacaddr;"					      \
 		"booti ${loadaddr} - ${fdtaddr}\0" \
 	"emmchdpload=fatload mmc 1:1 ${loadaddr} ls1028a-dp-fw.bin; hdp load ${loadaddr};\0" \
 	"emmcimageload=fatload mmc 1:1 ${fdtaddr} Image.gz; unzip $fdtaddr $loadaddr\0" \
@@ -284,6 +285,7 @@
 		"run emmchdpload; " \
 		"run emmcimageload; "\
 		"run emmcfdtload;" \
+		"run setmacaddr;"					      \
 		"booti ${loadaddr} - ${fdtaddr}\0" \
 	"rootfs_mtddev=RootFS\0"                                               \
 	"addspi=setenv bootargs ${bootargs} root=ubi0_0 rw "                \
@@ -295,8 +297,12 @@
 	"spihdpload=sf probe; sf read ${loadaddr} HDP; hdp load ${loadaddr};\0" \
 	"spiboot=echo Booting from SPI NOR flash...; setenv bootargs; "        \
 		"run spiargs; run spihdpload spikernelload spifdtload ; "       \
+		"run setmacaddr;"					      \
 		"booti ${loadaddr} - ${fdtaddr};\0"                            \
-	"panicboot=echo No boot device !!! reset\0"
+	"panicboot=echo No boot device !!! reset\0"			       \
+	"setmacaddr=fdt addr ${fdtaddr}; fdt resize 4;"			       \
+		"fdt set /soc/pcie@1f0000000/pci@0,5/port@0/ "                 \
+		"mac-address ${switch_mac_addr};\0"
 
 #undef CONFIG_BOOTCOMMAND
 #ifdef CONFIG_SD_BOOT
