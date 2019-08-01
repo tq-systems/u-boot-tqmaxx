@@ -81,10 +81,10 @@
 		"512k@0k(RCW),"                                                \
 		"512k@512k(PPA),"                                              \
 		"3M@1M(U-Boot-PBL),"                                           \
-		"64k@4M(DTB),"                                                 \
+		"512k@4M(DTB),"                                                 \
 		"512k@4608k(HDP),"                                             \
 		"10M@5M(Linux),"                                               \
-		"32M@15M(RootFS)\0"                                            \
+		"49M@15M(RootFS)\0"                                            \
 
 
 /* SATA */
