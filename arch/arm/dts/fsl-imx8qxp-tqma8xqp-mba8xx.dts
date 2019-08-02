@@ -63,6 +63,7 @@
 
 &iomuxc {
 	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>;
 
 	tqma8qx-mba8qx {
 		pinctrl_lpuart1: lpuart1grp {
@@ -114,9 +115,25 @@
 
 		pinctrl_hog: mba8qxhoggrp {
 			fsl,pins = <
+				/* REV. detect */
 				SC_P_MIPI_CSI0_I2C0_SCL_LSIO_GPIO3_IO05		0x06000048
 				SC_P_MIPI_CSI0_I2C0_SDA_LSIO_GPIO3_IO06		0x06000048
 				SC_P_MIPI_CSI0_GPIO0_01_LSIO_GPIO3_IO07		0x06000048
+				/* gpio keys */
+				SC_P_ADC_IN5_LSIO_GPIO1_IO13			0x06000048
+				SC_P_ADC_IN4_LSIO_GPIO1_IO14			0x06000048
+				/* LCD CTRL */
+				/* LCD RST# */
+				SC_P_MIPI_DSI1_I2C0_SCL_LSIO_GPIO1_IO29		0x06000048
+				/* LCD BLT EN */
+				SC_P_MIPI_DSI1_I2C0_SDA_LSIO_GPIO1_IO30		0x06000048
+				/* LCD PWR */
+				SC_P_MIPI_DSI0_I2C0_SCL_LSIO_GPIO1_IO25		0x06000048
+				/* LCD CONTRAST */
+				SC_P_SPI0_CS1_ADMA_LCD_PWM0_OUT			0x06000048
+				/* GPIO */
+				SC_P_MIPI_DSI0_I2C0_SDA_LSIO_GPIO1_IO26		0x06000048
+				SC_P_USDHC1_RESET_B_LSIO_GPIO4_IO19		0x06000048
 			>;
 		};
 
