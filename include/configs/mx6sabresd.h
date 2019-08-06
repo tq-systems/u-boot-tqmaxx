@@ -28,9 +28,4 @@
 
 #define CFG_SYS_FSL_USDHC_NUM	3
 
-#ifdef CONFIG_CMD_PCI
-#define CFG_PCIE_IMX_PERST_GPIO	IMX_GPIO_NR(7, 12)
-#define CFG_PCIE_IMX_POWER_GPIO	IMX_GPIO_NR(3, 19)
-#endif
-
 #endif                         /* __MX6SABRESD_CONFIG_H */

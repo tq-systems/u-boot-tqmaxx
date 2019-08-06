@@ -160,20 +160,6 @@ static void enable_lvds(struct display_info_t const *dev)
 }
 #endif
 
-#ifdef CONFIG_PCIE_IMX
-iomux_v3_cfg_t const pcie_pads[] = {
-	IOMUX_PADS(PAD_EIM_D19__GPIO3_IO19 | MUX_PAD_CTRL(NO_PAD_CTRL)),	/* POWER */
-	IOMUX_PADS(PAD_GPIO_17__GPIO7_IO12 | MUX_PAD_CTRL(NO_PAD_CTRL)),	/* RESET */
-};
-
-static void setup_pcie(void)
-{
-	SETUP_IOMUX_PADS(pcie_pads);
-	gpio_request(CFG_PCIE_IMX_POWER_GPIO, "PCIE Power Enable");
-	gpio_request(CFG_PCIE_IMX_PERST_GPIO, "PCIE Reset");
-}
-#endif
-
 iomux_v3_cfg_t const di0_pads[] = {
 	IOMUX_PADS(PAD_DI0_DISP_CLK__IPU1_DI0_DISP_CLK),	/* DISP0_CLK */
 	IOMUX_PADS(PAD_DI0_PIN2__IPU1_DI0_PIN02),		/* DISP0_HSYNC */
@@ -765,10 +751,6 @@ int board_init(void)
 	setup_spi();
 #endif
 
-
-#ifdef CONFIG_PCIE_IMX
-	setup_pcie();
-#endif
 
 #if defined(CONFIG_MX6DL) && defined(CONFIG_MXC_EPDC)
 	setup_epdc();
