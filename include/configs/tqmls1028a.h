@@ -106,7 +106,9 @@
 #define TQMLS1028_SD_RCW_FILE_NAME	"rcw_1300_sd.bin"
 #define TQMLS1028_EMMC_RCW_FILE_NAME	"rcw_1300_emmc.bin"
 #define TQMLS1028_QSPI_RCW_FILE_NAME	"rcw_1300_spi_nor.bin"
-#define TQMLS1028_SD_UBOOT_FILE_NAME	"u-boot-with-spl.bin"
+#define TQMLS1028_SD_UBOOT_FILE_NAME	"u-boot-with-spl_sdcard.bin"
+#define TQMLS1028_EMMC_UBOOT_FILE_NAME	"u-boot-with-spl_emmc.bin"
+#define TQMLS1028_QSPI_UBOOT_FILE_NAME	"u-boot-with-spl_qspi.bin"
 #define TQMLS1028_SD_KERNEL_FILE_NAME	"Image.gz"
 #define MAX_RCW_SIZE 1024
 #define SD_RCW_OFFSET 0x8 /* Blocks */
@@ -120,6 +122,8 @@
 	"rcw_emmc_file="TQMLS1028_EMMC_RCW_FILE_NAME"\0"                       \
 	"rcw_qspi_file="TQMLS1028_QSPI_RCW_FILE_NAME"\0"                       \
 	"uboot_sd_file="TQMLS1028_SD_UBOOT_FILE_NAME"\0"                       \
+	"uboot_emmc_file="TQMLS1028_EMMC_UBOOT_FILE_NAME"\0"                   \
+	"uboot_qspi_file="TQMLS1028_QSPI_UBOOT_FILE_NAME"\0"                   \
 	"uboot_max_size="__stringify(MAX_UBOOT_SIZE)"\0"                       \
 	"uboot_sd_offset="__stringify(SD_UBOOT_OFFSET)"\0"                     \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"                               \
@@ -184,7 +188,7 @@
 		"fi; "                                                         \
 		"setenv filesize; setenv blkc; setenv getcmd \0"               \
 	"update_uboot_emmc=run set_getcmd; "                                     \
-		"if ${getcmd} ${uboot_sd_file}; then "                         \
+		"if ${getcmd} ${uboot_emmc_file}; then "                       \
 			"if itest ${filesize} > 0; then "                      \
 				"mmc dev ${mmcdev}; mmc rescan; "		       \
 				"setexpr blkc ${filesize} + 0x1ff; "           \
@@ -225,7 +229,7 @@
 		"fi; "                                                         \
 		"setenv filesize; setenv blkc; setenv getcmd \0"               \
 	"update_uboot_qspi=run set_getcmd; "                                     \
-		"if ${getcmd} ${uboot_sd_file}; then "                         \
+		"if ${getcmd} ${uboot_qspi_file}; then "                       \
 			"if itest ${filesize} > 0; then "                      \
 				"if itest ${filesize} <= ${uboot_max_size}; then "	       \
 					"sf probe; sf update ${loadaddr} U-Boot-PBL ${filesize};"\
