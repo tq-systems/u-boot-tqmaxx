@@ -158,11 +158,6 @@
 
 #define CFG_POWER_PFUZE100_I2C_ADDR	0x08
 
-#ifdef CONFIG_CMD_PCI
-#define CFG_PCIE_IMX_PERST_GPIO	IMX_GPIO_NR(2, 0)
-#define CFG_PCIE_IMX_POWER_GPIO	IMX_GPIO_NR(2, 1)
-#endif
-
 #define CFG_SYS_FSL_USDHC_NUM	3
 
 #endif				/* __CONFIG_H */
