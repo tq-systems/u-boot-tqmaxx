@@ -151,7 +151,8 @@ int misc_init_r(void)
 		env_set("ethaddr", safe_string);
 		eth_env_set_enetaddr("ethaddr", (uchar *)safe_string);
 
-		for (size_t i = 1; i <= 4; i++) {
+		size_t i = 1;
+		for (i = 1; i <= 3; i++) {
 			ret = tqmaxx_parse_eeprom_mac_additional(&eepromdata,
 					safe_string, ARRAY_SIZE(safe_string),
 					i, "%02x:%02x:%02x:%02x:%02x:%02x");
@@ -164,7 +165,7 @@ int misc_init_r(void)
 		}
 
 		ret = tqmaxx_parse_eeprom_mac_additional(&eepromdata, safe_string,
-			ARRAY_SIZE(safe_string), 5, "[%02x %02x %02x %02x %02x %02x]");
+			ARRAY_SIZE(safe_string), i + 1, "[%02x %02x %02x %02x %02x %02x]");
 		if (!ret)
 			env_set("switch_mac_addr", safe_string);
 
