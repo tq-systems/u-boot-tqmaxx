@@ -5,6 +5,8 @@
  *
  * Generated code from MX8M_DDR_tool
  * Align with uboot-imx_v2018.03_4.14.78_1.0.0_ga
+ * REV.0003 2GB_K4F6E304HB-MGCJ000-SEC831_ZZZ
+ * from MX8M_LPDDR4_RPA_v23.xlsx / MX8 DDR Stress Test V2.10
  */
 
 #include <linux/kernel.h>
