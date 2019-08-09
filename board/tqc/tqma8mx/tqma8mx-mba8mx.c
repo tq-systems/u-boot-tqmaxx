@@ -27,6 +27,7 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#define TQMA8MX_BB_NAME "MBa8Mx"
 
 #define UART_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_FSEL1)
 
@@ -210,16 +211,16 @@ int mmc_map_to_kernel_blk(int dev_no)
 
 int tqc_bb_board_late_init(void)
 {
-#ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
-	env_set("board_name", "MBa8MQ");
-	env_set("board_rev", "iMX8MQ");
-#endif
-
 #ifdef CONFIG_ENV_IS_IN_MMC
 	board_late_mmc_env_init();
 #endif
 
 	return 0;
+}
+
+const char *tqc_bb_get_boardname(void)
+{
+	return TQMA8MX_BB_NAME;
 }
 
 #if defined(CONFIG_VIDEO_IMXDCSS)
