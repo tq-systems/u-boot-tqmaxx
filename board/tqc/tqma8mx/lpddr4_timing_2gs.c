@@ -5,7 +5,7 @@
  *
  * Generated code from MX8M_DDR_tool
  * Align with uboot-imx_v2018.03_4.14.78_1.0.0_ga
- * REV.0003 2GB_K4F6E3S4HM-GFCL03V-SEC804
+ * REV.0003 2GB_K4F6E3S4HM-GFCL03V-SEC804 (HW REV.010x)
  * from MX8M_LPDDR4_RPA_v23.xlsx / MX8 DDR Stress Test V2.10
  */
 
@@ -1720,7 +1720,7 @@ static struct dram_fsp_msg ddr_dram_fsp_msg[] = {
 };
 
 /* ddr timing config params */
-struct dram_timing_info dram_timing_2gs = {
+struct dram_timing_info tqma8mx_2gb_dram_timing_r010x = {
 	.ddrc_cfg = ddr_ddrc_cfg,
 	.ddrc_cfg_num = ARRAY_SIZE(ddr_ddrc_cfg),
 	.ddrphy_cfg = ddr_ddrphy_cfg,
