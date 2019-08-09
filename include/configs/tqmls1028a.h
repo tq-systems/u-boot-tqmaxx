@@ -278,6 +278,8 @@
 		"run sdimageload; "\
 		"run sdfdtload;" \
 		"run setmacaddr;"					      \
+		"run resetusb;"						       \
+		"run resetphy;"						       \
 		"booti ${loadaddr} - ${fdtaddr}\0" \
 	"emmchdpload=fatload mmc 1:1 ${loadaddr} ls1028a-dp-fw.bin; hdp load ${loadaddr};\0" \
 	"emmcimageload=fatload mmc 1:1 ${fdtaddr} Image.gz; unzip $fdtaddr $loadaddr\0" \
@@ -290,6 +292,8 @@
 		"run emmcimageload; "\
 		"run emmcfdtload;" \
 		"run setmacaddr;"					      \
+		"run resetusb;"						       \
+		"run resetphy;"						       \
 		"booti ${loadaddr} - ${fdtaddr}\0" \
 	"rootfs_mtddev=RootFS\0"                                               \
 	"addspi=setenv bootargs ${bootargs} root=ubi0_0 rw "                \
@@ -302,6 +306,8 @@
 	"spiboot=echo Booting from SPI NOR flash...; setenv bootargs; "        \
 		"run spiargs; run spihdpload spikernelload spifdtload ; "       \
 		"run setmacaddr;"					      \
+		"run resetusb;"						       \
+		"run resetphy;"						       \
 		"booti ${loadaddr} - ${fdtaddr};\0"                            \
 	"panicboot=echo No boot device !!! reset\0"			       \
 	"setmacaddr=fdt addr ${fdtaddr}; fdt resize 4;"			       \
