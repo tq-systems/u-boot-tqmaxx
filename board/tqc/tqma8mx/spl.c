@@ -31,6 +31,8 @@ DECLARE_GLOBAL_DATA_PTR;
 
 extern struct dram_timing_info tqma8mx_2gb_dram_timing_r010x;
 extern struct dram_timing_info tqma8mx_1gb_dram_timing_r010x;
+extern struct dram_timing_info tqma8mx_2gb_dram_timing;
+extern struct dram_timing_info tqma8mx_1gb_dram_timing;
 
 static void spl_dram_init(void)
 {
@@ -39,8 +41,13 @@ static void spl_dram_init(void)
 	printf("SPL: CPU rev. %u.%u\n", (rev & 0xf0) >> 4, rev & 0xf);
 	/* ddr init */
 	if (rev == CHIP_REV_2_1) {
-		printf("SPL: no timing for this chip rev\n");
-		hang();
+#if defined(CONFIG_TQMA8MX_2G)
+		ddr_init(&tqma8mx_2gb_dram_timing);
+#elif defined(CONFIG_TQMA8MX_1G)
+		ddr_init(&tqma8mx_1gb_dram_timing);
+#else
+#error
+#endif
 	} else {
 #if defined(CONFIG_TQMA8MX_2G)
 		ddr_init(&tqma8mx_2gb_dram_timing_r010x);
