@@ -88,7 +88,36 @@ int board_init(void)
 	return tqc_bb_board_init();
 }
 
+const char *tqma8mx_get_boardname(void)
+{
+	switch (get_cpu_type()) {
+	case MXC_CPU_IMX8MD:
+		return "TQMa8MD";
+		break;
+	case MXC_CPU_IMX8MQ:
+		return "TQMa8MQ";
+		break;
+	case MXC_CPU_IMX8MQL:
+		return "TQMa8MQL";
+		break;
+	default:
+		return "??";
+	};
+}
+
 int board_late_init(void)
 {
+#ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
+	env_set("board_name", tqc_bb_get_boardname());
+	env_set("board_rev", tqma8mx_get_boardname);
+#endif
+
 	return tqc_bb_board_late_init();
+}
+
+int checkboard(void)
+{
+	printf("Board: %s on a %s\n", tqma8mx_get_boardname(),
+	       tqc_bb_get_boardname());
+	return 0;
 }
