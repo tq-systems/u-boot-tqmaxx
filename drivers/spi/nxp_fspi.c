@@ -53,8 +53,10 @@ DECLARE_GLOBAL_DATA_PTR;
 #define SEQID_BE_4K		8
 #define SEQID_RDFSR		9
 #define SEQID_ENTR4BYTE		10
+#define SEQID_WRSR		11
 
 /* FSPI CMD */
+#define FSPI_CMD_WRSR		0x01	/* Write Status Register */
 #define FSPI_CMD_PP		0x02	/* Page program (up to 256 bytes) */
 #define FSPI_CMD_RDSR		0x05	/* Read status register */
 #define FSPI_CMD_RDFSR		0x70	/* Read flag status register */
@@ -223,6 +225,12 @@ static void fspi_set_lut(struct nxp_fspi_priv *priv)
 	fspi_write32(priv->flags, &regs->lut[lut_base + 2], 0);
 	fspi_write32(priv->flags, &regs->lut[lut_base + 3], 0);
 
+	/* Write Status Register */
+	lut_base = SEQID_WRSR * 4;
+	fspi_write32(priv->flags, &regs->lut[lut_base], OPRND0(FSPI_CMD_WRSR) |
+		     PAD0(LUT_PAD1) | INSTR0(LUT_CMD) | OPRND1(2) |
+		     PAD1(LUT_PAD1) | INSTR1(LUT_WRITE));
+
 	/* Erase a sector */
 	lut_base = SEQID_SE * 4;
 	fspi_write32(priv->flags, &regs->lut[lut_base],
@@ -305,6 +313,8 @@ static void fspi_op_write_cmd(struct nxp_fspi_priv *priv)
 		seqid = SEQID_WREN;
 	else if (priv->cur_seqid == FSPI_CMD_ENTR4BYTE)
 		seqid = SEQID_ENTR4BYTE;
+	else if (priv->cur_seqid == FSPI_CMD_WRSR)
+		seqid = SEQID_WRSR;
 	else
 		return;
 
