@@ -77,6 +77,44 @@ int dram_init(void)
 #ifdef CONFIG_OF_BOARD_SETUP
 int ft_board_setup(void *blob, bd_t *bd)
 {
+	u32 rev = get_cpu_rev() & 0xfff;
+
+	/*
+	 * TODO: only temporary supported. REV.010x with old CPU rev.
+	 * is not intended for mass production
+	 */
+	if (rev < CHIP_REV_2_1) {
+		int nodeoff;
+		int rc;
+
+		printf("cleanup dt for old CPU rev.\n");
+
+		nodeoff = fdt_path_offset(blob, "/cpus/cpu@0/");
+		if (nodeoff < 0) {
+			printf("Unable to find /cpus/cpu@0\n");
+		} else {
+			rc = fdt_delprop(blob, nodeoff,
+					  "operating-points");
+			if (rc < 0)
+				printf("Unable to delete operating-points, err=%s\n",
+					fdt_strerror(rc));
+			rc = fdt_delprop(blob, nodeoff, "dc-supply");
+			if (rc < 0)
+				printf("Unable to delete prop dc-supply, err=%s\n",
+					fdt_strerror(rc));
+		}
+
+		nodeoff = fdt_path_offset(blob, "/tqma8mx-vdd-arm");
+		if (nodeoff < 0) {
+			printf("Unable to find /tqma8mx-vdd-arm\n");
+		} else {
+			rc = fdt_del_node(blob, nodeoff);
+			if (rc < 0)
+				printf("Unable to delete /tqma8mx-vdd-arm, err=%s\n",
+					fdt_strerror(rc));
+		}
+	}
+
 	return tqc_bb_ft_board_setup(blob, bd);
 }
 #endif
