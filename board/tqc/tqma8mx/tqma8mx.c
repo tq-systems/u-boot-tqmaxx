@@ -88,7 +88,7 @@ int board_init(void)
 	return tqc_bb_board_init();
 }
 
-const char *tqma8mx_get_boardname(void)
+static const char *tqma8mx_get_boardname(void)
 {
 	switch (get_cpu_type()) {
 	case MXC_CPU_IMX8MD:
