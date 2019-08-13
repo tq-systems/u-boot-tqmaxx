@@ -149,7 +149,6 @@
 		"setenv bootargs; " \
 		"run mmcargs; " \
 		"run loadimage; " \
-		"run loadfdt; " \
 		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
 			"if run loadfdt; then " \
 				"booti ${loadaddr} - ${fdt_addr}; " \
