@@ -93,14 +93,13 @@ int ft_board_setup(void *blob, bd_t *bd)
 		if (nodeoff < 0) {
 			printf("Unable to find /cpus/cpu@0\n");
 		} else {
-			rc = fdt_delprop(blob, nodeoff,
-					  "operating-points");
-			if (rc < 0)
-				printf("Unable to delete operating-points, err=%s\n",
-					fdt_strerror(rc));
 			rc = fdt_delprop(blob, nodeoff, "dc-supply");
 			if (rc < 0)
 				printf("Unable to delete prop dc-supply, err=%s\n",
+					fdt_strerror(rc));
+			rc = fdt_delprop(blob, nodeoff, "arm-supply");
+			if (rc < 0)
+				printf("Unable to delete prop arm-supply, err=%s\n",
 					fdt_strerror(rc));
 		}
 
@@ -111,6 +110,16 @@ int ft_board_setup(void *blob, bd_t *bd)
 			rc = fdt_del_node(blob, nodeoff);
 			if (rc < 0)
 				printf("Unable to delete /tqma8mx-vdd-arm, err=%s\n",
+					fdt_strerror(rc));
+		}
+
+		nodeoff = fdt_path_offset(blob, "/reg_tqma8mx_overdrive");
+		if (nodeoff < 0) {
+			printf("Unable to find /reg_tqma8mx_overdrive\n");
+		} else {
+			rc = fdt_del_node(blob, nodeoff);
+			if (rc < 0)
+				printf("Unable to delete /reg_tqma8mx_overdrive, err=%s\n",
 					fdt_strerror(rc));
 		}
 	}
