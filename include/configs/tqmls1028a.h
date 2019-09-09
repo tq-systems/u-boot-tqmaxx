@@ -120,8 +120,10 @@
  *
  * Now include the baseboard specific configuration
  */
-#ifdef CONFIG_MBLS1028A
+#if defined CONFIG_MBLS1028A
 #include "tqmls1028a_mbls1028a.h"
+#elif defined CONFIG_MBLS1028A_IND
+#include "tqmls1028a_mbls1028a_ind.h"
 #else
 #error "No baseboard for the TQMLS1028A SOM defined!"
 #endif

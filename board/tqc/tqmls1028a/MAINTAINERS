@@ -5,4 +5,10 @@ F:	board/tqc/tqmls1028a/
 F:	include/configs/tqmls1028a.h
 F:	configs/tqmls1028a_mbls1028a_sdcard_defconfig
 F:	configs/tqmls1028a_mbls1028a_emmc_defconfig
+F:	configs/tqmls1028a_mbls1028a_qspi_defconfig
+F:	configs/tqmls1028a_mbls1028a_ind_emmc_defconfig
+F:	configs/tqmls1028a_mbls1028a_ind_qspi_defconfig
+F:	configs/tqmls1028a_mbls1028a_ind_sdcard_defconfig
 F:	arch/arm/dts/tqmls1028a_mbls1028a.dts
+F:	include/configs/tqmls1028a_mbls1028a.h
+F:	include/configs/tqmls1028a_mbls1028a_ind.h

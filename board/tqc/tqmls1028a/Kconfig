@@ -23,6 +23,13 @@ config MBLS1028A
 	help
 	  Select the MBLS1028A starterkit.
 	  This features a Ethernet, USB, SD-Card, etc.
+
+config MBLS1028A_IND
+	bool "TQMLS1028A on MBLS1028A-IND Board"
+	help
+	  Select the MBLS1028A industrial starterkit.
+	  This features a Ethernet, USB, SD-Card, etc.
+	  on a smaller board.
 endchoice
 
 config EMU
