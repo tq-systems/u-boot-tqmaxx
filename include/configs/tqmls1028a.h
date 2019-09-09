@@ -277,6 +277,7 @@
 
 #undef BOOT_ENV_SETTINGS
 #define BOOT_ENV_SETTINGS \
+	BOOT_ENV_BOARD \
 	"boot=SD\0" \
 	"loadaddr=0x82000000\0 " \
 	"fdtaddr=0x88000000\0 " \
@@ -286,10 +287,6 @@
 		"rootfstype=ext4\0"                                \
 	"addemmc=setenv bootargs ${bootargs} root=/dev/mmcblk1p2 "               \
 		"rootfstype=ext4\0"                                \
-	"resetusb=i2c dev 5; i2c mw 0x25 0x6.1 0xfd; i2c mw 0x25 0x2.1 0xfd; "\
-		"sleep 0.1; i2c mw 0x25 0x2.1 0xff;\0 " \
-	"resetphy=i2c dev 5; i2c mw 0x70 0x3 0xd5; i2c mw 0x70 0x1 0xd5; " \
-		"sleep 0.1; i2c mw 0x70 0x1 0xff;\0" \
 	"sdhdpload=fatload mmc 0:1 ${loadaddr} ls1028a-dp-fw.bin; hdp load ${loadaddr};\0" \
 	"sdimageload=fatload mmc 0:1 ${fdtaddr} Image.gz; unzip $fdtaddr $loadaddr\0" \
 	"sdfdtload=fatload mmc 0:1 ${fdtaddr} ls1028a-mbls1028a.dtb;\0" \
@@ -301,8 +298,7 @@
 		"run sdimageload; "\
 		"run sdfdtload;" \
 		"run setmacaddr;"					      \
-		"run resetusb;"						       \
-		"run resetphy;"						       \
+		"run boardinit;"					       \
 		"booti ${loadaddr} - ${fdtaddr}\0" \
 	"emmchdpload=fatload mmc 1:1 ${loadaddr} ls1028a-dp-fw.bin; hdp load ${loadaddr};\0" \
 	"emmcimageload=fatload mmc 1:1 ${fdtaddr} Image.gz; unzip $fdtaddr $loadaddr\0" \
@@ -315,8 +311,7 @@
 		"run emmcimageload; "\
 		"run emmcfdtload;" \
 		"run setmacaddr;"					      \
-		"run resetusb;"						       \
-		"run resetphy;"						       \
+		"run boardinit;"					       \
 		"booti ${loadaddr} - ${fdtaddr}\0" \
 	"rootfs_mtddev=RootFS\0"                                               \
 	"addspi=setenv bootargs ${bootargs} root=ubi0_0 rw "                \
@@ -329,8 +324,7 @@
 	"spiboot=echo Booting from SPI NOR flash...; setenv bootargs; "        \
 		"run spiargs; run spihdpload spikernelload spifdtload ; "       \
 		"run setmacaddr;"					      \
-		"run resetusb;"						       \
-		"run resetphy;"						       \
+		"run boardinit;"					       \
 		"booti ${loadaddr} - ${fdtaddr};\0"                            \
 	"panicboot=echo No boot device !!! reset\0"			       \
 	"setmacaddr=fdt addr ${fdtaddr}; fdt resize 4;"			       \
