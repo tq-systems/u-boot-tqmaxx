@@ -115,6 +115,17 @@
 #define CONFIG_SYS_SATA1                        AHCI_BASE_ADDR1
 #endif
 
+/*
+ * All the defines above are for the TQMLS1028a SoM
+ *
+ * Now include the baseboard specific configuration
+ */
+#ifdef CONFIG_MBLS1028A
+#include "tqmls1028a_mbls1028a.h"
+#else
+#error "No baseboard for the TQMLS1028A SOM defined!"
+#endif
+
 #define TQMLS1028_SD_RCW_FILE_NAME	"rcw_1300_sd.bin"
 #define TQMLS1028_EMMC_RCW_FILE_NAME	"rcw_1300_emmc.bin"
 #define TQMLS1028_QSPI_RCW_FILE_NAME	"rcw_1300_spi_nor.bin"
@@ -353,16 +364,5 @@
 		"setenv getcmd dhcp; setenv autoload yes; "                    \
 		"else setenv getcmd tftp; setenv autoload no; fi\0"            \
 		TQMLS1028_UPDATE_ENV_SETTINGS
-
-/*
- * All the defines above are for the TQMLS1028a SoM
- *
- * Now include the baseboard specific configuration
- */
-#ifdef CONFIG_MBLS1028A
-#include "tqmls1028a_mbls1028a.h"
-#else
-#error "No baseboard for the TQMLS1028A SOM defined!"
-#endif
 
 #endif /* __TQMLS1028A_H */
