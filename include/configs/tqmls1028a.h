@@ -317,7 +317,7 @@
 	"addspi=setenv bootargs ${bootargs} root=ubi0_0 rw "                \
 		"rootfstype=ubifs ubi.mtd=6\0"                                 \
 	"spiargs=run addspi addtty addvideo\0"                                 \
-	"spikernelload=sf probe 0; sf read ${fdtaddr} Linux\; "		       \
+	"spikernelload=sf probe 0; sf read ${fdtaddr} Linux; "		       \
 		"unzip ${fdtaddr} ${loadaddr}\0"			       \
 	"spifdtload=sf probe 0; sf read ${fdtaddr} DTB\0"                      \
 	"spihdpload=sf probe; sf read ${loadaddr} HDP; hdp load ${loadaddr};\0" \
