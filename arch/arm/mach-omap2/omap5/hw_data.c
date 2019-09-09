@@ -699,6 +699,30 @@ const struct ctrl_ioregs ioregs_dra7xx_es1 = {
 	.ctrl_ddr_ctrl_ext_0 = 0xA2000000,
 };
 
+const struct ctrl_ioregs ioregs_tqma571x = {
+	.ctrl_ddr3ch = 0x60606060,
+	.ctrl_ddrch = 0x40404040,
+	.ctrl_ddrio_0 = 0x00094A40,
+	.ctrl_ddrio_1 = 0x00000000,
+	.ctrl_emif_sdram_config_ext = 0x0000C123
+};
+
+const struct ctrl_ioregs ioregs_tqma572x = {
+	.ctrl_ddr3ch = 0x80808080,
+	.ctrl_ddrch = 0x40404040,
+	.ctrl_ddrio_0 = 0x00094A40,
+	.ctrl_ddrio_1 = 0x04A52000,
+	.ctrl_emif_sdram_config_ext = 0x0000C123
+};
+
+const struct ctrl_ioregs ioregs_tqma574x = {
+	.ctrl_ddr3ch = 0x80808080,
+	.ctrl_ddrch = 0x40404040,
+	.ctrl_ddrio_0 = 0x00094A40,
+	.ctrl_ddrio_1 = 0x00000000,
+	.ctrl_emif_sdram_config_ext = 0x0001C123
+};
+
 const struct ctrl_ioregs ioregs_dra72x_es1 = {
 	.ctrl_ddrch = 0x40404040,
 	.ctrl_lpddr2ch = 0x40404040,
@@ -795,7 +819,15 @@ void get_ioregs(const struct ctrl_ioregs **regs)
 	case DRA762_ES1_0:
 	case DRA762_ACD_ES1_0:
 	case DRA762_ABZ_ES1_0:
+#ifdef CONFIG_TQMA571X
+		*regs = &ioregs_tqma571x;
+#elif CONFIG_TQMA572X
+		*regs = &ioregs_tqma572x;
+#elif CONFIG_TQMA574X
+		*regs = &ioregs_tqma574x;
+#else
 		*regs = &ioregs_dra7xx_es1;
+#endif
 		break;
 	case DRA722_ES1_0:
 		*regs = &ioregs_dra72x_es1;

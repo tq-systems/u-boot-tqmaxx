@@ -20,7 +20,6 @@
 #endif
 
 /* SDRAM */
-#define CONFIG_NR_DRAM_BANKS		2
 #define CONFIG_SYS_DDR_DATA_INIT	0xdeadbeef
 #define CONFIG_SYS_MEMTEST_START	0x81000000
 #define CONFIG_SYS_MEMTEST_END		0x810fffff
@@ -124,11 +123,7 @@
 #define CONFIG_HSMMC2_8BIT
 
 /* CPSW Ethernet */
-#define CONFIG_BOOTP_DNS		/* Configurable parts of CMD_DHCP */
-#define CONFIG_BOOTP_DNS2
 #define CONFIG_BOOTP_SEND_HOSTNAME
-#define CONFIG_BOOTP_GATEWAY
-#define CONFIG_BOOTP_SUBNETMASK
 #define CONFIG_NET_RETRY_COUNT		10
 #define CONFIG_DRIVER_TI_CPSW		/* Driver for IP block */
 #define CONFIG_MII			/* Required in net/eth.c */
@@ -150,10 +145,9 @@
 
 /* SPI */
 #define CONFIG_TI_SPI_MMAP
-#define CONFIG_SF_DEFAULT_SPEED                15360000
-#define CONFIG_SF_DEFAULT_MODE                 SPI_MODE_0
 #define CONFIG_QSPI_QUAD_SUPPORT
 #define TQMA57XX_SPI_FLASH_SECTOR_SIZE		SZ_64K
+#define CONFIG_SYS_MAX_FLASH_BANKS	1
 
 /* SPI SPL */
 #define CONFIG_TI_EDMA3

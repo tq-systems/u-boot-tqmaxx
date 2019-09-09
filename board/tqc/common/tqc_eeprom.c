@@ -6,7 +6,7 @@
 
 #include <common.h>
 #include <console.h>
-#include <crc.h>
+#include <u-boot/crc.h>
 #include <i2c.h>
 #include <malloc.h>
 #include <linux/ctype.h>

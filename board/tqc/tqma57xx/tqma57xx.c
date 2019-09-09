@@ -50,29 +50,30 @@ const struct omap_sysinfo sysinfo = {
 	"Board: UNKNOWN TQMa57xx ??? REV UNKNOWN ?????\n"
 };
 
-#ifdef CONFIG_TQMA572X
-static const struct dmm_lisa_map_regs tqma572x_lisa_regs = {
-	.dmm_lisa_map_3 = 0x80740300,
-	.is_ma_present  = 0x1
-};
-#elif CONFIG_TQMA571X
+#ifdef CONFIG_TQMA571X
 static const struct dmm_lisa_map_regs tqma571x_lisa_regs = {
 	.dmm_lisa_map_3 = 0x80600100,
 	.is_ma_present  = 0x1
 };
+#elif CONFIG_TQMA572X
+static const struct dmm_lisa_map_regs tqma572x_lisa_regs = {
+	.dmm_lisa_map_3 = 0x80740300,
+	.is_ma_present  = 0x1
+};
 #elif CONFIG_TQMA574X
 static const struct dmm_lisa_map_regs tqma574x_lisa_regs = {
-	.dmm_lisa_map_3 = 0x80740300,
+	.dmm_lisa_map_2 = 0xc0600200, /* 1GiB on EMIF2 */
+	.dmm_lisa_map_3 = 0x80600100, /* 1GiB on EMIF1 */
 	.is_ma_present  = 0x1
 };
 #endif
 
 void emif_get_dmm_regs(const struct dmm_lisa_map_regs **dmm_lisa_regs)
 {
-#ifdef CONFIG_TQMA572X
-	*dmm_lisa_regs = &tqma572x_lisa_regs;
-#elif CONFIG_TQMA571X
+#ifdef CONFIG_TQMA571X
 	*dmm_lisa_regs = &tqma571x_lisa_regs;
+#elif CONFIG_TQMA572X
+	*dmm_lisa_regs = &tqma572x_lisa_regs;
 #elif CONFIG_TQMA574X
 	*dmm_lisa_regs = &tqma574x_lisa_regs;
 #endif
@@ -82,10 +83,10 @@ void emif_get_reg_dump(u32 emif_nr, const struct emif_regs **regs)
 {
 	switch (emif_nr) {
 	case 1:
-#ifdef CONFIG_TQMA572X
-		*regs = &tqma572x_emif1_ddr3_532mhz_emif_regs;
-#elif CONFIG_TQMA571X
+#ifdef CONFIG_TQMA571X
 		*regs = &tqma571x_emif1_ddr3_666mhz_emif_regs;
+#elif CONFIG_TQMA572X
+		*regs = &tqma572x_emif1_ddr3_532mhz_emif_regs;
 #elif CONFIG_TQMA574X
 		*regs = &tqma574x_emif1_ddr3_666mhz_emif_regs;
 #endif
@@ -104,12 +105,12 @@ void emif_get_ext_phy_ctrl_const_regs(u32 emif_nr, const u32 **regs, u32 *size)
 {
 	switch (emif_nr) {
 	case 1:
-#ifdef CONFIG_TQMA572X
-		*regs = tqma572x_emif1_ddr3_ext_phy_ctrl_const_regs;
-		*size = ARRAY_SIZE(tqma572x_emif1_ddr3_ext_phy_ctrl_const_regs);
-#elif CONFIG_TQMA571X
+#ifdef CONFIG_TQMA571X
 		*regs = tqma571x_emif1_ddr3_ext_phy_ctrl_const_regs;
 		*size = ARRAY_SIZE(tqma571x_emif1_ddr3_ext_phy_ctrl_const_regs);
+#elif CONFIG_TQMA572X
+		*regs = tqma572x_emif1_ddr3_ext_phy_ctrl_const_regs;
+		*size = ARRAY_SIZE(tqma572x_emif1_ddr3_ext_phy_ctrl_const_regs);
 #elif CONFIG_TQMA574X
 		*regs = tqma574x_emif1_ddr3_ext_phy_ctrl_const_regs;
 		*size = ARRAY_SIZE(tqma574x_emif1_ddr3_ext_phy_ctrl_const_regs);
@@ -204,10 +205,10 @@ int get_voltrail_opp(int rail_offset)
 
 const char *tqma57xx_get_boardname(void)
 {
-#ifdef CONFIG_TQMA572X
-	return "TQMa572x";
-#elif CONFIG_TQMA571X
+#ifdef CONFIG_TQMA571X
 	return "TQMa571x";
+#elif CONFIG_TQMA572X
+	return "TQMa572x";
 #elif CONFIG_TQMA574X
 	return "TQMa574x";
 #else
@@ -457,7 +458,6 @@ int omap_xhci_board_usb_cleanup(int index, enum usb_init_type init)
 #endif /* defined(CONFIG_USB_DWC3) || defined(CONFIG_USB_XHCI_OMAP) */
 
 #ifdef CONFIG_DRIVER_TI_CPSW
-
 int board_eth_init(bd_t *bis)
 {
 	int ret;
