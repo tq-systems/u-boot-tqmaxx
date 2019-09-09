@@ -289,7 +289,7 @@
 		"rootfstype=ext4\0"                                \
 	"sdhdpload=fatload mmc 0:1 ${loadaddr} ls1028a-dp-fw.bin; hdp load ${loadaddr};\0" \
 	"sdimageload=fatload mmc 0:1 ${fdtaddr} Image.gz; unzip $fdtaddr $loadaddr\0" \
-	"sdfdtload=fatload mmc 0:1 ${fdtaddr} ls1028a-mbls1028a.dtb;\0" \
+	"sdfdtload=fatload mmc 0:1 ${fdtaddr} ${fdt_file};\0" \
 	"sdargs=run addsd addtty addvideo\0"                      \
 	"sdboot=echo Booting from sd card ...; " \
 		"setenv bootargs; " \
@@ -302,7 +302,7 @@
 		"booti ${loadaddr} - ${fdtaddr}\0" \
 	"emmchdpload=fatload mmc 1:1 ${loadaddr} ls1028a-dp-fw.bin; hdp load ${loadaddr};\0" \
 	"emmcimageload=fatload mmc 1:1 ${fdtaddr} Image.gz; unzip $fdtaddr $loadaddr\0" \
-	"emmcfdtload=fatload mmc 1:1 ${fdtaddr} ls1028a-mbls1028a.dtb;\0" \
+	"emmcfdtload=fatload mmc 1:1 ${fdtaddr} ${fdt_file};\0" \
 	"emmcargs=run addemmc addtty addvideo\0"                      \
 	"emmcboot=echo Booting from emmc ...; " \
 		"setenv bootargs; " \
