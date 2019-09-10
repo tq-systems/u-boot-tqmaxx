@@ -12,4 +12,5 @@ obj-$(CONFIG_CLK_R8A77970) += r8a77970-cpg-mssr.o
 obj-$(CONFIG_CLK_R8A77990) += r8a77990-cpg-mssr.o
 obj-$(CONFIG_CLK_R8A77995) += r8a77995-cpg-mssr.o
 obj-$(CONFIG_CLK_R8A774A1) += r8a774a1-cpg-mssr.o
+obj-$(CONFIG_CLK_R8A774B1) += r8a774b1-cpg-mssr.o
 obj-$(CONFIG_CLK_R8A774C0) += r8a774c0-cpg-mssr.o
