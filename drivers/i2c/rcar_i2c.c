@@ -151,7 +151,7 @@ static int rcar_i2c_read_common(struct udevice *dev, struct i2c_msg *msg)
 			icmcr |= RCAR_I2C_ICMCR_FSB;
 
 		writel(icmcr, priv->base + RCAR_I2C_ICMCR);
-		writel(~RCAR_I2C_ICMSR_MDR, priv->base + RCAR_I2C_ICMSR);
+		writel((u32)~RCAR_I2C_ICMSR_MDR, priv->base + RCAR_I2C_ICMSR);
 
 		ret = wait_for_bit_le32(priv->base + RCAR_I2C_ICMSR,
 					RCAR_I2C_ICMSR_MDR, true, 100, true);
@@ -161,7 +161,7 @@ static int rcar_i2c_read_common(struct udevice *dev, struct i2c_msg *msg)
 		msg->buf[i] = readl(priv->base + RCAR_I2C_ICRXD_ICTXD) & 0xff;
 	}
 
-	writel(~RCAR_I2C_ICMSR_MDR, priv->base + RCAR_I2C_ICMSR);
+	writel((u32)~RCAR_I2C_ICMSR_MDR, priv->base + RCAR_I2C_ICMSR);
 
 	return rcar_i2c_finish(dev);
 }
@@ -179,7 +179,7 @@ static int rcar_i2c_write_common(struct udevice *dev, struct i2c_msg *msg)
 	for (i = 0; i < msg->len; i++) {
 		writel(msg->buf[i], priv->base + RCAR_I2C_ICRXD_ICTXD);
 		writel(icmcr, priv->base + RCAR_I2C_ICMCR);
-		writel(~RCAR_I2C_ICMSR_MDE, priv->base + RCAR_I2C_ICMSR);
+		writel((u32)~RCAR_I2C_ICMSR_MDE, priv->base + RCAR_I2C_ICMSR);
 
 		ret = wait_for_bit_le32(priv->base + RCAR_I2C_ICMSR,
 					RCAR_I2C_ICMSR_MDE, true, 100, true);
@@ -187,7 +187,7 @@ static int rcar_i2c_write_common(struct udevice *dev, struct i2c_msg *msg)
 			return ret;
 	}
 
-	writel(~RCAR_I2C_ICMSR_MDE, priv->base + RCAR_I2C_ICMSR);
+	writel((u32)~RCAR_I2C_ICMSR_MDE, priv->base + RCAR_I2C_ICMSR);
 	icmcr |= RCAR_I2C_ICMCR_FSB;
 	writel(icmcr, priv->base + RCAR_I2C_ICMCR);
 
