@@ -43,12 +43,23 @@
 
 #define CONFIG_SYS_UBOOT_BASE 0x20116000
 #define CONFIG_SPL_PAD_TO	0x16000
-
-/* Store environment at top of flash */
-#ifdef CONFIG_EMU_PXP
-#define CONFIG_ENV_SIZE			0x1000
+#if defined(CONFIG_EMMC_BOOT)
+#define CONFIG_SYS_MMC_ENV_DEV         1
 #else
-#define CONFIG_ENV_SIZE			0x2000
+#define CONFIG_SYS_MMC_ENV_DEV         0
+#endif
+
+#if defined(CONFIG_SD_BOOT) || defined(CONFIG_EMMC_BOOT)
+#define CONFIG_ENV_OFFSET              0x300000        /* 3MB */
+#define CONFIG_ENV_SIZE			0x80000          /* 512KB */
+#define CONFIG_TZPC_OCRAM_BSS_HEAP_NS
+#define OCRAM_NONSECURE_SIZE		0x00010000
+#else
+#define CONFIG_ENV_OFFSET              0x380000        /* 3,5MB */
+#define CONFIG_SYS_FSL_QSPI_BASE	0x20000000
+#define CONFIG_ENV_ADDR	CONFIG_SYS_FSL_QSPI_BASE + CONFIG_ENV_OFFSET
+#define CONFIG_ENV_SIZE			0x80000          /* 512KB */
+#define CONFIG_ENV_SECT_SIZE           0x40000
 #endif
 
 #ifdef CONFIG_SPL_BUILD
@@ -80,8 +91,9 @@
 	"mtdparts=nor0:"                                                       \
 		"512k@0k(RCW),"                                                \
 		"512k@512k(PPA),"                                              \
-		"3M@1M(U-Boot-PBL),"                                           \
-		"512k@4M(DTB),"                                                 \
+		"2560k@1M(U-Boot-PBL),"                                        \
+		"512k@3584k(U-Boot-ENV),"                                      \
+		"512k@4M(DTB),"                                                \
 		"512k@4608k(HDP),"                                             \
 		"10M@5M(Linux),"                                               \
 		"49M@15M(RootFS)\0"                                            \
