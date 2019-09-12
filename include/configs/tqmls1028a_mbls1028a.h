@@ -11,6 +11,7 @@
 
 #define RGMII_PHY_DEV_ADDR 0x00
 #define SGMII_PHY_DEV_ADDR 0x03
+#define QSGMII_PHY_DEV_ADDR 0x1C
 #define PHY_MDIO_NAME "netc_mdio"
 
 #define CLOCKGEN_I2C_BUS_NUM	0x4

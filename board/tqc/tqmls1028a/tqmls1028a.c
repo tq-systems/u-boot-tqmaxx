@@ -164,6 +164,17 @@ int misc_init_r(void)
 }
 #endif
 
+void setup_switch(void)
+{
+	struct udevice dev;
+	struct enetc_devfn hw;
+
+	dev.name = "sw";
+	dev.priv = &hw;
+	hw.port_regs = (void *)0x1f8140000;
+	register_imdio(&dev);
+}
+
 static void setup_SGMII(void)
 {
 	/* set up SGMII, this is hardcoded for SERDES 8xxx */
@@ -217,13 +228,60 @@ static void setup_RGMII(void)
 	out_le32(NETC_PF1_BAR0_BASE + 0x8300, 0x8006);
 }
 
+void setup_QSGMII(void)
+{
+	#define NETC_PF5_BAR0_BASE	0x1f8140000
+	#define NETC_PF5_ECAM_BASE	0x1F0005000
+	#define NETC_PCS_QSGMIICR1	0x001ea1884
+
+	u16 value;
+	struct mii_dev bus = {0};
+	int i, to;
+
+	if ((serdes_protocol & 0xf0) != 0x50)
+		return;
+
+	printf("trying to set up QSGMII for SERDES x5xx!!!!\n");
+
+	/* turn on PCI function */
+	out_le16(NETC_PF5_ECAM_BASE + 4, 0xffff);
+
+	bus.priv = (void *)NETC_PF5_BAR0_BASE + 0x8030;
+
+	for (i = 0; i < 4; i++) {
+		value = PHY_SGMII_IF_MODE_SGMII | PHY_SGMII_IF_MODE_AN;
+		enetc_imdio_write(&bus, i, MDIO_DEVAD_NONE, 0x14, value);
+		/* Dev ability according to SGMII specification */
+		value = PHY_SGMII_DEV_ABILITY_SGMII;
+		enetc_imdio_write(&bus, i, MDIO_DEVAD_NONE, 0x04, value);
+		/* Adjust link timer for SGMII */
+		enetc_imdio_write(&bus, i, MDIO_DEVAD_NONE, 0x13, 0x0003);
+		enetc_imdio_write(&bus, i, MDIO_DEVAD_NONE, 0x12, 0x06a0);
+	}
+
+	for (i = 0; i < 4; i++) {
+		to = 1000;
+		do {
+			value = enetc_imdio_read(&bus, i, MDIO_DEVAD_NONE, 1);
+			if ((value & 0x0024) == 0x0024)
+				break;
+		} while (--to);
+		if ((value & 0x24) != 0x24) {
+			printf("PCS[%d] didn't link up, giving up.\n", i);
+			break;
+		}
+	}
+}
+
 #ifdef CONFIG_LAST_STAGE_INIT
 int last_stage_init(void)
 {
 	u8 val;
 
+	setup_switch();
 	setup_RGMII();
 	setup_SGMII();
+	setup_QSGMII();
 	tqmls1028a_bb_late_init();
 
 	/* Set Bit 0 of Register 0 of RTC to adjust to 12.5 pF */

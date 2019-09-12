@@ -166,8 +166,39 @@ static void setup_SGMII_PHY(void)
 	ext_bus->write(ext_bus, SGMII_PHY_DEV_ADDR, MDIO_DEVAD_NONE, 0x19, val);
 }
 
+static void setup_QSGMII_PHY(void)
+{
+	struct mii_dev *ext_bus;
+	int phy_addr;
+	char *mdio_name = PHY_MDIO_NAME;
+
+	phy_addr = QSGMII_PHY_DEV_ADDR;
+
+	ext_bus = miiphy_get_dev_by_name(mdio_name);
+	if (!ext_bus) {
+		puts("couldn't find MDIO bus, skipping SGMII PHY config\n");
+		return;
+	}
+
+	/* Initialize QSGMII Phy, see Marvel Document MV-S301615 */
+	ext_bus->write(ext_bus, phy_addr, MDIO_DEVAD_NONE, 0x16, 0x00FF);
+	ext_bus->write(ext_bus, phy_addr, MDIO_DEVAD_NONE, 0x18, 0x2800);
+	ext_bus->write(ext_bus, phy_addr, MDIO_DEVAD_NONE, 0x17, 0x2001);
+	ext_bus->write(ext_bus, phy_addr, MDIO_DEVAD_NONE, 0x16, 0x0000);
+
+	ext_bus->write(ext_bus, phy_addr, MDIO_DEVAD_NONE, 0x16, 0x0000);
+	ext_bus->write(ext_bus, phy_addr, MDIO_DEVAD_NONE, 0x1D, 0x0003);
+	ext_bus->write(ext_bus, phy_addr, MDIO_DEVAD_NONE, 0x1E, 0x0002);
+	ext_bus->write(ext_bus, phy_addr, MDIO_DEVAD_NONE, 0x16, 0x0000);
+
+	/* Reset Phy */
+	ext_bus->write(ext_bus, phy_addr, MDIO_DEVAD_NONE, 0x16, 0x0004);
+	ext_bus->write(ext_bus, phy_addr, MDIO_DEVAD_NONE, 0x1B, 0x8000);
+}
+
 void tqmls1028a_bb_late_init(void)
 {
 	setup_RGMII_PHY();
 	setup_SGMII_PHY();
+	setup_QSGMII_PHY();
 }
