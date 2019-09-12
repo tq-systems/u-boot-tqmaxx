@@ -160,11 +160,24 @@ int misc_init_r(void)
 }
 #endif
 
+static void setup_RGMII(void)
+{
+	#define NETC_PF1_BAR0_BASE	0x1f8050000
+	#define NETC_PF1_ECAM_BASE	0x1F0001000
+
+	printf("trying to set up RGMII\n");
+
+	/* turn on PCI function */
+	out_le16(NETC_PF1_ECAM_BASE + 4, 0xffff);
+	out_le32(NETC_PF1_BAR0_BASE + 0x8300, 0x8006);
+}
+
 #ifdef CONFIG_LAST_STAGE_INIT
 int last_stage_init(void)
 {
 	u8 val;
 
+	setup_RGMII();
 	tqmls1028a_bb_late_init();
 
 	/* Set Bit 0 of Register 0 of RTC to adjust to 12.5 pF */

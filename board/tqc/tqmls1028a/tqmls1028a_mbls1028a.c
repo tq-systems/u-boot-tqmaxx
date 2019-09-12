@@ -87,9 +87,6 @@ int board_bb_init(void)
 	return clockgen_init();
 }
 
-#define PCS_INF(fmt, args...)  printf("PCS: " fmt, ##args)
-#define PCS_ERR(fmt, args...)  printf("PCS: " fmt, ##args)
-
 static uint16_t _rgmii_phy_read_indirect(struct mii_dev *ext_bus, uint8_t addr)
 {
 	if (ext_bus)
@@ -121,23 +118,15 @@ static void _rgmii_phy_write_indirect(struct mii_dev *ext_bus, uint8_t addr,
 		       0x0e, value);
 }
 
-static void setup_RGMII(void)
+static void setup_RGMII_PHY(void)
 {
-	#define NETC_PF1_BAR0_BASE	0x1f8050000
-	#define NETC_PF1_ECAM_BASE	0x1F0001000
 	struct mii_dev *ext_bus;
-	char *mdio_name = RGMII_MDIO_NAME;
+	char *mdio_name = PHY_MDIO_NAME;
 	int val;
-
-	PCS_INF("trying to set up RGMII\n");
-
-	/* turn on PCI function */
-	out_le16(NETC_PF1_ECAM_BASE + 4, 0xffff);
-	out_le32(NETC_PF1_BAR0_BASE + 0x8300, 0x8006);
 
 	ext_bus = miiphy_get_dev_by_name(mdio_name);
 	if (!ext_bus) {
-		PCS_ERR("couldn't find MDIO bus, ignoring the PHY\n");
+		printf("couldn't find MDIO bus, ignoring the PHY\n");
 		return;
 	}
 
@@ -161,5 +150,5 @@ static void setup_RGMII(void)
 
 void tqmls1028a_bb_late_init(void)
 {
-	setup_RGMII();
+	setup_RGMII_PHY();
 }
