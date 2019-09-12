@@ -257,3 +257,6 @@ struct enetc_devfn {
 #define enetc_bdr_write(hw, t, n, off, val) \
 				enetc_write(hw, ENETC_BDR(t, n, off), val)
 
+int enetc_imdio_write(struct mii_dev *bus, int port, int dev, int reg, u16 val);
+int enetc_imdio_read(struct mii_dev *bus, int port, int dev, int reg);
+void register_imdio(struct udevice *dev);

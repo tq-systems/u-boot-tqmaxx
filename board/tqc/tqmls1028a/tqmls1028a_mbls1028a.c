@@ -148,7 +148,26 @@ static void setup_RGMII_PHY(void)
 	val = _rgmii_phy_read_indirect(ext_bus, 0x86);
 }
 
+static void setup_SGMII_PHY(void)
+{
+	struct mii_dev *ext_bus;
+	char *mdio_name = PHY_MDIO_NAME;
+	u16 val;
+
+	ext_bus = miiphy_get_dev_by_name(mdio_name);
+	if (!ext_bus) {
+		printf("couldn't find MDIO bus, ignoring the PHY\n");
+		return;
+	}
+
+	/* Set SGMII PHY LEDs Led1 and Led2 to active low */
+	val = ext_bus->read(ext_bus, SGMII_PHY_DEV_ADDR, MDIO_DEVAD_NONE, 0x19);
+	val &= 0xFBBF;
+	ext_bus->write(ext_bus, SGMII_PHY_DEV_ADDR, MDIO_DEVAD_NONE, 0x19, val);
+}
+
 void tqmls1028a_bb_late_init(void)
 {
 	setup_RGMII_PHY();
+	setup_SGMII_PHY();
 }
