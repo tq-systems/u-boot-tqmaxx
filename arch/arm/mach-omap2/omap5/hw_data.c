@@ -816,14 +816,14 @@ void get_ioregs(const struct ctrl_ioregs **regs)
 	case DRA752_ES1_0:
 	case DRA752_ES1_1:
 	case DRA752_ES2_0:
+#ifdef CONFIG_TARGET_TQMA57XX
+		*regs = &ioregs_tqma572x;
+		break;
+#endif
 	case DRA762_ES1_0:
 	case DRA762_ACD_ES1_0:
 	case DRA762_ABZ_ES1_0:
-#ifdef CONFIG_TQMA571X
-		*regs = &ioregs_tqma571x;
-#elif CONFIG_TQMA572X
-		*regs = &ioregs_tqma572x;
-#elif CONFIG_TQMA574X
+#ifdef CONFIG_TARGET_TQMA57XX
 		*regs = &ioregs_tqma574x;
 #else
 		*regs = &ioregs_dra7xx_es1;
@@ -833,6 +833,10 @@ void get_ioregs(const struct ctrl_ioregs **regs)
 		*regs = &ioregs_dra72x_es1;
 		break;
 	case DRA722_ES2_0:
+#ifdef CONFIG_TARGET_TQMA57XX
+		*regs = &ioregs_tqma571x;
+		break;
+#endif
 	case DRA722_ES2_1:
 		*regs = &ioregs_dra72x_es2;
 		break;

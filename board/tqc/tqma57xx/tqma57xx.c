@@ -50,81 +50,110 @@ const struct omap_sysinfo sysinfo = {
 	"Board: UNKNOWN TQMa57xx ??? REV UNKNOWN ?????\n"
 };
 
-#ifdef CONFIG_TQMA571X
 static const struct dmm_lisa_map_regs tqma571x_lisa_regs = {
 	.dmm_lisa_map_3 = 0x80600100,
 	.is_ma_present  = 0x1
 };
-#elif CONFIG_TQMA572X
+
 static const struct dmm_lisa_map_regs tqma572x_lisa_regs = {
 	.dmm_lisa_map_3 = 0x80740300,
 	.is_ma_present  = 0x1
 };
-#elif CONFIG_TQMA574X
+
 static const struct dmm_lisa_map_regs tqma574x_lisa_regs = {
 	.dmm_lisa_map_2 = 0xc0600200, /* 1GiB on EMIF2 */
 	.dmm_lisa_map_3 = 0x80600100, /* 1GiB on EMIF1 */
 	.is_ma_present  = 0x1
 };
-#endif
 
 void emif_get_dmm_regs(const struct dmm_lisa_map_regs **dmm_lisa_regs)
 {
-#ifdef CONFIG_TQMA571X
-	*dmm_lisa_regs = &tqma571x_lisa_regs;
-#elif CONFIG_TQMA572X
-	*dmm_lisa_regs = &tqma572x_lisa_regs;
-#elif CONFIG_TQMA574X
-	*dmm_lisa_regs = &tqma574x_lisa_regs;
-#endif
+/*
+ * TQMA571x: DRA722-GP ES2.0
+ * TQMa572x: DRA752-GP ES2.0
+ * TQMa574x: DRA762-GP ES1.0 ABZ package
+ */
+	switch(omap_revision()) {
+	case DRA722_ES2_0:
+		*dmm_lisa_regs = &tqma571x_lisa_regs;
+		break;
+	case DRA752_ES2_0:
+		*dmm_lisa_regs = &tqma572x_lisa_regs;
+		break;
+	case DRA762_ABZ_ES1_0:
+		*dmm_lisa_regs = &tqma574x_lisa_regs;
+		break;
+	default:
+		printf("\n (%s:%d) INVALID OMAP REVISION ", __func__, __LINE__);
+	}
 }
 
 void emif_get_reg_dump(u32 emif_nr, const struct emif_regs **regs)
 {
-	switch (emif_nr) {
-	case 1:
-#ifdef CONFIG_TQMA571X
-		*regs = &tqma571x_emif1_ddr3_666mhz_emif_regs;
-#elif CONFIG_TQMA572X
-		*regs = &tqma572x_emif1_ddr3_532mhz_emif_regs;
-#elif CONFIG_TQMA574X
-		*regs = &tqma574x_emif1_ddr3_666mhz_emif_regs;
-#endif
-		break;
-	case 2:
-#ifdef CONFIG_TQMA572X
-		*regs = &tqma572x_emif2_ddr3_532mhz_emif_regs;
-#elif CONFIG_TQMA574X
-		*regs = &tqma574x_emif2_ddr3_666mhz_emif_regs;
-#endif
-		break;
+	if (emif_nr == 1) {
+		switch(omap_revision()) {
+		case DRA722_ES2_0:
+			*regs = &tqma571x_emif1_ddr3_666mhz_emif_regs;
+			break;
+		case DRA752_ES2_0:
+			*regs = &tqma572x_emif1_ddr3_532mhz_emif_regs;
+			break;
+		case DRA762_ABZ_ES1_0:
+			*regs = &tqma574x_emif1_ddr3_666mhz_emif_regs;
+			break;
+		default:
+			printf("\n (%s:%d) INVALID OMAP REVISION ", __func__, __LINE__);
+		}
+	} else if (emif_nr == 2) {
+		switch(omap_revision()) {
+		case DRA752_ES2_0:
+			*regs = &tqma572x_emif2_ddr3_532mhz_emif_regs;
+			break;
+		case DRA762_ABZ_ES1_0:
+			*regs = &tqma574x_emif2_ddr3_666mhz_emif_regs;
+			break;
+		default:
+			printf("\n (%s:%d) INVALID OMAP REVISION ", __func__, __LINE__);
+		}
+	} else {
+		printf("\n (%s:%d) INVALID EMIF_NR ", __func__, __LINE__);
 	}
 }
 
 void emif_get_ext_phy_ctrl_const_regs(u32 emif_nr, const u32 **regs, u32 *size)
 {
-	switch (emif_nr) {
-	case 1:
-#ifdef CONFIG_TQMA571X
-		*regs = tqma571x_emif1_ddr3_ext_phy_ctrl_const_regs;
-		*size = ARRAY_SIZE(tqma571x_emif1_ddr3_ext_phy_ctrl_const_regs);
-#elif CONFIG_TQMA572X
-		*regs = tqma572x_emif1_ddr3_ext_phy_ctrl_const_regs;
-		*size = ARRAY_SIZE(tqma572x_emif1_ddr3_ext_phy_ctrl_const_regs);
-#elif CONFIG_TQMA574X
-		*regs = tqma574x_emif1_ddr3_ext_phy_ctrl_const_regs;
-		*size = ARRAY_SIZE(tqma574x_emif1_ddr3_ext_phy_ctrl_const_regs);
-#endif
-		break;
-	case 2:
-#ifdef CONFIG_TQMA572X
-		*regs = tqma572x_emif2_ddr3_ext_phy_ctrl_const_regs;
-		*size = ARRAY_SIZE(tqma572x_emif2_ddr3_ext_phy_ctrl_const_regs);
-#elif CONFIG_TQMA574X
-		*regs = tqma574x_emif2_ddr3_ext_phy_ctrl_const_regs;
-		*size = ARRAY_SIZE(tqma574x_emif2_ddr3_ext_phy_ctrl_const_regs);
-#endif
-		break;
+	if (emif_nr == 1) {
+		switch(omap_revision()) {
+		case DRA722_ES2_0:
+			*regs = tqma571x_emif1_ddr3_ext_phy_ctrl_const_regs;
+			*size = ARRAY_SIZE(tqma571x_emif1_ddr3_ext_phy_ctrl_const_regs);
+			break;
+		case DRA752_ES2_0:
+			*regs = tqma572x_emif1_ddr3_ext_phy_ctrl_const_regs;
+			*size = ARRAY_SIZE(tqma572x_emif1_ddr3_ext_phy_ctrl_const_regs);
+			break;
+		case DRA762_ABZ_ES1_0:
+			*regs = tqma574x_emif1_ddr3_ext_phy_ctrl_const_regs;
+			*size = ARRAY_SIZE(tqma574x_emif1_ddr3_ext_phy_ctrl_const_regs);
+			break;
+		default:
+			printf("\n (%s:%d) INVALID OMAP REVISION ", __func__, __LINE__);
+		}
+	} else if (emif_nr == 2) {
+		switch(omap_revision()) {
+		case DRA752_ES2_0:
+			*regs = tqma572x_emif2_ddr3_ext_phy_ctrl_const_regs;
+			*size = ARRAY_SIZE(tqma572x_emif2_ddr3_ext_phy_ctrl_const_regs);
+			break;
+		case DRA762_ABZ_ES1_0:
+			*regs = tqma574x_emif2_ddr3_ext_phy_ctrl_const_regs;
+			*size = ARRAY_SIZE(tqma574x_emif2_ddr3_ext_phy_ctrl_const_regs);
+			break;
+		default:
+			printf("\n (%s:%d) INVALID OMAP REVISION ", __func__, __LINE__);
+		}
+	} else {
+		printf("\n (%s:%d) INVALID EMIF_NR ", __func__, __LINE__);
 	}
 }
 
@@ -205,15 +234,16 @@ int get_voltrail_opp(int rail_offset)
 
 const char *tqma57xx_get_boardname(void)
 {
-#ifdef CONFIG_TQMA571X
-	return "TQMa571x";
-#elif CONFIG_TQMA572X
-	return "TQMa572x";
-#elif CONFIG_TQMA574X
-	return "TQMa574x";
-#else
-	return "unknown";
-#endif
+	switch(omap_revision()) {
+	case DRA722_ES2_0:
+		return "TQMa571x";
+	case DRA752_ES2_0:
+		return "TQMa572x";
+	case DRA762_ABZ_ES1_0:
+		return "TQMa574x";
+	default:
+		return "unknown";
+	}
 }
 
 void do_board_detect(void)
