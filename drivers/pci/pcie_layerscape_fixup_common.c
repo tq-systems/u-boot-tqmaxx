@@ -82,7 +82,6 @@ int lx2_board_fix_fdt(void *fdt)
 		fdt_setprop(fdt, off, "reg-names", reg_names, names_len);
 		fdt_delprop(fdt, off, "apio-wins");
 		fdt_delprop(fdt, off, "ppio-wins");
-		fdt_setprop(fdt, off, "num-lanes", &val, sizeof(val));
 		off = fdt_node_offset_by_compatible(fdt, off,
 						    "fsl,lx2160a-pcie");
 	}
