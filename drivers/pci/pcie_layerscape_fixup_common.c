@@ -86,6 +86,19 @@ int lx2_board_fix_fdt(void *fdt)
 		off = fdt_node_offset_by_compatible(fdt, off,
 						    "fsl,lx2160a-pcie");
 	}
+
+	/* change compatible property in pcie_ep nodes also */
+	off = -1;
+	off = fdt_node_offset_by_compatible(fdt, off, "fsl,lx2160a-pcie-ep");
+	while (off != -FDT_ERR_NOTFOUND) {
+		fdt_setprop_string(fdt, off, "compatible",
+				   "fsl,ls2088a-pcie-ep");
+		fdt_setprop_u32(fdt, off, "num-ib-windows", 8);
+		fdt_setprop_u32(fdt, off, "num-ob-windows", 8);
+		off = fdt_node_offset_by_compatible(fdt, off,
+						    "fsl,lx2160a-pcie-ep");
+	}
+
 	return 0;
 }
 
