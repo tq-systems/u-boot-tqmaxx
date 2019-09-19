@@ -349,8 +349,8 @@
 	"baudrate=115200\0" \
 	"bootdelay=3\0" \
 	BOOT_ENV_SETTINGS \
-	"ethact=enetc\#1\0" \
-	"ethprime=enetc\#1\0" \
+	"ethact=enetc#1\0" \
+	"ethprime=enetc#1\0" \
 	"hwconfig=fsl_ddr:bank_intlv=auto\0" \
 	"stderr=serial\0" \
 	"stdin=serial\0" \
