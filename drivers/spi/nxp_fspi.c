@@ -658,6 +658,9 @@ static void fspi_op_write(struct nxp_fspi_priv *priv, u8 *txbuf, u32 len)
 	while (len > 0) {
 		/* Default is page programming */
 		seqid = SEQID_PP;
+		if (priv->cur_seqid == FSPI_CMD_WRSR)
+			seqid = SEQID_WRSR;
+
 		fspi_write32(priv->flags, &regs->ipcr0, to_or_from);
 
 		tx_size = (len > TX_IPBUF_SIZE) ? TX_IPBUF_SIZE : len;
