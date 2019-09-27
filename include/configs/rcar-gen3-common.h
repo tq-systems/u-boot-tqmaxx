@@ -51,7 +51,7 @@
 #define CONFIG_SYS_MALLOC_LEN		(1 * 1024 * 1024)
 #define CONFIG_SYS_BOOTMAPSZ		(8 * 1024 * 1024)
 #define CONFIG_SYS_BOOTM_LEN		(64 << 20)
-
+#define CONFIG_PRAM			(32 * 1024) /*reserve mem for Kerenel/dtb ECC area*/
 /* ENV setting */
 #define CONFIG_ENV_OVERWRITE
 #define CONFIG_ENV_SECT_SIZE	(128 * 1024)
