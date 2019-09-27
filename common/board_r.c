@@ -233,13 +233,18 @@ static int initr_barrier(void)
 static int initr_malloc(void)
 {
 	ulong malloc_start;
-
+#if CONFIG_PRAM
+	ulong pram = env_get_ulong("pram", 10, 0);
+#endif
 #if CONFIG_VAL(SYS_MALLOC_F_LEN)
 	debug("Pre-reloc malloc() used %#lx bytes (%ld KB)\n", gd->malloc_ptr,
 	      gd->malloc_ptr / 1024);
 #endif
 	/* The malloc area is immediately below the monitor copy in DRAM */
 	malloc_start = gd->relocaddr - TOTAL_MALLOC_LEN;
+#if CONFIG_PRAM
+	malloc_start -= (pram<<10); /*size is in kB*/
+#endif
 	mem_malloc_init((ulong)map_sysmem(malloc_start, TOTAL_MALLOC_LEN),
 			TOTAL_MALLOC_LEN);
 	return 0;
