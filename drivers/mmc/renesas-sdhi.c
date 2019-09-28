@@ -137,7 +137,7 @@ static int renesas_sdhi_hs400(struct udevice *dev)
 
 	tmio_sd_writel(priv, reg, RENESAS_SDHI_SCC_TMPPORT2);
 
-	tmio_sd_writel(priv, (taps << RENESAS_SDHI_SCC_DTCNTL_TAPNUM_SHIFT) |
+	tmio_sd_writel(priv, (0x8 << RENESAS_SDHI_SCC_DTCNTL_TAPNUM_SHIFT) |
 			     RENESAS_SDHI_SCC_DTCNTL_TAPEN,
 			     RENESAS_SDHI_SCC_DTCNTL);
 
@@ -147,6 +147,9 @@ static int renesas_sdhi_hs400(struct udevice *dev)
 	} else {
 		tmio_sd_writel(priv, priv->tap_set, RENESAS_SDHI_SCC_TAPSET);
 	}
+
+	tmio_sd_writel(priv, hs400 ? 0x704 : 0x300,
+		       RENESAS_SDHI_SCC_DT2FF);
 
 	reg = tmio_sd_readl(priv, RENESAS_SDHI_SCC_CKSEL);
 	reg |= RENESAS_SDHI_SCC_CKSEL_DTSEL;
@@ -465,6 +468,16 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 		priv->nrtaps = 4;
 	else
 		priv->nrtaps = 8;
+
+	/* H3 ES1.x and M3W ES1.0 uses bit 17 for DTRAEND */
+	if (((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7795) &&
+	    (rmobile_get_cpu_rev_integer() <= 1)) ||
+	    ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774A1) &&
+	    (rmobile_get_cpu_rev_integer() == 1) &&
+	    (rmobile_get_cpu_rev_fraction() == 0)))
+		priv->read_poll_flag = TMIO_SD_DMA_INFO1_END_RD;
+	else
+		priv->read_poll_flag = TMIO_SD_DMA_INFO1_END_RD2;
 }
 
 static int renesas_sdhi_probe(struct udevice *dev)

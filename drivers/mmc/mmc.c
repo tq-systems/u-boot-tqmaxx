@@ -23,10 +23,6 @@
 
 static int mmc_set_signal_voltage(struct mmc *mmc, uint signal_voltage);
 static int mmc_power_cycle(struct mmc *mmc);
-#if !CONFIG_IS_ENABLED(MMC_TINY)
-static int mmc_select_mode_and_width(struct mmc *mmc, uint card_caps);
-#endif
-
 #if !CONFIG_IS_ENABLED(DM_MMC)
 
 #if CONFIG_IS_ENABLED(MMC_UHS_SUPPORT)
@@ -724,7 +720,8 @@ static int mmc_send_ext_csd(struct mmc *mmc, u8 *ext_csd)
 	return err;
 }
 
-int mmc_switch(struct mmc *mmc, u8 set, u8 index, u8 value)
+static int __mmc_switch(struct mmc *mmc, u8 set, u8 index, u8 value,
+			bool send_status)
 {
 	struct mmc_cmd cmd;
 	int timeout = 1000;
@@ -740,21 +737,32 @@ int mmc_switch(struct mmc *mmc, u8 set, u8 index, u8 value)
 	while (retries > 0) {
 		ret = mmc_send_cmd(mmc, &cmd, NULL);
 
-		/* Waiting for the ready status */
-		if (!ret) {
-			ret = mmc_send_status(mmc, timeout);
-			return ret;
+		if (ret) {
+			retries--;
+			continue;
 		}
 
-		retries--;
+		if (!send_status) {
+			mdelay(50);
+			return 0;
+		}
+
+		/* Waiting for the ready status */
+		return mmc_send_status(mmc, timeout);
 	}
 
 	return ret;
 
 }
 
+int mmc_switch(struct mmc *mmc, u8 set, u8 index, u8 value)
+{
+	return __mmc_switch(mmc, set, index, value, true);
+}
+
 #if !CONFIG_IS_ENABLED(MMC_TINY)
-static int mmc_set_card_speed(struct mmc *mmc, enum bus_mode mode)
+static int mmc_set_card_speed(struct mmc *mmc, enum bus_mode mode,
+			      bool hsdowngrade)
 {
 	int err;
 	int speed_bits;
@@ -783,10 +791,25 @@ static int mmc_set_card_speed(struct mmc *mmc, enum bus_mode mode)
 	default:
 		return -EINVAL;
 	}
-	err = mmc_switch(mmc, EXT_CSD_CMD_SET_NORMAL, EXT_CSD_HS_TIMING,
-			 speed_bits);
+
+	err = __mmc_switch(mmc, EXT_CSD_CMD_SET_NORMAL, EXT_CSD_HS_TIMING,
+			   speed_bits, !hsdowngrade);
 	if (err)
 		return err;
+
+#if CONFIG_IS_ENABLED(MMC_HS200_SUPPORT) || \
+    CONFIG_IS_ENABLED(MMC_HS400_SUPPORT)
+	/*
+	 * In case the eMMC is in HS200/HS400 mode and we are downgrading
+	 * to HS mode, the card clock are still running much faster than
+	 * the supported HS mode clock, so we can not reliably read out
+	 * Extended CSD. Reconfigure the controller to run at HS mode.
+	 */
+	if (hsdowngrade) {
+		mmc_select_mode(mmc, MMC_HS);
+		mmc_set_clock(mmc, mmc_mode2freq(mmc, MMC_HS), false);
+	}
+#endif
 
 	if ((mode == MMC_HS) || (mode == MMC_HS_52)) {
 		/* Now check to see that it worked */
@@ -1628,7 +1651,7 @@ static const struct mode_width_tuning sd_modes_by_pref[] = {
 	     mwt++) \
 		if (caps & MMC_CAP(mwt->mode))
 
-static int sd_select_mode_and_width(struct mmc *mmc, uint card_caps)
+int sd_select_mode_and_width(struct mmc *mmc, uint card_caps)
 {
 	int err;
 	uint widths[] = {MMC_MODE_4BIT, MMC_MODE_1BIT};
@@ -1849,7 +1872,7 @@ static int mmc_select_hs400(struct mmc *mmc)
 	int err;
 
 	/* Set timing to HS200 for tuning */
-	err = mmc_set_card_speed(mmc, MMC_HS_200);
+	err = mmc_set_card_speed(mmc, MMC_HS_200, false);
 	if (err)
 		return err;
 
@@ -1865,7 +1888,7 @@ static int mmc_select_hs400(struct mmc *mmc)
 	}
 
 	/* Set back to HS */
-	mmc_set_card_speed(mmc, MMC_HS);
+	mmc_set_card_speed(mmc, MMC_HS, false);
 	mmc_set_clock(mmc, mmc_mode2freq(mmc, MMC_HS), false);
 
 	err = mmc_switch(mmc, EXT_CSD_CMD_SET_NORMAL, EXT_CSD_BUS_WIDTH,
@@ -1873,7 +1896,7 @@ static int mmc_select_hs400(struct mmc *mmc)
 	if (err)
 		return err;
 
-	err = mmc_set_card_speed(mmc, MMC_HS_400);
+	err = mmc_set_card_speed(mmc, MMC_HS_400, false);
 	if (err)
 		return err;
 
@@ -1897,7 +1920,7 @@ static int mmc_select_hs400(struct mmc *mmc)
 	    ecbv++) \
 		if ((ddr == ecbv->is_ddr) && (caps & ecbv->cap))
 
-static int mmc_select_mode_and_width(struct mmc *mmc, uint card_caps)
+int mmc_select_mode_and_width(struct mmc *mmc, uint card_caps)
 {
 	int err;
 	const struct mode_width_tuning *mwt;
@@ -1920,7 +1943,19 @@ static int mmc_select_mode_and_width(struct mmc *mmc, uint card_caps)
 		return -ENOTSUPP;
 	}
 
-	mmc_set_clock(mmc, mmc->legacy_speed, MMC_CLK_ENABLE);
+#if CONFIG_IS_ENABLED(MMC_HS200_SUPPORT) || \
+    CONFIG_IS_ENABLED(MMC_HS400_SUPPORT)
+	/*
+	 * In case the eMMC is in HS200/HS400 mode, downgrade to HS mode
+	 * before doing anything else, since a transition from either of
+	 * the HS200/HS400 mode directly to legacy mode is not supported.
+	 */
+	if (mmc->selected_mode == MMC_HS_200 ||
+	    mmc->selected_mode == MMC_HS_400)
+		mmc_set_card_speed(mmc, MMC_HS, true);
+	else
+#endif
+		mmc_set_clock(mmc, mmc->legacy_speed, MMC_CLK_ENABLE);
 
 	for_each_mmc_mode_by_pref(card_caps, mwt) {
 		for_each_supported_width(card_caps & mwt->widths,
@@ -1952,7 +1987,7 @@ static int mmc_select_mode_and_width(struct mmc *mmc, uint card_caps)
 				}
 			} else {
 				/* configure the bus speed (card) */
-				err = mmc_set_card_speed(mmc, mwt->mode);
+				err = mmc_set_card_speed(mmc, mwt->mode, false);
 				if (err)
 					goto error;
 
@@ -2740,6 +2775,32 @@ int mmc_init(struct mmc *mmc)
 
 	return err;
 }
+
+#if CONFIG_IS_ENABLED(MMC_UHS_SUPPORT) || \
+    CONFIG_IS_ENABLED(MMC_HS200_SUPPORT) || \
+    CONFIG_IS_ENABLED(MMC_HS400_SUPPORT)
+int mmc_deinit(struct mmc *mmc)
+{
+	u32 caps_filtered;
+
+	if (!mmc->has_init)
+		return 0;
+
+	if (IS_SD(mmc)) {
+		caps_filtered = mmc->card_caps &
+			~(MMC_CAP(UHS_SDR12) | MMC_CAP(UHS_SDR25) |
+			  MMC_CAP(UHS_SDR50) | MMC_CAP(UHS_DDR50) |
+			  MMC_CAP(UHS_SDR104));
+
+		return sd_select_mode_and_width(mmc, caps_filtered);
+	} else {
+		caps_filtered = mmc->card_caps &
+			~(MMC_CAP(MMC_HS_200) | MMC_CAP(MMC_HS_400));
+
+		return mmc_select_mode_and_width(mmc, caps_filtered);
+	}
+}
+#endif
 
 int mmc_set_dsr(struct mmc *mmc, u16 val)
 {

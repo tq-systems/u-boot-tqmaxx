@@ -347,12 +347,10 @@ static int tmio_sd_dma_xfer(struct udevice *dev, struct mmc_data *data)
 		/*
 		 * The DMA READ completion flag position differs on Socionext
 		 * and Renesas SoCs. It is bit 20 on Socionext SoCs and using
-		 * bit 17 is a hardware bug and forbidden. It is bit 17 on
-		 * Renesas SoCs and bit 20 does not work on them.
+		 * bit 17 is a hardware bug and forbidden. It is either bit 17
+		 * or bit 20 on Renesas SoCs, depending on SoC.
 		 */
-		poll_flag = (priv->caps & TMIO_SD_CAP_RCAR) ?
-			    TMIO_SD_DMA_INFO1_END_RD :
-			    TMIO_SD_DMA_INFO1_END_RD2;
+		poll_flag = priv->read_poll_flag;
 		tmp |= TMIO_SD_DMA_MODE_DIR_RD;
 	} else {
 		buf = (void *)data->src;
@@ -369,20 +367,25 @@ static int tmio_sd_dma_xfer(struct udevice *dev, struct mmc_data *data)
 
 	ret = tmio_sd_dma_wait_for_irq(dev, poll_flag, data->blocks);
 
+	if (poll_flag == TMIO_SD_DMA_INFO1_END_RD)
+		udelay(1);
+
 	__dma_unmap_single(dma_addr, len, dir);
 
 	return ret;
 }
 
 /* check if the address is DMA'able */
-static bool tmio_sd_addr_is_dmaable(const char *src)
+static bool tmio_sd_addr_is_dmaable(struct mmc_data *data)
 {
-	uintptr_t addr = (uintptr_t)src;
+	uintptr_t addr = (uintptr_t)data->src;
 
 	if (!IS_ALIGNED(addr, TMIO_SD_DMA_MINALIGN))
 		return false;
 
 #if defined(CONFIG_RCAR_GEN3)
+	if (!(data->flags & MMC_DATA_READ) && !IS_ALIGNED(addr, 128))
+		return false;
 	/* Gen3 DMA has 32bit limit */
 	if (addr >> 32)
 		return false;
@@ -497,7 +500,7 @@ int tmio_sd_send_cmd(struct udevice *dev, struct mmc_cmd *cmd,
 	if (data) {
 		/* use DMA if the HW supports it and the buffer is aligned */
 		if (priv->caps & TMIO_SD_CAP_DMA_INTERNAL &&
-		    tmio_sd_addr_is_dmaable(data->src))
+		    tmio_sd_addr_is_dmaable(data))
 			ret = tmio_sd_dma_xfer(dev, data);
 		else
 			ret = tmio_sd_pio_xfer(dev, cmd, data);
@@ -704,10 +707,14 @@ static void tmio_sd_host_init(struct tmio_sd_priv *priv)
 	 * This register dropped backward compatibility at version 0x10.
 	 * Write an appropriate value depending on the IP version.
 	 */
-	if (priv->version >= 0x10)
-		tmio_sd_writel(priv, 0x101, TMIO_SD_HOST_MODE);
-	else
+	if (priv->version >= 0x10) {
+		if (priv->caps & TMIO_SD_CAP_64BIT)
+			tmio_sd_writel(priv, 0x000, TMIO_SD_HOST_MODE);
+		else
+			tmio_sd_writel(priv, 0x101, TMIO_SD_HOST_MODE);
+	} else {
 		tmio_sd_writel(priv, 0x0, TMIO_SD_HOST_MODE);
+	}
 
 	if (priv->caps & TMIO_SD_CAP_DMA_INTERNAL) {
 		tmp = tmio_sd_readl(priv, TMIO_SD_DMA_MODE);
