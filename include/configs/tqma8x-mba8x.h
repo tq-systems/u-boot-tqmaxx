@@ -16,10 +16,7 @@
 /* #define CONFIG_PHY_TI */
 #define CONFIG_MII
 
-#define MX8QM_FEC1_BASE			0x5B040000U
-#define MX8QM_FEC2_BASE			0x5B050000U
-#define CONFIG_FEC_MXC_MDIO_BASE	MX8QM_FEC1_BASE
-
+/* must be defined but not used for DM */
 #define CONFIG_FEC_MXC_PHYADDR		0x1F
 
 #define BB_ENV_SETTINGS \
