@@ -1,0 +1,77 @@
+if TARGET_TQMA8X
+
+config SYS_BOARD
+	default "tqma8x"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_CONFIG_NAME
+	default "tqma8x"
+
+choice
+	prompt "TQMa8x CPU variant"
+	default TQMA8X_MX8QM
+	help
+	  Select cpu variant for TQMa8x
+
+config TQMA8X_CPU_MX8QM
+	bool "TQMa8x with i.MX8QM"
+	help
+	  Select CPU i.MX8QM
+
+endchoice
+
+choice
+	prompt "TQMa8x RAM size"
+	default TQMA8X_RAM_2048MB if TQMA8X_CPU_MX8QM
+	help
+	  Select RAM size for TQMa8x
+
+config TQMA8X_RAM_2048MB
+	bool "TQMa8x with 2048 MiB RAM"
+	help
+	  Select variant with 2048 MiB RAM
+
+endchoice
+
+choice
+	prompt "TQMa8x base board variant"
+	default TQMA8X_BB_MBA8X
+	help
+	  Select base board for TQMa8x
+
+config TQMA8X_BB_MBA8X
+	bool "TQMa8x on MBa8x Starterkit"
+	select TQC_SDMMC
+	select DM_ETH
+	help
+	  Select the MBa8x starterkit. This features a GigE Phy, USB, SD-Card
+	  etc.
+
+endchoice
+
+config DEFAULT_DEVICE_TREE
+	default "fsl-imx8qm-tqma8qm-mba8x" if TQMA8X_CPU_MX8QM && TQMA8X_BB_MBA8X
+
+config DEFAULT_FDT_FILE
+	default "fsl-imx8qm-tqma8qm-mba8x.dtb" if TQMA8X_CPU_MX8QM && TQMA8X_BB_MBA8X
+
+choice
+	prompt "TQMa8x boot device"
+	default TQMA8X_BOOT_SDCARD
+	help
+	  Select boot device for TQMa8x
+
+config TQMA8X_BOOT_SDCARD
+	bool "TQMa8x from SD / e-MMC"
+	select SD_BOOT
+	select ENV_IS_IN_MMC
+	help
+	  Select booting from SD / e-MMC
+
+endchoice
+
+source "board/tqc/common/Kconfig"
+
+endif

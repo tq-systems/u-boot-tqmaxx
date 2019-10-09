@@ -77,6 +77,35 @@ config TARGET_IMX8QXP_MEK
 	select SUPPORT_SPL
 	select IMX8QXP
 
+config TARGET_TQMA8X
+	bool "Support TQMa8x board"
+	select BOARD_LATE_INIT
+	select IMX8QM
+	select ARCH_MISC_INIT
+	select BOARD_EARLY_INIT_F
+	select PINCTRL
+	select PINCTRL_FULL
+	select PINCTRL_IMX8
+	select IMX_SMMU
+	select OF_CONTROL
+	select DM
+	select DM_GPIO
+	select MXC_GPIO
+	select DM_SERIAL
+	select FSL_LPUART
+	select DM_MMC
+	select FSL_FSPI
+	select DM_SPI
+	select DM_SPI_FLASH
+	select SPI_FLASH
+	select SPI_FLASH_MTD
+	select SPI_FLASH_4BYTES_ADDR
+	select SPI_FLASH_MACRONIX
+	select SPI_FLASH_SPANSION
+	select SPI_FLASH_STMICRO
+	select SPI_FLASH_SST
+	select SPI_FLASH_WINBOND
+
 config TARGET_TQMA8XX
 	bool "Support TQMa8Xx board"
 	select BOARD_LATE_INIT
@@ -141,6 +170,7 @@ source "board/freescale/imx8qm_mek/Kconfig"
 source "board/freescale/imx8qxp_arm2/Kconfig"
 source "board/freescale/imx8qxp_mek/Kconfig"
 source "board/tqc/tqma8xx/Kconfig"
+source "board/tqc/tqma8x/Kconfig"
 source "board/tqc/tqma8xxs/Kconfig"
 
 endif
