@@ -152,6 +152,7 @@ struct ls_pcie {
 	bool big_endian;
 	bool enabled;
 	int next_lut_index;
+	int stream_id_cur;
 	uint sriov_flag;
 	uint cfg2_flag;
 	int mode;
