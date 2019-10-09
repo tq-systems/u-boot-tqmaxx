@@ -17,5 +17,6 @@ static void ft_pci_setup_ls_gen4(void *blob, bd_t *bd)
 {
 }
 #endif
+int pcie_next_streamid(int currentid, int id);
 
 #endif //_PCIE_LAYERSCAPE_FIXUP_COMMON_H_
