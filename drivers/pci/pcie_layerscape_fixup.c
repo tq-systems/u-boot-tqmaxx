@@ -16,6 +16,7 @@
 #ifdef CONFIG_ARM
 #include <asm/arch/clock.h>
 #endif
+#include <asm/arch/soc.h>
 #include "pcie_layerscape.h"
 #include "pcie_layerscape_fixup_common.h"
 
@@ -73,7 +74,7 @@ static void fdt_pcie_set_msi_map_entry_ls(void *blob, struct ls_pcie *pcie,
 						   pcie->dbi_res.start);
 	if (nodeoffset < 0) {
 #ifdef CONFIG_FSL_PCIE_COMPAT /* Compatible with older version of dts node */
-		svr = (get_svr() >> SVR_VAR_PER_SHIFT) & 0xFFFFFE;
+		svr = SVR_SOC_VER(get_svr());
 		if (svr == SVR_LS2088A || svr == SVR_LS2084A ||
 		    svr == SVR_LS2048A || svr == SVR_LS2044A ||
 		    svr == SVR_LS2081A || svr == SVR_LS2041A)
@@ -127,7 +128,7 @@ static void fdt_pcie_set_iommu_map_entry_ls(void *blob, struct ls_pcie *pcie,
 						   pcie->dbi_res.start);
 	if (nodeoffset < 0) {
 #ifdef CONFIG_FSL_PCIE_COMPAT /* Compatible with older version of dts node */
-		svr = (get_svr() >> SVR_VAR_PER_SHIFT) & 0xFFFFFE;
+		svr = SVR_SOC_VER(get_svr());
 		if (svr == SVR_LS2088A || svr == SVR_LS2084A ||
 		    svr == SVR_LS2048A || svr == SVR_LS2044A ||
 		    svr == SVR_LS2081A || svr == SVR_LS2041A)
@@ -215,14 +216,16 @@ static void fdt_fixup_pcie_ls(void *blob)
 static void ft_pcie_rc_fix(void *blob, struct ls_pcie *pcie)
 {
 	int off;
-	uint svr;
-	char *compat = NULL;
 
 	off = fdt_node_offset_by_compat_reg(blob, "fsl,ls-pcie",
 					    pcie->dbi_res.start);
 	if (off < 0) {
+#if defined(CONFIG_FSL_LAYERSCAPE)
 #ifdef CONFIG_FSL_PCIE_COMPAT /* Compatible with older version of dts node */
-		svr = (get_svr() >> SVR_VAR_PER_SHIFT) & 0xFFFFFE;
+		uint svr;
+		char *compat = NULL;
+
+		svr = SVR_SOC_VER(get_svr());
 		if (svr == SVR_LS2088A || svr == SVR_LS2084A ||
 		    svr == SVR_LS2048A || svr == SVR_LS2044A ||
 		    svr == SVR_LS2081A || svr == SVR_LS2041A)
@@ -233,6 +236,7 @@ static void ft_pcie_rc_fix(void *blob, struct ls_pcie *pcie)
 			off = fdt_node_offset_by_compat_reg(blob,
 					compat, pcie->dbi_res.start);
 #endif
+#endif /* CONFIG_FSL_LAYERSCAPE */
 		if (off < 0)
 			return;
 	}

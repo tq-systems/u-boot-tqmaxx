@@ -11,6 +11,7 @@
 
 void ft_pci_setup(void *blob, bd_t *bd)
 {
+#if defined(CONFIG_FSL_LAYERSCAPE)
 	uint svr;
 
 	svr = SVR_SOC_VER(get_svr());
@@ -19,8 +20,12 @@ void ft_pci_setup(void *blob, bd_t *bd)
 		ft_pci_setup_ls_gen4(blob, bd);
 	else
 		ft_pci_setup_ls(blob, bd);
+#else /* CONFIG_FSL_LAYERSCAPE */
+	ft_pci_setup_ls(blob, bd);
+#endif /* CONFIG_FSL_LAYERSCAPE */
 }
 
+#if defined(CONFIG_FSL_LAYERSCAPE)
 int lx2_board_fix_fdt(void *fdt)
 {
 	char *reg_name, *old_str, *new_str;
@@ -117,3 +122,4 @@ int pcie_next_streamid(int currentid, int idx)
 	return next_stream_id++;
 }
 #endif
+#endif /* CONFIG_FSL_LAYERSCAPE */
