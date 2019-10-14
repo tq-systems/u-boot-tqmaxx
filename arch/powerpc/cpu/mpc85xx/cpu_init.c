@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright 2007-2011 Freescale Semiconductor, Inc.
+ * Copyright 2019 NXP
  *
  * (C) Copyright 2003 Motorola Inc.
  * Modified by Xianghua Xiao, X.Xiao@motorola.com
@@ -1021,16 +1022,6 @@ void arch_preboot_os(void)
 	msr &= ~(MSR_ME|MSR_CE);
 	mtmsr(msr);
 }
-
-#if defined(CONFIG_SATA) && defined(CONFIG_FSL_SATA)
-int sata_initialize(void)
-{
-	if (is_serdes_configured(SATA1) || is_serdes_configured(SATA2))
-		return __sata_initialize();
-
-	return 1;
-}
-#endif
 
 void cpu_secondary_init_r(void)
 {
