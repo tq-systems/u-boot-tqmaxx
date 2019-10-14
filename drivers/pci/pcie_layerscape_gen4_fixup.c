@@ -19,6 +19,7 @@
 #include <asm/arch/clock.h>
 #endif
 #include "pcie_layerscape_gen4.h"
+#include "pcie_layerscape_fixup_common.h"
 
 #if defined(CONFIG_FSL_LSCH3) || defined(CONFIG_FSL_LSCH2)
 /*
@@ -30,19 +31,6 @@ static int ls_pcie_g4_next_lut_index(struct ls_pcie_g4 *pcie)
 		return pcie->next_lut_index++;
 
 	return -ENOSPC;  /* LUT is full */
-}
-
-/* returns the next available streamid for pcie, -errno if failed */
-static int ls_pcie_g4_next_streamid(struct ls_pcie_g4 *pcie)
-{
-	int stream_id = pcie->stream_id_cur;
-
-	if (stream_id > FSL_PEX_STREAM_ID_NUM)
-		return -EINVAL;
-
-	pcie->stream_id_cur++;
-
-	return stream_id | ((pcie->idx + 1) << 11);
 }
 
 /*
@@ -64,8 +52,9 @@ static void ls_pcie_g4_lut_set_mapping(struct ls_pcie_g4 *pcie, int index,
  *      msi-map = <[devid] [phandle-to-msi-ctrl] [stream-id] [count]
  *                 [devid] [phandle-to-msi-ctrl] [stream-id] [count]>;
  */
-static void fdt_pcie_set_msi_map_entry(void *blob, struct ls_pcie_g4 *pcie,
-				       u32 devid, u32 streamid)
+static void fdt_pcie_set_msi_map_entry_ls_gen4(void *blob,
+					       struct ls_pcie_g4 *pcie,
+					       u32 devid, u32 streamid)
 {
 	u32 *prop;
 	u32 phandle;
@@ -106,8 +95,9 @@ static void fdt_pcie_set_msi_map_entry(void *blob, struct ls_pcie_g4 *pcie,
  *      iommu-map = <[devid] [phandle-to-iommu-ctrl] [stream-id] [count]
  *                 [devid] [phandle-to-iommu-ctrl] [stream-id] [count]>;
  */
-static void fdt_pcie_set_iommu_map_entry(void *blob, struct ls_pcie_g4 *pcie,
-					 u32 devid, u32 streamid)
+static void fdt_pcie_set_iommu_map_entry_ls_gen4(void *blob,
+						 struct ls_pcie_g4 *pcie,
+						 u32 devid, u32 streamid)
 {
 	u32 *prop;
 	u32 iommu_map[4];
@@ -145,7 +135,7 @@ static void fdt_pcie_set_iommu_map_entry(void *blob, struct ls_pcie_g4 *pcie,
 		fdt_appendprop(blob, nodeoff, "iommu-map", iommu_map, 16);
 }
 
-static void fdt_fixup_pcie(void *blob)
+static void fdt_fixup_pcie_ls_gen4(void *blob)
 {
 	struct udevice *dev, *bus;
 	struct ls_pcie_g4 *pcie;
@@ -159,10 +149,13 @@ static void fdt_fixup_pcie(void *blob)
 			bus = bus->parent;
 		pcie = dev_get_priv(bus);
 
-		streamid = ls_pcie_g4_next_streamid(pcie);
+		streamid = pcie_next_streamid(pcie->stream_id_cur, pcie->idx);
+
 		if (streamid < 0) {
 			debug("ERROR: no stream ids free\n");
 			continue;
+		} else {
+			pcie->stream_id_cur++;
 		}
 
 		index = ls_pcie_g4_next_lut_index(pcie);
@@ -176,9 +169,11 @@ static void fdt_fixup_pcie(void *blob)
 		/* map PCI b.d.f to streamID in LUT */
 		ls_pcie_g4_lut_set_mapping(pcie, index, bdf >> 8, streamid);
 		/* update msi-map in device tree */
-		fdt_pcie_set_msi_map_entry(blob, pcie, bdf >> 8, streamid);
+		fdt_pcie_set_msi_map_entry_ls_gen4(blob, pcie, bdf >> 8,
+						   streamid);
 		/* update iommu-map in device tree */
-		fdt_pcie_set_iommu_map_entry(blob, pcie, bdf >> 8, streamid);
+		fdt_pcie_set_iommu_map_entry_ls_gen4(blob, pcie, bdf >> 8,
+						     streamid);
 	}
 }
 #endif
@@ -230,7 +225,7 @@ static void ft_pcie_layerscape_gen4_setup(void *blob, struct ls_pcie_g4 *pcie)
 }
 
 /* Fixup Kernel DT for PCIe */
-void ft_pci_setup(void *blob, bd_t *bd)
+void ft_pci_setup_ls_gen4(void *blob, bd_t *bd)
 {
 	struct ls_pcie_g4 *pcie;
 
@@ -238,12 +233,12 @@ void ft_pci_setup(void *blob, bd_t *bd)
 		ft_pcie_layerscape_gen4_setup(blob, pcie);
 
 #if defined(CONFIG_FSL_LSCH3) || defined(CONFIG_FSL_LSCH2)
-	fdt_fixup_pcie(blob);
+	fdt_fixup_pcie_ls_gen4(blob);
 #endif
 }
 
 #else /* !CONFIG_OF_BOARD_SETUP */
-void ft_pci_setup(void *blob, bd_t *bd)
+void ft_pci_setup_ls_gen4(void *blob, bd_t *bd)
 {
 }
 #endif
