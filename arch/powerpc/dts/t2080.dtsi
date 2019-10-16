@@ -3,7 +3,7 @@
  * T2080/T2081 Silicon/SoC Device Tree Source (pre include)
  *
  * Copyright 2013 Freescale Semiconductor Inc.
- * Copyright 2018 NXP
+ * Copyright 2018-2019 NXP
  */
 
 /dts-v1/;
@@ -67,6 +67,15 @@
 			sdhci,auto-cmd12;
 			bus-width = <4>;
 			voltage-ranges = <1800 1800 3300 3300>;
+		};
+
+		sata: sata@220000 {
+			compatible = "fsl,pq-sata-v2";
+			reg = <0x220000 0x1000>;
+			interrupts = <68 0x2 0 0>;
+			sata-offset = <0x1000>;
+			sata-number = <2>;
+			sata-fpdma = <0>;
 		};
 	};
 
