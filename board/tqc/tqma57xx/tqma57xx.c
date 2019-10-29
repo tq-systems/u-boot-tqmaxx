@@ -310,6 +310,8 @@ int board_late_init(void)
 	omap_die_id_serial();
 	omap_set_fastboot_vars();
 
+	tqma57xx_bb_board_late_init();
+
 	return 0;
 }
 

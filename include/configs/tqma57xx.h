@@ -212,33 +212,35 @@
 #define NETARGS_TQMA57XX ""
 #endif
 
-#ifdef CONFIG_TQMA572X
-#define BOOTFILES_TQMA57XX \
-	"fdtfile=am572x-mba57xx.dtb\0" \
-	"u-boot=u-boot_tqma572x.img \0" \
-	"MLO=MLO_tqma572x \0"
-#elif CONFIG_TQMA571X
-#define BOOTFILES_TQMA57XX \
-	"fdtfile=am571x-mba57xx.dtb\0" \
-	"u-boot=u-boot_tqma571x.img \0" \
-	"MLO=MLO_tqma571x \0"
-#elif CONFIG_TQMA574X
-#define BOOTFILES_TQMA57XX \
-	"fdtfile=am574x-mba57xx.dtb\0" \
-	"u-boot=u-boot_tqma574x.img \0" \
-	"MLO=MLO_tqma574x \0"
-#endif
+#define COMMON_BOOT_ARGS \
+	"console=" CONSOLEDEV ",115200n8\0" \
+	"bootpart=0:2\0" \
+	"bootdir=/boot\0" \
+	"bootfile=zImage\0" \
+	"usbtty=cdc_acm\0" \
+	"vram=16M\0" \
+	AVB_VERIFY_CMD \
+	"partitions=" PARTS_DEFAULT "\0" \
+	"optargs=\0" \
+	"dofastboot=0\0" \
+	"emmc_linux_boot=" \
+		"echo Trying to boot Linux from eMMC ...; " \
+		"setenv mmcdev 1; " \
+		"setenv bootpart 1:2; " \
+		"setenv mmcroot /dev/mmcblk0p2 rw; " \
+		"run mmcboot;\0" \
 
 #define CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	DEFAULT_LINUX_BOOT_ENV \
 	DEFAULT_MMC_TI_ARGS \
-	DEFAULT_COMMON_BOOT_TI_ARGS \
+	COMMON_BOOT_ARGS \
 	DEFAULT_FIT_TI_ARGS \
 	NETARGS_TQMA57XX \
-	BOOTFILES_TQMA57XX \
 	"bootfile=zImage\0" \
 	"devtype=mmc \0" \
+	"u-boot=u-boot.img\0" \
+	"MLO=MLO\0" \
 	"upd_sd=if tftp u-boot/${u-boot}; " \
 		"then echo updating u-boot on sd card...; " \
 		"fatwrite mmc 0:1 $loadaddr u-boot.img $filesize; " \

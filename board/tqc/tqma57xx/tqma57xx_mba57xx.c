@@ -604,3 +604,24 @@ void board_boot_order(u32 *spl_boot_list)
 	spl_boot_list[2] = BOOT_DEVICE_SPI;
 }
 #endif /* CONFIG_SPL_BUILD */
+
+
+void tqma57xx_bb_board_late_init(void)
+{
+	if (!env_get("fdtfile")) {
+		switch(omap_revision()) {
+		case DRA752_ES2_0:
+			env_set("fdtfile", "am572x-mba57xx.dtb");
+			break;
+		case DRA762_ABZ_ES1_0:
+			env_set("fdtfile", "am574x-mba57xx.dtb");
+			break;
+		case DRA722_ES2_0:
+			env_set("fdtfile", "am571x-mba57xx.dtb");
+			break;
+		default:
+			env_set("fdtfile", "unknown");
+		}
+		printf("Setting fdtfile to %s\n", env_get("fdtfile"));
+	}
+}

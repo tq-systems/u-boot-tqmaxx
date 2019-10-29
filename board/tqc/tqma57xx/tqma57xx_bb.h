@@ -16,5 +16,6 @@ int tqma57xx_bb_recalibrate_iodelay(void);
 int tqma57xx_bb_board_mmc_init(bd_t *bis);
 int tqma57xx_bb_board_eth_init(bd_t *bis);
 int tqma57xx_bb_board_usb_init(void);
+void tqma57xx_bb_board_late_init(void);
 
 #endif /* __TQMA57XX_BB__ */
