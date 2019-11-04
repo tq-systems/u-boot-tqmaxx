@@ -240,6 +240,16 @@ void board_quiesce_devices(void)
 	imx8_power_off_pd_devices(power_on_devices, ARRAY_SIZE(power_on_devices));
 }
 
+/*
+ * Board specific reset that is system reset.
+ */
+void reset_cpu(void)
+{
+	sc_pm_reboot(-1, SC_PM_RESET_TYPE_COLD);
+	while(1);
+
+}
+
 #ifdef CONFIG_OF_BOARD_SETUP
 int ft_board_setup(void *blob, struct bd_info *bd)
 {
