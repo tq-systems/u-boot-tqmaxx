@@ -4,22 +4,24 @@
  * SPDX-License-Identifier:	GPL-2.0+
  */
 #include <common.h>
-#include <malloc.h>
-#include <errno.h>
-#include <fsl_ifc.h>
-#include <fdt_support.h>
-#include <linux/libfdt.h>
+#include <dm.h>
 #include <environment.h>
+#include <errno.h>
+#include <fdt_support.h>
 #include <fsl_esdhc.h>
+#include <fsl_ifc.h>
+#include <linux/libfdt.h>
+#include <malloc.h>
+#include <netdev.h>
+#include <power-domain.h>
 
+#include <asm/gpio.h>
 #include <asm/io.h>
 #include <asm/arch/clock.h>
 #include <asm/mach-imx/sci/sci.h>
 #include <asm/arch/imx8-pins.h>
-#include <dm.h>
 #include <asm/arch/iomux.h>
 #include <asm/arch/sys_proto.h>
-#include <asm/gpio.h>
 #include <power-domain.h>
 
 #include "../common/tqc_bb.h"
@@ -138,6 +140,135 @@ int tqc_bb_board_mmc_init(bd_t *bis)
 	return ret;
 }
 
+static iomux_cfg_t pad_enet1[] = {
+	SC_P_SPDIF0_EXT_CLK | MUX_MODE_ALT(3) | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+
+	SC_P_SPDIF0_TX | MUX_MODE_ALT(3) | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+	SC_P_SPDIF0_RX | MUX_MODE_ALT(3) | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+	SC_P_ESAI0_TX3_RX2 | MUX_MODE_ALT(3) | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+	SC_P_ESAI0_TX2_RX3 | MUX_MODE_ALT(3) | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+	SC_P_ESAI0_TX1 | MUX_MODE_ALT(3) | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+	SC_P_ESAI0_TX0 | MUX_MODE_ALT(3) | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+	SC_P_ESAI0_SCKR | MUX_MODE_ALT(3) | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+	SC_P_ESAI0_TX4_RX1 | MUX_MODE_ALT(3) | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+	SC_P_ESAI0_TX5_RX0 | MUX_MODE_ALT(3) | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+	SC_P_ESAI0_FST  | MUX_MODE_ALT(3) | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+	SC_P_ESAI0_SCKT | MUX_MODE_ALT(3) | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+	SC_P_ESAI0_FSR  | MUX_MODE_ALT(3) | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+#if 0
+	/* Shared MDIO */
+	SC_P_ENET0_MDC | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+	SC_P_ENET0_MDIO | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+#endif
+	SC_P_CSI_RESET | MUX_MODE_ALT(4) | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+};
+
+static iomux_cfg_t pad_enet0[] = {
+	SC_P_ENET0_REFCLK_125M_25M | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+
+	SC_P_ENET0_RGMII_RX_CTL | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+	SC_P_ENET0_RGMII_RXD0 | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+	SC_P_ENET0_RGMII_RXD1 | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+	SC_P_ENET0_RGMII_RXD2 | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+	SC_P_ENET0_RGMII_RXD3 | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+	SC_P_ENET0_RGMII_RXC | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+	SC_P_ENET0_RGMII_TX_CTL | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+	SC_P_ENET0_RGMII_TXD0 | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+	SC_P_ENET0_RGMII_TXD1 | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+	SC_P_ENET0_RGMII_TXD2 | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+	SC_P_ENET0_RGMII_TXD3 | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+	SC_P_ENET0_RGMII_TXC | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+
+	/* Shared MDIO */
+	SC_P_ENET0_MDC | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+	SC_P_ENET0_MDIO | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+
+	SC_P_CSI_EN | MUX_MODE_ALT(4) | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+};
+
+struct fec_port_info {
+	unsigned id;
+	unsigned base;
+	unsigned phy_addr;
+	const char *pwr_domain;
+	const char *rst_gpio_name;
+	const char *rst_gpio_label;
+	iomux_cfg_t *pad_cfg;
+	size_t num_pads;
+};
+
+static const struct fec_port_info fpi[] = {
+	{
+		.id = 0U,
+		.base = MX8QX_FEC1_BASE,
+		.phy_addr = 0U,
+		.pwr_domain = "conn_enet0",
+		.rst_gpio_label = "gpio@3_02",
+		.rst_gpio_name = "enet0_reset",
+		.pad_cfg = pad_enet0,
+		.num_pads = ARRAY_SIZE(pad_enet0),
+	}, {
+		.id = 1,
+		.base = MX8QX_FEC2_BASE,
+		.phy_addr = 3,
+		.pwr_domain = "conn_enet1",
+		.rst_gpio_label = "gpio@3_03",
+		.rst_gpio_name = "enet1_reset",
+		.pad_cfg = pad_enet1,
+		.num_pads = ARRAY_SIZE(pad_enet1),
+	},
+};
+
+static void enet_phy_reset_one(const struct fec_port_info *fpi)
+{
+	struct gpio_desc desc;
+	int ret;
+
+	ret = dm_gpio_lookup_name(fpi->rst_gpio_name, &desc);
+	if (ret)
+		return;
+
+	ret = dm_gpio_request(&desc, fpi->rst_gpio_label);
+	if (ret)
+		return;
+
+	dm_gpio_set_dir_flags(&desc, GPIOD_IS_OUT);
+	dm_gpio_set_value(&desc, 0);
+	udelay(50);
+	dm_gpio_set_value(&desc, 1);
+
+	/* TODO: */
+	/* The board has a long delay for this reset to become stable */
+	mdelay(200);
+}
+
+int board_eth_init(bd_t *bis)
+{
+	int ret;
+	unsigned idx;
+	struct power_domain pd;
+
+	printf("[%s] %d\n", __func__, __LINE__);
+
+	for (idx = 0; idx < ARRAY_SIZE(fpi); ++idx) {
+		const struct fec_port_info *fpti = &fpi[idx];
+
+		if (!power_domain_lookup_name(fpti->pwr_domain, &pd))
+			power_domain_on(&pd);
+
+		imx8_iomux_setup_multiple_pads(fpti->pad_cfg, fpti->num_pads);
+
+		enet_phy_reset_one(fpti);
+
+		ret = fecmxc_initialize_multi(bis, fpti->id, fpti->phy_addr,
+					      fpti->base);
+
+		if (ret)
+			printf("FEC%u MXC: %s:failed\n", fpti->id, __func__);
+	}
+
+	return 0;
+}
 
 int tqc_bb_checkboard(void)
 {
@@ -148,6 +279,14 @@ int tqc_bb_checkboard(void)
 
 int tqc_bb_board_init(void)
 {
+	unsigned idx;
+
+	for (idx = 0; idx < ARRAY_SIZE(fpi); ++idx) {
+		const struct fec_port_info *fpti = &fpi[idx];
+
+		enet_phy_reset_one(fpti);
+	}
+
 	return 0;
 }
 
