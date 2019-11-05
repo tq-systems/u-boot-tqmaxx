@@ -95,11 +95,6 @@ static const char *rev010x_delete_nodes[] = {
 	"/reg_tqma8mx_overdrive",
 };
 
-static const char *rev020x_delete_nodes[] = {
-	"pcie@0x33800000",
-	"pcie@0x33c00000",
-};
-
 int ft_board_setup(void *blob, bd_t *bd)
 {
 	u32 rev = get_cpu_rev() & 0xfff;
@@ -131,17 +126,6 @@ int ft_board_setup(void *blob, bd_t *bd)
 
 		for (i = 0; i < ARRAY_SIZE(rev010x_delete_nodes); ++i)
 			tqc_delete_node(blob, rev010x_delete_nodes[i]);
-	} else {
-		/*
-		 * TODO: should be deleted as soon as we know why PCIe causes
-		 * stalls
-		 */
-/*
-		printf("[HACK]: cleanup dt for new CPU rev.\n");
-
-		for (i = 0; i < ARRAY_SIZE(rev020x_delete_nodes); ++i)
-			tqc_delete_node(blob, rev020x_delete_nodes[i]);
-*/
 	}
 
 	return tqc_bb_ft_board_setup(blob, bd);
