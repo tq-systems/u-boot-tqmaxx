@@ -141,7 +141,7 @@ struct fsl_esdhc_priv {
 	u32 tuning_start_tap;
 	u32 strobe_dll_delay_target;
 	u32 signal_voltage;
-#if IS_ENABLED(CONFIG_DM_REGULATOR)
+#ifdef CONFIG_DM_REGULATOR
 	struct udevice *vqmmc_dev;
 	struct udevice *vmmc_dev;
 #endif
