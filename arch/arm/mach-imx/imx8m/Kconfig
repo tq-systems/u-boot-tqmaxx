@@ -78,6 +78,19 @@ config TARGET_IMX8MN_EVK
 	select SUPPORT_SPL
 	select IMX8M_DDR4
 
+config TARGET_TQMA8MX
+	bool "tqma8mx"
+	select IMX8MQ
+	select BOARD_LATE_INIT
+	select BOARD_EARLY_INIT_F
+	select PINCTRL
+	select PINCTRL_IMX8M
+	select DM_THERMAL
+	select DM_SERIAL
+	select MISC
+	select SUPPORT_SPL
+	select SPL
+
 endchoice
 
 config SYS_SOC
@@ -90,5 +103,6 @@ source "board/freescale/imx8mq_aiy/Kconfig"
 source "board/freescale/imx8mm_evk/Kconfig"
 source "board/freescale/imx8mm_val/Kconfig"
 source "board/freescale/imx8mn_evk/Kconfig"
+source "board/tqc/tqma8mx/Kconfig"
 
 endif
