@@ -478,7 +478,8 @@ dtb-$(CONFIG_ARCH_IMX8) += fsl-imx8dx-17x17-val.dtb \
 		fsl-imx8qm-mek-xen.dtb \
 		fsl-imx8qxp-17x17-val.dtb \
 		fsl-imx8qxp-lpddr4-arm2.dtb \
-		fsl-imx8qxp-mek.dtb
+		fsl-imx8qxp-mek.dtb \
+		fsl-imx8qxp-tqma8qx-mba8qx.dtb
 
 dtb-$(CONFIG_RCAR_GEN3) += \
 	r8a7795-h3ulcb.dtb \
