@@ -315,3 +315,15 @@ int tqc_bb_board_late_init(void)
 #endif
 }
 
+void board_quiesce_devices()
+{
+	const char *power_on_devices[] = {
+		"dma_lpuart1",
+
+		/* HIFI DSP boot */
+		"audio_sai0",
+		"audio_ocram",
+	};
+
+	power_off_pd_devices(power_on_devices, ARRAY_SIZE(power_on_devices));
+}
