@@ -1242,21 +1242,38 @@ static const struct eth_ops fecmxc_ops = {
 static int fec_phy_init(struct fec_priv *priv, struct udevice *dev)
 {
 	struct phy_device *phydev;
-	int mask = 0xffffffff;
 
-#ifdef CONFIG_PHYLIB
+#ifdef CONFIG_DM_ETH
 	int offset = 0;
 	int reg = 0;
+	int addr;
+	u32 supported = PHY_GBIT_FEATURES;
 
 	offset = fdtdec_lookup_phandle(gd->fdt_blob, dev_of_offset(dev),
 				       "phy-handle");
 	if (offset > 0) {
-		reg = fdtdec_get_int(gd->fdt_blob, offset, "reg", 0);
-		mask = 1 << reg;
+		addr = fdtdec_get_int(gd->fdt_blob, offset, "reg", 0);
 	} else {
 		printf("phy-handle does not exist under fec %s\n", dev->name);
-		mask = 1 << CONFIG_FEC_MXC_PHYADDR;
+		addr = CONFIG_FEC_MXC_PHYADDR;
+		offset = 0;
 	}
+
+	phydev = phy_connect(priv->bus, addr, dev, priv->interface);
+
+	if (!phydev)
+		return -1;
+
+	phydev->supported &= supported;
+	phydev->advertising = phydev->supported;
+
+	if (offset)
+		dev_set_of_offset(phydev->dev, offset);
+
+#else
+	int mask = 0xffffffff;
+#ifdef CONFIG_PHYLIB
+	mask = 1 << CONFIG_FEC_MXC_PHYADDR;
 #endif
 
 	phydev = phy_find_by_mask(priv->bus, mask, priv->interface);
@@ -1264,6 +1281,7 @@ static int fec_phy_init(struct fec_priv *priv, struct udevice *dev)
 		return -ENODEV;
 
 	phy_connect_dev(phydev, dev);
+#endif
 
 	priv->phydev = phydev;
 	phy_config(phydev);
