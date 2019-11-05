@@ -22,7 +22,6 @@ config TQMA8QX_MX8QXP
 
 endchoice
 
-
 choice
 	prompt "TQMa8QX base board variant"
 	default MBA8QX
@@ -32,6 +31,7 @@ choice
 config MBA8QX
 	bool "TQMa8QX on MBa8QX Starterkit"
 	select TQC_SDMMC
+	select DM_ETH
 	help
 	  Select the MBa8QX starterkit. This features a GigE Phy, USB, SD-Card
 	  etc.

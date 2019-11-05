@@ -91,6 +91,12 @@ config TARGET_TQMA8QX
 	bool "Support TQMa8xX board"
 	select BOARD_LATE_INIT
 	select IMX8QXP
+	select ARCH_MISC_INIT
+	select BOARD_EARLY_INIT_F
+	select DM_GPIO
+	select DM_SERIAL
+	select FSL_LPUART
+	select DM_MMC
 
 endchoice
 
