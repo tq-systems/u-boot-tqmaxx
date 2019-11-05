@@ -84,6 +84,11 @@ config REGEX
 	  regex support to some commands, for example "env grep" and
 	  "setexpr".
 
+config RBTREE
+	bool "enable rbtree support"
+	help
+	  rbtree is needed for UBI support
+
 choice
 	prompt "Pseudo-random library support type"
 	depends on NET_RANDOM_ETHADDR || RANDOM_UUID || CMD_UUID
