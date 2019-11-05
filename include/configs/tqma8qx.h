@@ -40,7 +40,7 @@
 #define CONFIG_CMD_FUSE
 
 /* GPIO configs */
-#define CONFIG_MXC_GPIO
+/* #define CONFIG_MXC_GPIO */
 
 #ifdef CONFIG_AHAB_BOOT
 #define AHAB_ENV "sec_boot=yes\0"
