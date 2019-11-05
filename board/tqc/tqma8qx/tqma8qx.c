@@ -28,85 +28,12 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#define ESDHC_PAD_CTRL	((SC_PAD_CONFIG_NORMAL << PADRING_CONFIG_SHIFT) | (SC_PAD_ISO_OFF << PADRING_LPCONFIG_SHIFT) \
-						| (SC_PAD_28FDSOI_DSE_DV_HIGH << PADRING_DSE_SHIFT) | (SC_PAD_28FDSOI_PS_PU << PADRING_PULL_SHIFT))
-
-#define ESDHC_CLK_PAD_CTRL	((SC_PAD_CONFIG_OUT_IN << PADRING_CONFIG_SHIFT) | (SC_PAD_ISO_OFF << PADRING_LPCONFIG_SHIFT) \
-						| (SC_PAD_28FDSOI_DSE_DV_HIGH << PADRING_DSE_SHIFT) | (SC_PAD_28FDSOI_PS_PU << PADRING_PULL_SHIFT))
-
 int board_early_init_f(void)
 {
 	tqc_bb_board_early_init_f();
 
 	return 0;
 }
-
-#ifdef CONFIG_FSL_ESDHC
-
-#define USDHC1_CD_GPIO	IMX_GPIO_NR(4, 22)
-
-static struct fsl_esdhc_cfg usdhc_cfg = {
-	USDHC1_BASE_ADDR, 0, 8,
-};
-
-static iomux_cfg_t emmc0[] = {
-	SC_P_EMMC0_CLK | MUX_PAD_CTRL(ESDHC_CLK_PAD_CTRL),
-	SC_P_EMMC0_CMD | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
-	SC_P_EMMC0_DATA0 | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
-	SC_P_EMMC0_DATA1 | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
-	SC_P_EMMC0_DATA2 | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
-	SC_P_EMMC0_DATA3 | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
-	SC_P_EMMC0_DATA4 | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
-	SC_P_EMMC0_DATA5 | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
-	SC_P_EMMC0_DATA6 | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
-	SC_P_EMMC0_DATA7 | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
-	SC_P_EMMC0_STROBE | MUX_PAD_CTRL(ESDHC_PAD_CTRL),
-};
-
-int board_mmc_init(bd_t *bis)
-{
-	int ret;
-	struct power_domain pd;
-
-	/*
-	 * According to the board_mmc_init() the following map is done:
-	 * (U-boot device node)    (Physical Port)
-	 * mmc0                    USDHC1
-	 * mmc1                    USDHC2
-	 */
-	if (!power_domain_lookup_name("conn_sdhc0", &pd))
-		power_domain_on(&pd);
-	imx8_iomux_setup_multiple_pads(emmc0, ARRAY_SIZE(emmc0));
-	init_clk_usdhc(0);
-	usdhc_cfg.sdhc_clk = mxc_get_clock(MXC_ESDHC_CLK);
-
-	ret = fsl_esdhc_initialize(bis, &usdhc_cfg);
-	if (ret) {
-		printf("Warning: failed to initialize USDHC1\n");
-		return ret;
-	}
-
-	return tqc_bb_board_mmc_init(bis);
-}
-
-int board_mmc_getcd(struct mmc *mmc)
-{
-	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
-	int ret = 0;
-
-	switch (cfg->esdhc_base) {
-	case USDHC1_BASE_ADDR:
-		ret = 1; /* eMMC */
-		break;
-	case USDHC2_BASE_ADDR:
-		ret = !gpio_get_value(USDHC1_CD_GPIO);
-		break;
-	}
-
-	return ret;
-}
-
-#endif /* CONFIG_FSL_ESDHC */
 
 static void board_gpio_init(void)
 {
