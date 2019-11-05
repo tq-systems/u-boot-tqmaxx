@@ -10,6 +10,8 @@
 #include <asm/mach-imx/sci/sci.h>
 #include <asm/arch/imx8-pins.h>
 #include <asm/arch/i2c.h>
+#include <asm/arch/imx-regs.h>
+#include <asm/arch/lpuart.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/arch/cpu.h>
 #include <asm/arch/lpcg.h>
@@ -52,6 +54,7 @@ unsigned int mxc_get_clock(enum mxc_clock clk)
 
 	switch (clk) {
 	case MXC_UART_CLK:
+		/* BUGBUG: works only for boards using LPUART0 as console */
 		err = sc_pm_get_clock_rate((sc_ipc_t)gd->arch.ipc_channel_handle,
 				SC_R_UART_0, 2, &clkrate);
 		if (err != SC_ERR_NONE) {
@@ -164,6 +167,29 @@ int enable_i2c_clk(unsigned char enable, unsigned i2c_num)
 	}
 
 	return 0;
+}
+
+u32 get_lpuart_clk_n(void *base)
+{
+	sc_err_t err;
+	unsigned n;
+	sc_ipc_t ipc;
+	u32 clock_rate;
+
+	for (n = 0; n < ARRAY_SIZE(imx_lpuart_desc); ++n) {
+		if (imx_lpuart_desc[n].base == base)
+			break;
+	}
+
+	if (n >= ARRAY_SIZE(imx_lpuart_desc))
+		return 0;
+
+	ipc = gd->arch.ipc_channel_handle;
+	err = sc_pm_get_clock_rate(ipc, imx_lpuart_desc[n].rsrc, 2, &clock_rate);
+	if (err != SC_ERR_NONE)
+		return 0;
+
+	return clock_rate;
 }
 
 u32 imx_get_i2cclk(unsigned i2c_num)
