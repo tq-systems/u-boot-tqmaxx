@@ -98,6 +98,18 @@ config TARGET_TQMA8QX
 	select FSL_LPUART
 	select DM_MMC
 
+config TARGET_TQMA8QXS
+	bool "Support TQMa8xXS board"
+	select BOARD_LATE_INIT
+	select IMX8QXP
+	select ARCH_MISC_INIT
+	select BOARD_EARLY_INIT_F
+	select DM_GPIO
+	select DM_ETH
+	select DM_SERIAL
+	select FSL_LPUART
+	select DM_MMC
+
 endchoice
 
 source "board/freescale/imx8qm_arm2/Kconfig"
@@ -105,5 +117,6 @@ source "board/freescale/imx8qm_mek/Kconfig"
 source "board/freescale/imx8qxp_arm2/Kconfig"
 source "board/freescale/imx8qxp_mek/Kconfig"
 source "board/tqc/tqma8qx/Kconfig"
+source "board/tqc/tqma8qxs/Kconfig"
 
 endif
