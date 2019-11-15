@@ -281,6 +281,10 @@ int board_init(void)
 int board_late_init(void)
 {
 	u8 val;
+	int ret = -1;
+	struct tqc_eeprom_data eedat;
+	char safe_string[0x41];
+	int addr = TQC_VARD_ADDR;
 
 	/*
 	 * DEV_CTRL.DEV_ON = 1 please - else palmas switches off in 8 seconds
@@ -309,6 +313,50 @@ int board_late_init(void)
 
 	omap_die_id_serial();
 	omap_set_fastboot_vars();
+
+	ret = tqc_read_eeprom_buf(TQC_VARD_BUS, TQC_VARD_ADDR, 1, 0,
+				  sizeof(eedat), (void *)&eedat);
+
+	if (ret) {
+		printf("EEPROM: (0x%x) err %d\n", addr, ret);
+	} else {
+		/* ID */
+		tqc_parse_eeprom_id(&eedat, safe_string,
+				       ARRAY_SIZE(safe_string));
+		if (0 == strncmp(safe_string, "TQM", 3))
+			env_set("boardtype", safe_string);
+
+		/* Serial# */
+		if (0 == tqc_parse_eeprom_serial(&eedat,
+						    safe_string,
+						    ARRAY_SIZE(safe_string)))
+			env_set("serial#", safe_string);
+		else
+			env_set("serial#", "???");
+
+		/* MAC */
+		if (0 == tqc_parse_eeprom_mac(&eedat,
+						 safe_string,
+						 ARRAY_SIZE(safe_string)))
+		{
+			uint32_t mac = 0;
+			uint8_t addr[6];
+			char *ethaddr = env_get("ethaddr");
+
+			if (ethaddr &&
+			    strncmp(safe_string, ethaddr, 18)) {
+				printf("\nWarning: MAC addresses don't match:\n");
+				printf("Address in EEPROM is      %s\n",
+				       safe_string);
+				printf("Address in environment is %s\n",
+				       ethaddr);
+			} else {
+				env_set("ethaddr", safe_string);
+			}
+		}
+
+		tqc_show_eeprom(&eedat, "TQM");
+	}
 
 	tqma57xx_bb_board_late_init();
 
