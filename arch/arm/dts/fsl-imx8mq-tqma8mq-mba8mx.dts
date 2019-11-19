@@ -144,14 +144,21 @@
 };
 
 &i2c1 {
-	expander1: pca9555@24 {
+	expander0: gpio@23 {
+		compatible = "nxp,pca9555";
+		reg = <0x23>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+
+	expander1: gpio@24 {
 		compatible = "nxp,pca9555";
 		reg = <0x24>;
 		gpio-controller;
 		#gpio-cells = <2>;
 	};
 
-	expander2: pca9555@25 {
+	expander2: gpio@25 {
 		compatible = "nxp,pca9555";
 		reg = <0x25>;
 		gpio-controller;
