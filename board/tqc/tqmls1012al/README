@@ -1,7 +1,7 @@
-U-Boot for the TQ Systems TQMLS1012AL modules
+U-Boot for the TQ-Systems TQMLS1012AL modules
 
 This file contains information for the port of
-U-Boot to the TQ Systems TQMLS1012AL modules.
+U-Boot to the TQ-Systems TQMLS1012AL modules.
 
 1. Boot source
 --------------
@@ -11,30 +11,27 @@ The following boot source is supported:
 - QSPI NOR
 
 2. Building
-------------
+-----------
 
-To build U-Boot for the TQ Systems TQMLS1012al modules:
+To build U-Boot for the TQ-Systems TQMLS1012AL modules:
 
 	make tqmls1012al_<baseboard>_<boot>_defconfig
 	make
 
-<baseboard> is a placeholder for the board the module is plugged into:
-mbls1012al	- Starter kit STKLS1012AL by TQ
+<baseboard> is a placeholder for the board on which the module is soldered:
+mbls1012al		- Starter kit STKLS1012AL by TQ
 
 <boot> is a placeholder for the boot device
 256mb_qspi[_emmc/sd]	- build with 256MB RAM to boot from flash on QSPI interface
 512mb_qspi[_emmc/sd]	- build with 512MB RAM to boot from flash on QSPI interface
 
 This gives the following configurations:
-
 tqmls1012al_mbls1012al_256mb_qspi_emmc_defconfig
 tqmls1012al_mbls1012al_256mb_qspi_sd_defconfig
 tqmls1012al_mbls1012al_512mb_qspi_emmc_defconfig
 tqmls1012al_mbls1012al_512mb_qspi_sd_defconfig
 
-
 Make gives the following binaries:
-
 u-boot[-256mb/512mb]-qspi[-emmc/sd]-2017.11-rc0.bin	- image with dtb
 u-boot-pbl[-256/512mb]-qspi[-emmc/sd].bin		- image with rcw, pbl and dtb
 pbl[-256/512mb]-qspi[-emmc/sd].bin			- rcw and pbl
@@ -56,12 +53,11 @@ core-image-minimal-tqmls1012al-mbls1012al-{DATETIME}.rootfs.wic
 
 QSPI Offset:
 
-RCW & PBL:	0x0		(0)	-> 1M
+RCW & PBL:	0x0		(0)	-> 64K
 U-Boot:		0x00010000	(64K)	-> 1M
 U-Boot ENV:	0x00300000	(3M)	-> 1M
-PPA:		0x00400000	(4M)	-> 2M
+PPA-Firmware:	0x00400000	(4M)	-> 2M
 PFE-Firmware:	0x00A00000	(10M)	-> 20K
-Kernel ITB:	0x01000000	(16M)	-> 48M
 ========================================================================
 
 How to:
@@ -74,7 +70,7 @@ load usb 0 $loadaddr <filename>
 sf probe
 sf update ${loadaddr} <offset> ${filesize}
 
-Upadate via tftp:
+Update via tftp:
 setenv ipaddt <ipaddr>
 setenv serverip <serverip>
 
