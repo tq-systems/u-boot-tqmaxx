@@ -96,6 +96,14 @@
 		>;
 	};
 
+	pinctrl_usb0: usb0grp {
+		fsl,pins = <
+			MX8MQ_IOMUXC_GPIO1_IO10_USB1_OTG_ID		0x41
+			MX8MQ_IOMUXC_GPIO1_IO12_USB1_OTG_PWR		0x41
+			MX8MQ_IOMUXC_GPIO1_IO13_USB1_OTG_OC		0x41
+		>;
+	};
+
 	pinctrl_usdhc2_gpio: usdhc2grpgpio {
 		fsl,pins = <
 			MX8MQ_IOMUXC_SD2_CD_B_GPIO2_IO12	0x41
@@ -190,18 +198,20 @@
 };
 
 
-/* TODO: not working */
 &usb3_phy0 {
-	status = "disabled";
+	status = "okay";
 };
 
 &usb3_0 {
-	status = "disabled";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usb0>;
+	status = "okay";
 };
 
 &usb_dwc3_0 {
-	status = "disabled";
-	dr_mode = "peripheral";
+	status = "okay";
+	/* TODO: overwritten by driver */
+	dr_mode = "otg";
 };
 
 &usb3_phy1 {
