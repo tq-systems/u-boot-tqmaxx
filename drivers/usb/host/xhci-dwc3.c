@@ -110,7 +110,7 @@ void dwc3_set_fladj(struct dwc3 *dwc3_reg, u32 val)
 			GFLADJ_30MHZ(val));
 }
 
-#if CONFIG_IS_ENABLED(DM_USB)
+#if CONFIG_IS_ENABLED(DM_USB) && !CONFIG_IS_ENABLED(USB_XHCI_IMX8M)
 static int xhci_dwc3_probe(struct udevice *dev)
 {
 	struct xhci_hcor *hcor;
