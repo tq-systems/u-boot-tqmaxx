@@ -88,7 +88,7 @@ int tqc_bb_checkboard(void)
 	return 0;
 }
 
-static const struct tqc_gpio_init_data mbpa8xx_gid[] = {
+static struct tqc_gpio_init_data mbpa8xx_gid[] = {
 	{
 		.name = "GPIO1_0",
 		.label = "REV_0",

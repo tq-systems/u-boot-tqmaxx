@@ -10,13 +10,14 @@
 struct tqc_gpio_init_data {
 	const char* name;
 	const char* label;
-	unsigned long flags;
+	const unsigned long flags;
+	struct gpio_desc desc;
 };
 
 #if defined(CONFIG_DM_GPIO)
-int tqc_board_gpio_init(const struct tqc_gpio_init_data *data, int count);
+int tqc_board_gpio_init(struct tqc_gpio_init_data *data, int count);
 #else
-static inline int tqc_board_gpio_init(const struct tqc_gpio_init_data *data,
+static inline int tqc_board_gpio_init(struct tqc_gpio_init_data *data,
 				      int count)
 {
 	return 0;

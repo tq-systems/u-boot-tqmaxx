@@ -8,22 +8,21 @@
 #include <asm/gpio.h>
 #include "tqc_board_gpio.h"
 
-int tqc_board_gpio_init(const struct tqc_gpio_init_data *data, int count)
+int tqc_board_gpio_init(struct tqc_gpio_init_data *data, int count)
 {
 	int i;
 	int ret;
-	struct gpio_desc desc;
 
 	for (i = 0; i < count; ++i) {
-		ret = dm_gpio_lookup_name(data[i].name, &desc);
+		ret = dm_gpio_lookup_name(data[i].name, &data[i].desc);
 		if (ret) {
 			printf("error: gpio lookup %s", data[i].name);
 		} else {
-			ret = dm_gpio_request(&desc, data[i].label);
+			ret = dm_gpio_request(&data[i].desc, data[i].label);
 			if (ret)
 				printf("error: gpio REQ %s", data[i].label);
 			else
-				dm_gpio_set_dir_flags(&desc, data[i].flags);
+				dm_gpio_set_dir_flags(&data[i].desc, data[i].flags);
 		}
 	}
 
