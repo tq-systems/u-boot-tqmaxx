@@ -161,7 +161,7 @@ int board_late_init(void)
 {
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 	env_set("board_name", tqc_bb_get_boardname());
-	env_set("board_rev", tqma8mx_get_boardname);
+	env_set("board_rev", tqma8mx_get_boardname());
 #endif
 
 	return tqc_bb_board_late_init();
