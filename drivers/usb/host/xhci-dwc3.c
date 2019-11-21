@@ -111,7 +111,7 @@ void dwc3_set_fladj(struct dwc3 *dwc3_reg, u32 val)
 			GFLADJ_30MHZ(val));
 }
 
-#ifdef CONFIG_DM_USB
+#if defined(CONFIG_DM_USB) && !defined(CONFIG_USB_XHCI_IMX8M)
 static int xhci_dwc3_probe(struct udevice *dev)
 {
 	struct xhci_dwc3_platdata *plat = dev_get_platdata(dev);
