@@ -154,6 +154,7 @@ static const char *tqma8mx_get_boardname(void)
 	default:
 		return "??";
 	};
+	return "UNKNOWN";
 }
 
 int board_late_init(void)
