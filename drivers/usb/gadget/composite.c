@@ -12,7 +12,15 @@
 
 #define USB_BUFSIZ	4096
 
+/* Helper type for accessing packed u16 pointers */
+typedef struct { __le16 val; } __packed __le16_packed;
+
 static struct usb_composite_driver *composite;
+
+static inline void le16_add_cpu_packed(__le16_packed *var, u16 val)
+{
+	var->val = cpu_to_le16(le16_to_cpu(var->val) + val);
+}
 
 /**
  * usb_add_function() - add a function to a configuration
@@ -480,20 +488,21 @@ done:
  * the host side.
  */
 
-static void collect_langs(struct usb_gadget_strings **sp, __le16 *buf)
+static void collect_langs(struct usb_gadget_strings **sp, void *buf)
 {
 	const struct usb_gadget_strings	*s;
 	u16				language;
-	__le16				*tmp;
+	__le16_packed			*tmp;
+	__le16_packed			*end = (buf + 252);
 
 	while (*sp) {
 		s = *sp;
 		language = cpu_to_le16(s->language);
-		for (tmp = buf; *tmp && tmp < &buf[126]; tmp++) {
-			if (*tmp == language)
+		for (tmp = buf; tmp->val && tmp < end; tmp++) {
+			if (tmp->val == language)
 				goto repeat;
 		}
-		*tmp++ = language;
+		tmp->val = language;
 repeat:
 		sp++;
 	}
