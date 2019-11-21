@@ -100,7 +100,8 @@
 		fsl,pins = <
 			MX8MQ_IOMUXC_GPIO1_IO10_USB1_OTG_ID		0x41
 			MX8MQ_IOMUXC_GPIO1_IO12_USB1_OTG_PWR		0x41
-			MX8MQ_IOMUXC_GPIO1_IO13_USB1_OTG_OC		0x41
+/* TODO: OC detection not functional in dwc3, pin mux will lead to non functional USB */
+/*			MX8MQ_IOMUXC_GPIO1_IO13_USB1_OTG_OC		0x41 */
 		>;
 	};
 
