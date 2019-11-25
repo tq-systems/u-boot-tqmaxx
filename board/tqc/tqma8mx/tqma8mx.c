@@ -19,12 +19,19 @@
 #include <mmc.h>
 #include <asm/arch/imx8mq_pins.h>
 #include <asm/arch/sys_proto.h>
+#include <asm/mach-imx/boot_mode.h>
 #include <asm/mach-imx/gpio.h>
 #include <asm/mach-imx/mxc_i2c.h>
 #include <asm/arch/clock.h>
 #include <spl.h>
 #include <power/pmic.h>
 #include <power/pfuze100_pmic.h>
+
+#if defined(CONFIG_FSL_QSPI)
+#include <spi.h>
+#include <spi_flash.h>
+#endif
+
 // #include "../common/pfuze.h"
 #include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
@@ -116,10 +123,57 @@ static const char *rev010x_delete_nodes[] = {
 	"/reg_tqma8mx_overdrive",
 };
 
+static void tqma8mx_ft_qspi_setup(void *blob, bd_t *bd)
+{
+	int off;
+	int enable_flash = 0;
+
+	if (QSPI_BOOT == get_boot_device()) {
+		enable_flash = 1;
+	} else {
+#if defined(CONFIG_FSL_QSPI)
+		unsigned int bus = CONFIG_SF_DEFAULT_BUS;
+		unsigned int cs = CONFIG_SF_DEFAULT_CS;
+		unsigned int speed = CONFIG_SF_DEFAULT_SPEED;
+		unsigned int mode = CONFIG_SF_DEFAULT_MODE;
+#ifdef CONFIG_DM_SPI_FLASH
+		struct udevice *new, *bus_dev;
+		int ret;
+
+		/* Remove the old device, otherwise probe will just be a nop */
+		ret = spi_find_bus_and_cs(bus, cs, &bus_dev, &new);
+		if (!ret) {
+			device_remove(new, DM_REMOVE_NORMAL);
+		}
+		ret = spi_flash_probe_bus_cs(bus, cs, speed, mode, &new);
+		if (!ret) {
+			device_remove(new, DM_REMOVE_NORMAL);
+			enable_flash = 1;
+		}
+#else
+		struct spi_flash *new;
+
+		new = spi_flash_probe(bus, cs, speed, mode);
+		if (new) {
+			spi_flash_free(new);
+			enable_flash = 1;
+		}
+#endif
+#endif
+	}
+	off = fdt_node_offset_by_compatible(blob, -1, "fsl,imx7d-qspi");
+	if (off >= 0)
+		fdt_set_node_status(blob, off, (enable_flash) ?
+				    FDT_STATUS_OKAY : FDT_STATUS_DISABLED,
+				    0);
+}
+
 int ft_board_setup(void *blob, bd_t *bd)
 {
 	u32 rev = get_cpu_rev() & 0xfff;
 	int i;
+
+	tqma8mx_ft_qspi_setup(blob, bd);
 
 	/*
 	 * TODO: only temporary supported. REV.010x with old CPU rev.
