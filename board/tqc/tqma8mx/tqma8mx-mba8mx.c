@@ -316,110 +316,77 @@ static int setup_fec(void)
 }
 #endif
 
-#ifdef CONFIG_USB_DWC3
-
-#define USB_PHY_CTRL0			0xF0040
-#define USB_PHY_CTRL0_REF_SSP_EN	BIT(2)
-
-#define USB_PHY_CTRL1			0xF0044
-#define USB_PHY_CTRL1_RESET		BIT(0)
-#define USB_PHY_CTRL1_COMMONONN		BIT(1)
-#define USB_PHY_CTRL1_ATERESET		BIT(3)
-#define USB_PHY_CTRL1_VDATSRCENB0	BIT(19)
-#define USB_PHY_CTRL1_VDATDETENB0	BIT(20)
-
-#define USB_PHY_CTRL2			0xF0048
-#define USB_PHY_CTRL2_TXENABLEN0	BIT(8)
-
-static struct dwc3_device dwc3_device_data = {
-	.maximum_speed = USB_SPEED_SUPER,
-	.base = USB1_BASE_ADDR,
-	.dr_mode = USB_DR_MODE_PERIPHERAL,
-	.index = 0,
-	.power_down_scale = 2,
-};
-
-int usb_gadget_handle_interrupts(void)
-{
-	dwc3_uboot_handle_interrupt(0);
-	return 0;
-}
-
-static void dwc3_nxp_usb_phy_init(struct dwc3_device *dwc3)
-{
-	u32 RegData;
-
-	RegData = readl(dwc3->base + USB_PHY_CTRL1);
-	RegData &= ~(USB_PHY_CTRL1_VDATSRCENB0 | USB_PHY_CTRL1_VDATDETENB0 |
-			USB_PHY_CTRL1_COMMONONN);
-	RegData |= USB_PHY_CTRL1_RESET | USB_PHY_CTRL1_ATERESET;
-	writel(RegData, dwc3->base + USB_PHY_CTRL1);
-
-	RegData = readl(dwc3->base + USB_PHY_CTRL0);
-	RegData |= USB_PHY_CTRL0_REF_SSP_EN;
-	writel(RegData, dwc3->base + USB_PHY_CTRL0);
-
-	RegData = readl(dwc3->base + USB_PHY_CTRL2);
-	RegData |= USB_PHY_CTRL2_TXENABLEN0;
-	writel(RegData, dwc3->base + USB_PHY_CTRL2);
-
-	RegData = readl(dwc3->base + USB_PHY_CTRL1);
-	RegData &= ~(USB_PHY_CTRL1_RESET | USB_PHY_CTRL1_ATERESET);
-	writel(RegData, dwc3->base + USB_PHY_CTRL1);
-}
-#endif
-
 #if defined(CONFIG_USB_DWC3) || defined(CONFIG_USB_XHCI_IMX8M)
+
 int board_usb_init(int index, enum usb_init_type init)
 {
 	int ret = 0;
+	struct gpio_desc *hub_reset_gpio;
 
-	if (index == 0) {
-		puts("USB0/OTG not supported yet\n");
-		return 1;
+	switch(index) {
+	case 0:
+		puts("USB0/OTG\n");
+		switch (init) {
+		case USB_INIT_DEVICE:
+			break;
+		case USB_INIT_HOST:
+			imx8m_usb_power(index, true);
+			break;
+		default:
+			printf("USB0/OTG: unknown init type\n");
+			ret = -EINVAL;
+		}
+		break;
+	case 1:
+		puts("USB1/HUB\n");
+		hub_reset_gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
+		dm_gpio_set_value(hub_reset_gpio, 1);
+		udelay(100);
+		dm_gpio_set_value(hub_reset_gpio, 0);
+		udelay(100);
+		imx8m_usb_power(index, true);
+		break;
+	default:
+		printf("invalid USB port %d\n", index);
+		ret = -EINVAL;
 	}
 
-	imx8m_usb_power(index, true);
-
-#if 0
-	if (index == 0 && init == USB_INIT_DEVICE) {
-#ifdef CONFIG_USB_TCPC
-		ret = tcpc_setup_ufp_mode(&port);
-#endif
-		dwc3_nxp_usb_phy_init(&dwc3_device_data);
-		return dwc3_uboot_init(&dwc3_device_data);
-	} else if (index == 0 && init == USB_INIT_HOST) {
-#ifdef CONFIG_USB_TCPC
-		ret = tcpc_setup_dfp_mode(&port);
-#endif
-		return ret;
-	}
-#endif
-
-	return 0;
+	return ret;
 }
 
 int board_usb_cleanup(int index, enum usb_init_type init)
 {
 	int ret = 0;
+	struct gpio_desc *hub_reset_gpio;
 
-	if (index == 0)
-		return 0;
-
-	if (index == 0 && init == USB_INIT_DEVICE) {
-		dwc3_uboot_exit(index);
-	} else if (index == 0 && init == USB_INIT_HOST) {
-#ifdef CONFIG_USB_TCPC
-		ret = tcpc_disable_src_vbus(&port);
-#endif
+	switch(index) {
+	case 0:
+		puts("USB0/OTG\n");
+		switch (init) {
+		case USB_INIT_DEVICE:
+			break;
+		case USB_INIT_HOST:
+			imx8m_usb_power(index, false);
+			break;
+		default:
+			printf("USB0/OTG: unknown init type\n");
+			ret = -EINVAL;
+		}
+		break;
+	case 1:
+		puts("USB1/HUB\n");
+		hub_reset_gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
+		dm_gpio_set_value(hub_reset_gpio, 1);
+		imx8m_usb_power(index, false);
+		break;
+	default:
+		printf("invalid USB port %d\n", index);
+		ret = -EINVAL;
 	}
-
-	imx8m_usb_power(index, false);
 
 	return ret;
 }
 #endif
-
 
 int tqc_bb_board_init(void)
 {
@@ -429,9 +396,6 @@ int tqc_bb_board_init(void)
 	setup_fec();
 #endif
 
-#ifdef CONFIG_USB_TCPC
-	setup_typec();
-#endif
 	return 0;
 }
 
