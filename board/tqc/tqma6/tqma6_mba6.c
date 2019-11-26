@@ -30,6 +30,7 @@
 #include <mmc.h>
 #include <netdev.h>
 #include <usb.h>
+#include <usb/ehci-fsl.h>
 
 #include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
@@ -373,43 +374,64 @@ static void mba6_setup_iomux_usb(void)
 
 int board_ehci_hcd_init(int port)
 {
+	int ret = -ENODEV;
+
 	switch (port) {
 	case 0:
 	case 1:
+		ret = 0;
 		break;
 	case 2:
 	case 3:
 		printf("MXC USB port %d not yet supported\n", port);
-		return -ENODEV;
 		break;
 	default:
-		return -ENODEV;
+		break;
 	}
-	return 0;
+
+	return ret;
 }
 
 int board_ehci_power(int port, int on)
 {
+	int ret = -ENODEV;
+
 	switch (port) {
 	case 0:
+		printf("MXC USB port %d power %d\n", port, on);
 		gpio_set_value(MBA6_OTG_PWR_GPIO, on);
+		ret = 0;
 		break;
 	case 1:
+		ret = 0;
 		break;
 	case 2:
 	case 3:
 		printf("MXC USB port %d not yet supported\n", port);
-		return -ENODEV;
 		break;
 	default:
-		return -ENODEV;
+		break;
 	}
-	return 0;
+
+	return ret;
 }
 
-int board_usb_phy_mode(int index)
+int board_usb_phy_mode(int port)
 {
-	return USB_INIT_HOST;
+	int ret = -EINVAL;
+
+	/* port index start at 0 */
+	switch (port) {
+	case 1:
+		ret = USB_INIT_HOST;
+		break;
+	case 0:
+		ret = usb_phy_mode(port);
+		printf("MXC USB port %d: mode %d\n", port, ret);
+		break;
+	}
+
+	return ret;
 }
 
 int tqc_bb_board_early_init_f(void)
