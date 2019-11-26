@@ -431,7 +431,21 @@ static void mba7_setup_iomux_usb(void)
  */
 int board_usb_phy_mode(int port)
 {
-	return USB_INIT_HOST;
+	switch (port) {
+	case 0:
+		return usb_phy_mode(port);
+		break;
+	case 1:
+		if (is_cpu_type(MXC_CPU_MX7S))
+			return -ENODEV;
+		return USB_INIT_HOST;
+		break;
+	case 2:
+		return USB_INIT_HOST;
+	default:
+		return -ENODEV;
+	}
+	return -ENODEV;
 }
 
 int board_ehci_power(int port, int on)
