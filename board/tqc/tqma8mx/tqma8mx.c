@@ -6,6 +6,10 @@
  */
 
 #include <common.h>
+#include <dm.h>
+#include <dm/device-internal.h>
+#include <dm/lists.h>
+#include <dm/uclass-internal.h>
 #include <malloc.h>
 #include <errno.h>
 #include <asm/io.h>
@@ -21,33 +25,49 @@
 #include <spl.h>
 #include <power/pmic.h>
 #include <power/pfuze100_pmic.h>
-#include <dm.h>
 // #include "../common/pfuze.h"
 #include "../common/tqc_bb.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#define QSPI_PAD_CTRL	(PAD_CTL_DSE2 | PAD_CTL_HYS)
+#if defined(CONFIG_FSL_QSPI) && defined(CONFIG_DM_SPI)
 
-#ifdef CONFIG_FSL_QSPI
-static iomux_v3_cfg_t const qspi_pads[] = {
-	IMX8MQ_PAD_NAND_ALE__QSPI_A_SCLK | MUX_PAD_CTRL(QSPI_PAD_CTRL),
-	IMX8MQ_PAD_NAND_CE0_B__QSPI_A_SS0_B | MUX_PAD_CTRL(QSPI_PAD_CTRL),
-
-	IMX8MQ_PAD_NAND_DATA00__QSPI_A_DATA0 | MUX_PAD_CTRL(QSPI_PAD_CTRL),
-	IMX8MQ_PAD_NAND_DATA01__QSPI_A_DATA1 | MUX_PAD_CTRL(QSPI_PAD_CTRL),
-	IMX8MQ_PAD_NAND_DATA02__QSPI_A_DATA2 | MUX_PAD_CTRL(QSPI_PAD_CTRL),
-	IMX8MQ_PAD_NAND_DATA03__QSPI_A_DATA3 | MUX_PAD_CTRL(QSPI_PAD_CTRL),
-};
-
-int board_qspi_init(void)
+static int board_qspi_init(void)
 {
-	imx_iomux_v3_setup_multiple_pads(qspi_pads, ARRAY_SIZE(qspi_pads));
+	struct udevice *bus;
+	struct uclass *uc;
+	int count = 0;
+	int ret;
 
 	set_clk_qspi();
 
+	ret = uclass_get(UCLASS_SPI, &uc);
+	if (ret)
+		return ret;
+
+	uclass_foreach_dev(bus, uc) {
+		/* init SPI controllers */
+		printf("SPI%d:   ", count);
+		count++;
+
+		ret = device_probe(bus);
+		if (ret == -ENODEV) {	/* No such device. */
+			puts("SPI not available.\n");
+			continue;
+		}
+
+		if (ret) {		/* Other error. */
+			printf("probe failed, error %d\n", ret);
+			continue;
+		}
+
+		puts("\n");
+	}
+
 	return 0;
 }
+#else
+static inline int board_qspi_init(void) { return 0; }
 #endif
 
 int board_early_init_f(void)
