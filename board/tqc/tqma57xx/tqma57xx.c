@@ -541,6 +541,25 @@ int omap_xhci_board_usb_cleanup(int index, enum usb_init_type init)
 int board_eth_init(bd_t *bis)
 {
 	int ret;
+	uint8_t mac_addr[6];
+	uint32_t mac_hi, mac_lo;
+
+	/* try reading mac address from efuse */
+	mac_lo = readl((*ctrl)->control_core_mac_id_0_lo);
+	mac_hi = readl((*ctrl)->control_core_mac_id_0_hi);
+	mac_addr[0] = (mac_hi & 0xFF0000) >> 16;
+	mac_addr[1] = (mac_hi & 0xFF00) >> 8;
+	mac_addr[2] = mac_hi & 0xFF;
+	mac_addr[3] = (mac_lo & 0xFF0000) >> 16;
+	mac_addr[4] = (mac_lo & 0xFF00) >> 8;
+	mac_addr[5] = mac_lo & 0xFF;
+
+	if (!env_get("ethaddr")) {
+		printf("<ethaddr> not set. Validating first E-fuse MAC\n");
+
+		if (is_valid_ethaddr(mac_addr))
+			eth_env_set_enetaddr("ethaddr", mac_addr);
+	}
 
 	ret = tqma57xx_bb_board_eth_init(bis);
 
