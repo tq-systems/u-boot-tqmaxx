@@ -85,3 +85,4 @@ obj-$(CONFIG_MXC_EPDC) += mxc_epdc_fb.o
 obj-y += bridge/
 obj-y += sunxi/
 obj-y += tegra20/
+obj-y += imx8/
