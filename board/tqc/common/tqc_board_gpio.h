@@ -15,7 +15,16 @@ struct tqc_gpio_init_data {
 };
 
 #if defined(CONFIG_DM_GPIO)
+
+#define GPIO_INIT_DATA_ENTRY(IDX, NAME, FLAGS) \
+	[IDX] = { \
+		.name = (NAME), \
+		.label = __stringify(IDX), \
+		.flags = (FLAGS), \
+	}
+
 int tqc_board_gpio_init(struct tqc_gpio_init_data *data, int count);
+
 #else
 static inline int tqc_board_gpio_init(struct tqc_gpio_init_data *data,
 				      int count)
