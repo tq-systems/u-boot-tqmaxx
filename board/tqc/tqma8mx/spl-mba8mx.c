@@ -46,6 +46,8 @@ int tqc_bb_board_mmc_getcd(struct mmc *mmc)
 			 PAD_CTL_FSEL2)
 #define USDHC_GPIO_PAD_CTRL (PAD_CTL_PUE | PAD_CTL_DSE1)
 
+#define USDHC2_VSELECT_GPIO	IMX_GPIO_NR(1, 4)
+
 static iomux_v3_cfg_t const usdhc2_pads[] = {
 	IMX8MQ_PAD_SD2_CLK__USDHC2_CLK | MUX_PAD_CTRL(USDHC_PAD_CTRL), /* 0xd6 */
 	IMX8MQ_PAD_SD2_CMD__USDHC2_CMD | MUX_PAD_CTRL(USDHC_PAD_CTRL), /* 0xd6 */
@@ -76,6 +78,14 @@ int tqc_bb_board_mmc_init(bd_t *bis)
 	usdhc2_cfg.sdhc_clk = mxc_get_clock(USDHC2_CLK_ROOT);
 	imx_iomux_v3_setup_multiple_pads(
 		usdhc2_pads, ARRAY_SIZE(usdhc2_pads));
+	/*
+	 * even if we do not use VSELECT / UHS set to default state, requesting
+	 * 3.3 Volts
+	 */
+	gpio_request(USDHC2_VSELECT_GPIO, "usdhc2_vselect");
+	gpio_direction_output(USDHC2_VSELECT_GPIO, 0);
+	udelay(500);
+
 	ret = fsl_esdhc_initialize(bis, &usdhc2_cfg);
 	if (ret)
 		return ret;
