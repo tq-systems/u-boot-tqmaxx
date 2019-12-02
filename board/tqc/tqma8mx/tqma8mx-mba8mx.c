@@ -92,194 +92,6 @@ static iomux_v3_cfg_t const uart_pads[] = {
 	IMX8MQ_PAD_UART1_TXD__UART1_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
 };
 
-static struct tqc_gpio_init_data mba8mx_gid[] = {
-	{
-		.name = "GPIO@23_0",
-		.label = __stringify(UART1_MUX),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@23_1",
-		.label = __stringify(UART2_MUX),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@23_2",
-		.label = __stringify(SD_MUX),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@23_3",
-		.label = __stringify(DSI_MUX),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@23_4",
-		.label = __stringify(SPI_MUX),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@23_5",
-		.label = __stringify(AVCC1V8_LVDS_EN),
-		.flags = GPIOD_IS_OUT,
-	}, {
-		.name = "GPIO@23_6",
-		.label = __stringify(LVDS_BRIDGE_EN),
-		.flags = GPIOD_IS_OUT,
-	}, {
-		.name = "GPIO@23_7",
-		.label = __stringify(LVDS_BRIDGE_IRQ),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@23_8",
-		.label = __stringify(SD_MUX_EN#),
-		.flags = GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE,
-	}, {
-		.name = "GPIO@23_9",
-		.label = __stringify(EN_HDMI_TERM),
-		.flags = GPIOD_IS_OUT,
-	}, {
-		.name = "GPIO@23_10",
-		.label = __stringify(DSI_MUX_OE#),
-		.flags = GPIOD_IS_OUT | GPIOD_ACTIVE_LOW,
-	}, {
-		.name = "GPIO@23_11",
-		.label = __stringify(EN_DP_BRIDGE_3V3),
-		.flags = GPIOD_IS_OUT,
-	}, {
-		.name = "GPIO@23_12",
-		.label = __stringify(BOOT_CFG_OE#),
-		.flags = GPIOD_IS_OUT | GPIOD_ACTIVE_LOW,
-	}, {
-		.name = "GPIO@23_13",
-		.label = __stringify(RST_USB_HUB#),
-		.flags = GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE,
-	}, {
-		.name = "GPIO@23_14",
-		.label = __stringify(PCIE_RST#),
-		.flags = GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE,
-	}, {
-		.name = "GPIO@23_15",
-		.label = __stringify(PCIE_WAKE#),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@24_0",
-		.label = __stringify(BOOT_CFG0),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@24_1",
-		.label = __stringify(BOOT_CFG1),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@24_2",
-		.label = __stringify(BOOT_CFG2),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@24_3",
-		.label = __stringify(BOOT_CFG3),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@24_4",
-		.label = __stringify(BOOT_CFG4),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@24_5",
-		.label = __stringify(BOOT_CFG5),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@24_6",
-		.label = __stringify(BOOT_CFG6),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@24_7",
-		.label = __stringify(BOOT_CFG7),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@24_8",
-		.label = __stringify(BOOT_CFG8),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@24_9",
-		.label = __stringify(BOOT_CFG9),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@24_10",
-		.label = __stringify(BOOT_CFG10),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@24_11",
-		.label = __stringify(BOOT_CFG11),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@24_12",
-		.label = __stringify(BOOT_CFG12),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@24_13",
-		.label = __stringify(BOOT_CFG13),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@24_14",
-		.label = __stringify(BOOT_CFG14),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@24_15",
-		.label = __stringify(BOOT_CFG15),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@25_0",
-		.label = __stringify(AUDIO_CODEC_RESET#),
-		.flags = GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE,
-	}, {
-		.name = "GPIO@25_1",
-		.label = __stringify(LCD_RESET#),
-		.flags = GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE,
-	}, {
-		.name = "GPIO@25_2",
-		.label = __stringify(LCD_BLT_EN),
-		.flags = GPIOD_IS_OUT,
-	}, {
-		.name = "GPIO@25_3",
-		.label = __stringify(LCD_PWR_EN),
-		.flags = GPIOD_IS_OUT,
-	}, {
-		.name = "GPIO@25_4",
-		.label = __stringify(EDP_IRQ),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@25_5",
-		.label = __stringify(HDMI_FAULT#),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@25_8",
-		.label = __stringify(MPCIE_WAKE#),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@25_9",
-		.label = __stringify(SIM_CARD_DETECT),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@25_10",
-		.label = __stringify(CAMX_PWR#),
-		.flags = GPIOD_IS_OUT | GPIOD_ACTIVE_LOW,
-	}, {
-		.name = "GPIO@25_11",
-		.label = __stringify(INT_MIKRO_MODULE),
-		.flags = GPIOD_IS_IN,
-	}, {
-		.name = "GPIO@25_12",
-		.label = __stringify(MPCIE_DIS#),
-		.flags = GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE,
-	}, {
-		.name = "GPIO@25_13",
-		.label = __stringify(MPCIE_RST#),
-		.flags = GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE,
-	}, {
-		.name = "GPIO@25_14",
-		.label = __stringify(CAMX_RST#),
-		.flags = GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE,
-	}, {
-		.name = "GPIO@25_15",
-		.label = __stringify(RESET_MIKRO_MODULE#),
-		.flags = GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE,
-	},
-};
-
 /*
  * NOTE: this is also used by SPL
  */
@@ -295,6 +107,65 @@ int tqc_bb_board_early_init_f(void)
 
 	return 0;
 }
+
+#if !defined(CONFIG_SPL_BUILD)
+
+static struct tqc_gpio_init_data mba8mx_gid[] = {
+	GPIO_INIT_DATA_ENTRY(UART1_MUX, "GPIO@23_0", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(UART2_MUX, "GPIO@23_1", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(SD_MUX, "GPIO@23_2", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(DSI_MUX, "GPIO@23_3", GPIOD_IS_IN),
+
+	GPIO_INIT_DATA_ENTRY(SPI_MUX, "GPIO@23_4", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(AVCC1V8_LVDS_EN, "GPIO@23_5", GPIOD_IS_OUT),
+	GPIO_INIT_DATA_ENTRY(LVDS_BRIDGE_EN, "GPIO@23_6", GPIOD_IS_OUT),
+	GPIO_INIT_DATA_ENTRY(LVDS_BRIDGE_IRQ, "GPIO@23_7", GPIOD_IS_IN),
+
+	GPIO_INIT_DATA_ENTRY(SD_MUX_EN_B, "GPIO@23_8", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
+	GPIO_INIT_DATA_ENTRY(EN_HDMI_TERM, "GPIO@23_9", GPIOD_IS_OUT),
+	GPIO_INIT_DATA_ENTRY(DSI_MUX_OE_B, "GPIO@23_10", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW),
+	GPIO_INIT_DATA_ENTRY(EN_DP_BRIDGE_3V3, "GPIO@23_11", GPIOD_IS_OUT),
+
+	GPIO_INIT_DATA_ENTRY(BOOT_CFG_OE_B, "GPIO@23_12", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW),
+	GPIO_INIT_DATA_ENTRY(RST_USB_HUB_B, "GPIO@23_13", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
+	GPIO_INIT_DATA_ENTRY(PCIE_RST_B, "GPIO@23_14", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
+	GPIO_INIT_DATA_ENTRY(PCIE_WAKE_B, "GPIO@23_15", GPIOD_IS_IN),
+
+	GPIO_INIT_DATA_ENTRY(BOOT_CFG0, "GPIO@24_0", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(BOOT_CFG1, "GPIO@24_1", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(BOOT_CFG2, "GPIO@24_2", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(BOOT_CFG3, "GPIO@24_3", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(BOOT_CFG4, "GPIO@24_4", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(BOOT_CFG5, "GPIO@24_5", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(BOOT_CFG6, "GPIO@24_6", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(BOOT_CFG7, "GPIO@24_7", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(BOOT_CFG8, "GPIO@24_8", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(BOOT_CFG9, "GPIO@24_9", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(BOOT_CFG10, "GPIO@24_10", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(BOOT_CFG11, "GPIO@24_11", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(BOOT_CFG12, "GPIO@24_12", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(BOOT_CFG13, "GPIO@24_13", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(BOOT_CFG14, "GPIO@24_14", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(BOOT_CFG15, "GPIO@24_15", GPIOD_IS_IN),
+
+	GPIO_INIT_DATA_ENTRY(AUDIO_CODEC_RESET_B, "GPIO@25_0", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
+	GPIO_INIT_DATA_ENTRY(LCD_RESET_B, "GPIO@25_1", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
+	GPIO_INIT_DATA_ENTRY(LCD_BLT_EN, "GPIO@25_2", GPIOD_IS_OUT),
+	GPIO_INIT_DATA_ENTRY(LCD_PWR_EN, "GPIO@25_3", GPIOD_IS_OUT),
+
+	GPIO_INIT_DATA_ENTRY(EDP_IRQ, "GPIO@25_4", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(HDMI_FAULT_B, "GPIO@25_5", GPIOD_IS_IN),
+
+	GPIO_INIT_DATA_ENTRY(MPCIE_WAKE_B, "GPIO@25_8", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(SIM_CARD_DETECT, "GPIO@25_9", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(CAMX_PWR_B, "GPIO@25_10", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW),
+	GPIO_INIT_DATA_ENTRY(INT_MIKRO_MODULE, "GPIO@25_11", GPIOD_IS_IN),
+
+	GPIO_INIT_DATA_ENTRY(MPCIE_DIS_B, "GPIO@25_12", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
+	GPIO_INIT_DATA_ENTRY(MPCIE_RST_B, "GPIO@25_13", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
+	GPIO_INIT_DATA_ENTRY(CAMX_RST_B, "GPIO@25_14", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
+	GPIO_INIT_DATA_ENTRY(RESET_MIKRO_MODULE_B, "GPIO@25_15", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
+};
 
 #ifdef CONFIG_OF_BOARD_SETUP
 int tqc_bb_ft_board_setup(void *blob, bd_t *bd)
@@ -474,3 +345,5 @@ struct display_info_t const displays[] = {{
 size_t display_count = ARRAY_SIZE(displays);
 
 #endif /* CONFIG_VIDEO_IMXDCSS */
+
+#endif /* #if !defined(CONFIG_SPL_BUILD) */
