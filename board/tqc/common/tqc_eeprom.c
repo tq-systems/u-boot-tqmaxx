@@ -49,12 +49,16 @@ int tqc_read_eeprom_buf(unsigned int bus, unsigned int i2c_addr,
 
 static struct tqc_eeprom_data eeprom;
 static int tqc_vard_has_been_read = 0;
+static bool tqc_vard_valid = false;
 
 static int tqc_vard_is_crc_valid(struct tqc_eeprom_data *data, uint16_t *cp)
 {
 	void *crc_offs;
 	int crc_len;
 	uint16_t crc;
+
+	if (tqc_vard_valid)
+		return 1;
 
 	/* calculate crc over all vard data except checksum */
 	crc_offs = (void *)(&data->crc + sizeof(data->crc));
@@ -70,6 +74,8 @@ static int tqc_vard_is_crc_valid(struct tqc_eeprom_data *data, uint16_t *cp)
 		return 0;
 	}
 
+	tqc_vard_valid = true;
+
 	return 1;
 }
 
@@ -77,58 +83,68 @@ static int tqc_vard_read_eeprom(void)
 {
 	int ret = 0;
 
+	if (tqc_vard_has_been_read)
+		return 0;
+
 	ret = tqc_read_eeprom_buf(TQC_VARD_BUS, TQC_VARD_ADDR, 1, 0,
 				  sizeof(eeprom), (void *)&eeprom);
 	if (ret) {
-		printf("Error reading VARD eeprom\n");
-		return -1;
+		printf("Error reading VARD eeprom: %d\n", ret);
+		return ret;
 	}
 
-	if (tqc_vard_is_crc_valid(&eeprom, NULL))
-		tqc_vard_has_been_read = 1;
+	tqc_vard_has_been_read = 1;
 
 	return 0;
 }
 
-static inline void tqc_get_eeprom_if_not_done(void)
+static inline bool tqc_validate_eeprom(void)
 {
-	if (!tqc_vard_has_been_read)
-		tqc_vard_read_eeprom();
+	if (!tqc_vard_read_eeprom() &&
+	     tqc_vard_is_crc_valid(&eeprom, NULL))
+		return true;
+	else
+		return false;
 };
 
 int tqc_has_hwrev(u8 rev)
 {
-	tqc_get_eeprom_if_not_done();
-
-	return (eeprom.hwrev & be32_to_cpu(rev));
+	if (tqc_validate_eeprom())
+		return (eeprom.hwrev & be32_to_cpu(rev));
+	else
+		return 0;
 };
 
 int tqc_has_memsize(u8 size)
 {
-	tqc_get_eeprom_if_not_done();
-
-	return (eeprom.memsize & be32_to_cpu(size));
+	if (tqc_validate_eeprom())
+		return (eeprom.memsize & be32_to_cpu(size));
+	else
+		return 0;
 };
 
 int tqc_has_memtype(u8 type)
 {
-	tqc_get_eeprom_if_not_done();
-
-	return (eeprom.memtype & be32_to_cpu(type));
+	if (tqc_validate_eeprom())
+		return (eeprom.memtype & be32_to_cpu(type));
+	else
+		return 0;
 };
 
 int tqc_has_feature1(u32 mask)
 {
-	tqc_get_eeprom_if_not_done();
-
-	return ((eeprom.features1 & be32_to_cpu(mask)) == 0);
+	if (tqc_validate_eeprom())
+		return ((eeprom.features1 & be32_to_cpu(mask)) == 0);
+	else
+		return 0;
 };
 
 int tqc_has_feature2(u32 mask)
 {
-	tqc_get_eeprom_if_not_done();
-
-	return ((eeprom.features2 & be32_to_cpu(mask)) == 0);
+	if (tqc_validate_eeprom())
+		return ((eeprom.features2 & be32_to_cpu(mask)) == 0);
+	else
+		return 0;
 };
 
 #if !defined(CONFIG_SPL_BUILD)
@@ -324,7 +340,7 @@ static int do_tqeeprom(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]
 		printf("Really enable permanent write-protection?\n");
 		
 		if (confirm_yesno()) {
-			int dummy = 0;
+			uint8_t dummy = 0;
 #ifdef CONFIG_DM_I2C
 			struct udevice *dev;
 			int ret = i2c_get_chip_for_busnum(TQC_VARD_BUS,
@@ -335,13 +351,11 @@ static int do_tqeeprom(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]
 				return ret;
 			}
 
-			/* ret = dm_i2c_write(dev, 0, &dummy, sizeof(dummy)); */
-			printf("dm_i2c_write(dev, 0, &dummy, sizeof(dummy))\n");
+			dm_i2c_write(dev, 0, &dummy, sizeof(dummy));
 #else
 			unsigned int oldbus = i2c_get_bus_num();
 			i2c_set_bus_num(TQC_VARD_BUS);
-			/* ret = i2c_write(0x37, 0, 1, &dummy, sizeof(dummy)); */
-			printf("ret = i2c_write(0x37, 0, 1, &dummy, sizeof(dummy));\n");
+			i2c_write(0x37, 0, 1, &dummy, sizeof(dummy));
 			i2c_set_bus_num(oldbus);
 #endif
 			printf("Write-protection enabled\n");
