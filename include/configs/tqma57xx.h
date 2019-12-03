@@ -104,12 +104,24 @@
 /* i2c eeprom */
 #define CONFIG_SYS_I2C_EEPROM_ADDR	0x54	/* Main EEPROM */
 #define CONFIG_SYS_I2C_EEPROM_ADDR_LEN	2
+/* variant and revision detection
+ * module-specific definitions
+ * memsize: 1G or 2G known
+ * memtype: only known type used, ecc optional for TQMa574x
+ * features: '0' defined as 'feature present'
+ */
 #define TQC_VARD_BUS			0	/* System EEPROM bus */
 #define TQC_VARD_ADDR			0x57
-#define TQC_VARD_FEATURES1_EMMC		BIT(31)
-#define TQC_VARD_FEATURES1_EEPROM	BIT(30)
-#define TQC_VARD_FEATURES1_SPINOR	BIT(29)
-#define TQC_VARD_FEATURES2_RTC		BIT(31)
+#define TQC_VARD_MEMSIZE_1G		0
+#define TQC_VARD_MEMSIZE_2G		1
+#define TQC_VARD_MEMSIZE_EMPTY		0xff
+#define TQC_VARD_MEMTYPE_ECC_MASK	0x80	/* Bit for ECC-enabled memory */
+#define TQC_VARD_MEMTYPE_RAM1		1
+#define TQC_VARD_MEMTYPE_EMPTY		0xff
+#define TQC_VARD_FEATURES1_EMMC		~BIT(31)
+#define TQC_VARD_FEATURES1_EEPROM	~BIT(30)	/* i2c1 0x54 */
+#define TQC_VARD_FEATURES1_QSPI		~BIT(29)
+#define TQC_VARD_FEATURES2_RTC		~BIT(31)
 
 /* PMIC I2C bus number */
 #define CONFIG_SYS_SPD_BUS_NUM		0

@@ -51,12 +51,12 @@ const struct omap_sysinfo sysinfo = {
 };
 
 static const struct dmm_lisa_map_regs tqma571x_lisa_regs = {
-	.dmm_lisa_map_3 = 0x80600100,
+	.dmm_lisa_map_3 = 0x80600100,	/* 1GiB on EMIF1 */
 	.is_ma_present  = 0x1
 };
 
 static const struct dmm_lisa_map_regs tqma572x_lisa_regs = {
-	.dmm_lisa_map_3 = 0x80740300,
+	.dmm_lisa_map_3 = 0x80740300,	/* 2GiB on EMIF1+2 */
 	.is_ma_present  = 0x1
 };
 
@@ -73,23 +73,49 @@ void emif_get_dmm_regs(const struct dmm_lisa_map_regs **dmm_lisa_regs)
  * TQMa572x: DRA752-GP ES2.0
  * TQMa574x: DRA762-GP ES1.0 ABZ package
  */
-	switch(omap_revision()) {
-	case DRA722_ES2_0:
-		*dmm_lisa_regs = &tqma571x_lisa_regs;
-		break;
-	case DRA752_ES2_0:
-		*dmm_lisa_regs = &tqma572x_lisa_regs;
-		break;
-	case DRA762_ABZ_ES1_0:
-		*dmm_lisa_regs = &tqma574x_lisa_regs;
-		break;
-	default:
-		printf("\n (%s:%d) INVALID OMAP REVISION ", __func__, __LINE__);
+	if (tqc_has_memsize(TQC_VARD_MEMSIZE_1G)) {
+		switch(omap_revision()) {
+		case DRA722_ES2_0:
+			*dmm_lisa_regs = &tqma571x_lisa_regs;
+			break;
+		default:
+			puts("VARD: Invalid MEMSIZE/CPU combination.\n");
+		}
+	} else if (tqc_has_memsize(TQC_VARD_MEMSIZE_2G)) {
+		switch(omap_revision()) {
+		case DRA752_ES2_0:
+			*dmm_lisa_regs = &tqma572x_lisa_regs;
+			break;
+		case DRA762_ABZ_ES1_0:
+			*dmm_lisa_regs = &tqma574x_lisa_regs;
+			break;
+		default:
+			puts("VARD: Invalid MEMSIZE/CPU combination.\n");
+		}
+	} else {
+		puts("VARD: Invalid MEMSIZE data, fallback to omap_rev()\n");
+		switch(omap_revision()) {
+		case DRA722_ES2_0:
+			*dmm_lisa_regs = &tqma571x_lisa_regs;
+			break;
+		case DRA752_ES2_0:
+			*dmm_lisa_regs = &tqma572x_lisa_regs;
+			break;
+		case DRA762_ABZ_ES1_0:
+			*dmm_lisa_regs = &tqma574x_lisa_regs;
+			break;
+		default:
+			puts("VARD: Invalid omap_revision.\n");
+		}
 	}
 }
 
 void emif_get_reg_dump(u32 emif_nr, const struct emif_regs **regs)
 {
+	/* TODO: implement more memtype cases when known */
+	if (!tqc_has_memtype(TQC_VARD_MEMTYPE_RAM1))
+		puts("VARD: Invalid MEMTYPE data, fallback to omap_rev()\n");
+
 	if (emif_nr == 1) {
 		switch(omap_revision()) {
 		case DRA722_ES2_0:
@@ -99,10 +125,14 @@ void emif_get_reg_dump(u32 emif_nr, const struct emif_regs **regs)
 			*regs = &tqma572x_emif1_ddr3_532mhz_emif_regs;
 			break;
 		case DRA762_ABZ_ES1_0:
+#ifdef CONFIG_TQMA57XX_ECC
+			if (!tqc_has_memtype(TQC_VARD_MEMTYPE_ECC_MASK))
+				puts("VARD: Error! ECC not placed, but enabled!\n");
+#endif
 			*regs = &tqma574x_emif1_ddr3_666mhz_emif_regs;
 			break;
 		default:
-			printf("\n (%s:%d) INVALID OMAP REVISION ", __func__, __LINE__);
+			puts("VARD: Invalid omap_revision.\n");
 		}
 	} else if (emif_nr == 2) {
 		switch(omap_revision()) {
@@ -113,15 +143,17 @@ void emif_get_reg_dump(u32 emif_nr, const struct emif_regs **regs)
 			*regs = &tqma574x_emif2_ddr3_666mhz_emif_regs;
 			break;
 		default:
-			printf("\n (%s:%d) INVALID OMAP REVISION ", __func__, __LINE__);
+			puts("VARD: Invalid omap_revision.\n");
 		}
-	} else {
-		printf("\n (%s:%d) INVALID EMIF_NR ", __func__, __LINE__);
 	}
 }
 
 void emif_get_ext_phy_ctrl_const_regs(u32 emif_nr, const u32 **regs, u32 *size)
 {
+	/* TODO: implement more memtype cases when known */
+	if (!tqc_has_memtype(TQC_VARD_MEMTYPE_RAM1))
+		puts("VARD: Invalid MEMTYPE data, fallback to omap_rev()\n");
+
 	if (emif_nr == 1) {
 		switch(omap_revision()) {
 		case DRA722_ES2_0:
@@ -137,7 +169,7 @@ void emif_get_ext_phy_ctrl_const_regs(u32 emif_nr, const u32 **regs, u32 *size)
 			*size = ARRAY_SIZE(tqma574x_emif1_ddr3_ext_phy_ctrl_const_regs);
 			break;
 		default:
-			printf("\n (%s:%d) INVALID OMAP REVISION ", __func__, __LINE__);
+			puts("VARD: Invalid omap_revision.\n");
 		}
 	} else if (emif_nr == 2) {
 		switch(omap_revision()) {
@@ -150,10 +182,8 @@ void emif_get_ext_phy_ctrl_const_regs(u32 emif_nr, const u32 **regs, u32 *size)
 			*size = ARRAY_SIZE(tqma574x_emif2_ddr3_ext_phy_ctrl_const_regs);
 			break;
 		default:
-			printf("\n (%s:%d) INVALID OMAP REVISION ", __func__, __LINE__);
+			puts("VARD: Invalid omap_revision.\n");
 		}
-	} else {
-		printf("\n (%s:%d) INVALID EMIF_NR ", __func__, __LINE__);
 	}
 }
 
@@ -278,6 +308,7 @@ int board_init(void)
 	return 0;
 }
 
+#if !defined(CONFIG_SPL_BUILD)
 int board_late_init(void)
 {
 	u8 val;
@@ -339,8 +370,6 @@ int board_late_init(void)
 						 safe_string,
 						 ARRAY_SIZE(safe_string)))
 		{
-			uint32_t mac = 0;
-			uint8_t addr[6];
 			char *ethaddr = env_get("ethaddr");
 
 			if (ethaddr &&
@@ -362,6 +391,7 @@ int board_late_init(void)
 
 	return 0;
 }
+#endif
 
 void set_muxconf_regs(void)
 {
@@ -439,8 +469,8 @@ void spl_board_prepare_for_boot(void)
 	if (tqc_has_feature1(TQC_VARD_FEATURES1_EEPROM))
 		printf("EEPROM present\n");
 
-	if (tqc_has_feature1(TQC_VARD_FEATURES1_SPINOR))
-		printf("SPINOR present\n");
+	if (tqc_has_feature1(TQC_VARD_FEATURES1_QSPI))
+		printf("QSPI present\n");
 
 	if (tqc_has_feature2(TQC_VARD_FEATURES2_RTC))
 		printf("RTC present\n");
