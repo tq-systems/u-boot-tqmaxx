@@ -265,7 +265,15 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 
 int tqc_bb_board_init(void)
 {
+	int idx;
+	unsigned cfg = 0x0;
+
 	tqc_board_gpio_init(mba8mx_gid, ARRAY_SIZE(mba8mx_gid));
+	for (idx = BOOT_CFG0; idx <= BOOT_CFG15; ++idx)
+		cfg |= (dm_gpio_get_value(&mba8mx_gid[idx].desc) ? 1 : 0) <<
+			(idx - BOOT_CFG0);
+	env_set_ulong("boot_config", cfg);
+	printf("BOOTCFG: %x\n", cfg);
 
 #ifdef CONFIG_FEC_MXC
 	setup_fec();
