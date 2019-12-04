@@ -6,6 +6,7 @@
  *		Mushtaq Khan <mushtaq_k@procsys.com>
  *			<mushtaqk_921@yahoo.co.in>
  * Copyright (C) 2008 Freescale Semiconductor, Inc.
+ * Copyright 2019 NXP
  *		Dave Liu <daveliu@freescale.com>
  */
 
@@ -25,6 +26,8 @@ int sata_remove(int devnum)
 #ifdef CONFIG_AHCI
 	struct udevice *dev;
 	int rc;
+
+	blk_unbind_all(IF_TYPE_SATA);
 
 	rc = uclass_find_device(UCLASS_AHCI, devnum, &dev);
 	if (!rc && !dev)
