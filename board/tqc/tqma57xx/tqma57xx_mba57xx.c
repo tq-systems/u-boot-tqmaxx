@@ -593,19 +593,6 @@ int tqma57xx_bb_board_eth_init(bd_t *bis)
 }
 #endif /* CONFIG_DRIVER_TI_CPSW */
 
-#ifdef CONFIG_SPL_BUILD
-void board_boot_order(u32 *spl_boot_list)
-{
-	/* primary boot device */
-	spl_boot_list[0] = BOOT_DEVICE_MMC1;
-	/* secondary boot device */
-	spl_boot_list[1] = BOOT_DEVICE_MMC2;
-	/* tertiary boot device */
-	spl_boot_list[2] = BOOT_DEVICE_SPI;
-}
-#endif /* CONFIG_SPL_BUILD */
-
-
 void tqma57xx_bb_board_late_init(void)
 {
 	if (!env_get("fdtfile")) {

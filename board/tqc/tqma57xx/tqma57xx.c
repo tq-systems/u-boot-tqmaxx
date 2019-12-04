@@ -27,12 +27,14 @@
 #include <asm/arch/mmc_host_def.h>
 #include <asm/arch/gpio.h>
 #include <asm/arch/omap.h>
+#include <asm/arch/spl.h>
 #include <environment.h>
 #include <usb.h>
 #include <linux/usb/gadget.h>
 #include <dwc3-uboot.h>
 #include <dwc3-omap-uboot.h>
 #include <ti-usb-phy-uboot.h>
+#include <mmc.h>
 
 #include "mux_data.h"
 #include "ddr.h"
@@ -389,6 +391,26 @@ int board_late_init(void)
 
 	tqma57xx_bb_board_late_init();
 
+	{
+		u32 boot_params = *((u32 *)OMAP_SRAM_SCRATCH_BOOT_PARAMS);
+		struct omap_boot_parameters *omap_boot_params;
+		u8 boot_device;
+
+		omap_boot_params = (struct omap_boot_parameters *)boot_params;
+		boot_device = omap_boot_params->boot_device;
+
+		switch (boot_device) {
+		case BOOT_DEVICE_MMC1:
+			env_set("mmcblkdev", "0");
+			env_set("mmcdev", "0");
+			break;
+		default:
+			env_set("mmcblkdev", "1");
+			env_set("mmcdev", "1");
+			break;
+		}
+	}
+
 	return 0;
 }
 #endif
@@ -623,4 +645,80 @@ void board_tee_image_process(ulong tee_image, size_t tee_size)
 }
 
 U_BOOT_FIT_LOADABLE_HANDLER(IH_TYPE_TEE, board_tee_image_process);
+#endif
+
+#ifdef CONFIG_SPL_BUILD
+void board_boot_order(u32 *spl_boot_list)
+{
+	u32 boot_params = *((u32 *)OMAP_SRAM_SCRATCH_BOOT_PARAMS);
+	struct omap_boot_parameters *omap_boot_params;
+	u8 boot_device;
+
+	omap_boot_params = (struct omap_boot_parameters *)boot_params;
+	boot_device = omap_boot_params->boot_device;
+
+	switch (boot_device) {
+	case BOOT_DEVICE_MMC1:
+		spl_boot_list[0] = BOOT_DEVICE_MMC1;
+		break;
+	case BOOT_DEVICE_MMC2_2:
+		spl_boot_list[0] = BOOT_DEVICE_MMC2;
+		break;
+	case BOOT_DEVICE_SPI:
+		spl_boot_list[0] = BOOT_DEVICE_SPI;
+	default:
+		break;
+	}
+}
+#endif /* CONFIG_SPL_BUILD */
+
+#ifdef CONFIG_ENV_IS_IN_MMC
+int mmc_get_env_dev(void)
+{
+	int mmcdev = -1;
+	u32 boot_params = *((u32 *)OMAP_SRAM_SCRATCH_BOOT_PARAMS);
+	struct omap_boot_parameters *omap_boot_params;
+	u8 boot_device;
+
+	omap_boot_params = (struct omap_boot_parameters *)boot_params;
+	boot_device = omap_boot_params->boot_device;
+
+	switch (boot_device) {
+	case BOOT_DEVICE_MMC1:
+		mmcdev = 0;
+		break;
+	case BOOT_DEVICE_MMC2_2:
+		mmcdev = 1;
+		break;
+	default:
+		break;
+	}
+
+	return mmcdev;
+}
+#endif
+
+#if 0
+enum env_location env_get_location(enum env_operation op, int prio)
+{
+	u32 boot_params = *((u32 *)OMAP_SRAM_SCRATCH_BOOT_PARAMS);
+	struct omap_boot_parameters *omap_boot_params;
+	u8 boot_device;
+
+	omap_boot_params = (struct omap_boot_parameters *)boot_params;
+	boot_device = omap_boot_params->boot_device;
+
+	switch (boot_device) {
+	case BOOT_DEVICE_MMC1:
+	case BOOT_DEVICE_MMC2_2:
+		return ENVL_MMC;
+		break;
+	case BOOT_DEVICE_SPI:
+		return ENVL_SPI_FLASH;
+		break;
+	default:
+		return ENVL_MMC;
+		break;
+	}
+}
 #endif
