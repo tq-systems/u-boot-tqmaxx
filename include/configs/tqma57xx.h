@@ -208,8 +208,8 @@
 		"::off\0" \
 	"nfsopts=nolock\0" \
 	"rootpath=/srv/nfs/rootfs\0" \
-	"netloadimage=nfs ${loadaddr} $serverip:$rootpath$bootdir/$bootfile\0" \
-	"netloadfdt=nfs ${fdtaddr} $serverip:$rootpath$bootdir/$fdtfile\0" \
+	"netloadimage=nfs ${loadaddr} $serverip:$rootpath/$bootfile\0" \
+	"netloadfdt=nfs ${fdtaddr} $serverip:$rootpath/$fdtfile\0" \
 	"netargs=setenv bootargs console=${console} " \
 		"${optargs} " \
 		"root=/dev/nfs " \
@@ -228,9 +228,7 @@
 
 #define COMMON_BOOT_ARGS \
 	"console=" CONSOLEDEV ",115200n8\0" \
-	"bootpart=0:2\0" \
-	"bootdir=/boot\0" \
-	"bootfile=zImage\0" \
+	"bootpart=${mmcdev}:1\0" \
 	"usbtty=cdc_acm\0" \
 	"vram=16M\0" \
 	AVB_VERIFY_CMD \
@@ -241,26 +239,49 @@
 		"echo Trying to boot Linux from eMMC ...; " \
 		"setenv mmcdev 1; " \
 		"setenv bootpart 1:2; " \
-		"setenv mmcroot /dev/mmcblk0p2 rw; " \
+		"setenv mmcroot /dev/mmcblk1p2 rw; " \
 		"run mmcboot;\0" \
 
 #define CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	DEFAULT_LINUX_BOOT_ENV \
-	DEFAULT_MMC_TI_ARGS \
 	COMMON_BOOT_ARGS \
 	DEFAULT_FIT_TI_ARGS \
 	NETARGS_TQMA57XX \
-	"bootfile=zImage\0" \
+	"bootfile=linuximage\0" \
 	"devtype=mmc \0" \
 	"u-boot=u-boot.img\0" \
+	"uboot_size=0x800\0" \
 	"MLO=MLO\0" \
-	"upd_sd=if tftp u-boot/${u-boot}; " \
-		"then echo updating u-boot on sd card...; " \
-		"fatwrite mmc 0:1 $loadaddr u-boot.img $filesize; " \
-		"tftp u-boot/${MLO}; " \
-		"fatwrite mmc 0:1 $loadaddr MLO $filesize; " \
-		" else echo u-boot file not found!; fi \0" \
+	"mlo_size=0x100\0" \
+	"update_uboot=if tftp ${MLO}; then " \
+		"echo updating MLO on mmc${mmcdev}...; " \
+		"mmc dev ${mmcdev}; mmc rescan; " \
+		"setexpr blkc ${filesize} + 0x1ff; " \
+		"setexpr blkc ${blkc} / 0x200; " \
+		"if itest ${blkc} <= ${mlo_size}; then " \
+			"mmc write ${loadaddr} 0x100 ${blkc}; " \
+		"fi; fi && " \
+		"if tftp ${u-boot}; then " \
+		"echo updating u-boot on mmc${mmcdev}...; " \
+		"mmc dev ${mmcdev}; mmc rescan; " \
+		"setexpr blkc ${filesize} + 0x1ff; " \
+		"setexpr blkc ${blkc} / 0x200; " \
+		"if itest ${blkc} <= ${uboot_size}; then " \
+			"mmc write ${loadaddr} " __stringify(CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR) " ${blkc}; " \
+		"fi; fi; setenv filesize; setenv blkc; \0" \
+	"update_kernel=setenv bootpart ${mmcdev}:1; " \
+		"if tftp ${bootfile}; then " \
+		"echo updating ${bootfile} on mmc${bootpart}...; " \
+		"mmc dev ${mmcdev}; mmc rescan; " \
+		"fatwrite ${devtype} ${bootpart} ${loadaddr} ${bootfile} ${filesize}; " \
+		"fi; setenv filesize; \0" \
+	"update_fdt=setenv bootpart ${mmcdev}:1; " \
+		"if tftp ${fdtfile}; then " \
+		"echo updating {fdtfile} on mmc${bootpart}...; " \
+		"mmc dev ${mmcdev}; mmc rescan; " \
+		"fatwrite ${devtype} ${bootpart} ${loadaddr} ${fdtfile} ${filesize}; " \
+		"fi; setenv filesize; \0" \
 	"upd_spi=if tftp u-boot/${u-boot}; " \
 		"then echo updating u-boot on spi flash...; " \
 		"sf probe 0; sf erase 0x00000 0x100000; " \
@@ -274,5 +295,63 @@
 		"echo Booting into fastboot ...; fastboot 1; fi; " \
 		"if test ${boot_fit} -eq 1; then run update_to_fit;fi; " \
 		"run envboot; run mmcboot; \0 " \
-	"boot_fit=0\0"
+	"boot_fit=0\0" \
+	"mmcrootfstype=ext4 rootwait\0" \
+	"finduuid=setenv bootpart ${mmcdev}:1; part uuid mmc ${bootpart} uuid\0" \
+	"args_mmc=setenv bootargs console=${console} " \
+		"${optargs} " \
+		"root=/dev/mmcblk${mmcblkdev}p2 rw " \
+		"rootfstype=${mmcrootfstype}\0" \
+	"loadbootscript=setenv bootpart ${mmcdev}:1; load ${devtype} ${bootpart} ${loadaddr} boot.scr\0" \
+	"bootscript=echo Running bootscript from mmc${mmcdev} ...; " \
+		"source ${loadaddr}\0" \
+	"bootenvfile=uEnv.txt\0" \
+	"importbootenv=echo Importing environment from mmc${mmcdev} ...; " \
+		"env import -t ${loadaddr} ${filesize}\0" \
+	"loadbootenv=setenv bootpart ${mmcdev}:1; load ${devtype} ${bootpart} ${loadaddr} ${bootenvfile}\0" \
+	"loadimage=setenv bootpart ${mmcdev}:1; load ${devtype} ${bootpart} ${loadaddr} ${bootfile}\0" \
+	"loadfdt=setenv bootpart ${mmcdev}:1; load ${devtype} ${bootpart} ${fdtaddr} ${fdtfile}\0" \
+	"envboot=mmc dev ${mmcdev}; " \
+		"if mmc rescan; then " \
+			"echo SD/MMC found on device ${mmcdev};" \
+			"if run loadbootscript; then " \
+				"run bootscript;" \
+			"else " \
+				"if run loadbootenv; then " \
+					"echo Loaded env from ${bootenvfile};" \
+					"run importbootenv;" \
+				"fi;" \
+				"if test -n $uenvcmd; then " \
+					"echo Running uenvcmd ...;" \
+					"run uenvcmd;" \
+				"fi;" \
+			"fi;" \
+		"fi;\0" \
+	"mmcloados=run args_mmc; " \
+		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
+			"if run loadfdt; then " \
+				"bootz ${loadaddr} - ${fdtaddr}; " \
+			"else " \
+				"if test ${boot_fdt} = try; then " \
+					"bootz; " \
+				"else " \
+					"echo WARN: Cannot load the DT; " \
+				"fi; " \
+			"fi; " \
+		"else " \
+			"bootz; " \
+		"fi;\0" \
+	"mmcboot=mmc dev ${mmcdev}; " \
+		"setenv devnum ${mmcdev}; " \
+		"setenv devtype mmc; " \
+		"if mmc rescan; then " \
+			"echo SD/MMC found on device ${mmcdev};" \
+			"if run loadimage; then " \
+				"if test ${boot_fit} -eq 1; then " \
+					"run loadfit; " \
+				"else " \
+					"run mmcloados;" \
+				"fi;" \
+			"fi;" \
+		"fi;\0"
 #endif /* __CONFIG_TQMA57XX_H */
