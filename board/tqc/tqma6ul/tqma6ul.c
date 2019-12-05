@@ -288,7 +288,7 @@ static const char *tqma6ul_get_boardname(void)
 #if defined(CONFIG_TQMA6UL_VARIANT_STANDARD)
 		return "TQMa6ULL REV.030x";
 #elif defined(CONFIG_TQMA6UL_VARIANT_LGA)
-		return "TQMa6ULxLL REV.020x";
+		return "TQMa6ULLxL REV.020x";
 #else
 #error
 #endif
