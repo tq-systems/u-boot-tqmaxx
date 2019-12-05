@@ -201,19 +201,27 @@ static int setup_fec(void)
 int board_usb_init(int index, enum usb_init_type init)
 {
 	int ret = 0;
+	int otg_id;
 	struct gpio_desc *gpio;
 
 	switch(index) {
 	case 0:
-		puts("USB0/OTG\n");
+		otg_id = dm_gpio_get_value(&mba8mx_gid[USB1_OTG_ID].desc);
+		printf("USB0/OTG: ID = %d\n", otg_id);
 		gpio = &mba8mx_gid[USB1_OTG_PWR].desc;
 		imx8m_usb_power(index, true);
 		switch (init) {
 		case USB_INIT_DEVICE:
-			dm_gpio_set_value(gpio, 0);
+			if (otg_id)
+				dm_gpio_set_value(gpio, 0);
+			else
+				ret = -ENODEV;
 			break;
 		case USB_INIT_HOST:
-			dm_gpio_set_value(gpio, 1);
+			if (!otg_id)
+				dm_gpio_set_value(gpio, 1);
+			else
+				ret = -ENODEV;
 			break;
 		default:
 			printf("USB0/OTG: unknown init type\n");
