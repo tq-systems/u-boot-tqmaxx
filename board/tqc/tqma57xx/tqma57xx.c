@@ -29,6 +29,8 @@
 #include <asm/arch/omap.h>
 #include <asm/arch/spl.h>
 #include <environment.h>
+#include <fdt_support.h>
+#include <spi.h>
 #include <usb.h>
 #include <linux/usb/gadget.h>
 #include <dwc3-uboot.h>
@@ -722,3 +724,50 @@ enum env_location env_get_location(enum env_operation op, int prio)
 	}
 }
 #endif
+
+int tqma57xx_qspi_present(void)
+{
+	struct spi_slave *spi;
+	int ret;
+	u8 idcode[5], cmd_read_id = 0x9f;
+
+	spi = spi_setup_slave(CONFIG_SF_DEFAULT_BUS, 0,
+			      CONFIG_SF_DEFAULT_SPEED, CONFIG_SF_DEFAULT_MODE);
+	if (spi) {
+		ret = spi_claim_bus(spi);
+		if (ret)
+			return -1;
+
+		ret = spi_xfer(spi, 8, &cmd_read_id, NULL, SPI_XFER_BEGIN);
+		ret += spi_xfer(spi, sizeof(idcode) * 8, NULL, idcode, SPI_XFER_END);
+		if (ret)
+			return -1;
+
+		if (idcode[0] == 0x00 && idcode[1] == 0x00 &&
+		    idcode[2] == 0x00 && idcode[3] == 0x00 &&
+		    idcode[4] == 0x00)
+			return 0;
+
+		return 1;
+	}
+
+	return -1;
+}
+
+int ft_board_setup(void *blob, bd_t *bd)
+{
+	int present;
+	int offset;
+
+	/* Detect qspi flash chip */
+	present = tqma57xx_qspi_present();
+	if (!present) {
+		offset = fdt_path_offset(blob, "/ocp/qspi@4b300000");
+		if (offset >= 0) {
+			fdt_set_node_status(blob, offset, FDT_STATUS_DISABLED, 0);
+			printf("ft_board_setup: disabled qspi node.\n");
+		}
+	}
+
+	return 0;
+}

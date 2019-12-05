@@ -12,6 +12,7 @@ CONFIG_ARMV7_LPAE=y
 CONFIG_SMBIOS_PRODUCT_NAME="am57xx"
 CONFIG_NR_DRAM_BANKS=2
 CONFIG_SYS_MALLOC_F=y
+CONFIG_OF_BOARD_SETUP=y
 CONFIG_USE_BOOTARGS=y
 CONFIG_BOOTARGS="androidboot.serialno=${serial#} console=ttyS2,115200 androidboot.console=ttyS2 androidboot.hardware=am57xevmboard"
 CONFIG_SYS_CONSOLE_INFO_QUIET=y
