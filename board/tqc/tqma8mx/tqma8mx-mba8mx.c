@@ -199,16 +199,19 @@ static int setup_fec(void)
 int board_usb_init(int index, enum usb_init_type init)
 {
 	int ret = 0;
-	struct gpio_desc *hub_reset_gpio;
+	struct gpio_desc *gpio;
 
 	switch(index) {
 	case 0:
 		puts("USB0/OTG\n");
+		gpio = &mba8mx_gid[USB1_OTG_PWR].desc;
+		imx8m_usb_power(index, true);
 		switch (init) {
 		case USB_INIT_DEVICE:
+			dm_gpio_set_value(gpio, 0);
 			break;
 		case USB_INIT_HOST:
-			imx8m_usb_power(index, true);
+			dm_gpio_set_value(gpio, 1);
 			break;
 		default:
 			printf("USB0/OTG: unknown init type\n");
@@ -217,10 +220,10 @@ int board_usb_init(int index, enum usb_init_type init)
 		break;
 	case 1:
 		puts("USB1/HUB\n");
-		hub_reset_gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
-		dm_gpio_set_value(hub_reset_gpio, 1);
+		gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
+		dm_gpio_set_value(gpio, 1);
 		udelay(100);
-		dm_gpio_set_value(hub_reset_gpio, 0);
+		dm_gpio_set_value(gpio, 0);
 		udelay(100);
 		imx8m_usb_power(index, true);
 		break;
@@ -235,26 +238,28 @@ int board_usb_init(int index, enum usb_init_type init)
 int board_usb_cleanup(int index, enum usb_init_type init)
 {
 	int ret = 0;
-	struct gpio_desc *hub_reset_gpio;
+	struct gpio_desc *gpio;
 
 	switch(index) {
 	case 0:
 		puts("USB0/OTG\n");
+		gpio = &mba8mx_gid[USB1_OTG_PWR].desc;
 		switch (init) {
 		case USB_INIT_DEVICE:
 			break;
 		case USB_INIT_HOST:
-			imx8m_usb_power(index, false);
 			break;
 		default:
 			printf("USB0/OTG: unknown init type\n");
 			ret = -EINVAL;
 		}
+		dm_gpio_set_value(gpio, 0);
+		imx8m_usb_power(index, false);
 		break;
 	case 1:
 		puts("USB1/HUB\n");
-		hub_reset_gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
-		dm_gpio_set_value(hub_reset_gpio, 1);
+		gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
+		dm_gpio_set_value(gpio, 1);
 		imx8m_usb_power(index, false);
 		break;
 	default:
