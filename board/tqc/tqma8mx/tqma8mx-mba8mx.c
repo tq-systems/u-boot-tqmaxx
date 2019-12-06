@@ -307,6 +307,13 @@ int tqc_bb_board_init(void)
 	env_set_ulong("boot_config", cfg);
 	printf("BOOTCFG: %x\n", cfg);
 
+	puts("MUX: ");
+	printf("UART1: %d ", dm_gpio_get_value(&mba8mx_gid[UART1_MUX].desc));
+	printf("UART2: %d ", dm_gpio_get_value(&mba8mx_gid[UART2_MUX].desc));
+	printf("SD: %d ", dm_gpio_get_value(&mba8mx_gid[SD_MUX].desc));
+	printf("DSI: %d ", dm_gpio_get_value(&mba8mx_gid[DSI_MUX].desc));
+	printf("SPI: %d\n", dm_gpio_get_value(&mba8mx_gid[SPI_MUX].desc));
+
 #ifdef CONFIG_FEC_MXC
 	setup_fec();
 #endif
