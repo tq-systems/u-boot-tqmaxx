@@ -306,6 +306,8 @@ int tqc_bb_board_init(void)
 			(idx - BOOT_CFG0);
 	env_set_ulong("boot_config", cfg);
 	printf("BOOTCFG: %x\n", cfg);
+	/* disable boot cfg signals on MCU bus */
+	dm_gpio_set_value(&mba8mx_gid[BOOT_CFG_OE_B].desc, 0);
 
 	puts("MUX: ");
 	printf("UART1: %d ", dm_gpio_get_value(&mba8mx_gid[UART1_MUX].desc));
