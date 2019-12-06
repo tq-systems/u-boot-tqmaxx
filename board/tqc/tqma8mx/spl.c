@@ -29,8 +29,6 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-extern struct dram_timing_info tqma8mx_2gb_dram_timing_r010x;
-extern struct dram_timing_info tqma8mx_1gb_dram_timing_r010x;
 extern struct dram_timing_info tqma8mx_2gb_dram_timing;
 extern struct dram_timing_info tqma8mx_1gb_dram_timing;
 
@@ -49,13 +47,7 @@ static void spl_dram_init(void)
 #error
 #endif
 	} else {
-#if defined(CONFIG_TQMA8MX_2G)
-		ddr_init(&tqma8mx_2gb_dram_timing_r010x);
-#elif defined(CONFIG_TQMA8MX_1G)
-		ddr_init(&tqma8mx_1gb_dram_timing_r010x);
-#else
-#error
-#endif
+		printf("SPL: REV.010x not supported\n");
 	}
 }
 

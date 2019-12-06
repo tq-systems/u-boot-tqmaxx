@@ -103,26 +103,6 @@ int dram_init(void)
 }
 
 #ifdef CONFIG_OF_BOARD_SETUP
-static void tqc_delete_node(void *blob, const char *nodepath) {
-	int nodeoff;
-	int rc;
-
-	nodeoff = fdt_path_offset(blob, nodepath);
-	if (nodeoff < 0) {
-		printf("Unable to find %s\n", nodepath);
-	} else {
-		rc = fdt_del_node(blob, nodeoff);
-		if (rc < 0)
-			printf("Unable to delete %s, err=%s\n",
-				nodepath, fdt_strerror(rc));
-	}
-}
-
-static const char *rev010x_delete_nodes[] = {
-	"/tqma8mx-vdd-arm",
-	"/reg_tqma8mx_overdrive",
-};
-
 static void tqma8mx_ft_qspi_setup(void *blob, bd_t *bd)
 {
 	int off;
@@ -170,38 +150,7 @@ static void tqma8mx_ft_qspi_setup(void *blob, bd_t *bd)
 
 int ft_board_setup(void *blob, bd_t *bd)
 {
-	u32 rev = get_cpu_rev() & 0xfff;
-	int i;
-
 	tqma8mx_ft_qspi_setup(blob, bd);
-
-	/*
-	 * TODO: only temporary supported. REV.010x with old CPU rev.
-	 * is not intended for mass production
-	 */
-	if (rev < CHIP_REV_2_1) {
-		int nodeoff;
-		int rc;
-
-		printf("cleanup dt for old CPU rev.\n");
-
-		nodeoff = fdt_path_offset(blob, "/cpus/cpu@0/");
-		if (nodeoff < 0) {
-			printf("Unable to find /cpus/cpu@0\n");
-		} else {
-			rc = fdt_delprop(blob, nodeoff, "dc-supply");
-			if (rc < 0)
-				printf("Unable to delete prop dc-supply, err=%s\n",
-					fdt_strerror(rc));
-			rc = fdt_delprop(blob, nodeoff, "arm-supply");
-			if (rc < 0)
-				printf("Unable to delete prop arm-supply, err=%s\n",
-					fdt_strerror(rc));
-		}
-
-		for (i = 0; i < ARRAY_SIZE(rev010x_delete_nodes); ++i)
-			tqc_delete_node(blob, rev010x_delete_nodes[i]);
-	}
 
 	return tqc_bb_ft_board_setup(blob, bd);
 }
