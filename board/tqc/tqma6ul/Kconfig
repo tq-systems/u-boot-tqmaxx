@@ -73,12 +73,14 @@ choice
 
 config TQMA6UL_MMC_BOOT
 	bool "MMC / SD Boot"
+	select SD_BOOT
 	help
 	  Boot from eMMC / SD Card
 
 config TQMA6UL_QSPI_BOOT
 	bool "QSPI NOR Boot"
 	select SPI_FLASH
+	select QSPI_BOOT
 	help
 	  Boot from on board QSPI NOR flash
 
