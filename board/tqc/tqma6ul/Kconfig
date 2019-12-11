@@ -86,6 +86,25 @@ config TQMA6UL_QSPI_BOOT
 
 endchoice
 
+
+choice
+	prompt "TQMa6UL DRAM configuration"
+	default TQMA6UL_256MB
+	help
+	  Configure DRAM size
+
+config TQMA6UL_256MB
+	bool "256 MB DRAM"
+	help
+	  configure for variant with 256 MB DRAM
+
+config TQMA6UL_512MB
+	bool "512 MB DRAM"
+	help
+	  configure for variant with 512 MB DRAM
+
+endchoice
+
 choice
 	prompt "TQMa6UL base board variant"
 	default MBA6UL
@@ -93,19 +112,21 @@ choice
 config MBA6UL
 	bool "TQMa6UL on MBa6UL Starterkit"
 	help
-	  Select the MBa6UL starterkit.
+	  Select the MBa6ULx starterkit.
 
 config MBA6ULXL
 	bool "TQMa6ULxL on MBa6ULxL base board"
 	depends on TQMA6UL_VARIANT_LGA
 	help
-	  Select the MBa6UL starterkit.
+	  Select the MBa6ULxL Kit.
 
 endchoice
 
 config IMX_CONFIG
-	default "board/tqc/tqma6ul/tqma6ul.cfg" if TQMA6UL
-	default "board/tqc/tqma6ul/tqma6ull.cfg" if TQMA6ULL
+	default "board/tqc/tqma6ul/tqma6ul.cfg" if TQMA6UL && TQMA6UL_256MB
+	default "board/tqc/tqma6ul/tqma6ull.cfg" if TQMA6ULL && TQMA6UL_256MB
+	default "board/tqc/tqma6ul/tqma6ul_512mb.cfg" if TQMA6UL && TQMA6UL_512MB
+	default "board/tqc/tqma6ul/tqma6ull_512mb.cfg" if TQMA6ULL && TQMA6UL_512MB
 
 source "board/tqc/common/Kconfig"
 

@@ -167,9 +167,15 @@
 #undef CONFIG_LOADADDR
 #define CONFIG_LOADADDR			0x82000000
 
-/* place code in last 4 MiB of RAM of 256 MiB RAM */
+/* place code in last 4 MiB of RAM of 256 / 512 MiB RAM */
 #undef CONFIG_SYS_TEXT_BASE
+#if defined (CONFIG_TQMA6UL_256MB)
 #define CONFIG_SYS_TEXT_BASE		0x8fc00000
+#elif defined (CONFIG_TQMA6UL_512MB)
+#define CONFIG_SYS_TEXT_BASE		0x9fc00000
+#else
+#error
+#endif
 
 #define CONFIG_ENV_SIZE			SZ_8K
 /* Size of malloc() pool */
