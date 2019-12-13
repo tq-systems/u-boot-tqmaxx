@@ -39,7 +39,6 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-/* TODO: check drive strength and pin config with hardware */
 #define PAD_CTL_SPEED_MED_1	(1 << 6)
 
 #define I2C_PAD_CTRL	(PAD_CTL_PKE | PAD_CTL_PUE |			\
