@@ -1,39 +1,50 @@
-U-Boot for the TQ Systems TQMa6ULx and TQMa6ULxL modules
+U-Boot for the TQ Systems TQMa6ULx, TQMa6ULxL, TQMa6ULLx and TQMa6ULLxL modules
 
 This file contains information for the port of
-U-Boot to the TQ Systems TQMa6ULx and TQMa6ULxL modules.
+U-Boot to the TQ Systems TQMa6ULx, TQMa6ULxL, TQMa6ULLx and TQMa6ULLxL modules.
 
 Main difference is form factor power supply concept. The modules
 share the same hardware, use the same peripherals an can be used on the
 same starter kit.
 
-The following hardwarerevisions are supported:
+The following hardware revisions are supported:
+
+Modules:
 
 TQMa6ULx:	REV.030x
+TQMa6ULLx:	REV.030x
 TQMa6ULxL:	REV.020x
-MBa6ULx:	REV.020x
-MBa6ULxL:	REV.010x,REV.020x
+TQMa6ULLxL:	REV.020x
 
-Hardware on modules TQMa6ULx and TQMa6ULxL:
+Mainboards:
+
+MBa6ULx:	REV.020x
+MBa6ULxL:	REV.020x
+
+Hardware on modules TQMa6ULx, TQMa6ULxL, TQMa6ULLx and TQMa6ULLxL:
 
 - e-MMC
-- RTC
+- RTC (I2C)
 - PMIC
 - QSPI-NOR (optional)
 - EEPROM
 - temperature sensor
-- 256 MiB RAM
+- 256 / 512 MiB RAM
 
 supported hardware on Starterkit MBa6ULx:
 
-- 2 Ethernet PHY connected to FEC0 / FEC1
+- 2 Ethernet PHY connected to FEC0 / FEC1 (usage depends on CPU)
 - SD-Card slot
 - UART
 - USB
 
 supported hardware on SBC MBa6ULxL:
 
-
+- 2 Ethernet PHY connected to FEC0 / FEC1 (usage depends on CPU)
+- SD-Card slot
+- Port Expander
+- UART
+- USB
 
 1. Boot source
 --------------
@@ -48,12 +59,19 @@ The following boot sources are supported:
 
 To build U-Boot for the TQ Systems TQMa6 modules:
 
-	make <som>_<baseboard>_<boot>_defconfig
+	make <som>_[mem_]<baseboard>_<boot>_defconfig
 	make
 
 som is a placeholder for the module:
-tqma6ulx	TQMa6ULx
-tqma6ulxl	TQMa6ULxL
+tqma6ulx	TQMa6ULx		i.MX6UL
+tqma6ullx	TQMa6ULLx		i.MX6ULL
+tqma6ulxl	TQMa6ULxL		i.MX6UL
+tqma6ullxl	TQMa6ULLxL		i.MX6ULL
+
+mem is optional for additional memory configurations:
+
+without mem	256 MiB (standard)
+512mb		512 MiB
 
 baseboard is a placeholder for the mainboard to compile for:
 mba6ul		MBa6ULx
@@ -61,15 +79,35 @@ mba6ulxl	MBa6ULxL
 
 boot is a placeholder for the boot device:
 mmc - means eMMC
-qspi - mean QSPI NOR
+qspi - means QSPI NOR
 
 This gives the following configurations:
 
+plug modules on MBa6ULx
+
 tqma6ulx_mba6ul_mmc_defconfig
 tqma6ulx_mba6ul_qspi_defconfig
+
+tqma6ulx_512mb_mba6ul_mmc_defconfig
+tqma6ulx_512mb_mba6ul_qspi_defconfig
+
+tqma6ullx_mba6ul_mmc_defconfig
+tqma6ullx_mba6ul_qspi_defconfig
+
+tqma6ullx_512mb_mba6ul_mmc_defconfig
+tqma6ullx_512mb_mba6ul_qspi_defconfig
+
+LGA modules with adapter on MBa6ULx
+
 tqma6ulxl_mba6ul_mmc_defconfig
 tqma6ulxl_mba6ul_qspi_defconfig
 
+tqma6ullxl_mba6ul_mmc_defconfig
+tqma6ullxl_mba6ul_qspi_defconfig
+
+note: LGA variants with 512 MiB are prepared but not tested
+
+LGA modules on MBa6ULxL
+
 tqma6ulxl_mba6ulxl_mmc_defconfig
 tqma6ulxl_mba6ulxl_qspi_defconfig
-
