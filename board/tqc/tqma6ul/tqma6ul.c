@@ -276,7 +276,7 @@ static const char *tqma6ul_get_boardname(void)
 	switch ((cpurev & 0xFF000) >> 12) {
 	case MXC_CPU_MX6UL:
 #if defined(CONFIG_TQMA6UL_VARIANT_STANDARD)
-		return "TQMa6UL REV.030x";
+		return "TQMa6ULx REV.030x";
 #elif defined(CONFIG_TQMA6UL_VARIANT_LGA)
 		return "TQMa6ULxL REV.020x";
 #else
@@ -285,7 +285,7 @@ static const char *tqma6ul_get_boardname(void)
 		break;
 	case MXC_CPU_MX6ULL:
 #if defined(CONFIG_TQMA6UL_VARIANT_STANDARD)
-		return "TQMa6ULL REV.030x";
+		return "TQMa6ULLx REV.030x";
 #elif defined(CONFIG_TQMA6UL_VARIANT_LGA)
 		return "TQMa6ULLxL REV.020x";
 #else
