@@ -3,7 +3,7 @@
  * Aquantia PHY drivers
  *
  * Copyright 2014 Freescale Semiconductor, Inc.
- * Copyright 2018 NXP
+ * Copyright 2018-2019 NXP
  */
 #include <config.h>
 #include <common.h>
@@ -303,41 +303,29 @@ struct {
 					   AQUANTIA_VND1_GSTART_RATE_1G},
 	[PHY_INTERFACE_MODE_SGMII_2500] = {0x144, AQUANTIA_VND1_GSYSCFG_2_5G,
 					   AQUANTIA_VND1_GSTART_RATE_2_5G},
-	[PHY_INTERFACE_MODE_XGMII] =      {0x100, AQUANTIA_VND1_GSYSCFG_10G,
-					   AQUANTIA_VND1_GSTART_RATE_10G},
 	[PHY_INTERFACE_MODE_XFI] =        {0x100, AQUANTIA_VND1_GSYSCFG_10G,
 					   AQUANTIA_VND1_GSTART_RATE_10G},
 	[PHY_INTERFACE_MODE_USXGMII] =    {0x080, AQUANTIA_VND1_GSYSCFG_10G,
 					   AQUANTIA_VND1_GSTART_RATE_10G},
 };
 
-static int aquantia_set_proto(struct phy_device *phydev, int if_type)
+static int aquantia_set_proto(struct phy_device *phydev,
+			      phy_interface_t interface)
 {
 	int i;
 
-	/* this code only works on gen2 and gen3 PHYs */
-	if (phydev->drv->data != AQUANTIA_GEN2 &&
-	    phydev->drv->data != AQUANTIA_GEN3)
-		return -ENOTSUPP;
-
-	if (!aquantia_syscfg[if_type].cnt)
+	if (!aquantia_syscfg[interface].cnt)
 		return 0;
 
 	/* set the default rate to enable the SI link */
 	phy_write(phydev, MDIO_MMD_VEND1, AQUANTIA_VND1_GSTART_RATE,
-		  aquantia_syscfg[if_type].start_rate);
+		  aquantia_syscfg[interface].start_rate);
 
-	for (i = 0; i <= aquantia_syscfg[if_type].cnt; i++) {
-		u16 reg = phy_read(phydev, MDIO_MMD_VEND1,
-				   AQUANTIA_VND1_GSYSCFG_BASE + i);
-		/* skip this rate, if disabled by FW */
-		if (!reg)
-			continue;
-
+	/* set selected protocol for all relevant line side link speeds */
+	for (i = 0; i <= aquantia_syscfg[interface].cnt; i++)
 		phy_write(phydev, MDIO_MMD_VEND1,
 			  AQUANTIA_VND1_GSYSCFG_BASE + i,
-			  aquantia_syscfg[if_type].syscfg);
-	}
+			  aquantia_syscfg[interface].syscfg);
 	return 0;
 }
 
@@ -411,7 +399,7 @@ static bool aquantia_link_is_up(struct phy_device *phydev)
 
 int aquantia_config(struct phy_device *phydev)
 {
-	int if_type = phydev->interface;
+	int interface = phydev->interface;
 	u32 val, id, rstatus, fault;
 	u32 reg_val1 = 0;
 	int usx_an = 0;
@@ -439,29 +427,32 @@ int aquantia_config(struct phy_device *phydev)
 	 * for backward compatibility convert XGMII into either XFI or USX based
 	 * on FW config
 	 */
-	if (if_type == PHY_INTERFACE_MODE_XGMII) {
+	if (interface == PHY_INTERFACE_MODE_XGMII) {
+		debug("use XFI or USXGMII SI protos, XGMII is not valid\n");
+
 		reg_val1 = phy_read(phydev, MDIO_MMD_PHYXS,
 				    AQUANTIA_SYSTEM_INTERFACE_SR);
 		if ((reg_val1 & AQUANTIA_SI_IN_USE_MASK) == AQUANTIA_SI_USXGMII)
-			if_type = PHY_INTERFACE_MODE_USXGMII;
+			interface = PHY_INTERFACE_MODE_USXGMII;
 		else
-			if_type = PHY_INTERFACE_MODE_XFI;
+			interface = PHY_INTERFACE_MODE_XFI;
 	}
 
-	if (!aquantia_link_is_up(phydev)) {
-		/*
-		 * if link is up already we can just use it, otherwise configure
-		 * the protocols in the PHY.  If link is down set the system
-		 * interface protocol to use based on phydev->interface
-		 */
-
+	/*
+	 * if link is up already we can just use it, otherwise configure
+	 * the protocols in the PHY.  If link is down set the system
+	 * interface protocol to use based on phydev->interface
+	 */
+	if (!aquantia_link_is_up(phydev) &&
+	    (phydev->drv->data == AQUANTIA_GEN2 ||
+	     phydev->drv->data == AQUANTIA_GEN3)) {
 		/* set PHY in low power mode so we can configure protocols */
 		phy_write(phydev, MDIO_MMD_VEND1, AQUANTIA_VND1_GLOBAL_SC,
 			  AQUANTIA_VND1_GLOBAL_SC_LP);
 		mdelay(10);
 
 		/* configure protocol based on phydev->interface */
-		aquantia_set_proto(phydev, if_type);
+		aquantia_set_proto(phydev, interface);
 		/* apply custom configuration based on DT */
 		aquantia_dts_config(phydev);
 
@@ -472,7 +463,7 @@ int aquantia_config(struct phy_device *phydev)
 
 	val = phy_read(phydev, MDIO_MMD_PMAPMD, MII_BMCR);
 
-	switch (if_type) {
+	switch (interface) {
 	case PHY_INTERFACE_MODE_SGMII:
 		/* 1000BASE-T mode */
 		phydev->advertising = SUPPORTED_1000baseT_Full;
@@ -496,21 +487,21 @@ int aquantia_config(struct phy_device *phydev)
 				  AQUNTIA_SPEED_MSB_MASK);
 
 		/* If SI is USXGMII then start USXGMII autoneg */
+		reg_val1 =  phy_read(phydev, MDIO_MMD_PHYXS,
+				     AQUANTIA_VENDOR_PROVISIONING_REG);
+
 		if (usx_an) {
-			reg_val1 =  phy_read(phydev, MDIO_MMD_PHYXS,
-					     AQUANTIA_VENDOR_PROVISIONING_REG);
-
 			reg_val1 |= AQUANTIA_USX_AUTONEG_CONTROL_ENA;
-
-			phy_write(phydev, MDIO_MMD_PHYXS,
-				  AQUANTIA_VENDOR_PROVISIONING_REG,
-				  reg_val1);
 			printf("%s: system interface USXGMII\n",
 			       phydev->dev->name);
 		} else {
+			reg_val1 &= ~AQUANTIA_USX_AUTONEG_CONTROL_ENA;
 			printf("%s: system interface XFI\n",
 			       phydev->dev->name);
 		}
+
+		phy_write(phydev, MDIO_MMD_PHYXS,
+			  AQUANTIA_VENDOR_PROVISIONING_REG, reg_val1);
 		break;
 	case PHY_INTERFACE_MODE_SGMII_2500:
 		/* 2.5GBASE-T mode */
