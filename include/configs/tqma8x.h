@@ -325,8 +325,10 @@
 
 #if defined(CONFIG_TQMA8X_RAM_4096MB)
 #define PHYS_SDRAM_1_SIZE		SZ_2G
-/* needed for loop in CPU code */
-#define PHYS_SDRAM_2_SIZE		SZ_2G	/* not placed */
+#define PHYS_SDRAM_2_SIZE		SZ_2G
+#elif defined(CONFIG_TQMA8X_RAM_8192MB)
+#define PHYS_SDRAM_1_SIZE		SZ_2G
+#define PHYS_SDRAM_2_SIZE		(3ull * SZ_2G)
 #else
 #error
 #endif

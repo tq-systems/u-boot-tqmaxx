@@ -33,6 +33,11 @@ config TQMA8X_RAM_4096MB
 	help
 	  Select variant with 4096 MiB RAM
 
+config TQMA8X_RAM_8192MB
+	bool "TQMa8x with 8192 MiB RAM"
+	help
+	  Select variant with 8192 MiB RAM
+
 endchoice
 
 choice
