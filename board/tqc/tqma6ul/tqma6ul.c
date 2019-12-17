@@ -425,16 +425,16 @@ int checkboard(void)
 	switch ((cpurev & 0xFF000) >> 12) {
 	case MXC_CPU_MX6UL:
 #if defined(CONFIG_MX6ULL)
-		printf("ERROR: image not compiled for i.MX6UL\n");
+		printf("*** ERROR: image not compiled for i.MX6UL\n");
 #endif
 		break;
 	case MXC_CPU_MX6ULL:
 #if !defined(CONFIG_MX6ULL)
-		printf("ERROR: image not compiled for i.MX6ULL!\n");
+		printf("*** ERROR: image not compiled for i.MX6ULL!\n");
 #endif
 		break;
 	default:
-		printf("ERROR: image not compiled for this CPU!\n");
+		printf("*** ERROR: image not compiled for this CPU!\n");
 	}
 
 	printf("Board: %s on a %s\n", tqma6ul_get_boardname(),
