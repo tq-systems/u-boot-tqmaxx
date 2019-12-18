@@ -24,14 +24,14 @@ endchoice
 
 choice
 	prompt "TQMa8x RAM size"
-	default TQMA8X_RAM_2048MB if TQMA8X_CPU_MX8QM
+	default TQMA8X_RAM_4096MB if TQMA8X_CPU_MX8QM
 	help
 	  Select RAM size for TQMa8x
 
-config TQMA8X_RAM_2048MB
-	bool "TQMa8x with 2048 MiB RAM"
+config TQMA8X_RAM_4096MB
+	bool "TQMa8x with 4096 MiB RAM"
 	help
-	  Select variant with 2048 MiB RAM
+	  Select variant with 4096 MiB RAM
 
 endchoice
 

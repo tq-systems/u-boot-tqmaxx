@@ -323,10 +323,10 @@
 #define PHYS_SDRAM_1			0x80000000
 #define PHYS_SDRAM_2			0x880000000
 
-#if defined(CONFIG_TQMA8X_RAM_2048MB)
+#if defined(CONFIG_TQMA8X_RAM_4096MB)
 #define PHYS_SDRAM_1_SIZE		SZ_2G
 /* needed for loop in CPU code */
-#define PHYS_SDRAM_2_SIZE		0x00000000	/* not placed */
+#define PHYS_SDRAM_2_SIZE		SZ_2G	/* not placed */
 #else
 #error
 #endif
