@@ -155,11 +155,11 @@ int tqc_read_eeprom_at(unsigned int bus, unsigned int i2c_addr,
 }
 
 #if defined(CONFIG_SYS_I2C_EEPROM_ADDR_LEN)
-int tqmaxx_read_eeprom(unsigned int bus, unsigned int addr,
-		       struct tqmaxx_eeprom_data *eeprom)
+int tqc_read_eeprom(unsigned int bus, unsigned int addr,
+		    struct tqc_eeprom_data *eeprom)
 {
-	return tqmaxx_read_eeprom_at(bus, i2c_addr,
-				     CONFIG_SYS_I2C_EEPROM_ADDR_LEN, addr eeprom);
+	return tqc_read_eeprom_at(bus, addr,
+				  CONFIG_SYS_I2C_EEPROM_ADDR_LEN, addr, eeprom);
 }
 #endif
 

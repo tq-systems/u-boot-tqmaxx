@@ -37,7 +37,7 @@ int tqc_read_eeprom_at(unsigned int bus, unsigned int i2c_addr,
 		       unsigned int alen, unsigned int addr,
 		       struct tqc_eeprom_data *eeprom);
 #if defined(CONFIG_SYS_I2C_EEPROM_ADDR_LEN)
-int tqc_read_eeprom(unsigned int bus, unsigned int i2c_addr,
+int tqc_read_eeprom(unsigned int bus, unsigned int addr,
 		    struct tqc_eeprom_data *eeprom);
 #endif /* CONFIG_SYS_I2C_EEPROM_ADDR_LEN */
 
