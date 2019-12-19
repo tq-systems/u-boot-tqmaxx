@@ -115,6 +115,7 @@ config TARGET_TQMA8X
 	select SPI_FLASH_STMICRO
 	select SPI_FLASH_SST
 	select SPI_FLASH_WINBOND
+	select TQC_EEPROM
 
 config TARGET_TQMA8XX
 	bool "Support TQMa8Xx board"
@@ -143,6 +144,7 @@ config TARGET_TQMA8XX
 	select SPI_FLASH_STMICRO
 	select SPI_FLASH_SST
 	select SPI_FLASH_WINBOND
+	select TQC_EEPROM
 
 config TARGET_TQMA8XXS
 	bool "Support TQMa8XxS board"
@@ -172,6 +174,7 @@ config TARGET_TQMA8XXS
 	select SPI_FLASH_STMICRO
 	select SPI_FLASH_SST
 	select SPI_FLASH_WINBOND
+	select TQC_EEPROM
 
 endchoice
 
