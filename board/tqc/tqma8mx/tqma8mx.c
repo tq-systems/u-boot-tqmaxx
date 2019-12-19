@@ -189,10 +189,10 @@ int board_late_init(void)
 
 	if (!tqc_read_eeprom_at(0, 0x53, 1, 0, &eeprom)) {
 		tqc_parse_eeprom_id(&eeprom, sstring, ARRAY_SIZE(sstring));
-		if (0 == strncmp(sstring, "TQMa8M", 5))
+		if (strncmp(sstring, "TQMa8M", 5) == 0)
 			env_set("boardtype", sstring);
-		if (0 == tqc_parse_eeprom_serial(&eeprom, sstring,
-						 ARRAY_SIZE(sstring)))
+		if (tqc_parse_eeprom_serial(&eeprom, sstring,
+					    ARRAY_SIZE(sstring)) == 0)
 			env_set("serial#", sstring);
 		else
 			env_set("serial#", "???");
