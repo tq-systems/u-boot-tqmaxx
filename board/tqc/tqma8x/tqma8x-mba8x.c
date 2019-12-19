@@ -33,6 +33,10 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+enum {
+	USB_RST_B,
+};
+
 #define UART_PAD_CTRL	((SC_PAD_CONFIG_OUT_IN << PADRING_CONFIG_SHIFT) | (SC_PAD_ISO_OFF << PADRING_LPCONFIG_SHIFT) \
 						| (SC_PAD_28FDSOI_DSE_DV_HIGH << PADRING_DSE_SHIFT) | (SC_PAD_28FDSOI_PS_PU << PADRING_PULL_SHIFT))
 
@@ -86,8 +90,19 @@ const char *tqc_bb_get_boardname(void)
 	return MBA8X_BOARD_NAME;
 }
 
+#if !defined(CONFIG_SPL_BUILD)
+
+static struct tqc_gpio_init_data mba8x_gid[] = {
+	GPIO_INIT_DATA_ENTRY(USB_RST_B, "GPIO2_7", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
+};
+
+#endif
+
 int tqc_bb_board_init(void)
 {
+#if !defined(CONFIG_SPL_BUILD)
+	tqc_board_gpio_init(mba8x_gid, ARRAY_SIZE(mba8x_gid));
+#endif
 	return 0;
 }
 
