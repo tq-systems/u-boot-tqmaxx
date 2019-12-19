@@ -40,9 +40,24 @@ static void board_gpio_init(void)
 
 }
 
+static const char *tqma8x_get_boardname(void)
+{
+	switch (get_cpu_type()) {
+	case MXC_CPU_IMX8QM:
+		return "TQMa8QM";
+		break;
+	default:
+		return "??";
+	};
+	return "UNKNOWN";
+}
+
 int checkboard(void)
 {
 	print_bootinfo();
+
+	printf("Board: %s on a %s\n", tqma8x_get_boardname(),
+	       tqc_bb_get_boardname());
 
 	/* Note:  After reloc, ipcHndl will no longer be valid.  If handle
 	 *        returned by sc_ipc_open matches SC_IPC_CH, use this
@@ -103,8 +118,8 @@ int ft_board_setup(void *blob, bd_t *bd)
 int board_late_init(void)
 {
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
-	env_set("board_name", TQMA8_BOARD_NAME);
-	env_set("board_rev", TQMA8_BOARD_REV);
+	env_set("board_name", tqc_bb_get_boardname());
+	env_set("board_rev", tqma8x_get_boardname());
 #endif
 
 	tqc_bb_board_late_init();
