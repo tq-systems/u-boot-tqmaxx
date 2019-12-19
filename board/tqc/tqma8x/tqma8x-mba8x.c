@@ -83,6 +83,11 @@ int tqc_bb_checkboard(void)
 	return 0;
 }
 
+const char *tqc_bb_get_boardname(void)
+{
+	return MBA8X_BOARD_NAME;
+}
+
 int tqc_bb_board_init(void)
 {
 	return 0;
