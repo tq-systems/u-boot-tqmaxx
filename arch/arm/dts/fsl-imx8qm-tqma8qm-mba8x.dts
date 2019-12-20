@@ -234,8 +234,9 @@
 	srp-disable;
 	hnp-disable;
 	adp-disable;
+	dr_mode = "host";
 	disable-over-current;
-	status = "disabled";
+	status = "okay";
 };
 
 &usb2 {
