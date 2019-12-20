@@ -14,6 +14,7 @@
 #include <malloc.h>
 #include <netdev.h>
 #include <power-domain.h>
+#include <usb.h>
 
 #include <asm/gpio.h>
 #include <asm/io.h>
@@ -96,6 +97,95 @@ static struct tqc_gpio_init_data mba8x_gid[] = {
 	GPIO_INIT_DATA_ENTRY(USB_RST_B, "GPIO2_7", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
 };
 
+#endif
+
+#if defined(CONFIG_USB)
+
+int board_usb_init(int index, enum usb_init_type init)
+{
+	int ret = 0;
+	struct gpio_desc *gpio;
+
+	switch (index) {
+	case 1:
+		puts("USB_OTG2/USB SS\n");
+		switch (init) {
+		case USB_INIT_DEVICE:
+			break;
+		case USB_INIT_HOST:
+			break;
+		default:
+			printf("USB_OTG2/USB SS: unknown init type\n");
+			ret = -EINVAL;
+		}
+		break;
+	case 0:
+		puts("USB_OTG1/HUB\n");
+		switch (init) {
+		case USB_INIT_HOST:
+			/* HUB reset */
+			gpio = &mba8x_gid[USB_RST_B].desc;
+			dm_gpio_set_value(gpio, 1);
+			udelay(100);
+			dm_gpio_set_value(gpio, 0);
+			udelay(100);
+
+			/*
+			 * Power on usb + phy is done already via generic
+			 * power_domain handling in device core
+			 */
+			break;
+		default:
+			printf("USB_OTG1: only host supported on this board\n");
+			ret = -EINVAL;
+		}
+		break;
+	default:
+		printf("invalid USB port %d\n", index);
+		ret = -EINVAL;
+	}
+
+	return ret;
+}
+
+int board_usb_cleanup(int index, enum usb_init_type init)
+{
+	int ret = 0;
+	struct gpio_desc *gpio;
+
+	switch (index) {
+	case 1:
+		puts("USB_OTG2/USB SS\n");
+
+		switch (init) {
+		case USB_INIT_DEVICE:
+			break;
+		case USB_INIT_HOST:
+			break;
+		default:
+			printf("USB_OTG2/USB SS: unknown init type\n");
+			ret = -EINVAL;
+		}
+		break;
+	case 0:
+		puts("USB_OTG1/HUB\n");
+
+		gpio = &mba8x_gid[USB_RST_B].desc;
+		dm_gpio_set_value(gpio, 1);
+
+		/*
+		 * Power off usb + phy is done via generic
+		 * power_domain handling in device core
+		 */
+
+		break;
+	default:
+		printf("invalid USB port %d\n", index);
+		ret = -EINVAL;
+	}
+
+	return ret;
+}
 #endif
 
 int tqc_bb_board_init(void)
