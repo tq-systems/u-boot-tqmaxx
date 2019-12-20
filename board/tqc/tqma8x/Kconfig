@@ -50,6 +50,13 @@ config TQMA8X_BB_MBA8X
 	bool "TQMa8x on MBa8x Starterkit"
 	select TQC_SDMMC
 	select DM_ETH
+	select USB
+	select DM_USB
+	select USB_XHCI_HCD
+	select USB_XHCI_IMX8
+	select USB_EHCI_HCD
+	select MXC_USB_OTG_HACTIVE
+	select USB_EHCI_MX6
 	help
 	  Select the MBa8x starterkit. This features a GigE Phy, USB, SD-Card
 	  etc.
