@@ -167,6 +167,7 @@
 	pinctrl_hog: hoggrp {
 		fsl,pins = <
 			SC_P_ESAI1_SCKT_LSIO_GPIO2_IO07		0x00000021
+			SC_P_USB_SS3_TC1_LSIO_GPIO4_IO04	0x00000021
 		>;
 	};
 
@@ -240,7 +241,8 @@
 };
 
 &usb2 {
-	status = "disabled";
+	status = "okay";
+	dr_mode = "otg";
 };
 
 &usdhc2 {
