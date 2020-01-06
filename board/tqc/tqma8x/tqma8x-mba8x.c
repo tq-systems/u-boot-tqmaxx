@@ -36,6 +36,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 enum {
 	USB_RST_B,
+	USB_OTG2_PWR,
 };
 
 #define UART_PAD_CTRL	((SC_PAD_CONFIG_OUT_IN << PADRING_CONFIG_SHIFT) | (SC_PAD_ISO_OFF << PADRING_LPCONFIG_SHIFT) \
@@ -95,6 +96,7 @@ const char *tqc_bb_get_boardname(void)
 
 static struct tqc_gpio_init_data mba8x_gid[] = {
 	GPIO_INIT_DATA_ENTRY(USB_RST_B, "GPIO2_7", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
+	GPIO_INIT_DATA_ENTRY(USB_OTG2_PWR, "GPIO4_4", GPIOD_IS_OUT),
 };
 
 #endif
@@ -109,10 +111,14 @@ int board_usb_init(int index, enum usb_init_type init)
 	switch (index) {
 	case 1:
 		puts("USB_OTG2/USB SS\n");
+		gpio = &mba8x_gid[USB_OTG2_PWR].desc;
+
 		switch (init) {
 		case USB_INIT_DEVICE:
+			dm_gpio_set_value(gpio, 0);
 			break;
 		case USB_INIT_HOST:
+			dm_gpio_set_value(gpio, 1);
 			break;
 		default:
 			printf("USB_OTG2/USB SS: unknown init type\n");
@@ -156,11 +162,14 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 	switch (index) {
 	case 1:
 		puts("USB_OTG2/USB SS\n");
+		gpio = &mba8x_gid[USB_OTG2_PWR].desc;
 
 		switch (init) {
 		case USB_INIT_DEVICE:
+			dm_gpio_set_value(gpio, 0);
 			break;
 		case USB_INIT_HOST:
+			dm_gpio_set_value(gpio, 0);
 			break;
 		default:
 			printf("USB_OTG2/USB SS: unknown init type\n");
