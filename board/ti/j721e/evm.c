@@ -18,8 +18,8 @@
 
 #include "../common/board_detect.h"
 
-#define board_is_j721e_som()	(board_ti_is("J721EX-PM1-SOM") || \
-				 board_ti_is("J721EX-PM2-SOM"))
+#define board_is_j721e_som()	(board_ti_k3_is("J721EX-PM1-SOM") || \
+				 board_ti_k3_is("J721EX-PM2-SOM"))
 
 /* Max number of MAC addresses that are parsed/processed per daughter card */
 #define DAUGHTER_CARD_NO_OF_MAC_ADDR	8
