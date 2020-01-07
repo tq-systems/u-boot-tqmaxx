@@ -150,8 +150,7 @@ int tqc_read_eeprom_at(unsigned int bus, unsigned int i2c_addr,
 		       struct tqc_eeprom_data *eeprom)
 {
 	return tqc_read_eeprom_buf(bus, i2c_addr, alen, addr, sizeof(*eeprom),
-				   (uchar *)eeprom)
-;
+				   (uchar *)eeprom);
 }
 
 #if defined(CONFIG_SYS_I2C_EEPROM_ADDR_LEN)
