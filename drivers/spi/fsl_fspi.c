@@ -635,7 +635,6 @@ static void fspi_op_write_enable (struct fsl_fspi_priv *priv)
 static void fspi_op_wrsr(struct fsl_fspi_priv *priv, u8 *txbuf, u32 len)
 {
 	struct fsl_fspi_regs *regs = priv->regs;
-	u32 data=0;
 
 	fspi_op_write_enable(priv);
 
@@ -648,11 +647,9 @@ static void fspi_op_wrsr(struct fsl_fspi_priv *priv, u8 *txbuf, u32 len)
 	while (!(fspi_read32(priv->flags, &regs->intr) & FLEXSPI_INTR_IPTXWE_MASK))
 		;
 	
-	memcpy(&data, txbuf, len);
-	
 	/* write the data to TXFIFO */
-	fspi_write32(priv->flags, &regs->tfdr, data);
-	
+	memcpy(&regs->tfdr, txbuf, len);
+
 	fspi_write32(priv->flags, &regs->intr, FLEXSPI_INTR_IPTXWE_MASK);
 
 	fspi_write32(priv->flags, &regs->ipcr1,
