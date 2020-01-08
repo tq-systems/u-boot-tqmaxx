@@ -341,6 +341,8 @@
 #define CLK_FREQ       (USB3_CORE_BASE + 0x20)
 #define OTGTMR         (USB3_CORE_BASE + 0x24)
 #define ADPBC_STS      (USB3_CORE_BASE + 0xe0)
+#define OTGCTRL1       (USB3_CORE_BASE + 0x58)
+#define OTGCTRL2       (USB3_CORE_BASE + 0x5c)
 #define ADP_RAMP_TIME  (USB3_CORE_BASE + 0xe4)
 #define ADPBC_CTRL1    (USB3_CORE_BASE + 0xe8)
 #define ADPBC_CTRL2    (USB3_CORE_BASE + 0xec)

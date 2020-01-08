@@ -12,6 +12,7 @@
 #include <usb.h>
 #include <malloc.h>
 #include <linux/compat.h>
+#include <linux/usb/otg.h>
 #include "xhci.h"
 #include <usb/imx8_usb3_reg_def.h>
 #include <dm.h>
@@ -20,6 +21,12 @@
 
 /* Declare global data pointer */
 DECLARE_GLOBAL_DATA_PTR;
+
+/*
+ * weak in drivers/usb/cdns3/core.c, implemented in
+ * arch/arm/mach-imx/imx8/clock.c
+ */
+int cdns3_disable_clks(int index);
 
 /* According to UG CH 3.1.1 Bring-up Sequence */
 static void imx_usb3_phy_init(void)
@@ -159,6 +166,8 @@ static int xhci_imx8_probe(struct udevice *dev)
 {
 	struct xhci_hccr *hccr;
 	struct xhci_hcor *hcor;
+	enum usb_dr_mode dr_mode;
+	u32 tmp_data;
 
 	int ret = 0;
 	int len;
@@ -169,29 +178,66 @@ static int xhci_imx8_probe(struct udevice *dev)
 	struct power_domain pd;
 	const void *blob = gd->fdt_blob;
 	int offset = dev_of_offset(dev), phy_off;
+#endif
 
+	dr_mode = usb_get_dr_mode(dev_of_offset(dev));
+	if (dr_mode == USB_DR_MODE_UNKNOWN)
+		/* by default set dual role mode to OTG */
+		dr_mode = USB_DR_MODE_OTG;
+
+	if (dr_mode == USB_DR_MODE_PERIPHERAL) {
+		printf("ERROR: USB device mode not implemented\n");
+		return -ENODEV;
+	}
+
+	debug("dr_mode = %d\n", dr_mode);
+
+	/* Need to power on the PHY before access it */
+#if CONFIG_IS_ENABLED(POWER_DOMAIN)
 	phy_off = fdtdec_lookup_phandle(blob,
 						offset,
 						"fsl,usbphy");
 	if (phy_off < 0)
 		return -EINVAL;
 
-    phy_dev.node = offset_to_ofnode(phy_off);
+	phy_dev.node = offset_to_ofnode(phy_off);
 	if (!power_domain_get(&phy_dev, &pd)) {
 		if (power_domain_on(&pd))
 			return -EINVAL;
 	}
 #endif
 
+	init_clk_usb3(dev->seq);
+
+	imx8_xhci_init();
+
+	if (dr_mode == USB_DR_MODE_OTG) {
+		tmp_data = readl(OTGCTRL1);
+		debug("OTGCTRL1=%x\n", tmp_data);
+		/* set idpullup */
+		tmp_data |= BIT(24);
+		writel(tmp_data, OTGCTRL1);
+		/* ID value should be valid 50 msec after pulling ID */
+		udelay(75 * 1000);
+		tmp_data = readl(OTGSTS);
+		debug("ID testing, OTGSTS=%x\n", tmp_data);
+		/* HOST not allowed, if VBUS detected or ID pin not LOW */
+		if ((tmp_data & 0x02) || (tmp_data & 0x01)) {
+			printf("ERROR: VBUS detected or ID not LOW.\n");
+			imx8_xhci_reset();
+			cdns3_disable_clks(dev->seq);
+#if CONFIG_IS_ENABLED(POWER_DOMAIN)
+			power_domain_off(&pd);
+#endif
+			return -ENODEV;
+		}
+	}
+
 	ret = board_usb_init(dev->seq, USB_INIT_HOST);
 	if (ret != 0) {
 		printf("Failed to initialize board for USB\n");
 		return ret;
 	}
-
-	init_clk_usb3(dev->seq);
-
-	imx8_xhci_init();
 
 	hccr = (struct xhci_hccr *)HCIVERSION_CAPLENGTH;
 	len = HC_LENGTH(xhci_readl(&hccr->cr_capbase));
