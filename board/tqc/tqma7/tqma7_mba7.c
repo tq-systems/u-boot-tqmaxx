@@ -10,6 +10,7 @@
 #include <asm/arch/imx-regs.h>
 #include <asm/arch/mx7-pins.h>
 #include <asm/arch/sys_proto.h>
+#include <asm/bootm.h>
 #include <asm/errno.h>
 #include <asm/gpio.h>
 #include <asm/imx-common/boot_mode.h>
