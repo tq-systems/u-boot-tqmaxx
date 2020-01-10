@@ -359,30 +359,6 @@ static int imx_set_usb_hsic_power(void)
 	return 0;
 }
 
-#define CONFIG_KEX_USBHUB_I2C_ADDR 0x2d
-
-static int attach_usb_hub(void)
-{
-	uint8_t usbattach_cmd[] = {0xaa, 0x55, 0x00};
-#if 0
-	/* reset USBHUB */
-	gpio_direction_output(IMX_GPIO_NR(1, 0), 0);
-	udelay(1000);
-	/* remove USBHUB reset */
-	gpio_direction_output(IMX_GPIO_NR(1, 0), 1);
-	udelay(250000);
-
-	i2c_set_bus_num(1);
-	if (i2c_probe(CONFIG_KEX_USBHUB_I2C_ADDR)) {
-		printf("USBHUB not found\n");
-		return 0;
-	}
-	i2c_write(CONFIG_KEX_USBHUB_I2C_ADDR, 0, 0, usbattach_cmd, 3);
-#endif
-
-	return 0;
-}
-
 iomux_v3_cfg_t const mba7_usb_otg1_pads[] = {
 	MX7D_PAD_GPIO1_IO04__USB_OTG1_OC |
 		MUX_PAD_CTRL(USB_OC_PAD_CTRL),
