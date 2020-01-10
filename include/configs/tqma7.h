@@ -344,14 +344,7 @@
 /* set to a resonable value, changeable by user */
 #define TQMA7_CMA_SIZE                 32M
 
-#if defined(CONFIG_DEFAULT_FDT_FILE)
-#define TQMA7_FDT_FILE_ENV	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"
-#else
-#define TQMA7_FDT_FILE_ENV
-#endif
-
-#define CONFIG_EXTRA_ENV_SETTINGS \
-	TQMA7_M4_ENV                                                           \
+#define TQMA7_MODULE_ENV_SETTINGS \
 	"board=tqma7\0"                                                        \
 	"uimage=uImage\0"                                                      \
 	"zimage=linuximage\0"                                                  \
@@ -360,9 +353,7 @@
 		"setenv kernel ${uimage}; "                                    \
 		"else setenv kernel ${zimage}; fi\0"                           \
 	"uboot=u-boot.imx\0"                                                   \
-	TQMA7_FDT_FILE_ENV                                                     \
 	"fdt_addr="__stringify(TQMA7_FDT_ADDRESS)"\0"                          \
-	"console=" CONFIG_CONSOLE_DEV "\0"                                     \
 	"cma_size="__stringify(TQMA7_CMA_SIZE)"\0"                             \
 	"fdt_high=0xffffffff\0"                                                \
 	"initrd_high=0xffffffff\0"                                             \
@@ -436,9 +427,6 @@
 	"fdt_mtdpart=DTB\0"                                                    \
 	"kernel_mtdpart=Linux\0"                                               \
 	"rootfs_mtdpart=RootFS\0"                                              \
-	"mtdparts=" MTDPARTS_DEFAULT "\0"                                      \
-	TQMA7_EXTRA_BOOTDEV_ENV_SETTINGS                                       \
-	TQMA7_MFG_ENV_SETTINGS                                                 \
 
 /* Miscellaneous configurable options */
 #define CONFIG_SYS_LONGHELP
@@ -512,5 +500,34 @@
 #if !defined(CONFIG_DTT_SENSORS)
 #define CONFIG_DTT_SENSORS		{ 0 }
 #endif
+
+/* fix env settings with manboard specific stuff */
+#if defined(CONFIG_DEFAULT_FDT_FILE)
+#define TQMA7_FDT_FILE_ENV	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"
+#else
+#define TQMA7_FDT_FILE_ENV
+#endif
+
+#if defined(CONFIG_ARMV7_BOOT_SEC_DEFAULT)
+#define TQMA7_BOOTM_BOOT_MODE "sec"
+#else
+#define TQMA7_BOOTM_BOOT_MODE "nonsec"
+#endif
+
+#if defined(MTDPARTS_DEFAULT)
+#define TQMA7_MTDPARTS_ENV "mtdparts=" MTDPARTS_DEFAULT "\0"
+#else
+#define TQMA7_MTDPARTS_ENV
+#endif
+
+#define CONFIG_EXTRA_ENV_SETTINGS                                              \
+	TQMA7_M4_ENV                                                           \
+	TQMA7_MODULE_ENV_SETTINGS                                              \
+	TQMA7_EXTRA_BOOTDEV_ENV_SETTINGS                                       \
+	TQMA7_FDT_FILE_ENV                                                     \
+	"console=" CONFIG_CONSOLE_DEV "\0"                                     \
+	"bootm_boot_mode=" TQMA7_BOOTM_BOOT_MODE "\0"                          \
+	TQMA7_MTDPARTS_ENV                                                     \
+	TQMA7_MFG_ENV_SETTINGS
 
 #endif /* __TQMA7_CONFIG_H */
