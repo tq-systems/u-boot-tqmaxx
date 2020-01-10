@@ -43,4 +43,6 @@
 		"7M@1M(Linux),"                                        \
 		"56M@8M(RootFS)"                                       \
 
+#define CONFIG_ARMV7_BOOT_SEC_DEFAULT
+
 #endif /* __CONFIG_TQMA7_MBA7_H */
