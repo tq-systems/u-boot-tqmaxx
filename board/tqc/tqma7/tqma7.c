@@ -469,9 +469,11 @@ int tqma7_ft_m4_setup(void *blob, bd_t *bd)
 		if (off > 0)
 			fdt_status_disabled(blob, off);
 	}
+
+	return ret;
 }
 #else
-inline tqma7_ft_m4_setup(void *blob, bd_t *bd) {}
+inline int tqma7_ft_m4_setup(void *blob, bd_t *bd) {}
 #endif
 
 #define MODELSTRLEN 32u
