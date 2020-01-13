@@ -93,6 +93,8 @@ struct serdes_phy_config {
  |			 |	IO_SLOT_6	|  M13-25G	 |
  |	20		 |	IO_SLOT_1	|  M7-40G	 |
  |			 |	IO_SLOT_2	|  M7-40G	 |
+ |	21		 |	IO_SLOT_1	|  M13-25G	 |
+ |			 |	IO_SLOT_2	|  M13-25G	 |
  *****************************************************************
  */
 static const struct serdes_phy_config serdes1_phy_config[] = {
@@ -158,27 +160,49 @@ static const struct serdes_phy_config serdes1_phy_config[] = {
 	{20, {{WRIOP1_DPMAC1, {CORTINA_PHY_ADDR1, -1},
 	       EMI1, IO_SLOT_1},
 	     {WRIOP1_DPMAC2, {CORTINA_PHY_ADDR1, -1},
+	      EMI1, IO_SLOT_2} } },
+	{21, {{WRIOP1_DPMAC3, {INPHI_PHY_ADDR1, INPHI_PHY_ADDR2, -1},
+	      EMI1, IO_SLOT_1},
+	     {WRIOP1_DPMAC4, {INPHI_PHY_ADDR1, INPHI_PHY_ADDR2, -1},
+	      EMI1, IO_SLOT_1},
+	     {WRIOP1_DPMAC5, {INPHI_PHY_ADDR1, INPHI_PHY_ADDR2, -1},
+	      EMI1, IO_SLOT_1},
+	     {WRIOP1_DPMAC6, {INPHI_PHY_ADDR1, INPHI_PHY_ADDR2, -1},
+	      EMI1, IO_SLOT_1},
+	     {WRIOP1_DPMAC9, {INPHI_PHY_ADDR1, INPHI_PHY_ADDR2, -1},
+	      EMI1, IO_SLOT_2},
+	     {WRIOP1_DPMAC10, {INPHI_PHY_ADDR1, INPHI_PHY_ADDR2, -1},
 	      EMI1, IO_SLOT_2} } }
 };
 
 /*****************************************************************
  |   SERDES_2 PROTOCOL   |	IO_SLOT		|	CARD	 |
  *****************************************************************
- |	2		 |	IO_SLOT_1	|  M4-PCIE-SGMII |
- |			 |	IO_SLOT_2	|  M4-PCIE-SGMII |
- |	3		 |	IO_SLOT_1	|  M4-PCIE-SGMII |
- |			 |	IO_SLOT_2	|  M4-PCIE-SGMII |
- |	5		 |	IO_SLOT_1	|  M4-PCIE-SGMII |
- |	11		 |	IO_SLOT_1	|  M4-PCIE-SGMII |
- |			 |	IO_SLOT_2	|  M4-PCIE-SGMII |
- |	12		 |	IO_SLOT_1	|  M4-PCIE-SGMII |
- |			 |	IO_SLOT_2	|  M4-PCIE-SGMII |
+ |	2		 |	IO_SLOT_7	|  M4-PCIE-SGMII |
+ |			 |	IO_SLOT_8	|  M4-PCIE-SGMII |
+ |	3		 |	IO_SLOT_7	|  M4-PCIE-SGMII |
+ |			 |	IO_SLOT_8	|  M4-PCIE-SGMII |
+ |	5		 |	IO_SLOT_7	|  M4-PCIE-SGMII |
+ |	10		 |	IO_SLOT_7	|  M4-PCIE-SGMII |
+ |			 |	IO_SLOT_8	|  M4-PCIE-SGMII |
+ |	11		 |	IO_SLOT_7	|  M4-PCIE-SGMII |
+ |			 |	IO_SLOT_8	|  M4-PCIE-SGMII |
+ |	12		 |	IO_SLOT_7	|  M4-PCIE-SGMII |
+ |			 |	IO_SLOT_8	|  M4-PCIE-SGMII |
  *****************************************************************
  */
 static const struct serdes_phy_config serdes2_phy_config[] = {
 	{2, {} },
 	{3, {} },
 	{5, {} },
+	{10, {{WRIOP1_DPMAC11, {SGMII_CARD_PORT1_PHY_ADDR, -1},
+	       EMI1, IO_SLOT_7},
+	     {WRIOP1_DPMAC12, {SGMII_CARD_PORT2_PHY_ADDR, -1},
+	      EMI1, IO_SLOT_7},
+	     {WRIOP1_DPMAC17, {SGMII_CARD_PORT3_PHY_ADDR, -1},
+	      EMI1, IO_SLOT_7},
+	     {WRIOP1_DPMAC18, {SGMII_CARD_PORT4_PHY_ADDR, -1},
+	      EMI1, IO_SLOT_7} } },
 	{11, {{WRIOP1_DPMAC12, {SGMII_CARD_PORT2_PHY_ADDR, -1},
 	       EMI1, IO_SLOT_7},
 	     {WRIOP1_DPMAC17, {SGMII_CARD_PORT3_PHY_ADDR, -1},
@@ -204,10 +228,10 @@ static const struct serdes_phy_config serdes2_phy_config[] = {
 /*****************************************************************
  |   SERDES_3 PROTOCOL   |	IO_SLOT		|	CARD	 |
  *****************************************************************
- |	2		 |	IO_SLOT_1	|  M4-PCIE-SGMII |
- |			 |	IO_SLOT_2	|  M4-PCIE-SGMII |
- |	3		 |	IO_SLOT_1	|  M4-PCIE-SGMII |
- |			 |	IO_SLOT_2	|  M4-PCIE-SGMII |
+ |	2		 |	IO_SLOT_5	|  M4-PCIE-SGMII |
+ |			 |	IO_SLOT_6	|  M4-PCIE-SGMII |
+ |	3		 |	IO_SLOT_5	|  M4-PCIE-SGMII |
+ |			 |	IO_SLOT_6	|  M4-PCIE-SGMII |
  *****************************************************************
  */
 static const struct serdes_phy_config serdes3_phy_config[] = {
