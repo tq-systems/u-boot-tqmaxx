@@ -591,4 +591,7 @@ config TEST_FDTDEC
 config LIB_DATE
 	bool
 
+config ELF
+	bool "enable basic elf loading/validating functions"
+
 endmenu

@@ -120,6 +120,7 @@ obj-y += vsprintf.o strto.o
 endif
 
 obj-y += date.o
+obj-$(CONFIG_ELF) += elf.o
 
 #
 # Build a fast OID lookup registry from include/linux/oid_registry.h
