@@ -17,6 +17,7 @@
 #include <asm/omap_common.h>
 #include <env.h>
 #include <spl.h>
+#include <board.h>
 #include <asm/arch/sys_proto.h>
 
 #include "../common/board_detect.h"
@@ -188,7 +189,7 @@ static int probe_daughtercards(void)
 	char mac_addr[DAUGHTER_CARD_NO_OF_MAC_ADDR][TI_EEPROM_HDR_ETH_ALEN];
 	u8 mac_addr_cnt;
 	char name_overlays[1024] = { 0 };
-	int i, j, nb_dtbos = 0;
+	int i, nb_dtbos = 0;
 	int ret;
 
 	/*
@@ -294,6 +295,9 @@ static int probe_daughtercards(void)
 
 		printf("Detected: %s rev %s\n", ep.name, ep.version);
 
+#ifndef CONFIG_SPL_BUILD
+		int j;
+
 		/*
 		 * Populate any MAC addresses from daughtercard into the U-Boot
 		 * environment, starting with a card-specific offset so we can
@@ -308,6 +312,7 @@ static int probe_daughtercards(void)
 						      cards[i].eth_offset + j,
 						      (uchar *)mac_addr[j]);
 		}
+#endif
 
 		/* Skip if no overlays are to be added */
 		if (!strlen(cards[i].dtbo_name))
@@ -329,9 +334,11 @@ static int probe_daughtercards(void)
 		strcat(name_overlays, " ");
 	}
 
+#ifndef CONFIG_SPL_BUILD
 	/* Apply device tree overlay(s) to the U-Boot environment, if any */
 	if (strlen(name_overlays))
 		return env_set("name_overlays", name_overlays);
+#endif
 
 	return 0;
 }
@@ -354,4 +361,16 @@ int board_late_init(void)
 	probe_daughtercards();
 
 	return 0;
+}
+
+void spl_board_init(void)
+{
+	struct udevice *board;
+
+	/* Check for and probe any plugged-in daughtercards */
+	probe_daughtercards();
+
+	/* Probe the board driver and call its detection method*/
+	if (!board_get(&board))
+		board_detect(board);
 }
