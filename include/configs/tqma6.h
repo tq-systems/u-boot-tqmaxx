@@ -180,8 +180,8 @@
 #define TQMA6_FDT_SECTOR_START		0x0a /* 8 Sector u-boot, 2 Sector env */
 #define TQMA6_FDT_SECTOR_COUNT		0x01
 
-#define TQMA6_KERNEL_SECTOR_START	0x10
-#define TQMA6_KERNEL_SECTOR_COUNT	0x60
+#define TQMA6_KERNEL_SECTOR_START	0x10 /* offset 1 MB */
+#define TQMA6_KERNEL_SECTOR_COUNT	0xa0 /* 10 MB */
 
 #define TQMA6_EXTRA_BOOTDEV_ENV_SETTINGS                                       \
 	"mmcblkdev=0\0"                                                        \
