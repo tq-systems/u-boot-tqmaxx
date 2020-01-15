@@ -22,4 +22,6 @@ config BOARD_SANDBOX
 	help
 	  Support querying device information for the Sandbox boards.
 
+source "drivers/board/ti/Kconfig"
+
 endif

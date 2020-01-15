@@ -1,0 +1,5 @@
+config BOARD_K3_EVMS
+	bool "Enable board driver for the K3 EVMs board"
+	help
+	  Support querying device information for the K3 EVMs. This
+	  include the AM65x EVM and the J721e EVM.
