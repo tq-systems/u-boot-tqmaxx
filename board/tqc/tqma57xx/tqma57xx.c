@@ -468,7 +468,8 @@ int board_mmc_init(bd_t *bis)
 }
 #endif
 
-#if defined(CONFIG_SPL_BUILD) && defined(CONFIG_SPL_OS_BOOT)
+#if defined(CONFIG_SPL_BUILD)
+#if defined(CONFIG_SPL_OS_BOOT)
 int spl_start_uboot(void)
 {
 	/* break into full u-boot on 'c' */
@@ -484,6 +485,7 @@ int spl_start_uboot(void)
 
 	return 0;
 }
+#endif
 
 void spl_board_prepare_for_boot(void)
 {
