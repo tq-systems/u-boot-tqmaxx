@@ -23,4 +23,6 @@
 #define CONFIG_SYS_MMC_ENV_DEV		1
 #define CONFIG_SYS_MMC_ENV_PART		2
 
+#define CONFIG_BOARD_LATE_INIT
+
 #endif /* __HIHOPE_RZG2N_H */
