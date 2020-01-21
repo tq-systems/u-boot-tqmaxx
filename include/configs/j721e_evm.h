@@ -58,10 +58,16 @@
 /* HyperFlash related configuration */
 #define CONFIG_SYS_MAX_FLASH_BANKS_DETECT 1
 
+#define PARTS_DEFAULT \
+	/* Linux partitions */ \
+	"name=rootfs,start=0,size=-,uuid=${uuid_gpt_rootfs}\0"
+
 /* U-Boot general configuration */
 #define EXTRA_ENV_J721E_BOARD_SETTINGS					\
 	"default_device_tree=" CONFIG_DEFAULT_DEVICE_TREE ".dtb\0"	\
-	"findfdt=setenv fdtfile ${default_device_tree}\0"		\
+	"findfdt="							\
+		"setenv name_fdt ${default_device_tree};"		\
+		"setenv fdtfile ${name_fdt}\0"				\
 	"loadaddr=0x80080000\0"						\
 	"fdtaddr=0x82000000\0"						\
 	"overlayaddr=0x83000000\0"					\
@@ -82,7 +88,7 @@
 	"mcur5f0_0fwname=/lib/firmware/j7-mcu-r5f0_0-fw\0"		\
 	"rd_spec=-\0"							\
 	"init_mmc=run args_all args_mmc\0"				\
-	"get_fdt_mmc=load mmc ${bootpart} ${fdtaddr} ${bootdir}/${fdtfile}\0" \
+	"get_fdt_mmc=load mmc ${bootpart} ${fdtaddr} ${bootdir}/${name_fdt}\0" \
 	"get_overlay_mmc="						\
 		"fdt address ${fdtaddr};"				\
 		"fdt resize 0x100000;"					\
@@ -92,7 +98,10 @@
 		"fdt apply ${overlayaddr};"				\
 		"done;\0"						\
 	"get_kern_mmc=load mmc ${bootpart} ${loadaddr} "		\
-		"${bootdir}/${name_kern}\0"
+		"${bootdir}/${name_kern}\0"				\
+	"get_fit_mmc=load mmc ${bootpart} ${addr_fit} "			\
+		"${bootdir}/${name_fit}\0"				\
+	"partitions=" PARTS_DEFAULT
 
 #ifdef DEFAULT_RPROCS
 #undef DEFAULT_RPROCS
@@ -107,6 +116,7 @@
 /* Incorporate settings into the U-Boot environment */
 #define CONFIG_EXTRA_ENV_SETTINGS					\
 	DEFAULT_MMC_TI_ARGS						\
+	DEFAULT_FIT_TI_ARGS						\
 	EXTRA_ENV_J721E_BOARD_SETTINGS					\
 	EXTRA_ENV_J721E_BOARD_SETTINGS_MMC				\
 	EXTRA_ENV_RPROC_SETTINGS					\
