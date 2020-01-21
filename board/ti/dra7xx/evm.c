@@ -62,6 +62,8 @@ DECLARE_GLOBAL_DATA_PTR;
 #define NAND_PCF8575_ADDR	0x21
 #define NAND_PCF8575_I2C_BUS_NUM	0
 
+static int nand_sw_detect(void);
+
 const struct omap_sysinfo sysinfo = {
 	"Board: UNKNOWN(DRA7 EVM) REV UNKNOWN\n"
 };
@@ -685,6 +687,12 @@ int board_late_init(void)
 	} else {
 		name = "dra7xx";
 	}
+
+	/*Test if nand is enabled*/
+	if (!nand_sw_detect())
+		env_set("boot_nand", "1");
+	else
+		env_set("boot_nand", "0");
 
 	set_board_info_env(name);
 

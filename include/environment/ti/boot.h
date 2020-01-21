@@ -175,7 +175,9 @@
 			"setenv fdtfile dra72-evm-revc.dtb; fi;" \
 		"if test $board_name = dra72x; then " \
 			"setenv fdtfile dra72-evm.dtb; fi;" \
-		"if test $board_name = dra71x; then " \
+		"if test $board_name = dra71x && test $boot_nand = 1; then " \
+			"setenv fdtfile dra71-evm-nand.dtb; fi;" \
+		"if test $board_name = dra71x && test $boot_nand = 0; then " \
 			"setenv fdtfile dra71-evm.dtb; fi;" \
 		"if test $board_name = dra76x_acd; then " \
 			"setenv fdtfile dra76-evm.dtb; fi;" \
