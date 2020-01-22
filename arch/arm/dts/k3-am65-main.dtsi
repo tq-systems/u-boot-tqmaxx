@@ -285,7 +285,7 @@
 
 	icssg2: icssg@b200000 {
 		compatible = "ti,am654-icssg";
-		power-domains = <&k3_pds 64>;
+		power-domains = <&k3_pds 64 TI_SCI_PD_EXCLUSIVE>;
 		reg = <0xb200000 0x80000>;
 		#address-cells = <1>;
 		#size-cells = <1>;
