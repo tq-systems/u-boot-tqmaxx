@@ -64,6 +64,13 @@
 /* FUSE command */
 #define CONFIG_CMD_FUSE
 
+/* Display configs */
+/* activate only HDP_LOAD because display port needs firmware,
+   but setting this Option in KConfig need CONFIG_VIDEO.
+   This way is the least complex approach.  
+   */
+#define CONFIG_VIDEO_IMX_HDP_LOAD
+
 /* GPIO configs */
 /* #define CONFIG_MXC_GPIO */
 
@@ -145,7 +152,7 @@
 	"loadfdt=load mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
 	"hdp_addr=0x84000000\0" \
 	"hdprx_addr=0x84800000\0" \
-	"hdp_file=hdmitxfw.bin\0" \
+	"hdp_file=dpfw.bin\0" \
 	"hdprx_file=hdmirxfw.bin\0" \
 	"loadhdp=load mmc ${mmcdev}:${mmcpart} ${hdp_addr} ${hdp_file}\0" \
 	"loadhdprx=load mmc ${mmcdev}:${mmcpart} ${hdprx_addr} ${hdprx_file}\0" \
