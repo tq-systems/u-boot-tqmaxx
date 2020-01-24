@@ -31,6 +31,8 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#define MB_SMARC_2_BOARD_NAME "MB-SMARC-2"
+
 #define FSPI_PAD_CTRL	((SC_PAD_CONFIG_NORMAL << PADRING_CONFIG_SHIFT) | (SC_PAD_ISO_OFF << PADRING_LPCONFIG_SHIFT) \
 						| (SC_PAD_28FDSOI_DSE_DV_HIGH << PADRING_DSE_SHIFT) | (SC_PAD_28FDSOI_PS_PU << PADRING_PULL_SHIFT))
 
@@ -110,10 +112,15 @@ int mmc_map_to_kernel_blk(int dev_no)
 	return dev_no;
 }
 
+const char *tqc_bb_get_boardname(void)
+{
+	return MB_SMARC_2_BOARD_NAME;
+}
+
 int tqc_bb_board_late_init(void)
 {
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
-	env_set("board_name", "MB-SMARC-2");
+	env_set("board_name", MB_SMARC_2_BOARD_NAME);
 	env_set("board_rev", "iMX8QXP");
 #endif
 
