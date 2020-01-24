@@ -96,6 +96,11 @@ int tqc_bb_board_early_init_f(void)
 	return 0;
 }
 
+const char *tqc_bb_get_boardname(void)
+{
+	return MBA8XX_BOARD_NAME;
+}
+
 int tqc_bb_checkboard(void)
 {
 	puts("Board: " TQMA8_BOARD_NAME " on " MBA8XX_BOARD_NAME " (" TQMA8_BOARD_REV ")\n");
