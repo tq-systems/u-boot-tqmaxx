@@ -120,23 +120,12 @@ int board_late_init(void)
 {
 #if !defined(CONFIG_SPL_BUILD)
 	struct tqc_eeprom_data eeprom;
-	char sstring[0x41];
 	const char *bname = tqma8x_get_boardname();
 
-	if (!tqc_read_eeprom_at(1, 0x53, 1, 0, &eeprom)) {
-		tqc_parse_eeprom_id(&eeprom, sstring, ARRAY_SIZE(sstring));
-		if (strncmp(sstring, bname, strlen(bname)) == 0)
-			env_set("boardtype", sstring);
-		if (tqc_parse_eeprom_serial(&eeprom, sstring,
-					    ARRAY_SIZE(sstring)) == 0)
-			env_set("serial#", sstring);
-		else
-			env_set("serial#", "???");
-
-		tqc_show_eeprom(&eeprom, bname);
-	} else {
+	if (!tqc_read_eeprom_at(1, 0x53, 1, 0, &eeprom))
+		tqc_board_handle_eeprom_data(bname, &eeprom);
+	else
 		puts("EEPROM: read error\n");
-	}
 #endif
 
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
