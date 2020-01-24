@@ -122,8 +122,8 @@ int ft_board_setup(void *blob, bd_t *bd)
 int board_late_init(void)
 {
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
-	env_set("board_name", TQMA8_BOARD_NAME);
-	env_set("board_rev", TQMA8_BOARD_REV);
+	env_set("board_name", tqc_bb_get_boardname());
+	env_set("board_rev", tqma8xx_get_boardname());
 #endif
 
 	tqc_bb_board_late_init();
