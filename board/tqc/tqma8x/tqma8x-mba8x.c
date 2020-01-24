@@ -24,7 +24,6 @@
 #include <asm/arch/iomux.h>
 #include <asm/arch/lpcg.h>
 #include <asm/arch/sys_proto.h>
-#include <power-domain.h>
 
 #include "../common/tqc_bb.h"
 #include "../common/tqc_board_gpio.h"
