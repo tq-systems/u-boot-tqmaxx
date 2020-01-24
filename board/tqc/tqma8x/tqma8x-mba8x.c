@@ -267,11 +267,6 @@ int mmc_map_to_kernel_blk(int dev_no)
 
 int tqc_bb_board_late_init(void)
 {
-#ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
-	env_set("board_name", "MBA8X_BOARD_NAME");
-	env_set("board_rev", "iMX8QM");
-#endif
-
 #ifdef CONFIG_ENV_IS_IN_MMC
 	board_late_mmc_env_init();
 #endif
