@@ -112,11 +112,6 @@ const char *tqc_bb_get_boardname(void)
 
 int tqc_bb_board_late_init(void)
 {
-#ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
-	env_set("board_name", MB_SMARC_2_BOARD_NAME);
-	env_set("board_rev", "iMX8QXP");
-#endif
-
 #ifdef CONFIG_ENV_IS_IN_MMC
 	board_late_mmc_env_init();
 #endif
