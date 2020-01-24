@@ -103,11 +103,10 @@ const char *tqc_bb_get_boardname(void)
 
 int tqc_bb_checkboard(void)
 {
-	puts("Board: " TQMA8_BOARD_NAME " on " MBA8XX_BOARD_NAME " (" TQMA8_BOARD_REV ")\n");
-
 	return 0;
 }
 
+/* TODO: use GPIO_INIT_DATA_ENTRY */
 static struct tqc_gpio_init_data mba8xx_gid[] = {
 	{
 		.name = "GPIO3_5",

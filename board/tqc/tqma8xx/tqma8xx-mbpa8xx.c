@@ -88,8 +88,6 @@ const char *tqc_bb_get_boardname(void)
 
 int tqc_bb_checkboard(void)
 {
-	puts("Board: " TQMA8_BOARD_NAME " on " MBPA8XX_BOARD_NAME " (" TQMA8_BOARD_REV ")\n");
-
 	return 0;
 }
 

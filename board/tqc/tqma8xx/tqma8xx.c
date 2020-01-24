@@ -40,9 +40,28 @@ static void board_gpio_init(void)
 
 }
 
+static const char *tqma8xx_get_boardname(void)
+{
+	switch (get_cpu_type()) {
+	case MXC_CPU_IMX8QXP:
+		return "TQMa8XQP";
+		break;
+	case MXC_CPU_IMX8DX:
+		return "TQMa8XD";
+		break;
+	default:
+		return "??";
+	}
+
+	return "UNKNOWN";
+}
+
 int checkboard(void)
 {
 	print_bootinfo();
+
+	printf("Board: %s on a %s\n", tqma8xx_get_boardname(),
+	       tqc_bb_get_boardname());
 
 	/* Note:  After reloc, ipcHndl will no longer be valid.  If handle
 	 *        returned by sc_ipc_open matches SC_IPC_CH, use this
