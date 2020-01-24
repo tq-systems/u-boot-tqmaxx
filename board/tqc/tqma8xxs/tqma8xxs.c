@@ -141,22 +141,12 @@ int board_late_init(void)
 {
 #if !defined(CONFIG_SPL_BUILD)
 	struct tqc_eeprom_data eeprom;
-	char sstring[0x41];
+	const char *bname = tqma8xxs_get_boardname();
 
-	if (!tqc_read_eeprom_at(1, 0x51, 1, 0, &eeprom)) {
-		tqc_parse_eeprom_id(&eeprom, sstring, ARRAY_SIZE(sstring));
-		if (strncmp(sstring, "TQMa8X", 6) == 0)
-			env_set("boardtype", sstring);
-		if (tqc_parse_eeprom_serial(&eeprom, sstring,
-					    ARRAY_SIZE(sstring)) == 0)
-			env_set("serial#", sstring);
-		else
-			env_set("serial#", "???");
-
-		tqc_show_eeprom(&eeprom, "TQMa8X");
-	} else {
+	if (!tqc_read_eeprom_at(1, 0x51, 1, 0, &eeprom))
+		tqc_board_handle_eeprom_data(bname, &eeprom);
+	else
 		puts("EEPROM: read error\n");
-	}
 #endif
 
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
