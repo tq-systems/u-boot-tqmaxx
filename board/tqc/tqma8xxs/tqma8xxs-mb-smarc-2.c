@@ -26,8 +26,6 @@
 #include <power-domain.h>
 
 #include "../common/tqc_bb.h"
-#include "../common/tqc_eeprom.h"
-
 
 DECLARE_GLOBAL_DATA_PTR;
 
