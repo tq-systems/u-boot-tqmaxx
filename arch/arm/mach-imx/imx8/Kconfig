@@ -175,6 +175,7 @@ config TARGET_TQMA8XXS
 	select SPI_FLASH_SST
 	select SPI_FLASH_WINBOND
 	select TQC_EEPROM
+	select TQC_GPIO
 	select USB
 	select DM_USB
 	select USB_XHCI_HCD
