@@ -47,7 +47,7 @@ int tqc_read_eeprom_buf(unsigned int bus, unsigned int i2c_addr,
 
 #if !defined(CONFIG_SPL_BUILD)
 
-int tqc_parse_eeprom_mac(struct tqc_eeprom_data *eeprom, char *buf,
+int tqc_parse_eeprom_mac(struct tqc_eeprom_data * const eeprom, char *buf,
 			 size_t len)
 {
 	u8 *p;
@@ -67,7 +67,7 @@ int tqc_parse_eeprom_mac(struct tqc_eeprom_data *eeprom, char *buf,
 	return !(is_valid_ethaddr(p));
 }
 
-int tqc_parse_eeprom_serial(struct tqc_eeprom_data *eeprom, char *buf,
+int tqc_parse_eeprom_serial(struct tqc_eeprom_data * const eeprom, char *buf,
 			    size_t len)
 {
 	unsigned int i;
@@ -87,7 +87,7 @@ int tqc_parse_eeprom_serial(struct tqc_eeprom_data *eeprom, char *buf,
 	return 0;
 }
 
-int tqc_parse_eeprom_id(struct tqc_eeprom_data *eeprom, char *buf,
+int tqc_parse_eeprom_id(struct tqc_eeprom_data * const eeprom, char *buf,
 			size_t len)
 {
 	unsigned int i;
@@ -108,7 +108,7 @@ int tqc_parse_eeprom_id(struct tqc_eeprom_data *eeprom, char *buf,
 /*
  * show_eeprom - display the contents of the module EEPROM
  */
-int tqc_show_eeprom(struct tqc_eeprom_data *eeprom, const char *id)
+int tqc_show_eeprom(struct tqc_eeprom_data * const eeprom, const char *id)
 {
 	/* must hold largest field of eeprom data */
 	char safe_string[0x41];
@@ -161,5 +161,22 @@ int tqc_read_eeprom(unsigned int bus, unsigned int addr,
 				  CONFIG_SYS_I2C_EEPROM_ADDR_LEN, addr, eeprom);
 }
 #endif
+
+int tqc_board_handle_eeprom_data(const char *board_name,
+				 struct tqc_eeprom_data * const eeprom)
+{
+	char sstring[(TQC_EE_BDID_BYTES) + 1];
+
+	tqc_parse_eeprom_id(eeprom, sstring, ARRAY_SIZE(sstring));
+	if (strncmp(sstring, board_name, strlen(board_name)) == 0)
+		env_set("boardtype", sstring);
+	if (tqc_parse_eeprom_serial(eeprom, sstring,
+				    ARRAY_SIZE(sstring)) == 0)
+		env_set("serial#", sstring);
+	else
+		env_set("serial#", "???");
+
+	return tqc_show_eeprom(eeprom, board_name);
+}
 
 #endif
