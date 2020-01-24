@@ -168,6 +168,8 @@ int tqc_board_handle_eeprom_data(const char *board_name,
 	char sstring[(TQC_EE_BDID_BYTES) + 1];
 
 	tqc_parse_eeprom_id(eeprom, sstring, ARRAY_SIZE(sstring));
+
+#ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 	if (strncmp(sstring, board_name, strlen(board_name)) == 0)
 		env_set("boardtype", sstring);
 	if (tqc_parse_eeprom_serial(eeprom, sstring,
@@ -175,6 +177,7 @@ int tqc_board_handle_eeprom_data(const char *board_name,
 		env_set("serial#", sstring);
 	else
 		env_set("serial#", "???");
+#endif
 
 	return tqc_show_eeprom(eeprom, board_name);
 }
