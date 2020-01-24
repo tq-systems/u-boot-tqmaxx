@@ -111,7 +111,7 @@ int tqc_parse_eeprom_id(struct tqc_eeprom_data * const eeprom, char *buf,
 int tqc_show_eeprom(struct tqc_eeprom_data * const eeprom, const char *id)
 {
 	/* must hold largest field of eeprom data */
-	char safe_string[0x41];
+	char safe_string[(TQC_EE_BDID_BYTES) + 1];
 
 	if (!eeprom)
 		return -1;
