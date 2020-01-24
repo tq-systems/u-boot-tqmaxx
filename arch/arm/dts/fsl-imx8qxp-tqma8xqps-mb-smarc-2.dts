@@ -26,29 +26,23 @@
 		stdout-path = &lpuart0;
 	};
 
-	regulators {
-		compatible = "simple-bus";
-		#address-cells = <1>;
-		#size-cells = <0>;
+	reg_usdhc2_vmmc: usdhc2_vmmc {
+		compatible = "regulator-fixed";
+		regulator-name = "SD1_PWR";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&gpio4 19 GPIO_ACTIVE_LOW>;
+		startup-delay-us = <100>;
+		off-on-delay-us = <12000>;
+		regulator-always-on;
+		regulator-boot-on;
+	};
 
-		reg_usdhc2_vmmc: usdhc2_vmmc {
-			compatible = "regulator-fixed";
-			regulator-name = "SD1_PWR";
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
-			gpio = <&gpio4 19 GPIO_ACTIVE_LOW>;
-			startup-delay-us = <100>;
-			off-on-delay-us = <12000>;
-			regulator-always-on;
-			regulator-boot-on;
-		};
-
-		reg_usdhc2_vqmmc: usdhc2_vqmmc {
-			compatible = "regulator-fixed";
-			regulator-name = "SD1_VQMMC";
-			regulator-min-microvolt = <1800000>;
-			regulator-max-microvolt = <3300000>;
-		};
+	reg_usdhc2_vqmmc: usdhc2_vqmmc {
+		compatible = "regulator-fixed";
+		regulator-name = "SD1_VQMMC";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <3300000>;
 	};
 };
 
