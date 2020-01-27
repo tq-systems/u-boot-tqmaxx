@@ -37,6 +37,15 @@
 		regulator-max-microvolt = <1800000>;
 		regulator-always-on;
 	};
+
+	reg_usbotg1_vbus: usbotg1_vbus {
+		compatible = "regulator-fixed";
+		regulator-name = "OTG1_VBUS";
+		gpio = <&gpio4 3 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+	};
 };
 
 &flexspi0 {
@@ -122,6 +131,13 @@
 			fsl,pins = <
 				SC_P_MIPI_DSI0_GPIO0_00_ADMA_I2C1_SCL	0x06000020
 				SC_P_MIPI_DSI0_GPIO0_01_ADMA_I2C1_SDA	0x06000020
+			>;
+		};
+
+		pinctrl_usbotg1: usbotg1grp {
+			fsl,pins = <
+				SC_P_USB_SS3_TC0_LSIO_GPIO4_IO03	0x00000021
+				SC_P_USB_SS3_TC2_CONN_USB_OTG1_OC	0x00000021
 			>;
 		};
 
@@ -263,6 +279,30 @@
 		compatible = "ds1339", "dallas,ds1339", "dallas,ds1337";
 		reg = <0x68>;
 	};
+};
+
+&usbmisc1 {
+	status = "okay";
+};
+
+&usbotg1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usbotg1>;
+/*
+ * TODO: check if session request protocol, host negotiation protocol and / or
+ * attach detection protocol should be disabled. AFAIK they are not implemented
+ * supported by U-Boot
+ *	srp-disable;
+ *	hnp-disable;
+ *	adp-disable;
+ */
+	vbus-supply = <&reg_usbotg1_vbus>;
+	dr_mode = "otg";
+	status = "okay";
+};
+
+&usbphy1 {
+	status = "okay";
 };
 
 &usdhc1 {
