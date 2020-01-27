@@ -22,7 +22,6 @@
 #include <asm/arch/iomux.h>
 #include <asm/arch/sys_proto.h>
 #include <power-domain.h>
-#include <cdns3-uboot.h>
 
 #include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
