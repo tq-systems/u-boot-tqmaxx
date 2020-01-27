@@ -22,7 +22,7 @@
 #include <asm/arch/iomux.h>
 #include <asm/arch/sys_proto.h>
 #include <power-domain.h>
-#include <cdns3-uboot.h>
+#include <usb.h>
 
 #include "../common/tqc_bb.h"
 #include "../common/tqc_board_gpio.h"
@@ -174,3 +174,83 @@ int board_late_init(void)
 	return 0;
 }
 
+#if defined(CONFIG_USB)
+
+int board_usb_init(int index, enum usb_init_type init)
+{
+	int ret = 0;
+
+	switch (index) {
+	case 1:
+		puts("USB_OTG2/HUB\n");
+
+		switch (init) {
+		case USB_INIT_HOST:
+			dm_gpio_set_value(&tqma8xxs_gid[USB_OTG2_PWR].desc, 1);
+			break;
+		default:
+			dm_gpio_set_value(&tqma8xxs_gid[USB_OTG2_PWR].desc, 0);
+			printf("USB_OTG2/HUB: init type not supported\n");
+			ret = -EINVAL;
+		}
+
+		break;
+	case 0:
+		puts("USB_OTG1\n");
+
+		switch (init) {
+		case USB_INIT_DEVICE:
+		case USB_INIT_HOST:
+			/*
+			 * Power on usb + phy is done already via generic
+			 * power_domain handling in device core
+			 */
+			break;
+		default:
+			printf("USB_OTG1: unknown init type\n");
+			ret = -EINVAL;
+		}
+
+		break;
+	default:
+		printf("invalid USB port %d\n", index);
+		ret = -EINVAL;
+	}
+
+	return ret;
+}
+
+int board_usb_cleanup(int index, enum usb_init_type init)
+{
+	int ret = 0;
+
+	switch (index) {
+	case 1:
+		puts("USB_OTG2/HUB\n");
+
+		switch (init) {
+		case USB_INIT_HOST:
+			dm_gpio_set_value(&tqma8xxs_gid[USB_OTG2_PWR].desc, 0);
+			break;
+		default:
+			dm_gpio_set_value(&tqma8xxs_gid[USB_OTG2_PWR].desc, 0);
+			printf("USB_OTG2/HUB: init type not supported\n");
+			ret = -EINVAL;
+		}
+
+		break;
+	case 0:
+		puts("USB_OTG1\n");
+		/*
+		 * Power off usb + phy is done via generic
+		 * power_domain handling in device core
+		 */
+		break;
+	default:
+		printf("invalid USB port %d\n", index);
+		ret = -EINVAL;
+	}
+
+	return ret;
+}
+#endif
