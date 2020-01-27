@@ -25,6 +25,7 @@
 
 #include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
+#include "../common/tqc_scu.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -64,6 +65,8 @@ int checkboard(void)
 	 */
 	if (gd->arch.ipc_channel_handle != SC_IPC_CH)
 		printf("\nSCI error! Invalid handle\n");
+
+	tqc_scu_checkpmic(false);
 
 #ifdef SCI_FORCE_ABORT
 	sc_rpc_msg_t abort_msg;
