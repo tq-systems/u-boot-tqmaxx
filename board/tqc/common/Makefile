@@ -19,5 +19,6 @@ else
 obj-$(CONFIG_DM_GPIO) += tqc_board_gpio.o
 obj-$(CONFIG_TQC_EEPROM) += tqc_eeprom.o
 obj-$(CONFIG_TQC_EMMC) += tqc_emmc.o
-obj-y += tqc_sdmmc.o
+obj-$(CONFIG_TQC_SDMMC) += tqc_sdmmc.o
+obj-$(CONFIG_TQC_SCU) += tqc_scu.o
 endif
