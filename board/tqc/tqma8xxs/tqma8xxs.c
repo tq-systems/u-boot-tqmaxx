@@ -25,9 +25,22 @@
 #include <cdns3-uboot.h>
 
 #include "../common/tqc_bb.h"
+#include "../common/tqc_board_gpio.h"
 #include "../common/tqc_eeprom.h"
 
 DECLARE_GLOBAL_DATA_PTR;
+
+enum {
+	USB_OTG2_PWR,
+};
+
+#if !defined(CONFIG_SPL_BUILD)
+
+static struct tqc_gpio_init_data tqma8xxs_gid[] = {
+	GPIO_INIT_DATA_ENTRY(USB_OTG2_PWR, "GPIO4_4", GPIOD_IS_OUT),
+};
+
+#endif
 
 int board_early_init_f(void)
 {
@@ -90,6 +103,10 @@ int board_init(void)
 {
 #ifdef CONFIG_MXC_GPIO
 	board_gpio_init();
+#endif
+
+#if !defined(CONFIG_SPL_BUILD)
+	tqc_board_gpio_init(tqma8xxs_gid, ARRAY_SIZE(tqma8xxs_gid));
 #endif
 
 	tqc_bb_board_init();
