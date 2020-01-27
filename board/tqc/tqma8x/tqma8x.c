@@ -35,11 +35,6 @@ int board_early_init_f(void)
 	return 0;
 }
 
-static void board_gpio_init(void)
-{
-
-}
-
 static const char *tqma8x_get_boardname(void)
 {
 	switch (get_cpu_type()) {
@@ -83,10 +78,6 @@ int checkboard(void)
 
 int board_init(void)
 {
-#ifdef CONFIG_MXC_GPIO
-	board_gpio_init();
-#endif
-
 	tqc_bb_board_init();
 
 	return 0;
