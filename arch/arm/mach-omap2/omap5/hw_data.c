@@ -376,6 +376,79 @@ struct vcores_data omap5430_volts_es2 = {
 	.mm.efuse.reg_bits	= OMAP5_ES2_PROD_REGBITS,
 };
 
+#if defined(CONFIG_DRA7XX) && defined(CONFIG_REMOTEPROC_TI_IPU)
+/*
+ * Enable IPU1 clock domains, modules and
+ * do some additional special settings needed
+ */
+void enable_ipu1_clocks(void)
+{
+	u32 const clk_domains[] = {
+		(*prcm)->cm_ipu_clkstctrl,
+		(*prcm)->cm_ipu1_clkstctrl,
+		0
+	};
+
+	u32 const clk_modules_hw_auto_essential[] = {
+		(*prcm)->cm_ipu1_ipu1_clkctrl,
+		0
+	};
+
+	u32 const clk_modules_explicit_en_essential[] = {
+		(*prcm)->cm_l4per_gptimer11_clkctrl,
+		(*prcm)->cm1_abe_timer7_clkctrl,
+		(*prcm)->cm1_abe_timer8_clkctrl,
+		0
+	};
+	do_enable_ipu_clocks(clk_domains, clk_modules_hw_auto_essential,
+			     clk_modules_explicit_en_essential, 0);
+
+	/* Enable optional additional functional clock for IPU1 */
+	setbits_le32((*prcm)->cm_ipu1_ipu1_clkctrl,
+		     IPU1_CLKCTRL_CLKSEL_MASK);
+	/* Enable optional additional functional clock for IPU1 */
+	setbits_le32((*prcm)->cm1_abe_timer7_clkctrl,
+		     IPU1_CLKCTRL_CLKSEL_MASK);
+	/* Enable optional additional functional clock for IPU1 */
+	setbits_le32((*prcm)->cm1_abe_timer8_clkctrl,
+		     IPU1_CLKCTRL_CLKSEL_MASK);
+}
+
+/*
+ * Enable IPU2 clock domains, modules and
+ * do some additional special settings needed
+ */
+void enable_ipu2_clocks(void)
+{
+	u32 const clk_domains[] = {
+		(*prcm)->cm_ipu_clkstctrl,
+		(*prcm)->cm_ipu2_clkstctrl,
+		0
+	};
+
+	u32 const clk_modules_hw_auto_essential[] = {
+		(*prcm)->cm_ipu2_ipu2_clkctrl,
+		0
+	};
+
+	u32 const clk_modules_explicit_en_essential[] = {
+		(*prcm)->cm_l4per_gptimer3_clkctrl,
+		(*prcm)->cm_l4per_gptimer4_clkctrl,
+		(*prcm)->cm_l4per_gptimer9_clkctrl,
+		0
+	};
+	do_enable_ipu_clocks(clk_domains, clk_modules_hw_auto_essential,
+			     clk_modules_explicit_en_essential, 0);
+
+	/* Enable optional additional functional clock for IPU2 */
+	setbits_le32((*prcm)->cm_l4per_gptimer4_clkctrl,
+		     IPU1_CLKCTRL_CLKSEL_MASK);
+	/* Enable optional additional functional clock for IPU2 */
+	setbits_le32((*prcm)->cm_l4per_gptimer9_clkctrl,
+		     IPU1_CLKCTRL_CLKSEL_MASK);
+}
+#endif
+
 /*
  * Enable essential clock domains, modules and
  * do some additional special settings needed
@@ -479,7 +552,7 @@ void enable_basic_clocks(void)
 void enable_basic_uboot_clocks(void)
 {
 	u32 const clk_domains_essential[] = {
-#if defined(CONFIG_DRA7XX)
+#if defined(CONFIG_DRA7XX) && !defined(CONFIG_REMOTEPROC_TI_IPU)
 		(*prcm)->cm_ipu_clkstctrl,
 #endif
 		0

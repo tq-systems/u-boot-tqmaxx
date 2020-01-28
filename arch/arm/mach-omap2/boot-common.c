@@ -9,6 +9,7 @@
 
 #include <common.h>
 #include <ahci.h>
+#include <fs_loader.h>
 #include <spl.h>
 #include <asm/omap_common.h>
 #include <asm/arch/omap.h>
@@ -17,8 +18,12 @@
 #include <watchdog.h>
 #include <scsi.h>
 #include <i2c.h>
+#include <remoteproc.h>
 
 DECLARE_GLOBAL_DATA_PTR;
+
+#define IPU1_LOAD_ADDR	0xa0fff000
+#define IPU2_LOAD_ADDR	0xa17ff000
 
 __weak u32 omap_sys_boot_device(void)
 {
@@ -192,6 +197,96 @@ u32 spl_boot_mode(const u32 boot_device)
 	return gd->arch.omap_boot_mode;
 }
 
+#ifdef CONFIG_FS_LOADER
+int load_firmware(char *name_fw, u32 *loadaddr)
+{
+	struct udevice *fsdev;
+	int size = 0;
+
+	if (!*loadaddr)
+		return 0;
+
+	if (!uclass_get_device(UCLASS_FS_FIRMWARE_LOADER, 0, &fsdev)) {
+		size = request_firmware_into_buf(fsdev, name_fw,
+						 (void *)*loadaddr, 0, 0);
+	}
+
+	return size;
+}
+#else
+int load_firmware(char *name_fw, u32 *loadaddr)
+{
+	return 0;
+}
+#endif
+
+void spl_boot_ipu(void)
+{
+#if defined(CONFIG_SPL_BUILD) && defined(CONFIG_REMOTEPROC_TI_IPU)
+	int ret, size;
+	u32 loadaddr = IPU1_LOAD_ADDR;
+
+	size = load_firmware("dra7-ipu1-fw.xem4", &loadaddr);
+	if (size <= 0) {
+		dev_err(dev, "Firmware loading failed\n");
+		goto skip_ipu1;
+	}
+
+	enable_ipu1_clocks();
+	ret = rproc_dev_init(0);
+	if (ret) {
+		debug("%s: IPU1 failed to initialize on rproc (%d)\n",
+		      __func__, ret);
+		goto skip_ipu1;
+	}
+
+	ret = rproc_load(0, IPU1_LOAD_ADDR, 0x2000000);
+	if (ret) {
+		debug("%s: IPU1 failed to load on rproc (%d)\n", __func__,
+		      ret);
+		goto skip_ipu1;
+	}
+
+	debug("Starting IPU1...\n");
+
+	ret = rproc_start(0);
+	if (ret)
+		debug("%s: IPU1 failed to start (%d)\n", __func__, ret);
+
+skip_ipu1:
+	loadaddr = IPU2_LOAD_ADDR;
+	size = load_firmware("dra7-ipu2-fw.xem4", &loadaddr);
+	if (size <= 0) {
+		dev_err(dev, "Firmware loading failed for ipu2\n");
+		goto skip_ipu;
+	}
+
+	enable_ipu2_clocks();
+	ret = rproc_dev_init(1);
+	if (ret) {
+		debug("%s: IPU2 failed to initialize on rproc (%d)\n", __func__,
+		      ret);
+		goto skip_ipu;
+	}
+
+	ret = rproc_load(1, IPU2_LOAD_ADDR, 0x2000000);
+	if (ret) {
+		debug("%s: IPU2 failed to load on rproc (%d)\n", __func__,
+		      ret);
+		goto skip_ipu;
+	}
+
+	debug("Starting IPU2...\n");
+
+	ret = rproc_start(1);
+	if (ret)
+		debug("%s: IPU2 failed to start (%d)\n", __func__, ret);
+skip_ipu:
+
+	return;
+#endif
+}
+
 void spl_board_init(void)
 {
 #ifdef CONFIG_SPL_SERIAL_SUPPORT
@@ -212,6 +307,9 @@ void spl_board_init(void)
 #endif
 #ifdef CONFIG_AM33XX
 	am33xx_spl_board_init();
+#endif
+#if defined(CONFIG_SPL_BUILD) && defined(CONFIG_REMOTEPROC_TI_IPU)
+	spl_boot_ipu();
 #endif
 }
 
