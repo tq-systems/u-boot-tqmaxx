@@ -114,3 +114,7 @@
 		};
 	};
 };
+
+&main_sdhci1 {
+	vqmmc-supply = <&ldo1_reg>;
+};

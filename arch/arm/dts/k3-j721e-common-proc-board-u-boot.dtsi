@@ -346,6 +346,10 @@
 	u-boot,dm-spl;
 };
 
+&main_gpio0 {
+	u-boot,dm-spl;
+};
+
 &main_mmc1_pins_default {
 	u-boot,dm-spl;
 };
