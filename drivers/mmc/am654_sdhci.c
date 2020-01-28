@@ -329,7 +329,7 @@ const struct am654_driver_data j721e_4bit_drv_data = {
 	.flags = IOMUX_PRESENT,
 };
 
-int am654_sdhci_init(struct am654_sdhci_plat *plat)
+int am654_sdhci_init_phy(struct am654_sdhci_plat *plat)
 {
 	u32 ctl_cfg_2 = 0;
 	u32 mask, val;
@@ -406,8 +406,37 @@ static int sdhci_am654_get_otap_delay(struct udevice *dev,
 	return 0;
 }
 
+#define MAX_SDCD_DEBOUNCE_TIME 2000
+int am654_sdhci_init(struct udevice *dev)
+{
+	struct am654_sdhci_plat *plat = dev_get_platdata(dev);
+	struct mmc *mmc = mmc_get_mmc_dev(dev);
+	struct sdhci_host *host = mmc->priv;
+	unsigned long start;
+	int val;
+
+	/*
+	 * The controller takes about 1 second to debounce the card detect line
+	 * and doesn't let us power on until that time is up. Instead of waiting
+	 * for 1 second at every stage, poll on the CARD_PRESENT bit upto a
+	 * maximum of 2 seconds to be safe..
+	 */
+	start = get_timer(0);
+	do {
+		if (get_timer(start) > MAX_SDCD_DEBOUNCE_TIME)
+			return -ENOMEDIUM;
+
+		val = mmc_getcd(host->mmc);
+	} while (!val);
+
+	am654_sdhci_init_phy(plat);
+
+	return sdhci_init(mmc);
+}
+
 static int am654_sdhci_probe(struct udevice *dev)
 {
+	struct dm_mmc_ops *ops = mmc_get_ops(dev);
 	struct am654_driver_data *drv_data =
 			(struct am654_driver_data *)dev_get_driver_data(dev);
 	struct am654_sdhci_plat *plat = dev_get_platdata(dev);
@@ -448,9 +477,9 @@ static int am654_sdhci_probe(struct udevice *dev)
 
 	regmap_init_mem_index(dev_ofnode(dev), &plat->base, 1);
 
-	am654_sdhci_init(plat);
+	ops->init = am654_sdhci_init;
 
-	return sdhci_probe(dev);
+	return 0;
 }
 
 static int am654_sdhci_ofdata_to_platdata(struct udevice *dev)
