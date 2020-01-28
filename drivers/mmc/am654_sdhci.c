@@ -74,6 +74,7 @@ struct am654_sdhci_plat {
 	u32 drv_strength;
 	u32 flags;
 #define DLL_PRESENT	(1 << 0)
+#define IOMUX_PRESENT	(1 << 1)
 	bool dll_on;
 };
 
@@ -176,7 +177,7 @@ const struct sdhci_ops am654_sdhci_ops = {
 
 const struct am654_driver_data am654_drv_data = {
 	.ops = &am654_sdhci_ops,
-	.flags = DLL_PRESENT,
+	.flags = DLL_PRESENT | IOMUX_PRESENT,
 };
 
 const struct am654_driver_data j721e_8bit_drv_data = {
@@ -190,6 +191,7 @@ const struct sdhci_ops j721e_4bit_sdhci_ops = {
 
 const struct am654_driver_data j721e_4bit_drv_data = {
 	.ops = &j721e_4bit_sdhci_ops,
+	.flags = IOMUX_PRESENT,
 };
 
 int am654_sdhci_init(struct am654_sdhci_plat *plat)
@@ -226,7 +228,8 @@ int am654_sdhci_init(struct am654_sdhci_plat *plat)
 	}
 
 	/* Enable pins by setting IO mux to 0 */
-	regmap_update_bits(plat->base, PHY_CTRL1, IOMUX_ENABLE_MASK, 0);
+	if (plat->flags & IOMUX_PRESENT)
+		regmap_update_bits(plat->base, PHY_CTRL1, IOMUX_ENABLE_MASK, 0);
 
 	/* Set slot type based on SD or eMMC */
 	if (plat->non_removable)
