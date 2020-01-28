@@ -2770,14 +2770,13 @@ int mmc_get_op_cond(struct mmc *mmc)
 	}
 	if (err)
 		return err;
-
 #if CONFIG_IS_ENABLED(DM_MMC)
-	/* The device has already been probed ready for use */
-#else
-	/* made sure it's not NULL earlier */
-	err = mmc->cfg->ops->init(mmc);
-	if (err)
-		return err;
+	struct dm_mmc_ops *ops = mmc_get_ops(mmc->dev);
+	if (ops->init) {
+		err = ops->init(mmc->dev);
+		if (err)
+			return err;
+	}
 #endif
 	mmc->ddr_mode = 0;
 

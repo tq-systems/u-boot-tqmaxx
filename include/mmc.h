@@ -406,6 +406,13 @@ struct mmc;
 #if CONFIG_IS_ENABLED(DM_MMC)
 struct dm_mmc_ops {
 	/**
+	 * init() - platform specific initialization for the host controller
+	 *
+	 * @dev:	Device to init
+	 * @return 0 if Ok, -ve if error
+	 */
+	int (*init)(struct udevice *dev);
+	/**
 	 * send_cmd() - Send a command to the MMC device
 	 *
 	 * @dev:	Device to receive the command
