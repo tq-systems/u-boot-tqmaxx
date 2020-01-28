@@ -12,6 +12,7 @@
 #include <power-domain.h>
 #include <regmap.h>
 #include <sdhci.h>
+#include "mmc_private.h"
 
 /* CTL_CFG Registers */
 #define CTL_CFG_2		0x14
@@ -67,6 +68,8 @@
 
 #define AM654_SDHCI_MIN_FREQ	400000
 
+#define SDHCI_TUNING_LOOP_COUNT	40
+
 struct am654_sdhci_plat {
 	struct mmc_config cfg;
 	struct mmc mmc;
@@ -93,6 +96,75 @@ struct am654_driver_data {
 	const struct sdhci_ops *ops;
 	u32 flags;
 };
+
+static int am654_sdhci_execute_tuning(struct mmc *mmc, u8 opcode)
+{
+	struct mmc_cmd cmd;
+	struct mmc_data data;
+	u32 ctrl;
+	struct sdhci_host *host;
+	char tuning_loop_counter = SDHCI_TUNING_LOOP_COUNT;
+
+	debug("%s\n", __func__);
+
+	host = mmc->priv;
+
+	ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
+	ctrl |= SDHCI_CTRL_EXEC_TUNING;
+	sdhci_writew(host, ctrl, SDHCI_HOST_CONTROL2);
+
+	sdhci_writel(host, SDHCI_INT_DATA_AVAIL, SDHCI_INT_ENABLE);
+	sdhci_writel(host, SDHCI_INT_DATA_AVAIL, SDHCI_SIGNAL_ENABLE);
+
+	do {
+		cmd.cmdidx = opcode;
+		cmd.resp_type = MMC_RSP_R1;
+		cmd.cmdarg = 0;
+
+		data.blocksize = 64;
+		data.blocks = 1;
+		data.flags = MMC_DATA_READ;
+
+		if (tuning_loop_counter-- == 0)
+			break;
+
+		if (cmd.cmdidx == MMC_CMD_SEND_TUNING_BLOCK_HS200 &&
+		    mmc->bus_width == 8)
+			data.blocksize = 128;
+
+		sdhci_writew(host, SDHCI_MAKE_BLKSZ(SDHCI_DEFAULT_BOUNDARY_ARG,
+						    data.blocksize),
+			     SDHCI_BLOCK_SIZE);
+		sdhci_writew(host, data.blocks, SDHCI_BLOCK_COUNT);
+		sdhci_writew(host, SDHCI_TRNS_READ, SDHCI_TRANSFER_MODE);
+
+		mmc_send_cmd(mmc, &cmd, NULL);
+
+		ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
+
+		if (cmd.cmdidx == MMC_CMD_SEND_TUNING_BLOCK)
+			udelay(1);
+
+	} while (ctrl & SDHCI_CTRL_EXEC_TUNING);
+
+	if (tuning_loop_counter < 0) {
+		ctrl &= ~SDHCI_CTRL_TUNED_CLK;
+		sdhci_writel(host, ctrl, SDHCI_HOST_CONTROL2);
+	}
+
+	if (!(ctrl & SDHCI_CTRL_TUNED_CLK)) {
+		printf("%s:Tuning failed\n", __func__);
+		return -1;
+	}
+
+	/* Enable only interrupts served by the SD controller */
+	sdhci_writel(host, SDHCI_INT_DATA_MASK | SDHCI_INT_CMD_MASK,
+		     SDHCI_INT_ENABLE);
+	/* Mask all sdhci interrupt sources */
+	sdhci_writel(host, 0x0, SDHCI_SIGNAL_ENABLE);
+
+	return 0;
+}
 
 static void am654_sdhci_set_control_reg(struct sdhci_host *host)
 {
@@ -203,6 +275,7 @@ static int am654_sdhci_set_ios_post(struct sdhci_host *host)
 const struct sdhci_ops am654_sdhci_ops = {
 	.set_ios_post		= &am654_sdhci_set_ios_post,
 	.set_control_reg	= &am654_sdhci_set_control_reg,
+	.platform_execute_tuning = &am654_sdhci_execute_tuning,
 };
 
 const struct am654_driver_data am654_drv_data = {
@@ -232,6 +305,7 @@ static int j721e_4bit_sdhci_set_ios_post(struct sdhci_host *host)
 const struct sdhci_ops j721e_4bit_sdhci_ops = {
 	.set_ios_post		= &j721e_4bit_sdhci_set_ios_post,
 	.set_control_reg	= &am654_sdhci_set_control_reg,
+	.platform_execute_tuning = &am654_sdhci_execute_tuning,
 };
 
 const struct am654_driver_data j721e_4bit_drv_data = {
