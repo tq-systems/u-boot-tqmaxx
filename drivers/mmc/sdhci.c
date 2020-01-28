@@ -666,7 +666,7 @@ static int sdhci_set_ios(struct mmc *mmc)
 	return 0;
 }
 
-static int sdhci_init(struct mmc *mmc)
+int sdhci_init(struct mmc *mmc)
 {
 	struct sdhci_host *host = mmc->priv;
 #if CONFIG_IS_ENABLED(DM_MMC) && CONFIG_IS_ENABLED(DM_GPIO)
