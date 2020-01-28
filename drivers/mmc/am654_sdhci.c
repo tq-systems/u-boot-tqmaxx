@@ -320,7 +320,7 @@ static int j721e_4bit_sdhci_set_ios_post(struct sdhci_host *host)
 
 const struct sdhci_ops j721e_4bit_sdhci_ops = {
 	.set_ios_post		= &j721e_4bit_sdhci_set_ios_post,
-	.set_control_reg	= &am654_sdhci_set_control_reg,
+	.set_control_reg	= &sdhci_set_control_reg,
 	.platform_execute_tuning = &am654_sdhci_execute_tuning,
 };
 
