@@ -235,11 +235,19 @@ static int cadence_spi_mem_exec_op(struct spi_slave *spi,
 			mode = CQSPI_STIG_READ;
 		else
 			mode = CQSPI_READ;
+
+		err = cadence_qspi_apb_read_setup(plat, op);
+		if (err)
+			return err;
 	} else {
 		if (!op->addr.nbytes || !op->data.buf.out)
 			mode = CQSPI_STIG_WRITE;
 		else
 			mode = CQSPI_WRITE;
+
+		err = cadence_qspi_apb_write_setup(plat, op);
+		if (err)
+			return err;
 	}
 
 	switch (mode) {
