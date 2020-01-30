@@ -138,6 +138,28 @@ static ssize_t spi_nor_write_data(struct spi_nor *nor, loff_t to, size_t len,
 	return op.data.nbytes;
 }
 
+static int spi_nor_select_mode(struct spi_nor *nor, enum spi_nor_mode mode)
+{
+	int ret;
+
+	if (nor->mode == mode)
+		return 0;
+
+	if (!nor->change_mode)
+		return -ENOTSUPP;
+
+	ret = nor->change_mode(nor, mode);
+	if (ret)
+		return ret;
+
+	if (nor->adjust_op)
+		nor->adjust_op(nor, mode);
+
+	nor->mode = mode;
+
+	return ret;
+}
+
 /*
  * Read the status register, returning its value in the location
  * Return the status register value.
@@ -910,6 +932,8 @@ static int spi_nor_read(struct mtd_info *mtd, loff_t from, size_t len,
 
 	dev_dbg(nor->dev, "from 0x%08x, len %zd\n", (u32)from, len);
 
+	spi_nor_select_mode(nor, nor->preferred_mode);
+
 	while (len) {
 		loff_t addr = from;
 		size_t read_len = len;
@@ -948,6 +972,8 @@ read_err:
 #ifdef CONFIG_SPI_FLASH_BAR
 	ret = clean_bar(nor);
 #endif
+	spi_nor_select_mode(nor, SPI_NOR_MODE_SPI);
+
 	return ret;
 }
 
@@ -2344,6 +2370,9 @@ static int spi_nor_setup(struct spi_nor *nor, const struct flash_info *info,
 			"SPI n-n-n protocols are not supported yet.\n");
 		shared_mask &= ~ignored_mask;
 	}
+
+	nor->change_mode = info->change_mode;
+	nor->adjust_op = info->adjust_op;
 
 	/* Select the (Fast) Read command. */
 	err = spi_nor_select_read(nor, params, shared_mask);

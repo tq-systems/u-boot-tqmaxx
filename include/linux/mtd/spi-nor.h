@@ -248,6 +248,15 @@ enum spi_nor_option_flags {
 	SNOR_F_BROKEN_RESET	= BIT(6),
 };
 
+enum spi_nor_mode {
+	SPI_NOR_MODE_SPI = 0,
+	SPI_NOR_MODE_DPI,
+	SPI_NOR_MODE_QPI,
+	SPI_NOR_MODE_OPI,
+	SPI_NOR_MODE_OPI_DTR,
+	SPI_NOR_NUM_MODES,
+};
+
 /**
  * struct flash_info - Forward declaration of a structure used internally by
  *		       spi_nor_scan()
@@ -322,6 +331,8 @@ struct spi_nor {
 	enum spi_nor_protocol	write_proto;
 	enum spi_nor_protocol	reg_proto;
 	bool			sst_write_second;
+	enum spi_nor_mode	mode;
+	enum spi_nor_mode	preferred_mode;
 	u32			flags;
 	u8			cmd_buf[SPI_NOR_MAX_CMD_SIZE];
 
@@ -340,6 +351,8 @@ struct spi_nor {
 	int (*flash_unlock)(struct spi_nor *nor, loff_t ofs, uint64_t len);
 	int (*flash_is_locked)(struct spi_nor *nor, loff_t ofs, uint64_t len);
 	int (*quad_enable)(struct spi_nor *nor);
+	int (*change_mode)(struct spi_nor *nor, enum spi_nor_mode mode);
+	 void (*adjust_op)(struct spi_nor *nor, enum spi_nor_mode mode);
 
 	void *priv;
 /* Compatibility for spi_flash, remove once sf layer is merged with mtd */
