@@ -20,7 +20,7 @@
 #define CONFIG_FEC_MXC_PHYADDR		0x1F
 
 #define BB_ENV_SETTINGS \
-	"console=ttyLP1,115200 earlycon=lpuart32,5a070000,115200\0" \
+	"console=ttyLP1,115200 earlycon=lpuart32,0x5a070000\0" \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"
 
 #endif /* __TQMA8XX_MBPA8XX_H */
