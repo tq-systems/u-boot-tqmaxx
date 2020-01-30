@@ -12,6 +12,61 @@
 
 #include "sf_internal.h"
 
+#ifdef CONFIG_SPI_FLASH_STMICRO
+static void spi_nor_micron_adjust_op(struct spi_nor *nor,
+				     enum spi_nor_mode mode)
+{
+	if (mode == SPI_NOR_MODE_OPI_DTR) {
+		nor->reg_proto = SNOR_PROTO_8_8_8_DTR;
+		nor->read_proto = SNOR_PROTO_8_8_8_DTR;
+		nor->write_proto = SNOR_PROTO_8_8_8_DTR;
+		nor->read_dummy = 16;
+		nor->addr_width = 4;
+		nor->read_opcode = SPINOR_OP_READ_8_8_8_DTR_4B;
+	} else {
+		nor->reg_proto = SNOR_PROTO_1_1_1;
+		nor->read_proto = SNOR_PROTO_1_1_1;
+		nor->write_proto = SNOR_PROTO_1_1_1;
+		nor->read_dummy = 8;
+		nor->addr_width = 4;
+		nor->read_opcode = SPINOR_OP_READ_FAST_4B;
+	}
+}
+
+static int spi_nor_micron_set_octal_ddr_mode(struct spi_nor *nor,
+					     enum spi_nor_mode mode)
+{
+	u8 addr_width, program_opcode, vcr_val;
+	int ret;
+
+	program_opcode = nor->program_opcode;
+	addr_width = nor->addr_width;
+
+	/* Enable Octal DTR mode */
+	nor->program_opcode = SPINOR_OP_WR_VCR;
+
+	if (mode == SPI_NOR_MODE_OPI_DTR) {
+		nor->addr_width = 3;
+		vcr_val = VCR_OCTAL_DDR_EN_MICRON;
+		ret = nor->write(nor, 0x0, sizeof(vcr_val), &vcr_val);
+		if (ret < 0)
+			return ret;
+	} else {
+		nor->reg_proto = SNOR_PROTO_8_8_8_DTR;
+		/* Soft reset the flash to return to SPI_NOR_MODE_SPI */
+		nor->write_reg(nor, SPINOR_OP_RESET_EN, NULL, 0);
+		udelay(1);
+		nor->write_reg(nor, SPINOR_OP_RESET_MEM, NULL, 0);
+		udelay(1);
+	}
+
+	nor->program_opcode = program_opcode;
+	nor->addr_width = addr_width;
+
+	return 0;
+}
+#endif /* CONFIG_SPI_FLASH_STMICRO */
+
 /* Exclude chip names for SPL to save space */
 #if !CONFIG_IS_ENABLED(SPI_FLASH_TINY)
 #define INFO_NAME(_name) .name = _name,
@@ -182,7 +237,13 @@ const struct flash_info spi_nor_ids[] = {
 	{ INFO("n25q00",      0x20ba21, 0, 64 * 1024, 2048, SECT_4K | USE_FSR | SPI_NOR_QUAD_READ | NO_CHIP_ERASE) },
 	{ INFO("n25q00a",     0x20bb21, 0, 64 * 1024, 2048, SECT_4K | USE_FSR | SPI_NOR_QUAD_READ | NO_CHIP_ERASE) },
 	{ INFO("mt25qu02g",   0x20bb22, 0, 64 * 1024, 4096, SECT_4K | USE_FSR | SPI_NOR_QUAD_READ | NO_CHIP_ERASE) },
-	{ INFO("mt35xu512aba", 0x2c5b1a, 0,  128 * 1024,  512, USE_FSR | SPI_NOR_4B_OPCODES) },
+	{
+		INFO("mt35xu512aba", 0x2c5b1a, 0, 128 * 1024, 512,
+			SECT_4K | USE_FSR | SPI_NOR_OPI_DTR |
+			SPI_NOR_4B_OPCODES)
+			.change_mode = spi_nor_micron_set_octal_ddr_mode,
+			.adjust_op = spi_nor_micron_adjust_op
+	},
 	{ INFO("mt35xu02g",  0x2c5b1c, 0, 128 * 1024,  2048, USE_FSR | SPI_NOR_4B_OPCODES) },
 #endif
 #ifdef CONFIG_SPI_FLASH_SPANSION	/* SPANSION */
