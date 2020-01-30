@@ -50,6 +50,8 @@
 #define CQSPI_DUMMY_CLKS_PER_BYTE		8
 #define CQSPI_DUMMY_BYTES_MAX			4
 
+#define CQSPI_MAX_RX_DLL_DELAY			0x7F
+
 /****************************************************************************
  * Controller's configuration and status register (offset from QSPI_BASE)
  ****************************************************************************/
@@ -57,11 +59,14 @@
 #define	CQSPI_REG_CONFIG_ENABLE			BIT(0)
 #define	CQSPI_REG_CONFIG_CLK_POL		BIT(1)
 #define	CQSPI_REG_CONFIG_CLK_PHA		BIT(2)
+#define	CQSPI_REG_CONFIG_PHY			BIT(3)
 #define	CQSPI_REG_CONFIG_DIRECT			BIT(7)
 #define	CQSPI_REG_CONFIG_DECODE			BIT(9)
 #define	CQSPI_REG_CONFIG_XIP_IMM		BIT(18)
 #define	CQSPI_REG_CONFIG_CHIPSELECT_LSB		10
 #define	CQSPI_REG_CONFIG_BAUD_LSB		19
+#define	CQSPI_REG_CONFIG_DTR_PROTO		BIT(24)
+#define	CQSPI_REG_CONFIG_PHY_PIPELINE		BIT(25)
 #define	CQSPI_REG_CONFIG_IDLE_LSB		31
 #define	CQSPI_REG_CONFIG_CHIPSELECT_MASK	0xF
 #define	CQSPI_REG_CONFIG_BAUD_MASK		0xF
@@ -95,6 +100,7 @@
 #define	CQSPI_REG_RD_DATA_CAPTURE		0x10
 #define	CQSPI_REG_RD_DATA_CAPTURE_BYPASS	BIT(0)
 #define	CQSPI_REG_RD_DATA_CAPTURE_DELAY_LSB	1
+#define	CQSPI_REG_RD_DATA_CAPTURE_DQS		BIT(8)
 #define	CQSPI_REG_RD_DATA_CAPTURE_DELAY_MASK	0xF
 
 #define	CQSPI_REG_SIZE				0x14
@@ -163,6 +169,13 @@
 #define	CQSPI_REG_CMDWRITEDATALOWER		0xA8
 #define	CQSPI_REG_CMDWRITEDATAUPPER		0xAC
 
+#define	CQSPI_REG_PHY_CONFIGURATION			0xB4
+#define	CQSPI_REG_PHY_CONFIGURATION_DLL_RESET		BIT(30)
+#define	CQSPI_REG_PHY_CONFIGURATION_DLL_RESYNC		BIT(31)
+#define	CQSPI_REG_PHY_CONFIGURATION_RX_DLL_MASK		GENMASK(6, 0)
+#define	CQSPI_REG_PHY_CONFIGURATION_TX_DLL_MASK		GENMASK(22, 16)
+#define	CQSPI_REG_PHY_CONFIGURATION_TX_DLL_SHIFT	16
+
 #define CQSPI_REG_IS_IDLE(base)					\
 	((readl(base + CQSPI_REG_CONFIG) >>		\
 		CQSPI_REG_CONFIG_IDLE_LSB) & 0x1)
@@ -228,7 +241,9 @@ static unsigned int cadence_qspi_wait_idle(void *reg_base)
 }
 
 void cadence_qspi_apb_readdata_capture(void *reg_base,
-				unsigned int bypass, unsigned int delay)
+				       unsigned int bypass,
+				       unsigned int delay,
+				       bool dqs_en)
 {
 	unsigned int reg;
 	cadence_qspi_apb_controller_disable(reg_base);
@@ -239,6 +254,11 @@ void cadence_qspi_apb_readdata_capture(void *reg_base,
 		reg |= CQSPI_REG_RD_DATA_CAPTURE_BYPASS;
 	else
 		reg &= ~CQSPI_REG_RD_DATA_CAPTURE_BYPASS;
+
+	if (dqs_en)
+		reg |= CQSPI_REG_RD_DATA_CAPTURE_DQS;
+	else
+		reg &= ~CQSPI_REG_RD_DATA_CAPTURE_DQS;
 
 	reg &= ~(CQSPI_REG_RD_DATA_CAPTURE_DELAY_MASK
 		<< CQSPI_REG_RD_DATA_CAPTURE_DELAY_LSB);
@@ -399,6 +419,151 @@ void cadence_qspi_apb_controller_init(struct cadence_spi_platdata *plat)
 	writel(0, plat->regbase + CQSPI_REG_IRQMASK);
 
 	cadence_qspi_apb_controller_enable(plat->regbase);
+}
+
+static void cqspi_phy_dtr_enable(void *reg_base, bool enable)
+{
+	unsigned int reg;
+
+	reg = readl(reg_base + CQSPI_REG_CONFIG);
+
+	if (enable) {
+		reg |= (CQSPI_REG_CONFIG_PHY |
+			CQSPI_REG_CONFIG_PHY_PIPELINE |
+			CQSPI_REG_CONFIG_DTR_PROTO);
+		cadence_qspi_apb_readdata_capture(reg_base, 1,
+						  0, true);
+	} else {
+		reg &= ~(CQSPI_REG_CONFIG_PHY |
+			 CQSPI_REG_CONFIG_PHY_PIPELINE |
+			 CQSPI_REG_CONFIG_DTR_PROTO);
+		cadence_qspi_apb_readdata_capture(reg_base, 1,
+						  0, false);
+	}
+
+	writel(reg, reg_base + CQSPI_REG_CONFIG);
+
+	cadence_qspi_wait_idle(reg_base);
+}
+
+static void cqspi_phy_dll_config(struct cadence_spi_platdata *plat, u8 tx_dly,
+				 u8 rx_dly)
+{
+	void __iomem *reg_base = plat->regbase;
+	u32 reg;
+
+	reg = readl(reg_base + CQSPI_REG_PHY_CONFIGURATION);
+	reg &= ~CQSPI_REG_PHY_CONFIGURATION_TX_DLL_MASK;
+	reg |= tx_dly << CQSPI_REG_PHY_CONFIGURATION_TX_DLL_SHIFT;
+
+	reg &= ~CQSPI_REG_PHY_CONFIGURATION_RX_DLL_MASK;
+	reg |= rx_dly;
+	writel(reg, reg_base + CQSPI_REG_PHY_CONFIGURATION);
+
+	reg &= ~CQSPI_REG_PHY_CONFIGURATION_DLL_RESYNC;
+	writel(reg, reg_base + CQSPI_REG_PHY_CONFIGURATION);
+	reg |= CQSPI_REG_PHY_CONFIGURATION_DLL_RESYNC;
+	writel(reg, reg_base + CQSPI_REG_PHY_CONFIGURATION);
+	/* Make sure 0->1 transition of DLL resync bit is triggered */
+	dmb();
+	/* satisfy wait for 20 reference clock cycles @166MHz clock */
+	udelay(1);
+}
+
+/* Configure OSPI PHY in Master Bypass mode */
+int cqspi_config_phy(struct cadence_spi_platdata *plat, struct spi_mem_op *op,
+		     void *calib_data, size_t len)
+{
+	char *read_data = kmalloc(len, GFP_KERNEL);
+	u8 rx_dly_start[CQSPI_MAX_RX_DLL_DELAY + 1];
+	u8 tx_dly_start = 0xff, tx_dly_end = 0;
+	void __iomem *reg_base = plat->regbase;
+	u8 tx_dly = 0, rx_dly = 0;
+	int ret = 0;
+	u32 reg;
+
+	reg = readl(reg_base + CQSPI_REG_PHY_CONFIGURATION);
+	/* If PHY is already calibrated return */
+	if (reg & CQSPI_REG_PHY_CONFIGURATION_TX_DLL_MASK) {
+		plat->phy_calibrated = true;
+		return 0;
+	}
+
+	memset(rx_dly_start, 0xff, sizeof(rx_dly_start));
+
+	reg = readl(reg_base + CQSPI_REG_CONFIG);
+	/* Reset PHY */
+	reg &= ~(CQSPI_REG_CONFIG_PHY | CQSPI_REG_CONFIG_PHY_PIPELINE);
+	writel(reg, reg_base + CQSPI_REG_CONFIG);
+	cqspi_phy_dtr_enable(reg_base, true);
+
+	op->data.buf.in = read_data;
+	op->data.nbytes = len;
+	/* Find range of TX DLL values which have at least one passing RX
+	 * DLL value
+	 */
+	while (tx_dly <= CQSPI_MAX_RX_DLL_DELAY) {
+		rx_dly = 0;
+
+		while (rx_dly <= CQSPI_MAX_RX_DLL_DELAY) {
+			cqspi_phy_dll_config(plat, tx_dly, rx_dly);
+
+			cadence_qspi_apb_read_setup(plat, op);
+			cadence_qspi_apb_read_execute(plat, op);
+
+			if (!memcmp(read_data, calib_data, len)) {
+				if (tx_dly_start == 0xff)
+					tx_dly_start = tx_dly;
+				rx_dly_start[tx_dly] = rx_dly;
+				break;
+			}
+			rx_dly++;
+		}
+		if (tx_dly_start != 0xff && rx_dly_start[tx_dly] == 0xff) {
+			tx_dly_end = tx_dly - 1;
+			break;
+		}
+		tx_dly++;
+	}
+
+	if (tx_dly_start == 0xff) {
+		ret = -EINVAL;
+		goto disable_phy;
+	}
+	/* Choose mid value from range of passing TX DLL values */
+	tx_dly = (tx_dly_start + tx_dly_end) / 2;
+	dev_dbg(nor->dev, "TX DLL valid range %x...%x\n",
+		tx_dly_start, tx_dly_end);
+	rx_dly = rx_dly_start[tx_dly];
+
+	/* For the chosen TX DLL value, find range of passing RX DLL
+	 * values
+	 */
+	while (rx_dly <= CQSPI_MAX_RX_DLL_DELAY) {
+		cqspi_phy_dll_config(plat, tx_dly, rx_dly);
+
+		cadence_qspi_apb_read_setup(plat, op);
+		cadence_qspi_apb_read_execute(plat, op);
+
+		if (memcmp(read_data, calib_data, len))
+			break;
+		rx_dly++;
+	}
+
+	/* Choose mid value from range of passing RX DLL values */
+	rx_dly = (rx_dly_start[tx_dly] + rx_dly - 1) / 2;
+	dev_dbg(nor->dev, "RX DLL valid range %x...%x\n",
+		rx_dly_start[tx_dly], rx_dly - 1);
+
+	dev_dbg(nor->dev, "Calibrating DLLs to (%x, %x)\n", tx_dly, rx_dly);
+	/* Set the chosen TX and RX DLL value pair */
+	cqspi_phy_dll_config(plat, tx_dly, rx_dly);
+
+	plat->phy_calibrated = true;
+disable_phy:
+	cqspi_phy_dtr_enable(reg_base, false);
+
+	return ret;
 }
 
 static int cadence_qspi_apb_exec_flash_cmd(void *reg_base,

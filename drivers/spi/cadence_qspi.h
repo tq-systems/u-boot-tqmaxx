@@ -26,6 +26,8 @@ struct cadence_spi_platdata {
 	u32		trigger_address;
 	fdt_addr_t	ahbsize;
 	bool		use_dac_mode;
+	bool		phy_mode;
+	bool		phy_calibrated;
 
 	/* Flash parameters */
 	u32		page_size;
@@ -34,6 +36,7 @@ struct cadence_spi_platdata {
 	u32		tsd2d_ns;
 	u32		tchsh_ns;
 	u32		tslch_ns;
+	u32		read_delay;
 };
 
 struct cadence_spi_priv {
@@ -81,7 +84,9 @@ void cadence_qspi_apb_delay(void *reg_base,
 	unsigned int tshsl_ns, unsigned int tsd2d_ns,
 	unsigned int tchsh_ns, unsigned int tslch_ns);
 void cadence_qspi_apb_enter_xip(void *reg_base, char xip_dummy);
-void cadence_qspi_apb_readdata_capture(void *reg_base,
-	unsigned int bypass, unsigned int delay);
+void cadence_qspi_apb_readdata_capture(void *reg_base, unsigned int bypass,
+				       unsigned int delay, bool dqs_en);
+int cqspi_config_phy(struct cadence_spi_platdata *plat, struct spi_mem_op *op,
+		     void *calib_data, size_t size);
 
 #endif /* __CADENCE_QSPI_H__ */

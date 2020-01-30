@@ -60,7 +60,7 @@ static int spi_calibration(struct udevice *bus, uint hz)
 	cadence_spi_write_speed(bus, 1000000);
 
 	/* configure the read data capture delay register to 0 */
-	cadence_qspi_apb_readdata_capture(base, 1, 0);
+	cadence_qspi_apb_readdata_capture(base, 1, 0, false);
 
 	/* Enable QSPI */
 	cadence_qspi_apb_controller_enable(base);
@@ -79,7 +79,7 @@ static int spi_calibration(struct udevice *bus, uint hz)
 		cadence_qspi_apb_controller_disable(base);
 
 		/* reconfigure the read data capture delay register */
-		cadence_qspi_apb_readdata_capture(base, 1, i);
+		cadence_qspi_apb_readdata_capture(base, 1, i, false);
 
 		/* Enable back QSPI */
 		cadence_qspi_apb_controller_enable(base);
@@ -114,7 +114,8 @@ static int spi_calibration(struct udevice *bus, uint hz)
 	cadence_qspi_apb_controller_disable(base);
 
 	/* configure the final value for read data capture delay register */
-	cadence_qspi_apb_readdata_capture(base, 1, (range_hi + range_lo) / 2);
+	cadence_qspi_apb_readdata_capture(base, 1, (range_hi + range_lo) / 2,
+					  false);
 	debug("SF: Read data capture delay calibrated to %i (%i - %i)\n",
 	      (range_hi + range_lo) / 2, range_lo, range_hi);
 
@@ -144,9 +145,13 @@ static int cadence_spi_set_speed(struct udevice *bus, uint hz)
 	if (priv->previous_hz != hz ||
 	    priv->qspi_calibrated_hz != hz ||
 	    priv->qspi_calibrated_cs != spi_chip_select(bus)) {
-		err = spi_calibration(bus, hz);
-		if (err)
-			return err;
+		if (plat->phy_mode) {
+			cadence_spi_write_speed(bus, hz);
+		} else {
+			err = spi_calibration(bus, hz);
+			if (err)
+				return err;
+		}
 
 		/* prevent calibration run when same as previous request */
 		priv->previous_hz = hz;
@@ -302,6 +307,7 @@ static int cadence_spi_ofdata_to_platdata(struct udevice *bus)
 						 255);
 	plat->tchsh_ns = ofnode_read_u32_default(subnode, "cdns,tchsh-ns", 20);
 	plat->tslch_ns = ofnode_read_u32_default(subnode, "cdns,tslch-ns", 20);
+	plat->phy_mode = ofnode_read_bool(subnode, "cdns,phy-mode");
 
 	ret = clk_get_by_index(bus, 0, &clk);
 	if (ret) {
@@ -324,8 +330,19 @@ static int cadence_spi_ofdata_to_platdata(struct udevice *bus)
 	return 0;
 }
 
+static int cadence_spi_calibrate(struct spi_slave *spi,
+				 struct spi_mem_op *op, void *calib_data,
+				 size_t size)
+{
+	struct udevice *bus = spi->dev->parent;
+	struct cadence_spi_platdata *plat = bus->platdata;
+
+	return cqspi_config_phy(plat, op, calib_data, size);
+}
+
 static const struct spi_controller_mem_ops cadence_spi_mem_ops = {
 	.exec_op = cadence_spi_mem_exec_op,
+	.calibrate = cadence_spi_calibrate,
 };
 
 static const struct dm_spi_ops cadence_spi_ops = {
