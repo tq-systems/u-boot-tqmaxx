@@ -184,6 +184,8 @@ struct spi_controller_mem_ops {
 			    const struct spi_mem_op *op);
 	int (*exec_op)(struct spi_slave *slave,
 		       const struct spi_mem_op *op);
+	int (*calibrate)(struct spi_slave *slave, struct spi_mem_op *op,
+			 void *calib_data, size_t size);
 };
 
 #ifndef __UBOOT__
