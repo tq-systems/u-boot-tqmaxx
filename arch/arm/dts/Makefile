@@ -902,6 +902,7 @@ dtb-$(CONFIG_ARCH_IMX8) += \
 	fsl-imx8qxp-colibri.dtb \
 	fsl-imx8qxp-mek.dtb \
 	fsl-imx8dx-mek.dtb \
+	fsl-imx8dxl-evk.dtb \
 	imx8-capricorn-cxg3.dtb \
 
 dtb-$(CONFIG_ARCH_IMX8ULP) += \
