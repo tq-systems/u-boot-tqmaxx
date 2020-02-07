@@ -5493,6 +5493,9 @@ void e1000_get_bus_type(struct e1000_hw *hw)
 static LIST_HEAD(e1000_hw_list);
 #endif
 
+#define E1000_PCI_DEV_CTRL	0xe8
+#define PCI_DEV_CTRL_MRRS_MASK	GENMASK(14, 12)
+
 #ifdef CONFIG_DM_ETH
 static int e1000_init_one(struct e1000_hw *hw, int cardnum,
 			  struct udevice *devno, unsigned char enetaddr[6])
@@ -5525,6 +5528,16 @@ static int e1000_init_one(struct e1000_hw *hw, int cardnum, pci_dev_t devno,
 	dm_pci_write_config32(devno, PCI_COMMAND, val);
 #else
 	pci_write_config_dword(devno, PCI_COMMAND, val);
+#endif
+
+#ifdef CONFIG_DM_ETH
+	dm_pci_read_config32(devno, E1000_PCI_DEV_CTRL, &val);
+	/*
+	 * Set MRRS to 128 Bytes to make the card compatible with RCs
+	 * which may not support higher MRRS values.
+	 */
+	val &= ~PCI_DEV_CTRL_MRRS_MASK;
+	dm_pci_write_config32(devno, E1000_PCI_DEV_CTRL, val);
 #endif
 
 	/* Make sure it worked */
