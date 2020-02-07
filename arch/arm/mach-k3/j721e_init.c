@@ -130,6 +130,56 @@ void k3_mmc_restart_clock(void)
 }
 #endif
 
+#ifdef CONFIG_CPU_V7R
+void setup_navss_nb(void)
+{
+	/* Map orderid 8-15 to VBUSM.C thread 2 (real-time traffic) */
+	writel(2, NAVSS0_NBSS_NB0_CFG_NB_THREADMAP);
+	writel(2, NAVSS0_NBSS_NB1_CFG_NB_THREADMAP);
+}
+
+void setup_dss_credentials(void)
+{
+	unsigned int channel, group;
+
+	/* two master ports: dma and fbdc */
+	/* two groups: SRAM and DDR */
+	/* 10 channels: (pipe << 1) | is_second_buffer */
+
+	/* master port 1 (dma) */
+
+	for (group = 0; group < 2; ++group) {
+		writel(0x76543210, QOS_DSS0_DMA_CBASS_GRP_MAP1(group));
+		writel(0xfedcba98, QOS_DSS0_DMA_CBASS_GRP_MAP2(group));
+	}
+
+	for (channel = 0; channel < 10; ++channel) {
+		u8 orderid;
+		u8 atype = 0;
+
+		orderid = 0xf - channel;
+
+		writel((atype << 28) | (orderid << 4), QOS_DSS0_DMA_CBASS_MAP(channel));
+	}
+
+	/* master port 2 (fbdc) */
+
+	for (group = 0; group < 2; ++group) {
+		writel(0x76543210, QOS_DSS0_FBDC_CBASS_GRP_MAP1(group));
+		writel(0xfedcba98, QOS_DSS0_FBDC_CBASS_GRP_MAP2(group));
+	}
+
+	for (channel = 0; channel < 10; ++channel) {
+		u8 orderid;
+		u8 atype = 0;
+
+		orderid = 0xf - channel;
+
+		writel((atype << 28) | (orderid << 4), QOS_DSS0_FBDC_CBASS_MAP(channel));
+	}
+}
+#endif
+
 /*
  * This uninitialized global variable would normal end up in the .bss section,
  * but the .bss is cleared between writing and reading this variable, so move
@@ -164,6 +214,9 @@ void board_init_f(ulong dummy)
 #ifdef CONFIG_CPU_V7R
 	disable_linefill_optimization();
 	setup_k3_mpu_regions();
+
+	setup_navss_nb();
+	setup_dss_credentials();
 #endif
 
 	/* Init DM early */
