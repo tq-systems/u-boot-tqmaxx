@@ -548,4 +548,10 @@
 		clocks = <&k3_clks 193 0>;
 		power-domains = <&k3_pds 193 TI_SCI_PD_EXCLUSIVE>;
 	};
+
+	main_esm: esm@700000 {
+		compatible = "ti,j721e-esm";
+		reg = <0x0 0x700000 0x0 0x1000>;
+		ti,esm-pins = <344>, <345>;
+	};
 };

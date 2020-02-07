@@ -369,3 +369,7 @@
 		u-boot,dm-spl;
 	};
 };
+
+&main_esm {
+	u-boot,dm-spl;
+};
