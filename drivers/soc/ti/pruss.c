@@ -79,11 +79,6 @@ int pruss_request_shrmem_region(struct udevice *dev, phys_addr_t *loc)
 	return 0;
 }
 
-static int pruss_bind(struct udevice *dev)
-{
-	return dm_scan_fdt_dev(dev);
-}
-
 /**
  * pruss_probe() - Basic probe
  * @dev:	corresponding k3 device
@@ -151,7 +146,6 @@ U_BOOT_DRIVER(pruss) = {
 	.name = "pruss",
 	.of_match = pruss_ids,
 	.id = UCLASS_MISC,
-	.bind = pruss_bind,
 	.probe = pruss_probe,
 	.priv_auto_alloc_size = sizeof(struct pruss),
 };
