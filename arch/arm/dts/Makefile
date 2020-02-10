@@ -832,7 +832,7 @@ dtb-$(CONFIG_TARGET_STM32MP1) += \
 	stm32mp157c-ev1.dtb
 
 dtb-$(CONFIG_SOC_K3_AM6) += k3-am654-base-board.dtb k3-am654-r5-base-board.dtb \
-		k3-am654-pcie-usb2.dtbo
+		k3-am654-pcie-usb2.dtbo k3-am654-idk.dtbo
 dtb-$(CONFIG_SOC_K3_J721E) += k3-j721e-common-proc-board.dtb \
 			      k3-j721e-tps65917-proc-board.dtb \
 			      k3-j721e-r5-common-proc-board.dtb
