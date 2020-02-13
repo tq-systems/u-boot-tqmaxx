@@ -122,7 +122,7 @@
 	"script=boot.scr\0" \
 	"image=Image\0" \
 	"panel=NULL\0" \
-	"console=ttyLP0,115200 earlycon=lpuart32,0x5a060000,115200\0" \
+	"console=ttyLP0,115200 earlycon=lpuart32,0x5a060000\0" \
 	"fdt_addr=0x83000000\0"			\
 	"fdt_high=0xffffffffffffffff\0"		\
 	"cntr_addr=0x88000000\0"			\
