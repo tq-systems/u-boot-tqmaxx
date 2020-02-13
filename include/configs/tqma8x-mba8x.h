@@ -21,7 +21,7 @@
 
 #define BB_ENV_SETTINGS \
 	"console=ttyLP0,"__stringify(CONFIG_BAUDRATE)"\0" \
-	"earlycon=lpuart32,5a060000,"__stringify(CONFIG_BAUDRATE)"\0" \
+	"earlycon=lpuart32,0x5a060000\0" \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"
 
 #endif /* __TQMA8X_MBA8X_H */
