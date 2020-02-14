@@ -4,6 +4,9 @@
  *
  * Copyright (C) 2016-2019 Texas Instruments Incorporated - http://www.ti.com/
  */
+#include <dt-bindings/mux/mux.h>
+#include <dt-bindings/phy/phy.h>
+#include <dt-bindings/mux/mux-j721e-wiz.h>
 
 &cbass_main {
 	msmc_ram: sram@70000000 {
@@ -16,6 +19,37 @@
 		atf-sram@0 {
 			reg = <0x0 0x20000>;
 		};
+	};
+
+	scm_conf: scm_conf@100000 {
+		compatible = "syscon", "simple-mfd";
+		reg = <0 0x00100000 0 0x1c000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges = <0x0 0x0 0x00100000 0x1c000>;
+
+		serdes_ln_ctrl: serdes_ln_ctrl@4080 {
+			compatible = "mmio-mux";
+			#mux-control-cells = <1>;
+			mux-reg-masks = <0x4080 0x3>, <0x4084 0x3>, /* SERDES0 lane0/1 select */
+					<0x4090 0x3>, <0x4094 0x3>, /* SERDES1 lane0/1 select */
+					<0x40a0 0x3>, <0x40a4 0x3>, /* SERDES2 lane0/1 select */
+					<0x40b0 0x3>, <0x40b4 0x3>, /* SERDES3 lane0/1 select */
+					<0x40c0 0x3>, <0x40c4 0x3>, <0x40c8 0x3>, <0x40cc 0x3>;
+					/* SERDES4 lane0/1/2/3 select */
+			idle-states = <SERDES0_LANE0_PCIE0_LANE0>, <SERDES0_LANE1_PCIE0_LANE1>,
+				      <SERDES1_LANE0_PCIE1_LANE0>, <SERDES1_LANE1_PCIE1_LANE1>,
+				      <SERDES2_LANE0_PCIE2_LANE0>, <SERDES2_LANE1_PCIE2_LANE1>,
+				      <MUX_IDLE_AS_IS>, <SERDES3_LANE1_USB3_0>,
+				      <SERDES4_LANE0_EDP_LANE0>, <SERDES4_LANE1_EDP_LANE1>, <SERDES4_LANE2_EDP_LANE2>, <SERDES4_LANE3_EDP_LANE3>;
+		};
+
+		usb_serdes_mux: mux-controller@4000 {
+			compatible = "mmio-mux";
+			#mux-control-cells = <1>;
+			mux-reg-masks = <0x4000 0x8000000>, /* USB0 to SERDES0/3 mux */
+					<0x4010 0x8000000>; /* USB1 to SERDES1/2 mux */
+	    };
 	};
 
 	gic500: interrupt-controller@1800000 {
@@ -68,6 +102,80 @@
 		#pinctrl-cells = <1>;
 		pinctrl-single,register-width = <32>;
 		pinctrl-single,function-mask = <0xffffffff>;
+	};
+
+	dummy_cmn_refclk: dummy_cmn_refclk {
+		#clock-cells = <0>;
+		compatible = "fixed-clock";
+		clock-frequency = <0>;
+	};
+
+	dummy_cmn_refclk1: dummy_cmn_refclk1 {
+		#clock-cells = <0>;
+		compatible = "fixed-clock";
+		clock-frequency = <0>;
+	};
+
+	serdes_wiz3: wiz@5030000 {
+		compatible = "ti,j721e-wiz";
+		#address-cells = <2>;
+		#size-cells = <2>;
+		power-domains = <&k3_pds 295 TI_SCI_PD_EXCLUSIVE>;
+		clocks = <&k3_clks 295 5>, <&k3_clks 295 9>, <&dummy_cmn_refclk>;
+		clock-names = "fck", "core_ref_clk", "ext_ref_clk";
+		assigned-clocks = <&k3_clks 295 9>, <&k3_clks 295 0>;
+		assigned-clock-parents = <&k3_clks 295 13>, <&k3_clks 295 4>;
+		num-lanes = <2>;
+		#reset-cells = <1>;
+		ranges;
+
+		wiz3_pll0_refclk: pll0_refclk {
+			clocks = <&k3_clks 295 9>, <&dummy_cmn_refclk>;
+			clock-output-names = "wiz3_pll0_refclk";
+			#clock-cells = <0>;
+			assigned-clocks = <&wiz3_pll0_refclk>;
+			assigned-clock-parents = <&k3_clks 295 9>;
+		};
+
+		wiz3_pll1_refclk: pll1_refclk {
+			clocks = <&k3_clks 295 0>, <&dummy_cmn_refclk1>;
+			clock-output-names = "wiz3_pll1_refclk";
+			#clock-cells = <0>;
+			assigned-clocks = <&wiz3_pll1_refclk>;
+			assigned-clock-parents = <&k3_clks 295 0>;
+		};
+
+		wiz3_refclk_dig: refclk_dig {
+			clocks = <&k3_clks 295 9>, <&k3_clks 295 0>, <&dummy_cmn_refclk>, <&dummy_cmn_refclk1>;
+			clock-output-names = "wiz3_refclk_dig";
+			#clock-cells = <0>;
+			assigned-clocks = <&wiz3_refclk_dig>;
+			assigned-clock-parents = <&k3_clks 295 9>;
+		};
+
+		wiz3_cmn_refclk: cmn_refclk {
+			clocks = <&wiz3_refclk_dig>;
+			clock-output-names = "wiz3_cmn_refclk";
+			#clock-cells = <0>;
+		};
+
+		wiz3_cmn_refclk1: cmn_refclk1 {
+			clocks = <&wiz3_pll1_refclk>;
+			clock-output-names = "wiz3_cmn_refclk1";
+			#clock-cells = <0>;
+		};
+
+		serdes3: serdes@5030000 {
+			compatible = "cdns,ti,sierra-phy-t0";
+			reg-names = "serdes";
+			reg = <0x00 0x5030000 0x00 0x10000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			resets = <&serdes_wiz3 0>;
+			reset-names = "sierra_reset";
+			clocks = <&wiz3_cmn_refclk>, <&wiz3_cmn_refclk1>;
+			clock-names = "cmn_refclk", "cmn_refclk1";
+		};
 	};
 
 	main_uart0: serial@2800000 {
@@ -219,6 +327,23 @@
 		ti,davinci-gpio-unbanked = <0>;
 		power-domains = <&k3_pds 105 TI_SCI_PD_EXCLUSIVE>;
 		clocks = <&k3_clks 105 0>;
+		clock-names = "gpio";
+	};
+
+	main_gpio1: gpio@601000 {
+		compatible = "ti,j721e-gpio", "ti,keystone-gpio";
+		reg = <0x0 0x00601000 0x0 0x100>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupts = <106 0 IRQ_TYPE_EDGE_RISING>,
+			     <106 1 IRQ_TYPE_EDGE_RISING>,
+			     <106 2 IRQ_TYPE_EDGE_RISING>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+		ti,ngpio = <36>;
+		ti,davinci-gpio-unbanked = <0>;
+		power-domains = <&k3_pds 106 TI_SCI_PD_EXCLUSIVE>;
+		clocks = <&k3_clks 106 0>;
 		clock-names = "gpio";
 	};
 
