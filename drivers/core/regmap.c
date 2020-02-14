@@ -15,6 +15,14 @@
 #include <dm/of_addr.h>
 #include <linux/ioport.h>
 
+struct regmap_field {
+	struct regmap *regmap;
+	unsigned int mask;
+	/* lsb */
+	unsigned int shift;
+	unsigned int reg;
+};
+
 DECLARE_GLOBAL_DATA_PTR;
 
 /**
@@ -509,4 +517,73 @@ int regmap_update_bits(struct regmap *map, uint offset, uint mask, uint val)
 	reg &= ~mask;
 
 	return regmap_write(map, offset, reg | (val & mask));
+}
+
+int regmap_field_read(struct regmap_field *field, unsigned int *val)
+{
+	int ret;
+	unsigned int reg_val;
+
+	ret = regmap_read(field->regmap, field->reg, &reg_val);
+	if (ret != 0)
+		return ret;
+
+	reg_val &= field->mask;
+	reg_val >>= field->shift;
+	*val = reg_val;
+
+	return ret;
+}
+
+int regmap_field_write(struct regmap_field *field, unsigned int val)
+{
+	return regmap_update_bits(field->regmap, field->reg, field->mask,
+				  val << field->shift);
+}
+
+static void regmap_field_init(struct regmap_field *rm_field,
+			      struct regmap *regmap,
+			      struct reg_field reg_field)
+{
+	rm_field->regmap = regmap;
+	rm_field->reg = reg_field.reg;
+	rm_field->shift = reg_field.lsb;
+	rm_field->mask = GENMASK(reg_field.msb, reg_field.lsb);
+}
+
+struct regmap_field *devm_regmap_field_alloc(struct udevice *dev,
+					     struct regmap *regmap,
+					     struct reg_field reg_field)
+{
+	struct regmap_field *rm_field = devm_kzalloc(dev,
+					sizeof(*rm_field), GFP_KERNEL);
+	if (!rm_field)
+		return ERR_PTR(-ENOMEM);
+
+	regmap_field_init(rm_field, regmap, reg_field);
+
+	return rm_field;
+}
+
+void devm_regmap_field_free(struct udevice *dev, struct regmap_field *field)
+{
+	devm_kfree(dev, field);
+}
+
+struct regmap_field *regmap_field_alloc(struct regmap *regmap,
+					struct reg_field reg_field)
+{
+	struct regmap_field *rm_field = kzalloc(sizeof(*rm_field), GFP_KERNEL);
+
+	if (!rm_field)
+		return ERR_PTR(-ENOMEM);
+
+	regmap_field_init(rm_field, regmap, reg_field);
+
+	return rm_field;
+}
+
+void regmap_field_free(struct regmap_field *field)
+{
+	kfree(field);
 }
