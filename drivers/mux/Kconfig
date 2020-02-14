@@ -1,0 +1,7 @@
+menu "Multiplexer drivers"
+
+config MULTIPLEXER
+	bool "Multiplexer Support"
+	depends on DM
+
+endmenu
