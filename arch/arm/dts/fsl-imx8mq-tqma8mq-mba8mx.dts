@@ -64,7 +64,7 @@
 
 &iomuxc {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_gpioled>, <&pinctrl_gpiobutton>;
+	pinctrl-0 = <&pinctrl_gpioled>, <&pinctrl_gpiobutton>, <&pinctrl_wdog>;
 
 	pinctrl_fec1: fec1grp {
 		fsl,pins = <
@@ -247,11 +247,4 @@
 &usb_dwc3_1 {
 	status = "okay";
 	dr_mode = "host";
-};
-
-&wdog1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_wdog>;
-	fsl,ext-reset-output;
-	status = "okay";
 };
