@@ -227,6 +227,32 @@ err:
 
 	return ret;
 }
+
+static void devm_reset_release(struct udevice *dev, void *res)
+{
+	regmap_uninit(res);
+}
+
+struct regmap *devm_regmap_init(struct udevice *dev,
+				const struct regmap_bus *bus,
+				void *bus_context,
+				const struct regmap_config *config)
+{
+	int rc;
+	struct regmap **mapp;
+
+	mapp = devres_alloc(devm_reset_release, sizeof(struct regmap *),
+			    __GFP_ZERO);
+	if (unlikely(!mapp))
+		return ERR_PTR(-ENOMEM);
+
+	rc = regmap_init_mem(dev_ofnode(dev), mapp);
+	if (rc)
+		return ERR_PTR(rc);
+
+	devres_add(dev, mapp);
+	return *mapp;
+}
 #endif
 
 void *regmap_get_range(struct regmap *map, unsigned int range_num)

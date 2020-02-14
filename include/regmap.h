@@ -73,6 +73,9 @@ struct regmap_range {
 	ulong size;
 };
 
+struct regmap_bus;
+struct regmap_config;
+
 /**
  * struct regmap - a way of accessing hardware/bus registers
  *
@@ -333,6 +336,22 @@ int regmap_init_mem_platdata(struct udevice *dev, fdt_val_t *reg, int count,
 
 int regmap_init_mem_index(ofnode node, struct regmap **mapp, int index);
 
+/**
+ * devm_regmap_init() - Initialise register map (device managed)
+ *
+ * @dev: Device that will be interacted with
+ * @bus: Bus-specific callbacks to use with device (IGNORED)
+ * @bus_context: Data passed to bus-specific callbacks (IGNORED)
+ * @config: Configuration for register map (IGNORED)
+ *
+ * The return value will be an ERR_PTR() on error or a valid pointer to
+ * a struct regmap.
+ * The structure is automatically freed when the device is unbound
+ */
+struct regmap *devm_regmap_init(struct udevice *dev,
+				const struct regmap_bus *bus,
+				void *bus_context,
+				const struct regmap_config *config);
 /**
  * regmap_get_range() - Obtain the base memory address of a regmap range
  *
