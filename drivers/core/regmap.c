@@ -31,6 +31,9 @@ static struct regmap *regmap_alloc(int count)
 	if (!map)
 		return NULL;
 	map->range_count = count;
+	map->bus_context = NULL;
+	map->reg_read = NULL;
+	map->reg_write = NULL;
 
 	return map;
 }
@@ -249,6 +252,9 @@ struct regmap *devm_regmap_init(struct udevice *dev,
 	rc = regmap_init_mem(dev_ofnode(dev), mapp);
 	if (rc)
 		return ERR_PTR(rc);
+	(*mapp)->reg_read = config->reg_read;
+	(*mapp)->reg_write = config->reg_write;
+	(*mapp)->bus_context = bus_context;
 
 	devres_add(dev, mapp);
 	return *mapp;
@@ -327,6 +333,9 @@ int regmap_raw_read_range(struct regmap *map, uint range_num, uint offset,
 {
 	struct regmap_range *range;
 	void *ptr;
+
+	if (map->reg_read)
+		return map->reg_read(map->bus_context, offset, valp);
 
 	if (range_num >= map->range_count) {
 		debug("%s: range index %d larger than range count\n",
@@ -437,6 +446,9 @@ int regmap_raw_write_range(struct regmap *map, uint range_num, uint offset,
 	struct regmap_range *range;
 	void *ptr;
 
+	if (map->reg_write)
+		return map->reg_write(map->bus_context, offset,
+				      *(unsigned int *)val);
 	if (range_num >= map->range_count) {
 		debug("%s: range index %d larger than range count\n",
 		      __func__, range_num);

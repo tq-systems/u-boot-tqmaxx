@@ -74,16 +74,36 @@ struct regmap_range {
 };
 
 struct regmap_bus;
-struct regmap_config;
+/**
+ * struct regmap_config - a way of accessing hardware/bus registers
+ *
+ * @reg_read:	  Optional callback that if filled will be used to perform
+ *		  all the reads from the registers. Should only be provided for
+ *		  devices whose read operation cannot be represented as a simple
+ *		  read operation on a bus such as SPI, I2C, etc. Most of the
+ *		  devices do not need this.
+ * @reg_write:	  Same as above for writing.
+ */
+struct regmap_config {
+	int (*reg_read)(void *context, unsigned int reg, unsigned int *val);
+	int (*reg_write)(void *context, unsigned int reg, unsigned int val);
+};
 
 /**
  * struct regmap - a way of accessing hardware/bus registers
  *
  * @range_count:	Number of ranges available within the map
  * @ranges:		Array of ranges
+ * @bus_context:	Data passed to bus-specific callbacks
+ * @reg_read:		Optional callback that if filled will be used to perform
+ *			all the reads from the registers.
+ * @reg_write:		Same as above for writing.
  */
 struct regmap {
 	enum regmap_endianness_t endianness;
+	void *bus_context;
+	int (*reg_read)(void *context, unsigned int reg, unsigned int *val);
+	int (*reg_write)(void *context, unsigned int reg, unsigned int val);
 	int range_count;
 	struct regmap_range ranges[0];
 };
@@ -341,8 +361,8 @@ int regmap_init_mem_index(ofnode node, struct regmap **mapp, int index);
  *
  * @dev: Device that will be interacted with
  * @bus: Bus-specific callbacks to use with device (IGNORED)
- * @bus_context: Data passed to bus-specific callbacks (IGNORED)
- * @config: Configuration for register map (IGNORED)
+ * @bus_context: Data passed to bus-specific callbacks
+ * @config: Configuration for register map
  *
  * The return value will be an ERR_PTR() on error or a valid pointer to
  * a struct regmap.
