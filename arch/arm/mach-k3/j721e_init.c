@@ -74,6 +74,62 @@ static void mmr_unlock(u32 base, u32 partition)
 	writel(CTRLMMR_LOCK_KICK1_UNLOCK_VAL, part_base + CTRLMMR_LOCK_KICK1);
 }
 
+static inline void cbass_qos_rmw(uint32_t addr, uint32_t val, uint32_t mask)
+{
+	writel(addr, (readl(addr) & ~mask) | (val & mask));
+}
+
+void setup_initiator_credentials(void)
+{
+	u32 i, mask;
+
+	mask = QOS_ATYPE_MASK | QOS_VIRTID_MASK;
+
+	/* Initiators for root_cell, virtid = 2 */
+	/* MMC1*/
+	cbass_qos_rmw(QOS_MMC1_RD_CBASS_MAP(0), QOS_PVU_CTX(2), mask);
+	cbass_qos_rmw(QOS_MMC1_WR_CBASS_MAP(0), QOS_PVU_CTX(2), mask);
+
+	/* DSS VID1, VID2, VIDL2 */
+	cbass_qos_rmw(QOS_DSS0_DMA_CBASS_MAP(0), QOS_PVU_CTX(2), mask);
+	cbass_qos_rmw(QOS_DSS0_DMA_CBASS_MAP(1), QOS_PVU_CTX(2), mask);
+	cbass_qos_rmw(QOS_DSS0_DMA_CBASS_MAP(4), QOS_PVU_CTX(2), mask);
+	cbass_qos_rmw(QOS_DSS0_DMA_CBASS_MAP(5), QOS_PVU_CTX(2), mask);
+	cbass_qos_rmw(QOS_DSS0_DMA_CBASS_MAP(6), QOS_PVU_CTX(2), mask);
+	cbass_qos_rmw(QOS_DSS0_DMA_CBASS_MAP(7), QOS_PVU_CTX(2), mask);
+
+	/* GPU OS_id = 0 uses chanid = [0-3] */
+	for (i = 0; i < 4; i++) {
+		cbass_qos_rmw(QOS_GPU_M0_RD_CBASS_MAP(i), QOS_PVU_CTX(2), mask);
+		cbass_qos_rmw(QOS_GPU_M0_WR_CBASS_MAP(i), QOS_PVU_CTX(2), mask);
+		cbass_qos_rmw(QOS_GPU_M1_RD_CBASS_MAP(i), QOS_PVU_CTX(2), mask);
+		cbass_qos_rmw(QOS_GPU_M1_WR_CBASS_MAP(i), QOS_PVU_CTX(2), mask);
+	}
+
+	/* D5520 chanid=[0-1] */
+	for (i = 0; i < 2; i++) {
+		cbass_qos_rmw(QOS_D5520_RD_CBASS_MAP(2), QOS_PVU_CTX(2), mask);
+		cbass_qos_rmw(QOS_D5520_WR_CBASS_MAP(2), QOS_PVU_CTX(2), mask);
+	}
+
+	/* Initiators for inmate_cell, virtid=3 */
+	/* MMC0 */
+	cbass_qos_rmw(QOS_MMC0_RD_CBASS_MAP(0), QOS_PVU_CTX(3), mask);
+	cbass_qos_rmw(QOS_MMC0_WR_CBASS_MAP(0), QOS_PVU_CTX(3), mask);
+
+	/* DSS VIDL1 */
+	cbass_qos_rmw(QOS_DSS0_DMA_CBASS_MAP(2), QOS_PVU_CTX(3), mask);
+	cbass_qos_rmw(QOS_DSS0_DMA_CBASS_MAP(3), QOS_PVU_CTX(3), mask);
+
+	/* GPU OS_id = 1 uses chanid = [4-7] */
+	for (i = 4; i < 8; i++) {
+		cbass_qos_rmw(QOS_GPU_M0_RD_CBASS_MAP(i), QOS_PVU_CTX(3), mask);
+		cbass_qos_rmw(QOS_GPU_M0_WR_CBASS_MAP(i), QOS_PVU_CTX(3), mask);
+		cbass_qos_rmw(QOS_GPU_M1_RD_CBASS_MAP(i), QOS_PVU_CTX(3), mask);
+		cbass_qos_rmw(QOS_GPU_M1_WR_CBASS_MAP(i), QOS_PVU_CTX(3), mask);
+	}
+}
+
 static void ctrl_mmr_unlock(void)
 {
 	/* Unlock all WKUP_CTRL_MMR0 module registers */
@@ -218,6 +274,7 @@ void board_init_f(ulong dummy)
 
 	setup_navss_nb();
 	setup_dss_credentials();
+	setup_initiator_credentials();
 #endif
 
 	/* Init DM early */

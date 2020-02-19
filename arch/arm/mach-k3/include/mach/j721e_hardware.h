@@ -46,6 +46,11 @@
 #define CTRLMMR_LOCK_KICK1				0x0100c
 #define CTRLMMR_LOCK_KICK1_UNLOCK_VAL			0xd172bc5a
 
+#define QOS_ATYPE_MASK			0x30000000
+#define QOS_VIRTID_MASK			0x0fff0000
+#define QOS_PVU_CTX(virtid)		((0x1 << 28) | (virtid << 16))
+#define QOS_SMMU_CTX(virtid)		((0x2 << 28) | (virtid << 16))
+
 /* MCU SCRATCHPAD usage */
 #define TI_SRAM_SCRATCH_BOARD_EEPROM_START	CONFIG_SYS_K3_MCU_SCRATCHPAD_BASE
 
@@ -59,6 +64,19 @@
 #define QOS_DSS0_FBDC_CBASS_GRP_MAP1(j)		(QOS_DSS0_FBDC + 0x0 + (j) * 8)
 #define QOS_DSS0_FBDC_CBASS_GRP_MAP2(j)		(QOS_DSS0_FBDC + 0x4 + (j) * 8)
 #define QOS_DSS0_FBDC_CBASS_MAP(i)		(QOS_DSS0_FBDC + 0x100 + (i) * 4)
+
+#define QOS_MMC0_RD_CBASS_MAP(i)		(0x45d9a100 + (i) * 4)
+#define QOS_MMC0_WR_CBASS_MAP(i)		(0x45d9a500 + (i) * 4)
+#define QOS_MMC1_RD_CBASS_MAP(i)		(0x45d82100 + (i) * 4)
+#define QOS_MMC1_WR_CBASS_MAP(i)		(0x45d82500 + (i) * 4)
+
+#define QOS_GPU_M0_RD_CBASS_MAP(i)		(0x45dc5100 + (i) * 4)
+#define QOS_GPU_M0_WR_CBASS_MAP(i)		(0x45dc5900 + (i) * 4)
+#define QOS_GPU_M1_RD_CBASS_MAP(i)		(0x45dc6100 + (i) * 4)
+#define QOS_GPU_M1_WR_CBASS_MAP(i)		(0x45dc6900 + (i) * 4)
+
+#define QOS_D5520_RD_CBASS_MAP(i)		(0x45dc0500 + (i) * 4)
+#define QOS_D5520_WR_CBASS_MAP(i)		(0x45dc0900 + (i) * 4)
 
 /* NAVSS North Bridge (NB) */
 #define NAVSS0_NBSS_NB0_CFG_MMRS		0x3802000
