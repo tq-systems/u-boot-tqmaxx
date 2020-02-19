@@ -15,6 +15,9 @@
 #include <asm/io.h>
 #include <spl.h>
 #include <asm/arch/sys_proto.h>
+#include <dm/device.h>
+#include <dm/uclass-internal.h>
+#include <dm/pinctrl.h>
 
 #include "../common/board_detect.h"
 
@@ -354,4 +357,17 @@ int board_late_init(void)
 void spl_board_init(void)
 {
 	probe_daughtercards();
+}
+
+void board_preboot_os(void)
+{
+	struct udevice *dev;
+	int ret;
+
+	/* baremetal inmates expect the uart1 to be initialized
+	 * Enable main_uart1 pinmux directly
+	 */
+	ret = uclass_find_device_by_seq(UCLASS_SERIAL, 3, true, &dev);
+	if (!ret)
+		pinctrl_select_state(dev, "default");
 }
