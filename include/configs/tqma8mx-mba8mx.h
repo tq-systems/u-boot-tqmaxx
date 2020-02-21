@@ -18,11 +18,9 @@
 #define CONFIG_FEC_MXC_PHYADDR		0
 #define FEC_QUIRK_ENET_MAC
 
-/* #define CONFIG_PHY_GIGE */
 #endif
 
 #if !defined(CONFIG_SPL_BUILD)
-/* #define CONFIG_DM_GPIO */
 #define CONFIG_DM_PCA953X
 #endif
 

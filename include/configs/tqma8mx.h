@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 TQ Systems GmbH
+ * Copyright 2019 - 2020 TQ Systems GmbH
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
@@ -26,22 +26,10 @@
 #endif
 
 #ifdef CONFIG_SPL_BUILD
-/* #define CONFIG_SPL_ENV_SUPPORT */
 /*#define CONFIG_ENABLE_DDR_TRAINING_DEBUG*/
 #define CONFIG_SPL_WATCHDOG_SUPPORT
-/* #define CONFIG_SPL_BOARD_INIT */
 #define CONFIG_SPL_LDSCRIPT		"arch/arm/cpu/armv8/u-boot-spl.lds"
 #define CONFIG_SPL_STACK		0x187FF0
-/*
-#define CONFIG_SPL_DRIVERS_MISC_SUPPORT
-#define CONFIG_SPL_POWER_SUPPORT
-#define CONFIG_SPL_I2C_SUPPORT
-#define CONFIG_SPL_LIBCOMMON_SUPPORT
-#define CONFIG_SPL_LIBGENERIC_SUPPORT
-#define CONFIG_SPL_SERIAL_SUPPORT
-#define CONFIG_SPL_GPIO_SUPPORT
-#define CONFIG_SPL_MMC_SUPPORT
-*/
 #define CONFIG_SPL_BSS_START_ADDR      0x00180000
 #define CONFIG_SPL_BSS_MAX_SIZE        0x2000	/* 8 KB */
 #define CONFIG_SYS_SPL_MALLOC_START	0x42200000
@@ -50,9 +38,11 @@
 #define CONFIG_SYS_ICACHE_OFF
 #define CONFIG_SYS_DCACHE_OFF
 
-#define CONFIG_MALLOC_F_ADDR		0x182000 /* malloc f used before GD_FLG_FULL_MALLOC_INIT set */
+/* malloc f used before GD_FLG_FULL_MALLOC_INIT set */
+#define CONFIG_MALLOC_F_ADDR		0x182000
 
-#define CONFIG_SPL_ABORT_ON_RAW_IMAGE /* For RAW image gives a error info not panic */
+/* For RAW image gives a error info not panic */
+#define CONFIG_SPL_ABORT_ON_RAW_IMAGE
 
 #undef CONFIG_DM_MMC
 #undef CONFIG_BLK
@@ -80,31 +70,13 @@
  * - gpio expander support via dt
  * - i2c eeprom support via dt
  */
-#if 0
-#define CONFIG_CMD_PMIC
-#define CONFIG_CMD_REGULATOR
-
-#define CONFIG_DM_I2C
-#define CONFIG_DM_GPIO
-#define CONFIG_DM_MMC
-
-#define CONFIG_DM_PMIC
-#define CONFIG_DM_PMIC_PFUZE100
-#define CONFIG_PMIC_CHILDREN
-#define CONFIG_DM_REGULATOR
-#define CONFIG_DM_REGULATOR_PFUZE100
-#define CONFIG_DM_REGULATOR_FIXED
-#define CONFIG_DM_REGULATOR_GPIO
-#endif
 #define CONFIG_I2C_EEPROM
 
 #endif
 
 #define CONFIG_REMAKE_ELF
 
-/* #define CONFIG_BOARD_EARLY_INIT_F */
 #define CONFIG_BOARD_POSTCLK_INIT
-/* #define CONFIG_BOARD_LATE_INIT */
 
 /* Flat Device Tree Definitions */
 #define CONFIG_OF_BOARD_SETUP
@@ -127,6 +99,7 @@
 	"initrd_addr=0x43800000\0" \
 	"initrd_high=0xffffffff\0" \
 	"bootcmd_mfg=run mfgtool_args;booti ${loadaddr} ${initrd_addr} ${fdt_addr};\0" \
+
 /* Initial environment variables */
 #define TQMA8MX_MODULE_ENV_SETTINGS		\
 	CONFIG_MFG_ENV_SETTINGS \
@@ -316,31 +289,16 @@
 
 #define CONFIG_IMX_BOOTAUX
 
-/* #define CONFIG_CMD_MMC */
 #define CONFIG_FSL_ESDHC
 #define CONFIG_FSL_USDHC
 
-/* #define CONFIG_SYS_FSL_USDHC_NUM	2 */
 #define CONFIG_SYS_FSL_ESDHC_ADDR       0
-
-/*
-#define CONFIG_DOS_PARTITION
-#define CONFIG_CMD_EXT2
-#define CONFIG_CMD_EXT4
-#define CONFIG_CMD_EXT4_WRITE
-#define CONFIG_CMD_FAT
-*/
 
 #define CONFIG_SUPPORT_EMMC_BOOT	/* eMMC specific */
 #define CONFIG_SYS_MMC_IMG_LOAD_PART	1
 
 #ifdef CONFIG_FSL_QSPI
-/* #define CONFIG_CMD_SF */
-/* #define	CONFIG_SPI_FLASH */
-/*
-#define	CONFIG_SPI_FLASH_STMICRO
-#define	CONFIG_SPI_FLASH_BAR
-*/
+
 #define	CONFIG_SF_DEFAULT_BUS		0
 #define	CONFIG_SF_DEFAULT_CS		0
 #define	CONFIG_SF_DEFAULT_SPEED		40000000
@@ -361,23 +319,14 @@
 #define CONFIG_MXC_OCOTP
 #define CONFIG_CMD_FUSE
 
-/* I2C Configs */
-/* #define CONFIG_SYS_I2C_SPEED		  100000 */
-
 /* USB configs */
 #ifndef CONFIG_SPL_BUILD
-
-/* #define CONFIG_CMD_USB */
-/* #define CONFIG_USB_STORAGE */
-
-/* #define CONFIG_CMD_USB_MASS_STORAGE */
 
 #define CONFIG_CMD_READ
 
 #endif
 
 #define CONFIG_USB_MAX_CONTROLLER_COUNT         2
-/* #define CONFIG_SYS_USB_XHCI_MAX_ROOT_PORTS      2 */
 
 #define CONFIG_USBD_HS
 
