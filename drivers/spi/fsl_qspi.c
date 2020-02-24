@@ -28,7 +28,18 @@ DECLARE_GLOBAL_DATA_PTR;
 #define TX_BUFFER_SIZE		0x40
 #endif
 
+/*
+ * If we want true 4 Byte addresses, bank adressing is disabled and flash size
+ * if larger than 16M. In an ideal world flash size should be detected at runtime
+ * but in current U-Boot it is a fixed define
+ * OFFSET_BITS_MASK is used to generate the bits to write to register SFAR
+ * 0xffffff in case of 3 byte addresses, 0xfffffff in case of 4 byte addresses
+ */
+#if !defined(CONFIG_SPI_FLASH_BAR) && (FSL_QSPI_FLASH_SIZE > SZ_16M)
+#define OFFSET_BITS_MASK	GENMASK(27, 0)
+#else
 #define OFFSET_BITS_MASK	GENMASK(23, 0)
+#endif
 
 #define FLASH_STATUS_WEL	0x02
 
