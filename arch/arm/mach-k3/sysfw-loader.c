@@ -321,11 +321,11 @@ void k3_sysfw_loader(void (*config_pm_pre_callback) (void),
 	/* Get handle for accessing SYSFW services */
 	ti_sci = get_ti_sci_handle();
 
-	/* Parse and apply the different SYSFW configuration fragments */
-	k3_sysfw_configure_using_fit(sysfw_load_address, ti_sci);
-
 	if (config_pm_pre_callback)
 		config_pm_pre_callback();
+
+	/* Parse and apply the different SYSFW configuration fragments */
+	k3_sysfw_configure_using_fit(sysfw_load_address, ti_sci);
 
 	/*
 	 * Now that all clocks and PM aspects are setup, invoke a user-
