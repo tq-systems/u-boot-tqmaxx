@@ -275,7 +275,6 @@
 #define CONFIG_BAUDRATE			115200
 
 #define CONFIG_MXC_UART
-#define CONFIG_MXC_UART_BASE		UART1_BASE_ADDR
 
 /* Monitor Command Prompt */
 #undef CONFIG_SYS_PROMPT

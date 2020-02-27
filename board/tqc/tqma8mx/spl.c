@@ -217,8 +217,6 @@ void board_init_f(ulong dummy)
 
 	arch_cpu_init();
 
-	init_uart_clk(0); /* Init UART0 clock */
-
 	board_early_init_f();
 
 	timer_init();

@@ -24,8 +24,8 @@
 	compatible = "tq,imx8mq-tqma8mq-mba8mx", "tq,imx8mq-tqma8mq", "fsl,imx8mq";
 
 	chosen {
-		bootargs = "console=ttymxc0,115200 earlycon=ec_imx6q,0x30860000,115200";
-		stdout-path = &uart1;
+		bootargs = "console=ttymxc2,115200 earlycon=ec_imx6q,0x30880000,115200";
+		stdout-path = &uart3;
 	};
 
 	reg_usdhc2_vmmc: usdhc2_vmmc {
@@ -115,6 +115,13 @@
 		>;
 	};
 
+	pinctrl_uart3: uart3grp {
+		fsl,pins = <
+			MX8MQ_IOMUXC_UART3_RXD_UART3_DCE_RX		0x79
+			MX8MQ_IOMUXC_UART3_TXD_UART3_DCE_TX		0x79
+		>;
+	};
+
 	pinctrl_usb0: usb0grp {
 		fsl,pins = <
 			/* ID */
@@ -199,10 +206,19 @@
 	status = "disabled";
 };
 
-&uart1 { /* console */
+&uart1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart1>;
 	assigned-clocks = <&clk IMX8MQ_CLK_UART1_SRC>;
+	assigned-clock-parents = <&clk IMX8MQ_CLK_25M>;
+	status = "okay";
+};
+
+/* console */
+&uart3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart3>;
+	assigned-clocks = <&clk IMX8MQ_CLK_UART3_SRC>;
 	assigned-clock-parents = <&clk IMX8MQ_CLK_25M>;
 	status = "okay";
 };
