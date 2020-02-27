@@ -353,7 +353,22 @@ unsigned int mxc_get_clock(enum clk_root_index clk)
 
 u32 imx_get_uartclk(void)
 {
-	return mxc_get_clock(UART1_CLK_ROOT);
+	switch (CONFIG_MXC_UART_BASE) {
+	case UART1_BASE_ADDR:
+		return mxc_get_clock(UART1_CLK_ROOT);
+		break;
+	case UART2_BASE_ADDR:
+		return mxc_get_clock(UART2_CLK_ROOT);
+		break;
+	case UART3_BASE_ADDR:
+		return mxc_get_clock(UART3_CLK_ROOT);
+		break;
+	case UART4_BASE_ADDR:
+		return mxc_get_clock(UART4_CLK_ROOT);
+		break;
+	}
+
+	return 0;
 }
 
 void mxs_set_lcdclk(u32 base_addr, u32 freq)
@@ -889,6 +904,12 @@ int do_mx8m_showclocks(cmd_tbl_t *cmdtp, int flag, int argc,
 	printf("SYS_PLL3       %8d MHz\n", freq / 1000000);
 	freq = mxc_get_clock(UART1_CLK_ROOT);
 	printf("UART1          %8d MHz\n", freq / 1000000);
+	freq = mxc_get_clock(UART2_CLK_ROOT);
+	printf("UART2          %8d MHz\n", freq / 1000000);
+	freq = mxc_get_clock(UART3_CLK_ROOT);
+	printf("UART3          %8d MHz\n", freq / 1000000);
+	freq = mxc_get_clock(UART4_CLK_ROOT);
+	printf("UART4          %8d MHz\n", freq / 1000000);
 	freq = mxc_get_clock(USDHC1_CLK_ROOT);
 	printf("USDHC1         %8d MHz\n", freq / 1000000);
 	freq = mxc_get_clock(USDHC2_CLK_ROOT);
