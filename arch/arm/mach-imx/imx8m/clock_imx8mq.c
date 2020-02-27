@@ -346,6 +346,22 @@ u32 get_arm_core_clk(void)
 	return root_src_clk;
 }
 
+u32 imx_get_uartclk_n(void *uart_base)
+{
+	switch ((size_t)uart_base) {
+	case UART1_BASE_ADDR:
+		return get_root_clk(UART1_CLK_ROOT);
+	case UART2_BASE_ADDR:
+		return get_root_clk(UART2_CLK_ROOT);
+	case UART3_BASE_ADDR:
+		return get_root_clk(UART3_CLK_ROOT);
+	case UART4_BASE_ADDR:
+		return get_root_clk(UART4_CLK_ROOT);
+	}
+
+	return 0;
+}
+
 unsigned int mxc_get_clock(enum mxc_clock clk)
 {
 	u32 val;
@@ -366,7 +382,11 @@ unsigned int mxc_get_clock(enum mxc_clock clk)
 	case MXC_I2C_CLK:
 		return get_root_clk(I2C1_CLK_ROOT);
 	case MXC_UART_CLK:
+#if defined(CONFIG_MXC_UART_BASE)
+		return imx_get_uartclk_n((void *)CONFIG_MXC_UART_BASE);
+#else
 		return get_root_clk(UART1_CLK_ROOT);
+#endif
 	case MXC_QSPI_CLK:
 		return get_root_clk(QSPI_CLK_ROOT);
 	default:
@@ -927,8 +947,13 @@ static int do_imx8m_showclocks(cmd_tbl_t *cmdtp, int flag, int argc,
 	printf("SYS_PLL2_50    %8d MHz\n", freq / 1000000);
 	freq = decode_sscg_pll(SYSTEM_PLL3_CLK);
 	printf("SYS_PLL3       %8d MHz\n", freq / 1000000);
+#if defined(CONFIG_MXC_UART_BASE)
+	freq = imx_get_uartclk_n((void *)CONFIG_MXC_UART_BASE);
+	printf("UART           %8d MHz\n", freq / 1000000);
+#else
 	freq = mxc_get_clock(MXC_UART_CLK);
 	printf("UART1          %8d MHz\n", freq / 1000000);
+#endif
 	freq = mxc_get_clock(MXC_ESDHC_CLK);
 	printf("USDHC1         %8d MHz\n", freq / 1000000);
 	freq = mxc_get_clock(MXC_QSPI_CLK);
