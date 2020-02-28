@@ -208,8 +208,6 @@ int board_fit_config_name_match(const char *name)
  */
 void board_init_f(ulong dummy)
 {
-	uchar rcw[32];
-	char *ram_type;
 	int ret;
 
 	/* Clear global data */
