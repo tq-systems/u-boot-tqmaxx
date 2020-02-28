@@ -74,9 +74,9 @@ static void mmr_unlock(u32 base, u32 partition)
 	writel(CTRLMMR_LOCK_KICK1_UNLOCK_VAL, part_base + CTRLMMR_LOCK_KICK1);
 }
 
-static inline void cbass_qos_rmw(uint32_t addr, uint32_t val, uint32_t mask)
+static inline void cbass_qos_rmw(uintptr_t addr, uint32_t val, uint32_t mask)
 {
-	writel(addr, (readl(addr) & ~mask) | (val & mask));
+	writel((readl(addr) & ~mask) | (val & mask), addr);
 }
 
 void setup_initiator_credentials(void)
