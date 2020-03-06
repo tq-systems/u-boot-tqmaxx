@@ -355,7 +355,7 @@ int board_ehci_hcd_init(int port)
 			setbits_le32(usbnc_usb_ctrl, UCTRL_OC_POL);
 			break;
 		case 1:
-			if (check_module_fused(MX6_MODULE_USB_OTG1)) {
+			if (check_module_fused(MX6_MODULE_USB_OTG2)) {
 				puts("OTG2: fused\n");
 				return -ENODEV;
 			}
