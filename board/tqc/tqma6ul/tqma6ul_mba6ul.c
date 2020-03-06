@@ -318,6 +318,9 @@ static void mba6ul_setup_usb(void)
 {
 	imx_iomux_v3_setup_multiple_pads(usb_otg1_pads,
 					 ARRAY_SIZE(usb_otg1_pads));
+
+	gpio_request(USB_OTG1_PWR, "usb-otg1-pwr");
+	gpio_direction_output(USB_OTG1_PWR , 0);
 }
 
 int board_usb_phy_mode(int port)
@@ -379,7 +382,6 @@ int board_ehci_power(int port, int on)
 
 	switch (port) {
 		case 0:
-			gpio_request(USB_OTG1_PWR, "usb-otg1-pwr");
 			if (on) {
 				/* enable usb-otg */
 				gpio_direction_output(USB_OTG1_PWR , 1);
