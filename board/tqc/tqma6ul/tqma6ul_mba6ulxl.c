@@ -397,12 +397,20 @@ int board_ehci_hcd_init(int port)
 
 	switch (port) {
 		case 0:
+			if (check_module_fused(MX6_MODULE_USB_OTG1)) {
+				puts("OTG1: fused\n");
+				return -ENODEV;
+			}
 			/* Set Power polarity */
 			setbits_le32(usbnc_usb_ctrl, UCTRL_PWR_POL);
 			/* Set Overcurrent polarity */
 			setbits_le32(usbnc_usb_ctrl, UCTRL_OC_POL);
 			break;
 		case 1:
+			if (check_module_fused(MX6_MODULE_USB_OTG2)) {
+				puts("OTG2: fused\n");
+				return -ENODEV;
+			}
 			/* Disable Overcurrent detection */
 			/* managed by 2517i 7port usb hub */
 			setbits_le32(usbnc_usb_ctrl, UCTRL_OC_DISABLE);
