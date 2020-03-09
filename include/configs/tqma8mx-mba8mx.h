@@ -40,11 +40,11 @@
 
 #if (CONFIG_MXC_UART_BASE == UART1_BASE_ADDR)
 #define BB_ENV_SETTINGS \
-	"console=ttymxc2,115200 earlycon=ec_imx6q,0x30880000,115200\0" \
+	"console=ttymxc0,115200 earlycon=ec_imx6q,0x30860000,115200\0" \
 	"fdt_file=fsl-imx8mq-tqma8mq-mba8mx.dtb\0"
 #elif (CONFIG_MXC_UART_BASE == UART3_BASE_ADDR)
 #define BB_ENV_SETTINGS \
-	"console=ttymxc0,115200 earlycon=ec_imx6q,0x30860000,115200\0" \
+	"console=ttymxc2,115200 earlycon=ec_imx6q,0x30880000,115200\0" \
 	"fdt_file=fsl-imx8mq-tqma8mq-mba8mx.dtb\0"
 #else
 #error
