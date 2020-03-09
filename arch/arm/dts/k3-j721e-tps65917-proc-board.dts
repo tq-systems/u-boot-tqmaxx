@@ -118,3 +118,11 @@
 &main_sdhci1 {
 	vqmmc-supply = <&ldo1_reg>;
 };
+
+&usbss0 {
+	/delete-property/ ti,usb2-only;
+};
+
+&usb0 {
+	 dr_mode = "host";
+};
