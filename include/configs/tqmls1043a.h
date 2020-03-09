@@ -94,6 +94,11 @@
 #endif
 #endif
 
+#ifdef CONFIG_SF_DEFAULT_BUS
+#undef CONFIG_SF_DEFAULT_BUS
+#define CONFIG_SF_DEFAULT_BUS	0
+#endif
+
 /* SATA */
 #ifndef SPL_NO_SATA
 #define CONFIG_SCSI_AHCI_PLAT
