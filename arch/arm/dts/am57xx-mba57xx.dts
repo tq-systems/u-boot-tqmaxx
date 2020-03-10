@@ -8,11 +8,18 @@
  * published by the Free Software Foundation.
  */
 
-#include "dra76x.dtsi"
-#include "dra76x-mmc-iodelay.dtsi"
+/dts-v1/;
+
+#include "dra74x.dtsi"
+#include "dra74x-mmc-iodelay.dtsi"
 #include "am57xx-tqma57xx.dtsi"
+#include "am57xx-mba57xx.dtsi"
 
 / {
+	model = "TQ TQMa57xx MBa57xx";
+	compatible = "tq,mba57xx", "tq,tqma5728", "ti,am5728",
+		     "ti,dra7";
+
 	memory@0 {
 		device_type = "memory";
 		reg = <0x0 0x80000000 0x0 0x80000000>;
@@ -20,6 +27,10 @@
 };
 
 &mmc2 {
-	pinctrl-2 = <&mmc2_pins_ddr>;
-	pinctrl-3 = <&mmc2_pins_hs200 &mmc2_iodelay_hs200_conf>;
+	pinctrl-2 = <&mmc2_pins_ddr_rev20>;
+	pinctrl-3 = <&mmc2_pins_hs200 &mmc2_iodelay_hs200_rev20_conf>;
+};
+
+&pcie2_phy {
+	status = "okay";
 };

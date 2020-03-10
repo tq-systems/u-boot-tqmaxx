@@ -9,37 +9,15 @@ config SYS_VENDOR
 config SYS_CONFIG_NAME
         default "tqma57xx"
 
+config TQMA57XX
+	bool
+	default y
+	select TQC_EEPROM
+
 config TQMA57XX_ECC
 	bool "TQMa57xx module w/ ECC DDR"
 	help
 		Enable ECC memory (only when placed on module)
-
-choice
-	prompt "TQMa57xx SoC variant"
-	default TQMA572X
-	help
-		Select the TQMa57xx module variant. The variants differing in
-		the used CPU type and DRAM.
-
-config TQMA572X
-	bool "TQMa572x"
-	select TQC_EEPROM
-	help
-		Select TQMa572x with AM572x and 2GiB DRAM
-
-config TQMA571X
-	bool "TQMa571x"
-	select TQC_EEPROM
-	help
-		Select TQMa571x with AM571x and 1GiB DRAM
-
-config TQMA574X
-        bool "TQMa574x"
-        select TQC_EEPROM
-        help
-                Select TQMa574x with AM574x and 2GiB DRAM + ECC
-
-endchoice
 
 choice
 	prompt "TQMa57xx base board variant"
