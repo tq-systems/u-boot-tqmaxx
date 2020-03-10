@@ -319,6 +319,9 @@ void board_init_f(ulong dummy)
 	preloader_console_init();
 #endif
 
+	/* Output System Firmware version info */
+	k3_sysfw_print_ver();
+
 	/* Perform EEPROM-based board detection */
 	do_board_detect();
 
