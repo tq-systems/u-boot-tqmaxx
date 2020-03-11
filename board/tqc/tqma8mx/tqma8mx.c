@@ -181,6 +181,36 @@ static const char *tqma8mx_get_boardname(void)
 	return "UNKNOWN";
 }
 
+int print_bootinfo(void)
+{
+	enum boot_device bt_dev;
+	bt_dev = get_boot_device();
+
+	puts("Boot:  ");
+	switch (bt_dev) {
+	case SD1_BOOT:
+		puts("SD0\n");
+		break;
+	case SD2_BOOT:
+		puts("SD1\n");
+		break;
+	case MMC1_BOOT:
+		puts("MMC0\n");
+		break;
+	case MMC2_BOOT:
+		puts("MMC1\n");
+		break;
+	case USB_BOOT:
+		puts("USB\n");
+		break;
+	default:
+		printf("Unknown/Unsupported device %u\n", bt_dev);
+		break;
+	}
+
+	return 0;
+}
+
 int board_late_init(void)
 {
 #if !defined(CONFIG_SPL_BUILD)
@@ -203,6 +233,7 @@ int board_late_init(void)
 
 int checkboard(void)
 {
+	print_bootinfo();
 	printf("Board: %s on a %s\n", tqma8mx_get_boardname(),
 	       tqc_bb_get_boardname());
 	return 0;
