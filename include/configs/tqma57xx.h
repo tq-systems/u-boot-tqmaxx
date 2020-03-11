@@ -242,7 +242,7 @@
 	COMMON_BOOT_ARGS \
 	DEFAULT_FIT_TI_ARGS \
 	NETARGS_TQMA57XX \
-	"bootfile=linuximage-ti\0" \
+	"bootfile=linuximage\0" \
 	"devtype=mmc \0" \
 	"u-boot=u-boot.img\0" \
 	"uboot_size=0x800\0" \

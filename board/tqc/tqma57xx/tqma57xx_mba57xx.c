@@ -598,13 +598,13 @@ void tqma57xx_bb_board_late_init(void)
 	if (!env_get("fdtfile")) {
 		switch(omap_revision()) {
 		case DRA752_ES2_0:
-			env_set("fdtfile", "am572x-mba57xx.dtb-ti");
+			env_set("fdtfile", "am572x-mba57xx.dtb");
 			break;
 		case DRA762_ABZ_ES1_0:
-			env_set("fdtfile", "am574x-mba57xx.dtb-ti");
+			env_set("fdtfile", "am574x-mba57xx.dtb");
 			break;
 		case DRA722_ES2_0:
-			env_set("fdtfile", "am571x-mba57xx.dtb-ti");
+			env_set("fdtfile", "am571x-mba57xx.dtb");
 			break;
 		default:
 			env_set("fdtfile", "unknown");
