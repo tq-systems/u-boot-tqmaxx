@@ -144,8 +144,8 @@
 	"update_kernel=run set_getcmd; "                                       \
 		"if ${get_cmd} ${image}; then "                                \
 			"if itest ${filesize} > 0; then "                      \
-				"echo Write kernel image to mmc ${mmcdev}:${firmwarepart}...; " \
-				"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} " \
+				"echo Write kernel image to mmc ${mmcdev}:${mmcpart}...; " \
+				"save mmc ${mmcdev}:${mmcpart} ${loadaddr} "   \
 					"${image} ${filesize}; "               \
 			"fi; "                                                 \
 		"fi; "                                                         \
@@ -153,8 +153,8 @@
 	"update_fdt=run set_getcmd; "                                          \
 		"if ${get_cmd} ${fdt_file}; then "                             \
 			"if itest ${filesize} > 0; then "                      \
-				"echo Write fdt image to mmc ${mmcdev}:${firmwarepart}...; " \
-				"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} " \
+				"echo Write fdt image to mmc ${mmcdev}:${mmcpart}...; " \
+				"save mmc ${mmcdev}:${mmcpart} ${loadaddr} "   \
 					"${fdt_file} ${filesize}; "            \
 			"fi; "                                                 \
 		"fi; "                                                         \
