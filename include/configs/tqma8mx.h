@@ -286,7 +286,28 @@
 #define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
 					sizeof(CONFIG_SYS_PROMPT) + 16)
 
-#define CONFIG_IMX_BOOTAUX
+#if defined(CONFIG_IMX_BOOTAUX)
+
+#define TQMA8MX_CM4_ENV_SETTINGS						\
+	"m4_image=test.bin\0"							\
+	"m4_loadaddr=0x7e0000\0"						\
+	"load_m4=load mmc ${mmcdev}:${mmcpart} ${m4_loadaddr} ${m4_image}\0"	\
+	"boot_m4=run load_m4; bootaux ${m4_loadaddr}\0"				\
+	"update_m4=run set_getcmd; "                                            \
+		"if ${get_cmd} ${m4_image}; then "                              \
+			"if itest ${filesize} > 0; then "                       \
+				"echo Write M4 image to mmc ${mmcdev}:${mmcpart}...; " \
+				"save mmc ${mmcdev}:${mmcpart} ${loadaddr} "   \
+					"${m4_image} ${filesize}; "            \
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; setenv get_cmd \0"                           \
+
+#else
+
+#define TQMA8MX_CM4_ENV_SETTINGS
+
+#endif
 
 #define CONFIG_FSL_ESDHC
 #define CONFIG_FSL_USDHC
@@ -338,6 +359,7 @@
 #endif
 
 #define CONFIG_EXTRA_ENV_SETTINGS		\
+	TQMA8MX_CM4_ENV_SETTINGS		\
 	TQMA8MX_MODULE_ENV_SETTINGS		\
 	BB_ENV_SETTINGS
 
