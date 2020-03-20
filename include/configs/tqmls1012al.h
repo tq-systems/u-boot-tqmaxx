@@ -212,7 +212,7 @@
 	"addtty=setenv bootargs ${bootargs} console=${console},${baudrate} "   \
 		"consoleblank=0\0"                                             \
 	"addmmc=setenv bootargs ${bootargs} root=/dev/mmcblk0p2 "              \
-		"rootfstype=ext4 rootdelay=5\0"                                \
+		"rootfstype=ext4\0"                                            \
 	"addusb=setenv bootargs ${bootargs} root=/dev/sda2 "                   \
 		"rootfstype=ext4 rootdelay=5\0"                                \
 	"qspiargs=run addqspi addtty econ\0"                                   \
