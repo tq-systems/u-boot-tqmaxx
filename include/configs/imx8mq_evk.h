@@ -22,7 +22,7 @@
 
 /* ENET Config */
 /* ENET1 */
-#if defined(CONFIG_CMD_NET)
+#if defined(CONFIG_FEC_MXC)
 #define CFG_FEC_MXC_PHYADDR          0
 #endif
 
