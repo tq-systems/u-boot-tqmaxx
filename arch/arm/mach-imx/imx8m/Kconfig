@@ -96,6 +96,18 @@ config TARGET_IMX8MM_EVK
 	imply BOOTSTD_BOOTCOMMAND
 	imply OF_UPSTREAM
 
+config TARGET_IMX8MM_DDR4_EVK
+	bool "imx8mm DDR4 EVK board"
+	select IMX8MM
+	select SUPPORT_SPL
+	select IMX8M_DDR4
+	select FSL_CAAM
+	select ARCH_MISC_INIT
+	select SPL_CRYPTO if SPL
+	imply OF_UPSTREAM
+	imply BOOTSTD_FULL
+	imply BOOTSTD_BOOTCOMMAND
+
 config TARGET_IMX8MM_ICORE_MX8MM
 	bool "Engicam i.Core MX8M Mini SOM"
 	select IMX8MM
