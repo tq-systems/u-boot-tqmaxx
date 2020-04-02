@@ -19,6 +19,7 @@
 
 &reg_usdhc2_vmmc {
 	u-boot,off-on-delay-us = <20000>;
+	bootph-pre-ram;
 };
 
 &pinctrl_reg_usdhc2_vmmc {
@@ -79,12 +80,18 @@
 
 &usdhc1 {
 	bootph-pre-ram;
+	assigned-clocks = <&clk IMX8MM_CLK_USDHC1>;
+	assigned-clock-rates = <400000000>;
+	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_400M>;
 };
 
 &usdhc2 {
 	bootph-pre-ram;
 	sd-uhs-sdr104;
 	sd-uhs-ddr50;
+	assigned-clocks = <&clk IMX8MM_CLK_USDHC2>;
+	assigned-clock-rates = <400000000>;
+	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_400M>;
 	fsl,signal-voltage-switch-extra-delay-ms = <8>;
 };
 
@@ -92,6 +99,9 @@
 	bootph-pre-ram;
 	mmc-hs400-1_8v;
 	mmc-hs400-enhanced-strobe;
+	assigned-clocks = <&clk IMX8MM_CLK_USDHC3>;
+	assigned-clock-rates = <400000000>;
+	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_400M>;
 };
 
 &i2c1 {
@@ -221,6 +231,19 @@
 	phy-reset-gpios = <&gpio4 22 GPIO_ACTIVE_LOW>;
 };
 
+&ethphy0 {
+	vddio0: vddio-regulator {
+		regulator-name = "VDDIO";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+	};
+};
+
 &wdog1 {
 	bootph-pre-ram;
+};
+
+&usbotg1 {
+	status = "okay";
+	extcon = <&ptn5110>;
 };
