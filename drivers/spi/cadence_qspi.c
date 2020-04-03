@@ -169,10 +169,27 @@ static int cadence_spi_probe(struct udevice *bus)
 {
 	struct cadence_spi_platdata *plat = bus->platdata;
 	struct cadence_spi_priv *priv = dev_get_priv(bus);
+	struct clk clk;
 	int ret;
 
 	priv->regbase = plat->regbase;
 	priv->ahbbase = plat->ahbbase;
+
+	if (plat->ref_clk_hz == 0) {
+		ret = clk_get_by_index(bus, 0, &clk);
+		if (ret) {
+#ifdef CONFIG_CQSPI_REF_CLK
+			plat->ref_clk_hz = CONFIG_CQSPI_REF_CLK;
+#else
+			return ret;
+#endif
+		} else {
+			plat->ref_clk_hz = clk_get_rate(&clk);
+			clk_free(&clk);
+			if (IS_ERR_VALUE(plat->ref_clk_hz))
+				return plat->ref_clk_hz;
+		}
+	}
 
 	ret = reset_get_bulk(bus, &priv->resets);
 	if (ret)
@@ -279,8 +296,6 @@ static int cadence_spi_ofdata_to_platdata(struct udevice *bus)
 {
 	struct cadence_spi_platdata *plat = bus->platdata;
 	ofnode subnode;
-	struct clk clk;
-	int ret;
 
 	plat->regbase = (void *)devfdt_get_addr_index(bus, 0);
 	plat->ahbbase = (void *)devfdt_get_addr_size_index(bus, 1,
@@ -316,20 +331,6 @@ static int cadence_spi_ofdata_to_platdata(struct udevice *bus)
 	plat->tchsh_ns = ofnode_read_u32_default(subnode, "cdns,tchsh-ns", 20);
 	plat->tslch_ns = ofnode_read_u32_default(subnode, "cdns,tslch-ns", 20);
 	plat->phy_mode = ofnode_read_bool(subnode, "cdns,phy-mode");
-
-	ret = clk_get_by_index(bus, 0, &clk);
-	if (ret) {
-#ifdef CONFIG_CQSPI_REF_CLK
-		plat->ref_clk_hz = CONFIG_CQSPI_REF_CLK;
-#else
-		return ret;
-#endif
-	} else {
-		plat->ref_clk_hz = clk_get_rate(&clk);
-		clk_free(&clk);
-		if (IS_ERR_VALUE(plat->ref_clk_hz))
-			return plat->ref_clk_hz;
-	}
 
 	debug("%s: regbase=%p ahbbase=%p max-frequency=%d page-size=%d\n",
 	      __func__, plat->regbase, plat->ahbbase, plat->max_hz,
