@@ -438,6 +438,7 @@ static const struct udevice_id renesas_sdhi_match[] = {
 	{ .compatible = "renesas,sdhi-r8a774a1", .data = RENESAS_GEN3_QUIRKS },
 	{ .compatible = "renesas,sdhi-r8a774b1", .data = RENESAS_GEN3_QUIRKS },
 	{ .compatible = "renesas,sdhi-r8a774c0", .data = RENESAS_GEN3_QUIRKS },
+	{ .compatible = "renesas,sdhi-r8a774e1", .data = RENESAS_GEN3_QUIRKS },
 	{ /* sentinel */ }
 };
 
@@ -455,7 +456,7 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 		return;
 
 	/* HS400 is not supported on H3 ES1.x and M3W ES1.0,ES1.1 */
-	if (((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7795) &&
+	if (((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774E1) &&
 	    (rmobile_get_cpu_rev_integer() <= 1)) ||
 	    ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774A1) &&
 	    (rmobile_get_cpu_rev_integer() == 1) &&
@@ -463,14 +464,14 @@ static void renesas_sdhi_filter_caps(struct udevice *dev)
 		plat->cfg.host_caps &= ~MMC_MODE_HS400;
 
 	/* H3 ES2.0 uses 4 tuning taps */
-	if ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7795) &&
+	if ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774E1) &&
 	    (rmobile_get_cpu_rev_integer() == 2))
 		priv->nrtaps = 4;
 	else
 		priv->nrtaps = 8;
 
 	/* H3 ES1.x and M3W ES1.0 uses bit 17 for DTRAEND */
-	if (((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A7795) &&
+	if (((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774E1) &&
 	    (rmobile_get_cpu_rev_integer() <= 1)) ||
 	    ((rmobile_get_cpu_type() == RMOBILE_CPU_TYPE_R8A774A1) &&
 	    (rmobile_get_cpu_rev_integer() == 1) &&
