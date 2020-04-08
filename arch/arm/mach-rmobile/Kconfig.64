@@ -27,6 +27,9 @@ config R8A774B1
 config R8A774C0
 	bool "Renesas SoC R8A774C0"
 
+config R8A774E1
+	bool "Renesas SoC R8A774E1"
+
 endchoice
 
 choice
@@ -73,6 +76,11 @@ config TARGET_HIHOPE_RZG2N
 	help
           Support for RZG2N HiHope platform
 
+config TARGET_HIHOPE_RZG2H
+	bool "HiHope RZ/G2H board"
+	help
+          Support for RZG2H HiHope platform
+
 endchoice
 
 config SYS_SOC
@@ -86,5 +94,6 @@ source "board/renesas/ulcb/Kconfig"
 source "board/renesas/ek874/Kconfig"
 source "board/renesas/hihope-rzg2m/Kconfig"
 source "board/renesas/hihope-rzg2n/Kconfig"
+source "board/renesas/hihope-rzg2h/Kconfig"
 
 endif
