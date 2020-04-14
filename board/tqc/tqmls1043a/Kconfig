@@ -12,6 +12,10 @@ config SYS_SOC
 config SYS_CONFIG_NAME
 	default "tqmls1043a"
 
+config TQMLS1043A_DDR_2G
+	bool "TQMLS1043A with 2GB DDR size"
+	default n
+
 source "board/tqc/tqmls1043a/pbi_rcw/Kconfig"
 
 choice

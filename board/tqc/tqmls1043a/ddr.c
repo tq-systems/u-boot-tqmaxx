@@ -124,7 +124,11 @@ phys_size_t fixed_sdram(void)
 		panic("Unsupported DDR data rate %s MT/s data rate\n",
 		      strmhz(buf, ddr_freq));
 
+#ifdef CONFIG_TQMLS1043A_DDR_2G
+	ddr_size = (phys_size_t)2048 * 1024 * 1024;
+#else
 	ddr_size = (phys_size_t)1024 * 1024 * 1024;
+#endif
 	fsl_ddr_set_memctl_regs(&ddr_cfg_regs, 0, 0);
 
 	return ddr_size;
@@ -138,7 +142,11 @@ int fsl_initdram(void)
 	puts("Initialzing DDR using fixed setting\n");
 	dram_size = fixed_sdram();
 #else
+#ifdef CONFIG_TQMLS1043A_DDR_2G
+	gd->ram_size = 0x80000000;
+#else
 	gd->ram_size = 0x40000000;
+#endif
 
 	return 0;
 #endif

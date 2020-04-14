@@ -45,8 +45,13 @@ static const struct board_specific_parameters *udimms[] = {
 #endif
 
 fsl_ddr_cfg_regs_t ddr_cfg_regs_1600 = {
+#ifdef CONFIG_TQMLS1043A_DDR_2G
+	.cs[0].bnds         = 0x0000007F,
+	.cs[0].config       = 0x80010412,
+#else
 	.cs[0].bnds         = 0x0000003F,
 	.cs[0].config       = 0x80010312,
+#endif
 	.cs[0].config_2     = 0x00000000,
 	.cs[1].bnds         = 0x0040007F,
 	.cs[1].config       = 0x00000202,
@@ -57,9 +62,14 @@ fsl_ddr_cfg_regs_t ddr_cfg_regs_1600 = {
 	.cs[3].bnds         = 0x00C000FF,
 	.cs[3].config       = 0x00000202,
 	.cs[3].config_2     = 0x00000000,
+#ifdef CONFIG_TQMLS1043A_DDR_2G
+	.timing_cfg_3       = 0x010D1000,
+	.timing_cfg_1       = 0xBCB44D66,
+#else
 	.timing_cfg_3       = 0x010C1000,
-	.timing_cfg_0       = 0xAA650008,
 	.timing_cfg_1       = 0xBCB48D66,
+#endif
+	.timing_cfg_0       = 0xAA650008,
 	.timing_cfg_2       = 0x0059119C,
 	.ddr_sdram_cfg      = 0x650C0004,
 	.ddr_sdram_cfg_2    = 0x00401010,
