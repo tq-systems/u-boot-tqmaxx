@@ -33,6 +33,7 @@
 #include <malloc.h>
 #include <mapmem.h>
 #include <watchdog.h>
+#include <wdt.h>
 #include <linux/stddef.h>
 #include <asm/byteorder.h>
 #include <asm/io.h>
@@ -212,6 +213,9 @@ DONE:
 static int _do_env_set(int flag, int argc, char * const argv[], int env_flag)
 {
 	int   i, len;
+	unsigned int watchdog_timeout = 0;
+	char *timeout;
+	bool is_set = false;
 	char  *name, *value, *s;
 	ENTRY e, *ep;
 
@@ -232,6 +236,16 @@ static int _do_env_set(int flag, int argc, char * const argv[], int env_flag)
 	}
 	debug("Final value for argc=%d\n", argc);
 	name = argv[1];
+	if (strncmp(argv[1], "wdt_timeout", 11) == 0) {
+		if (argv[2] != NULL) {
+			is_set = true;
+			timeout = argv[2];
+			watchdog_timeout = simple_strtoul(timeout, NULL, 10);
+#ifdef CONFIG_WDT_RENESAS
+			rwdt_set_timeout(watchdog_timeout, is_set);
+#endif
+		}
+	}
 
 	if (strchr(name, '=')) {
 		printf("## Error: illegal character '='"
