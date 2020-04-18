@@ -7,6 +7,25 @@
 	binman: binman {
 	};
 
+	wdt-reboot {
+		compatible = "wdt-reboot";
+		wdt = <&wdog1>;
+		bootph-pre-ram;
+	};
+
+	aliases {
+		spi0 = &flexspi;
+		usb0 = &usbotg1;
+		usb_gadget0 = &usbg1;
+	};
+
+	usbg1: usbg1 {
+		compatible = "fsl,imx27-usb-gadget";
+		dr_mode = "peripheral";
+		chipidea,usb = <&usbotg1>;
+		status = "okay";
+	};
+
 #ifdef CONFIG_OPTEE
 	firmware {
 		optee {
@@ -15,12 +34,6 @@
 		};
 	};
 #endif
-
-	wdt-reboot {
-		compatible = "wdt-reboot";
-		wdt = <&wdog1>;
-		bootph-pre-ram;
-	};
 };
 
 &{/soc@0} {
@@ -87,12 +100,49 @@
 };
 #endif
 
+&osc_32k {
+	bootph-pre-ram;
+	bootph-all;
+};
+
+&clk_ext1 {
+	bootph-pre-ram;
+	bootph-all;
+};
+
+&clk_ext2 {
+	bootph-pre-ram;
+	bootph-all;
+};
+
+&clk_ext3 {
+	bootph-pre-ram;
+	bootph-all;
+};
+
+&clk_ext4 {
+	bootph-pre-ram;
+	bootph-all;
+};
+
 &spba1 {
 	bootph-pre-ram;
 };
 
 &wdog1 {
 	bootph-pre-ram;
+};
+
+&lcdif {
+	assigned-clocks = <&clk IMX8MN_CLK_DISP_PIXEL>,
+			<&clk IMX8MN_CLK_DISP_AXI>,
+			<&clk IMX8MN_CLK_DISP_APB>;
+	assigned-clock-parents = <&clk IMX8MN_VIDEO_PLL1_OUT>,
+			<&clk IMX8MN_SYS_PLL2_1000M>,
+			<&clk IMX8MN_SYS_PLL1_800M>;
+	assigned-clock-rate = <594000000>,
+			<500000000>,
+			<200000000>;
 };
 
 &binman {

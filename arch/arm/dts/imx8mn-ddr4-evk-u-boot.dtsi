@@ -5,12 +5,20 @@
 
 #include "imx8mn-u-boot.dtsi"
 
-&pinctrl_reg_usdhc2_vmmc {
-	bootph-pre-ram;
+/ {
+	chosen {
+		bootargs = "console=ttymxc1,115200 earlycon=ec_imx6q,0x30890000,115200";
+	};
+	/delete-node/ hdmi-connector;
 };
 
 &reg_usdhc2_vmmc {
+	bootph-pre-ram;
 	u-boot,off-on-delay-us = <20000>;
+};
+
+&pinctrl_reg_usdhc2_vmmc {
+	bootph-pre-ram;
 };
 
 &pinctrl_uart2 {
@@ -59,16 +67,118 @@
 
 &usdhc1 {
 	bootph-pre-ram;
+	assigned-clocks = <&clk IMX8MN_CLK_USDHC1>;
+	assigned-clock-rates = <400000000>;
+	assigned-clock-parents = <&clk IMX8MN_SYS_PLL1_400M>;
 };
 
 &usdhc2 {
 	bootph-pre-ram;
 	sd-uhs-sdr104;
 	sd-uhs-ddr50;
+	assigned-clocks = <&clk IMX8MN_CLK_USDHC2>;
+	assigned-clock-rates = <400000000>;
+	assigned-clock-parents = <&clk IMX8MN_SYS_PLL1_400M>;
 };
 
 &usdhc3 {
 	bootph-pre-ram;
 	mmc-hs400-1_8v;
 	mmc-hs400-enhanced-strobe;
+	assigned-clocks = <&clk IMX8MN_CLK_USDHC3>;
+	assigned-clock-rates = <400000000>;
+	assigned-clock-parents = <&clk IMX8MN_SYS_PLL1_400M>;
+};
+
+&tmu {
+	bootph-all;
+};
+
+&i2c1 {
+	pinctrl-names = "default", "gpio";
+	pinctrl-1 = <&pinctrl_i2c1_gpio>;
+	scl-gpios = <&gpio5 14 GPIO_ACTIVE_HIGH>;
+	sda-gpios = <&gpio5 15 GPIO_ACTIVE_HIGH>;
+	bootph-pre-ram;
+};
+
+&{/soc@0/bus@30800000/i2c@30a20000/pmic@4b} {
+	bootph-pre-ram;
+};
+
+&{/soc@0/bus@30800000/i2c@30a20000/pmic@4b/regulators} {
+	bootph-pre-ram;
+};
+
+&pinctrl_i2c1 {
+	bootph-pre-ram;
+};
+
+&pinctrl_pmic {
+	bootph-pre-ram;
+};
+
+&ethphy0 {
+	vddio0: vddio-regulator {
+		regulator-name = "VDDIO";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+	};
+};
+
+&flash0 {
+	spi-tx-bus-width = <1>;
+};
+
+&i2c2 {
+	/delete-node/ hdmi@3d;
+
+	adv_bridge: adv7535@3d {
+		compatible = "adi,adv7535";
+		reg = <0x3d>;
+		adi,addr-cec = <0x3c>;
+		adi,dsi-lanes = <4>;
+		status = "okay";
+
+		port {
+			adv7535_from_dsim: endpoint {
+				remote-endpoint = <&dsim_to_adv7535>;
+			};
+		};
+	};
+};
+
+&mipi_dsi {
+	ports {
+		port@1 {
+			dsim_to_adv7535: endpoint {
+				remote-endpoint = <&adv7535_from_dsim>;
+			};
+		};
+	};
+};
+
+&usbotg1 {
+	clock-names = "usb1_ctrl_root_clk";
+	assigned-clocks = <&clk IMX8MN_CLK_USB_BUS>,
+			<&clk IMX8MN_CLK_USB_CORE_REF>;
+	assigned-clock-parents = <&clk IMX8MN_SYS_PLL2_500M>,
+			<&clk IMX8MN_SYS_PLL1_100M>;
+	extcon = <&ptn5110>;
+};
+
+&iomuxc {
+	pinctrl_i2c1_gpio: i2c1gpiogrp {
+		bootph-pre-ram;
+		fsl,pins = <
+			MX8MN_IOMUXC_I2C1_SCL_GPIO5_IO14        	0x1c3
+			MX8MN_IOMUXC_I2C1_SDA_GPIO5_IO15        	0x1c3
+		>;
+	};
+
+	pinctrl_mipi_dsi_en: mipidsiengrp {
+		fsl,pins = <
+			MX8MN_IOMUXC_GPIO1_IO08_GPIO1_IO8		0x16
+		>;
+	};
 };
