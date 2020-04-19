@@ -46,6 +46,20 @@
 	bootph-pre-ram;
 };
 
+&usbotg1 {
+	assigned-clocks = <&clk IMX8MM_CLK_USB_BUS>,
+				<&clk IMX8MM_CLK_USB_CORE_REF>;
+	assigned-clock-parents = <&clk IMX8MM_SYS_PLL2_500M>,
+				<&clk IMX8MM_SYS_PLL1_100M>;
+};
+
+&usbotg2 {
+	assigned-clocks = <&clk IMX8MM_CLK_USB_BUS>,
+				<&clk IMX8MM_CLK_USB_CORE_REF>;
+	assigned-clock-parents = <&clk IMX8MM_SYS_PLL2_500M>,
+				<&clk IMX8MM_SYS_PLL1_100M>;
+};
+
 &binman {
 	filename = "flash.bin";
 	section {
