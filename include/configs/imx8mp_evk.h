@@ -10,8 +10,6 @@
 #include <linux/stringify.h>
 #include <asm/arch/imx-regs.h>
 
-#define CFG_SYS_UBOOT_BASE	(QSPI0_AMBA_BASE + CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR * 512)
-
 #if defined(CONFIG_CMD_NET)
 #define CFG_FEC_MXC_PHYADDR          1
 
@@ -28,5 +26,7 @@
 #define PHYS_SDRAM_SIZE			0xC0000000	/* 3 GB */
 #define PHYS_SDRAM_2			0x100000000
 #define PHYS_SDRAM_2_SIZE		0xC0000000	/* 3 GB */
+
+#define CFG_MXC_UART_BASE		UART2_BASE_ADDR
 
 #endif
