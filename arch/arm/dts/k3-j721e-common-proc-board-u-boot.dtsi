@@ -399,3 +399,7 @@
 &usb_serdes_mux {
 	u-boot,mux-autoprobe;
 };
+
+&chipid {
+	u-boot,dm-spl;
+};
