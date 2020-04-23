@@ -20,6 +20,7 @@
 #include <fs.h>
 #include <env.h>
 #include <elf.h>
+#include <soc.h>
 
 struct ti_sci_handle *get_ti_sci_handle(void)
 {
@@ -303,37 +304,20 @@ void reset_cpu(ulong ignored)
 #if defined(CONFIG_DISPLAY_CPUINFO)
 int print_cpuinfo(void)
 {
-	u32 soc, rev;
-	char *name;
+	struct udevice *soc;
+	char name[64];
+	int ret;
 
-	soc = (readl(CTRLMMR_WKUP_JTAG_DEVICE_ID) &
-		DEVICE_ID_FAMILY_MASK) >> DEVICE_ID_FAMILY_SHIFT;
-	rev = (readl(CTRLMMR_WKUP_JTAG_ID) &
-		JTAG_ID_VARIANT_MASK) >> JTAG_ID_VARIANT_SHIFT;
+	ret = soc_get(&soc);
+	if (ret)
+		return ret;
 
 	printf("SoC:   ");
-	switch (soc) {
-	case AM654:
-		name = "AM654";
-		break;
-	case J721E:
-		name = "J721E";
-		break;
-	default:
-		name = "Unknown Silicon";
-	};
 
-	printf("%s SR ", name);
-	switch (rev) {
-	case REV_PG1_0:
-		name = "1.0";
-		break;
-	case REV_PG2_0:
-		name = "2.0";
-		break;
-	default:
-		name = "Unknown Revision";
-	};
+	ret = soc_get_family(soc, name, 64);
+	printf("%s ", name);
+
+	ret = soc_get_revision(soc, name, 64);
 	printf("%s\n", name);
 
 	return 0;
