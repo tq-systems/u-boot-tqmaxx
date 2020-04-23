@@ -3,3 +3,4 @@
 # Makefile for the U-Boot SOC specific device drivers.
 
 obj-$(CONFIG_SOC_TI) += ti/
+obj-y += soc-uclass.o
