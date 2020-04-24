@@ -18,6 +18,7 @@
 #include <env.h>
 #include <spl.h>
 #include <board.h>
+#include <soc.h>
 #include <asm/arch/sys_proto.h>
 
 #include "../common/board_detect.h"
@@ -25,6 +26,36 @@
 #define board_is_am65x_base_board()	board_ti_is("AM6-COMPROCEVM")
 #define MAX_DAUGHTER_CARDS	8
 
+/* Match data for SR1 vs SR2 dtb selection */
+struct am65x_rev_fdt_data {
+	const char *findfdt_cmd_override;
+	const char *fit_config_name;
+};
+
+static const struct am65x_rev_fdt_data am65x_sr10_fdt_data = {
+	.findfdt_cmd_override =
+		"setenv name_fdt k3-am654-base-board-sr1.dtb;setenv fdtfile ${name_fdt}",
+	.fit_config_name = "k3-am654-base-board-sr1",
+};
+
+static const struct am65x_rev_fdt_data am65x_sr20_fdt_data = {
+	.findfdt_cmd_override = NULL,
+	.fit_config_name = "k3-am654-base-board",
+};
+
+static const struct soc_device_attribute am65x_rev_fdt_match[] = {
+	{
+		.family = "AM65X",
+		.revision = "SR2.0",
+		.data = &am65x_sr20_fdt_data,
+	},
+	{
+		.family = "AM65X",
+		.revision = "SR1.0",
+		.data = &am65x_sr10_fdt_data,
+	},
+	{ /* sentinel */ }
+};
 /* Daughter card presence detection signals */
 enum {
 	AM65X_EVM_APP_BRD_DET,
@@ -87,7 +118,18 @@ int dram_init_banksize(void)
 int board_fit_config_name_match(const char *name)
 {
 #ifdef CONFIG_TARGET_AM654_A53_EVM
-	if (!strcmp(name, "k3-am654-base-board"))
+	const struct soc_device_attribute *match;
+	const struct am65x_rev_fdt_data *fdt_data;
+
+	match = soc_device_match(am65x_rev_fdt_match);
+	if (!match) {
+		/* Default to SR2.0 */
+		match = &am65x_rev_fdt_match[0];
+	}
+
+	fdt_data = match->data;
+
+	if (!strcmp(name, fdt_data->fit_config_name))
 		return 0;
 #endif
 
@@ -344,6 +386,8 @@ static int probe_daughtercards(void)
 int board_late_init(void)
 {
 	struct ti_am6_eeprom *ep = TI_AM6_EEPROM_DATA;
+	const struct soc_device_attribute *match;
+	const struct am65x_rev_fdt_data *fdt_data;
 
 	setup_board_eeprom_env();
 
@@ -354,6 +398,18 @@ int board_late_init(void)
 	 * an index of 1.
 	 */
 	board_ti_am6_set_ethaddr(1, ep->mac_addr_cnt);
+
+	/* If we are on SR1 silicon set env to use sr1 dtb for kernel */
+	match = soc_device_match(am65x_rev_fdt_match);
+	if (!match) {
+		/* Default to SR2.0 */
+		match = &am65x_rev_fdt_match[0];
+	}
+
+	fdt_data = match->data;
+
+	if (fdt_data->findfdt_cmd_override)
+		env_set("findfdt", fdt_data->findfdt_cmd_override);
 
 	/* Check for and probe any plugged-in daughtercards */
 	probe_daughtercards();
