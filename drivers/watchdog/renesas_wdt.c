@@ -49,6 +49,7 @@ static const struct udevice_id rwdt_match[] = {
 	{ .compatible = "renesas,r8a774a1-wdt", },
 	{ .compatible = "renesas,r8a774b1-wdt", },
 	{ .compatible = "renesas,r8a774c0-wdt", },
+	{ .compatible = "renesas,r8a774e1-wdt", },
 	{ /* sentinel */ }
 };
 
