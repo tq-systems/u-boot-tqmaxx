@@ -84,6 +84,7 @@ struct am654_sdhci_plat {
 #define IOMUX_PRESENT	(1 << 1)
 #define FREQSEL_2_BIT	(1 << 2)
 #define STRBSEL_4_BIT	(1 << 3)
+#define DLL_CALIB	(1 << 4)
 	bool dll_on;
 };
 
@@ -270,6 +271,15 @@ static int am654_sdhci_set_ios_post(struct sdhci_host *host)
 					   freqsel << FREQSEL_SHIFT);
 		}
 
+		/* Configure DLL TRIM */
+		mask = DLL_TRIM_ICP_MASK;
+		val = plat->trm_icp << DLL_TRIM_ICP_SHIFT;
+
+		/* Configure DLL driver strength */
+		mask |= DR_TY_MASK;
+		val |= plat->drv_strength << DR_TY_SHIFT;
+		regmap_update_bits(plat->base, PHY_CTRL1, mask, val);
+
 		/* Enable DLL */
 		regmap_update_bits(plat->base, PHY_CTRL1, ENDLL_MASK,
 				   0x1 << ENDLL_SHIFT);
@@ -296,12 +306,13 @@ const struct sdhci_ops am654_sdhci_ops = {
 
 const struct am654_driver_data am654_drv_data = {
 	.ops = &am654_sdhci_ops,
-	.flags = DLL_PRESENT | IOMUX_PRESENT | FREQSEL_2_BIT | STRBSEL_4_BIT,
+	.flags = DLL_PRESENT | DLL_CALIB | IOMUX_PRESENT | FREQSEL_2_BIT |
+		 STRBSEL_4_BIT,
 };
 
 const struct am654_driver_data j721e_8bit_drv_data = {
 	.ops = &am654_sdhci_ops,
-	.flags = DLL_PRESENT,
+	.flags = DLL_PRESENT | DLL_CALIB,
 };
 
 static int j721e_4bit_sdhci_set_ios_post(struct sdhci_host *host)
@@ -339,7 +350,7 @@ int am654_sdhci_init_phy(struct am654_sdhci_plat *plat)
 	mask = OTAPDLYENA_MASK | OTAPDLYSEL_MASK;
 	regmap_update_bits(plat->base, PHY_CTRL4, mask, 0x0);
 
-	if (plat->flags & DLL_PRESENT) {
+	if (plat->flags & DLL_CALIB) {
 		regmap_read(plat->base, PHY_STAT1, &val);
 		if (~val & CALDONE_MASK) {
 			/* Calibrate IO lines */
@@ -351,15 +362,6 @@ int am654_sdhci_init_phy(struct am654_sdhci_plat *plat)
 			if (ret)
 				return ret;
 		}
-
-		/* Configure DLL TRIM */
-		mask = DLL_TRIM_ICP_MASK;
-		val = plat->trm_icp << DLL_TRIM_ICP_SHIFT;
-
-		/* Configure DLL driver strength */
-		mask |= DR_TY_MASK;
-		val |= plat->drv_strength << DR_TY_SHIFT;
-		regmap_update_bits(plat->base, PHY_CTRL1, mask, val);
 	}
 
 	/* Enable pins by setting IO mux to 0 */
