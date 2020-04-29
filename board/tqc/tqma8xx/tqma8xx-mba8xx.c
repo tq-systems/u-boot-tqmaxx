@@ -25,6 +25,8 @@
 #include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
 
+#define MBA8XX_BOARD_NAME "MBa8Xx"
+
 DECLARE_GLOBAL_DATA_PTR;
 
 #define UART_PAD_CTRL	((SC_PAD_CONFIG_OUT_IN << PADRING_CONFIG_SHIFT) | \
@@ -77,10 +79,13 @@ int tqc_bb_board_early_init_f(void)
 	return 0;
 }
 
+const char *tqc_bb_get_boardname(void)
+{
+	return MBA8XX_BOARD_NAME;
+}
+
 int tqc_bb_checkboard(void)
 {
-	puts("Board: TQMa8XQP on MBa8Xx (i.MX8QXP)\n");
-
 	return 0;
 }
 
@@ -105,11 +110,6 @@ int tqc_bb_board_late_init(void)
 {
 #ifdef CONFIG_ENV_IS_IN_MMC
 	board_late_mmc_env_init();
-#endif
-
-#ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
-	env_set("board_name", "MBa8QX");
-	env_set("board_rev", "iMX8QXP");
 #endif
 
 	return 0;

@@ -34,11 +34,25 @@ int board_early_init_f(void)
 	return 0;
 }
 
+static const char *tqma8xx_get_boardname(void)
+{
+	switch (get_cpu_type()) {
+	case MXC_CPU_IMX8QXP:
+		return "TQMa8XQP";
+		break;
+	default:
+		return "??";
+	}
+
+	return "UNKNOWN";
+}
+
 int checkboard(void)
 {
-	puts("Board: TQMa8QX\n");
-
 	print_bootinfo();
+
+	printf("Board: %s on a %s\n", tqma8xx_get_boardname(),
+	       tqc_bb_get_boardname());
 
 	return tqc_bb_checkboard();
 }
@@ -73,8 +87,8 @@ int ft_board_setup(void *blob, bd_t *bd)
 int board_late_init(void)
 {
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
-	env_set("board_name", "TQMa8XQP");
-	env_set("board_rev", "iMX8QXP");
+	env_set("board_name", tqc_bb_get_boardname());
+	env_set("board_rev", tqma8xx_get_boardname());
 #endif
 
 	tqc_bb_board_late_init();
