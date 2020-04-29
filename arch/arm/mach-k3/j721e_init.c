@@ -273,8 +273,10 @@ void board_init_f(ulong dummy)
 	setup_k3_mpu_regions();
 
 	setup_navss_nb();
+#ifndef CONFIG_TI_SECURE_DEVICE
 	setup_dss_credentials();
 	setup_initiator_credentials();
+#endif
 #endif
 
 	/* Init DM early */
