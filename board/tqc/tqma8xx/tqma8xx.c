@@ -24,6 +24,7 @@
 #include <power-domain.h>
 
 #include "../common/tqc_bb.h"
+#include "../common/tqc_eeprom.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -86,6 +87,16 @@ int ft_board_setup(void *blob, bd_t *bd)
 
 int board_late_init(void)
 {
+#if !defined(CONFIG_SPL_BUILD)
+	struct tqc_eeprom_data eeprom;
+	const char *bname = tqma8xx_get_boardname();
+
+	if (!tqc_read_eeprom_at(1, 0x53, 1, 0, &eeprom))
+		tqc_board_handle_eeprom_data(bname, &eeprom);
+	else
+		puts("EEPROM: read error\n");
+#endif
+
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 	env_set("board_name", tqc_bb_get_boardname());
 	env_set("board_rev", tqma8xx_get_boardname());
