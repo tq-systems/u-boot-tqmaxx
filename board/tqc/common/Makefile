@@ -7,6 +7,7 @@
 # necessary to create built-in.o
 obj- := __dummy__.o
 
+obj-$(CONFIG_DM_GPIO) += tqc_board_gpio.o
 obj-$(CONFIG_TQC_EEPROM) += tqc_eeprom.o
 obj-$(CONFIG_TQC_EMMC) += tqc_emmc.o
 obj-$(CONFIG_TQC_SDMMC) += tqc_sdmmc.o
