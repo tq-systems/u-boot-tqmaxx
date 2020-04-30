@@ -101,9 +101,18 @@ int tqc_bb_ft_board_setup(void *blob, bd_t *bd)
 }
 #endif
 
+/*
+ * SD0 -> mmc0 / mmcblk0
+ * SD1 -> mmc1 / mmcblk1
+ */
 int board_mmc_get_env_dev(int devno)
 {
 	return devno;
+}
+
+int mmc_map_to_kernel_blk(int dev_no)
+{
+	return dev_no;
 }
 
 int tqc_bb_board_late_init(void)
