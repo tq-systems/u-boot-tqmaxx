@@ -3,7 +3,7 @@
 # Copyright (c) 2016, NVIDIA CORPORATION.
 #
 
-obj-$(CONFIG_DM_RESET) += reset-uclass.o
+obj-$(CONFIG_$(SPL_)DM_RESET) += reset-uclass.o
 obj-$(CONFIG_SANDBOX_MBOX) += sandbox-reset.o
 obj-$(CONFIG_SANDBOX_MBOX) += sandbox-reset-test.o
 obj-$(CONFIG_STI_RESET) += sti-reset.o
