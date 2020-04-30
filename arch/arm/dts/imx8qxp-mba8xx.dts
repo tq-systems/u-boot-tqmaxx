@@ -11,6 +11,10 @@
 	model = "TQ-Systems i.MX8QXP TQMa8XQP on MBa8Xx";
 	compatible = "tq,imx8qxp-mba8xx", "tq,imx8qxp-tqma8xqp", "fsl,imx8qxp";
 
+	aliases {
+		gpio8 = &pca9538;
+	};
+
 	chosen {
 		bootargs = "console=ttyLP1,115200 earlycon";
 		stdout-path = &lpuart1;
@@ -18,10 +22,42 @@
 
 	reg_usdhc2_vmmc: regulator-usdhc2-vmmc {
 		compatible = "regulator-fixed";
-		regulator-name = "SD1_SPWR";
+		regulator-name = "SD1_PWR";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		status = "okay";
+	};
+
+	reg_1v8: regulator-1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "V_1V8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+	};
+
+};
+
+&i2c1 {
+	/* NXP SE97BTP with temperature sensor + eeprom */
+	se97b_1c: temperature-sensor-eeprom@1c {
+		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+		reg = <0x1c>;
+		status = "okay";
+	};
+
+	at24c02_54: eeprom@54 {
+		compatible = "nxp,se97b", "atmel,24c02";
+		reg = <0x54>;
+		pagesize = <16>;
+		status = "okay";
+	};
+
+	pca9538: expander@70 {
+		compatible = "nxp,pca9538";
+		reg = <0x70>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pca9538>;
+		vcc-supply = <&reg_1v8>;
 	};
 };
 
@@ -30,6 +66,13 @@
 		fsl,pins = <
 			SC_P_UART1_RX_ADMA_UART1_RX		0x06000021
 			SC_P_UART1_TX_ADMA_UART1_TX		0x06000021
+		>;
+	};
+
+	pinctrl_pca9538: pca9538grp {
+		fsl,pins = <
+			/* Muxing as GPIO (no pull) for PE1_INT# (not used) to avoid mistakes */
+			SC_P_USDHC1_RESET_B_LSIO_GPIO4_IO19	0x00000061
 		>;
 	};
 
