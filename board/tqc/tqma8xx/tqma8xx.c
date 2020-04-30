@@ -25,6 +25,7 @@
 
 #include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
+#include "../common/tqc_scu.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -54,6 +55,8 @@ int checkboard(void)
 
 	printf("Board: %s on a %s\n", tqma8xx_get_boardname(),
 	       tqc_bb_get_boardname());
+
+	tqc_scu_checkpmic(false);
 
 	return tqc_bb_checkboard();
 }

@@ -25,6 +25,7 @@ config TQMA8XX_DEFAULTS
 	select BOARD_EARLY_INIT_F
 	select TQC_SDMMC
 	select TQC_EEPROM
+	select TQC_SCU
 
 choice
 	prompt "TQMa8Xx CPU variant"
