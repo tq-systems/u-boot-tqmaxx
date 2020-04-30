@@ -122,7 +122,7 @@ struct phy_ops {
 	int	(*power_off)(struct phy *phy);
 };
 
-#ifdef CONFIG_PHY
+#if CONFIG_IS_ENABLED(PHY)
 
 /**
  * generic_phy_init() - initialize the PHY port
