@@ -2,6 +2,10 @@
 #
 # Copyright (C) 2016-2022 TQ-Systems GmbH
 
+config TQ_BOARD_GPIO
+	bool
+	select DM_GPIO
+
 config TQ_EEPROM
 	bool
 	select I2C_EEPROM
