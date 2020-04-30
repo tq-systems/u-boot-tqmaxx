@@ -57,6 +57,99 @@
 	};
 };
 
+&cbass_main {
+	dummy_cmn_refclk: dummy_cmn_refclk {
+		#clock-cells = <0>;
+		compatible = "fixed-clock";
+		clock-frequency = <0>;
+		u-boot,dm-spl;
+	};
+
+	dummy_cmn_refclk1: dummy_cmn_refclk1 {
+		#clock-cells = <0>;
+		compatible = "fixed-clock";
+		clock-frequency = <0>;
+		u-boot,dm-spl;
+	};
+
+	serdes_wiz0: wiz@5000000 {
+		compatible = "ti,j721e-wiz";
+		#address-cells = <2>;
+		#size-cells = <2>;
+		power-domains = <&k3_pds 292 TI_SCI_PD_SHARED>;
+		clocks = <&k3_clks 292 5>, <&k3_clks 292 11>, <&dummy_cmn_refclk>;
+		clock-names = "fck", "core_ref_clk", "ext_ref_clk";
+		assigned-clocks = <&k3_clks 292 11>, <&k3_clks 292 0>;
+		assigned-clock-parents = <&k3_clks 292 15>, <&k3_clks 292 4>;
+		num-lanes = <2>;
+		#reset-cells = <1>;
+		ranges;
+		u-boot,dm-spl;
+
+		wiz0_pll0_refclk: pll0_refclk {
+			clocks = <&k3_clks 292 11>, <&dummy_cmn_refclk>;
+			#clock-cells = <0>;
+			assigned-clocks = <&wiz0_pll0_refclk>;
+			assigned-clock-parents = <&k3_clks 292 11>;
+			u-boot,dm-spl;
+		};
+
+		wiz0_pll1_refclk: pll1_refclk {
+			clocks = <&k3_clks 292 0>, <&dummy_cmn_refclk1>;
+			#clock-cells = <0>;
+			assigned-clocks = <&wiz0_pll1_refclk>, <&wiz0_pll0_refclk>;
+			assigned-clock-parents = <&k3_clks 292 0>, <&k3_clks 292 11>;
+			u-boot,dm-spl;
+		};
+
+		wiz0_refclk_dig: refclk_dig {
+			clocks = <&k3_clks 292 11>, <&k3_clks 292 0>, <&dummy_cmn_refclk>, <&dummy_cmn_refclk1>;
+			#clock-cells = <0>;
+			assigned-clocks = <&wiz0_refclk_dig>;
+			assigned-clock-parents = <&k3_clks 292 11>;
+			u-boot,dm-spl;
+		};
+
+		wiz0_cmn_refclk: cmn_refclk {
+			clocks = <&wiz0_refclk_dig>;
+			clock-output-names = "wiz0_cmn_refclk";
+			#clock-cells = <0>;
+			u-boot,dm-spl;
+		};
+
+		wiz0_cmn_refclk1: cmn_refclk1 {
+			clocks = <&wiz0_pll1_refclk>;
+			clock-output-names = "wiz0_cmn_refclk1";
+			#clock-cells = <0>;
+			u-boot,dm-spl;
+		};
+
+		serdes0: serdes@5000000 {
+			compatible = "cdns,ti,sierra-phy-t0";
+			reg-names = "serdes";
+			reg = <0x00 0x5000000 0x00 0x10000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			resets = <&serdes_wiz0 0>;
+			reset-names = "sierra_reset";
+			clocks = <&wiz0_cmn_refclk>, <&wiz0_cmn_refclk1>;
+			clock-names = "cmn_refclk", "cmn_refclk1";
+			u-boot,dm-spl;
+		};
+	};
+};
+
+&serdes0 {
+	serdes0_pcie_link: link@0 {
+		reg = <0>;
+		cdns,num-lanes = <1>;
+		#phy-cells = <0>;
+		cdns,phy-type = <PHY_TYPE_PCIE>;
+		resets = <&serdes_wiz0 1>;
+		u-boot,dm-spl;
+	};
+};
+
 &cbass_mcu_wakeup {
 	mcu_secproxy: secproxy@28380000 {
 		u-boot,dm-spl;
