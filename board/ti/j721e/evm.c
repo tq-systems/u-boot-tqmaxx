@@ -18,6 +18,8 @@
 #include <dm/device.h>
 #include <dm/uclass-internal.h>
 #include <dm/pinctrl.h>
+#include <dm/uclass.h>
+#include <generic-phy.h>
 
 #include "../common/board_detect.h"
 
@@ -343,6 +345,27 @@ static int probe_daughtercards(void)
 	return 0;
 }
 
+#if defined(CONFIG_SPL_PHY_J721E_WIZ) && defined(CONFIG_TARGET_J721E_R5_EVM)
+void configure_serdes(void)
+{
+	struct udevice *dev;
+	struct phy serdes;
+	int ret;
+
+	ret = uclass_get_device_by_driver(UCLASS_PHY,
+					  DM_GET_DRIVER(sierra_phy_provider),
+					  &dev);
+	if (ret)
+		printf("SerDes init failed:%d\n", ret);
+
+	serdes.dev = dev;
+	serdes.id = 0;
+
+	generic_phy_init(&serdes);
+
+	generic_phy_power_on(&serdes);
+}
+#endif
 int board_late_init(void)
 {
 	setup_board_eeprom_env();
@@ -356,7 +379,12 @@ int board_late_init(void)
 
 void spl_board_init(void)
 {
+#ifdef CONFIG_TARGET_J721E_A72_EVM
 	probe_daughtercards();
+#endif
+#if defined(CONFIG_SPL_PHY_J721E_WIZ) && defined(CONFIG_TARGET_J721E_R5_EVM)
+	configure_serdes();
+#endif
 }
 
 void board_preboot_os(void)
