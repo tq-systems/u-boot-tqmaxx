@@ -65,6 +65,10 @@
 #undef CONFIG_CMD_CRC32
 #undef CONFIG_BOOTM_NETBSD
 
+#if defined(CONFIG_FEC_MXC)
+#define FEC_QUIRK_ENET_MAC
+#endif
+
 #if defined(CONFIG_FSL_ESDHC)
 #define CONFIG_FSL_USDHC
 #define CONFIG_SUPPORT_EMMC_BOOT	/* eMMC specific */
