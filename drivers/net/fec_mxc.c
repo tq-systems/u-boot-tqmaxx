@@ -1276,28 +1276,23 @@ static const struct eth_ops fecmxc_ops = {
 	.read_rom_hwaddr	= fecmxc_read_rom_hwaddr,
 };
 
-static int device_get_phy_addr(struct udevice *dev)
+static int fec_phy_init(struct fec_priv *priv, struct udevice *dev)
 {
 	struct ofnode_phandle_args phandle_args;
-	int reg;
+	struct phy_device *phydev;
+	int addr;
+	int offset;
 
 	if (dev_read_phandle_with_args(dev, "phy-handle", NULL, 0, 0,
 				       &phandle_args)) {
 		debug("Failed to find phy-handle");
-		return -ENODEV;
+		addr = -ENODEV;
+		offset = -ENODEV;
+	} else {
+		addr = ofnode_read_u32_default(phandle_args.node, "reg", 0);
+		offset = phandle_args.node.of_offset;
 	}
 
-	reg = ofnode_read_u32_default(phandle_args.node, "reg", 0);
-
-	return reg;
-}
-
-static int fec_phy_init(struct fec_priv *priv, struct udevice *dev)
-{
-	struct phy_device *phydev;
-	int addr;
-
-	addr = device_get_phy_addr(dev);
 #ifdef CONFIG_FEC_MXC_PHYADDR
 	addr = CONFIG_FEC_MXC_PHYADDR;
 #endif
@@ -1305,6 +1300,12 @@ static int fec_phy_init(struct fec_priv *priv, struct udevice *dev)
 	phydev = phy_connect(priv->bus, addr, dev, priv->interface);
 	if (!phydev)
 		return -ENODEV;
+
+	phydev->supported &= PHY_GBIT_FEATURES;
+	phydev->advertising = phydev->supported;
+
+	if (offset > 0)
+		dev_set_of_offset(phydev->dev, offset);
 
 	priv->phydev = phydev;
 	phy_config(phydev);
