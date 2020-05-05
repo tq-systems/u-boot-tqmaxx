@@ -231,6 +231,8 @@ static int probe_daughtercards(void)
 	char name_overlays[1024] = { 0 };
 	int i, nb_dtbos = 0;
 	int ret;
+	struct udevice *soc;
+	char str[SOC_MAX_STR_SIZE];
 
 	/*
 	 * Daughter card presence detection signal name to GPIO (via I2C I/O
@@ -285,6 +287,8 @@ static int probe_daughtercards(void)
 		},
 	};
 
+	const char *am65x_idk_sr1_dtboname = "k3-am654-idk-sr1.dtbo";
+
 	/*
 	 * Initialize GPIO used for daughtercard slot presence detection and
 	 * keep the resulting handles in local array for easier access.
@@ -301,6 +305,7 @@ static int probe_daughtercards(void)
 		/* Obtain card-specific slot index and associated I2C address */
 		u8 slot_index = cards[i].slot_index;
 		u8 i2c_addr = slot_map[slot_index].i2c_addr;
+		const char *dtboname;
 
 		/*
 		 * The presence detection signal is active-low, hence skip
@@ -358,19 +363,35 @@ static int probe_daughtercards(void)
 		if (!strlen(cards[i].dtbo_name))
 			continue;
 
-		k3_dtbo_list[nb_dtbos++] = cards[i].dtbo_name;
+		dtboname = cards[i].dtbo_name;
+
+		if (strncmp(ep.name, "AM6-IDKAPPEVM", sizeof(ep.name)))
+			goto dflt;
+
+		if (soc_get(&soc))
+			goto dflt;
+
+		if (soc_get_revision(soc, str, sizeof(str)))
+			goto dflt;
+
+		/* Fix up IDK overlay for SR1.0 */
+		if (!strncmp(str, "SR1.0", 5))
+			dtboname = am65x_idk_sr1_dtboname;
+
+dflt:
+		k3_dtbo_list[nb_dtbos++] = dtboname;
 
 		/*
 		 * Make sure we are not running out of buffer space by checking
 		 * if we can fit the new overlay, a trailing space to be used
 		 * as a separator, plus the terminating zero.
 		 */
-		if (strlen(name_overlays) + strlen(cards[i].dtbo_name) + 2 >
+		if (strlen(name_overlays) + strlen(dtboname) + 2 >
 		    sizeof(name_overlays))
 			return -ENOMEM;
 
 		/* Append to our list of overlays */
-		strcat(name_overlays, cards[i].dtbo_name);
+		strcat(name_overlays, dtboname);
 		strcat(name_overlays, " ");
 	}
 
