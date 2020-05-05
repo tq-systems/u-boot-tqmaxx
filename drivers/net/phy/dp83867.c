@@ -372,12 +372,14 @@ static int dp83867_config(struct phy_device *phydev)
 
 		phy_write_mmd(phydev, DP83867_DEVADDR, DP83867_RGMIICTL, val);
 
+		val = phy_read_mmd(phydev, DP83867_DEVADDR, DP83867_RGMIIDCTL);
 		delay = (dp83867->rx_id_delay |
 			(dp83867->tx_id_delay <<
 			DP83867_RGMII_TX_CLK_DELAY_SHIFT));
-
+		val &= (~0xffu);
+		val |= (delay & 0xffu);
 		phy_write_mmd(phydev, DP83867_DEVADDR,
-			      DP83867_RGMIIDCTL, delay);
+			      DP83867_RGMIIDCTL, val);
 	}
 
 	if (phy_interface_is_sgmii(phydev)) {
