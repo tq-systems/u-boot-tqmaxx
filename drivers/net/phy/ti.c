@@ -95,6 +95,7 @@
 
 #define DP83867_IO_MUX_CFG_IO_IMPEDANCE_MAX	0x0
 #define DP83867_IO_MUX_CFG_IO_IMPEDANCE_MIN	0x1f
+#define DP83867_IO_MUX_CFG_CLK_O_DISABLE	BIT(6)
 #define DP83867_IO_MUX_CFG_CLK_O_SEL_SHIFT	8
 #define DP83867_IO_MUX_CFG_CLK_O_SEL_MASK	\
 		GENMASK(0x1f, DP83867_IO_MUX_CFG_CLK_O_SEL_SHIFT)
@@ -115,9 +116,11 @@ struct dp83867_private {
 	int io_impedance;
 	bool rxctrl_strap_quirk;
 	int port_mirroring;
-	int clk_output_sel;
+	unsigned int clk_output_sel;
+	bool set_clk_output;
 	u32 led_function;
 	u32 led_ctrl;
+
 };
 
 /**
@@ -234,17 +237,24 @@ static int dp83867_of_init(struct phy_device *phydev)
 	struct dp83867_private *dp83867 = phydev->priv;
 	ofnode node;
 	u16 val;
+	int ret;
 
 	/* Optional configuration */
-
-	/*
-	 * Keep the default value if ti,clk-output-sel is not set
-	 * or to high
-	 */
-
-	dp83867->clk_output_sel =
-		ofnode_read_u32_default(node, "ti,clk-output-sel",
-					DP83867_CLK_O_SEL_REF_CLK);
+	ret = ofnode_read_u32(node, "ti,clk-output-sel",
+			      &dp83867->clk_output_sel);
+	/* If not set, keep default */
+	if (!ret) {
+		dp83867->set_clk_output = true;
+		/* Valid values are 0 to DP83867_CLK_O_SEL_REF_CLK or
+		 * DP83867_CLK_O_SEL_OFF.
+		 */
+		if (dp83867->clk_output_sel > DP83867_CLK_O_SEL_REF_CLK &&
+		    dp83867->clk_output_sel != DP83867_CLK_O_SEL_OFF) {
+			pr_debug("ti,clk-output-sel value %u out of range\n",
+				 dp83867->clk_output_sel);
+			return -EINVAL;
+		}
+	}
 
 	node = phy_get_ofnode(phydev);
 	if (!ofnode_valid(node))
@@ -450,6 +460,26 @@ static int dp83867_config(struct phy_device *phydev)
 
 	if (dp83867->port_mirroring != DP83867_PORT_MIRRORING_KEEP)
 		dp83867_config_port_mirroring(phydev);
+
+	/* Clock output selection if muxing property is set */
+	if (dp83867->set_clk_output) {
+		val = phy_read_mmd_indirect(phydev,
+					    DP83867_IO_MUX_CFG,
+					    DP83867_DEVADDR,
+					    phydev->addr);
+
+		if (dp83867->clk_output_sel == DP83867_CLK_O_SEL_OFF) {
+			val |= DP83867_IO_MUX_CFG_CLK_O_DISABLE;
+		} else {
+			val &= ~(DP83867_IO_MUX_CFG_CLK_O_SEL_MASK |
+				 DP83867_IO_MUX_CFG_CLK_O_DISABLE);
+			val |= dp83867->clk_output_sel <<
+			       DP83867_IO_MUX_CFG_CLK_O_SEL_SHIFT;
+		}
+		phy_write_mmd_indirect(phydev, DP83867_IO_MUX_CFG,
+				       DP83867_DEVADDR, phydev->addr,
+				       val);
+	}
 
 	if (dp83867->led_function != U32_MAX)
 		phy_write(phydev, MDIO_DEVAD_NONE, DP83867_LEDCR1,
