@@ -123,6 +123,23 @@ struct dp83867_private {
 	bool sgmii_ref_clk_en;
 };
 
+static int dp83867_phy_extread(struct phy_device *phydev,
+			       int addr, int devad, int reg)
+{
+	if (devad != DP83867_DEVADDR)
+		return -1;
+	return phy_read_mmd(phydev, DP83867_DEVADDR, addr);
+};
+
+static int dp83867_phy_extwrite(struct phy_device *phydev, int addr,
+				int devad, int reg, u16 val)
+{
+	if (devad != DP83867_DEVADDR)
+		return -1;
+	phy_write_mmd(phydev, DP83867_DEVADDR, addr, (u32)val);
+	return 0;
+};
+
 static int dp83867_config_port_mirroring(struct phy_device *phydev)
 {
 	struct dp83867_private *dp83867 =
@@ -426,6 +443,8 @@ static struct phy_driver DP83867_driver = {
 	.config = &dp83867_config,
 	.startup = &genphy_startup,
 	.shutdown = &genphy_shutdown,
+	.readext = dp83867_phy_extread,
+	.writeext = dp83867_phy_extwrite,
 };
 
 int phy_ti_init(void)
