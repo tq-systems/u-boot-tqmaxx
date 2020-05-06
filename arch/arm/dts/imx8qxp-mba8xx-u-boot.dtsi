@@ -132,6 +132,10 @@
 	u-boot,dm-spl;
 };
 
+&flexspi0 {
+	u-boot,dm-spl;
+};
+
 &gpio4 {
 	u-boot,dm-spl;
 };

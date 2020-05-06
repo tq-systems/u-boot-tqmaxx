@@ -65,6 +65,44 @@
 			SC_P_EMMC0_STROBE_CONN_EMMC0_STROBE	0x00000040
 		>;
 	};
+
+	pinctrl_flexspi0: flexspi0grp {
+		fsl,pins = <
+			SC_P_QSPI0A_DATA0_LSIO_QSPI0A_DATA0	0x0600004c
+			SC_P_QSPI0A_DATA1_LSIO_QSPI0A_DATA1	0x0600004c
+			SC_P_QSPI0A_DATA2_LSIO_QSPI0A_DATA2	0x0600004c
+			SC_P_QSPI0A_DATA3_LSIO_QSPI0A_DATA3	0x0600004c
+			SC_P_QSPI0A_DQS_LSIO_QSPI0A_DQS		0x0600004c
+			SC_P_QSPI0A_SS0_B_LSIO_QSPI0A_SS0_B	0x0600004c
+			SC_P_QSPI0A_SS1_B_LSIO_QSPI0A_SS1_B	0x0600004c
+			SC_P_QSPI0A_SCLK_LSIO_QSPI0A_SCLK	0x0600004c
+			SC_P_QSPI0B_SCLK_LSIO_QSPI0B_SCLK	0x0600004c
+			SC_P_QSPI0B_DATA0_LSIO_QSPI0B_DATA0	0x0600004c
+			SC_P_QSPI0B_DATA1_LSIO_QSPI0B_DATA1	0x0600004c
+			SC_P_QSPI0B_DATA2_LSIO_QSPI0B_DATA2	0x0600004c
+			SC_P_QSPI0B_DATA3_LSIO_QSPI0B_DATA3	0x0600004c
+			SC_P_QSPI0B_DQS_LSIO_QSPI0B_DQS		0x0600004c
+			SC_P_QSPI0B_SS0_B_LSIO_QSPI0B_SS0_B	0x0600004c
+			SC_P_QSPI0B_SS1_B_LSIO_QSPI0B_SS1_B	0x0600004c
+		>;
+	};
+};
+
+&flexspi0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexspi0>;
+	status = "okay";
+
+	flash0: flash@0 {
+		reg = <0>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "jedec,spi-nor";
+		spi-max-frequency = <66000000>;
+		spi-nor,ddr-quad-read-dummy = <8>;
+		spi-tx-bus-width = <4>;
+		spi-rx-bus-width = <4>;
+	};
 };
 
 &gpio0 {
