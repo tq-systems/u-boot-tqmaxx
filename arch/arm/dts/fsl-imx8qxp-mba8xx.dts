@@ -128,6 +128,9 @@
 };
 
 &iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>;
+
 	pinctrl_fec1: fec1grp {
 		fsl,pins = <
 			SC_P_ENET0_MDC_CONN_ENET0_MDC			0x06000048
@@ -172,6 +175,29 @@
 		>;
 	};
 
+	pinctrl_hog: mba8qxhoggrp {
+		fsl,pins = <
+			/* gpio keys */
+			SC_P_ADC_IN5_LSIO_GPIO1_IO13			0x00000048
+			SC_P_ADC_IN4_LSIO_GPIO1_IO14			0x00000048
+			/* LCD CTRL */
+			/* LCD RST# */
+			SC_P_MIPI_DSI1_I2C0_SCL_LSIO_GPIO1_IO29		0x00000048
+			/* LCD BLT EN */
+			SC_P_MIPI_DSI1_I2C0_SDA_LSIO_GPIO1_IO30		0x00000048
+			/* LCD PWR */
+			SC_P_MIPI_DSI0_I2C0_SCL_LSIO_GPIO1_IO25		0x00000048
+			/* LCD CONTRAST */
+			SC_P_SPI0_CS1_ADMA_LCD_PWM0_OUT			0x00000048
+			/* GPIO */
+			SC_P_MIPI_DSI0_I2C0_SDA_LSIO_GPIO1_IO26		0x00000048
+			SC_P_USDHC1_RESET_B_LSIO_GPIO4_IO19		0x00000048
+			/* MIPI CSI EN / RST# */
+			SC_P_MIPI_CSI0_GPIO0_00_LSIO_GPIO3_IO08		0x00000048
+			SC_P_MIPI_CSI0_GPIO0_01_LSIO_GPIO3_IO07		0x00000048
+		>;
+	};
+
 	pinctrl_lpuart1: lpuart1grp {
 		fsl,pins = <
 			SC_P_UART1_RX_ADMA_UART1_RX		0x06000020
@@ -199,7 +225,6 @@
 
 	pinctrl_usdhc2_gpio: usdhc2gpiogrp {
 		fsl,pins = <
-			SC_P_USDHC1_RESET_B_LSIO_GPIO4_IO19	0x00000021
 			SC_P_USDHC1_WP_LSIO_GPIO4_IO21		0x00000021
 			SC_P_USDHC1_CD_B_LSIO_GPIO4_IO22	0x00000021
 		>;
