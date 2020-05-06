@@ -54,10 +54,12 @@ enum fspi_lut_id {
 	SEQID_EN4B = 22,
 	SEQID_WRDI = 23,
 	SEQID_QUAD_PP = 24,
+	SEQID_WRSR = 25,
 	SEQID_END,
 };
 
 /* FSPI CMD */
+#define FSPI_CMD_WRSR		0x01	/* Write status register */
 #define FSPI_CMD_PP		0x02	/* Page program (up to 256 bytes) */
 #define FSPI_CMD_RDSR		0x05	/* Read status register */
 #define FSPI_CMD_WRDI		0x04	/* Write disable */
@@ -442,6 +444,15 @@ static void fspi_set_lut(struct fsl_fspi_priv *priv)
 	fspi_write32(priv->flags, &regs->lut[lut_base + 1],
 		     OPRND0(0) | PAD0(LUT_PAD4) |
 		     INSTR0(LUT_WRITE));
+	fspi_write32(priv->flags, &regs->lut[lut_base + 2], 0);
+	fspi_write32(priv->flags, &regs->lut[lut_base + 3], 0);
+
+	/* Write Status */
+	lut_base = SEQID_WRSR * 4;
+	fspi_write32(priv->flags, &regs->lut[lut_base], OPRND0(FSPI_CMD_WRSR) |
+		PAD0(LUT_PAD1) | INSTR0(LUT_CMD) | OPRND1(2) |
+		     PAD1(LUT_PAD1) | INSTR1(LUT_WRITE));
+	fspi_write32(priv->flags, &regs->lut[lut_base + 1], 0);
 	fspi_write32(priv->flags, &regs->lut[lut_base + 2], 0);
 	fspi_write32(priv->flags, &regs->lut[lut_base + 3], 0);
 
@@ -830,6 +841,11 @@ static void fspi_op_wrevcr(struct fsl_fspi_priv *priv, u8 *txbuf, u32 len)
 	fspi_mem_op_write(priv, SEQID_WREVCR, txbuf, len);
 }
 
+static void fspi_op_wrsr(struct fsl_fspi_priv *priv, u8 *txbuf, u32 len)
+{
+	fspi_mem_op_write(priv, SEQID_WRSR, txbuf, len);
+}
+
 static void fspi_op_rdid(struct fsl_fspi_priv *priv, u32 *rxbuf, u32 len)
 {
 	fspi_mem_op_read_reg(priv, SEQID_RDID, (u8 *)rxbuf, len);
@@ -937,6 +953,11 @@ int fspi_xfer(struct fsl_fspi_priv *priv, unsigned int bitlen,
 #endif
 				return 0;
 			}
+			if (priv->cur_seqid == FSPI_CMD_WRSR) {
+				fspi_op_wrsr(priv, (u8 *)dout, bytes);
+				return 0;
+			}
+
 			priv->sf_addr = wr_sfaddr;
 			fspi_op_write(priv, (u8 *)dout, bytes);
 			return 0;
@@ -1191,6 +1212,7 @@ struct fspi_cmd_func_pair fspi_supported_cmds[SEQID_END] = {
 	{FSPI_CMD_EN4B, false, &fspi_mem_op_cmd},
 	{FSPI_CMD_WRDI, false, &fspi_mem_op_cmd},
 	{FSPI_CMD_QUAD_PP, true, &fspi_mem_op_write},
+	{FSPI_CMD_WRSR, false, &fspi_mem_op_write},
 };
 
 static int fsl_fspi_child_pre_probe(struct udevice *dev)
