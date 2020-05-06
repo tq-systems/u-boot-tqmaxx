@@ -53,8 +53,6 @@
 
 #define CONFIG_REMAKE_ELF
 
-#define CONFIG_CMD_READ
-
 /* Flat Device Tree Definitions */
 #define CONFIG_OF_BOARD_SETUP
 
@@ -239,6 +237,16 @@
 /* needed for loop in CPU code */
 #define PHYS_SDRAM_2			0x800000000
 #define PHYS_SDRAM_2_SIZE		0x0000000	/* not placed */
+
+#if defined(CONFIG_CMD_MEMTEST)
+#if !defined(CONFIG_SYS_ALT_MEMTEST)
+#define CONFIG_SYS_ALT_MEMTEST
+#endif
+#define CONFIG_SYS_MEMTEST_START	(CONFIG_BOOTAUX_RESERVED_MEM_BASE)
+#define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + \
+					(PHYS_SDRAM_1_SIZE / 4) * 3)
+#define CONFIG_SYS_MEMTEST_SCRATCH	CONFIG_SYS_MEMTEST_END
+#endif
 
 /* Serial */
 #define CONFIG_BAUDRATE			115200
