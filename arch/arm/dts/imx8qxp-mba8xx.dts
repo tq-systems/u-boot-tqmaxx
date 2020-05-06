@@ -26,7 +26,6 @@
 		regulator-name = "SD1_PWR";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
-		status = "okay";
 	};
 
 	reg_1v8: regulator-1v8 {
@@ -36,6 +35,40 @@
 		regulator-max-microvolt = <1800000>;
 	};
 
+	reg_12v0: regulator-12v0 {
+		compatible = "regulator-fixed";
+		regulator-name = "V_12V";
+		regulator-min-microvolt = <12000000>;
+		regulator-max-microvolt = <12000000>;
+		gpio = <&pca9538 6 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+
+	reg_pcie_1v5: regulator-pcie-1v5 {
+		compatible = "regulator-fixed";
+		regulator-name = "PCIE_1V5";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_pcie_1v5>;
+		regulator-min-microvolt = <1500000>;
+		regulator-max-microvolt = <1500000>;
+		gpio = <&gpio0 30 GPIO_ACTIVE_HIGH>;
+		startup-delay-us = <1000>;
+		enable-active-high;
+		status = "okay";
+	};
+
+	reg_pcie_3v3: regulator-pcie-3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "PCIE_3V3";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_pcie_3v3>;
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&gpio0 31 GPIO_ACTIVE_HIGH>;
+		startup-delay-us = <1000>;
+		enable-active-high;
+		status = "okay";
+	};
 };
 
 &i2c1 {
@@ -182,6 +215,18 @@
 		fsl,pins = <
 			/* Muxing as GPIO (no pull) for PE1_INT# (not used) to avoid mistakes */
 			SC_P_USDHC1_RESET_B_LSIO_GPIO4_IO19	0x00000061
+		>;
+	};
+
+	pinctrl_reg_pcie_1v5: regpcie1v5grp {
+		fsl,pins = <
+			SC_P_SAI1_RXC_LSIO_GPIO0_IO30		0x00000021
+		>;
+	};
+
+	pinctrl_reg_pcie_3v3: regpcie3v3grp {
+		fsl,pins = <
+			SC_P_SAI1_RXFS_LSIO_GPIO0_IO31		0x00000021
 		>;
 	};
 
