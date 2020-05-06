@@ -78,7 +78,7 @@
 /* Boot M4 */
 #define M4_BOOT_ENV \
 	"m4_0_image=m4_0.bin\0" \
-	"loadm4image_0=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} " \
+	"loadm4image_0=load mmc ${mmcdev}:${mmcpart} ${loadaddr} " \
 		"${m4_0_image}\0" \
 	"m4boot_0=run loadm4image_0; dcache flush; bootaux ${loadaddr} 0\0" \
 
@@ -90,36 +90,34 @@
 	"sd_dev=1\0" \
 
 /* Initial environment variables */
-#define CONFIG_EXTRA_ENV_SETTINGS		\
+#define TQMA8XX_MODULE_ENV_SETTINGS		\
 	CONFIG_MFG_ENV_SETTINGS \
 	M4_BOOT_ENV \
 	AHAB_ENV \
 	"script=boot.scr\0" \
 	"image=Image\0" \
 	"panel=NULL\0" \
-	"console=ttyLP1\0" \
 	"fdt_addr=0x83000000\0"			\
 	"cntr_addr=0x98000000\0"			\
 	"cntr_file=os_cntr_signed.bin\0" \
 	"boot_fdt=try\0" \
-	"fdt_file=undefined\0" \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
-	"mmcroot=" CONFIG_MMCROOT " rootwait rw\0" \
 	"mmcautodetect=yes\0" \
-	"mmcargs=setenv bootargs console=${console},${baudrate} " \
-		"earlycon root=${mmcroot}\0 " \
 	"loadbootscript=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} " \
 		"${script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
 		"source\0" \
-	"loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
-	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
-	"loadcntr=fatload mmc ${mmcdev}:${mmcpart} ${cntr_addr} ${cntr_file}\0" \
+	"loadimage=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
+	"loadfdt=load mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
+	"loadcntr=load mmc ${mmcdev}:${mmcpart} ${cntr_addr} ${cntr_file}\0" \
 	"auth_os=auth_cntr ${cntr_addr}\0" \
 	"boot_os=booti ${loadaddr} - ${fdt_addr};\0" \
 	"mmcboot=echo Booting from mmc ...; " \
+		"setenv bootargs; " \
 		"run mmcargs; " \
+		"run loadimage; " \
+		"run loadfdt; " \
 		"if test ${sec_boot} = yes; then " \
 			"if run auth_os; then " \
 				"run boot_os; " \
@@ -137,16 +135,10 @@
 				"echo wait for boot; " \
 			"fi;" \
 		"fi;\0" \
-	"netargs=setenv bootargs console=${console},${baudrate} earlycon " \
-		"root=/dev/nfs " \
-		"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
 	"netboot=echo Booting from net ...; " \
+		"setenv bootargs; " \
 		"run netargs;  " \
-		"if test ${ip_dyn} = yes; then " \
-			"setenv get_cmd dhcp; " \
-		"else " \
-			"setenv get_cmd tftp; " \
-		"fi; " \
+		"run set_getcmd; " \
 		"if test ${sec_boot} = yes; then " \
 			"${get_cmd} ${cntr_addr} ${cntr_file}; " \
 			"if run auth_os; then " \
@@ -165,10 +157,70 @@
 			"else " \
 				"booti; " \
 			"fi;" \
-		"fi;\0"
+		"fi;\0" \
+	"update_kernel=run set_getcmd; "                                       \
+		"if ${get_cmd} ${image}; then "                                \
+			"if itest ${filesize} > 0; then "                      \
+				"echo Write kernel image to mmc "              \
+					"${mmcdev}:${firmwarepart}...; "       \
+				"save mmc ${mmcdev}:${firmwarepart} "          \
+					"${loadaddr} ${image} ${filesize}; "   \
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; setenv get_cmd \0"                           \
+	"update_fdt=run set_getcmd; "                                          \
+		"if ${get_cmd} ${fdt_file}; then "                             \
+			"if itest ${filesize} > 0; then "                      \
+				"echo Write fdt image to mmc "                 \
+					"${mmcdev}:${firmwarepart}...; "       \
+				"save mmc ${mmcdev}:${firmwarepart} "          \
+					"${loadaddr} ${fdt_file} ${filesize}; "\
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; setenv get_cmd \0"                           \
+	"uboot_start=0x40\0"                                                   \
+	"uboot_size=0xfc0\0"                                                   \
+	"uboot=bootstream.bin\0"                                               \
+	"update_uboot=run set_getcmd; if ${get_cmd} ${uboot}; then "           \
+		"if itest ${filesize} > 0; then "                              \
+			"echo Write u-boot image to mmc ${mmcdev} ...; "       \
+			"mmc dev ${mmcdev}; mmc rescan; "                      \
+			"setexpr blkc ${filesize} + 0x1ff; "                   \
+			"setexpr blkc ${blkc} / 0x200; "                       \
+			"if itest ${blkc} <= ${uboot_size}; then "             \
+				"mmc write ${loadaddr} ${uboot_start} "        \
+					"${blkc}; "                            \
+			"fi; "                                                 \
+		"fi; fi; "                                                     \
+		"setenv filesize; setenv blkc \0"                              \
+	"set_getcmd=if test \"${ip_dyn}\" = yes; then "                        \
+			"setenv get_cmd dhcp; "                                \
+		"else "                                                        \
+			"setenv get_cmd tftp; "                                \
+		"fi; \0"                                                       \
+	"rootfsmode=ro\0"                                                      \
+	"addtty=setenv bootargs ${bootargs} console=${console},${baudrate}"    \
+		" earlycon\0"                                                  \
+	"mmcargs=run addmmc addtty\0"                                          \
+	"mmcrootpart=2\0"                                                      \
+	"addmmc=setenv bootargs ${bootargs} "                                  \
+		"root=/dev/mmcblk${mmcblkdev}p${mmcrootpart} ${rootfsmode} "   \
+		"rootwait\0"                                                   \
+	"netargs=run addnfs addip addtty\0"                                    \
+	"addnfs=setenv bootargs ${bootargs} "                                  \
+		"root=/dev/nfs rw "                                            \
+		"nfsroot=${serverip}:${rootpath},v3,tcp;\0"                    \
+	"netdev=eth0\0"                                                        \
+	"rootpath=/srv/nfs\0"                                                  \
+	"ipmode=static\0"                                                      \
+	"addip_static=setenv bootargs ${bootargs} "                            \
+		"ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:"            \
+		"${hostname}:${netdev}:off\0"                                  \
+	"addip_dynamic=setenv bootargs ${bootargs} ip=dhcp\0"                  \
+	"addip=if test \"${ipmode}\" != static; then "                         \
+		"run addip_dynamic; else run addip_static; fi\0"
 
 #if !defined(CONFIG_BOOTCOMMAND)
-
 #define CONFIG_BOOTCOMMAND \
 	   "mmc dev ${mmcdev}; if mmc rescan; then " \
 		   "if run loadbootscript; then " \
@@ -187,7 +239,6 @@
 			 "fi; " \
 		   "fi; " \
 	   "else booti ${loadaddr} - ${fdt_addr}; fi"
-
 #endif
 
 /* Link Definitions */
@@ -212,10 +263,11 @@
 
 #define CONFIG_SYS_MMC_IMG_LOAD_PART	1
 
-/* On LPDDR4 board, USDHC1 is for eMMC, USDHC2 is for SD on CPU board */
-#define CONFIG_SYS_MMC_ENV_DEV		1   /* USDHC2 */
-#define CONFIG_MMCROOT			"/dev/mmcblk1p2"  /* USDHC2 */
-#define CONFIG_SYS_FSL_USDHC_NUM	2
+/*
+ * USDHC1 is for eMMC, USDHC2 is for SD on CPU board - we use DM and
+ * determine it based on current boot device
+ */
+#define CONFIG_SYS_MMC_ENV_DEV		-1   /* invalid */
 
 /* Size of malloc() pool */
 #define CONFIG_SYS_MALLOC_LEN		((CONFIG_ENV_SIZE + (32 * 1024)) * 1024)
@@ -263,6 +315,17 @@
 #include "tqma8xx-mba8xx.h"
 #else
 #error
+#endif
+
+#define CONFIG_EXTRA_ENV_SETTINGS		\
+	TQMA8XX_MODULE_ENV_SETTINGS		\
+	BB_ENV_SETTINGS
+
+#ifndef CONFIG_SPL_BUILD
+#define BOOT_TARGET_DEVICES(func) \
+	func(MMC, mmc, 0) \
+	func(USB, usb, 0)
+#include <config_distro_bootcmd.h>
 #endif
 
 #endif /* __TQMA8XX_H */
