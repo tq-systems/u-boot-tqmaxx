@@ -19,6 +19,8 @@
 #define MII_DP83867_MICR	0x12
 #define MII_DP83867_CFG2	0x14
 #define MII_DP83867_BISCR	0x16
+#define DP83867_LEDCR1		0x18
+#define DP83867_LEDCR2		0x19
 #define DP83867_CTRL		0x1f
 
 /* Extended Registers */
@@ -114,6 +116,8 @@ struct dp83867_private {
 	bool rxctrl_strap_quirk;
 	int port_mirroring;
 	int clk_output_sel;
+	u32 led_function;
+	u32 led_ctrl;
 };
 
 /**
@@ -283,6 +287,25 @@ static int dp83867_of_init(struct phy_device *phydev)
 				       DP83867_DEVADDR, phydev->addr, val);
 	}
 
+	ret = ofnode_read_u32(node, "ti,led-function",
+				   &dp83867->led_function);
+	if (ret) {
+		dp83867->led_function = U32_MAX;
+	} else if (dp83867->led_function > U16_MAX) {
+		pr_err("ti,led-function value %x out of range\n",
+		       dp83867->led_function);
+		return -EINVAL;
+	}
+
+	ret = ofnode_read_u32(node, "ti,led-ctrl", &dp83867->led_ctrl);
+	if (ret) {
+		dp83867->led_ctrl = U32_MAX;
+	} else if (dp83867->led_ctrl > U16_MAX) {
+		pr_err("ti,led-ctrl value %x out of range\n",
+		       dp83867->led_ctrl);
+		return -EINVAL;
+	}
+
 	return 0;
 }
 #else
@@ -294,6 +317,8 @@ static int dp83867_of_init(struct phy_device *phydev)
 	dp83867->tx_id_delay = DEFAULT_TX_ID_DELAY;
 	dp83867->fifo_depth = DEFAULT_FIFO_DEPTH;
 	dp83867->io_impedance = -EINVAL;
+	dp83867->led_function = U32_MAX;
+	dp83867->led_ctrl = U32_MAX;
 
 	return 0;
 }
@@ -423,7 +448,15 @@ static int dp83867_config(struct phy_device *phydev)
 	if (dp83867->port_mirroring != DP83867_PORT_MIRRORING_KEEP)
 		dp83867_config_port_mirroring(phydev);
 
+	if (dp83867->led_function != U32_MAX)
+		phy_write(phydev, MDIO_DEVAD_NONE, DP83867_LEDCR1,
+			  dp83867->led_function);
+	if (dp83867->led_ctrl != U32_MAX)
+		phy_write(phydev, MDIO_DEVAD_NONE, DP83867_LEDCR2,
+			  dp83867->led_ctrl);
+
 	genphy_config_aneg(phydev);
+
 	return 0;
 
 err_out:

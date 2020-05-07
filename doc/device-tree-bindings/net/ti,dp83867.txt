@@ -15,6 +15,14 @@ Required properties:
 	- ti,clk-output-sel - Clock output select - see dt-bindings/net/ti-dp83867.h
 		for applicable values
 
+Optional property:
+	- ti,led-function	  - Value of LED configuration register 1,
+				    controlling the triggers for the PHY LED
+				    GPIOs.
+	- ti,led-ctrl		  - Value of LED configuration register 2,
+				    controlling polarity and related settings
+				    for the PHY LED GPIOs.
+
 Default child nodes are standard Ethernet PHY device
 nodes as described in doc/devicetree/bindings/net/ethernet.txt
 
