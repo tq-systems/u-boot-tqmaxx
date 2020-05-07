@@ -17,6 +17,14 @@ Required properties:
 			      be disabled by this property.  When omitted, the
 			      PHY's default will be left as is.
 
+Optional property:
+	- ti,led-function	  - Value of LED configuration register 1,
+				    controlling the triggers for the PHY LED
+				    GPIOs.
+	- ti,led-ctrl		  - Value of LED configuration register 2,
+				    controlling polarity and related settings
+				    for the PHY LED GPIOs.
+
 Default child nodes are standard Ethernet PHY device
 nodes as described in doc/devicetree/bindings/net/ethernet.txt
 
