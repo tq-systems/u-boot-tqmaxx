@@ -16,6 +16,7 @@
 	aliases {
 		spi0 = &flexspi;
 		usb0 = &usbotg1;
+		video0 = &lcdif;
 		usb_gadget0 = &usbg1;
 	};
 
