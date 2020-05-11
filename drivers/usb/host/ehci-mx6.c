@@ -477,6 +477,13 @@ int ehci_usb_remove(struct udevice *dev)
 
 	plat->init_type = 0; /* Clean the requested usb type to host mode */
 
+#if CONFIG_IS_ENABLED(DM_REGULATOR)
+	if (priv->vbus_supply) {
+		debug("disabling VBUS supply\n");
+		regulator_set_enable(priv->vbus_supply, false);
+	}
+#endif
+
 	return board_usb_cleanup(dev->req_seq, priv->init_type);
 }
 
