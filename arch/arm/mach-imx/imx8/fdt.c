@@ -718,7 +718,9 @@ int ft_system_setup(void *blob, struct bd_info *bd)
 			       fdt_strerror(off));
 	}
 
+#ifndef CONFIG_SKIP_RESOURCE_CHECKING
 	update_fdt_with_owned_resources(blob);
+#endif
 
 	update_fdt_frequencies(blob);
 
