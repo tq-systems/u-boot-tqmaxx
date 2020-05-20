@@ -4,6 +4,10 @@
  */
 
 #include <common.h>
+#include <dm.h>
+#include <dm/device-internal.h>
+#include <dm/lists.h>
+#include <dm/uclass-internal.h>
 #include <malloc.h>
 #include <errno.h>
 #include <asm/io.h>
@@ -31,6 +35,46 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#if defined(CONFIG_FSL_QSPI) && defined(CONFIG_DM_SPI)
+
+static int board_qspi_init(void)
+{
+	struct udevice *bus;
+	struct uclass *uc;
+	int count = 0;
+	int ret;
+
+	set_clk_qspi();
+
+	ret = uclass_get(UCLASS_SPI, &uc);
+	if (ret)
+		return ret;
+
+	uclass_foreach_dev(bus, uc) {
+		/* init SPI controllers */
+		printf("SPI%d:   ", count);
+		count++;
+
+		ret = device_probe(bus);
+		if (ret == -ENODEV) {	/* No such device. */
+			puts("SPI not available.\n");
+			continue;
+		}
+
+		if (ret) {		/* Other error. */
+			printf("probe failed, error %d\n", ret);
+			continue;
+		}
+
+		puts("\n");
+	}
+
+	return 0;
+}
+#else
+static inline int board_qspi_init(void) { return 0; }
+#endif
+
 int board_early_init_f(void)
 {
 	return tqc_bb_board_early_init_f();
@@ -48,14 +92,63 @@ int dram_init(void)
 }
 
 #ifdef CONFIG_OF_BOARD_SETUP
+static void tqma8mx_ft_qspi_setup(void *blob, bd_t *bd)
+{
+	int off;
+	int enable_flash = 0;
+
+	if (QSPI_BOOT == get_boot_device()) {
+		enable_flash = 1;
+	} else {
+#if defined(CONFIG_FSL_QSPI)
+		unsigned int bus = CONFIG_SF_DEFAULT_BUS;
+		unsigned int cs = CONFIG_SF_DEFAULT_CS;
+		unsigned int speed = CONFIG_SF_DEFAULT_SPEED;
+		unsigned int mode = CONFIG_SF_DEFAULT_MODE;
+#ifdef CONFIG_DM_SPI_FLASH
+		struct udevice *new, *bus_dev;
+		int ret;
+
+		/* Remove the old device, otherwise probe will just be a nop */
+		ret = spi_find_bus_and_cs(bus, cs, &bus_dev, &new);
+		if (!ret) {
+			device_remove(new, DM_REMOVE_NORMAL);
+		}
+		ret = spi_flash_probe_bus_cs(bus, cs, speed, mode, &new);
+		if (!ret) {
+			device_remove(new, DM_REMOVE_NORMAL);
+			enable_flash = 1;
+		}
+#else
+		struct spi_flash *new;
+
+		new = spi_flash_probe(bus, cs, speed, mode);
+		if (new) {
+			spi_flash_free(new);
+			enable_flash = 1;
+		}
+#endif
+#endif
+	}
+	off = fdt_node_offset_by_compatible(blob, -1, "fsl,imx7d-qspi");
+	if (off >= 0)
+		fdt_set_node_status(blob, off, (enable_flash) ?
+				    FDT_STATUS_OKAY : FDT_STATUS_DISABLED,
+				    0);
+}
+
 int ft_board_setup(void *blob, bd_t *bd)
 {
+	tqma8mx_ft_qspi_setup(blob, bd);
+
 	return tqc_bb_ft_board_setup(blob, bd);
 }
 #endif
 
 int board_init(void)
 {
+	board_qspi_init();
+
 	return tqc_bb_board_init();
 }
 

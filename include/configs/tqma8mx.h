@@ -304,6 +304,18 @@
 #define CONFIG_SUPPORT_EMMC_BOOT	/* eMMC specific */
 #define CONFIG_SYS_MMC_IMG_LOAD_PART	1
 
+#ifdef CONFIG_FSL_QSPI
+
+#define FSL_QSPI_FLASH_SIZE		(SZ_64M)
+#define FSL_QSPI_FLASH_NUM		1
+
+/* needed for UBI support */
+/* #define CONFIG_CMD_MTDPARTS */
+/* #define CONFIG_MTD_PARTITIONS */
+#define CONFIG_MTD_DEVICE
+
+#endif
+
 #define CONFIG_MXC_OCOTP
 
 #ifndef CONFIG_SPL_BUILD

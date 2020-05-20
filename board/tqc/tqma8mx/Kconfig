@@ -35,6 +35,18 @@ config TQMA8MX_DEFAULTS
 	select MXC_GPIO
 	select DM_I2C
 	select SYS_I2C_MXC
+	select FSL_QSPI
+	select DM_SPI
+	select SPI
+	select DM_SPI_FLASH
+	select SPI_FLASH
+	select SPI_FLASH_MTD
+	select SPI_FLASH_4BYTES_ADDR
+	select SPI_FLASH_MACRONIX
+	select SPI_FLASH_SPANSION
+	select SPI_FLASH_STMICRO
+	select SPI_FLASH_SST
+	select SPI_FLASH_WINBOND
 	select MISC
 	select SPL
 	select SPL_LOAD_FIT
