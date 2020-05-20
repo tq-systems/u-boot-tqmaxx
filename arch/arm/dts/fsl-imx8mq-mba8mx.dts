@@ -113,6 +113,17 @@
 		>;
 	};
 
+	pinctrl_usb0: usb0grp {
+		fsl,pins = <
+			/* ID */
+			MX8MQ_IOMUXC_GPIO1_IO10_GPIO1_IO10		0x41
+			/* PWR */
+			MX8MQ_IOMUXC_GPIO1_IO12_GPIO1_IO12		0x06
+/* TODO: OC detection not functional in dwc3, pin mux will lead to non functional USB */
+/*			MX8MQ_IOMUXC_GPIO1_IO13_USB1_OTG_OC		0x41 */
+		>;
+	};
+
 	pinctrl_usdhc2_gpio: usdhc2grpgpio {
 		fsl,pins = <
 			MX8MQ_IOMUXC_SD2_CD_B_GPIO2_IO12	0x41
@@ -213,4 +224,33 @@
 	disable-wp;
 	vmmc-supply = <&reg_usdhc2_vmmc>;
 	status = "okay";
+};
+
+&usb3_phy0 {
+	status = "okay";
+};
+
+&usb3_0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usb0>;
+	status = "okay";
+};
+
+&usb_dwc3_0 {
+	status = "okay";
+	/* TODO: overwritten by driver */
+	dr_mode = "otg";
+};
+
+&usb3_phy1 {
+	status = "okay";
+};
+
+&usb3_1 {
+	status = "okay";
+};
+
+&usb_dwc3_1 {
+	status = "okay";
+	dr_mode = "host";
 };
