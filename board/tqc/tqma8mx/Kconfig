@@ -98,6 +98,16 @@ config TQMA8MX_BB_MBA8MX
 	bool "TQMa8MX on MBa8MX Starterkit"
 	select TQC_SDMMC
 	select CMD_FUSE
+	select MII
+	select CMD_MII
+	select CMD_PING
+	select CMD_DHCP
+	select CMD_NET
+	select DM_ETH
+	select FEC_MXC
+	select PHYLIB
+	select PHY_GIGE
+	select PHY_TI
 	select CMD_MMC
 	select CMD_FAT
 	select CMD_EXT2
