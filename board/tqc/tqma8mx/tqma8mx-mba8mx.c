@@ -18,6 +18,8 @@
 #include <asm/arch/clock.h>
 #include <spl.h>
 #include <dm.h>
+#include <usb.h>
+#include <dwc3-uboot.h>
 
 #include "../common/tqc_bb.h"
 #include "../common/tqc_board_gpio.h"
@@ -216,6 +218,91 @@ static int setup_fec(void)
 	clrsetbits_le32(&iomuxc_gpr_regs->gpr[1],
 			IOMUXC_GPR_GPR1_GPR_ENET1_TX_CLK_SEL_SHIFT, 0);
 	return set_clk_enet(ENET_125MHZ);
+}
+#endif
+
+#if defined(CONFIG_USB)
+
+int board_usb_init(int index, enum usb_init_type init)
+{
+	int ret = 0;
+	int otg_id;
+	struct gpio_desc *gpio;
+
+	switch(index) {
+	case 0:
+		otg_id = dm_gpio_get_value(&mba8mx_gid[USB1_OTG_ID].desc);
+		printf("USB0/OTG: ID = %d\n", otg_id);
+		gpio = &mba8mx_gid[USB1_OTG_PWR].desc;
+		imx8m_usb_power(index, true);
+		switch (init) {
+		case USB_INIT_DEVICE:
+			if (otg_id)
+				dm_gpio_set_value(gpio, 0);
+			else
+				ret = -ENODEV;
+			break;
+		case USB_INIT_HOST:
+			if (!otg_id)
+				dm_gpio_set_value(gpio, 1);
+			else
+				ret = -ENODEV;
+			break;
+		default:
+			printf("USB0/OTG: unknown init type\n");
+			ret = -EINVAL;
+		}
+		break;
+	case 1:
+		puts("USB1/HUB\n");
+		gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
+		dm_gpio_set_value(gpio, 1);
+		udelay(100);
+		dm_gpio_set_value(gpio, 0);
+		udelay(100);
+		imx8m_usb_power(index, true);
+		break;
+	default:
+		printf("invalid USB port %d\n", index);
+		ret = -EINVAL;
+	}
+
+	return ret;
+}
+
+int board_usb_cleanup(int index, enum usb_init_type init)
+{
+	int ret = 0;
+	struct gpio_desc *gpio;
+
+	switch(index) {
+	case 0:
+		puts("USB0/OTG\n");
+		gpio = &mba8mx_gid[USB1_OTG_PWR].desc;
+		switch (init) {
+		case USB_INIT_DEVICE:
+			break;
+		case USB_INIT_HOST:
+			break;
+		default:
+			printf("USB0/OTG: unknown init type\n");
+			ret = -EINVAL;
+		}
+		dm_gpio_set_value(gpio, 0);
+		imx8m_usb_power(index, false);
+		break;
+	case 1:
+		puts("USB1/HUB\n");
+		gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
+		dm_gpio_set_value(gpio, 1);
+		imx8m_usb_power(index, false);
+		break;
+	default:
+		printf("invalid USB port %d\n", index);
+		ret = -EINVAL;
+	}
+
+	return ret;
 }
 #endif
 
