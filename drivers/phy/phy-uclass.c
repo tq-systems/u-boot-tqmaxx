@@ -110,7 +110,7 @@ int generic_phy_init(struct phy *phy)
 {
 	struct phy_ops const *ops;
 
-	if (!phy)
+	if (!generic_phy_valid(phy))
 		return 0;
 	ops = phy_dev_ops(phy->dev);
 
@@ -121,7 +121,7 @@ int generic_phy_reset(struct phy *phy)
 {
 	struct phy_ops const *ops;
 
-	if (!phy)
+	if (!generic_phy_valid(phy))
 		return 0;
 	ops = phy_dev_ops(phy->dev);
 
@@ -132,7 +132,7 @@ int generic_phy_exit(struct phy *phy)
 {
 	struct phy_ops const *ops;
 
-	if (!phy)
+	if (!generic_phy_valid(phy))
 		return 0;
 	ops = phy_dev_ops(phy->dev);
 
@@ -143,7 +143,7 @@ int generic_phy_power_on(struct phy *phy)
 {
 	struct phy_ops const *ops;
 
-	if (!phy)
+	if (!generic_phy_valid(phy))
 		return 0;
 	ops = phy_dev_ops(phy->dev);
 
@@ -154,7 +154,7 @@ int generic_phy_power_off(struct phy *phy)
 {
 	struct phy_ops const *ops;
 
-	if (!phy)
+	if (!generic_phy_valid(phy))
 		return 0;
 	ops = phy_dev_ops(phy->dev);
 
