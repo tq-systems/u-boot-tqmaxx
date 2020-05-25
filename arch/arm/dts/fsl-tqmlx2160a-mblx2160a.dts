@@ -1,0 +1,31 @@
+// SPDX-License-Identifier: GPL-2.0+ OR X11
+/*
+ * TQ TMLX2160ARDB device tree source
+ *
+ * Author:	Gregor Herburger <gregor.herburger@tq-group.com>
+ *
+ * Copyright 2020
+ *
+ */
+
+/dts-v1/;
+
+#include "fsl-lx2160a.dtsi"
+
+/ {
+	model = "TQ TQMLX2160A module on MBLX2160a baseboard";
+	compatible = "fsl,tqmlx2160a", "fsl,lx2160a";
+};
+
+&i2c0 {
+	status = "okay";
+	u-boot,dm-pre-reloc;
+};
+
+&i2c4 {
+	status = "okay";
+};
+
+&i2c5 {
+	status = "okay";
+};

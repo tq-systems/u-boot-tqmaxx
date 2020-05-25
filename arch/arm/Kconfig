@@ -1114,6 +1114,17 @@ config TARGET_LX2160AQDS
 	  is a high-performance development platform that supports the
 	  QorIQ LX2160A/LX2120A/LX2080A Layerscape Architecture processor.
 
+config TARGET_TQMLX2160A
+	bool "Support tqmlx2160a"
+	select ARCH_LX2160A
+	select ARCH_MISC_INIT
+	select ARM64
+	select ARMV8_MULTIENTRY
+	select BOARD_LATE_INIT
+	help
+	  Support for TQ TQMLX2160A module.
+	  The TQMLX2160A is a module with a lx2160a SoC.
+
 config TARGET_HIKEY
 	bool "Support HiKey 96boards Consumer Edition Platform"
 	select ARM64
@@ -1655,6 +1666,7 @@ source "board/spear/spear600/Kconfig"
 source "board/spear/x600/Kconfig"
 source "board/st/stv0991/Kconfig"
 source "board/tcl/sl50/Kconfig"
+source "board/tqc/tqmlx2160a/Kconfig"
 source "board/ucRobotics/bubblegum_96/Kconfig"
 source "board/birdland/bav335x/Kconfig"
 source "board/toradex/colibri_pxa270/Kconfig"

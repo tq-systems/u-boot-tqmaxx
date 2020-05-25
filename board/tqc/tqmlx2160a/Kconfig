@@ -1,0 +1,29 @@
+if TARGET_TQMLX2160A
+
+config SYS_BOARD
+	default "tqmlx2160a"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_SOC
+	default "fsl-layerscape"
+
+config SYS_CONFIG_NAME
+	default "tqmlx2160a"
+
+choice TQMLX2160A_BASEBOARD
+	prompt "TQMLX2160A base board variant"
+	default MBLX2160A
+	help
+		Select base board for TQMLX2160A module
+		The TQMLX2160A is a SoM. Choose the baseboard it is running on.
+
+config MBLX2160A
+	bool "TQMLX2160A on MBLX2160A Starterkit"
+	help
+		Selects the MBLX2160A starterkit
+		This features 10G/100G 1G SGMII/ 1G RGMII, SATA, PCIe, USB
+endchoice
+
+endif
