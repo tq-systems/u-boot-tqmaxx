@@ -1,0 +1,131 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * TQ MBLX2160A device tree source
+ *
+ * Author: Gregor Herburger <gregor.herburger@tq-group.com>
+ * Copyright 2020 - 2021 TQ-Systems GmbH
+ *
+ */
+
+/dts-v1/;
+
+#include <dt-bindings/gpio/gpio.h>
+
+#include "fsl-lx2160a-tqmlx2160a.dtsi"
+
+/ {
+	model = "TQ-Systems GmbH TQMLX2160A module on MBLX2160a baseboard";
+	compatible = "tq,mblx2160a", "tq,tqmlx2160a", "fsl,lx2160a";
+};
+
+&esdhc0 {
+	wp-gpios = <&gpio0 30 GPIO_ACTIVE_LOW>;
+	cd-gpios = <&gpio0 31 GPIO_ACTIVE_LOW>;
+	status = "okay";
+};
+
+&i2c4 {
+	status = "okay";
+
+	mux@70 {
+		compatible = "nxp,pca9544";
+		reg = <0x70>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		i2c@0 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0>;
+		};
+
+		i2c@1 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <1>;
+		};
+
+		i2c@2 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <2>;
+
+			gpioex0: gpio@20 {
+				compatible = "nxp,pca9555";
+				reg = <0x20>;
+				#gpio-cells = <2>;
+				gpio-controller;
+			};
+
+			gpioex1: gpio@21 {
+				compatible = "nxp,pca9555";
+				reg = <0x21>;
+				#gpio-cells = <2>;
+				gpio-controller;
+			};
+
+			gpioex2: gpio@22 {
+				compatible = "nxp,pca9555";
+				reg = <0x22>;
+				#gpio-cells = <2>;
+				gpio-controller;
+			};
+		};
+
+		i2c@3 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <3>;
+		};
+	};
+};
+
+&i2c5 {
+	status = "okay";
+
+	mux@70 {
+		compatible = "nxp,pca9544";
+		reg = <0x70>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		i2c@0 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0>;
+		};
+
+		i2c@1 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <1>;
+		};
+
+		i2c@2 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <2>;
+		};
+
+		i2c@3 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <3>;
+		};
+	};
+};
+
+&uart1 {
+	status = "okay";
+	clock = <175000000>; /* clock is 1/4 of platform */
+};
+
+&uart2 {
+	status = "okay";
+	clock = <175000000>; /* clock is 1/4 of platform */
+};
+
+&uart3 {
+	status = "okay";
+	clock = <175000000>;
+};

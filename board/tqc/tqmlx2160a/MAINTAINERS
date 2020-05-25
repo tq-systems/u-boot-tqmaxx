@@ -1,0 +1,8 @@
+MBLX2160A BOARD
+M:	Gregor Herburger <gregor.herburger@tq-group.com>
+S:	Maintained
+F:	board/tqc/tqmlx2160a/
+F:	include/configs/tqmlx2160a.h
+F:	configs/tqmlx2160a_mblx2160a_tfa_defconfig
+F:	arch/arm/dts/fsl-lx2160a-tqmlx2160a.dtsi
+F:	arch/arm/dts/fsl-lx2160a-tqmlx2160a-mblx2160a.dts

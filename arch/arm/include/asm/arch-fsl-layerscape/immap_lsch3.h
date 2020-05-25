@@ -228,6 +228,8 @@
 /* Device Configuration */
 #define DCFG_BASE		0x01e00000
 #define DCFG_PORSR1			0x000
+#define DCFG_RST			0x60000
+#define DCFG_RST_HRESET			0x02000000
 #define DCFG_PORSR1_RCW_SRC		0xff800000
 #define DCFG_PORSR1_RCW_SRC_NOR		0x12f00000
 #define DCFG_RCWSR13			0x130

@@ -1,0 +1,45 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * TQ TQMLX2160A device tree source
+ *
+ * Author: Gregor Herburger <gregor.herburger@tq-group.com>
+ * Copyright 2020 - 2021 TQ-Systems GmbH
+ */
+
+/dts-v1/;
+
+#include "fsl-lx2160a.dtsi"
+
+/ {
+	model = "TQ-Systems GmbH TQMLX2160A module";
+	compatible = "tq,tqmlx2160a", "fsl,lx2160a";
+
+	aliases {
+		spi0 = &fspi;
+	};
+};
+
+&esdhc1 {
+	bus-width = <8>;
+	status = "okay";
+};
+
+&fspi {
+	bus-num = <0>;
+	status = "okay";
+
+	flash0: flash@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "jedec,spi-nor";
+		spi-max-frequency = <10000000>;
+		spi-tx-bus-width = <1>;
+		spi-rx-bus-width = <1>;
+		reg = <0>;
+	};
+};
+
+&i2c0 {
+	status = "okay";
+};
+
