@@ -1,0 +1,136 @@
+if TARGET_TQMA8MX
+
+config SYS_BOARD
+	default "tqma8mx"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_CONFIG_NAME
+	default "tqma8mx"
+
+config TQMA8MX_DEFAULTS
+	bool
+	default y if TARGET_TQMA8MX
+	select ARCH_MISC_INIT
+	select TQC_SDMMC
+	select TQC_EEPROM
+	select BOARD_LATE_INIT
+	select BOARD_EARLY_INIT_F
+	select FIT
+	select OF_CONTROL
+	select OF_BOARD_SETUP
+	select OF_SYSTEM_SETUP
+	select PINCTRL
+	select PINCTRL_IMX8M
+	select DM
+	select DM_MMC
+	select MMC_IO_VOLTAGE
+	select MMC_HS400_SUPPORT
+	select FSL_ESDHC
+	select DM_THERMAL
+	select DM_SERIAL
+	select MXC_UART
+	select DM_GPIO
+	select MXC_GPIO
+	select DM_I2C
+	select SYS_I2C_MXC
+	select MISC
+	select SPL
+	select SPL_LOAD_FIT
+	select SPL_BOARD_INIT
+	select SPL_ENV_SUPPORT
+	select SPL_SERIAL_SUPPORT
+	select SPL_GPIO_SUPPORT
+	select SPL_MMC_SUPPORT
+	select SPL_DRIVERS_MISC_SUPPORT
+	select SPL_POWER_SUPPORT
+	select SPL_I2C_SUPPORT
+	select SPL_LIBGENERIC_SUPPORT
+	select SPL_LIBCOMMON_SUPPORT
+
+config NR_DRAM_BANKS
+	default 1 if TARGET_TQMA8MX
+
+config SYS_TEXT_BASE
+	default 0x40200000 if TARGET_TQMA8MX
+
+config SYS_MALLOC_F_LEN
+	default 0x2000 if TARGET_TQMA8MX
+
+config SAVED_DRAM_TIMING_BASE
+	default 0x40000000 if TARGET_TQMA8MX
+
+config FIT_EXTERNAL_OFFSET
+	default 0x3000 if TARGET_TQMA8MX
+
+config SPL_FIT_GENERATOR
+	default "arch/arm/mach-imx/mkimage_fit_atf.sh" if TARGET_TQMA8MX
+
+config SYS_EXTRA_OPTIONS
+	default "IMX_CONFIG=arch/arm/mach-imx/imx8m/imximage.cfg" if TARGET_TQMA8MX
+
+choice
+	prompt "TQMa8MX Memory variant"
+	default TQMA8MX_RAM_2G
+	help
+	  Select memory variant for TQMa8MX
+
+config TQMA8MX_RAM_2G
+	bool "TQMa8MX with 2GB LPDDR4"
+	help
+	  Select module with 2GB LPDDR4"
+
+config TQMA8MX_RAM_1G
+	bool "TQMa8MX with 1GB LPDDR4"
+	help
+	  Select module with 1GB LPDDR4"
+
+endchoice
+
+choice
+	prompt "TQMa8MX base board variant"
+	default TQMA8MX_BB_MBA8MX
+	help
+	  Select base board for TQMa8MX
+
+config TQMA8MX_BB_MBA8MX
+	bool "TQMa8MX on MBa8MX Starterkit"
+	select TQC_SDMMC
+	select CMD_FUSE
+	select CMD_MMC
+	select CMD_FAT
+	select CMD_EXT2
+	select CMD_EXT4
+	select CMD_EXT4_WRITE
+	select CONFIG_DOS_PARTITION
+	help
+	  Select the MBa8Mx starterkit. This features a GigE Phy, USB, SD-Card
+	  etc.
+
+endchoice
+
+config DEFAULT_DEVICE_TREE
+	default "fsl-imx8mq-mba8mx" if TQMA8MX_BB_MBA8MX
+
+config DEFAULT_FDT_FILE
+	default "imx8mq-mba8mx.dtb" if TQMA8MX_BB_MBA8MX
+
+choice
+	prompt "TQMa8MX boot device"
+	default TQMBA8MX_BOOT_SDCARD
+	help
+	  Select boot device for TQMa8MX
+
+config TQMBA8MX_BOOT_SDCARD
+	bool "TQMa8MX from SD / e-MMC"
+	select SD_BOOT
+	select ENV_IS_IN_MMC
+	help
+	  Select booting from SD / e-MMC
+
+endchoice
+
+source "board/tqc/common/Kconfig"
+
+endif

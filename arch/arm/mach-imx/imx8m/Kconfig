@@ -84,6 +84,11 @@ config TARGET_IMX8MN_EVK
 	select SUPPORT_SPL
 	select IMX8M_DDR4
 
+config TARGET_TQMA8MX
+	bool "tqma8mx"
+	select IMX8MQ
+	select IMX8M_LPDDR4
+
 endchoice
 
 source "board/freescale/imx8mq_evk/Kconfig"
@@ -92,5 +97,6 @@ source "board/freescale/imx8mq_aiy/Kconfig"
 source "board/freescale/imx8mm_evk/Kconfig"
 source "board/freescale/imx8mm_val/Kconfig"
 source "board/freescale/imx8mn_evk/Kconfig"
+source "board/tqc/tqma8mx/Kconfig"
 
 endif

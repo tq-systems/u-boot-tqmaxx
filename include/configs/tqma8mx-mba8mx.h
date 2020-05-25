@@ -1,0 +1,27 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
+/*
+ * Copyright 2019 - 2020 TQ Systems GmbH
+ */
+
+#if !defined(__TQMA8MX_MBA8MX_H)
+#define __TQMA8MX_MBA8MX_H
+
+#if !defined(CONFIG_SPL_BUILD)
+#define CONFIG_DM_PCA953X
+#endif
+
+#define CONFIG_MXC_UART_BASE		UART3_BASE_ADDR
+
+#if (CONFIG_MXC_UART_BASE == UART1_BASE_ADDR)
+#define BB_ENV_SETTINGS \
+	"console=ttymxc0,115200 earlycon=ec_imx6q,0x30860000,115200\0" \
+	"fdt_file=fsl-imx8mq-tqma8mq-mba8mx.dtb\0"
+#elif (CONFIG_MXC_UART_BASE == UART3_BASE_ADDR)
+#define BB_ENV_SETTINGS \
+	"console=ttymxc2,115200 earlycon=ec_imx6q,0x30880000,115200\0" \
+	"fdt_file=fsl-imx8mq-tqma8mq-mba8mx.dtb\0"
+#else
+#error
+#endif
+
+#endif /* __TQMA8MX_MBA8MX_H */
