@@ -10,16 +10,11 @@
 
 /dts-v1/;
 
-#include "fsl-lx2160a.dtsi"
+#include "fsl-lx2160a-tqmlx2160a.dtsi"
 
 / {
-	model = "TQ TQMLX2160A module on MBLX2160a baseboard";
-	compatible = "fsl,tqmlx2160a", "fsl,lx2160a";
-};
-
-&i2c0 {
-	status = "okay";
-	u-boot,dm-pre-reloc;
+	model = "TQ Systems GmbH TQMLX2160A module on MBLX2160a baseboard";
+	compatible = "tq,tqmlx2160a-mblx2160a, tq,tqmlx2160a", "fsl,lx2160a";
 };
 
 &i2c4 {

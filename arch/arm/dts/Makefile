@@ -298,7 +298,7 @@ dtb-$(CONFIG_FSL_LSCH3) += fsl-ls2080a-qds.dtb \
 	fsl-ls1088a-rdb.dtb \
 	fsl-ls1088a-qds.dtb \
 	fsl-lx2160a-rdb.dtb \
-	fsl-tqmlx2160a-mblx2160a.dtb \
+	fsl-lx2160a-tqmlx2160a-mblx2160a.dtb \
 	fsl-lx2160a-qds.dtb
 dtb-$(CONFIG_FSL_LSCH2) += fsl-ls1043a-qds-duart.dtb \
 	fsl-ls1043a-qds-lpuart.dtb \
