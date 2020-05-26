@@ -27,6 +27,8 @@
 };
 
 &iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_wdog>;
 	/*
 	Pad Control Register
 
@@ -114,6 +116,12 @@
 			MX8MM_IOMUXC_SD1_DATA7_USDHC1_DATA7		0x1d6
 			MX8MM_IOMUXC_SD1_STROBE_USDHC1_STROBE 		0x84
 			MX8MM_IOMUXC_SD1_RESET_B_USDHC1_RESET_B		0x84
+		>;
+	};
+
+	pinctrl_wdog: wdoggrp {
+		fsl,pins = <
+			MX8MM_IOMUXC_GPIO1_IO02_WDOG1_WDOG_B		0x84
 		>;
 	};
 };

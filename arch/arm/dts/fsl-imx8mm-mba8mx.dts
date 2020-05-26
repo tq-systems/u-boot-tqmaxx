@@ -25,6 +25,8 @@
 };
 
 &iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpioled>, <&pinctrl_gpiobutton>, <&pinctrl_wdog>;
 
 	/*
 	Pad Control Register
@@ -57,6 +59,22 @@
 	UDHC100: 0x92 [HYS|fast|x4] (no pull up)
 	UDHC200: 0x96 [HYS|fast|x6] (no pull up)
 	*/
+
+	pinctrl_gpiobutton: gpiobuttongrp {
+		fsl,pins = <
+			MX8MM_IOMUXC_GPIO1_IO05_GPIO1_IO5	0x84
+			MX8MM_IOMUXC_GPIO1_IO07_GPIO1_IO7	0x84
+			MX8MM_IOMUXC_NAND_WE_B_GPIO3_IO17	0x84
+		>;
+	};
+
+	pinctrl_gpioled: gpioledgrp {
+		fsl,pins = <
+			MX8MM_IOMUXC_GPIO1_IO00_GPIO1_IO0	0x84
+			MX8MM_IOMUXC_GPIO1_IO08_GPIO1_IO8	0x84
+			MX8MM_IOMUXC_NAND_READY_B_GPIO3_IO16	0x84
+		>;
+	};
 
 	pinctrl_uart3: uart3grp {
 		fsl,pins = <
@@ -106,6 +124,29 @@
 			MX8MM_IOMUXC_SD2_DATA3_USDHC2_DATA3	0x96
 			MX8MM_IOMUXC_GPIO1_IO04_USDHC2_VSELECT	0x84
 		>;
+	};
+};
+
+&i2c1 {
+	expander0: gpio@23 {
+		compatible = "nxp,pca9555";
+		reg = <0x23>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+
+	expander1: gpio@24 {
+		compatible = "nxp,pca9555";
+		reg = <0x24>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+
+	expander2: gpio@25 {
+		compatible = "nxp,pca9555";
+		reg = <0x25>;
+		gpio-controller;
+		#gpio-cells = <2>;
 	};
 };
 
