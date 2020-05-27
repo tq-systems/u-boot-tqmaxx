@@ -15,6 +15,23 @@
 / {
 	model = "TQ Systems GmbH TQMLX2160A module";
 	compatible = ",tq,tqmlx2160a", "fsl,lx2160a";
+
+	aliases {
+		spi0 = &fspi;
+	};
+};
+
+&fspi {
+	bus-num = <0>;
+	status = "okay";
+
+	flash0: mx66um1g45g@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "spi-flash";
+		spi-max-frequency = <10000000>;
+		reg = <0>;
+	};
 };
 
 &i2c0 {
