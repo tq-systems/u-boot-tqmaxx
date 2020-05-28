@@ -17,6 +17,10 @@
 	compatible = "tq,tqmlx2160a-mblx2160a, tq,tqmlx2160a", "fsl,lx2160a";
 };
 
+&esdhc0 {
+	status = "okay";
+};
+
 &i2c4 {
 	status = "okay";
 };
