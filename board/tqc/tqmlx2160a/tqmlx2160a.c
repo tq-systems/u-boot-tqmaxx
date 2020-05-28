@@ -1,6 +1,7 @@
 #include <common.h>
 #include <dm.h>
 #include <dm/platform_data/serial_pl01x.h>
+#include <i2c.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -53,9 +54,30 @@ int board_early_init_f(void)
 	return 0;
 }
 
+int rtc_init(void)
+{
+	u8 val;
+	struct udevice *dev;
+
+	if (i2c_get_chip_for_busnum(CONFIG_SYS_RTC_BUS_NUM, CONFIG_SYS_I2C_RTC_ADDR, 1, &dev))
+		return -ENODEV;
+
+	/* Set Bit 0 of Register 0 of RTC to adjust to 12.5 pF */
+	val = dm_i2c_reg_read(dev, 0x00);
+
+	if (!(val & 0x01))
+		dm_i2c_reg_write(dev, 0x00, val | 0x01);
+
+	return 0;
+}
+
 int board_init(void)
 {
-	return 0;
+	int ret;
+
+	ret = rtc_init();
+
+	return ret;
 }
 
 #if defined(CONFIG_ARCH_MISC_INIT)
