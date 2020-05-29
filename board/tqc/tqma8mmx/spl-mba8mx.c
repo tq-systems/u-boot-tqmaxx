@@ -16,6 +16,8 @@
 #include <fsl_esdhc.h>
 #include <mmc.h>
 #include <spl.h>
+#include <usb.h>
+#include <usb/ehci-ci.h>
 
 #include "../common/tqc_bb.h"
 
@@ -138,3 +140,84 @@ void tqc_bb_board_init_f(ulong dummy)
 
 	init_uart_clk(uart_index);
 }
+
+#if defined(CONFIG_USB)
+
+#define OTG_ID_PAD		IMX_GPIO_NR(1, 10)
+#define OTG_PWR_PAD		IMX_GPIO_NR(1, 12)
+
+#define OTG_GPIO_PAD_CTL	(PAD_CTL_HYS | PAD_CTL_DSE1)
+
+static iomux_v3_cfg_t const usb_otg_pads[] = {
+	/* PWR */
+	IMX8MM_PAD_GPIO1_IO12_GPIO1_IO12 | MUX_PAD_CTRL(OTG_GPIO_PAD_CTL),
+	/* ID */
+	IMX8MM_PAD_GPIO1_IO10_GPIO1_IO10 | MUX_PAD_CTRL(OTG_GPIO_PAD_CTL),
+};
+
+int board_usb_phy_mode(int port)
+{
+	int ret = USB_INIT_HOST;
+
+	pr_err("board_usb_phy_mode(idx %d)\n", port);
+
+	if (port == 0)
+		ret = (gpio_get_value(OTG_ID_PAD)) ? USB_INIT_DEVICE :
+			USB_INIT_HOST;
+
+	return ret;
+}
+
+int board_ehci_hcd_init(int port)
+{
+	pr_err("board_ehci_hcd_init(idx %d)\n", port);
+
+	if (port == 0) {
+		imx_iomux_v3_setup_multiple_pads(usb_otg_pads,
+					 ARRAY_SIZE(usb_otg_pads));
+
+		gpio_request(OTG_ID_PAD, "otg_id");
+		gpio_direction_input(OTG_ID_PAD);
+		gpio_request(OTG_PWR_PAD, "otg_pwr");
+		gpio_direction_output(OTG_PWR_PAD, 0);
+	};
+
+	return 0;
+}
+
+int board_ehci_power(int port, int on)
+{
+	pr_err("board_ehci_power(idx %d, %s)\n", port, (on) ? "ON" : "OFF");
+
+	if (port == 0) {
+		gpio_direction_output(OTG_PWR_PAD, (on) ? 1 : 0);
+	};
+
+	return 0;
+}
+
+int board_usb_init(int index, enum usb_init_type init)
+{
+	int ret = 0;
+/*
+	if (index == 1) {
+		puts("init: USB1/HUB\n");
+		if (init != USB_INIT_HOST) {
+			printf("USB1/HUB: wrong init type\n");
+			ret = -EINVAL;
+		} else {
+			usb_phy_mode(index);
+			gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
+			dm_gpio_set_value(gpio, 1);
+			udelay(100);
+			dm_gpio_set_value(gpio, 0);
+			udelay(1000);
+			printf("USB1/HUB: hub reset\n");
+		}
+	}
+*/
+	pr_err("board_usb_init(idx %d)\n", index);
+
+	return ret;
+}
+#endif

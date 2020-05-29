@@ -48,6 +48,50 @@ config TQMA8MMX_DEFAULTS
 	select SPL_LIBGENERIC_SUPPORT
 	select SPL_LIBCOMMON_SUPPORT
 
+config TQMA8MMX_MFG_SUPPORT
+	bool "MFG Tool support"
+	depends on USB
+	select USB_GADGET
+	select DM_USB_GADGET
+	select CI_UDC
+	select USB_FUNCTION_SDP
+	select USB_FUNCTION_FASTBOOT
+	select FASTBOOT_UUU_SUPPORT
+	select FASTBOOT_FLASH
+	select CMD_FASTBOOT
+	select SPL_USB_HOST_SUPPORT
+	select SPL_USB_GADGET
+	select SPL_USB_SDP_SUPPORT
+
+if TQMA8MMX_MFG_SUPPORT
+
+config USB_GADGET_MANUFACTURER
+	default "FSL"
+
+config USB_GADGET_VENDOR_NUM
+	default 0x0525
+
+config USB_GADGET_PRODUCT_NUM
+	default 0xa4a5
+
+config USB_GADGET_VBUS_DRAW
+	default 2
+
+config SDP_LOADADDR
+	default 0x40400000
+
+config FASTBOOT_BUF_ADDR
+	default 0x42800000
+
+# restrict to 256M
+config FASTBOOT_BUF_SIZE
+	default 0x10000000
+
+config FASTBOOT_USB_DEV
+	default 0 if TQMA8MMX_BB_MBA8MX
+
+endif
+
 choice
 	prompt "TQMa8MMx CPU variant"
 	default TQMa8MMX_CPU_MX8MM
