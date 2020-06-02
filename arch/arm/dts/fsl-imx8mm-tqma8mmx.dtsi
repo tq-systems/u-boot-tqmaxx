@@ -1,0 +1,123 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Copyright 2020 TQ Systems GmbH
+ */
+
+#include "fsl-imx8mm.dtsi"
+
+/ {
+	model = "TQ Systems i.MX8MM TQMa8MM";
+	compatible = "tq,tqma8mm", "fsl,imx8mm";
+
+	reg_tqma8mmx_vcc3v3: regulator-vcc3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "TQMA8MMX_VCC3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+	};
+
+	reg_tqma8mmx_vcc1v8: regulator-vcc1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "TQMA8MMX_VCC1V8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-always-on;
+	};
+};
+
+&iomuxc {
+	/*
+	Pad Control Register
+
+	| 0  | 0    | 0   | 0   | 0x   | 00x |
+	| PE | HYS  | PUE | ODE | FSEL | DSE |
+
+	PE: Pull Resistors Enable
+	HYS: Hysteresis Enable
+
+	PUE:
+	0 — Select pull-down resistors
+	1 — Select pull-up resistors
+
+	ODE: Open Drain Enable
+
+	FSEL:
+	0x - Select slow slew rate (SR=1)
+	1x — Select fast slew rate (SR=0)
+
+	DSE:
+	00x — Drive strength X1
+	10x — Drive strength X2
+	01x — Drive strength X4
+	11x — Drive strength X6
+
+	GPIO: 0x84 [HYS|slow|X2] (no pull up)
+	UDHC: 0x1D4 [HYS|fast|x2] (pull up)
+	UDHC100: 0x1D2 [HYS|fast|x4] (pull up)
+	UDHC200: 0x1D6 [HYS|fast|x6] (pull up)
+	*/
+
+	pinctrl_usdhc1: usdhc1grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_SD1_CLK_USDHC1_CLK			0x1d4
+			MX8MM_IOMUXC_SD1_CMD_USDHC1_CMD			0x1d4
+			MX8MM_IOMUXC_SD1_DATA0_USDHC1_DATA0		0x1d4
+			MX8MM_IOMUXC_SD1_DATA1_USDHC1_DATA1		0x1d4
+			MX8MM_IOMUXC_SD1_DATA2_USDHC1_DATA2		0x1d4
+			MX8MM_IOMUXC_SD1_DATA3_USDHC1_DATA3		0x1d4
+			MX8MM_IOMUXC_SD1_DATA4_USDHC1_DATA4		0x1d4
+			MX8MM_IOMUXC_SD1_DATA5_USDHC1_DATA5		0x1d4
+			MX8MM_IOMUXC_SD1_DATA6_USDHC1_DATA6		0x1d4
+			MX8MM_IOMUXC_SD1_DATA7_USDHC1_DATA7		0x1d4
+			MX8MM_IOMUXC_SD1_STROBE_USDHC1_STROBE 		0x1d4
+			MX8MM_IOMUXC_SD1_RESET_B_USDHC1_RESET_B		0x1d4
+		>;
+	};
+
+	pinctrl_usdhc1_100mhz: usdhc1grp100mhz {
+		fsl,pins = <
+			MX8MM_IOMUXC_SD1_CLK_USDHC1_CLK			0x1d2
+			MX8MM_IOMUXC_SD1_CMD_USDHC1_CMD			0x1d2
+			MX8MM_IOMUXC_SD1_DATA0_USDHC1_DATA0		0x1d2
+			MX8MM_IOMUXC_SD1_DATA1_USDHC1_DATA1		0x1d2
+			MX8MM_IOMUXC_SD1_DATA2_USDHC1_DATA2		0x1d2
+			MX8MM_IOMUXC_SD1_DATA3_USDHC1_DATA3		0x1d2
+			MX8MM_IOMUXC_SD1_DATA4_USDHC1_DATA4		0x1d2
+			MX8MM_IOMUXC_SD1_DATA5_USDHC1_DATA5		0x1d2
+			MX8MM_IOMUXC_SD1_DATA6_USDHC1_DATA6		0x1d2
+			MX8MM_IOMUXC_SD1_DATA7_USDHC1_DATA7		0x1d2
+			MX8MM_IOMUXC_SD1_STROBE_USDHC1_STROBE 		0x84
+			MX8MM_IOMUXC_SD1_RESET_B_USDHC1_RESET_B		0x84
+		>;
+	};
+
+	pinctrl_usdhc1_200mhz: usdhc1grp200mhz {
+		fsl,pins = <
+			MX8MM_IOMUXC_SD1_CLK_USDHC1_CLK			0x1d6
+			MX8MM_IOMUXC_SD1_CMD_USDHC1_CMD			0x1d6
+			MX8MM_IOMUXC_SD1_DATA0_USDHC1_DATA0		0x1d6
+			MX8MM_IOMUXC_SD1_DATA1_USDHC1_DATA1		0x1d6
+			MX8MM_IOMUXC_SD1_DATA2_USDHC1_DATA2		0x1d6
+			MX8MM_IOMUXC_SD1_DATA3_USDHC1_DATA3		0x1d6
+			MX8MM_IOMUXC_SD1_DATA4_USDHC1_DATA4		0x1d6
+			MX8MM_IOMUXC_SD1_DATA5_USDHC1_DATA5		0x1d6
+			MX8MM_IOMUXC_SD1_DATA6_USDHC1_DATA6		0x1d6
+			MX8MM_IOMUXC_SD1_DATA7_USDHC1_DATA7		0x1d6
+			MX8MM_IOMUXC_SD1_STROBE_USDHC1_STROBE 		0x84
+			MX8MM_IOMUXC_SD1_RESET_B_USDHC1_RESET_B		0x84
+		>;
+	};
+};
+
+&usdhc1 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc1>;
+	pinctrl-1 = <&pinctrl_usdhc1_100mhz>;
+	pinctrl-2 = <&pinctrl_usdhc1_200mhz>;
+	bus-width = <8>;
+	non-removable;
+	vmmc-supply = <&reg_tqma8mmx_vcc3v3>;
+	vqmmc-supply = <&reg_tqma8mmx_vcc1v8>;
+	status = "okay";
+};

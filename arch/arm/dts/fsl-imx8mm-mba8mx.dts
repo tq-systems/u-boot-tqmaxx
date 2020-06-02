@@ -1,0 +1,129 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Copyright 2020 TQ Systems GmbH
+ */
+
+/dts-v1/;
+
+#include "fsl-imx8mm-tqma8mmx.dtsi"
+
+/ {
+	model = "TQ Systems GmbH i.MX8MM TQMa8MM on MBa8MX";
+	compatible = "tq,tqma8mm-mba8mx", "tq,tqma8mm", "fsl,imx8mm";
+
+	chosen {
+		bootargs = "console=ttymxc2,115200 earlycon=ec_imx6q,0x30880000,115200";
+		stdout-path = &uart3;
+	};
+
+	reg_usdhc2_vmmc: regulator-vmmc {
+		compatible = "regulator-fixed";
+		regulator-name = "VSD_3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+	};
+};
+
+&iomuxc {
+
+	/*
+	Pad Control Register
+
+	| 0  | 0    | 0   | 0   | 0x   | 00x |
+	| PE | HYS  | PUE | ODE | FSEL | DSE |
+
+	PE: Pull Resistors Enable
+	HYS: Hysteresis Enable
+
+	PUE: 
+	0 — Select pull-down resistors
+	1 — Select pull-up resistors
+
+	ODE: Open Drain Enable
+
+	FSEL:
+	0x - Select slow slew rate (SR=1)
+	1x — Select fast slew rate (SR=0)
+
+	DSE:
+	00x — Drive strength X1
+	10x — Drive strength X2
+	01x — Drive strength X4
+	11x — Drive strength X6
+
+	GPIO: 0x84 [HYS|slow|X2] (no pull up)
+	UART: 0x16 [fast|X6] (no pull up)
+	UDHC: 0x94 [HYS|fast|x2] (no pull up)
+	UDHC100: 0x92 [HYS|fast|x4] (no pull up)
+	UDHC200: 0x96 [HYS|fast|x6] (no pull up)
+	*/
+
+	pinctrl_uart3: uart3grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_UART3_RXD_UART3_DCE_RX	0x16
+			MX8MM_IOMUXC_UART3_TXD_UART3_DCE_TX	0x16
+		>;
+	};
+
+
+	pinctrl_usdhc2_gpio: usdhc2grpgpio {
+		fsl,pins = <
+			MX8MM_IOMUXC_SD2_CD_B_GPIO2_IO12	0x84
+		>;
+	};
+
+	pinctrl_usdhc2: usdhc2grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_SD2_CLK_USDHC2_CLK		0x94
+			MX8MM_IOMUXC_SD2_CMD_USDHC2_CMD		0x94
+			MX8MM_IOMUXC_SD2_DATA0_USDHC2_DATA0	0x94
+			MX8MM_IOMUXC_SD2_DATA1_USDHC2_DATA1	0x94
+			MX8MM_IOMUXC_SD2_DATA2_USDHC2_DATA2	0x94
+			MX8MM_IOMUXC_SD2_DATA3_USDHC2_DATA3	0x94
+			MX8MM_IOMUXC_GPIO1_IO04_USDHC2_VSELECT	0x84
+		>;
+	};
+
+	pinctrl_usdhc2_100mhz: usdhc2grp100mhz {
+		fsl,pins = <
+			MX8MM_IOMUXC_SD2_CLK_USDHC2_CLK		0x92
+			MX8MM_IOMUXC_SD2_CMD_USDHC2_CMD		0x92
+			MX8MM_IOMUXC_SD2_DATA0_USDHC2_DATA0	0x92
+			MX8MM_IOMUXC_SD2_DATA1_USDHC2_DATA1	0x92
+			MX8MM_IOMUXC_SD2_DATA2_USDHC2_DATA2	0x92
+			MX8MM_IOMUXC_SD2_DATA3_USDHC2_DATA3	0x92
+			MX8MM_IOMUXC_GPIO1_IO04_USDHC2_VSELECT	0x84
+		>;
+	};
+
+	pinctrl_usdhc2_200mhz: usdhc2grp200mhz {
+		fsl,pins = <
+			MX8MM_IOMUXC_SD2_CLK_USDHC2_CLK		0x96
+			MX8MM_IOMUXC_SD2_CMD_USDHC2_CMD		0x96
+			MX8MM_IOMUXC_SD2_DATA0_USDHC2_DATA0	0x96
+			MX8MM_IOMUXC_SD2_DATA1_USDHC2_DATA1	0x96
+			MX8MM_IOMUXC_SD2_DATA2_USDHC2_DATA2	0x96
+			MX8MM_IOMUXC_SD2_DATA3_USDHC2_DATA3	0x96
+			MX8MM_IOMUXC_GPIO1_IO04_USDHC2_VSELECT	0x84
+		>;
+	};
+};
+
+/* console */
+&uart3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart3>;
+	status = "okay";
+};
+
+&usdhc2 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
+	bus-width = <4>;
+	cd-gpios = <&gpio2 12 GPIO_ACTIVE_LOW>;
+	disable-wp;
+	vmmc-supply = <&reg_usdhc2_vmmc>;
+	status = "okay";
+};
