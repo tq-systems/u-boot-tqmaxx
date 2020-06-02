@@ -139,6 +139,7 @@
 #define CONFIG_DRIVER_TI_CPSW		/* Driver for IP block */
 #define CONFIG_MII			/* Required in net/eth.c */
 #define PHY_ANEG_TIMEOUT	8000	/* PHY needs longer aneg time at 1G */
+#define FDT_SEQ_MACADDR_FROM_ENV
 
 /* USB xHCI HOST */
 #define CONFIG_USB_XHCI_OMAP

@@ -374,17 +374,29 @@ int board_late_init(void)
 						 safe_string,
 						 ARRAY_SIZE(safe_string)))
 		{
-			char *ethaddr = env_get("ethaddr");
+			uint32_t mac = 0;
+			uint8_t addr[6];
+			char *eth2addr = env_get("eth2addr");
 
-			if (ethaddr &&
-			    strncmp(safe_string, ethaddr, 18)) {
+			if (eth2addr &&
+			    strncmp(safe_string, eth2addr, 18)) {
 				printf("\nWarning: MAC addresses don't match:\n");
 				printf("Address in EEPROM is      %s\n",
 				       safe_string);
 				printf("Address in environment is %s\n",
-				       ethaddr);
+				       eth2addr);
 			} else {
-				env_set("ethaddr", safe_string);
+				env_set("eth2addr", safe_string);
+
+				/* Increment ethaddr for eth1addr, eth2addr */
+				eth_parse_enetaddr(safe_string, addr);
+				mac = (addr[3] << 16) | (addr[4] << 8) | addr[5];
+
+				mac++;
+				addr[3] = (uint8_t)(mac >> 16);
+				addr[4] = (uint8_t)(mac >>  8);
+				addr[5] = (uint8_t)(mac >>  0);
+				eth_env_set_enetaddr("eth3addr", addr);
 			}
 		}
 
