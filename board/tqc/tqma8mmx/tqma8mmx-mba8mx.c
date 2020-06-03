@@ -203,6 +203,19 @@ int tqc_bb_ft_board_setup(void *blob, bd_t *bd)
 }
 #endif
 
+#ifdef CONFIG_FEC_MXC
+static int setup_fec(void)
+{
+	struct iomuxc_gpr_base_regs *const iomuxc_gpr_regs
+		= (struct iomuxc_gpr_base_regs *) IOMUXC_GPR_BASE_ADDR;
+
+	/* Use 125M anatop REF_CLK1 for ENET1, not from external */
+	clrsetbits_le32(&iomuxc_gpr_regs->gpr[1],
+			IOMUXC_GPR_GPR1_GPR_ENET1_TX_CLK_SEL_SHIFT, 0);
+	return set_clk_enet(ENET_125MHZ);
+}
+#endif
+
 int tqc_bb_board_init(void)
 {
 	int idx;
@@ -223,6 +236,10 @@ int tqc_bb_board_init(void)
 	printf("SD: %d ", dm_gpio_get_value(&mba8mx_gid[SD_MUX].desc));
 	printf("DSI: %d ", dm_gpio_get_value(&mba8mx_gid[DSI_MUX].desc));
 	printf("SPI: %d\n", dm_gpio_get_value(&mba8mx_gid[SPI_MUX].desc));
+	
+#ifdef CONFIG_FEC_MXC
+	setup_fec();
+#endif
 
 	return 0;
 }

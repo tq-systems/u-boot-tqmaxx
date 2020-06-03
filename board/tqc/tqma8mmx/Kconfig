@@ -115,6 +115,16 @@ config TQMA8MMX_BB_MBA8MX
 	bool "TQMa8MMx on MBa8Mx Starterkit"
 	select TQC_SDMMC
 	select CMD_FUSE
+	select MII
+	select CMD_MII
+	select CMD_PING
+	select CMD_DHCP
+	select CMD_NET
+	select DM_ETH
+	select FEC_MXC
+	select PHYLIB
+	select PHY_GIGE
+	select PHY_TI
 	help
 	  Select the MBa8Mx starterkit. This features a GigE Phy, USB, SD-Card
 	  etc.
