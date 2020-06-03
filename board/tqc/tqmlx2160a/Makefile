@@ -5,4 +5,5 @@
 #
 
 obj-y += tqmlx2160a.o
+obj-y += eth.o
 obj-y += ddr.o
