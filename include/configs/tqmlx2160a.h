@@ -215,6 +215,29 @@ unsigned long get_board_ddr_clk(void);
 	"addmmc=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/mmcblk${mmcblkdev}p${mmcrootpart} ${rootfsmode} "   \
 		"rootwait\0"                                                   \
+	"uboot=fip_uboot.bin\0"						       \
+	"uboot_spi_offset=0x100000\0"					       \
+	"pbl_spi_offset=0x0\0"						       \
+	"pbl_spi=bl2_flexspi_nor.pbl\0"					       \
+	"update_uboot_spi=run set_getcmd; if ${get_cmd} ${uboot}; then "       \
+		"if itest ${filesize} > 0; then "                              \
+			"echo Write u-boot image to sf address ${uboot_spi_offset};"\
+			"sf probe;"					       \
+			"sf update ${fileaddr} ${uboot_spi_offset} ${filesize};"\
+		"fi; fi; "                                                     \
+		"setenv filesize;\0"					       \
+	"update_pbl_spi=run set_getcmd; if ${get_cmd} ${pbl_spi}; then "       \
+		"if itest ${filesize} > 0; then "                              \
+			"echo Write rcw-pbl image to address ${pbl_spi_offset};"\
+			"sf probe;"					       \
+			"sf update ${fileaddr} ${pbl_spi_offset} ${filesize};"\
+		"fi; fi; "                                                     \
+		"setenv filesize;\0"					       \
+	"set_getcmd=if test \"${ip_dyn}\" = yes; then "                        \
+			"setenv get_cmd dhcp; "                                \
+		"else "                                                        \
+			"setenv get_cmd tftp; "                                \
+		"fi; \0"                                                       \
 	BOOTENV					\
 	"mcmemsize=0x70000000\0"		\
 	XSPI_MC_INIT_CMD				\
