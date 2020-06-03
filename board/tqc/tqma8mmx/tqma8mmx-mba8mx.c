@@ -18,6 +18,7 @@
 #include <asm/arch/clock.h>
 #include <spl.h>
 #include <dm.h>
+#include <usb.h>
 
 #include "../common/tqc_bb.h"
 #include "../common/tqc_board_gpio.h"
@@ -73,6 +74,7 @@ enum {
 	MPCIE_RST_B,
 	CAMX_RST_B,
 	RESET_MIKRO_MODULE_B,
+	USB1_OTG_ID,
 	GPIO_BTN1,
 	GPIO_BTN2,
 	GPIO_BTN3,
@@ -187,6 +189,7 @@ static struct tqc_gpio_init_data mba8mx_gid[] = {
 	GPIO_INIT_DATA_ENTRY(MPCIE_RST_B, "GPIO@25_13", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
 	GPIO_INIT_DATA_ENTRY(CAMX_RST_B, "GPIO@25_14", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
 	GPIO_INIT_DATA_ENTRY(RESET_MIKRO_MODULE_B, "GPIO@25_15", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
+	GPIO_INIT_DATA_ENTRY(USB1_OTG_ID, "GPIO1_10", GPIOD_IS_IN),
 	GPIO_INIT_DATA_ENTRY(GPIO_BTN1, "GPIO1_5", GPIOD_IS_IN),
 	GPIO_INIT_DATA_ENTRY(GPIO_BTN2, "GPIO3_17", GPIOD_IS_IN),
 	GPIO_INIT_DATA_ENTRY(GPIO_BTN3, "GPIO1_7", GPIOD_IS_IN),
@@ -257,6 +260,61 @@ int mmc_map_to_kernel_blk(int dev_no)
 {
 	return dev_no;
 }
+
+#if defined(CONFIG_USB)
+int usb_phy_mode(int port);
+
+int board_ehci_usb_phy_mode(struct udevice *dev)
+{
+	int otg_id;
+	int ret = -ENODEV;
+
+	if (dev->seq == 0) {
+		otg_id = dm_gpio_get_value(&mba8mx_gid[USB1_OTG_ID].desc);
+		printf("USB0/OTG: ID = %d\n", otg_id);
+		ret = (otg_id) ? USB_INIT_DEVICE : USB_INIT_HOST;
+	}
+
+	return ret;
+}
+
+int board_usb_init(int index, enum usb_init_type init)
+{
+	int ret = 0;
+	struct gpio_desc *gpio;
+
+	if (index == 1) {
+		puts("init: USB1/HUB\n");
+		if (init != USB_INIT_HOST) {
+			printf("USB1/HUB: wrong init type\n");
+			ret = -EINVAL;
+		} else {
+			usb_phy_mode(index);
+			gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
+			dm_gpio_set_value(gpio, 1);
+			udelay(100);
+			dm_gpio_set_value(gpio, 0);
+			udelay(1000);
+			printf("USB1/HUB: hub reset\n");
+		}
+	}
+
+	return ret;
+}
+
+int board_usb_cleanup(int index, enum usb_init_type init)
+{
+	struct gpio_desc *gpio;
+
+	if (index == 1) {
+		puts("USB1/HUB\n");
+		gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
+		dm_gpio_set_value(gpio, 1);
+	}
+
+	return 0;
+}
+#endif
 
 int tqc_bb_board_late_init(void)
 {

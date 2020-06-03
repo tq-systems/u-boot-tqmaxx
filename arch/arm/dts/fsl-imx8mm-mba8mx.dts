@@ -17,11 +17,28 @@
 		stdout-path = &uart3;
 	};
 
+	extcon_usbotg1: extcon-usbotg1-id {
+		compatible = "linux,extcon-usb-gpio";
+		id-gpio = <&gpio1 10 GPIO_ACTIVE_HIGH>;
+	};
+
 	reg_usdhc2_vmmc: regulator-vmmc {
 		compatible = "regulator-fixed";
 		regulator-name = "VSD_3V3";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
+	};
+
+	reg_usbotg1_vbus: regulator-usbotg1-vbus {
+		compatible = "regulator-fixed";
+		regulator-name = "USBOTG1_VBUS";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_usbotg1_vbus>;
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&gpio1 12 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		status = "okay";
 	};
 };
 
@@ -129,6 +146,13 @@
 		>;
 	};
 
+	pinctrl_reg_usbotg1_vbus: regusbotg1vbusgrp {
+		fsl,pins = <
+			/* PWR */
+			MX8MM_IOMUXC_GPIO1_IO12_GPIO1_IO12	0x19
+		>;
+	};
+
 	pinctrl_uart3: uart3grp {
 		fsl,pins = <
 			MX8MM_IOMUXC_UART3_RXD_UART3_DCE_RX	0x16
@@ -136,6 +160,17 @@
 		>;
 	};
 
+	pinctrl_usbotg1: usbotg1grp {
+		fsl,pins = <
+			/* ID */
+			/* MX8MM_IOMUXC_GPIO1_IO10_USB1_OTG_ID	0x19 */
+			MX8MM_IOMUXC_GPIO1_IO10_GPIO1_IO10	0x19
+			/* OC */
+			MX8MM_IOMUXC_GPIO1_IO13_USB1_OTG_OC	0x19
+			/* PWR */
+			/* MX8MM_IOMUXC_GPIO1_IO12_GPIO1_IO12	0x19 */
+		>;
+	};
 
 	pinctrl_usdhc2_gpio: usdhc2grpgpio {
 		fsl,pins = <
@@ -220,4 +255,36 @@
 	disable-wp;
 	vmmc-supply = <&reg_usdhc2_vmmc>;
 	status = "okay";
+};
+
+&usbg1 {
+	status = "disabled";
+};
+
+&usbg2 {
+	status = "disabled";
+};
+
+&usbotg1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usbotg1>;
+	/* should use extcon - otg ID pin handling is borked */
+	/* dr_mode = "otg"; */
+	extcon = <&extcon_usbotg1>;
+	vbus-supply = <&reg_usbotg1_vbus>;
+	srp-disable;
+	hnp-disable;
+	adp-disable;
+	power-polarity-active-high;
+	status = "okay";
+};
+
+/*
+ * TODO: currently not usable
+ */
+&usbotg2 {
+	dr_mode = "host";
+	disable-over-current;
+	power-polarity-active-high;
+	status = "disabled";
 };

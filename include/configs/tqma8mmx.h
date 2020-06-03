@@ -287,6 +287,16 @@
 
 #define CONFIG_MXC_OCOTP
 
+#if defined(CONFIG_USB)
+
+#define CONFIG_USB_MAX_CONTROLLER_COUNT		2
+
+#define CONFIG_USBD_HS
+
+#define CONFIG_MXC_USB_PORTSC			(PORT_PTS_UTMI | PORT_PTS_PTW)
+
+#endif
+
 #if defined(CONFIG_TQMA8MMX_BB_MBA8MX)
 #include "tqma8mmx-mba8mx.h"
 #else
@@ -299,7 +309,8 @@
 
 #ifndef CONFIG_SPL_BUILD
 #define BOOT_TARGET_DEVICES(func) \
-	func(MMC, mmc, 0)
+	func(MMC, mmc, 0) \
+	func(USB, usb, 0)
 #include <config_distro_bootcmd.h>
 #endif
 
