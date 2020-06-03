@@ -201,11 +201,20 @@ unsigned long get_board_ddr_clk(void);
 	"kernelhdr_addr_sd=0x3E00\0"            \
 	"kernel_size_sd=0x1d000\0"              \
 	"kernelhdr_size_sd=0x20\0"              \
-	"console=ttyAMA0,38400n8\0"		\
+	"console=ttyAMA0,115200n8\0"		\
 	"mmcdev=0\0"				\
-	"bootpart=1\0"				\
 	"kernel=linuximage\0"			\
-	"fdt=fsl-lx2160a-rdb.dtb\0"		\
+	"fdt="__stringify(CONFIG_DEFAULT_DEVICE_TREE)".dtb\0"		\
+	"earlycon=pl011,mmio32,0x21c0000\0"	\
+	"rootfsmode=ro\0"                                                      \
+	"addtty=setenv bootargs ${bootargs} console=${console}\0"              \
+	"addearlycon=setenv bootargs ${bootargs} earlycon=${earlycon}\0"       \
+	"mmcargs=run addmmc addtty addearlycon\0"                              \
+	"mmcblkdev=0\0"                                                        \
+	"mmcrootpart=2\0"                                                      \
+	"addmmc=setenv bootargs ${bootargs} "                                  \
+		"root=/dev/mmcblk${mmcblkdev}p${mmcrootpart} ${rootfsmode} "   \
+		"rootwait\0"                                                   \
 	BOOTENV					\
 	"mcmemsize=0x70000000\0"		\
 	XSPI_MC_INIT_CMD				\
@@ -248,7 +257,7 @@ unsigned long get_board_ddr_clk(void);
 		"$kernelheader_size && esbc_validate ${kernelheader_addr_r}; "\
 		" bootm $load_addr#$BOARD\0"			\
 	"sd_bootcmd=echo Trying load from sd card..;"		\
-		"mmcinfo; load mmc ${mmcdev}:${bootpart} ${load_addr} ${kernel};"		\
+		"run mmcargs; load mmc ${mmcdev}:${bootpart} ${load_addr} ${kernel};"		\
 		"load mmc ${mmcdev}:${bootpart} ${fdt_addr_r} ${fdt};"		\
 		"booti ${load_addr} - ${fdt_addr_r}\0"
 
