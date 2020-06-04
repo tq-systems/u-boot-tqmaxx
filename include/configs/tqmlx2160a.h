@@ -146,6 +146,24 @@ unsigned long get_board_ddr_clk(void);
 
 #define CONFIG_HWCONFIG
 #define HWCONFIG_BUFFER_SIZE		128
+#define CONFIG_MTD_DEVICE
+#define CONFIG_CMD_MTDPARTS
+#define CONFIG_MTD_PARTITIONS
+#define MTDIDS_DEFAULT \
+		"nor0=nor0\0"
+
+#define MTDPARTS_DEFAULT						       \
+	"mtdparts=nor0:"                                                       \
+	"1M@0k(RCW-PBL),"                                                      \
+	"2M@1M(U-Boot),"                                                       \
+	"1M@3M(U-Boot-Env),"						       \
+	"2M@8M(DDR-PHY),"						       \
+	"3M@10M(DPAA2-MC),"                                                    \
+	"1M@13M(DPAA2-DPL),"						       \
+	"1M@14M(DPAA2-DPC),"						       \
+	"1M@15M(Linux-DTB),"						       \
+	"32M@16M(Kernel),"						       \
+	"80M@48M(RootFS)\0"
 
 #define CONFIG_SYS_MMC_ENV_DEV          0
 #define CONFIG_ENV_SIZE			0x2000          /* 8KB */
@@ -200,15 +218,16 @@ unsigned long get_board_ddr_clk(void);
 	"kernel_addr_r=0x81000000\0"		\
 	"kernelheader_size=0x40000\0"		\
 	"fdt_addr_r=0x90000000\0"		\
+	"dtb_size=0x100000\0"			\
 	"load_addr=0xa0000000\0"		\
-	"kernel_size=0x2800000\0"		\
+	"kernel_size=0x2000000\0"		\
 	"kernel_addr_sd=0x8000\0"		\
 	"kernelhdr_addr_sd=0x3E00\0"            \
 	"kernel_size_sd=0x1d000\0"              \
 	"kernelhdr_size_sd=0x20\0"              \
 	"console=ttyAMA0,115200n8\0"		\
 	"mmcdev=0\0"				\
-	"kernel=linuximage\0"			\
+	"kernel=Image\0"			\
 	"fdt="__stringify(CONFIG_DEFAULT_DEVICE_TREE)".dtb\0"		\
 	"earlycon=pl011,mmio32,0x21c0000\0"	\
 	"rootfsmode=ro\0"                                                      \
@@ -238,11 +257,38 @@ unsigned long get_board_ddr_clk(void);
 			"sf update ${fileaddr} ${pbl_spi_offset} ${filesize};"\
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"					       \
+	"update_fdt_spi=run set_getcmd; if ${get_cmd} ${fdt}; then "       \
+		"if itest ${filesize} > 0; then "                              \
+			"sf probe;"					       \
+			"sf update ${fileaddr} Linux-DTB ${filesize};"\
+		"fi; fi; "                                                     \
+		"setenv filesize;\0"					       \
+	"update_kernel_spi=run set_getcmd; if ${get_cmd} ${kernel}; then "       \
+		"if itest ${filesize} > 0; then "                              \
+			"sf probe;"					       \
+			"sf update ${fileaddr} Kernel ${filesize};"\
+		"fi; fi; "                                                     \
+		"setenv filesize;\0"					       \
+	"update_fdt_sd=run set_getcmd; if ${get_cmd} ${fdt}; then "       \
+		"if itest ${filesize} > 0; then "                              \
+			"mmc info"					       \
+			"save mmc ${mmcdev}:${bootpart} ${fileaddr} ${fdt} ${filesize};"		\
+		"fi; fi; "                                                     \
+		"setenv filesize;\0"					       \
+	"update_kernel_sd=run set_getcmd; if ${get_cmd} ${kernel}; then "       \
+		"if itest ${filesize} > 0; then "                              \
+			"mmc info"					       \
+			"save mmc ${mmcdev}:${bootpart} ${fileaddr} ${kernel} ${filesize};"		\
+		"fi; fi; "                                                     \
+		"setenv filesize;\0"					       \
 	"set_getcmd=if test \"${ip_dyn}\" = yes; then "                        \
 			"setenv get_cmd dhcp; "                                \
 		"else "                                                        \
 			"setenv get_cmd tftp; "                                \
 		"fi; \0"                                                       \
+	"spiargs=run addspi addtty addearlycon\0"                                 \
+	"addspi=setenv bootargs ${bootargs} root=ubi0_0 rw "                \
+		"rootfstype=ubifs ubi.mtd=9\0"                                 \
 	BOOTENV					\
 	"mcmemsize=0x70000000\0"		\
 	XSPI_MC_INIT_CMD				\
@@ -265,25 +311,19 @@ unsigned long get_board_ddr_clk(void);
 			"&& esbc_validate ${scripthdraddr};"	\
 		"source ${scriptaddr}\0"
 
-#define XSPI_NOR_BOOTCOMMAND						\
-			"env exists mcinitcmd && env exists secureboot "\
-			"&& esbc_validate 0x20780000; "			\
-			"env exists mcinitcmd && "			\
-			"fsl_mc lazyapply dpl 0x20d00000; "		\
-			"run distro_bootcmd;run xspi_bootcmd; "		\
-			"env exists secureboot && esbc_halt;"
+#define XSPI_NOR_BOOTCOMMAND					\
+	"run distro_bootcmd;run xspi_bootcmd; "
 #define SD_BOOTCOMMAND						\
-		"run distro_bootcmd;run sd_bootcmd;"
+	"run distro_bootcmd;run sd_bootcmd;"
 
 /* Initial environment variables */
 #define CONFIG_EXTRA_ENV_SETTINGS		\
 	EXTRA_ENV_SETTINGS			\
 	"xspi_bootcmd=echo Trying load from flexspi..;"		\
-		"sf probe 0:0 && sf read $load_addr "		\
-		"$kernel_start $kernel_size ; env exists secureboot &&"	\
-		"sf read $kernelheader_addr_r $kernelheader_start "	\
-		"$kernelheader_size && esbc_validate ${kernelheader_addr_r}; "\
-		" bootm $load_addr#$BOARD\0"			\
+		"run spiargs; " \
+		"sf probe 0:0 && sf read ${load_addr} Kernel ${kernel_size}; "	\
+		"sf read ${fdt_addr_r} Linux-DTB ${dtb_size}; "	\
+		"booti ${load_addr} - ${fdt_addr_r}\0"			\
 	"sd_bootcmd=echo Trying load from sd card..;"		\
 		"run mmcargs; load mmc ${mmcdev}:${bootpart} ${load_addr} ${kernel};"		\
 		"load mmc ${mmcdev}:${bootpart} ${fdt_addr_r} ${fdt};"		\
