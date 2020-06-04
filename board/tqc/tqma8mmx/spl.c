@@ -7,7 +7,13 @@
 #include <errno.h>
 #include <asm/io.h>
 #include <asm/arch/ddr.h>
+#ifdef CONFIG_IMX8MN
+#include <asm/arch/imx8mn_pins.h>
+#elif defined(CONFIG_IMX8MM)
 #include <asm/arch/imx8mm_pins.h>
+#else
+#error
+#endif
 #include <asm/arch/sys_proto.h>
 #include <asm/arch/clock.h>
 #include <asm/gpio.h>
@@ -21,20 +27,32 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-extern struct dram_timing_info tqma8mxxl_512mb_dram_timing;
-
-static void spl_dram_init(void)
-{
-	ddr_init(&tqma8mxxl_512mb_dram_timing);
-}
-
 
 #define USDHC1_PWR_GPIO IMX_GPIO_NR(2, 10)
 
 #define USDHC_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS | PAD_CTL_PUE |PAD_CTL_PE | \
 			 PAD_CTL_FSEL2)
-#define USDHC_GPIO_PAD_CTRL (PAD_CTL_HYS | PAD_CTL_DSE1 )
 
+#define USDHC_GPIO_PAD_CTRL (PAD_CTL_HYS | PAD_CTL_DSE1)
+
+
+#ifdef CONFIG_IMX8MN
+static iomux_v3_cfg_t const usdhc1_pads[] = {
+	IMX8MN_PAD_SD1_CLK__USDHC1_CLK | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MN_PAD_SD1_CMD__USDHC1_CMD | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MN_PAD_SD1_DATA0__USDHC1_DATA0 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MN_PAD_SD1_DATA1__USDHC1_DATA1 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MN_PAD_SD1_DATA2__USDHC1_DATA2 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MN_PAD_SD1_DATA3__USDHC1_DATA3 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MN_PAD_SD1_DATA4__USDHC1_DATA4 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MN_PAD_SD1_DATA5__USDHC1_DATA5 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MN_PAD_SD1_DATA6__USDHC1_DATA6 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MN_PAD_SD1_DATA7__USDHC1_DATA7 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MN_PAD_SD1_RESET_B__GPIO2_IO10 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
+	IMX8MN_PAD_SD1_STROBE__USDHC1_STROBE | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
+};
+extern struct dram_timing_info tqma8mxxl_1g_lpddr4_timing;
+#elif defined(CONFIG_IMX8MM)
 static iomux_v3_cfg_t const usdhc1_pads[] = {
 	IMX8MM_PAD_SD1_CLK_USDHC1_CLK | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 	IMX8MM_PAD_SD1_CMD_USDHC1_CMD | MUX_PAD_CTRL(USDHC_PAD_CTRL),
@@ -48,6 +66,21 @@ static iomux_v3_cfg_t const usdhc1_pads[] = {
 	IMX8MM_PAD_SD1_DATA7_USDHC1_DATA7 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 	IMX8MM_PAD_SD1_RESET_B_GPIO2_IO10 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
 	IMX8MM_PAD_SD1_STROBE_USDHC1_STROBE | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
+};
+extern struct dram_timing_info tqma8mxxl_512mb_dram_timing;
+#else
+#error
+#endif
+
+
+
+static void spl_dram_init(void)
+{
+	#ifdef CONFIG_IMX8MN
+	ddr_init(&tqma8mxxl_1g_lpddr4_timing);
+	#else
+	ddr_init(&tqma8mxxl_512mb_dram_timing);
+	#endif
 };
 
 int board_mmc_getcd(struct mmc *mmc)

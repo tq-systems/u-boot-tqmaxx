@@ -5,7 +5,13 @@
 
 #include <common.h>
 #include <asm/arch/clock.h>
+#ifdef CONFIG_IMX8MN
+#include <asm/arch/imx8mn_pins.h>
+#elif defined(CONFIG_IMX8MM)
 #include <asm/arch/imx8mm_pins.h>
+#else
+#error
+#endif
 #include <asm/arch/sys_proto.h>
 #include <asm/mach-imx/boot_mode.h>
 #include <asm/mach-imx/gpio.h>
@@ -33,7 +39,63 @@ static const u32 uart_index = 1;
 #error
 #endif
 
-#define USDHC2_CD_GPIO	IMX_GPIO_NR(2, 12)
+#define USDHC_PAD_CTRL		(PAD_CTL_DSE6 | PAD_CTL_HYS | PAD_CTL_FSEL2)
+#define USDHC_GPIO_PAD_CTRL	(PAD_CTL_HYS | PAD_CTL_DSE1)
+#define USDHC2_VSELECT_GPIO	IMX_GPIO_NR(1, 4)
+#define USDHC2_CD_GPIO		IMX_GPIO_NR(2, 12)
+
+#ifdef CONFIG_USB
+#define OTG_ID_PAD		IMX_GPIO_NR(1, 10)
+#define OTG_PWR_PAD		IMX_GPIO_NR(1, 12)
+#define OTG_GPIO_PAD_CTL	(PAD_CTL_HYS | PAD_CTL_DSE1)
+#endif
+
+#ifdef CONFIG_IMX8MN
+	static iomux_v3_cfg_t const usdhc2_pads[] = {
+		IMX8MN_PAD_SD2_CLK__USDHC2_CLK | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+		IMX8MN_PAD_SD2_CMD__USDHC2_CMD | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+		IMX8MN_PAD_SD2_DATA0__USDHC2_DATA0 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+		IMX8MN_PAD_SD2_DATA1__USDHC2_DATA1 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+		IMX8MN_PAD_SD2_DATA2__USDHC2_DATA2 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+		IMX8MN_PAD_SD2_DATA3__USDHC2_DATA3 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+		IMX8MN_PAD_SD2_CD_B__GPIO2_IO12 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
+		IMX8MN_PAD_GPIO1_IO04__USDHC2_VSELECT | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
+	};
+	#ifdef CONFIG_USB
+	static iomux_v3_cfg_t const usb_otg_pads[] = {
+		/* PWR */
+		IMX8MN_PAD_GPIO1_IO12__GPIO1_IO12 | MUX_PAD_CTRL(OTG_GPIO_PAD_CTL),
+		/* ID */
+		IMX8MN_PAD_GPIO1_IO10__GPIO1_IO10 | MUX_PAD_CTRL(OTG_GPIO_PAD_CTL),
+	};
+	#endif
+#elif defined(CONFIG_IMX8MM)
+	static iomux_v3_cfg_t const usdhc2_pads[] = {
+		IMX8MM_PAD_SD2_CLK_USDHC2_CLK | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+		IMX8MM_PAD_SD2_CMD_USDHC2_CMD | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+		IMX8MM_PAD_SD2_DATA0_USDHC2_DATA0 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+		IMX8MM_PAD_SD2_DATA1_USDHC2_DATA1 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+		IMX8MM_PAD_SD2_DATA2_USDHC2_DATA2 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+		IMX8MM_PAD_SD2_DATA3_USDHC2_DATA3 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+		IMX8MM_PAD_SD2_CD_B_GPIO2_IO12 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
+		IMX8MM_PAD_GPIO1_IO04_USDHC2_VSELECT | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
+	};
+	#ifdef CONFIG_USB
+	static iomux_v3_cfg_t const usb_otg_pads[] = {
+		/* PWR */
+		IMX8MM_PAD_GPIO1_IO12_GPIO1_IO12 | MUX_PAD_CTRL(OTG_GPIO_PAD_CTL),
+		/* ID */
+		IMX8MM_PAD_GPIO1_IO10_GPIO1_IO10 | MUX_PAD_CTRL(OTG_GPIO_PAD_CTL),
+	};
+	#endif
+#else
+#error
+#endif
+
+static struct fsl_esdhc_cfg usdhc2_cfg = {
+	.esdhc_base = USDHC2_BASE_ADDR,
+	.max_bus_width = 4,
+};
 
 int tqc_bb_board_mmc_getcd(struct mmc *mmc)
 {
@@ -49,28 +111,6 @@ int tqc_bb_board_mmc_getcd(struct mmc *mmc)
 
 	return ret;
 }
-
-#define USDHC_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS | \
-			 PAD_CTL_FSEL2)
-#define USDHC_GPIO_PAD_CTRL (PAD_CTL_HYS | PAD_CTL_DSE1)
-
-#define USDHC2_VSELECT_GPIO	IMX_GPIO_NR(1, 4)
-
-static iomux_v3_cfg_t const usdhc2_pads[] = {
-	IMX8MM_PAD_SD2_CLK_USDHC2_CLK | MUX_PAD_CTRL(USDHC_PAD_CTRL), /* 0xd6 */
-	IMX8MM_PAD_SD2_CMD_USDHC2_CMD | MUX_PAD_CTRL(USDHC_PAD_CTRL), /* 0xd6 */
-	IMX8MM_PAD_SD2_DATA0_USDHC2_DATA0 | MUX_PAD_CTRL(USDHC_PAD_CTRL), /* 0xd6 */
-	IMX8MM_PAD_SD2_DATA1_USDHC2_DATA1 | MUX_PAD_CTRL(USDHC_PAD_CTRL), /* 0xd6 */
-	IMX8MM_PAD_SD2_DATA2_USDHC2_DATA2 | MUX_PAD_CTRL(USDHC_PAD_CTRL), /* 0x16 */
-	IMX8MM_PAD_SD2_DATA3_USDHC2_DATA3 | MUX_PAD_CTRL(USDHC_PAD_CTRL), /* 0xd6 */
-	IMX8MM_PAD_SD2_CD_B_GPIO2_IO12 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
-	IMX8MM_PAD_GPIO1_IO04_USDHC2_VSELECT | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
-};
-
-static struct fsl_esdhc_cfg usdhc2_cfg = {
-	.esdhc_base = USDHC2_BASE_ADDR,
-	.max_bus_width = 4,
-};
 
 int tqc_bb_board_mmc_init(bd_t *bis)
 {
@@ -142,18 +182,6 @@ void tqc_bb_board_init_f(ulong dummy)
 }
 
 #if defined(CONFIG_USB)
-
-#define OTG_ID_PAD		IMX_GPIO_NR(1, 10)
-#define OTG_PWR_PAD		IMX_GPIO_NR(1, 12)
-
-#define OTG_GPIO_PAD_CTL	(PAD_CTL_HYS | PAD_CTL_DSE1)
-
-static iomux_v3_cfg_t const usb_otg_pads[] = {
-	/* PWR */
-	IMX8MM_PAD_GPIO1_IO12_GPIO1_IO12 | MUX_PAD_CTRL(OTG_GPIO_PAD_CTL),
-	/* ID */
-	IMX8MM_PAD_GPIO1_IO10_GPIO1_IO10 | MUX_PAD_CTRL(OTG_GPIO_PAD_CTL),
-};
 
 int board_usb_phy_mode(int port)
 {

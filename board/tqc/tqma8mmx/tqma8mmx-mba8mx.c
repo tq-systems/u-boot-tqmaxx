@@ -11,7 +11,13 @@
 #include <asm-generic/gpio.h>
 #include <fsl_esdhc.h>
 #include <mmc.h>
+#ifdef CONFIG_IMX8MN
+#include <asm/arch/imx8mn_pins.h>
+#elif defined(CONFIG_IMX8MM)
 #include <asm/arch/imx8mm_pins.h>
+#else
+#error
+#endif
 #include <asm/arch/sys_proto.h>
 #include <asm/mach-imx/gpio.h>
 #include <asm/mach-imx/mxc_i2c.h>
@@ -85,30 +91,59 @@ enum {
 
 #define UART_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_FSEL1)
 
-#define WDOG_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS | PAD_CTL_PUE)
+#define WDOG_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS)
 
-static iomux_v3_cfg_t const wdog_pads[] = {
-	IMX8MM_PAD_GPIO1_IO02_WDOG1_WDOG_B | MUX_PAD_CTRL(WDOG_PAD_CTRL),
-};
 
-#if (CONFIG_MXC_UART_BASE == UART1_BASE_ADDR)
-static iomux_v3_cfg_t const uart_pads[] = {
-	IMX8MM_PAD_UART1_RXD_UART1_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
-	IMX8MM_PAD_UART1_TXD_UART1_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
-};
-static const u32 uart_index = 0;
-#elif (CONFIG_MXC_UART_BASE == UART3_BASE_ADDR)
-static iomux_v3_cfg_t const uart_pads[] = {
-	IMX8MM_PAD_UART3_RXD_UART3_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
-	IMX8MM_PAD_UART3_TXD_UART3_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
-};
-static const u32 uart_index = 2;
-#elif (CONFIG_MXC_UART_BASE == UART2_BASE_ADDR)
-static iomux_v3_cfg_t const uart_pads[] = {
-	IMX8MM_PAD_UART2_RXD_UART2_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
-	IMX8MM_PAD_UART2_TXD_UART2_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
-};
-static const u32 uart_index = 1;
+#ifdef CONFIG_IMX8MN
+	static iomux_v3_cfg_t const wdog_pads[] = {
+		IMX8MN_PAD_GPIO1_IO02__WDOG1_WDOG_B | MUX_PAD_CTRL(WDOG_PAD_CTRL),
+	};
+	#if (CONFIG_MXC_UART_BASE == UART1_BASE_ADDR)
+	static iomux_v3_cfg_t const uart_pads[] = {
+		IMX8MN_PAD_UART1_RXD__UART1_DCE_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
+		IMX8MN_PAD_UART1_TXD__UART1_DCE_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
+	};
+	static const u32 uart_index = 0;
+	#elif (CONFIG_MXC_UART_BASE == UART3_BASE_ADDR)
+	static iomux_v3_cfg_t const uart_pads[] = {
+		IMX8MN_PAD_UART3_RXD__UART3_DCE_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
+		IMX8MN_PAD_UART3_TXD__UART3_DCE_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
+	};
+	static const u32 uart_index = 2;
+	#elif (CONFIG_MXC_UART_BASE == UART2_BASE_ADDR)
+	static iomux_v3_cfg_t const uart_pads[] = {
+		IMX8MN_PAD_UART2_TXD__UART2_DCE_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
+		IMX8MN_PAD_UART2_TXD__UART2_DCE_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
+	};
+	static const u32 uart_index = 1;
+	#else
+	#error
+	#endif
+#elif defined(CONFIG_IMX8MM)
+	static iomux_v3_cfg_t const wdog_pads[] = {
+		IMX8MM_PAD_GPIO1_IO02_WDOG1_WDOG_B | MUX_PAD_CTRL(WDOG_PAD_CTRL),
+	};
+	#if (CONFIG_MXC_UART_BASE == UART1_BASE_ADDR)
+	static iomux_v3_cfg_t const uart_pads[] = {
+		IMX8MM_PAD_UART1_RXD_UART1_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
+		IMX8MM_PAD_UART1_TXD_UART1_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
+	};
+	static const u32 uart_index = 0;
+	#elif (CONFIG_MXC_UART_BASE == UART3_BASE_ADDR)
+	static iomux_v3_cfg_t const uart_pads[] = {
+		IMX8MM_PAD_UART3_RXD_UART3_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
+		IMX8MM_PAD_UART3_TXD_UART3_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
+	};
+	static const u32 uart_index = 2;
+	#elif (CONFIG_MXC_UART_BASE == UART2_BASE_ADDR)
+	static iomux_v3_cfg_t const uart_pads[] = {
+		IMX8MM_PAD_UART2_RXD_UART2_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
+		IMX8MM_PAD_UART2_TXD_UART2_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
+	};
+	static const u32 uart_index = 1;
+	#else
+	#error
+	#endif
 #else
 #error
 #endif
@@ -222,7 +257,7 @@ static int setup_fec(void)
 int tqc_bb_board_init(void)
 {
 	int idx;
-	unsigned cfg = 0x0;
+	unsigned int cfg = 0x0;
 
 	tqc_board_gpio_init(mba8mx_gid, ARRAY_SIZE(mba8mx_gid));
 	for (idx = BOOT_CFG0; idx <= BOOT_CFG15; ++idx)
@@ -239,7 +274,7 @@ int tqc_bb_board_init(void)
 	printf("SD: %d ", dm_gpio_get_value(&mba8mx_gid[SD_MUX].desc));
 	printf("DSI: %d ", dm_gpio_get_value(&mba8mx_gid[DSI_MUX].desc));
 	printf("SPI: %d\n", dm_gpio_get_value(&mba8mx_gid[SPI_MUX].desc));
-	
+
 #ifdef CONFIG_FEC_MXC
 	setup_fec();
 #endif

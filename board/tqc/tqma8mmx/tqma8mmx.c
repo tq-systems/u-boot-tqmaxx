@@ -15,14 +15,12 @@
 #include <asm-generic/gpio.h>
 #include <fsl_esdhc.h>
 #include <mmc.h>
-#include <asm/arch/imx8mm_pins.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/mach-imx/boot_mode.h>
 #include <asm/mach-imx/gpio.h>
 #include <asm/mach-imx/mxc_i2c.h>
 #include <asm/arch/clock.h>
 #include <spl.h>
-
 
 #include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
@@ -58,27 +56,33 @@ int board_init(void)
 	return tqc_bb_board_init();
 }
 
-static const char *tqma8mmx_get_boardname(void)
+static const char *tqma8mxx_get_boardname(void)
 {
 	switch (get_cpu_type()) {
 	case MXC_CPU_IMX8MM:
 		return "TQMa8MQML";
-		break;
 	case MXC_CPU_IMX8MML:
 		return "TQMa8MQMLL";
-		break;
 	case MXC_CPU_IMX8MMD:
 		return "TQMa8MDML";
-		break;
 	case MXC_CPU_IMX8MMDL:
 		return "TQMa8MDMLL";
-		break;
 	case MXC_CPU_IMX8MMS:
 		return "TQMa8MSML";
-		break;
 	case MXC_CPU_IMX8MMSL:
 		return "TQMa8MSMLL";
-		break;
+	case MXC_CPU_IMX8MN:
+		return "TQMa8MQNL";
+	case MXC_CPU_IMX8MNL:
+		return "TQMa8MQNLL";
+	case MXC_CPU_IMX8MND:
+		return "TQMa8MDNL";
+	case MXC_CPU_IMX8MNDL:
+		return "TQMa8MDNLL";
+	case MXC_CPU_IMX8MNS:
+		return "TQMa8MSNL";
+	case MXC_CPU_IMX8MNSL:
+		return "TQMa8MSNLL";
 	default:
 		return "??";
 	};
@@ -88,6 +92,7 @@ static const char *tqma8mmx_get_boardname(void)
 int print_bootinfo(void)
 {
 	enum boot_device bt_dev;
+
 	bt_dev = get_boot_device();
 
 	puts("Boot:  ");
@@ -119,7 +124,7 @@ int board_late_init(void)
 {
 #if !defined(CONFIG_SPL_BUILD)
 	struct tqc_eeprom_data eeprom;
-	const char *bname = tqma8mmx_get_boardname();
+	const char *bname = tqma8mxx_get_boardname();
 
 	if (!tqc_read_eeprom_at(0, 0x53, 1, 0, &eeprom))
 		tqc_board_handle_eeprom_data(bname, &eeprom);
@@ -129,7 +134,7 @@ int board_late_init(void)
 
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 	env_set("board_name", tqc_bb_get_boardname());
-	env_set("board_rev", tqma8mmx_get_boardname());
+	env_set("board_rev", tqma8mxx_get_boardname());
 #endif
 
 	return tqc_bb_board_late_init();
@@ -138,7 +143,7 @@ int board_late_init(void)
 int checkboard(void)
 {
 	print_bootinfo();
-	printf("Board: %s on a %s\n", tqma8mmx_get_boardname(),
+	printf("Board: %s on a %s\n", tqma8mxx_get_boardname(),
 	       tqc_bb_get_boardname());
 	return 0;
 }

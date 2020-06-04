@@ -30,15 +30,27 @@
  * the idea is re-use the early malloc (CONFIG_SYS_MALLOC_F_LEN) with
  * CONFIG_SYS_SPL_MALLOC_START
  */
-#define CONFIG_SPL_STACK		0x187FF0
-#define CONFIG_SPL_BSS_START_ADDR	0x00180000
+#ifdef CONFIG_IMX8MN
+#define CONFIG_SPL_STACK		0x95fff0
+#define CONFIG_SPL_BSS_START_ADDR	0x950000
 #define CONFIG_SPL_BSS_MAX_SIZE		0x2000	/* 8 KB */
-#define CONFIG_SYS_SPL_MALLOC_START	0x42200000
-#define CONFIG_SYS_SPL_MALLOC_SIZE	0x80000	/* 64 KB */
+#define CONFIG_SYS_SPL_MALLOC_START	0x940000
+#define CONFIG_SYS_SPL_MALLOC_SIZE	0x10000	/* 64 KB */
 #define CONFIG_SYS_ICACHE_OFF
 #define CONFIG_SYS_DCACHE_OFF
-
+#define CONFIG_MALLOC_F_ADDR		0x940000 /* malloc f used before GD_FLG_FULL_MALLOC_INIT set */
+#elif defined(CONFIG_IMX8MM)
+#define CONFIG_SPL_STACK		0x91fff0
+#define CONFIG_SPL_BSS_START_ADDR	0x00910000
+#define CONFIG_SPL_BSS_MAX_SIZE		0x2000	/* 8 KB */
+#define CONFIG_SYS_SPL_MALLOC_START	0x42200000
+#define CONFIG_SYS_SPL_MALLOC_SIZE	0x80000	/* 320 KB */
+#define CONFIG_SYS_ICACHE_OFF
+#define CONFIG_SYS_DCACHE_OFF
 #define CONFIG_MALLOC_F_ADDR		0x912000 /* malloc f used before GD_FLG_FULL_MALLOC_INIT set */
+#else
+#error
+#endif
 
 #define CONFIG_SPL_ABORT_ON_RAW_IMAGE /* For RAW image gives a error info not panic */
 
@@ -297,7 +309,7 @@
 
 #endif
 
-#if defined(CONFIG_TQMA8MMX_BB_MBA8MX)
+#if defined(CONFIG_TQMA8MXX_BB_MBA8MX)
 #include "tqma8mmx-mba8mx.h"
 #else
 #error

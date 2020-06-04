@@ -6,5 +6,8 @@ F:	board/tqc/tqma8mmx/
 F:	include/configs/tqma8mmx.h
 F:	include/configs/tqma8mmx-mba8mx.h
 F:	configs/tqma8mmx*_defconfig
+F:	configs/tqma8mnx*_defconfig
 F:	arch/arm/dts/*imx8mm-tqma8mmx*.dtsi
 F:	arch/arm/dts/*imx8mm*-mba8mx*.dts
+F:	arch/arm/dts/*imx8mn-tqma8mmx*.dtsi
+F:	arch/arm/dts/*imx8mn*-mba8mx*.dts
