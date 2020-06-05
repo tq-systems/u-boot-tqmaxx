@@ -139,6 +139,11 @@ static void tqma8mx_ft_qspi_setup(void *blob, bd_t *bd)
 
 int ft_board_setup(void *blob, bd_t *bd)
 {
+	if (env_get("fdt_noauto")) {
+		puts("   Skiping ft_board_setup (fdt_noauto defined)\n");
+		return 0;
+	}
+
 	tqma8mx_ft_qspi_setup(blob, bd);
 
 	return tqc_bb_ft_board_setup(blob, bd);
