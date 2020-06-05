@@ -31,18 +31,21 @@
 #define CONFIG_IMX_VIDEO_SKIP
 #endif
 
+#define CONFIG_BAUDRATE			115200
 #define CONFIG_MXC_UART_BASE		UART3_BASE_ADDR
 
 #if (CONFIG_MXC_UART_BASE == UART1_BASE_ADDR)
-#define BB_ENV_SETTINGS \
-	"console=ttymxc0,115200 earlycon=ec_imx6q,0x30860000,115200\0" \
-	"fdt_file=fsl-imx8mq-tqma8mq-mba8mx.dtb\0"
+#define CONSOLE_DEV			"ttymxc0"
 #elif (CONFIG_MXC_UART_BASE == UART3_BASE_ADDR)
-#define BB_ENV_SETTINGS \
-	"console=ttymxc2,115200 earlycon=ec_imx6q,0x30880000,115200\0" \
-	"fdt_file=fsl-imx8mq-tqma8mq-mba8mx.dtb\0"
+#define CONSOLE_DEV			"ttymxc2"
 #else
 #error
 #endif
+
+#define BB_ENV_SETTINGS \
+	"console=" CONSOLE_DEV "," __stringify(CONFIG_BAUDRATE) \
+		" earlycon=ec_imx6q," __stringify(CONFIG_MXC_UART_BASE) "," \
+		__stringify(CONFIG_BAUDRATE) "\0" \
+	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"
 
 #endif /* __TQMA8MX_MBA8MX_H */
