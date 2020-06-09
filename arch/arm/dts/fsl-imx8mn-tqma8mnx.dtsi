@@ -55,10 +55,18 @@
 	11x — Drive strength X6
 
 	GPIO: 0x84 [HYS|slow|X2] (no pull up)
+	I2C: 0x400001C4 [SION|PE|HYS|PUE|slow|x2]
 	UDHC: 0x1D4 [HYS|fast|x2] (pull up)
 	UDHC100: 0x1D2 [HYS|fast|x4] (pull up)
 	UDHC200: 0x1D6 [HYS|fast|x6] (pull up)
 	*/
+
+	pinctrl_i2c1: i2c1grp {
+		fsl,pins = <
+			MX8MN_IOMUXC_I2C1_SCL__I2C1_SCL			0x400001C4
+			MX8MN_IOMUXC_I2C1_SDA__I2C1_SDA			0x400001C4
+		>;
+	};
 
 	pinctrl_usdhc1: usdhc1grp {
 		fsl,pins = <
@@ -116,6 +124,28 @@
 			MX8MN_IOMUXC_GPIO1_IO02__WDOG1_WDOG_B		0x84
 		>;
 	};
+};
+
+&i2c1 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c1>;
+	status = "okay";
+
+	eeprom1: eeprom@53 {
+		compatible = "atmel,24c02";
+		reg = <0x53>;
+		pagesize = <16>;
+		status = "okay";
+	};
+
+	eeprom0: eeprom@57 {
+		compatible = "st,24c64", "atmel,24c64", "at24";
+		reg = <0x57>;
+		pagesize = <32>;
+		status = "okay";
+	};
+
 };
 
 &usdhc1 {
