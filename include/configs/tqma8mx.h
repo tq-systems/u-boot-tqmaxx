@@ -327,6 +327,17 @@
 
 #define CONFIG_USBD_HS
 
+#if defined(CONFIG_SPL_BUILD)
+
+#if defined(CONFIG_SPL_USB_GADGET)
+#undef CONFIG_SPL__DM_USB_GADGET
+#undef CONFIG_DM_USB_GADGET
+#define CONFIG_USB_DWC3_GADGET
+#undef CONFIG_USB_DWC3_HOST
+#endif /* CONFIG_SPL_USB_GADGET */
+
+#endif
+
 #if defined(CONFIG_TQMA8MX_BB_MBA8MX)
 #include "tqma8mx-mba8mx.h"
 #else
