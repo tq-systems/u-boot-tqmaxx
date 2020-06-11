@@ -63,8 +63,10 @@ config TQMA8MX_DEFAULTS
 
 config TQMA8MX_MFG_SUPPORT
 	bool "MFG Tool support for TQMa8Mx"
-	depends on USB
+	select USB
+	select DM_USB
 	select USB_GADGET
+	select DM_USB_GADGET
 	select USB_GADGET_DUALSPEED
 	select USB_XHCI_HCD
 	select USB_XHCI_IMX8M
@@ -79,9 +81,6 @@ config TQMA8MX_MFG_SUPPORT
 	select SPL_USB_HOST_SUPPORT
 	select SPL_USB_GADGET
 	select SPL_USB_SDP_SUPPORT
-
-#	select CMD_FASTBOOT
-# 	select DM_USB_GADGET
 
 if TQMA8MX_MFG_SUPPORT
 
