@@ -131,8 +131,99 @@ int arch_misc_init(void)
 }
 #endif
 
+int ft_board_setup(void *blob, bd_t *bd)
+{
+	int i;
+	bool mc_memory_bank = false;
+
+	u64 *base;
+	u64 *size;
+	u64 mc_memory_base = 0;
+	u64 mc_memory_size = 0;
+	u16 total_memory_banks;
+
+	ft_cpu_setup(blob, bd);
+	fdt_fixup_mc_ddr(&mc_memory_base, &mc_memory_size);
+
+	if (mc_memory_base != 0)
+		mc_memory_bank = true;
+
+	total_memory_banks = CONFIG_NR_DRAM_BANKS + mc_memory_bank;
+
+	base = calloc(total_memory_banks, sizeof(u64));
+	size = calloc(total_memory_banks, sizeof(u64));
+
+	/* fixup DT for the three GPP DDR banks */
+	for (i = 0; i < CONFIG_NR_DRAM_BANKS; i++) {
+		base[i] = gd->bd->bi_dram[i].start;
+		size[i] = gd->bd->bi_dram[i].size;
+	}
+
+#ifdef CONFIG_RESV_RAM
+	/* reduce size if reserved memory is within this bank */
+	if (gd->arch.resv_ram >= base[0] &&
+	    gd->arch.resv_ram < base[0] + size[0])
+		size[0] = gd->arch.resv_ram - base[0];
+	else if (gd->arch.resv_ram >= base[1] &&
+		 gd->arch.resv_ram < base[1] + size[1])
+		size[1] = gd->arch.resv_ram - base[1];
+	else if (gd->arch.resv_ram >= base[2] &&
+		 gd->arch.resv_ram < base[2] + size[2])
+		size[2] = gd->arch.resv_ram - base[2];
+#endif
+
+	if (mc_memory_base != 0) {
+		for (i = 0; i <= total_memory_banks; i++) {
+			if (base[i] == 0 && size[i] == 0) {
+				base[i] = mc_memory_base;
+				size[i] = mc_memory_size;
+				break;
+			}
+		}
+	}
+
+	fdt_fixup_memory_banks(blob, base, size, total_memory_banks);
+
+#ifdef CONFIG_USB
+	fsl_fdt_fixup_dr_usb(blob, bd);
+#endif
+
 #ifdef CONFIG_FSL_MC_ENET
+	fdt_fsl_mc_fixup_iommu_map_entry(blob);
+	fdt_fixup_board_enet(blob);
+#endif
+
+	return 0;
+}
+#ifdef CONFIG_FSL_MC_ENET
+extern int fdt_fixup_board_phy(void *fdt);
+
 void fdt_fixup_board_enet(void *fdt)
 {
+	int offset;
+
+	offset = fdt_path_offset(fdt, "/soc/fsl-mc");
+
+	if (offset < 0)
+		offset = fdt_path_offset(fdt, "/fsl-mc");
+
+	if (offset < 0) {
+		printf("%s: fsl-mc node not found in device tree (error %d)\n",
+		       __func__, offset);
+		return;
+	}
+
+	if (get_mc_boot_status() == 0 &&
+	    (is_lazy_dpl_addr_valid() || get_dpl_apply_status() == 0)) {
+		fdt_status_okay(fdt, offset);
+		fdt_fixup_board_phy(fdt);
+	} else {
+		fdt_status_fail(fdt, offset);
+	}
+}
+
+void board_quiesce_devices(void)
+{
+	fsl_mc_ldpaa_exit(gd->bd);
 }
 #endif
