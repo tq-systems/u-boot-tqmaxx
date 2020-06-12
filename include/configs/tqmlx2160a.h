@@ -42,6 +42,9 @@
 #define CONFIG_FSL_DDR_BIST	/* enable built-in memory test */
 #define CONFIG_SYS_MONITOR_LEN		(936 * 1024)
 
+#define CONFIG_SYS_MEMTEST_START	CONFIG_SYS_DDR_SDRAM_BASE
+#define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_SDRAM_BASE + (100 * 1024 * 1024))
+
 /* Miscellaneous configurable options */
 #define CONFIG_SYS_LOAD_ADDR	(CONFIG_SYS_DDR_SDRAM_BASE + 0x10000000)
 
