@@ -187,7 +187,7 @@ int board_usb_phy_mode(int port)
 {
 	int ret = USB_INIT_HOST;
 
-	pr_err("board_usb_phy_mode(idx %d)\n", port);
+	pr_debug("board_usb_phy_mode(idx %d)\n", port);
 
 	if (port == 0)
 		ret = (gpio_get_value(OTG_ID_PAD)) ? USB_INIT_DEVICE :
@@ -198,7 +198,7 @@ int board_usb_phy_mode(int port)
 
 int board_ehci_hcd_init(int port)
 {
-	pr_err("board_ehci_hcd_init(idx %d)\n", port);
+	pr_debug("board_ehci_hcd_init(idx %d)\n", port);
 
 	if (port == 0) {
 		imx_iomux_v3_setup_multiple_pads(usb_otg_pads,
@@ -215,7 +215,7 @@ int board_ehci_hcd_init(int port)
 
 int board_ehci_power(int port, int on)
 {
-	pr_err("board_ehci_power(idx %d, %s)\n", port, (on) ? "ON" : "OFF");
+	pr_debug("board_ehci_power(idx %d, %s)\n", port, (on) ? "ON" : "OFF");
 
 	if (port == 0) {
 		gpio_direction_output(OTG_PWR_PAD, (on) ? 1 : 0);
@@ -227,24 +227,8 @@ int board_ehci_power(int port, int on)
 int board_usb_init(int index, enum usb_init_type init)
 {
 	int ret = 0;
-/*
-	if (index == 1) {
-		puts("init: USB1/HUB\n");
-		if (init != USB_INIT_HOST) {
-			printf("USB1/HUB: wrong init type\n");
-			ret = -EINVAL;
-		} else {
-			usb_phy_mode(index);
-			gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
-			dm_gpio_set_value(gpio, 1);
-			udelay(100);
-			dm_gpio_set_value(gpio, 0);
-			udelay(1000);
-			printf("USB1/HUB: hub reset\n");
-		}
-	}
-*/
-	pr_err("board_usb_init(idx %d)\n", index);
+
+	pr_debug("board_usb_init(idx %d)\n", index);
 
 	return ret;
 }
