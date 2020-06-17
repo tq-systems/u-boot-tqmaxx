@@ -231,9 +231,9 @@
 		#gpio-cells = <2>;
 	};
 
-	expander2: gpio@25 {
+	expander2: gpio@27 {
 		compatible = "nxp,pca9555";
-		reg = <0x25>;
+		reg = <0x27>;
 		gpio-controller;
 		#gpio-cells = <2>;
 	};
