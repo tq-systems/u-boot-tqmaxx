@@ -259,12 +259,15 @@
  * U-Boot is loaded to 0x40200000 (offset 2 MiB)
  * and relocated at end of configured RAM
  */
-#define CONFIG_SYS_ALT_MEMTEST
+#if defined(CONFIG_SYS_ALT_MEMTEST)
 #define CONFIG_SYS_MEMTEST_START	(CONFIG_LOADADDR)
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + \
 					((PHYS_SDRAM_SIZE / 4) * 3))
 #define CONFIG_SYS_MEMTEST_SCRATCH	CONFIG_SYS_MEMTEST_END
-#endif
+
+#endif /* CONFIG_SYS_ALT_MEMTEST */
+
+#endif /* CONFIG_CMD_MEMTEST */
 
 #define CONFIG_BAUDRATE			115200
 
