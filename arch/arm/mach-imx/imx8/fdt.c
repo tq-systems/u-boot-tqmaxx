@@ -495,7 +495,7 @@ static void update_fdt_with_owned_resources_legacy(void *blob)
 	}
 }
 
-static void update_fdt_with_owned_resources(void *blob)
+static __maybe_unused void update_fdt_with_owned_resources(void *blob)
 {
 	/*
 	 * Traverses the fdt nodes, check its power domain and use

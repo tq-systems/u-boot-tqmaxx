@@ -29,6 +29,7 @@
 #include <dm/uclass-internal.h>
 #include <dm/pinctrl.h>
 #include <fuse.h>
+#include <mmc.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
