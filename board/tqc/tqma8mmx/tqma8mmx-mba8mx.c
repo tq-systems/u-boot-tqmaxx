@@ -91,13 +91,7 @@ enum {
 
 #define UART_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_FSEL1)
 
-#define WDOG_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS)
-
-
 #ifdef CONFIG_IMX8MN
-	static iomux_v3_cfg_t const wdog_pads[] = {
-		IMX8MN_PAD_GPIO1_IO02__WDOG1_WDOG_B | MUX_PAD_CTRL(WDOG_PAD_CTRL),
-	};
 	#if (CONFIG_MXC_UART_BASE == UART1_BASE_ADDR)
 	static iomux_v3_cfg_t const uart_pads[] = {
 		IMX8MN_PAD_UART1_RXD__UART1_DCE_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
@@ -120,9 +114,6 @@ enum {
 	#error
 	#endif
 #elif defined(CONFIG_IMX8MM)
-	static iomux_v3_cfg_t const wdog_pads[] = {
-		IMX8MM_PAD_GPIO1_IO02_WDOG1_WDOG_B | MUX_PAD_CTRL(WDOG_PAD_CTRL),
-	};
 	#if (CONFIG_MXC_UART_BASE == UART1_BASE_ADDR)
 	static iomux_v3_cfg_t const uart_pads[] = {
 		IMX8MM_PAD_UART1_RXD_UART1_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
@@ -153,12 +144,7 @@ enum {
  */
 int tqc_bb_board_early_init_f(void)
 {
-	struct wdog_regs *wdog = (struct wdog_regs *)WDOG1_BASE_ADDR;
-
-	imx_iomux_v3_setup_multiple_pads(wdog_pads, ARRAY_SIZE(wdog_pads));
-
-	set_wdog_reset(wdog);
-	 /* Init UART<n> clock */
+	/* Init UART<n> clock */
 	init_uart_clk(uart_index);
 
 	imx_iomux_v3_setup_multiple_pads(uart_pads, ARRAY_SIZE(uart_pads));

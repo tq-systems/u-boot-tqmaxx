@@ -8,6 +8,13 @@
 #include <dm/device-internal.h>
 #include <dm/lists.h>
 #include <dm/uclass-internal.h>
+#ifdef CONFIG_IMX8MN
+#include <asm/arch/imx8mn_pins.h>
+#elif defined(CONFIG_IMX8MM)
+#include <asm/arch/imx8mm_pins.h>
+#else
+#error
+#endif
 #include <malloc.h>
 #include <errno.h>
 #include <asm/io.h>
@@ -25,9 +32,32 @@
 #include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
 
+#define WDOG_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS)
+
+#ifdef CONFIG_IMX8MN
+
+static iomux_v3_cfg_t const wdog_pads[] = {
+	IMX8MN_PAD_GPIO1_IO02__WDOG1_WDOG_B | MUX_PAD_CTRL(WDOG_PAD_CTRL),
+};
+
+#elif defined(CONFIG_IMX8MM)
+
+static iomux_v3_cfg_t const wdog_pads[] = {
+	IMX8MM_PAD_GPIO1_IO02_WDOG1_WDOG_B | MUX_PAD_CTRL(WDOG_PAD_CTRL),
+};
+
+#else
+#error
+#endif
+
 DECLARE_GLOBAL_DATA_PTR;
 int board_early_init_f(void)
 {
+	struct wdog_regs *wdog = (struct wdog_regs *)WDOG1_BASE_ADDR;
+
+	imx_iomux_v3_setup_multiple_pads(wdog_pads, ARRAY_SIZE(wdog_pads));
+	set_wdog_reset(wdog);
+
 	tqc_bb_board_early_init_f();
 
 	return 0;
