@@ -19,8 +19,13 @@
 #include <asm/gpio.h>
 #include <asm/mach-imx/iomux-v3.h>
 #include <asm/mach-imx/gpio.h>
+#include <asm/mach-imx/mxc_i2c.h>
 #include <fsl_esdhc.h>
 #include <mmc.h>
+#include <power/pmic.h>
+#ifdef CONFIG_POWER_PCA9450
+#include <power/pca9450.h>
+#endif
 #include <spl.h>
 
 #include "../common/tqc_bb.h"
@@ -37,6 +42,21 @@ DECLARE_GLOBAL_DATA_PTR;
 
 
 #ifdef CONFIG_IMX8MN
+
+#define I2C_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS | PAD_CTL_PUE | PAD_CTL_PE)
+static struct i2c_pads_info i2c_pad_info = {
+	.scl = {
+		.i2c_mode = IMX8MN_PAD_I2C1_SCL__I2C1_SCL | MUX_PAD_CTRL(I2C_PAD_CTRL),
+		.gpio_mode = IMX8MN_PAD_I2C1_SCL__GPIO5_IO14 | MUX_PAD_CTRL(I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(5, 14),
+	},
+	.sda = {
+		.i2c_mode = IMX8MN_PAD_I2C1_SDA__I2C1_SDA | MUX_PAD_CTRL(I2C_PAD_CTRL),
+		.gpio_mode = IMX8MN_PAD_I2C1_SDA__GPIO5_IO15 | MUX_PAD_CTRL(I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(5, 15),
+	},
+};
+
 static iomux_v3_cfg_t const usdhc1_pads[] = {
 	IMX8MN_PAD_SD1_CLK__USDHC1_CLK | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 	IMX8MN_PAD_SD1_CMD__USDHC1_CMD | MUX_PAD_CTRL(USDHC_PAD_CTRL),
@@ -53,6 +73,22 @@ static iomux_v3_cfg_t const usdhc1_pads[] = {
 };
 extern struct dram_timing_info tqma8mxxl_1g_lpddr4_timing;
 #elif defined(CONFIG_IMX8MM)
+
+/* TODO: check if this is correct */
+#define I2C_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS)
+static struct i2c_pads_info i2c_pad_info = {
+	.scl = {
+		.i2c_mode = IMX8MM_PAD_I2C1_SCL_I2C1_SCL | MUX_PAD_CTRL(I2C_PAD_CTRL),
+		.gpio_mode = IMX8MM_PAD_I2C1_SCL_GPIO5_IO14 | MUX_PAD_CTRL(I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(5, 14),
+	},
+	.sda = {
+		.i2c_mode = IMX8MM_PAD_I2C1_SDA_I2C1_SDA | MUX_PAD_CTRL(I2C_PAD_CTRL),
+		.gpio_mode = IMX8MM_PAD_I2C1_SDA_GPIO5_IO15 | MUX_PAD_CTRL(I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(5, 15),
+	},
+};
+
 static iomux_v3_cfg_t const usdhc1_pads[] = {
 	IMX8MM_PAD_SD1_CLK_USDHC1_CLK | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 	IMX8MM_PAD_SD1_CMD_USDHC1_CMD | MUX_PAD_CTRL(USDHC_PAD_CTRL),
@@ -134,6 +170,46 @@ int board_mmc_init(bd_t *bis)
 	return ret;
 }
 
+#if defined(CONFIG_POWER)
+
+#define I2C_PMIC	0
+
+#if defined(CONFIG_POWER_PCA9450)
+int power_init_board(void)
+{
+	struct pmic *p;
+	int ret;
+	u32 regval;
+
+	ret = power_pca9450b_init(I2C_PMIC);
+	if (ret)
+		printf("power init failed");
+	p = pmic_get("PCA9450");
+	pmic_probe(p);
+
+	pmic_reg_read(p, PCA9450_REG_DEV_ID, &regval);
+	printf("PMIC:  PCA9450 ID=0x%02x\n", regval);
+
+	/*
+	 * TODO:
+	 * check DVS for BUCK (power save with PMIC_STBY_REQ)
+	 * check VDD_SOC/dRAM -> 0.95 Volt
+	 * check VDD_SNVS_0V8 -> 0.85V
+	 * see imx8m[m,n]_evk
+	 */
+
+	/* set WDOG_B_CFG to cold reset w/o LDO1/2*/
+	pmic_reg_read(p, PCA9450_RESET_CTRL, &regval);
+	regval &= 0x3f;
+	regval |= 0x80;
+	pmic_reg_write(p, PCA9450_RESET_CTRL, regval);
+
+	return 0;
+}
+
+#endif /* CONFIG_POWER_PCA9450 */
+
+#endif /* CONFIG_POWER */
 
 void spl_board_init(void)
 {
@@ -187,6 +263,10 @@ void board_init_f(ulong dummy)
 	}
 
 	enable_tzc380();
+
+	/* TODO: Adjust pmic voltages - really needed ? */
+	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info);
+	power_init_board();
 
 	/* DDR initialization */
 	spl_dram_init();
