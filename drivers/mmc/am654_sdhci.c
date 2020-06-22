@@ -60,6 +60,8 @@
 #define CALDONE_MASK		BIT(CALDONE_SHIFT)
 #define RETRIM_SHIFT		17
 #define RETRIM_MASK		BIT(RETRIM_SHIFT)
+#define SELDLYTXCLK_SHIFT	17
+#define SELDLYTXCLK_MASK	BIT(SELDLYTXCLK_SHIFT)
 
 #define DRIVER_STRENGTH_50_OHM	0x0
 #define DRIVER_STRENGTH_33_OHM	0x1
@@ -304,7 +306,11 @@ static int am654_sdhci_set_ios_post(struct sdhci_host *host)
 	regmap_update_bits(plat->base, PHY_CTRL4, mask, val);
 
 	if (speed > AM654_SDHCI_MIN_FREQ && mode > UHS_SDR25) {
+		regmap_update_bits(plat->base, PHY_CTRL5, SELDLYTXCLK_MASK, 0);
 		sdhci_am654_setup_dll(host, speed);
+	} else {
+		regmap_update_bits(plat->base, PHY_CTRL5, SELDLYTXCLK_MASK,
+				   1 << SELDLYTXCLK_SHIFT);
 	}
 
 	return 0;
