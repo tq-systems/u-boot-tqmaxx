@@ -197,15 +197,79 @@ static void am654_sdhci_set_control_reg(struct sdhci_host *host)
 	sdhci_set_uhs_timing(host);
 }
 
+static void sdhci_am654_setup_dll(struct sdhci_host *host, unsigned int speed)
+{
+	struct udevice *dev = host->mmc->dev;
+	struct am654_sdhci_plat *plat = dev_get_platdata(dev);
+	int sel50, sel100, freqsel;
+	u32 mask, val;
+	int ret;
+
+	if (plat->flags & FREQSEL_2_BIT) {
+		switch (speed) {
+		case 200000000:
+			sel50 = 0;
+			sel100 = 0;
+			break;
+		case 100000000:
+			sel50 = 0;
+			sel100 = 1;
+			break;
+		default:
+			sel50 = 1;
+			sel100 = 0;
+		}
+
+		/* Configure PHY DLL frequency */
+		mask = SEL50_MASK | SEL100_MASK;
+		val = (sel50 << SEL50_SHIFT) | (sel100 << SEL100_SHIFT);
+		regmap_update_bits(plat->base, PHY_CTRL5, mask, val);
+	} else {
+		switch (speed) {
+		case 200000000:
+			freqsel = 0x0;
+			break;
+		default:
+			freqsel = 0x4;
+		}
+		regmap_update_bits(plat->base, PHY_CTRL5, FREQSEL_MASK,
+				   freqsel << FREQSEL_SHIFT);
+	}
+
+	/* Configure DLL TRIM */
+	mask = DLL_TRIM_ICP_MASK;
+	val = plat->trm_icp << DLL_TRIM_ICP_SHIFT;
+
+	/* Configure DLL driver strength */
+	mask |= DR_TY_MASK;
+	val |= plat->drv_strength << DR_TY_SHIFT;
+	regmap_update_bits(plat->base, PHY_CTRL1, mask, val);
+
+	/* Enable DLL */
+	regmap_update_bits(plat->base, PHY_CTRL1, ENDLL_MASK,
+			   0x1 << ENDLL_SHIFT);
+	/*
+	 * Poll for DLL ready. Use a one second timeout.
+	 * Works in all experiments done so far
+	 */
+	ret = regmap_read_poll_timeout(plat->base, PHY_STAT1, val,
+				       val & DLLRDY_MASK, 1000, 1000000);
+	if (ret) {
+		dev_err(dev, "DLL failed to relock\n");
+		return;
+	}
+
+	plat->dll_on = true;
+}
+
 static int am654_sdhci_set_ios_post(struct sdhci_host *host)
 {
 	struct udevice *dev = host->mmc->dev;
 	struct am654_sdhci_plat *plat = dev_get_platdata(dev);
 	unsigned int speed = host->mmc->clock;
-	int sel50, sel100, freqsel;
+	int mode = host->mmc->selected_mode;
 	u32 otap_del_sel;
 	u32 mask, val;
-	int ret;
 
 	/* Reset SD Clock Enable */
 	val = sdhci_readw(host, SDHCI_CLOCK_CONTROL);
@@ -223,77 +287,24 @@ static int am654_sdhci_set_ios_post(struct sdhci_host *host)
 	sdhci_set_clock(host->mmc, speed);
 
 	/* switch phy back on */
-	if (speed > AM654_SDHCI_MIN_FREQ) {
-		otap_del_sel = plat->otap_del_sel[host->mmc->selected_mode];
-		mask = OTAPDLYENA_MASK | OTAPDLYSEL_MASK;
-		val = (1 << OTAPDLYENA_SHIFT) |
-		      (otap_del_sel << OTAPDLYSEL_SHIFT);
+	otap_del_sel = plat->otap_del_sel[mode];
+	mask = OTAPDLYENA_MASK | OTAPDLYSEL_MASK;
+	val = (1 << OTAPDLYENA_SHIFT) | (otap_del_sel << OTAPDLYSEL_SHIFT);
 
-		/* Write to STRBSEL for HS400 speed mode */
-		if (host->mmc->selected_mode == MMC_HS_400) {
-			if (plat->flags & STRBSEL_4_BIT)
-				mask |= STRBSEL_4BIT_MASK;
-			else
-				mask |= STRBSEL_8BIT_MASK;
+	/* Write to STRBSEL for HS400 speed mode */
+	if (mode == MMC_HS_400) {
+		if (plat->flags & STRBSEL_4_BIT)
+			mask |= STRBSEL_4BIT_MASK;
+		else
+			mask |= STRBSEL_8BIT_MASK;
 
-			val |= plat->strb_sel << STRBSEL_SHIFT;
-		}
+		val |= plat->strb_sel << STRBSEL_SHIFT;
+	}
 
-		regmap_update_bits(plat->base, PHY_CTRL4, mask, val);
+	regmap_update_bits(plat->base, PHY_CTRL4, mask, val);
 
-		if (plat->flags & FREQSEL_2_BIT) {
-			switch (speed) {
-			case 200000000:
-				sel50 = 0;
-				sel100 = 0;
-				break;
-			case 100000000:
-				sel50 = 0;
-				sel100 = 1;
-				break;
-			default:
-				sel50 = 1;
-				sel100 = 0;
-			}
-
-			/* Configure PHY DLL frequency */
-			mask = SEL50_MASK | SEL100_MASK;
-			val = (sel50 << SEL50_SHIFT) | (sel100 << SEL100_SHIFT);
-			regmap_update_bits(plat->base, PHY_CTRL5, mask, val);
-		} else {
-			switch (speed) {
-			case 200000000:
-				freqsel = 0x0;
-				break;
-			default:
-				freqsel = 0x4;
-			}
-			regmap_update_bits(plat->base, PHY_CTRL5, FREQSEL_MASK,
-					   freqsel << FREQSEL_SHIFT);
-		}
-
-		/* Configure DLL TRIM */
-		mask = DLL_TRIM_ICP_MASK;
-		val = plat->trm_icp << DLL_TRIM_ICP_SHIFT;
-
-		/* Configure DLL driver strength */
-		mask |= DR_TY_MASK;
-		val |= plat->drv_strength << DR_TY_SHIFT;
-		regmap_update_bits(plat->base, PHY_CTRL1, mask, val);
-
-		/* Enable DLL */
-		regmap_update_bits(plat->base, PHY_CTRL1, ENDLL_MASK,
-				   0x1 << ENDLL_SHIFT);
-		/*
-		 * Poll for DLL ready. Use a one second timeout.
-		 * Works in all experiments done so far
-		 */
-		ret = regmap_read_poll_timeout(plat->base, PHY_STAT1, val,
-					 val & DLLRDY_MASK, 1000, 1000000);
-		if (ret)
-			return ret;
-
-		plat->dll_on = true;
+	if (speed > AM654_SDHCI_MIN_FREQ && mode > UHS_SDR25) {
+		sdhci_am654_setup_dll(host, speed);
 	}
 
 	return 0;
