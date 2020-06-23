@@ -180,8 +180,8 @@
 
 	pinctrl_usdhc2: usdhc2grp {
 		fsl,pins = <
-			MX8MM_IOMUXC_SD2_CLK_USDHC2_CLK		0x94
-			MX8MM_IOMUXC_SD2_CMD_USDHC2_CMD		0x94
+			MX8MM_IOMUXC_SD2_CLK_USDHC2_CLK		0x92
+			MX8MM_IOMUXC_SD2_CMD_USDHC2_CMD		0x92
 			MX8MM_IOMUXC_SD2_DATA0_USDHC2_DATA0	0x94
 			MX8MM_IOMUXC_SD2_DATA1_USDHC2_DATA1	0x94
 			MX8MM_IOMUXC_SD2_DATA2_USDHC2_DATA2	0x94
@@ -190,6 +190,7 @@
 		>;
 	};
 
+	/* TODO: not verified */
 	pinctrl_usdhc2_100mhz: usdhc2grp100mhz {
 		fsl,pins = <
 			MX8MM_IOMUXC_SD2_CLK_USDHC2_CLK		0x92
@@ -202,6 +203,7 @@
 		>;
 	};
 
+	/* TODO: not verified */
 	pinctrl_usdhc2_200mhz: usdhc2grp200mhz {
 		fsl,pins = <
 			MX8MM_IOMUXC_SD2_CLK_USDHC2_CLK		0x96
