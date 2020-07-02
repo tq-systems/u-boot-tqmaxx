@@ -275,6 +275,38 @@ static int pfe_eth_bind(struct udevice *dev)
 	return device_set_name(dev, name);
 }
 
+static int pfe_eth_ofdata_to_platdata(struct udevice *dev)
+{
+	struct pfe_eth_pdata *pdata = dev_get_platdata(dev);
+
+	u32 reg = dev_read_u32_default(dev, "reg", -1);
+
+	switch (reg) {
+	case 0:
+		pdata->pfe_eth_pdata_mac.iobase = (phys_addr_t)EMAC1_BASE_ADDR;
+		break;
+
+	case 1:
+		pdata->pfe_eth_pdata_mac.iobase = (phys_addr_t)EMAC2_BASE_ADDR;
+		break;
+
+	default:
+		return -ENODEV;
+	}
+
+	pdata->pfe_eth_pdata_mac.phy_interface = reg;
+
+	pdata->pfe_ddr_addr.ddr_pfe_baseaddr = (void *)CONFIG_DDR_PFE_BASEADDR;
+	pdata->pfe_ddr_addr.ddr_pfe_phys_baseaddr = CONFIG_DDR_PFE_PHYS_BASEADDR;
+
+	return pfe_eth_bind(dev);
+}
+
+static const struct udevice_id pfe_eth_ids[] = {
+	{ .compatible = "fsl,pfe-gemac-port" },
+	{ }
+};
+
 static const struct eth_ops pfe_eth_ops = {
 	.start		= pfe_eth_start,
 	.send		= pfe_eth_send,
@@ -287,6 +319,8 @@ static const struct eth_ops pfe_eth_ops = {
 U_BOOT_DRIVER(pfe_eth) = {
 	.name	= "pfe_eth",
 	.id	= UCLASS_ETH,
+	.of_match = pfe_eth_ids,
+	.ofdata_to_platdata = pfe_eth_ofdata_to_platdata,
 	.bind	= pfe_eth_bind,
 	.probe	= pfe_eth_probe,
 	.remove = pfe_eth_remove,
