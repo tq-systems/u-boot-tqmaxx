@@ -29,6 +29,8 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#define USBNC_OFFSET		0x200
+
 #if (CONFIG_MXC_UART_BASE == UART1_BASE_ADDR)
 static const u32 uart_index = 0;
 #elif (CONFIG_MXC_UART_BASE == UART3_BASE_ADDR)
@@ -47,7 +49,6 @@ static const u32 uart_index = 1;
 #define USDHC2_CD_GPIO		IMX_GPIO_NR(2, 12)
 
 #ifdef CONFIG_USB
-#define OTG_ID_PAD		IMX_GPIO_NR(1, 10)
 #define OTG_PWR_PAD		IMX_GPIO_NR(1, 12)
 #define OTG_GPIO_PAD_CTL	(PAD_CTL_HYS | PAD_CTL_DSE1)
 #endif
@@ -68,7 +69,7 @@ static const u32 uart_index = 1;
 		/* PWR */
 		IMX8MN_PAD_GPIO1_IO12__GPIO1_IO12 | MUX_PAD_CTRL(OTG_GPIO_PAD_CTL),
 		/* ID */
-		IMX8MN_PAD_GPIO1_IO10__GPIO1_IO10 | MUX_PAD_CTRL(OTG_GPIO_PAD_CTL),
+		IMX8MN_PAD_GPIO1_IO10_USB1_OTG_ID | MUX_PAD_CTRL(OTG_GPIO_PAD_CTL),
 	};
 	#endif
 #elif defined(CONFIG_IMX8MM)
@@ -87,7 +88,7 @@ static const u32 uart_index = 1;
 		/* PWR */
 		IMX8MM_PAD_GPIO1_IO12_GPIO1_IO12 | MUX_PAD_CTRL(OTG_GPIO_PAD_CTL),
 		/* ID */
-		IMX8MM_PAD_GPIO1_IO10_GPIO1_IO10 | MUX_PAD_CTRL(OTG_GPIO_PAD_CTL),
+		IMX8MM_PAD_GPIO1_IO10_USB1_OTG_ID | MUX_PAD_CTRL(OTG_GPIO_PAD_CTL),
 	};
 	#endif
 #else
@@ -185,29 +186,20 @@ void tqc_bb_board_init_f(ulong dummy)
 
 #if defined(CONFIG_USB)
 
-int board_usb_phy_mode(int port)
-{
-	int ret = USB_INIT_HOST;
-
-	pr_debug("board_usb_phy_mode(idx %d)\n", port);
-
-	if (port == 0)
-		ret = (gpio_get_value(OTG_ID_PAD)) ? USB_INIT_DEVICE :
-			USB_INIT_HOST;
-
-	return ret;
-}
-
 int board_ehci_hcd_init(int port)
 {
 	pr_debug("board_ehci_hcd_init(idx %d)\n", port);
 
 	if (port == 0) {
+		u32 *usbnc_usb_ctrl2 = (u32 *)(ulong)(USB_BASE_ADDR +
+				(0x10000 * (ulong)port) + USBNC_OFFSET + 4);
 		imx_iomux_v3_setup_multiple_pads(usb_otg_pads,
 					 ARRAY_SIZE(usb_otg_pads));
 
-		gpio_request(OTG_ID_PAD, "otg_id");
-		gpio_direction_input(OTG_ID_PAD);
+		pr_debug("USB0/OTG: DIG_ID_SEL %p\n", usbnc_usb_ctrl2);
+		/* Set DIG_ID_SEL to muxable PIN for ID detect */
+		setbits_le32(usbnc_usb_ctrl2, BIT(20));
+
 		gpio_request(OTG_PWR_PAD, "otg_pwr");
 		gpio_direction_output(OTG_PWR_PAD, 0);
 	};

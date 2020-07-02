@@ -17,11 +17,6 @@
 		stdout-path = &uart3;
 	};
 
-	extcon_usbotg1: extcon-usbotg1-id {
-		compatible = "linux,extcon-usb-gpio";
-		id-gpio = <&gpio1 10 GPIO_ACTIVE_HIGH>;
-	};
-
 	reg_usdhc2_vmmc: regulator-vmmc {
 		compatible = "regulator-fixed";
 		regulator-name = "VSD_3V3";
@@ -152,7 +147,7 @@
 	pinctrl_reg_usbotg1_vbus: regusbotg1vbusgrp {
 		fsl,pins = <
 			/* PWR */
-			MX8MM_IOMUXC_GPIO1_IO12_GPIO1_IO12	0x19
+			MX8MM_IOMUXC_GPIO1_IO12_GPIO1_IO12	0x84
 		>;
 	};
 
@@ -165,13 +160,8 @@
 
 	pinctrl_usbotg1: usbotg1grp {
 		fsl,pins = <
-			/* ID */
-			/* MX8MM_IOMUXC_GPIO1_IO10_USB1_OTG_ID	0x19 */
-			MX8MM_IOMUXC_GPIO1_IO10_GPIO1_IO10	0x19
-			/* OC */
-			MX8MM_IOMUXC_GPIO1_IO13_USB1_OTG_OC	0x19
-			/* PWR */
-			/* MX8MM_IOMUXC_GPIO1_IO12_GPIO1_IO12	0x19 */
+			MX8MM_IOMUXC_GPIO1_IO13_USB1_OTG_OC	0x84
+			MX8MM_IOMUXC_GPIO1_IO10_USB1_OTG_ID	0x84
 		>;
 	};
 
@@ -275,10 +265,8 @@
 &usbotg1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usbotg1>;
-	/* should use extcon - otg ID pin handling is borked */
-	/* dr_mode = "otg"; */
-	extcon = <&extcon_usbotg1>;
 	vbus-supply = <&reg_usbotg1_vbus>;
+	dr_mode = "otg";
 	srp-disable;
 	hnp-disable;
 	adp-disable;

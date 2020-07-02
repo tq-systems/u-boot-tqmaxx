@@ -25,6 +25,7 @@
 #include <spl.h>
 #include <dm.h>
 #include <usb.h>
+#include <usb/ehci-ci.h>
 
 #include "../common/tqc_bb.h"
 #include "../common/tqc_board_gpio.h"
@@ -32,6 +33,8 @@
 DECLARE_GLOBAL_DATA_PTR;
 
 #define TQMA8MX_BB_NAME "MBa8Mx"
+
+#define USBNC_OFFSET		0x200
 
 enum {
 	UART1_MUX,
@@ -80,7 +83,6 @@ enum {
 	MPCIE_RST_B,
 	CAMX_RST_B,
 	RESET_MIKRO_MODULE_B,
-	USB1_OTG_ID,
 	GPIO_BTN1,
 	GPIO_BTN2,
 	GPIO_BTN3,
@@ -210,7 +212,6 @@ static struct tqc_gpio_init_data mba8mx_gid[] = {
 	GPIO_INIT_DATA_ENTRY(MPCIE_RST_B, "GPIO@27_13", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
 	GPIO_INIT_DATA_ENTRY(CAMX_RST_B, "GPIO@27_14", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
 	GPIO_INIT_DATA_ENTRY(RESET_MIKRO_MODULE_B, "GPIO@27_15", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
-	GPIO_INIT_DATA_ENTRY(USB1_OTG_ID, "GPIO1_10", GPIOD_IS_IN),
 	GPIO_INIT_DATA_ENTRY(GPIO_BTN1, "GPIO1_5", GPIOD_IS_IN),
 	GPIO_INIT_DATA_ENTRY(GPIO_BTN2, "GPIO3_17", GPIOD_IS_IN),
 	GPIO_INIT_DATA_ENTRY(GPIO_BTN3, "GPIO1_7", GPIOD_IS_IN),
@@ -283,21 +284,6 @@ int mmc_map_to_kernel_blk(int dev_no)
 }
 
 #if defined(CONFIG_USB)
-int usb_phy_mode(int port);
-
-int board_ehci_usb_phy_mode(struct udevice *dev)
-{
-	int otg_id;
-	int ret = -ENODEV;
-
-	if (dev->seq == 0) {
-		otg_id = dm_gpio_get_value(&mba8mx_gid[USB1_OTG_ID].desc);
-		printf("USB0/OTG: ID = %d\n", otg_id);
-		ret = (otg_id) ? USB_INIT_DEVICE : USB_INIT_HOST;
-	}
-
-	return ret;
-}
 
 int board_usb_init(int index, enum usb_init_type init)
 {
@@ -309,9 +295,9 @@ int board_usb_init(int index, enum usb_init_type init)
 		return ret;
 
 	if (index == 1) {
-		puts("init: USB1/HUB\n");
+		debug("init: USB1/HUB\n");
 		if (init != USB_INIT_HOST) {
-			printf("USB1/HUB: wrong init type\n");
+			debug("USB1/HUB: wrong init type\n");
 			ret = -EINVAL;
 		} else {
 			gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
@@ -319,11 +305,25 @@ int board_usb_init(int index, enum usb_init_type init)
 			udelay(100);
 			dm_gpio_set_value(gpio, 0);
 			udelay(1000);
-			printf("USB1/HUB: hub reset\n");
+			debug("USB1/HUB: hub reset\n");
 		}
 	}
 
 	return ret;
+}
+
+int board_ehci_hcd_init(int port)
+{
+	if (port == 0) {
+		u32 *usbnc_usb_ctrl2 = (u32 *)(ulong)(USB_BASE_ADDR +
+				(0x10000 * (ulong)port) + USBNC_OFFSET + 4);
+
+		debug("USB0/OTG: DIG_ID_SEL");
+		/* Set DIG_ID_SEL to muxable PIN for ID detect */
+		setbits_le32(usbnc_usb_ctrl2, BIT(20));
+	}
+
+	return 0;
 }
 
 int board_usb_cleanup(int index, enum usb_init_type init)
