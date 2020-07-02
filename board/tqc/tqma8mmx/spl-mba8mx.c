@@ -228,10 +228,22 @@ int board_ehci_power(int port, int on)
 
 int board_usb_init(int index, enum usb_init_type init)
 {
-	int ret = 0;
+	int ret;
 
 	pr_debug("board_usb_init(idx %d)\n", index);
+	ret = imx8m_usb_power(index, true);
 
 	return ret;
 }
+
+int board_usb_cleanup(int index, enum usb_init_type init)
+{
+	int ret;
+
+	pr_debug("board_usb_init(idx %d)\n", index);
+	ret = imx8m_usb_power(index, false);
+
+	return ret;
+}
+
 #endif

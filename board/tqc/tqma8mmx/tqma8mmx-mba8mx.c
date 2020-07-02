@@ -304,6 +304,10 @@ int board_usb_init(int index, enum usb_init_type init)
 	int ret = 0;
 	struct gpio_desc *gpio;
 
+	ret = imx8m_usb_power(index, true);
+	if (ret)
+		return ret;
+
 	if (index == 1) {
 		puts("init: USB1/HUB\n");
 		if (init != USB_INIT_HOST) {
@@ -326,6 +330,8 @@ int board_usb_init(int index, enum usb_init_type init)
 int board_usb_cleanup(int index, enum usb_init_type init)
 {
 	struct gpio_desc *gpio;
+
+	imx8m_usb_power(index, false);
 
 	if (index == 1) {
 		puts("USB1/HUB\n");
