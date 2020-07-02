@@ -286,12 +286,9 @@
 	status = "okay";
 };
 
-/*
- * TODO: currently not usable
- */
 &usbotg2 {
 	dr_mode = "host";
 	disable-over-current;
 	power-polarity-active-high;
-	status = "disabled";
+	status = "okay";
 };

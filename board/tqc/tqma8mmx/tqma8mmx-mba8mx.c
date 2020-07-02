@@ -314,7 +314,6 @@ int board_usb_init(int index, enum usb_init_type init)
 			printf("USB1/HUB: wrong init type\n");
 			ret = -EINVAL;
 		} else {
-			usb_phy_mode(index);
 			gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
 			dm_gpio_set_value(gpio, 1);
 			udelay(100);
