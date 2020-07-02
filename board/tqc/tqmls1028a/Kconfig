@@ -1,0 +1,42 @@
+if TARGET_TQMLS1028A
+
+config SYS_BOARD
+	default "tqmls1028a"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_SOC
+	default "fsl-layerscape"
+
+config SYS_CONFIG_NAME
+	default "tqmls1028a"
+
+choice
+	prompt "TQMLS1028A base board variant"
+	default MBLS1028A
+	help
+	  Select base board for TQMLS1028A module
+
+config MBLS1028A
+	bool "TQMLS1028A on MBLS1028A Starterkit"
+	select DM_GPIO
+	help
+	  Select the MBLS1028A starterkit.
+	  This features a Ethernet, USB, SD-Card, etc.
+
+config MBLS1028A_IND
+	bool "TQMLS1028A on MBLS1028A-IND Board"
+	select DM_GPIO
+	help
+	  Select the MBLS1028A industrial starterkit.
+	  This features a Ethernet, USB, SD-Card, etc.
+	  on a smaller board.
+endchoice
+
+config SYS_TEXT_BASE
+	default 0x82000000
+
+source "board/tqc/common/Kconfig"
+
+endif
