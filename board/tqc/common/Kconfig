@@ -1,0 +1,2 @@
+config TQ_EEPROM
+	bool
