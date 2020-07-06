@@ -175,9 +175,9 @@
  */
 #define CONFIG_SYS_SPI_U_BOOT_OFFS	0x40000
 #define TQMA57XX_SPI_ENV_OFFS		0x140000
-#define CONFIG_SYS_SPI_KERNEL_OFFS      0x1E0000
-#define CONFIG_SYS_SPI_ARGS_OFFS        0x140000
-#define CONFIG_SYS_SPI_ARGS_SIZE        0x80000
+#define CONFIG_SYS_SPI_KERNEL_OFFS	0x1E0000
+#define CONFIG_SYS_SPI_ARGS_OFFS	0x140000
+#define CONFIG_SYS_SPI_ARGS_SIZE	0x80000
 
 /* SPI ENV */
 #define CONFIG_ENV_SPI_BUS		(CONFIG_SF_DEFAULT_BUS)
@@ -187,7 +187,7 @@
 
 #define CONFIG_ENV_OFFSET		(TQMA57XX_SPI_ENV_OFFS)
 #define CONFIG_ENV_SIZE			SZ_64K
-#define CONFIG_ENV_SECT_SIZE            TQMA57XX_SPI_FLASH_SECTOR_SIZE
+#define CONFIG_ENV_SECT_SIZE		TQMA57XX_SPI_FLASH_SECTOR_SIZE
 #define CONFIG_SYS_REDUNDAND_ENVIRONMENT
 #define CONFIG_ENV_OFFSET_REDUND        (CONFIG_ENV_OFFSET + \
 					 CONFIG_ENV_SECT_SIZE)
@@ -249,22 +249,15 @@
 	"uboot_size=0x800\0" \
 	"MLO=MLO\0" \
 	"mlo_size=0x100\0" \
-	"update_uboot=if tftp ${MLO}; then " \
+	"update_uboot=setenv bootpart ${mmcdev}:1; " \
+		"if tftp ${MLO}; then " \
 		"echo updating MLO on mmc${mmcdev}...; " \
 		"mmc dev ${mmcdev}; mmc rescan; " \
-		"setexpr blkc ${filesize} + 0x1ff; " \
-		"setexpr blkc ${blkc} / 0x200; " \
-		"if itest ${blkc} <= ${mlo_size}; then " \
-			"mmc write ${loadaddr} 0x100 ${blkc}; " \
-		"fi; fi && " \
-		"if tftp ${u-boot}; then " \
+		"fatwrite ${devtype} ${bootpart} ${loadaddr} ${MLO} ${filesize}; " \
+		"fi; if tftp ${u-boot}; then " \
 		"echo updating u-boot on mmc${mmcdev}...; " \
-		"mmc dev ${mmcdev}; mmc rescan; " \
-		"setexpr blkc ${filesize} + 0x1ff; " \
-		"setexpr blkc ${blkc} / 0x200; " \
-		"if itest ${blkc} <= ${uboot_size}; then " \
-			"mmc write ${loadaddr} " __stringify(CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR) " ${blkc}; " \
-		"fi; fi; setenv filesize; setenv blkc; \0" \
+		"fatwrite ${devtype} ${bootpart} ${loadaddr} ${u-boot} ${filesize}; " \
+		"fi; setenv filesize; \0" \
 	"update_kernel=setenv bootpart ${mmcdev}:1; " \
 		"if tftp ${bootfile}; then " \
 		"echo updating ${bootfile} on mmc${bootpart}...; " \
