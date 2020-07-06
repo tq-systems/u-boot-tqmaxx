@@ -498,8 +498,6 @@ flush_dir(fat_itr *itr)
 			   nsects * mydata->sect_size);
 }
 
-static __u8 tmpbuf_cluster[MAX_CLUSTSIZE] __aligned(ARCH_DMA_MINALIGN);
-
 /*
  * Read and modify data on existing and consecutive cluster blocks
  */
@@ -507,6 +505,7 @@ static int
 get_set_cluster(fsdata *mydata, __u32 clustnum, loff_t pos, __u8 *buffer,
 		loff_t size, loff_t *gotsize)
 {
+	static u8 *tmpbuf_cluster;
 	unsigned int bytesperclust = mydata->clust_size * mydata->sect_size;
 	__u32 startsect;
 	loff_t wsize;
@@ -515,6 +514,12 @@ get_set_cluster(fsdata *mydata, __u32 clustnum, loff_t pos, __u8 *buffer,
 	*gotsize = 0;
 	if (!size)
 		return 0;
+
+	if (!tmpbuf_cluster) {
+		tmpbuf_cluster = memalign(ARCH_DMA_MINALIGN, MAX_CLUSTSIZE);
+		if (!tmpbuf_cluster)
+			return -1;
+	}
 
 	assert(pos < bytesperclust);
 	startsect = clust_to_sect(mydata, clustnum);
