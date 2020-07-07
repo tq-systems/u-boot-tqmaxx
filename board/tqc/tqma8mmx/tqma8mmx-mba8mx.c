@@ -89,6 +89,9 @@ enum {
 	GPIO_LED1,
 	GPIO_LED2,
 	GPIO_LED3,
+#ifdef CONFIG_IMX8MN
+	SEL_USB_HUB_B,
+#endif
 };
 
 #define UART_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_FSEL1)
@@ -219,6 +222,9 @@ static struct tqc_gpio_init_data mba8mx_gid[] = {
 	GPIO_INIT_DATA_ENTRY(GPIO_LED1, "GPIO1_0", GPIOD_IS_OUT),
 	GPIO_INIT_DATA_ENTRY(GPIO_LED2, "GPIO3_16", GPIOD_IS_OUT),
 	GPIO_INIT_DATA_ENTRY(GPIO_LED3, "GPIO1_8", GPIOD_IS_OUT),
+#ifdef CONFIG_IMX8MN
+	GPIO_INIT_DATA_ENTRY(SEL_USB_HUB_B, "GPIO3_18", GPIOD_IS_OUT ),
+#endif
 };
 
 #ifdef CONFIG_OF_BOARD_SETUP
@@ -309,6 +315,26 @@ int board_usb_init(int index, enum usb_init_type init)
 		}
 	}
 
+#ifdef CONFIG_IMX8MN
+	if (index == 0) {
+		if (dm_gpio_get_value(&mba8mx_gid[SEL_USB_HUB_B].desc)) {
+			debug("init: USB0/HUB\n");
+			if (init != USB_INIT_HOST) {
+				debug("USB0/HUB: wrong init type\n");
+				ret = -EINVAL;
+			} else {
+				gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
+				dm_gpio_set_value(gpio, 1);
+				udelay(100);
+				dm_gpio_set_value(gpio, 0);
+				udelay(1000);
+				debug("USB0/HUB: hub reset\n");
+			}
+		} else {
+			debug("init: USB0/OTG\n");
+		}
+	}
+#endif
 	return ret;
 }
 

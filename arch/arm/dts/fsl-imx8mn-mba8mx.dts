@@ -162,12 +162,12 @@
 
 	pinctrl_usbotg1: usbotg1grp {
 		fsl,pins = <
-			/* ID */
-			MX8MN_IOMUXC_GPIO1_IO10__USB1_OTG_ID	0x84
+			/* ID (PU needed for working detection) */
+			MX8MN_IOMUXC_GPIO1_IO10__USB1_OTG_ID	0x1C4
 			/* OC */
 			MX8MN_IOMUXC_GPIO1_IO13__USB1_OTG_OC	0x84
-			/* NANO USB SWITCH (LOW = USB-OTG) */
-			MX8MN_IOMUXC_NAND_WP_B__GPIO3_IO18	0x184
+			/* SEL_USB_HUB_B */
+			MX8MN_IOMUXC_NAND_WP_B__GPIO3_IO18	0x84
 		>;
 	};
 
