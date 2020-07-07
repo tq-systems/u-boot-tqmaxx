@@ -300,6 +300,7 @@ int board_usb_init(int index, enum usb_init_type init)
 	if (ret)
 		return ret;
 
+#if defined(CONFIG_IMX8MM)
 	if (index == 1) {
 		debug("init: USB1/HUB\n");
 		if (init != USB_INIT_HOST) {
@@ -314,8 +315,9 @@ int board_usb_init(int index, enum usb_init_type init)
 			debug("USB1/HUB: hub reset\n");
 		}
 	}
+#endif
 
-#ifdef CONFIG_IMX8MN
+#if defined(CONFIG_IMX8MN)
 	if (index == 0) {
 		if (dm_gpio_get_value(&mba8mx_gid[SEL_USB_HUB_B].desc)) {
 			debug("init: USB0/HUB\n");
@@ -358,8 +360,12 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 
 	imx8m_usb_power(index, false);
 
+#if defined(CONFIG_IMX8MM)
 	if (index == 1) {
-		puts("USB1/HUB\n");
+#elif defined(CONFIG_IMX8MN)
+	if (index == 0) {
+#endif
+		debug("USB/HUB\n");
 		gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
 		dm_gpio_set_value(gpio, 1);
 	}
