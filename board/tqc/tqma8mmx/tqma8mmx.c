@@ -29,6 +29,11 @@
 #include <asm/arch/clock.h>
 #include <spl.h>
 
+#if defined(CONFIG_FSL_FSPI)
+#include <spi.h>
+#include <spi_flash.h>
+#endif
+
 #include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
 
@@ -81,8 +86,18 @@ int ft_board_setup(void *blob, bd_t *bd)
 }
 #endif
 
+#ifdef CONFIG_FSL_FSPI
+int board_qspi_init(void)
+{
+	return set_clk_qspi();
+}
+#endif
+
 int board_init(void)
 {
+#ifdef CONFIG_FSL_FSPI
+	board_qspi_init();
+#endif
 	return tqc_bb_board_init();
 }
 
