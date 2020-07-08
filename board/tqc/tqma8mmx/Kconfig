@@ -100,6 +100,18 @@ config TQMA8MXX_BOOT_FSPI
 
 endmenu
 
+config SF_DEFAULT_BUS
+	default 0
+
+config SF_DEFAULT_CS
+	default 0
+
+config SF_DEFAULT_SPEED
+	default 40000000
+
+config SF_DEFAULT_MODE
+	default 0
+
 config TQMA8MXX_MFG_SUPPORT
 	bool "MFG Tool support"
 	select USB
@@ -195,6 +207,17 @@ config TQMA8MNX_DEFAULTS
 	select SPL_I2C_SUPPORT
 	select SPL_LIBGENERIC_SUPPORT
 	select SPL_LIBCOMMON_SUPPORT
+	select FSL_FSPI
+	select DM_SPI
+	select SPI
+	select DM_SPI_FLASH
+	select SPI_FLASH
+	select SPI_FLASH_MTD
+	select SPI_FLASH_MACRONIX
+	select SPI_FLASH_SPANSION
+	select SPI_FLASH_STMICRO
+	select SPI_FLASH_SST
+	select SPI_FLASH_WINBOND
 
 config DEFAULT_DEVICE_TREE
 	default "fsl-imx8mn-mba8mx" if TQMA8MXX_BB_MBA8MX
@@ -232,6 +255,18 @@ config TQMA8MMX_DEFAULTS
 	select DM_I2C
 	select SYS_I2C_MXC
 	select MISC
+	select FSL_FSPI
+	select DM_SPI
+	select SPI
+	select DM_SPI
+	select DM_SPI_FLASH
+	select SPI_FLASH
+	select SPI_FLASH_4BYTES_ADDR
+	select SPI_FLASH_MACRONIX
+	select SPI_FLASH_SPANSION
+	select SPI_FLASH_STMICRO
+	select SPI_FLASH_SST
+	select SPI_FLASH_WINBOND
 	select SPL
 	select SPL_LOAD_FIT
 	select SPL_BOARD_INIT
@@ -242,6 +277,9 @@ config TQMA8MMX_DEFAULTS
 	select SPL_DRIVERS_MISC_SUPPORT
 	select SPL_POWER_SUPPORT
 	select SPL_I2C_SUPPORT
+	select SPL_SPI_FLASH_SUPPORT
+	select SPL_SPI_FLASH_TINY
+	select SPL_SPI_SUPPORT
 	select SPL_LIBGENERIC_SUPPORT
 	select SPL_LIBCOMMON_SUPPORT
 
