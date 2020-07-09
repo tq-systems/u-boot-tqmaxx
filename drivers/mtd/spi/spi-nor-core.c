@@ -4239,6 +4239,10 @@ int spi_nor_scan(struct spi_nor *nor)
 	print_size(nor->erase_size, ", total ");
 	print_size(nor->size, "");
 	puts("\n");
+
+	printf("addr_width = %u erase_cmd = %#.2x rd_cmd = %#.2x pp_cmd = %#.2x\n",
+	       (unsigned int)nor->addr_width, (uint32_t)nor->erase_opcode,
+	       (uint32_t)nor->read_opcode, (uint32_t)nor->program_opcode);
 #endif
 
 	return 0;
