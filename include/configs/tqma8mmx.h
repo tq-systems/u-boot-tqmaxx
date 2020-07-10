@@ -101,12 +101,15 @@
 	"initrd_high=0xffffffffffffffff\0" \
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
+	"mmcpath=/\0" \
 	"mmcautodetect=yes\0" \
 	"loadbootscript=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
 		"source\0" \
-	"loadimage=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
-	"loadfdt=load mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
+	"loadimage=load mmc ${mmcdev}:${mmcpart} ${loadaddr} " \
+		"${mmcpath}${image}\0" \
+	"loadfdt=load mmc ${mmcdev}:${mmcpart} ${fdt_addr} " \
+		"${mmcpath}${fdt_file}\0" \
 	"mmcboot=echo Booting from mmc ...; " \
 		"setenv bootargs; " \
 		"run mmcargs; " \
@@ -139,7 +142,7 @@
 			"if itest ${filesize} > 0; then "                      \
 				"echo Write kernel image to mmc ${mmcdev}:${mmcpart}...; " \
 				"save mmc ${mmcdev}:${mmcpart} ${loadaddr} "   \
-					"${image} ${filesize}; "               \
+					"${mmcpath}${image} ${filesize}; "     \
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"setenv filesize; setenv get_cmd \0"                           \
@@ -148,7 +151,7 @@
 			"if itest ${filesize} > 0; then "                      \
 				"echo Write fdt image to mmc ${mmcdev}:${mmcpart}...; " \
 				"save mmc ${mmcdev}:${mmcpart} ${loadaddr} "   \
-					"${fdt_file} ${filesize}; "            \
+					"${mmcpath}${fdt_file} ${filesize}; "  \
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"setenv filesize; setenv get_cmd \0"                           \
