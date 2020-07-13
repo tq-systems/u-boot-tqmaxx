@@ -59,6 +59,14 @@ config TQMA8MXX_BB_MBA8MX
 
 endchoice
 
+config DEFAULT_DEVICE_TREE
+	default "fsl-imx8mn-mba8mx" if TQMA8MXX_BB_MBA8MX
+	default "fsl-imx8mm-mba8mx" if TQMA8MXX_BB_MBA8MX
+
+config DEFAULT_FDT_FILE
+	default "imx8mn-mba8mx.dtb" if TQMA8MXX_BB_MBA8MX
+	default "imx8mm-mba8mx.dtb" if TQMA8MXX_BB_MBA8MX
+
 config NR_DRAM_BANKS
 	default 1 
 
@@ -99,6 +107,61 @@ config TQMA8MXX_BOOT_FSPI
 	  Select booting from FlexSPI
 
 endmenu
+
+config TQMA8MXX_DEFAULTS
+	bool
+	default y
+	select ARCH_MISC_INIT
+	select TQC_EEPROM
+	select BOARD_LATE_INIT
+	select BOARD_EARLY_INIT_F
+	select FIT
+	select OF_CONTROL
+	select OF_BOARD_SETUP
+	select OF_SYSTEM_SETUP
+	select PINCTRL
+	select PINCTRL_IMX8M
+	select DM
+	select DM_MMC
+	select MMC_IO_VOLTAGE
+	select MMC_HS400_SUPPORT
+	select FSL_ESDHC
+	select DM_THERMAL
+	select DM_SERIAL
+	select MXC_UART
+	select DM_GPIO
+	select MXC_GPIO
+	select DM_I2C
+	select SYS_I2C_MXC
+	select MISC
+	select FSL_FSPI
+	select DM_SPI
+	select SPI
+	select DM_SPI
+	select SPI_FLASH_MTD
+	select DM_SPI_FLASH
+	select SPI_FLASH
+	select SPI_FLASH_4BYTES_ADDR
+	select SPI_FLASH_MACRONIX
+	select SPI_FLASH_SPANSION
+	select SPI_FLASH_STMICRO
+	select SPI_FLASH_SST
+	select SPI_FLASH_WINBOND
+	select SPL
+	select SPL_LOAD_FIT
+	select SPL_BOARD_INIT
+	select SPL_ENV_SUPPORT
+	select SPL_SERIAL_SUPPORT
+	select SPL_GPIO_SUPPORT
+	select SPL_MMC_SUPPORT
+	select SPL_DRIVERS_MISC_SUPPORT
+	select SPL_POWER_SUPPORT
+	select SPL_I2C_SUPPORT
+	select SPL_LIBGENERIC_SUPPORT
+	select SPL_LIBCOMMON_SUPPORT
+	select SPL_SPI_FLASH_SUPPORT
+	select SPL_SPI_FLASH_TINY
+	select SPL_SPI_SUPPORT
 
 config SF_DEFAULT_BUS
 	default 0
@@ -164,129 +227,5 @@ config FASTBOOT_USB_DEV
 endif
 
 source "board/tqc/common/Kconfig"
-
-endif
-
-if TARGET_TQMA8MNX
-
-config TQMA8MNX_DEFAULTS
-	bool
-	default y if TARGET_TQMA8MNX
-	select ARCH_MISC_INIT
-	select TQC_EEPROM
-	select BOARD_LATE_INIT
-	select BOARD_EARLY_INIT_F
-	select FIT
-	select OF_CONTROL
-	select OF_BOARD_SETUP
-	select OF_SYSTEM_SETUP
-	select PINCTRL
-	select PINCTRL_IMX8M
-	select DM
-	select DM_MMC
-	select MMC_IO_VOLTAGE
-	select MMC_HS400_SUPPORT
-	select FSL_ESDHC
-	select DM_THERMAL
-	select DM_SERIAL
-	select MXC_UART
-	select DM_GPIO
-	select MXC_GPIO
-	select DM_I2C
-	select SYS_I2C_MXC
-	select MISC
-	select SPL
-	select SPL_LOAD_FIT
-	select SPL_BOARD_INIT
-	select SPL_ENV_SUPPORT
-	select SPL_SERIAL_SUPPORT
-	select SPL_GPIO_SUPPORT
-	select SPL_MMC_SUPPORT
-	select SPL_DRIVERS_MISC_SUPPORT
-	select SPL_POWER_SUPPORT
-	select SPL_I2C_SUPPORT
-	select SPL_LIBGENERIC_SUPPORT
-	select SPL_LIBCOMMON_SUPPORT
-	select FSL_FSPI
-	select DM_SPI
-	select SPI
-	select DM_SPI_FLASH
-	select SPI_FLASH
-	select SPI_FLASH_MTD
-	select SPI_FLASH_MACRONIX
-	select SPI_FLASH_SPANSION
-	select SPI_FLASH_STMICRO
-	select SPI_FLASH_SST
-	select SPI_FLASH_WINBOND
-
-config DEFAULT_DEVICE_TREE
-	default "fsl-imx8mn-mba8mx" if TQMA8MXX_BB_MBA8MX
-
-config DEFAULT_FDT_FILE
-	default "imx8mn-mba8mx.dtb" if TQMA8MXX_BB_MBA8MX
-
-endif
-
-if TARGET_TQMA8MMX
-
-config TQMA8MMX_DEFAULTS
-	bool
-	default y if TARGET_TQMA8MMX
-	select ARCH_MISC_INIT
-	select TQC_EEPROM
-	select BOARD_LATE_INIT
-	select BOARD_EARLY_INIT_F
-	select FIT
-	select OF_CONTROL
-	select OF_BOARD_SETUP
-	select OF_SYSTEM_SETUP
-	select PINCTRL
-	select PINCTRL_IMX8M
-	select DM
-	select DM_MMC
-	select MMC_IO_VOLTAGE
-	select MMC_HS400_SUPPORT
-	select FSL_ESDHC
-	select DM_THERMAL
-	select DM_SERIAL
-	select MXC_UART
-	select DM_GPIO
-	select MXC_GPIO
-	select DM_I2C
-	select SYS_I2C_MXC
-	select MISC
-	select FSL_FSPI
-	select DM_SPI
-	select SPI
-	select DM_SPI
-	select DM_SPI_FLASH
-	select SPI_FLASH
-	select SPI_FLASH_4BYTES_ADDR
-	select SPI_FLASH_MACRONIX
-	select SPI_FLASH_SPANSION
-	select SPI_FLASH_STMICRO
-	select SPI_FLASH_SST
-	select SPI_FLASH_WINBOND
-	select SPL
-	select SPL_LOAD_FIT
-	select SPL_BOARD_INIT
-	select SPL_ENV_SUPPORT
-	select SPL_SERIAL_SUPPORT
-	select SPL_GPIO_SUPPORT
-	select SPL_MMC_SUPPORT
-	select SPL_DRIVERS_MISC_SUPPORT
-	select SPL_POWER_SUPPORT
-	select SPL_I2C_SUPPORT
-	select SPL_SPI_FLASH_SUPPORT
-	select SPL_SPI_FLASH_TINY
-	select SPL_SPI_SUPPORT
-	select SPL_LIBGENERIC_SUPPORT
-	select SPL_LIBCOMMON_SUPPORT
-
-config DEFAULT_DEVICE_TREE
-	default "fsl-imx8mm-mba8mx" if TQMA8MXX_BB_MBA8MX
-
-config DEFAULT_FDT_FILE
-	default "imx8mm-mba8mx.dtb" if TQMA8MXX_BB_MBA8MX 
 
 endif
