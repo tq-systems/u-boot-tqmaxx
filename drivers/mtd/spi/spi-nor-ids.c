@@ -146,7 +146,18 @@ const struct flash_info spi_nor_ids[] = {
 	{ INFO("mx25u25635f", 0xc22539, 0, 64 * 1024, 512, SECT_4K | SPI_NOR_4B_OPCODES) },
 	{ INFO("mx25l25655e", 0xc22619, 0, 64 * 1024, 512, 0) },
 	{ INFO("mx66l51235l", 0xc2201a, 0, 64 * 1024, 1024, SPI_NOR_DUAL_READ | SPI_NOR_QUAD_READ | SPI_NOR_4B_OPCODES) },
+	/*
+	 * HACKHACKHACK:
+	 * disable 4k secor erase adn dual/quad for geiven boards
+	 * this is the only way so far without exchanging capabilities
+	 * between flash and spi controller to get this flash working with
+	 * flexspi on given boards
+	 */
+#if defined(CONFIG_TARGET_TQMA8MNX) || defined(CONFIG_TARGET_TQMA8MMX)
+	{ INFO("mx66u51235f", 0xc2253a, 0, 64 * 1024, 1024, SPI_NOR_4B_OPCODES) },
+#else
 	{ INFO("mx66u51235f", 0xc2253a, 0, 64 * 1024, 1024, SECT_4K | SPI_NOR_DUAL_READ | SPI_NOR_QUAD_READ | SPI_NOR_4B_OPCODES) },
+#endif
 	{ INFO("mx66l1g45g",  0xc2201b, 0, 64 * 1024, 2048, SECT_4K | SPI_NOR_DUAL_READ | SPI_NOR_QUAD_READ) },
 	{ INFO("mx25l1633e", 0xc22415, 0, 64 * 1024,   32, SPI_NOR_QUAD_READ | SPI_NOR_4B_OPCODES | SECT_4K) },
 	{ INFO("mx25r6435f", 0xc22817, 0, 64 * 1024,   128,  SECT_4K) },
