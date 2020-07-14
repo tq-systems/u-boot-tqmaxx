@@ -17,6 +17,11 @@
 		spi0 = &fspi;
 	};
 
+	config {
+		u-boot,mmc-env-offset = <0x800000>;
+		u-boot,mmc-env-offset-redundant = <0x840000>;
+	};
+
 	reg_3p3v_som: regulator-3p3v-som {
 		compatible = "regulator-fixed";
 		regulator-name = "3P3V_SOM";
