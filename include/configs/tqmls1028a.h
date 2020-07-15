@@ -201,7 +201,7 @@
 	"fdtaddr=0x88000000\0" \
 	"addtty=setenv bootargs ${bootargs} console=${console}\0" \
 	"addvideo=setenv bootargs ${bootargs} video=1920x1080-32@60\0"	\
-	"addmmc=setenv bootargs ${bootargs} root=/dev/mmcblk${mmcdev}p2\0"     \
+	"addmmc=setenv bootargs ${bootargs} root=/dev/mmcblk${mmcdev}p2 rootwait\0" \
 	"firmwarepart=1\0"                                                     \
 	"mmchdpload=load mmc ${mmcdev}:${firmwarepart} ${loadaddr} ls1028a-dp-fw.bin; hdp load ${loadaddr};\0" \
 	"mmcimageload=load mmc ${mmcdev}:${firmarepart} ${fdtaddr} Image.gz; unzip $fdtaddr $loadaddr\0" \
