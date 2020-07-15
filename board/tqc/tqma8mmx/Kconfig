@@ -60,12 +60,12 @@ config TQMA8MXX_BB_MBA8MX
 endchoice
 
 config DEFAULT_DEVICE_TREE
-	default "fsl-imx8mn-mba8mx" if TQMA8MXX_BB_MBA8MX
-	default "fsl-imx8mm-mba8mx" if TQMA8MXX_BB_MBA8MX
+	default "fsl-imx8mn-mba8mx" if TQMA8MXX_BB_MBA8MX && IMX8MN
+	default "fsl-imx8mm-mba8mx" if TQMA8MXX_BB_MBA8MX && IMX8MM
 
 config DEFAULT_FDT_FILE
-	default "imx8mn-mba8mx.dtb" if TQMA8MXX_BB_MBA8MX
-	default "imx8mm-mba8mx.dtb" if TQMA8MXX_BB_MBA8MX
+	default "imx8mn-mba8mx.dtb" if TQMA8MXX_BB_MBA8MX && IMX8MN
+	default "imx8mm-mba8mx.dtb" if TQMA8MXX_BB_MBA8MX && IMX8MM
 
 config NR_DRAM_BANKS
 	default 1 
