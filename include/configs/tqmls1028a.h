@@ -238,6 +238,7 @@
 	"stderr=serial\0"                                                      \
 	"stdin=serial\0"                                                       \
 	"stdout=serial\0"                                                      \
+	"ipmode=static\0"                                                      \
 	"set_getcmd=if test \"${ipmode}\" != static; then "                    \
 		"setenv getcmd dhcp; setenv autoload yes; "                    \
 		"else setenv getcmd tftp; setenv autoload no; fi\0"            \
