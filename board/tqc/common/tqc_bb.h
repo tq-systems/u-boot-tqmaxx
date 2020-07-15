@@ -33,4 +33,8 @@ void tqc_bb_spl_board_init(void);
 int tqc_bb_ft_board_setup(void *blob, bd_t *bd);
 #endif /* defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT) */
 
+#if defined(CONFIG_TQC_RTC) && (CONFIG_DM_I2C)
+int tqc_pcf85063_adjust_capacity(int bus, int address, int quartz_load);
+#endif /* CONFIG_TQC_RTC */
+
 #endif

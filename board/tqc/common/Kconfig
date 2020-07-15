@@ -13,3 +13,6 @@ config TQC_SDMMC
 config TQC_SCU
 	bool
 	default y if HAVE_SC_FIRMWARE
+
+config TQC_RTC
+	bool
