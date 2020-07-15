@@ -215,6 +215,9 @@ int board_late_init(void)
 		tqc_board_handle_eeprom_data(bname, &eeprom);
 	else
 		puts("EEPROM: read error\n");
+
+	/* set quartz load to 7.000 femtofarads */
+	tqc_pcf85063_adjust_capacity(0, 0x51, 7000);
 #endif
 
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
