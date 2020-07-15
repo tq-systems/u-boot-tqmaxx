@@ -113,6 +113,7 @@ config TQMA8MXX_DEFAULTS
 	default y
 	select ARCH_MISC_INIT
 	select TQC_EEPROM
+	select TQC_RTC
 	select BOARD_LATE_INIT
 	select BOARD_EARLY_INIT_F
 	select FIT
