@@ -18,6 +18,7 @@ config TQMA8XX_DEFAULTS
 	select TQC_SDMMC
 	select TQC_EEPROM
 	select TQC_SCU
+	select TQC_RTC
 
 choice
 	prompt "TQMa8Xx CPU variant"
