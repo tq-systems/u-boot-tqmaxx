@@ -1,0 +1,8 @@
+TQ Systems GmbH TQMa8Xx Board
+M:	Markus Niebel <Markus.Niebel@tq-group.com>
+S:	Maintained
+F:	board/tqc/tqma8xxs/
+F:	include/configs/tqma8xxs*.h
+F:	configs/tqma8xxs*_defconfig
+F:	arch/arm/dts/*imx8qxp-tqma8xqps*.dtsi
+F:	arch/arm/dts/*imx8qxp-mb-smarc-2*.dts
