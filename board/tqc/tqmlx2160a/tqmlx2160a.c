@@ -1,4 +1,5 @@
 #include <common.h>
+#include <asm/io.h>
 #include <dm.h>
 #include <dm/platform_data/serial_pl01x.h>
 #include <fsl_mdio.h>
@@ -77,6 +78,38 @@ int rtc_init(void)
 
 	return 0;
 }
+
+#if defined(CONFIG_VID)
+int init_func_vid(void)
+{
+	struct ccsr_gur *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
+	u32 fusesr;
+	u8 gur_vid;
+	u8 sysc_vid;
+	struct udevice *dev;
+
+	/* get the voltage ID from fuse status register */
+	fusesr = in_le32(&gur->dcfg_fusesr);
+	gur_vid = (fusesr >> FSL_CHASSIS3_DCFG_FUSESR_ALTVID_SHIFT) &
+		FSL_CHASSIS3_DCFG_FUSESR_ALTVID_MASK;
+	if ((gur_vid == 0) || (gur_vid == FSL_CHASSIS3_DCFG_FUSESR_ALTVID_MASK)) {
+		gur_vid = (fusesr >> FSL_CHASSIS3_DCFG_FUSESR_VID_SHIFT) &
+			FSL_CHASSIS3_DCFG_FUSESR_VID_MASK;
+	}
+
+	if (i2c_get_chip_for_busnum(SYSCTRL_I2C_BUS_NUM, SYSCTRL_I2C_ADDR, 1, &dev))
+		return -ENODEV;
+
+	sysc_vid = dm_i2c_reg_read(dev, 0x30) & 0x1F;
+
+	printf("VID device config: %x, VID systemcontroller config: %x\n", gur_vid, sysc_vid);
+	if (sysc_vid != gur_vid) {
+		dm_i2c_reg_write(dev, 0x30, gur_vid);
+		printf("VDD core voltage mismatch. Setting VID voltage\n");
+	}
+	return 0;
+}
+#endif
 
 int board_init(void)
 {

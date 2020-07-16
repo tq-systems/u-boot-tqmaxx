@@ -99,10 +99,15 @@
 #define CONFIG_SYS_LS_MC_DRAM_BLOCK_MIN_SIZE	(256UL * 1024 * 1024)
 #endif
 
+#define CONFIG_VID
+
 /* RTC */
 #define RTC
 #define CONFIG_SYS_RTC_BUS_NUM		0x0
 #define CONFIG_SYS_I2C_RTC_ADDR		0x51
+
+#define SYSCTRL_I2C_BUS_NUM		0x0
+#define SYSCTRL_I2C_ADDR		0x11
 
 /* PCI */
 #ifdef CONFIG_PCI
@@ -159,6 +164,7 @@ unsigned long get_board_ddr_clk(void);
 	"1M@0k(RCW-PBL),"                                                      \
 	"2M@1M(U-Boot),"                                                       \
 	"1M@3M(U-Boot-Env),"						       \
+	"1M@5M(U-Boot-Env),"						       \
 	"2M@8M(DDR-PHY),"						       \
 	"3M@10M(DPAA2-MC),"                                                    \
 	"1M@13M(DPAA2-DPL),"						       \
