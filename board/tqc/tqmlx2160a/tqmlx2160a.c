@@ -117,6 +117,10 @@ int board_init(void)
 
 	ret = rtc_init();
 
+#if defined(CONFIG_MBLX2160A)
+	ret = mblx2160a_gpios_init();
+#endif
+
 	return ret;
 }
 
