@@ -9,7 +9,11 @@ obj-$(CONFIG_TQMA8MXX_BB_MBA8MX) += tqma8mmx-mba8mx.o
 
 ifdef CONFIG_SPL_BUILD
 obj-y += spl.o
-obj-$(CONFIG_TQMA8MMX_RAM_512MB) += tqma8mmx-512mb-lpddr4_timing.o
-obj-$(CONFIG_TQMA8MMX_RAM_1024MB) += tqma8mmx-1g-lpddr4_timing.o
+ifdef CONFIG_IMX8MM
+obj-$(CONFIG_TQMA8MMX_RAM_1024MB) += tqma8mmx-1gb-lpddr4_timing.o
+endif
+ifdef CONFIG_IMX8MN
+obj-$(CONFIG_TQMA8MMX_RAM_1024MB) += tqma8mnx-1gb-lpddr4_timing.o
+endif
 obj-$(CONFIG_TQMA8MXX_BB_MBA8MX) += spl-mba8mx.o
 endif

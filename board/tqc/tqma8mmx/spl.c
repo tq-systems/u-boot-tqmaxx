@@ -71,7 +71,11 @@ static iomux_v3_cfg_t const usdhc1_pads[] = {
 	IMX8MN_PAD_SD1_RESET_B__GPIO2_IO10 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
 	IMX8MN_PAD_SD1_STROBE__USDHC1_STROBE | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
 };
-extern struct dram_timing_info tqma8mxxl_1g_lpddr4_timing;
+
+extern struct dram_timing_info tqma8mxnl_1gb_lpddr4_timing;
+
+static struct dram_timing_info *default_dram_timing = &tqma8mxnl_1gb_lpddr4_timing;
+
 #elif defined(CONFIG_IMX8MM)
 
 /* TODO: check if this is correct */
@@ -103,7 +107,11 @@ static iomux_v3_cfg_t const usdhc1_pads[] = {
 	IMX8MM_PAD_SD1_RESET_B_GPIO2_IO10 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
 	IMX8MM_PAD_SD1_STROBE_USDHC1_STROBE | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
 };
-extern struct dram_timing_info tqma8mxxl_512mb_dram_timing;
+
+extern struct dram_timing_info tqma8mxml_1gb_dram_timing;
+
+static struct dram_timing_info *default_dram_timing = &tqma8mxml_1gb_dram_timing;
+
 #else
 #error
 #endif
@@ -112,11 +120,7 @@ extern struct dram_timing_info tqma8mxxl_512mb_dram_timing;
 
 static void spl_dram_init(void)
 {
-	#ifdef CONFIG_IMX8MN
-	ddr_init(&tqma8mxxl_1g_lpddr4_timing);
-	#else
-	ddr_init(&tqma8mxxl_512mb_dram_timing);
-	#endif
+	ddr_init(default_dram_timing);
 };
 
 int board_mmc_getcd(struct mmc *mmc)

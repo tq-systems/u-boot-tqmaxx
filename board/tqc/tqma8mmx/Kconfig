@@ -12,14 +12,9 @@ config SYS_CONFIG_NAME
 choice
 	prompt "TQMa8MMX RAM size"
 	default TQMA8MMX_RAM_1024MB if IMX8MN
-	default TQMA8MMX_RAM_512MB if IMX8MM
+	default TQMA8MMX_RAM_1024MB if IMX8MM
 	help
 	  Select RAM size for TQMa8MMx
-
-config TQMA8MMX_RAM_512MB
-	bool "TQMa8MMx with 512 MiB RAM"
-	help
-	  Select variant with 512 MiB RAM
 
 config TQMA8MMX_RAM_1024MB
 	bool "TQMa8MMx with 1024 MiB RAM"

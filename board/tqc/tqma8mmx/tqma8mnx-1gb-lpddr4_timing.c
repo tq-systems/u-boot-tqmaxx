@@ -1,11 +1,12 @@
+// SPDX-License-Identifier: GPL-2.0+
 /*
  * Copyright 2019 NXP
- *
- * SPDX-License-Identifier:	GPL-2.0+
  *
  * Generated code from MX8M_DDR_tool
  * Align with uboot version:
  * imx_v2018.03_4.14.78_1.0.0_ga ~ imx_v2018.04_4.19.35_1.1.0_ga
+ * TQMa8MQNL.1GByte.RAM-Timing.0002.xlsx / K4F8E164HA-MGCL (HW REV.010x)
+ * from MX8MN_LPDDR4_RPA_v15.xlsx
  */
 
 #include <linux/kernel.h>
@@ -1750,7 +1751,7 @@ static struct dram_fsp_msg ddr_dram_fsp_msg[] = {
 };
 
 /* ddr timing config params */
-struct dram_timing_info tqma8mxxl_1g_lpddr4_timing = {
+struct dram_timing_info tqma8mxnl_1gb_lpddr4_timing = {
 	.ddrc_cfg = ddr_ddrc_cfg,
 	.ddrc_cfg_num = ARRAY_SIZE(ddr_ddrc_cfg),
 	.ddrphy_cfg = ddr_ddrphy_cfg,
