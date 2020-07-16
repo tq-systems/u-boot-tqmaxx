@@ -1,0 +1,56 @@
+if TARGET_TQMLS1012AL
+
+config SYS_BOARD
+	default "tqmls1012al"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_SOC
+	default "fsl-layerscape"
+
+config SYS_CONFIG_NAME
+	default "tqmls1012al"
+
+choice
+	prompt "TQMLS1012AL base board variant"
+	default MBLS1012AL
+	help
+	  Select base board for TQMLS1012AL module
+
+config MBLS1012AL
+	bool "TQMLS1012AL on MBLS1012AL Starterkit"
+	help
+	  Select the MBLS1012AL starterkit.
+	  This features Ethernet, USB, SD-Card, etc.
+
+endchoice
+
+choice
+	prompt "TQMLS1012AL MMC variant"
+	default TQMLS1012AL_SD
+	help
+	  Select boot device variant for TQMLS1012AL module
+
+config TQMLS1012AL_SD
+	bool "TQMLS1012AL with SD card"
+	help
+	  Select the TQMLS1012AL module with SD card.
+
+config TQMLS1012AL_EMMC
+	bool "TQMLS1012AL with eMMC"
+	help
+	  Select the TQMLS1012AL module with eMMC.
+
+endchoice
+
+if FSL_PFE
+config SYS_LS_PFE_FW_ADDR
+	hex "Flash address of PFE firmware"
+	default 0x40a00000 if MBLS1012AL
+endif
+
+source "board/tqc/common/Kconfig"
+source "board/freescale/common/Kconfig"
+
+endif

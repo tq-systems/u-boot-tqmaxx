@@ -1,0 +1,94 @@
+U-Boot for the TQ-Systems TQMLS1012AL modules
+
+This file contains information for the port of
+U-Boot to the TQ-Systems TQMLS1012AL modules.
+
+1. Boot source
+--------------
+
+Only TF-A boot from SPI-NOR is supported. The built U-Boot binary is expected
+to be combined into a BL3 image with the ATF (ARM Trusted Firmware).
+
+In the default configuration U-Boot will load Linux from SD card, but scripts
+for booting from SPI-NOR flash are provided as well.
+
+
+2. Building
+-----------
+
+To build U-Boot for the TQ-Systems TQMLS1012AL modules:
+
+	make tqmls1012al_<baseboard>_tfa_defconfig
+	make
+
+<baseboard> is a placeholder for the board on which the module is soldered:
+mbls1012al		- Starter kit STKLS1012AL by TQ
+
+This gives the following configuration:
+tqmls1012al_mbls1012al_tfa_defconfig
+
+
+3. SPI-NOR layout
+-----------------
+
+  Partition      Offset    (Offset)  Size
+-------------  ----------  --------  ----
+RCW/PBL/BL2:   0x00000000      (0M)    1M
+BL3 (U-Boot):  0x00100000      (1M)    4M
+U-Boot ENV:    0x00500000      (5M)    1M
+PFE firmware:  0x00A00000     (10M)    3M
+DTB:           0x00F00000     (15M)    1M
+Linux+Rootfs:  0x01000000     (16M)   64M
+
+
+========================================================================
+
+
+How to:
+
+# Update
+
+Update from USB:
+----------------
+
+usb start
+load usb 0 $loadaddr <filename>
+sf probe
+sf update ${loadaddr} <offset> ${filesize}
+
+Update via tftp:
+----------------
+setenv ipaddr <ipaddr>
+setenv serverip <serverip>
+
+or
+
+setenv ipmode dynamic			# obtain IP configuration via DHCP
+
+RCW/PBL/BL2
+-----------
+setenv pbl_spi_file <filename>		# RCW/PBL/BL2 file name
+run update_pbl				# update PCW/PBL/BL2
+
+U-boot
+------
+setenv uboot_spi_file <filename>	# U-boot file name
+run update_uboot			# update U-boot
+
+DTB
+---
+setenv fdt_file <filename>		# DTB file name
+run update_fdt_mmc			# update DTB on SD card
+run update_fdt_spi			# update DTB in SPI-NOR flash
+
+Kernel
+------
+setenv kernel <filename>		# Kernel file name
+run update_kernel_mmc			# update kernel on SD card
+run update_kernel_spi			# update kernel in SPI-NOR flash
+
+
+# Start Linux from U-Boot
+
+run mmcboot		- boot from SD card
+run spiboot		- boot from SPI-NOR flash
