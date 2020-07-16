@@ -173,6 +173,7 @@ int tqc_bb_board_eth_init(bd_t *bis)
 	struct mii_dev *dev;
 	struct ccsr_gur *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
 	u32 srds_s1, srds_s2;
+	int ret;
 
 	srds_s1 = in_le32(&gur->rcwsr[28]) &
 				FSL_CHASSIS3_RCWSR28_SRDS1_PRTCL_MASK;
@@ -193,6 +194,8 @@ int tqc_bb_board_eth_init(bd_t *bis)
 		break;
 	case 7:
 		wriop_set_phy_address(WRIOP1_DPMAC12, 0, 0x1);
+		wriop_set_phy_address(WRIOP1_DPMAC13, 0, 0xa);
+		wriop_set_phy_address(WRIOP1_DPMAC14, 0, 0xb);
 		wriop_set_phy_address(WRIOP1_DPMAC16, 0, 0x4);
 		wriop_set_phy_address(WRIOP1_DPMAC17, 0, 0x2);
 		wriop_set_phy_address(WRIOP1_DPMAC18, 0, 0x3);
@@ -201,6 +204,19 @@ int tqc_bb_board_eth_init(bd_t *bis)
 		wriop_set_mdio(WRIOP1_DPMAC16, dev);
 		wriop_set_mdio(WRIOP1_DPMAC17, dev);
 		wriop_set_mdio(WRIOP1_DPMAC18, dev);
+		/* Intentional fallthrough */
+	case 8:
+		printf("mod detect 1: %d, 2: %d\n", mblx2160a_get_gpio("XFI1_MOD_DECTECT"), mblx2160a_get_gpio("XFI2_MOD_DECTECT"));
+
+		if (mblx2160a_get_gpio("XFI1_MOD_DECTECT") == 0)
+			ret = mblx2160a_set_gpio("XFI1_TX_DIS", 0);
+
+		if (mblx2160a_get_gpio("XFI2_MOD_DECTECT") == 0)
+			ret |= mblx2160a_set_gpio("XFI2_TX_DIS", 0);
+
+		if (ret)
+			printf("Error Setting XFI GPIOS: %d\n", ret);
+
 		break;
 	case 12:
 		wriop_set_phy_address(WRIOP1_DPMAC17, 0, 0x2);
