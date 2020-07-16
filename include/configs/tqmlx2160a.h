@@ -331,6 +331,7 @@ unsigned long get_board_ddr_clk(void);
 		"run spiargs; " \
 		"sf probe 0:0 && sf read ${load_addr} Kernel ${kernel_size}; "	\
 		"sf read ${fdt_addr_r} Linux-DTB ${dtb_size}; "	\
+		"fsl_mc lazyapply DPL 0x20d00000; "			       \
 		"booti ${load_addr} - ${fdt_addr_r}\0"			\
 	"sd_bootcmd=echo Trying load from sd card..;"		\
 		"run mmcargs; load mmc ${mmcdev}:${bootpart} ${load_addr} ${kernel};"		\
