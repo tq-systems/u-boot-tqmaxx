@@ -1,0 +1,31 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * U-Boot Device Tree file for TQ LS1012A MBLS1012AL Board.
+ *
+ * Copyright 2022 TQ-Systems GmbH
+ *
+ * Authors: Alexander Stein <Alexander.Stein@tq-group.com>
+ */
+
+/ {
+	pfe {
+		/* HACK: minimal PFE specification for fixed-link configuration */
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "simple-bus";
+
+		pfe_mac0: ethernet@0 {
+			compatible = "fsl,pfe-gemac-port";
+			reg = <0x0>;
+		};
+
+		pfe_mac1: ethernet@1 {
+			compatible = "fsl,pfe-gemac-port";
+			reg = <0x1>;
+			fixed-link {
+				speed = <1000>;
+				full-duplex;
+			};
+		};
+	};
+};

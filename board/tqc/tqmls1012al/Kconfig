@@ -1,0 +1,84 @@
+# SPDX-License-Identifier: GPL-2.0+
+#
+# Copyright (C) 2022 TQ-Systems GmbH
+#
+
+if TARGET_TQMLS1012AL
+
+config SYS_BOARD
+	default "tqmls1012al"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_SOC
+	default "fsl-layerscape"
+
+config SYS_CONFIG_NAME
+	default "tqmls1012al"
+
+choice
+	prompt "TQMLS1012AL base board variant"
+	default MBLS1012AL
+	help
+	  Select base board for TQMLS1012AL module
+
+config MBLS1012AL
+	bool "TQMLS1012AL on MBLS1012AL Starterkit"
+	help
+	  Select the MBLS1012AL starterkit.
+	  This features Ethernet, USB, SD-Card, etc.
+
+endchoice
+
+choice
+	prompt "TQMLS1012AL MMC variant"
+	default TQMLS1012AL_SD
+	help
+	  Select expansion device variant for TQMLS1012AL module
+
+config TQMLS1012AL_SD
+	bool "TQMLS1012AL with SD card"
+	help
+	  Select the TQMLS1012AL module with external SD card and without
+	  e-MMC.
+
+config TQMLS1012AL_EMMC
+	bool "TQMLS1012AL with eMMC"
+	help
+	  Select the TQMLS1012AL module with eMMC.
+
+endchoice
+
+if FSL_PFE
+
+config SYS_LS_PFE_FW_ADDR
+	hex "Flash offset of PFE firmware"
+	default 0xa00000 if MBLS1012AL
+
+config SYS_LS_PFE_FW_LENGTH
+	hex "length of PFE firmware"
+	default 0x300000
+
+config DDR_PFE_PHYS_BASEADDR
+	hex "PFE DDR physical base address"
+	default 0x03400000
+
+config DDR_PFE_BASEADDR
+	hex "PFE DDR base address"
+	default 0x83400000
+
+config PFE_EMAC1_PHY_ADDR
+	hex "PFE PHY1 address"
+	default 0x9
+
+config PFE_EMAC2_PHY_ADDR
+	hex "PFE PHY2 address"
+	default 0x1
+
+endif
+
+source "board/tqc/common/Kconfig"
+source "board/freescale/common/Kconfig"
+
+endif
