@@ -14,13 +14,7 @@
 DECLARE_GLOBAL_DATA_PTR;
 
 static struct pl01x_serial_platdata serial0 = {
-#if CONFIG_CONS_INDEX == 0
 	.base = CONFIG_SYS_SERIAL0,
-#elif CONFIG_CONS_INDEX == 1
-	.base = CONFIG_SYS_SERIAL1,
-#else
-#error "Unsupported console index value."
-#endif
 	.type = TYPE_PL011,
 };
 
@@ -29,20 +23,9 @@ U_BOOT_DEVICE(nxp_serial0) = {
 	.platdata = &serial0,
 };
 
-static struct pl01x_serial_platdata serial1 = {
-	.base = CONFIG_SYS_SERIAL1,
-	.type = TYPE_PL011,
-};
-
-U_BOOT_DEVICE(nxp_serial1) = {
-	.name = "serial_pl01x",
-	.platdata = &serial1,
-};
-
 static void uart_get_clock(void)
 {
 	serial0.clock = get_serial_clock();
-	serial1.clock = get_serial_clock();
 }
 
 unsigned long get_board_sys_clk(void)
