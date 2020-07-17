@@ -29,6 +29,71 @@ struct mblx2160a_gpio {
 	s8 initval;
 };
 
+enum mblx2160a_phys {
+	ETH_NO,
+	ETH_01,
+	ETH_02,
+	ETH_03,
+	ETH_04,
+	ETH_05,
+	ETH_06,
+	ETH_07,
+	ETH_08,
+	ETH_09,
+	ETH_10,
+	XFI_01,
+	XFI_02,
+	QSFP28,
+};
+
+u8 mac_to_dpmac[] = {
+	WRIOP1_DPMAC1,
+	WRIOP1_DPMAC9,
+	WRIOP1_DPMAC10,
+	WRIOP1_DPMAC12,
+	WRIOP1_DPMAC13,
+	WRIOP1_DPMAC14,
+	WRIOP1_DPMAC16,
+	WRIOP1_DPMAC17,
+	WRIOP1_DPMAC18,
+};
+
+struct mblx2160a_srds_config {
+	struct {
+		u32 srds_s1;
+		u32 srds_s2;
+		u32 srds_s3;
+	} serdes_config;
+	u8 macs[ARRAY_SIZE(mac_to_dpmac)];
+};
+
+struct phy_info {
+	char *reset_name;
+	u8 phy_address;
+	char *mdio_bus;
+};
+
+struct phy_info phy_infos[] = {
+	[ETH_01] = {"RESET_ETH1", 0x1, DEFAULT_WRIOP_MDIO1_NAME },
+	[ETH_02] = {"RESET_ETH2", 0x2, DEFAULT_WRIOP_MDIO1_NAME },
+	[ETH_03] = {"RESET_ETH3", 0x3, DEFAULT_WRIOP_MDIO1_NAME },
+	[ETH_04] = {"RESET_ETH4", 0x4, DEFAULT_WRIOP_MDIO1_NAME },
+	[ETH_05] = {"RESET_ETH5", 0x5, DEFAULT_WRIOP_MDIO1_NAME },
+	[ETH_06] = {"RESET_ETH6", 0x6, DEFAULT_WRIOP_MDIO1_NAME },
+	[ETH_07] = {"RESET_ETH7", 0x1, DEFAULT_WRIOP_MDIO2_NAME },
+	[ETH_08] = {"RESET_ETH8", 0x2, DEFAULT_WRIOP_MDIO2_NAME },
+	[ETH_09] = {"RESET_ETH9", 0x3, DEFAULT_WRIOP_MDIO2_NAME },
+	[ETH_10] = {"RESET_ETH10", 0x4, DEFAULT_WRIOP_MDIO2_NAME },
+};
+
+struct mblx2160a_srds_config srds_configs[] = {
+	/* SERDES  , MAC 1,  MAC 9,  MAC 10, MAC 12, MAC 13, MAC 14, MAC 16, MAC 17, MAC 18 */
+	{{12, 7, 0}, {ETH_NO, ETH_07, ETH_08, ETH_01, XFI_01, XFI_02, ETH_04, ETH_02, ETH_03} },
+	{{12, 8, 0}, {ETH_NO, ETH_07, ETH_08, ETH_NO, XFI_01, XFI_02, ETH_NO, ETH_09, ETH_10} },
+	{{12, 11, 0}, {ETH_NO, ETH_07, ETH_08, ETH_01, ETH_05, ETH_06, ETH_04, ETH_02, ETH_03} },
+	{{14, 11, 0}, {QSFP28, ETH_NO, ETH_NO, ETH_01, ETH_05, ETH_06, ETH_04, ETH_02, ETH_03} },
+};
+
 struct mblx2160a_gpio mblx2160a_gpios[] = {
 	{"gpio@20_0",		"QSFP_MODSEL",		GPIOD_IS_OUT, 0 },
 	{"gpio@20_1",		"QSFP_RESET#",		GPIOD_IS_OUT, 1 },
@@ -48,16 +113,16 @@ struct mblx2160a_gpio mblx2160a_gpios[] = {
 	{"gpio@20_15",		"SIM_CARD_DETECT",	GPIOD_IS_IN, 0 },
 
 	{"gpio@21_0",		"RESET_USB_HUB#",	GPIOD_IS_OUT, 0 },
-	{"gpio@21_1",		"RESET_ETH1",		GPIOD_IS_OUT, 1 },
-	{"gpio@21_2",		"RESET_ETH2",		GPIOD_IS_OUT, 1 },
-	{"gpio@21_3",		"RESET_ETH3",		GPIOD_IS_OUT, 1 },
-	{"gpio@21_4",		"RESET_ETH4",		GPIOD_IS_OUT, 1 },
-	{"gpio@21_5",		"RESET_ETH5",		GPIOD_IS_OUT, 1 },
-	{"gpio@21_6",		"RESET_ETH6",		GPIOD_IS_OUT, 1 },
-	{"gpio@21_7",		"RESET_ETH7",		GPIOD_IS_OUT, 1 },
-	{"gpio@21_8",		"RESET_ETH8",		GPIOD_IS_OUT, 1 },
-	{"gpio@21_9",		"RESET_ETH9",		GPIOD_IS_OUT, 1 },
-	{"gpio@21_10",		"RESET_ETH10",		GPIOD_IS_OUT, 1 },
+	{"gpio@21_1",		"RESET_ETH1",		GPIOD_IS_OUT, 0 },
+	{"gpio@21_2",		"RESET_ETH2",		GPIOD_IS_OUT, 0 },
+	{"gpio@21_3",		"RESET_ETH3",		GPIOD_IS_OUT, 0 },
+	{"gpio@21_4",		"RESET_ETH4",		GPIOD_IS_OUT, 0 },
+	{"gpio@21_5",		"RESET_ETH5",		GPIOD_IS_OUT, 0 },
+	{"gpio@21_6",		"RESET_ETH6",		GPIOD_IS_OUT, 0 },
+	{"gpio@21_7",		"RESET_ETH7",		GPIOD_IS_OUT, 0 },
+	{"gpio@21_8",		"RESET_ETH8",		GPIOD_IS_OUT, 0 },
+	{"gpio@21_9",		"RESET_ETH9",		GPIOD_IS_OUT, 0 },
+	{"gpio@21_10",		"RESET_ETH10",		GPIOD_IS_OUT, 0 },
 	{"gpio@21_11",		"CAN1_SEL",		GPIOD_IS_OUT, 1 },
 	{"gpio@21_12",		"CAN2_SEL",		GPIOD_IS_OUT, 1 },
 	{"gpio@21_13",		"RST_M2_SATA_1",	GPIOD_IS_OUT, 1 },
@@ -170,10 +235,11 @@ int mblx2160a_set_gpio(const char *name, int val)
 int tqc_bb_board_eth_init(bd_t *bis)
 {
 #if defined(CONFIG_FSL_MC_ENET)
-	struct mii_dev *dev;
+	struct mii_dev *mii_dev;
 	struct ccsr_gur *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
 	u32 srds_s1, srds_s2;
-	int ret;
+	int i;
+	int found = 0;
 
 	srds_s1 = in_le32(&gur->rcwsr[28]) &
 				FSL_CHASSIS3_RCWSR28_SRDS1_PRTCL_MASK;
@@ -183,59 +249,32 @@ int tqc_bb_board_eth_init(bd_t *bis)
 				FSL_CHASSIS3_RCWSR28_SRDS2_PRTCL_MASK;
 	srds_s2 >>= FSL_CHASSIS3_RCWSR28_SRDS2_PRTCL_SHIFT;
 
-	printf("Configuring Ethernet for SerDes2: %d.\n", srds_s2);
-	switch (srds_s2) {
-	case 0:
-		wriop_set_phy_address(WRIOP1_DPMAC17, 0, 0x3);
-		wriop_set_phy_address(WRIOP1_DPMAC18, 0, 0x4);
-		dev = miiphy_get_dev_by_name(DEFAULT_WRIOP_MDIO2_NAME);
-		wriop_set_mdio(WRIOP1_DPMAC17, dev);
-		wriop_set_mdio(WRIOP1_DPMAC18, dev);
-		break;
-	case 7:
-		wriop_set_phy_address(WRIOP1_DPMAC12, 0, 0x1);
-		wriop_set_phy_address(WRIOP1_DPMAC13, 0, 0xa);
-		wriop_set_phy_address(WRIOP1_DPMAC14, 0, 0xb);
-		wriop_set_phy_address(WRIOP1_DPMAC16, 0, 0x4);
-		wriop_set_phy_address(WRIOP1_DPMAC17, 0, 0x2);
-		wriop_set_phy_address(WRIOP1_DPMAC18, 0, 0x3);
-		dev = miiphy_get_dev_by_name(DEFAULT_WRIOP_MDIO1_NAME);
-		wriop_set_mdio(WRIOP1_DPMAC12, dev);
-		wriop_set_mdio(WRIOP1_DPMAC16, dev);
-		wriop_set_mdio(WRIOP1_DPMAC17, dev);
-		wriop_set_mdio(WRIOP1_DPMAC18, dev);
-		/* Intentional fallthrough */
-	case 8:
-		printf("mod detect 1: %d, 2: %d\n", mblx2160a_get_gpio("XFI1_MOD_DECTECT"), mblx2160a_get_gpio("XFI2_MOD_DECTECT"));
+	/* Reset all Phys */
+	for (int i = 1; i < ARRAY_SIZE(phy_infos); i++) {
+		mblx2160a_set_gpio(phy_infos[i].reset_name, 1);
+	}
+	/* Wait after getting all PHYs out of reset */
+	mdelay(10);
 
-		if (mblx2160a_get_gpio("XFI1_MOD_DECTECT") == 0)
-			ret = mblx2160a_set_gpio("XFI1_TX_DIS", 0);
+	for (i = 0; i < ARRAY_SIZE(srds_configs); i++) {
+		if (srds_configs[i].serdes_config.srds_s1 == srds_s1 &&
+		    srds_configs[i].serdes_config.srds_s2 == srds_s2) {
+			printf("Configuring Ethernet for SerDes Configuration %d_%d_xx.\n",
+			       srds_s1, srds_s2);
+			found = 1;
 
-		if (mblx2160a_get_gpio("XFI2_MOD_DECTECT") == 0)
-			ret |= mblx2160a_set_gpio("XFI2_TX_DIS", 0);
-
-		if (ret)
-			printf("Error Setting XFI GPIOS: %d\n", ret);
-
-		break;
-	case 12:
-		wriop_set_phy_address(WRIOP1_DPMAC17, 0, 0x2);
-		wriop_set_phy_address(WRIOP1_DPMAC18, 0, 0x3);
-		dev = miiphy_get_dev_by_name(DEFAULT_WRIOP_MDIO1_NAME);
-		wriop_set_mdio(WRIOP1_DPMAC17, dev);
-		wriop_set_mdio(WRIOP1_DPMAC18, dev);
-		break;
-	default:
-		printf("SerDes2 Protocol %d not supported\n", srds_s2);
+			for (int j = 0; j < ARRAY_SIZE(srds_configs[i].macs); j++) {
+				if (srds_configs[i].macs[j] >= ETH_01 && srds_configs[i].macs[j] <= ETH_10) {
+					wriop_set_phy_address(mac_to_dpmac[j], 0, phy_infos[srds_configs[i].macs[j]].phy_address);
+					mii_dev = miiphy_get_dev_by_name(phy_infos[srds_configs[i].macs[j]].mdio_bus);
+					wriop_set_mdio(mac_to_dpmac[j], mii_dev);
+				}
+			}
+		}
 	}
 
-	if (srds_s1 == 12) {
-		wriop_set_phy_address(WRIOP1_DPMAC9, 0, 0x1);
-		wriop_set_phy_address(WRIOP1_DPMAC10, 0, 0x2);
-		dev = miiphy_get_dev_by_name(DEFAULT_WRIOP_MDIO2_NAME);
-		wriop_set_mdio(WRIOP1_DPMAC9, dev);
-		wriop_set_mdio(WRIOP1_DPMAC10, dev);
-	}
+	if (!found)
+		printf("No ethernet configuriation for Serdes  %d_%d_xx found.\n", srds_s1, srds_s2);
 
 #endif /* CONFIG_FSL_MC_ENET */
 
