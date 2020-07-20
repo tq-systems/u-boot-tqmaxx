@@ -10,6 +10,7 @@
 #include <common.h>
 #include <command.h>
 #include <env.h>
+#include <lmb.h>
 #include <vsprintf.h>
 #include <linux/compiler.h>
 
@@ -162,6 +163,17 @@ static inline void __maybe_unused print_std_bdinfo(const bd_t *bd)
 	print_bi_flash(bd);
 	print_eth_ip_addr();
 	print_baudrate();
+}
+
+void do_bd_info_common(void)
+{
+	if (gd->fdt_blob) {
+		struct lmb lmb;
+
+		print_num("fdt_blob", (ulong)gd->fdt_blob);
+		lmb_init_and_reserve(&lmb, gd->bd, (void *)gd->fdt_blob);
+		lmb_dump_all_force(&lmb);
+	}
 }
 
 #if defined(CONFIG_PPC)
@@ -352,8 +364,8 @@ static int do_bdinfo(cmd_tbl_t *cmdtp, int flag, int argc,
 #if CONFIG_IS_ENABLED(MULTI_DTB_FIT)
 	print_num("multi_dtb_fit", (ulong)gd->multi_dtb_fit);
 #endif
-	if (gd->fdt_blob)
-		print_num("fdt_blob", (ulong)gd->fdt_blob);
+
+	do_bd_info_common();
 
 	return 0;
 }
