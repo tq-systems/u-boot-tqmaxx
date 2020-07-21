@@ -42,6 +42,13 @@ config TQMA8XXS_DEFAULTS
 	select DM_I2C
 	select SYS_I2C_IMX_LPI2C
 	select MISC
+	select MII
+	select DM_ETH
+	select FEC_MXC
+	select FEC_MXC_SHARE_MDIO
+	select PHYLIB
+	select PHY_GIGE
+	select PHY_TI
 	select SPL
 	select SPL_DM
 	select SPL_OF_CONTROL
@@ -112,6 +119,10 @@ config TQMA8XXS_BB_MB_SMARC_2
 	bool "TQMa8XxS on MB_SMARC_2 Board"
 	select TQC_SDMMC
 	select CMD_FUSE
+	select CMD_MII
+	select CMD_PING
+	select CMD_DHCP
+	select CMD_NET
 	help
 	  Select the MB_SMARC_2 board. This is a SMARC2 mainboard
 	  etc.
@@ -123,6 +134,9 @@ config DEFAULT_DEVICE_TREE
 
 config DEFAULT_FDT_FILE
 	default "imx8qxp-mb-smarc-2.dtb" if TQMA8XXS_CPU_MX8QXP && TQMA8XXS_BB_MB_SMARC_2
+
+config FEC_MXC_MDIO_BASE
+	default 0x5B040000
 
 menu "TQMa8XQP boot device"
 
