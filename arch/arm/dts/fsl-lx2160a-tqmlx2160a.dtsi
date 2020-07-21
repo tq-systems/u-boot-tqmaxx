@@ -21,6 +21,10 @@
 	};
 };
 
+&esdhc1 {
+	status = "okay";
+};
+
 &fspi {
 	bus-num = <0>;
 	status = "okay";
