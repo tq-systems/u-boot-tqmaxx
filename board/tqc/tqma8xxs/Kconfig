@@ -151,11 +151,14 @@ config DEFAULT_FDT_FILE
 config FEC_MXC_MDIO_BASE
 	default 0x5B040000
 
-menu "TQMa8XQP boot device"
+choice
+	prompt "TQMa8XQP boot device"
+	default TQMA8XXS_BOOT_SDCARD if TQMA8XXS_CPU_MX8QXP
+	help
+	  Select boot device
 
 config TQMA8XXS_BOOT_SDCARD
 	bool "TQMa8XxS from SD / e-MMC"
-	default "y"
 	select SD_BOOT
 	select ENV_IS_IN_MMC
 	help
@@ -168,7 +171,7 @@ config TQMA8XXS_BOOT_QSPI
 	help
 	  Select booting from QSPI
 
-endmenu
+endchoice
 
 config SF_DEFAULT_BUS
 	default 0
