@@ -260,7 +260,7 @@
 
 /* Default environment is in SD */
 #define CONFIG_ENV_SIZE			0x8000
-#if defined(CONFIG_QSPI_BOOT)
+#if defined(CONFIG_ENV_IS_IN_SPI_FLASH)
 #define CONFIG_ENV_OFFSET	(4 * 1024 * 1024)
 #define CONFIG_ENV_SECT_SIZE	(128 * 1024)
 #define CONFIG_ENV_SPI_BUS	CONFIG_SF_DEFAULT_BUS
