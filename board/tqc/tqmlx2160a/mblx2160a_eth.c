@@ -274,9 +274,51 @@ int _config_i2c_device(struct udevice *dev, struct i2c_reg_setting *settings, in
 		val |= (settings[i].mask & settings[i].val);
 
 		debug("Writing: %2x\n", val);
-		dm_i2c_reg_write(dev, settings[i].reg, val);
+		ret = dm_i2c_reg_write(dev, settings[i].reg, val);
+
+		if (ret)
+			return ret;
 	}
 	return 0;
+}
+
+int xfi_config(int xfi_nr)
+{
+	int ret;
+	struct udevice *dev;
+	int bus;
+	int addr;
+
+	struct i2c_reg_setting xfi_retimer_settings[] = {
+		{0xff, 0x0c, 0x0c},
+		{0x00, 0x04, 0x04},
+		{0x0a, 0x0c, 0x0c},
+		{0x2f, 0xc0, 0xf0},
+		{0x31, 0x20, 0x20},
+		{0x3a, 0x00, 0xff},
+		{0x1e, 0x08, 0x08},
+		{0x2d, 0x07, 0x07},
+		{0x15, 0x00, 0x47},
+		{0x0a, 0x00, 0x0c},
+	};
+
+	if (xfi_nr == XFI_01) {
+		bus = I2C_XFI1_BUS;
+		addr = I2C_XFI1_RETIMER_ADDR;
+	} else if (xfi_nr == XFI_02) {
+		bus = I2C_XFI1_BUS;
+		addr = I2C_XFI1_RETIMER_ADDR;
+	} else {
+		printf("Error: unknown XFI device: %d\n", xfi_nr);
+		return -ENODEV;
+	}
+
+	if (i2c_get_chip_for_busnum(bus, addr, 1, &dev))
+		return -ENODEV;
+
+	ret = _config_i2c_device(dev, &xfi_retimer_settings[0], ARRAY_SIZE(xfi_retimer_settings));
+
+	return ret;
 }
 
 int tqc_bb_board_eth_init(bd_t *bis)
@@ -318,6 +360,8 @@ int tqc_bb_board_eth_init(bd_t *bis)
 					wriop_set_phy_address(mac_to_dpmac[j], 0, phy_infos[srds_configs[i].macs[j]].phy_address);
 					mii_dev = miiphy_get_dev_by_name(phy_infos[srds_configs[i].macs[j]].mdio_bus);
 					wriop_set_mdio(mac_to_dpmac[j], mii_dev);
+				} else if (srds_configs[i].macs[j] == XFI_01 || srds_configs[i].macs[j] == XFI_02) {
+					xfi_config(srds_configs[i].macs[j]);
 				}
 			}
 		}

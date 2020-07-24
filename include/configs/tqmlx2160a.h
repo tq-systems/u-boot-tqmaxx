@@ -109,6 +109,11 @@
 #define SYSCTRL_I2C_BUS_NUM		0x0
 #define SYSCTRL_I2C_ADDR		0x11
 
+#define I2C_XFI1_BUS			0x8
+#define I2C_XFI1_RETIMER_ADDR		0x19
+#define I2C_XFI2_BUS			0x9
+#define I2C_XFI2_RETIMER_ADDR		0x1B
+
 /* PCI */
 #ifdef CONFIG_PCI
 #define CONFIG_SYS_PCI_64BIT
