@@ -67,6 +67,12 @@ struct mblx2160a_srds_config {
 	u8 macs[ARRAY_SIZE(mac_to_dpmac)];
 };
 
+struct i2c_reg_setting {
+		u8 reg;
+		u8 val;
+		u8 mask;
+};
+
 struct phy_info {
 	char *reset_name;
 	u8 phy_address;
@@ -248,6 +254,29 @@ static void _dp83867_phy_write_indirect(struct phy_device *phydev,
 	phy_write(phydev, MDIO_DEVAD_NONE, 0x0e, addr);
 	phy_write(phydev, MDIO_DEVAD_NONE, 0x0d, 0x401f);
 	phy_write(phydev, MDIO_DEVAD_NONE, 0x0e, value);
+}
+
+int _config_i2c_device(struct udevice *dev, struct i2c_reg_setting *settings, int count)
+{
+	u8 val;
+	int ret;
+
+	debug("Configuring i2c device\n");
+	for (int i = 0; i < count; i++) {
+		val = dm_i2c_reg_read(dev, settings[i].reg);
+		if (ret)
+			return ret;
+
+		debug("Read reg %2x: val: %2x ", settings[i].reg, val);
+
+		/* Clear bits to write */
+		val &= ~settings[i].mask;
+		val |= (settings[i].mask & settings[i].val);
+
+		debug("Writing: %2x\n", val);
+		dm_i2c_reg_write(dev, settings[i].reg, val);
+	}
+	return 0;
 }
 
 int tqc_bb_board_eth_init(bd_t *bis)
