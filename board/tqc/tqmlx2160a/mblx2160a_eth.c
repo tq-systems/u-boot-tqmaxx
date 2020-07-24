@@ -232,14 +232,35 @@ int mblx2160a_set_gpio(const char *name, int val)
 	return dm_gpio_set_value(&desc, val);
 }
 
+static uint16_t _dp83868_phy_read_indirect(struct phy_device *phydev,
+					   u8 addr)
+{
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x0d, 0x001f);
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x0e, addr);
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x0d, 0x401f);
+	return phy_read(phydev, MDIO_DEVAD_NONE, 0x0e);
+}
+
+static void _dp83867_phy_write_indirect(struct phy_device *phydev,
+					u8 addr, uint16_t value)
+{
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x0d, 0x001f);
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x0e, addr);
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x0d, 0x401f);
+	phy_write(phydev, MDIO_DEVAD_NONE, 0x0e, value);
+}
+
 int tqc_bb_board_eth_init(bd_t *bis)
 {
 #if defined(CONFIG_FSL_MC_ENET)
 	struct mii_dev *mii_dev;
 	struct ccsr_gur *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
 	u32 srds_s1, srds_s2;
+	struct list_head *mii_devs, *entry;
+	struct phy_device *dev;
 	int i;
 	int found = 0;
+	uint mask;
 
 	srds_s1 = in_le32(&gur->rcwsr[28]) &
 				FSL_CHASSIS3_RCWSR28_SRDS1_PRTCL_MASK;
@@ -276,27 +297,46 @@ int tqc_bb_board_eth_init(bd_t *bis)
 	if (!found)
 		printf("No ethernet configuriation for Serdes  %d_%d_xx found.\n", srds_s1, srds_s2);
 
+	/* Configure PHY LEDs for all PHYs also if not used */
+	mii_devs = mdio_get_list_head();
+	list_for_each(entry, mii_devs) {
+		mii_dev = list_entry(entry, struct mii_dev, link);
+
+		for (int i = 0; i < PHY_MAX_ADDR; i++) {
+			dev = mii_dev->phymap[i];
+			mask = (1 << i);
+			dev = phy_find_by_mask(mii_dev, mask, PHY_INTERFACE_MODE_NONE);
+
+			if (dev) {
+				_dp83867_phy_write_indirect(dev, 0x18, 0x6101);
+				_dp83867_phy_write_indirect(dev, 0x19, 0x4400);
+			}
+		}
+	}
 #endif /* CONFIG_FSL_MC_ENET */
 
 	return 0;
 }
 
-extern int phy_read_mmd_indirect(struct phy_device *phydev, int prtad, int devad, int addr);
-extern void phy_write_mmd_indirect(struct phy_device *phydev, int prtad, int devad, int addr, u32 data);
-
 int board_phy_config(struct phy_device *phydev)
 {
 	int val;
 
-	printf("init phy on addr 0x%x\n", phydev->addr);
-	val = phy_read_mmd_indirect(phydev, 0x32, 0x1f, phydev->addr);
-	val |= 0x0003;
-	phy_write_mmd_indirect(phydev, 0x32,  0x1f, phydev->addr, val);
+	if (phy_interface_is_rgmii(phydev)) {
+		debug("configuring rgmii phy on addr: %x\n", phydev->addr);
+		val = _dp83868_phy_read_indirect(phydev, 0x32);
+		val |= 0x0003;
+		_dp83867_phy_write_indirect(phydev, 0x32, val);
 
-	/* set RGMII delay in both directions to 1,5ns */
-	val = phy_read_mmd_indirect(phydev, 0x86, 0x1f, phydev->addr);
-	val = (val & 0xFF00) | 0x0055;
-	phy_write_mmd_indirect(phydev, 0x86,  0x1f, phydev->addr, val);
+		/* set RGMII delay in both directions to 1,5ns */
+		val = _dp83868_phy_read_indirect(phydev, 0x86);
+		val = (val & 0xFF00) | 0x0055;
+		_dp83867_phy_write_indirect(phydev, 0x86, val);
+	}
+
+	/* Configure LEDs on PHY */
+	_dp83867_phy_write_indirect(phydev, 0x18, 0x6101);
+	_dp83867_phy_write_indirect(phydev, 0x19, 0x4400);
 
 	if (phydev->drv->config)
 		phydev->drv->config(phydev);
