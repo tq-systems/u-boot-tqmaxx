@@ -27,3 +27,4 @@ void start_non_linux_remote_cores(void);
 int load_firmware(char *name_fw, char *name_loadaddr, u32 *loadaddr);
 void remove_fwl_configs(struct fwl_data *fwl_data, size_t fwl_data_size);
 void k3_sysfw_print_ver(void);
+void mmr_unlock(phys_addr_t base, u32 partition);
