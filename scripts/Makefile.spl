@@ -452,7 +452,13 @@ dtbs:
 # information in a variable so we can use it in if_changed and friends.
 .PHONY: $(PHONY)
 
-SHRUNK_ARCH_DTB = $(patsubst %,$(obj)/dts/%.dtb,$(subst ",,$(CONFIG_SPL_OF_LIST)))
+ifeq ($(CONFIG_SPL_OF_LIST),)
+LIST_OF_DTB := $(CONFIG_DEFAULT_DEVICE_TREE)
+else
+LIST_OF_DTB := $(CONFIG_SPL_OF_LIST)
+endif
+
+SHRUNK_ARCH_DTB = $(patsubst %,$(obj)/dts/%.dtb,$(subst ",,$(LIST_OF_DTB)))
 .SECONDEXPANSION:
 $(SHRUNK_ARCH_DTB): $$(patsubst $(obj)/dts/%, arch/$(ARCH)/dts/%, $$@)
 	$(call if_changed,fdtgrep)
