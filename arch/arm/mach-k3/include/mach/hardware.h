@@ -29,6 +29,6 @@
 #define JTAG_ID_VARIANT_SHIFT	28
 #define JTAG_ID_VARIANT_MASK	(0xf << 28)
 #define JTAG_ID_PARTNO_SHIFT	12
-#define JTAG_ID_PARTNO_MASK	(0x7ff << 1)
+#define JTAG_ID_PARTNO_MASK	(0xffff << 12)
 
 #endif /* _ASM_ARCH_HARDWARE_H_ */

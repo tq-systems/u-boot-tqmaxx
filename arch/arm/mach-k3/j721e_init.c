@@ -262,11 +262,13 @@ void board_init_f(ulong dummy)
 	disable_linefill_optimization();
 	setup_k3_mpu_regions();
 
-	setup_navss_nb();
+	if (soc_is_j721e()) {
+		setup_navss_nb();
 #ifndef CONFIG_TI_SECURE_DEVICE
-	setup_dss_credentials();
-	setup_initiator_credentials();
+		setup_dss_credentials();
+		setup_initiator_credentials();
 #endif
+	}
 #endif
 
 	/* Init DM early */
@@ -504,6 +506,9 @@ void start_non_linux_remote_cores(void)
 {
 	int size = 0, ret;
 	u32 loadaddr = 0;
+
+	if (!soc_is_j721e())
+		return;
 
 	size = load_firmware("mainr5f0_0fwname", "mainr5f0_0loadaddr",
 			     &loadaddr);
