@@ -108,6 +108,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 }
 #endif
 
+#ifdef CONFIG_TI_I2C_BOARD_DETECT
 int do_board_detect(void)
 {
 	int ret;
@@ -344,6 +345,7 @@ static int probe_daughtercards(void)
 
 	return 0;
 }
+#endif
 
 #if defined(CONFIG_SPL_PHY_J721E_WIZ) && defined(CONFIG_TARGET_J721E_R5_EVM)
 void configure_serdes(void)
@@ -368,20 +370,23 @@ void configure_serdes(void)
 #endif
 int board_late_init(void)
 {
-	setup_board_eeprom_env();
-	setup_serial();
+	if (IS_ENABLED(CONFIG_TI_I2C_BOARD_DETECT)) {
+		setup_board_eeprom_env();
+		setup_serial();
 
-	/* Check for and probe any plugged-in daughtercards */
-	probe_daughtercards();
+		/* Check for and probe any plugged-in daughtercards */
+		probe_daughtercards();
+	}
 
 	return 0;
 }
 
 void spl_board_init(void)
 {
-#ifdef CONFIG_TARGET_J721E_A72_EVM
-	probe_daughtercards();
-#endif
+	if (IS_ENABLED(CONFIG_TARGET_J721E_A72_EVM) &&
+	    IS_ENABLED(CONFIG_TI_I2C_BOARD_DETECT))
+		probe_daughtercards();
+
 #if defined(CONFIG_SPL_PHY_J721E_WIZ) && defined(CONFIG_TARGET_J721E_R5_EVM)
 	configure_serdes();
 #endif
