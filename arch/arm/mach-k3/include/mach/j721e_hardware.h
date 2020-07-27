@@ -53,6 +53,9 @@
 #define QOS_PVU_CTX(virtid)		((0x1 << 28) | (virtid << 16))
 #define QOS_SMMU_CTX(virtid)		((0x2 << 28) | (virtid << 16))
 
+/* ROM HANDOFF Structure location */
+#define ROM_ENTENDED_BOOT_DATA_INFO			0x41cffb00
+
 /* MCU SCRATCHPAD usage */
 #define TI_SRAM_SCRATCH_BOARD_EEPROM_START	CONFIG_SYS_K3_MCU_SCRATCHPAD_BASE
 
