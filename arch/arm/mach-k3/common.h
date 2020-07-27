@@ -7,6 +7,7 @@
  */
 
 #include <asm/armv7_mpu.h>
+#include <asm/hardware.h>
 
 #define AM65X	0xbb5a
 #define J721E	0xbb64
@@ -29,3 +30,4 @@ int load_firmware(char *name_fw, char *name_loadaddr, u32 *loadaddr);
 void remove_fwl_configs(struct fwl_data *fwl_data, size_t fwl_data_size);
 void k3_sysfw_print_ver(void);
 void mmr_unlock(phys_addr_t base, u32 partition);
+bool is_rom_loaded_sysfw(struct rom_extended_boot_data *data);
