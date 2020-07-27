@@ -48,19 +48,25 @@ ALL-y	+= tiboot3.bin
 endif
 
 ifdef CONFIG_ARM64
+ifeq ($(CONFIG_SPL_OF_LIST),)
+LIST_OF_DTB := $(CONFIG_DEFAULT_DEVICE_TREE)
+else
+LIST_OF_DTB := $(CONFIG_SPL_OF_LIST)
+endif
+
 ifeq ($(CONFIG_TI_SECURE_DEVICE),y)
 SPL_ITS := u-boot-spl-k3_HS.its
 $(SPL_ITS): FORCE
 	IS_HS=1 \
 	$(srctree)/tools/k3_fit_atf.sh \
-	$(patsubst %,$(obj)/dts/%.dtb,$(subst ",,$(CONFIG_SPL_OF_LIST))) > $@
+	$(patsubst %,$(obj)/dts/%.dtb,$(subst ",,$(LIST_OF_DTB))) > $@
 
 ALL-y	+= tispl.bin_HS
 else
 SPL_ITS := u-boot-spl-k3.its
 $(SPL_ITS): FORCE
 	$(srctree)/tools/k3_fit_atf.sh \
-	$(patsubst %,$(obj)/dts/%.dtb,$(subst ",,$(CONFIG_SPL_OF_LIST))) > $@
+	$(patsubst %,$(obj)/dts/%.dtb,$(subst ",,$(LIST_OF_DTB))) > $@
 
 ALL-y	+= tispl.bin
 endif
