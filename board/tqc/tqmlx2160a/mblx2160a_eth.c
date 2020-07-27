@@ -372,6 +372,11 @@ int xfi_config(int xfi_nr)
 
 	ret = _config_i2c_device(dev, &xfi_retimer_settings[0], ARRAY_SIZE(xfi_retimer_settings));
 
+	if (xfi_nr == XFI_01)
+		ret = mblx2160a_set_gpio("XFI1_TX_DIS", 0);
+	else
+		ret = mblx2160a_set_gpio("XFI2_TX_DIS", 0);
+
 	return ret;
 }
 
