@@ -282,12 +282,66 @@ int _config_i2c_device(struct udevice *dev, struct i2c_reg_setting *settings, in
 	return 0;
 }
 
+int _reconfigure_serdes_tx_lane(int serdes_nr, int lane_nr, u32 val, u32 mask)
+{
+	void *serdes_base;
+	u32 *tx_rst_reg;
+	u32 *tx_eq_reg;
+	u32 hlt_req_mask = 0x08000000;
+	u32 rst_req_mask = 0x80000000;
+	int timeout = 100;
+	u32 reg_val;
+
+	if (serdes_nr < 1 || serdes_nr > 3 || lane_nr < 0 || lane_nr > 7)
+		return -1;
+
+	serdes_base = (void *)CONFIG_SYS_FSL_LSCH3_SERDES_ADDR + (serdes_nr - 1) * 0x10000;
+	tx_rst_reg = serdes_base + 0x800 + (lane_nr * 0x100) + 0x20;
+	tx_eq_reg = serdes_base + 0x800 + (lane_nr * 0x100) + 0x30;
+
+	/* Reset Lane */
+	reg_val = in_le32(tx_rst_reg);
+	out_le32(tx_rst_reg, reg_val | hlt_req_mask);
+
+	while ((in_le32(tx_rst_reg) & hlt_req_mask)) {
+		if (timeout == 0) {
+			printf ("Timeout waiting for halt lane %d_%d.\n", serdes_nr, lane_nr);
+			return -ETIMEDOUT;
+		}
+		timeout--;
+		mdelay(1);
+	}
+
+	/* Write Value */
+	reg_val = in_le32(tx_eq_reg);
+	reg_val &= ~mask;
+	reg_val |= (mask & val);
+	out_le32(tx_eq_reg, reg_val);
+
+	/* Release from Rreset */
+	reg_val = in_le32(tx_rst_reg);
+	out_le32(tx_rst_reg, reg_val | rst_req_mask);
+
+	return 0;
+}
+
 int xfi_config(int xfi_nr)
 {
 	int ret;
 	struct udevice *dev;
 	int bus;
 	int addr;
+	int lane;
+
+	if (xfi_nr == XFI_01)
+		lane = 6;
+	else if (xfi_nr == XFI_02)
+		lane = 7;
+	else
+		return -ENODEV;
+
+	/* Configure EQ_AMP_RED */
+	ret = _reconfigure_serdes_tx_lane(2, lane, 0x10828020, 0xFFFFFFFF);
 
 	struct i2c_reg_setting xfi_retimer_settings[] = {
 		{0xff, 0x0c, 0x0c},
