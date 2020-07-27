@@ -100,7 +100,10 @@ int ft_board_setup(void *blob, bd_t *bd)
 {
 	int ret;
 
-	ret = fdt_fixup_msmc_ram(blob, "/interconnect@100000", "sram@70000000");
+	ret = fdt_fixup_msmc_ram(blob, "/bus@100000", "sram@70000000");
+	if (ret < 0)
+		ret = fdt_fixup_msmc_ram(blob, "/interconnect@100000",
+					 "sram@70000000");
 	if (ret)
 		printf("%s: fixing up msmc ram failed %d\n", __func__, ret);
 
