@@ -43,7 +43,7 @@ enum mblx2160a_phys {
 	ETH_10,
 	XFI_01,
 	XFI_02,
-	QSFP28,
+	CAUI_4,
 };
 
 u8 mac_to_dpmac[] = {
@@ -97,7 +97,8 @@ struct mblx2160a_srds_config srds_configs[] = {
 	{{12, 7, 0}, {ETH_NO, ETH_07, ETH_08, ETH_01, XFI_01, XFI_02, ETH_04, ETH_02, ETH_03} },
 	{{12, 8, 0}, {ETH_NO, ETH_07, ETH_08, ETH_NO, XFI_01, XFI_02, ETH_NO, ETH_09, ETH_10} },
 	{{12, 11, 0}, {ETH_NO, ETH_07, ETH_08, ETH_01, ETH_05, ETH_06, ETH_04, ETH_02, ETH_03} },
-	{{14, 11, 0}, {QSFP28, ETH_NO, ETH_NO, ETH_01, ETH_05, ETH_06, ETH_04, ETH_02, ETH_03} },
+	{{14, 7, 0}, {CAUI_4, ETH_07, ETH_08, ETH_01, XFI_01, XFI_02, ETH_04, ETH_02, ETH_03} },
+	{{14, 11, 0}, {CAUI_4, ETH_NO, ETH_NO, ETH_01, ETH_05, ETH_06, ETH_04, ETH_02, ETH_03} },
 };
 
 struct mblx2160a_gpio mblx2160a_gpios[] = {
@@ -380,6 +381,18 @@ int xfi_config(int xfi_nr)
 	return ret;
 }
 
+int caui4_config(int caui_nr)
+{
+	int ret;
+
+	ret = _reconfigure_serdes_tx_lane(1, 4, 0x20820c20, 0xFFFFFFFF);
+	ret = _reconfigure_serdes_tx_lane(1, 5, 0x20820c20, 0xFFFFFFFF);
+	ret = _reconfigure_serdes_tx_lane(1, 6, 0x20820c20, 0xFFFFFFFF);
+	ret = _reconfigure_serdes_tx_lane(1, 7, 0x20820c20, 0xFFFFFFFF);
+
+	return ret;
+}
+
 int tqc_bb_board_eth_init(bd_t *bis)
 {
 #if defined(CONFIG_FSL_MC_ENET)
@@ -421,6 +434,8 @@ int tqc_bb_board_eth_init(bd_t *bis)
 					wriop_set_mdio(mac_to_dpmac[j], mii_dev);
 				} else if (srds_configs[i].macs[j] == XFI_01 || srds_configs[i].macs[j] == XFI_02) {
 					xfi_config(srds_configs[i].macs[j]);
+				} else if (srds_configs[i].macs[j] == CAUI_4) {
+					caui4_config(srds_configs[i].macs[j]);
 				}
 			}
 		}
