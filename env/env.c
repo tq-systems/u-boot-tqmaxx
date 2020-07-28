@@ -125,8 +125,6 @@ __weak enum env_location env_get_location(enum env_operation op, int prio)
 	if (prio >= ARRAY_SIZE(env_locations))
 		return ENVL_UNKNOWN;
 
-	gd->env_load_prio = prio;
-
 	return env_locations[prio];
 }
 
@@ -198,6 +196,8 @@ int env_load(void)
 		ret = drv->load();
 		if (!ret) {
 			printf("OK\n");
+			gd->env_load_prio = prio;
+
 			return 0;
 		} else if (ret == -ENOMSG) {
 			/* Handle "bad CRC" case */
@@ -221,7 +221,8 @@ int env_load(void)
 		debug("Selecting environment with bad CRC\n");
 	else
 		best_prio = 0;
-	env_get_location(ENVOP_LOAD, best_prio);
+
+	gd->env_load_prio = best_prio;
 
 	return -ENODEV;
 }
