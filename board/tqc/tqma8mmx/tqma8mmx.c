@@ -107,27 +107,27 @@ static const char *tqma8mxx_get_boardname(void)
 	case MXC_CPU_IMX8MM:
 		return "TQMa8MQML";
 	case MXC_CPU_IMX8MML:
-		return "TQMa8MQMLL";
+		return "TQMa8MQLML";
 	case MXC_CPU_IMX8MMD:
 		return "TQMa8MDML";
 	case MXC_CPU_IMX8MMDL:
-		return "TQMa8MDMLL";
+		return "TQMa8MDLML";
 	case MXC_CPU_IMX8MMS:
 		return "TQMa8MSML";
 	case MXC_CPU_IMX8MMSL:
-		return "TQMa8MSMLL";
+		return "TQMa8MSLML";
 	case MXC_CPU_IMX8MN:
 		return "TQMa8MQNL";
 	case MXC_CPU_IMX8MNL:
-		return "TQMa8MQNLL";
+		return "TQMa8MQLNL";
 	case MXC_CPU_IMX8MND:
 		return "TQMa8MDNL";
 	case MXC_CPU_IMX8MNDL:
-		return "TQMa8MDNLL";
+		return "TQMa8MDLNL";
 	case MXC_CPU_IMX8MNS:
 		return "TQMa8MSNL";
 	case MXC_CPU_IMX8MNSL:
-		return "TQMa8MSNLL";
+		return "TQMa8MSLNL";
 	default:
 		return "??";
 	};
