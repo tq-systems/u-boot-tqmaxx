@@ -3,8 +3,8 @@
  * Copyright 2020 TQ Systems GmbH
  */
 
-#ifndef __TQMA8MMX_H
-#define __TQMA8MMX_H
+#ifndef __TQMA8MXML_H
+#define __TQMA8MXML_H
 
 #include <linux/sizes.h>
 #include <asm/arch/imx-regs.h>
@@ -319,7 +319,7 @@
 #endif
 
 #if defined(CONFIG_TQMA8MXX_BB_MBA8MX)
-#include "tqma8mmx-mba8mx.h"
+#include "tqma8mxml-mba8mx.h"
 #else
 #error
 #endif
@@ -335,4 +335,4 @@
 #include <config_distro_bootcmd.h>
 #endif
 
-#endif
+#endif /* __TQMA8MXML_H */

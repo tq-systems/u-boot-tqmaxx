@@ -1,4 +1,4 @@
-U-Boot for the TQ Systems TQMa8M[S,D,Q]M[L]L SOM and Baseboards
+U-Boot for the TQ Systems TQMa8M[S,D,Q][L][M,N]L SOM and Baseboards
 
 Quick Start
 ===========
@@ -12,10 +12,10 @@ Get and Build the ARM Trusted firmware
 Note: srctree is U-Boot source directory
 Get ATF from: https://source.codeaurora.org/external/imx/imx-atf
 branch: lf-5.4.y
-$ make PLAT=imx8mm bl31
-$ cp build/imx8mm/release/bl31.bin $(srctree)
+$ make PLAT=imx8m[m,n] bl31
+$ cp build/imx8m[m,n]/release/bl31.bin $(srctree)
 
-Get the ddr
+Get the ddr firmware
 =============================
 $ wget https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-imx-8.6.bin
 $ chmod +x firmware-imx-8.6.bin
@@ -25,18 +25,18 @@ $ cp firmware-imx-8.6/firmware/ddr/synopsys/lpddr4*.bin $(srctree)
 Build U-Boot
 ============
 mem: 
-* 1g for 1GB
-* 2g for 2GB
+* 1gb for 1GB
+* 2gb for 2GB
 
 baseboard:
 * mba8mx for MBa8Mx starterkit mainboard
 
 $ export CROSS_COMPILE=aarch64-poky-linux-
-$ make tqma8mmx_<mem>_<baseboard>_mmc_defconfig
+$ make tqma8mx[m,n]l_<mem>_<baseboard>_mmc_defconfig
 $ make flash.bin
 
-Burn the flash.bin to MicroSD card offset 33KB
-$sudo dd if=flash.bin of=/dev/sd[x] bs=1k seek=33 conv=fsync
+Burn the flash.bin to MicroSD card offset 32KB
+$sudo dd if=flash.bin of=/dev/sd[x] bs=1k seek=32 conv=fsync
 
 Boot
 ====

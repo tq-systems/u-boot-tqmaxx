@@ -85,19 +85,19 @@ config TARGET_IMX8MN_EVK
 	select IMX8M_DDR4
 
 config TARGET_TQMA8MX
-	bool "tqma8mx"
+	bool "TQ Systems GmbH TQMa8Mx SOM family"
 	select IMX8MQ
 	select IMX8M_LPDDR4
 	select SUPPORT_SPL
 
-config TARGET_TQMA8MMX
-	bool "Support TQMA8MMx on TQMa8Mx board"
+config TARGET_TQMA8MXML
+	bool "TQ Systems GmbH TQMa8MxML SOM family"
 	select IMX8MM
 	select IMX8M_LPDDR4
 	select SUPPORT_SPL
 
-config TARGET_TQMA8MNX
-	bool "Support TQMA8MNx on TQMa8Mx board"
+config TARGET_TQMA8MXNL
+	bool "TQ Systems GmbH TQMa8MxNL SOM family"
 	select IMX8MN
 	select IMX8M_LPDDR4
 	select SUPPORT_SPL
@@ -111,5 +111,5 @@ source "board/freescale/imx8mm_evk/Kconfig"
 source "board/freescale/imx8mm_val/Kconfig"
 source "board/freescale/imx8mn_evk/Kconfig"
 source "board/tqc/tqma8mx/Kconfig"
-source "board/tqc/tqma8mmx/Kconfig"
+source "board/tqc/tqma8mxml/Kconfig"
 endif

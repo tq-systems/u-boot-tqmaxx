@@ -3,8 +3,8 @@
  * Copyright 2020 TQ Systems GmbH
  */
 
-#if !defined(__TQMA8MMX_MBA8MX_H)
-#define __TQMA8MMX_MBA8MX_H
+#if !defined(__TQMA8MXML_MBA8MX_H)
+#define __TQMA8MXML_MBA8MX_H
 
 /* ENET Config */
 /* ENET1 */
@@ -38,4 +38,4 @@
 		__stringify(CONFIG_BAUDRATE) "\0" \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"
 
-#endif /* __TQMA8MMX_MBA8MX_H */
+#endif /* __TQMA8MXML_MBA8MX_H */

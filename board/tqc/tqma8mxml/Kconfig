@@ -1,13 +1,13 @@
-if TARGET_TQMA8MNX || TARGET_TQMA8MMX
+if TARGET_TQMA8MXML || TARGET_TQMA8MXNL
 
 config SYS_BOARD
-	default "tqma8mmx"
+	default "tqma8mxml"
 
 config SYS_VENDOR
 	default "tqc"
 
 config SYS_CONFIG_NAME
-	default "tqma8mmx"
+	default "tqma8mxml"
 
 choice
 	prompt "TQMa8MMX RAM size"
@@ -81,8 +81,8 @@ config SPL_FIT_GENERATOR
 	default "arch/arm/mach-imx/mkimage_fit_atf.sh" 
 
 config SYS_EXTRA_OPTIONS
-	default "IMX_CONFIG=arch/arm/mach-imx/imx8m/imximage.cfg,SPL_TEXT_BASE=0x7E1000" if TARGET_TQMA8MMX
-	default "IMX_CONFIG=arch/arm/mach-imx/imx8m/imximage.cfg,SPL_TEXT_BASE=0x912000" if TARGET_TQMA8MNX
+	default "IMX_CONFIG=arch/arm/mach-imx/imx8m/imximage.cfg,SPL_TEXT_BASE=0x7E1000" if TARGET_TQMA8MXML
+	default "IMX_CONFIG=arch/arm/mach-imx/imx8m/imximage.cfg,SPL_TEXT_BASE=0x912000" if TARGET_TQMA8MXNL
 
 menu "TQMa8MXX boot device"
 
@@ -188,7 +188,7 @@ config TQMA8MXX_MFG_SUPPORT
 	select SPL_USB_HOST_SUPPORT
 	select SPL_USB_GADGET
 	select SPL_USB_SDP_SUPPORT
-	select SPL_IMX_ROMAPI_SUPPORT if TARGET_TQMA8MNX
+	select SPL_IMX_ROMAPI_SUPPORT if TARGET_TQMA8MXNL
 
 if TQMA8MXX_MFG_SUPPORT
 
@@ -211,7 +211,7 @@ config FASTBOOT_BUF_ADDR
 	default 0x42800000
 
 config SPL_IMX_ROMAPI_LOADADDR
-	default 0x48000000 if TARGET_TQMA8MNX
+	default 0x48000000 if TARGET_TQMA8MXNL
 
 # restrict to 256M
 config FASTBOOT_BUF_SIZE
