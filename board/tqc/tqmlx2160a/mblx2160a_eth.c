@@ -94,6 +94,7 @@ struct phy_info phy_infos[] = {
 
 struct mblx2160a_srds_config srds_configs[] = {
 	/* SERDES  , MAC 1,  MAC 9,  MAC 10, MAC 12, MAC 13, MAC 14, MAC 16, MAC 17, MAC 18 */
+	{{0, 0, 0}, {ETH_NO, ETH_NO, ETH_NO, ETH_NO, ETH_NO, ETH_NO, ETH_NO, ETH_09, ETH_10} },
 	{{12, 7, 0}, {ETH_NO, ETH_07, ETH_08, ETH_01, XFI_01, XFI_02, ETH_04, ETH_02, ETH_03} },
 	{{12, 8, 0}, {ETH_NO, ETH_07, ETH_08, ETH_NO, XFI_01, XFI_02, ETH_NO, ETH_09, ETH_10} },
 	{{12, 11, 0}, {ETH_NO, ETH_07, ETH_08, ETH_01, ETH_05, ETH_06, ETH_04, ETH_02, ETH_03} },
