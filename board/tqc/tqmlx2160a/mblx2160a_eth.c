@@ -341,7 +341,7 @@ int xfi_config(int xfi_nr)
 		return -ENODEV;
 
 	/* Configure EQ_AMP_RED */
-	ret = _reconfigure_serdes_tx_lane(2, lane, 0x10828020, 0xFFFFFFFF);
+	ret = _reconfigure_serdes_tx_lane(2, lane, 0x10820c20, 0xFFFFFFFF);
 
 	struct i2c_reg_setting xfi_retimer_settings[] = {
 		{0xff, 0x0c, 0x0c},
