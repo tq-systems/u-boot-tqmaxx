@@ -91,8 +91,25 @@
 	"emmc_dev=0\0"\
 	"sd_dev=1\0" \
 
+#if defined(CONFIG_IMX8MM)
+
+#define TQMA8MX_CPU_ENV_SETTINGS \
+	"uboot_mmc_start=0x42\0" \
+	"uboot_mmc_size=0xfbe\0"
+
+#elif defined(CONFIG_IMX8MN)
+
+#define TQMA8MX_CPU_ENV_SETTINGS \
+	"uboot_mmc_start=0x40\0" \
+	"uboot_mmc_size=0xfc0\0"
+
+#else
+#error
+#endif
+
 /* Initial environment variables */
 #define TQMA8MX_MODULE_ENV_SETTINGS		\
+	TQMA8MX_CPU_ENV_SETTINGS \
 	CONFIG_MFG_ENV_SETTINGS \
 	"script=boot.scr\0" \
 	"image=Image\0" \
@@ -157,8 +174,6 @@
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"setenv filesize; setenv get_cmd \0"                           \
-	"uboot_start=0x42\0"                                                   \
-	"uboot_size=0xfbe\0"                                                   \
 	"uboot=bootstream.bin\0"                                               \
 	"update_uboot=run set_getcmd; if ${get_cmd} ${uboot}; then "           \
 		"if itest ${filesize} > 0; then "                              \
@@ -166,8 +181,8 @@
 			"mmc dev ${mmcdev}; mmc rescan; "                      \
 			"setexpr blkc ${filesize} + 0x1ff; "                   \
 			"setexpr blkc ${blkc} / 0x200; "                       \
-			"if itest ${blkc} <= ${uboot_size}; then "             \
-				"mmc write ${loadaddr} ${uboot_start} "        \
+			"if itest ${blkc} <= ${uboot_mmc_size}; then "         \
+				"mmc write ${loadaddr} ${uboot_mmc_start} "    \
 					"${blkc}; "                            \
 			"fi; "                                                 \
 		"fi; fi; "                                                     \
