@@ -7,7 +7,7 @@
 
 / {
 	model = "TQ Systems i.MX8MM TQMa8MM";
-	compatible = "tq,tqma8mm", "fsl,imx8mm";
+	compatible = "tq,tqma8mxml", "fsl,imx8mm";
 
 	reg_tqma8mmx_vcc3v3: regulator-vcc3v3 {
 		compatible = "regulator-fixed";
