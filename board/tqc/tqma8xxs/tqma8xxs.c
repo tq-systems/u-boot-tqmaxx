@@ -98,6 +98,11 @@ int board_late_init(void)
 	const char *bname = tqma8xxs_get_boardname();
 
 	if ((get_cpu_rev() & 0xfff) == CHIP_REV_C) {
+		/* set quartz load to 7.000 femtofarads */
+		ret = tqc_pcf85063_adjust_capacity(0, 0x51, 7000);
+		if (ret)
+			puts("PCF85063: adjust error\n");
+
 		ret = tqc_read_eeprom_at(0, 0x53, 1, 0, &eeprom);
 	} else
 		ret = tqc_read_eeprom_at(1, 0x51, 1, 0, &eeprom);
