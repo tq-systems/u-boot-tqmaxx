@@ -84,6 +84,54 @@ config TQMA8XXS_DEFAULTS
 	select SPL_SPI_FLASH_TINY
 	select SPL_SPI_SUPPORT
 
+config TQMA8XXS_MFG_SUPPORT
+	bool "MFG Tool support"
+	select USB
+	select DM_USB
+	select USB_GADGET
+	select DM_USB_GADGET
+	select CI_UDC
+	select USB_PORT_AUTO
+	select USB_XHCI_HCD
+	select USB_XHCI_IMX8
+	select USB_FUNCTION_SDP
+	select USB_FUNCTION_FASTBOOT
+	select FASTBOOT_UUU_SUPPORT
+	select FASTBOOT_FLASH
+	select CMD_FASTBOOT
+	select SPL_USB_GADGET
+	select SPL_USB_SDP_SUPPORT
+	select SPL_DM_USB
+	select SPL_DM_USB_GADGET
+	select SPL_USB_HOST_SUPPORT
+
+
+if TQMA8XXS_MFG_SUPPORT
+
+config USB_GADGET_MANUFACTURER
+	default "FSL"
+
+config USB_GADGET_VENDOR_NUM
+	default 0x0525
+
+config USB_GADGET_PRODUCT_NUM
+	default 0xa4a5
+
+config USB_GADGET_VBUS_DRAW
+	default 2
+
+config SDP_LOADADDR
+	default 0x80400000
+
+config FASTBOOT_BUF_ADDR
+	default 0x82800000
+
+# restrict to 512M
+config FASTBOOT_BUF_SIZE
+	default 0x40000000
+
+endif
+
 choice
 	prompt "TQMa8XxS CPU variant"
 	default TQMA8XXS_CPU_MX8QXP
