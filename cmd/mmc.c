@@ -557,12 +557,12 @@ static int do_mmc_maxhwpartsectors(cmd_tbl_t *cmdtp, int flag, int argc, char * 
 
 	max_enh_user_size /= 0x200ULL;
 	if (max_enh_user_size >= (u64)(ULONG_MAX)) {
-		printf("ERROR: size to large for setenv_hex\n");
+		printf("ERROR: size to large for ulong\n");
 		return CMD_RET_FAILURE;
 	}
 
 	sectors = (ulong)max_enh_user_size;
-	env_set_hex("maxhwpartsectors", sectors);
+	env_set_ulong("maxhwpartsectors", sectors);
 
 	printf("maxhwpartsectors: %lx\n", sectors);
 
