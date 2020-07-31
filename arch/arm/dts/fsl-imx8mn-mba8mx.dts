@@ -17,6 +17,11 @@
 		stdout-path = &uart3;
 	};
 
+	config {
+		u-boot,mmc-env-offset = <0x400000>;
+		u-boot,mmc-env-offset-redundant = <0x404000>;
+	};
+
 	reg_usdhc2_vmmc: regulator-vmmc {
 		compatible = "regulator-fixed";
 		regulator-name = "VSD_3V3";
