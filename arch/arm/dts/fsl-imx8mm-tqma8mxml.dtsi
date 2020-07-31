@@ -29,13 +29,16 @@
 &flexspi {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexspi>;
+	spi-max-frequency = <29000000>;
+	num-cs = <1>;
+
 	status = "okay";
 
 	flash0: flash@0 {
 		reg = <0>;
 		#address-cells = <1>;
 		#size-cells = <1>;
-		compatible = "spi-flash", "jedec,spi-nor";
+		compatible = "jedec,spi-nor";
 		spi-max-frequency = <29000000>;
 		spi-nor,ddr-quad-read-dummy = <8>;
 	};
