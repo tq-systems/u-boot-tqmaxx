@@ -247,17 +247,24 @@ static int setup_fec(void)
 }
 #endif
 
-int tqc_bb_board_init(void)
+static void tqma8mxml_show_bootcfg(void)
 {
+#if defined(CONFIG_TQMA8MXML)
 	int idx;
 	unsigned int cfg = 0x0;
 
-	tqc_board_gpio_init(mba8mx_gid, ARRAY_SIZE(mba8mx_gid));
 	for (idx = BOOT_CFG0; idx <= BOOT_CFG15; ++idx)
 		cfg |= (dm_gpio_get_value(&mba8mx_gid[idx].desc) ? 1 : 0) <<
 			(idx - BOOT_CFG0);
 	env_set_ulong("boot_config", cfg);
 	printf("BOOTCFG: %x\n", cfg);
+#endif
+}
+
+int tqc_bb_board_init(void)
+{
+	tqc_board_gpio_init(mba8mx_gid, ARRAY_SIZE(mba8mx_gid));
+	tqma8mxml_show_bootcfg();
 	/* disable boot cfg signals on MCU bus */
 	dm_gpio_set_value(&mba8mx_gid[BOOT_CFG_OE_B].desc, 0);
 
