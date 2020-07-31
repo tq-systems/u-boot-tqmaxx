@@ -32,10 +32,10 @@ choice
 	prompt "TQMa8MXX base board variant"
 	default TQMA8MXX_BB_MBA8MX
 	help
-	  Select base board for TQMa8MMx/TQMa8MNx
+	  Select base board for TQMa8MxML/TQMa8MxNL
 
 config TQMA8MXX_BB_MBA8MX
-	bool "TQMa8MMx/TQMa8MNx on MBa8Mx Starterkit"
+	bool "TQMa8MxML/TQMa8MxNL on MBa8Mx Starterkit"
 	select TQC_SDMMC
 	select CMD_FUSE
 	select MII
@@ -87,7 +87,7 @@ config SYS_EXTRA_OPTIONS
 menu "TQMa8MXX boot device"
 
 config TQMA8MXX_BOOT_SDCARD
-	bool "TQMa8MMx/TQMa8MNx boot from SD / e-MMC"
+	bool "TQMa8MxML/TQMa8MxNL boot from SD / e-MMC"
 	default "y"
 	select SD_BOOT
 	select ENV_IS_IN_MMC
@@ -95,7 +95,8 @@ config TQMA8MXX_BOOT_SDCARD
 	  Select booting from SD / e-MMC
 
 config TQMA8MXX_BOOT_FSPI
-	bool "TQMa8MMx/TQMa8MNx boot from FlexSPI"
+	bool "TQMa8MxML/TQMa8MxNL boot from FlexSPI"
+#	default "y"
 	select QSPI_BOOT
 	select ENV_IS_IN_SPI_FLASH
 	help
