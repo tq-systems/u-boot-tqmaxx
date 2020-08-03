@@ -77,19 +77,21 @@ struct phy_info {
 	char *reset_name;
 	u8 phy_address;
 	char *mdio_bus;
+	u8 serdes_nr;
+	u8 serdes_lane;
 };
 
 struct phy_info phy_infos[] = {
-	[ETH_01] = {"RESET_ETH1", 0x1, DEFAULT_WRIOP_MDIO1_NAME },
-	[ETH_02] = {"RESET_ETH2", 0x2, DEFAULT_WRIOP_MDIO1_NAME },
-	[ETH_03] = {"RESET_ETH3", 0x3, DEFAULT_WRIOP_MDIO1_NAME },
-	[ETH_04] = {"RESET_ETH4", 0x4, DEFAULT_WRIOP_MDIO1_NAME },
-	[ETH_05] = {"RESET_ETH5", 0x5, DEFAULT_WRIOP_MDIO1_NAME },
-	[ETH_06] = {"RESET_ETH6", 0x6, DEFAULT_WRIOP_MDIO1_NAME },
-	[ETH_07] = {"RESET_ETH7", 0x1, DEFAULT_WRIOP_MDIO2_NAME },
-	[ETH_08] = {"RESET_ETH8", 0x2, DEFAULT_WRIOP_MDIO2_NAME },
-	[ETH_09] = {"RESET_ETH9", 0x3, DEFAULT_WRIOP_MDIO2_NAME },
-	[ETH_10] = {"RESET_ETH10", 0x4, DEFAULT_WRIOP_MDIO2_NAME },
+	[ETH_01] = {"RESET_ETH1", 0x1, DEFAULT_WRIOP_MDIO1_NAME, 2, 1 },
+	[ETH_02] = {"RESET_ETH2", 0x2, DEFAULT_WRIOP_MDIO1_NAME, 2, 2 },
+	[ETH_03] = {"RESET_ETH3", 0x3, DEFAULT_WRIOP_MDIO1_NAME, 2, 3 },
+	[ETH_04] = {"RESET_ETH4", 0x4, DEFAULT_WRIOP_MDIO1_NAME, 2, 5 },
+	[ETH_05] = {"RESET_ETH5", 0x5, DEFAULT_WRIOP_MDIO1_NAME, 2, 6 },
+	[ETH_06] = {"RESET_ETH6", 0x6, DEFAULT_WRIOP_MDIO1_NAME, 2, 7 },
+	[ETH_07] = {"RESET_ETH7", 0x1, DEFAULT_WRIOP_MDIO2_NAME, 1, 6 },
+	[ETH_08] = {"RESET_ETH8", 0x2, DEFAULT_WRIOP_MDIO2_NAME, 1, 7 },
+	[ETH_09] = {"RESET_ETH9", 0x3, DEFAULT_WRIOP_MDIO2_NAME, 0, 0 },
+	[ETH_10] = {"RESET_ETH10", 0x4, DEFAULT_WRIOP_MDIO2_NAME, 0, 0 },
 };
 
 struct mblx2160a_srds_config srds_configs[] = {
@@ -433,6 +435,11 @@ int tqc_bb_board_eth_init(bd_t *bis)
 					wriop_set_phy_address(mac_to_dpmac[j], 0, phy_infos[srds_configs[i].macs[j]].phy_address);
 					mii_dev = miiphy_get_dev_by_name(phy_infos[srds_configs[i].macs[j]].mdio_bus);
 					wriop_set_mdio(mac_to_dpmac[j], mii_dev);
+					if (phy_infos[srds_configs[i].macs[j]].serdes_nr) {
+						_reconfigure_serdes_tx_lane(phy_infos[srds_configs[i].macs[j]].serdes_nr,
+									    phy_infos[srds_configs[i].macs[j]].serdes_lane,
+									    0x10808c00, 0xFFFFFFFF);
+					}
 				} else if (srds_configs[i].macs[j] == XFI_01 || srds_configs[i].macs[j] == XFI_02) {
 					xfi_config(srds_configs[i].macs[j]);
 				} else if (srds_configs[i].macs[j] == CAUI_4) {
