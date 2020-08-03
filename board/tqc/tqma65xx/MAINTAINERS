@@ -1,0 +1,7 @@
+TQMA65XX BOARD
+M:	Someone
+S:	Maintained
+F:	board/tqc/tqma65x/
+F:	include/configs/tqma65xx_mba65xx.h
+F:	configs/tqma65xx_mba65xx_a53_defconfig
+F:	configs/tqma65xx_mba65xx_r5_defconfig

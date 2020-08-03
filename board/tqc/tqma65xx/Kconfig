@@ -1,0 +1,67 @@
+# SPDX-License-Identifier: GPL-2.0+
+#
+# Copyright (C) 2017-2018 Texas Instruments Incorporated - http://www.ti.com/
+# Copyright (C) 2020 TQ Systems
+
+choice
+	prompt "K3 TQMA65 based boards"
+	optional
+
+config TARGET_TQMA65XX_MBA65XX_A53
+	bool "TQ K3 based TQMA654 MBA654 running on A53"
+	select ARM64
+	select SOC_K3_AM6
+	select SYS_DISABLE_DCACHE_OPS
+	select BOARD_LATE_INIT
+	imply BOARD
+	imply SPL_BOARD
+	imply BOARD_K3_EVMS
+	imply TI_I2C_BOARD_DETECT
+
+config TARGET_TQMA65XX_MBA65XX_R5
+	bool "TQ K3 based TQMA654 MBA654 running on R5"
+	select CPU_V7R
+	select SYS_THUMB_BUILD
+	select SOC_K3_AM6
+	select K3_LOAD_SYSFW
+	select K3_AM654_DDRSS
+	imply BOARD
+	imply SPL_BOARD
+	imply BOARD_K3_EVMS
+	imply SYS_K3_SPL_ATF
+	imply TI_I2C_BOARD_DETECT
+
+endchoice
+
+if TARGET_TQMA65XX_MBA65XX_A53
+
+config SYS_BOARD
+       default "tqma65xx"
+
+config SYS_VENDOR
+       default "tqc"
+
+config SYS_CONFIG_NAME
+       default "tqma65xx_mba65xx"
+
+source "board/tqc/common/Kconfig"
+
+endif
+
+if TARGET_TQMA65XX_MBA65XX_R5
+
+config SYS_BOARD
+       default "tqma65xx"
+
+config SYS_VENDOR
+       default "tqc"
+
+config SYS_CONFIG_NAME
+       default "tqma65xx_mba65xx"
+
+config SPL_LDSCRIPT
+	default "arch/arm/mach-omap2/u-boot-spl.lds"
+
+source "board/tqc/common/Kconfig"
+
+endif
