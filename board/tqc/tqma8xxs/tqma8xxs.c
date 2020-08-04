@@ -21,6 +21,7 @@
 #include <dm.h>
 #include <asm/arch/iomux.h>
 #include <asm/arch/sys_proto.h>
+#include <asm/mach-imx/boot_mode.h>
 #include <power-domain.h>
 
 #include "../common/tqc_bb.h"
@@ -91,8 +92,20 @@ int ft_board_setup(void *blob, bd_t *bd)
 int board_late_init(void)
 {
 #if !defined(CONFIG_SPL_BUILD)
+	int ret;
+
 	struct tqc_eeprom_data eeprom;
 	const char *bname = tqma8xxs_get_boardname();
+
+	if ((get_cpu_rev() & 0xfff) == CHIP_REV_C) {
+		ret = tqc_read_eeprom_at(0, 0x53, 1, 0, &eeprom);
+	} else
+		ret = tqc_read_eeprom_at(1, 0x51, 1, 0, &eeprom);
+
+	if (!ret)
+		tqc_board_handle_eeprom_data(bname, &eeprom);
+	else
+		puts("EEPROM: read error\n");
 #endif
 
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG

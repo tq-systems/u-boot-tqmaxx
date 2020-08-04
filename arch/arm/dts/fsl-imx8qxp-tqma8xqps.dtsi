@@ -35,6 +35,13 @@
 		>;
 	};
 
+	pinctrl_lpi2c0: lpi2c0grp {
+		fsl,pins = <
+			SC_P_MIPI_CSI0_GPIO0_00_ADMA_I2C0_SCL	0x06000021
+			SC_P_MIPI_CSI0_GPIO0_01_ADMA_I2C0_SDA	0x06000021
+		>;
+	};
+
 	pinctrl_usdhc1: usdhc1grp {
 		fsl,pins = <
 			SC_P_EMMC0_CLK_CONN_EMMC0_CLK		0x06000041
@@ -130,6 +137,44 @@
 
 &A35_0 {
 	u-boot,dm-pre-reloc;
+};
+
+&i2c0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpi2c0>;
+	clocks = <&clk IMX8QXP_I2C0_CLK>,
+		<&clk IMX8QXP_I2C0_IPG_CLK>;
+	clock-names = "per", "ipg";
+	status = "okay";
+
+	/* NXP SE97BTP with temperature sensor + eeprom */
+	sensor0: tempsensor@1b {
+		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+		reg = <0x1b>;
+		status = "okay";
+	};
+
+	eeprom0: eeprom@50 {
+		compatible = "st,24c64", "atmel,24c64";
+		reg = <0x50>;
+		pagesize = <32>;
+		status = "okay";
+	};
+
+	rtc0: rtc@51 {
+		compatible = "nxp,pcf85063a";
+		reg = <0x51>;
+	};
+
+	eeprom1: eeprom@53 {
+		compatible = "nxp,se97b", "atmel,24c02";
+		reg = <0x53>;
+		pagesize = <16>;
+		status = "okay";
+	};
 };
 
 &lpuart0 {

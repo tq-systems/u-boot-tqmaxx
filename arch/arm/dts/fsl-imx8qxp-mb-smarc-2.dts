@@ -5,7 +5,7 @@
 
 /dts-v1/;
 
-#include "fsl-imx8qxp-tqma8xqps-0100.dtsi"
+#include "fsl-imx8qxp-tqma8xqps.dtsi"
 
 / {
 	model = "TQ Systems i.MX8QXP TQMa8XxS on MB-SMARC-2";

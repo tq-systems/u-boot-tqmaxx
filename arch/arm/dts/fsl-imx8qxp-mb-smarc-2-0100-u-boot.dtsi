@@ -100,6 +100,10 @@
 	u-boot,dm-spl;
 };
 
+&i2c1 {
+	compatible = "fsl,imx8qm-lpi2c", "fsl,imx-virt-i2c";
+};
+
 &wu {
 	u-boot,dm-spl;
 };
