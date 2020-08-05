@@ -208,6 +208,13 @@
 		>;
 	};
 
+	pinctrl_usbotg1: usbotg1grp {
+		fsl,pins = <
+			SC_P_USB_SS3_TC2_CONN_USB_OTG1_OC	0x00000021
+			SC_P_USB_SS3_TC0_LSIO_GPIO4_IO03	0x00000021
+		>;
+	};
+
 	pinctrl_usdhc2_gpio: usdhc2gpiogrp {
 		fsl,pins = <
 			SC_P_USDHC1_RESET_B_LSIO_GPIO4_IO19	0x06000021
@@ -313,6 +320,15 @@
 &lpuart0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpuart0>;
+};
+
+&usbotg1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usbotg1>;
+	srp-disable;
+	hnp-disable;
+	adp-disable;
+	power-polarity-active-high;
 };
 
 &usdhc1 {
