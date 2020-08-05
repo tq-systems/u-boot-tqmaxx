@@ -102,6 +102,7 @@ int board_init(void)
 
 #if defined(CONFIG_MBLX2160A)
 	ret = mblx2160a_gpios_init();
+	ret = mblx2160a_board_init();
 #endif
 
 	return ret;

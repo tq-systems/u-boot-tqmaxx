@@ -473,6 +473,11 @@ int tqc_bb_board_eth_init(bd_t *bis)
 	return 0;
 }
 
+int mblx2160a_board_init(bd_t *bis)
+{
+	return mblx2160a_set_gpio("RESET_USB_HUB#", 1);
+}
+
 int board_phy_config(struct phy_device *phydev)
 {
 	int val;
