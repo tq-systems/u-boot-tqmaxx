@@ -22,6 +22,7 @@
 };
 
 &esdhc1 {
+	bus-width = <8>;
 	status = "okay";
 };
 
