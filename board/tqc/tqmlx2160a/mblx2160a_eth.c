@@ -364,8 +364,8 @@ int xfi_config(int xfi_nr)
 		bus = I2C_XFI1_BUS;
 		addr = I2C_XFI1_RETIMER_ADDR;
 	} else if (xfi_nr == XFI_02) {
-		bus = I2C_XFI1_BUS;
-		addr = I2C_XFI1_RETIMER_ADDR;
+		bus = I2C_XFI2_BUS;
+		addr = I2C_XFI2_RETIMER_ADDR;
 	} else {
 		printf("Error: unknown XFI device: %d\n", xfi_nr);
 		return -ENODEV;
