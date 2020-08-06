@@ -109,7 +109,7 @@ struct mblx2160a_gpio mblx2160a_gpios[] = {
 	{"gpio@20_1",		"QSFP_RESET#",		GPIOD_IS_OUT, 1 },
 	{"gpio@20_2",		"QSFP_MODPRS#",		GPIOD_IS_IN, 0 },
 	{"gpio@20_3",		"QSFP_INT#",		GPIOD_IS_IN, 0 },
-	{"gpio@20_4",		"QSFP_LPMOD",		GPIOD_IS_IN, 0 },
+	{"gpio@20_4",		"QSFP_LPMOD",		GPIOD_IS_OUT, 1 },
 	{"gpio@20_5",		"QSFP_RETIMER_1#",	GPIOD_IS_IN, 0 },
 	{"gpio@20_6",		"QSFP_RETIMER_2#",	GPIOD_IS_IN, 0 },
 	{"gpio@20_7",		"MPCIE_1_WAKE#",	GPIOD_IS_OUT, 0 },
@@ -387,11 +387,62 @@ int xfi_config(int xfi_nr)
 int caui4_config(int caui_nr)
 {
 	int ret;
+	struct udevice *dev;
+
+	debug("CAUI4\n");
+
+	mblx2160a_set_gpio("QSFP_LPMOD", 0);
 
 	ret = _reconfigure_serdes_tx_lane(1, 4, 0x20820c20, 0xFFFFFFFF);
 	ret = _reconfigure_serdes_tx_lane(1, 5, 0x20820c20, 0xFFFFFFFF);
 	ret = _reconfigure_serdes_tx_lane(1, 6, 0x20820c20, 0xFFFFFFFF);
 	ret = _reconfigure_serdes_tx_lane(1, 7, 0x20820c20, 0xFFFFFFFF);
+
+	struct i2c_reg_setting caui_retimer1_settings[] = {
+		{0xfc, 0x01, 0xFF},
+		{0xff, 0x03, 0x03},
+		{0x00, 0x04, 0x04},
+		{0x0a, 0x0c, 0x0c},
+		{0x2f, 0x50, 0xf0},
+		{0x31, 0x20, 0x60},
+		{0x1e, 0x08, 0x08},
+		{0x3d, 0x80, 0x80},
+		{0x3d, 0x00, 0x40},/* Main-cursor positive*/
+		{0x3f, 0x40, 0x40},/* Post-cursor positive*/
+		{0x3e, 0x40, 0x40},/* Pre-cursor negative*/
+		{0x3d, 0x1b, 0x1f},/* Main-cursor magnitude*/
+		{0x3f, 0x00, 0x0f},/* Post-cursor magnitude*/
+		{0x3e, 0x04, 0x0f},/* Pre-cursor magnitude*/
+		{0x0a, 0x00, 0x0c},
+	};
+
+	struct i2c_reg_setting caui_retimer2_settings[] = {
+		{0xfc, 0x01, 0xFF},
+		{0xff, 0x03, 0x03},
+		{0x00, 0x04, 0x04},
+		{0x0a, 0x0c, 0x0c},
+		{0x2f, 0x50, 0xf0},
+		{0x31, 0x20, 0x60},
+		{0x1e, 0x08, 0x08},
+		{0x3d, 0x80, 0x80},
+		{0x3d, 0x00, 0x40},/* Main-cursor */
+		{0x3f, 0x40, 0x40},/* Post-cursor */
+		{0x3e, 0x40, 0x40},/* Pre-cursor */
+		{0x3d, 0x1a, 0x1f},/* Main-cursor */
+		{0x3f, 0x00, 0x0f},/* Post-cursor */
+		{0x3e, 0x05, 0x0f},/* Pre-cursor */
+		{0x0a, 0x00, 0x0c},
+	};
+
+	if (i2c_get_chip_for_busnum(I2C_QSFP_BUS, I2C_QSFP_RETIMER1_ADDR, 1, &dev))
+		return -ENODEV;
+
+	ret = _config_i2c_device(dev, &caui_retimer1_settings[0], ARRAY_SIZE(caui_retimer1_settings));
+
+	if (i2c_get_chip_for_busnum(I2C_QSFP_BUS, I2C_QSFP_RETIMER2_ADDR, 1, &dev))
+		return -ENODEV;
+
+	ret = _config_i2c_device(dev, &caui_retimer2_settings[0], ARRAY_SIZE(caui_retimer2_settings));
 
 	return ret;
 }

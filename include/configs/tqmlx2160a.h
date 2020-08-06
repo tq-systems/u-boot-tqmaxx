@@ -114,6 +114,10 @@
 #define I2C_XFI2_BUS			0x9
 #define I2C_XFI2_RETIMER_ADDR		0x1B
 
+#define I2C_QSFP_BUS			0xA
+#define I2C_QSFP_RETIMER1_ADDR		0x21
+#define I2C_QSFP_RETIMER2_ADDR		0x20
+
 /* PCI */
 #ifdef CONFIG_PCI
 #define CONFIG_SYS_PCI_64BIT
