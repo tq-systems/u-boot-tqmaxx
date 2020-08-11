@@ -172,7 +172,6 @@ unsigned long get_board_ddr_clk(void);
 	"mtdparts=nor0:"                                                       \
 	"1M@0k(RCW-PBL),"                                                      \
 	"2M@1M(U-Boot),"                                                       \
-	"1M@3M(U-Boot-Env),"						       \
 	"1M@5M(U-Boot-Env),"						       \
 	"2M@8M(DDR-PHY),"						       \
 	"3M@10M(DPAA2-MC),"                                                    \
