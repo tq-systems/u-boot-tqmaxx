@@ -447,6 +447,24 @@ int caui4_config(int caui_nr)
 	return ret;
 }
 
+int checkboard_tqmlx2160a_bb(void)
+{
+	puts("on MBLX2160A Baseboard. Booting from: ");
+	switch (get_boot_src()) {
+	case BOOT_SOURCE_XSPI_NOR:
+		puts("XSPI_NOR");
+		break;
+	case BOOT_SOURCE_SD_MMC:
+		puts("SD-Card");
+		break;
+	case BOOT_SOURCE_SD_MMC2:
+		puts("emmc");
+		break;
+	default:
+		puts("unknown");
+		break;
+	};
+}
 int tqc_bb_board_eth_init(bd_t *bis)
 {
 #if defined(CONFIG_FSL_MC_ENET)

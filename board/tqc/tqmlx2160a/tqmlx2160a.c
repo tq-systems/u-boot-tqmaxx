@@ -94,6 +94,15 @@ int init_func_vid(void)
 }
 #endif
 
+int checkboard(void)
+{
+	printf("TQMLX2160A ");
+	checkboard_tqmlx2160a_bb();
+	puts("\n");
+
+	return 0;
+}
+
 int board_init(void)
 {
 	int ret;
