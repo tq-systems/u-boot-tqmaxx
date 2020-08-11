@@ -93,6 +93,16 @@ static void get_imx_rev_str(struct cpu_imx_plat *plat, u32 rev)
 		case CHIP_REV_C:
 			plat->rev[0] = 'C';
 			break;
+		case CHIP_REV_A1:
+			plat->rev[0] = 'A';
+			plat->rev[1] = '1';
+			plat->rev[2] = '\0';
+			return;
+		case CHIP_REV_A2:
+			plat->rev[0] = 'A';
+			plat->rev[1] = '2';
+			plat->rev[2] = '\0';
+			return;
 		default:
 			plat->rev[0] = '?';
 			break;
