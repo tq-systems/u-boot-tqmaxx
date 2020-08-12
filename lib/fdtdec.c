@@ -1069,8 +1069,6 @@ int fdtdec_setup_mem_size_base(void)
 	return fdtdec_setup_mem_size_base_fdt(gd->fdt_blob);
 }
 
-#if defined(CONFIG_NR_DRAM_BANKS)
-
 static int get_next_memory_node(const void *blob, int mem)
 {
 	do {
@@ -1126,7 +1124,6 @@ int fdtdec_setup_memory_banksize(void)
 	return fdtdec_setup_memory_banksize_fdt(gd->fdt_blob);
 
 }
-#endif
 
 #if CONFIG_IS_ENABLED(MULTI_DTB_FIT)
 # if CONFIG_IS_ENABLED(MULTI_DTB_FIT_GZIP) ||\
@@ -1561,7 +1558,6 @@ int fdtdec_resetup(int *rescan)
 }
 #endif
 
-#ifdef CONFIG_NR_DRAM_BANKS
 int fdtdec_decode_ram_size(const void *blob, const char *area, int board_id,
 			   phys_addr_t *basep, phys_size_t *sizep, bd_t *bd)
 {
@@ -1666,6 +1662,5 @@ int fdtdec_decode_ram_size(const void *blob, const char *area, int board_id,
 
 	return 0;
 }
-#endif /* CONFIG_NR_DRAM_BANKS */
 
 #endif /* !USE_HOSTCC */

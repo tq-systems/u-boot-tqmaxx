@@ -93,7 +93,6 @@ static inline void print_bi_mem(const bd_t *bd)
 
 static inline void print_bi_dram(const bd_t *bd)
 {
-#ifdef CONFIG_NR_DRAM_BANKS
 	int i;
 
 	for (i = 0; i < CONFIG_NR_DRAM_BANKS; ++i) {
@@ -103,7 +102,6 @@ static inline void print_bi_dram(const bd_t *bd)
 			print_num("-> size",	bd->bi_dram[i].size);
 		}
 	}
-#endif
 }
 
 static inline void print_bi_flash(const bd_t *bd)
