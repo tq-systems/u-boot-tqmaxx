@@ -465,6 +465,8 @@ int checkboard_tqmlx2160a_bb(void)
 		puts("unknown");
 		break;
 	};
+
+	return 0;
 }
 
 int tqc_bb_board_eth_late_init(void)
