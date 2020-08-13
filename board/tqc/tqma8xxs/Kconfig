@@ -29,7 +29,6 @@ config TQMA8XXS_DEFAULTS
 	select PINCTRL_IMX8
 	select POWER_DOMAIN
 	select IMX8_POWER_DOMAIN
-	select CPU
 	select DM
 	select DM_MMC
 	select MMC_IO_VOLTAGE
