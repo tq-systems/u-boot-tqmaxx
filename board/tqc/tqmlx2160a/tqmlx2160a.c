@@ -151,6 +151,7 @@ void reset_phy(void)
 #if defined(CONFIG_FSL_MC_ENET)
 	mc_env_boot();
 #endif
+	tqc_bb_board_eth_late_init();
 }
 #endif /* CONFIG_RESET_PHY_R */
 

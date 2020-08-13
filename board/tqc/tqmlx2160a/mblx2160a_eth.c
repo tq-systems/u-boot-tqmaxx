@@ -466,6 +466,41 @@ int checkboard_tqmlx2160a_bb(void)
 		break;
 	};
 }
+
+int tqc_bb_board_eth_late_init(void)
+{
+	int ret;
+	int bus;
+	int addr;
+	struct udevice *dev;
+
+	mdelay(1000);
+
+	ret = _reconfigure_serdes_tx_lane(2, 7, 0x10820620, 0xFFFFFFFF);
+
+	struct i2c_reg_setting xfi_retimer_settings[] = {
+		{0xff, 0x0c, 0xff},
+		{0x00, 0x04, 0xff},
+		{0xff, 0x0c, 0xff},
+		{0x0a, 0x0c, 0xff},
+		{0x2f, 0xc0, 0xff},
+		{0x31, 0x20, 0xff},
+		{0x2d, 0x87, 0xff},
+		{0x15, 0x53, 0xff},
+		{0x0a, 0x00, 0xff},
+	};
+
+	bus = I2C_XFI2_BUS;
+	addr = I2C_XFI2_RETIMER_ADDR;
+
+	if (i2c_get_chip_for_busnum(bus, addr, 1, &dev))
+		return -ENODEV;
+
+	ret = _config_i2c_device(dev, &xfi_retimer_settings[0], ARRAY_SIZE(xfi_retimer_settings));
+
+	return ret;
+}
+
 int tqc_bb_board_eth_init(bd_t *bis)
 {
 #if defined(CONFIG_FSL_MC_ENET)
