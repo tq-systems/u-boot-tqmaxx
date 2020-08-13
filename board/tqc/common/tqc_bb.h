@@ -10,6 +10,6 @@
 
 #include <common.h>
 
-int tqc_bb_board_eth_init(void);
+int tqc_bb_board_eth_init(int *eth_nr);
 
 #endif

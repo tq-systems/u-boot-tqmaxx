@@ -8,7 +8,9 @@
 #include <fsl-mc/fsl_mc.h>
 #include <i2c.h>
 #include <netdev.h>
+#include <environment.h>
 
+#include "../common/tqmaxx_eeprom.h"
 #include "../common/tqc_bb.h"
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -119,6 +121,7 @@ int board_init(void)
 
 int board_eth_init(bd_t *bis)
 {
+	int eth_nr = 0;
 #if defined(CONFIG_FSL_MC_ENET)
 	struct memac_mdio_info mdio_info;
 	struct memac_mdio_controller *reg;
@@ -137,7 +140,8 @@ int board_eth_init(bd_t *bis)
 	/* Register the EMI 2 */
 	fm_memac_mdio_init(bis, &mdio_info);
 
-	tqc_bb_board_eth_init();
+	tqc_bb_board_eth_init(&eth_nr);
+	mac_init(eth_nr);
 
 	cpu_eth_init(bis);
 #endif /* CONFIG_FSL_MC_ENET */
@@ -325,3 +329,41 @@ int board_fix_fdt(void *fdt)
 	return 0;
 }
 #endif
+
+int mac_init(int eth_nr)
+{
+	int ret = -1;
+	struct tqmaxx_eeprom_data eepromdata;
+	char safe_string[0x41];
+	char ethaddrstring[9];
+	int i;
+
+	ret = tqmaxx_read_eeprom(0, CONFIG_SYS_I2C_EEPROM_ADDR, &eepromdata);
+
+	if (ret) {
+		printf("Error reading eeprom.\n");
+		return ret;
+	}
+
+	ret = tqmaxx_parse_eeprom_mac(&eepromdata, safe_string,
+				      ARRAY_SIZE(safe_string));
+	if (!ret) {
+		env_set("ethaddr", safe_string);
+		eth_env_set_enetaddr("ethaddr", (uchar *)safe_string);
+
+		for (i = 1; i <= eth_nr - 1; i++) {
+			ret = tqmaxx_parse_eeprom_mac_additional(&eepromdata,
+					safe_string, ARRAY_SIZE(safe_string),
+					i, "%02x:%02x:%02x:%02x:%02x:%02x");
+			if (!ret) {
+				snprintf(ethaddrstring, 9, "eth%daddr", i);
+				env_set(ethaddrstring, safe_string);
+				eth_env_set_enetaddr(ethaddrstring,
+						    (uchar *)safe_string);
+			}
+		}
+
+		tqmaxx_show_eeprom(&eepromdata, "TQMLX2160A");
+	}
+	return 0;
+}

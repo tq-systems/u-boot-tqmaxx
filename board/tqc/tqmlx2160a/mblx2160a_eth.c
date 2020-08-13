@@ -501,7 +501,7 @@ int tqc_bb_board_eth_late_init(void)
 	return ret;
 }
 
-int tqc_bb_board_eth_init(bd_t *bis)
+int tqc_bb_board_eth_init(int *nr)
 {
 #if defined(CONFIG_FSL_MC_ENET)
 	struct mii_dev *mii_dev;
@@ -512,6 +512,7 @@ int tqc_bb_board_eth_init(bd_t *bis)
 	int i;
 	int found = 0;
 	uint mask;
+	int eth_nr = 0;
 
 	srds_s1 = in_le32(&gur->rcwsr[28]) &
 				FSL_CHASSIS3_RCWSR28_SRDS1_PRTCL_MASK;
@@ -537,6 +538,7 @@ int tqc_bb_board_eth_init(bd_t *bis)
 
 			for (int j = 0; j < ARRAY_SIZE(srds_configs[i].macs); j++) {
 				if (srds_configs[i].macs[j] >= ETH_01 && srds_configs[i].macs[j] <= ETH_10) {
+					eth_nr++;
 					wriop_set_phy_address(mac_to_dpmac[j], 0, phy_infos[srds_configs[i].macs[j]].phy_address);
 					mii_dev = miiphy_get_dev_by_name(phy_infos[srds_configs[i].macs[j]].mdio_bus);
 					wriop_set_mdio(mac_to_dpmac[j], mii_dev);
@@ -546,8 +548,10 @@ int tqc_bb_board_eth_init(bd_t *bis)
 									    0x10808c00, 0xFFFFFFFF);
 					}
 				} else if (srds_configs[i].macs[j] == XFI_01 || srds_configs[i].macs[j] == XFI_02) {
+					eth_nr++;
 					xfi_config(srds_configs[i].macs[j]);
 				} else if (srds_configs[i].macs[j] == CAUI_4) {
+					eth_nr++;
 					caui4_config(srds_configs[i].macs[j]);
 				}
 			}
@@ -575,6 +579,7 @@ int tqc_bb_board_eth_init(bd_t *bis)
 	}
 #endif /* CONFIG_FSL_MC_ENET */
 
+	*nr = eth_nr;
 	return 0;
 }
 

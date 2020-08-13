@@ -1121,6 +1121,7 @@ config TARGET_TQMLX2160A
 	select ARM64
 	select ARMV8_MULTIENTRY
 	select BOARD_LATE_INIT
+	select TQC_EEPROM
 	help
 	  Support for TQ TQMLX2160A module.
 	  The TQMLX2160A is a module with a lx2160a SoC.

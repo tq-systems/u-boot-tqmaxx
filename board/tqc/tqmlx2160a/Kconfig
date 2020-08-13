@@ -26,4 +26,6 @@ config MBLX2160A
 		This features 10G/100G 1G SGMII/ 1G RGMII, SATA, PCIe, USB
 endchoice
 
+source "board/tqc/common/Kconfig"
+
 endif
