@@ -5,5 +5,5 @@
 #
 
 obj-y += tqmlx2160a.o
-obj-$(CONFIG_MBLX2160A) += mblx2160a_eth.o
+obj-$(CONFIG_MBLX2160A) += tqmlx2160a_mblx2160a.o
 obj-y += ddr.o
