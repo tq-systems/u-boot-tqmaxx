@@ -1,5 +1,6 @@
 #include <common.h>
 #include <asm/io.h>
+#include <asm/arch/clock.h>
 #include <dm.h>
 #include <dm/platform_data/serial_pl01x.h>
 #include <fsl_mdio.h>
