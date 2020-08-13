@@ -100,7 +100,7 @@ struct mblx2160a_srds_config srds_configs[] = {
 	{{12, 7, 0}, {ETH_NO, ETH_07, ETH_08, ETH_01, XFI_01, XFI_02, ETH_04, ETH_02, ETH_03} },
 	{{12, 8, 0}, {ETH_NO, ETH_07, ETH_08, ETH_NO, XFI_01, XFI_02, ETH_NO, ETH_09, ETH_10} },
 	{{12, 11, 0}, {ETH_NO, ETH_07, ETH_08, ETH_01, ETH_05, ETH_06, ETH_04, ETH_02, ETH_03} },
-	{{14, 7, 0}, {CAUI_4, ETH_07, ETH_08, ETH_01, XFI_01, XFI_02, ETH_04, ETH_02, ETH_03} },
+	{{14, 7, 0}, {CAUI_4, ETH_NO, ETH_NO, ETH_01, XFI_01, XFI_02, ETH_04, ETH_02, ETH_03} },
 	{{14, 11, 0}, {CAUI_4, ETH_NO, ETH_NO, ETH_01, ETH_05, ETH_06, ETH_04, ETH_02, ETH_03} },
 };
 
