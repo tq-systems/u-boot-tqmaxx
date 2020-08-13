@@ -264,8 +264,9 @@ int _config_i2c_device(struct udevice *dev, struct i2c_reg_setting *settings, in
 {
 	u8 val;
 	int ret;
+	struct udevice *bus = dev_get_parent(dev);
 
-	debug("Configuring i2c device\n");
+	debug("Configuring i2c device %s on bus: %s\n", dev->name, bus->name);
 	for (int i = 0; i < count; i++) {
 		val = dm_i2c_reg_read(dev, settings[i].reg);
 		if (ret)
