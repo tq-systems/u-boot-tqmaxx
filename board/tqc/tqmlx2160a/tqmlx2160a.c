@@ -12,7 +12,7 @@
 #include <environment.h>
 
 #include "../common/tqmaxx_eeprom.h"
-#include "../common/tqc_bb.h"
+#include "tqmlx2160a_bb.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -118,6 +118,44 @@ int board_init(void)
 #endif
 
 	return ret;
+}
+
+int mac_init(int eth_nr)
+{
+	int ret = -1;
+	struct tqmaxx_eeprom_data eepromdata;
+	char safe_string[0x41];
+	char ethaddrstring[9];
+	int i;
+
+	ret = tqmaxx_read_eeprom(0, CONFIG_SYS_I2C_EEPROM_ADDR, &eepromdata);
+
+	if (ret) {
+		printf("Error reading eeprom.\n");
+		return ret;
+	}
+
+	ret = tqmaxx_parse_eeprom_mac(&eepromdata, safe_string,
+				      ARRAY_SIZE(safe_string));
+	if (!ret) {
+		env_set("ethaddr", safe_string);
+		eth_env_set_enetaddr("ethaddr", (uchar *)safe_string);
+
+		for (i = 1; i <= eth_nr - 1; i++) {
+			ret = tqmaxx_parse_eeprom_mac_additional(&eepromdata,
+					safe_string, ARRAY_SIZE(safe_string),
+					i, "%02x:%02x:%02x:%02x:%02x:%02x");
+			if (!ret) {
+				snprintf(ethaddrstring, 9, "eth%daddr", i);
+				env_set(ethaddrstring, safe_string);
+				eth_env_set_enetaddr(ethaddrstring,
+						    (uchar *)safe_string);
+			}
+		}
+
+		tqmaxx_show_eeprom(&eepromdata, "TQMLX2160A");
+	}
+	return 0;
 }
 
 int board_eth_init(bd_t *bis)
@@ -330,41 +368,3 @@ int board_fix_fdt(void *fdt)
 	return 0;
 }
 #endif
-
-int mac_init(int eth_nr)
-{
-	int ret = -1;
-	struct tqmaxx_eeprom_data eepromdata;
-	char safe_string[0x41];
-	char ethaddrstring[9];
-	int i;
-
-	ret = tqmaxx_read_eeprom(0, CONFIG_SYS_I2C_EEPROM_ADDR, &eepromdata);
-
-	if (ret) {
-		printf("Error reading eeprom.\n");
-		return ret;
-	}
-
-	ret = tqmaxx_parse_eeprom_mac(&eepromdata, safe_string,
-				      ARRAY_SIZE(safe_string));
-	if (!ret) {
-		env_set("ethaddr", safe_string);
-		eth_env_set_enetaddr("ethaddr", (uchar *)safe_string);
-
-		for (i = 1; i <= eth_nr - 1; i++) {
-			ret = tqmaxx_parse_eeprom_mac_additional(&eepromdata,
-					safe_string, ARRAY_SIZE(safe_string),
-					i, "%02x:%02x:%02x:%02x:%02x:%02x");
-			if (!ret) {
-				snprintf(ethaddrstring, 9, "eth%daddr", i);
-				env_set(ethaddrstring, safe_string);
-				eth_env_set_enetaddr(ethaddrstring,
-						    (uchar *)safe_string);
-			}
-		}
-
-		tqmaxx_show_eeprom(&eepromdata, "TQMLX2160A");
-	}
-	return 0;
-}

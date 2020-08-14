@@ -20,6 +20,8 @@
 #include <fsl-mc/fsl_mc.h>
 #include <fsl-mc/ldpaa_wriop.h>
 
+#include "tqmlx2160a_bb.h"
+
 DECLARE_GLOBAL_DATA_PTR;
 
 struct mblx2160a_gpio {
@@ -204,7 +206,7 @@ int mblx2160a_gpios_init(void)
 	return 0;
 }
 
-int mblx2160a_get_gpio(const char *name)
+static int mblx2160a_get_gpio(const char *name)
 {
 	int i;
 	int ret;
@@ -222,7 +224,7 @@ int mblx2160a_get_gpio(const char *name)
 	return dm_gpio_get_value(&desc);
 }
 
-int mblx2160a_set_gpio(const char *name, int val)
+static int mblx2160a_set_gpio(const char *name, int val)
 {
 	int i;
 	int ret;
@@ -260,7 +262,7 @@ static void _dp83867_phy_write_indirect(struct phy_device *phydev,
 	phy_write(phydev, MDIO_DEVAD_NONE, 0x0e, value);
 }
 
-int _config_i2c_device(struct udevice *dev, struct i2c_reg_setting *settings, int count)
+static int _config_i2c_device(struct udevice *dev, struct i2c_reg_setting *settings, int count)
 {
 	u8 val;
 	int ret;
@@ -287,7 +289,7 @@ int _config_i2c_device(struct udevice *dev, struct i2c_reg_setting *settings, in
 	return 0;
 }
 
-int _reconfigure_serdes_tx_lane(int serdes_nr, int lane_nr, u32 val, u32 mask)
+static int _reconfigure_serdes_tx_lane(int serdes_nr, int lane_nr, u32 val, u32 mask)
 {
 	void *serdes_base;
 	u32 *tx_rst_reg;
@@ -330,7 +332,7 @@ int _reconfigure_serdes_tx_lane(int serdes_nr, int lane_nr, u32 val, u32 mask)
 	return 0;
 }
 
-int xfi_config(int xfi_nr)
+static int xfi_config(int xfi_nr)
 {
 	int ret;
 	struct udevice *dev;
@@ -385,7 +387,7 @@ int xfi_config(int xfi_nr)
 	return ret;
 }
 
-int caui4_config(int caui_nr)
+static int caui4_config(int caui_nr)
 {
 	int ret;
 	struct udevice *dev;
@@ -585,7 +587,7 @@ int tqc_bb_board_eth_init(int *nr)
 	return 0;
 }
 
-int mblx2160a_board_init(bd_t *bis)
+int mblx2160a_board_init(void)
 {
 	return mblx2160a_set_gpio("RESET_USB_HUB#", 1);
 }
