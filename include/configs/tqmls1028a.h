@@ -197,16 +197,15 @@
 #undef BOOT_ENV_SETTINGS
 #define BOOT_ENV_SETTINGS \
 	BOOT_ENV_BOARD \
-	"loadaddr=0x82000000\0" \
-	"fdtaddr=0x88000000\0" \
-	"addtty=setenv bootargs ${bootargs} console=${console}\0" \
-	"addvideo=setenv bootargs ${bootargs} video=1920x1080-32@60\0"	\
+	"loadaddr=0x82000000\0"                                                \
+	"fdtaddr=0x88000000\0"                                                 \
+	"addtty=setenv bootargs ${bootargs} console=${console}\0"              \
 	"addmmc=setenv bootargs ${bootargs} root=/dev/mmcblk${mmcdev}p2 rootwait\0" \
 	"firmwarepart=1\0"                                                     \
 	"mmchdpload=load mmc ${mmcdev}:${firmwarepart} ${loadaddr} ls1028a-dp-fw.bin; hdp load ${loadaddr};\0" \
 	"mmcimageload=load mmc ${mmcdev}:${firmarepart} ${fdtaddr} Image.gz; unzip $fdtaddr $loadaddr\0" \
 	"mmcfdtload=load mmc ${mmcdev}:${firmwarepart} ${fdtaddr} ${fdt_file}; fdt addr ${fdtaddr}\0" \
-	"mmcargs=run addmmc addtty addvideo\0"                                 \
+	"mmcargs=run addmmc addtty\0"                                          \
 	"mmcboot=echo Booting from MMC ...; "                                  \
 		"setenv bootargs; "                                            \
 		"run mmcargs; "                                                \
@@ -217,7 +216,7 @@
 	"rootfs_mtddev=RootFS\0"                                               \
 	"addspi=setenv bootargs ${bootargs} root=ubi0_0 rw "                   \
 		"rootfstype=ubifs ubi.mtd=7\0"                                 \
-	"spiargs=run addspi addtty addvideo\0"                                 \
+	"spiargs=run addspi addtty\0"                                          \
 	"spikernelload=sf probe 0; sf read ${fdtaddr} Linux; "		       \
 		"unzip ${fdtaddr} ${loadaddr}\0"			       \
 	"spifdtload=sf probe 0; sf read ${fdtaddr} DTB; fdt addr ${fdtaddr}\0" \
