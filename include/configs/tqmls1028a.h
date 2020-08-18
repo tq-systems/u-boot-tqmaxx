@@ -215,7 +215,7 @@
 		"booti ${loadaddr} - ${fdtaddr}\0"                             \
 	"rootfs_mtddev=RootFS\0"                                               \
 	"addspi=setenv bootargs ${bootargs} root=ubi0_0 rw "                   \
-		"rootfstype=ubifs ubi.mtd=7\0"                                 \
+		"rootfstype=ubifs ubi.mtd=8\0"                                 \
 	"spiargs=run addspi addtty\0"                                          \
 	"spikernelload=sf probe 0; sf read ${fdtaddr} Linux; "		       \
 		"unzip ${fdtaddr} ${loadaddr}\0"			       \
