@@ -58,6 +58,9 @@ config TQMA8XXS_DEFAULTS
 	select DM_SPI_FLASH
 	select USB
 	select DM_USB
+	select USB_EHCI_HCD
+	select USB_EHCI_MX6
+	select MXC_USB_OTG_HACTIVE
 	select USB_XHCI_HCD
 	select USB_XHCI_IMX8
 	select SPI_FLASH
