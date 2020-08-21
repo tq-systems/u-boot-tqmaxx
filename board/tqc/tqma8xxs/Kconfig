@@ -156,7 +156,7 @@ config FEC_MXC_MDIO_BASE
 	default 0x5B040000
 
 choice
-	prompt "TQMa8XQP boot device"
+	prompt "TQMa8XxS boot device"
 	default TQMA8XXS_BOOT_SDCARD if TQMA8XXS_CPU_MX8QXP
 	help
 	  Select boot device
