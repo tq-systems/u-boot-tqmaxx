@@ -24,22 +24,6 @@
 		gpio = <&gpio4 19 GPIO_ACTIVE_LOW>;
 		regulator-boot-on;
 	};
-
-	reg_usbotg1_vbus: regulator-usbotg1-vbus {
-		compatible = "regulator-fixed";
-		regulator-name = "USBOTG1_VBUS";
-		regulator-min-microvolt = <5000000>;
-		regulator-max-microvolt = <5000000>;
-		gpio = <&gpio4 3 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-	};
-
-	usbh3: usbh3 {
-		compatible = "Cadence,usb3-host";
-		dr_mode = "host";
-		cdns3,usb = <&usbotg3>;
-		status = "okay";
-	};
 };
 
 &lpuart0 {
@@ -47,12 +31,7 @@
 };
 
 &usbotg1 {
-	vbus-supply = <&reg_usbotg1_vbus>;
 	dr_mode = "otg";
-	status = "okay";
-};
-
-&usbotg3 {
 	status = "okay";
 };
 

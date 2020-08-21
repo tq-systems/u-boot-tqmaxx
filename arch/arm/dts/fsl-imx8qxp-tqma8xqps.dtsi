@@ -26,6 +26,21 @@
 		regulator-always-on;
 	};
 
+	reg_usbotg1_vbus: regulator-usbotg1-vbus {
+		compatible = "regulator-fixed";
+		regulator-name = "USBOTG1_VBUS";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&gpio4 3 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+
+	usbh3: usbh3 {
+		compatible = "Cadence,usb3-host";
+		dr_mode = "host";
+		cdns3,usb = <&usbotg3>;
+		status = "okay";
+	};
 };
 
 &fec1 {
@@ -329,6 +344,11 @@
 	hnp-disable;
 	adp-disable;
 	power-polarity-active-high;
+	vbus-supply = <&reg_usbotg1_vbus>;
+};
+
+&usbotg3 {
+	status = "okay";
 };
 
 &usdhc1 {
