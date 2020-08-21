@@ -42,6 +42,8 @@ config TQMA8XXS_DEFAULTS
 	select MXC_GPIO
 	select DM_I2C
 	select SYS_I2C_IMX_LPI2C
+	select DM_REGULATOR
+	select DM_REGULATOR_FIXED
 	select MISC
 	select MII
 	select DM_ETH
