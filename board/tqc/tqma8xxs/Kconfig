@@ -135,7 +135,6 @@ choice
 
 config TQMA8XXS_BB_MB_SMARC_2
 	bool "TQMa8XxS on MB_SMARC_2 Board"
-	select TQC_SDMMC
 	select CMD_FUSE
 	select CMD_MII
 	select CMD_PING
