@@ -89,10 +89,19 @@ int arch_misc_init(void)
 	char cpu[10] = { 0 };
 	u16 cut_ver;
 
-	for (i = 0; i < sizeof(cpu); i++)
-		cpu[i] = tolower(rmobile_cpuinfo[idx].cpu_name[i]);
+	if ((rmobile_cpuinfo[idx].cpu_type == RMOBILE_CPU_TYPE_R8A774A1) &&
+		(rmobile_get_cpu_rev_integer() == 3) &&
+		(rmobile_get_cpu_rev_fraction() == 0))
+	{
+		env_set("platform", "r8a774a3");
+	}
+	else
+	{
+		for (i = 0; i < sizeof(cpu); i++)
+			cpu[i] = tolower(rmobile_cpuinfo[idx].cpu_name[i]);
 
-	env_set("platform", cpu);
+		env_set("platform", cpu);
+	}
 
 	i = rmobile_cpuinfo_idx();
 	if ((rmobile_cpuinfo[i].cpu_type == RMOBILE_CPU_TYPE_R8A774A1) &&
