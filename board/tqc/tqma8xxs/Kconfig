@@ -91,6 +91,8 @@ config TQMA8XXS_DEFAULTS
 	select SPL_SPI_FLASH_SUPPORT
 	select SPL_SPI_FLASH_TINY
 	select SPL_SPI_SUPPORT
+	select SPL_SPI_LOAD
+	select SPL_DM_SEQ_ALIAS
 
 config TQMA8XXS_MFG_SUPPORT
 	bool "MFG Tool support"
@@ -211,27 +213,31 @@ config DEFAULT_FDT_FILE
 config FEC_MXC_MDIO_BASE
 	default 0x5B040000
 
-choice
-	prompt "TQMa8XxS boot device"
-	default TQMA8XXS_BOOT_SDCARD if TQMA8XXS_CPU_MX8QXP
-	help
-	  Select boot device
+menu "TQMa8XxS boot device"
 
 config TQMA8XXS_BOOT_SDCARD
 	bool "TQMa8XxS from SD / e-MMC"
+	default "y"
 	select SD_BOOT
 	select ENV_IS_IN_MMC
 	help
-	  Select booting from SD / e-MMC
+	  Select booting from SD / e-MMC, you should supply env offsets per
+	  devicetree
 
 config TQMA8XXS_BOOT_QSPI
 	bool "TQMa8XxS from QSPI"
+	default "y"
 	select QSPI_BOOT
 	select ENV_IS_IN_SPI_FLASH
 	help
-	  Select booting from QSPI
+	  Select booting from QSPI, you need to supply correct env location
 
-endchoice
+endmenu
+
+#
+# default values for FLEXSPI NOR. Will be used also for environment from FLEXSPI
+# if ENV_SPI_[BUS,CS,MODE,SPEED] are not used to overwrite.
+#
 
 config SF_DEFAULT_BUS
 	default 0
