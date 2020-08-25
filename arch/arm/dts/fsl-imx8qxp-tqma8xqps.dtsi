@@ -10,6 +10,12 @@
 	model = "TQ Systems i.MX8QXP TQMa8XQPS";
 	compatible = "tq,tqma8xqps", "fsl,imx8qxp";
 
+	config {
+		/* 32 kiB redundant env */
+		u-boot,mmc-env-offset = <0x400000>;
+		u-boot,mmc-env-offset-redundant = <0x408000>;
+	};
+
 	reg_vmmc: regulator-vmmc {
 		compatible = "regulator-fixed";
 		regulator-name = "MMC0_3V3";
