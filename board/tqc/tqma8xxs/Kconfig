@@ -251,6 +251,13 @@ config SF_DEFAULT_SPEED
 config SF_DEFAULT_MODE
 	default 0
 
+#
+# environment settings: 32k, offset 4M (SPI NOR sector 64k), redundant env
+# in SPI NOR @ 4M + 64k
+#
+# These should go here, when updating U-Boot to newer Version
+#
+
 source "board/tqc/common/Kconfig"
 
 endif
