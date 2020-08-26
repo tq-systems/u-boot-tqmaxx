@@ -677,37 +677,15 @@ int disable_gpu_nodes(void *blob)
 int disable_cpu_nodes(void *blob, u32 disabled_cores)
 {
 	const char *nodes_path[] = {
-			"/cpus/cpu@1",
-			"/cpus/cpu@2",
 			"/cpus/cpu@3",
+			"/cpus/cpu@2",
+			"/cpus/cpu@1",
 	};
 
-	u32 i = 0;
-	int rc;
-	int nodeoff;
-
-	if (disabled_cores > 3)
+	if (disabled_cores > ARRAY_SIZE(nodes_path))
 		return -EINVAL;
 
-	i = 3 - disabled_cores;
-
-	for (; i < 3; i++) {
-		nodeoff = fdt_path_offset(blob, nodes_path[i]);
-		if (nodeoff < 0)
-			continue; /* Not found, skip it */
-
-		printf("Found %s node\n", nodes_path[i]);
-
-		rc = fdt_del_node(blob, nodeoff);
-		if (rc < 0) {
-			printf("Unable to delete node %s, err=%s\n",
-				nodes_path[i], fdt_strerror(rc));
-		} else {
-			printf("Delete node %s\n", nodes_path[i]);
-		}
-	}
-
-	return 0;
+	return disable_fdt_nodes(blob, nodes_path, disabled_cores);
 }
 
 int ft_system_setup(void *blob, bd_t *bd)
