@@ -39,6 +39,10 @@
 	u-boot,dm-spl;
 };
 
+&pinctrl_flexspi0 {
+	u-boot,dm-spl;
+};
+
 &pinctrl_usdhc2_gpio {
 	u-boot,dm-spl;
 };
@@ -75,6 +79,10 @@
 	u-boot,dm-spl;
 };
 
+&pd_lsio_flexspi0 {
+	u-boot,dm-spl;
+};
+
 &pd_lsio_gpio4 {
 	u-boot,dm-spl;
 };
@@ -96,6 +104,10 @@
 };
 
 &flexspi0 {
+	u-boot,dm-spl;
+};
+
+&flash0 {
 	u-boot,dm-spl;
 };
 
