@@ -16,3 +16,6 @@ config TQC_SCU
 
 config TQC_RTC
 	bool
+
+config TQC_ENVLOC
+	bool
