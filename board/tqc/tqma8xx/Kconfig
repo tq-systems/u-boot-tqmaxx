@@ -74,6 +74,8 @@ config TQMA8XX_DEFAULTS
 	select SPL_SPI_FLASH_SUPPORT
 	select SPL_SPI_FLASH_TINY
 	select SPL_SPI_SUPPORT
+	select SPL_SPI_LOAD
+	select SPL_DM_SEQ_ALIAS
 
 config TQMA8XX_MFG_SUPPORT
 	bool "MFG Tool support"
@@ -179,6 +181,7 @@ choice
 
 config TQMA8XX_BB_MBA8XX
 	bool "TQMa8Xx on MBa8Xx Starterkit"
+	select TQC_ENVLOC
 	select DM_SERIAL
 	select FSL_LPUART
 	select MII
@@ -229,10 +232,11 @@ config TQMA8XX_BOOT_SDCARD
 
 config TQMBA8XX_BOOT_FSPI
 	bool "TQMa8Xx boot from FlexSPI"
+	default "y"
 	select QSPI_BOOT
 	select ENV_IS_IN_SPI_FLASH
 	help
-	  Select booting from QSPI
+	  Select booting from QSPI NOR at FlexSPI port
 
 endmenu
 
