@@ -204,6 +204,9 @@ unsigned long get_board_ddr_clk(void);
 
 #define CONFIG_SYS_BOOTM_LEN   (64 << 20)      /* Increase max gunzip size */
 
+#define MAX_UBOOT_SIZE 0x300000
+#define MMC_UBOOT_OFFSET 0x800 /* Blocks */
+
 /* Initial environment variables */
 #define XSPI_MC_INIT_CMD			\
 	"env exists secureboot && "		\
@@ -212,13 +215,12 @@ unsigned long get_board_ddr_clk(void);
 	"fsl_mc start mc 0x20a00000 0x20e00000\0"
 
 #define SD_MC_INIT_CMD				\
-	"mmc read 0x80a00000 0x5000 0x1200;"	\
-	"mmc read 0x80e00000 0x7000 0x800;"	\
-	"env exists secureboot && "		\
-	"mmc read 0x80700000 0x3800 0x20 && "	\
-	"mmc read 0x80740000 0x3A00 0x20 && "	\
-	"esbc_validate 0x80700000 && "		\
-	"esbc_validate 0x80740000 ;"		\
+	"load mmc ${mmcdev_sdhc}:${bootpart} 0x80a00000 ${mc_file};"\
+	"load mmc ${mmcdev_sdhc}:${bootpart} 0x80e00000 ${dpc_file};"\
+
+#define SD2_MC_INIT_CMD				\
+	"load mmc ${mmcdev_emmc}:${bootpart} 0x80a00000 ${mc_file};"\
+	"load mmc ${mmcdev_emmc}:${bootpart} 0x80e00000 ${dpc_file};"\
 	"fsl_mc start mc 0x80a00000 0x80e00000\0"
 
 #define EXTRA_ENV_SETTINGS			\
@@ -245,7 +247,12 @@ unsigned long get_board_ddr_clk(void);
 	"kernel_size_sd=0x1d000\0"              \
 	"kernelhdr_size_sd=0x20\0"              \
 	"console=ttyAMA0,115200n8\0"		\
-	"mmcdev=0\0"				\
+	"bootpart=1\0"				\
+	"mc_file=mc.itb\0"			\
+	"dpc_file=dpc-warn.dtb\0"		\
+	"dpl_file=dpl-min.dtb\0"		\
+	"mmcdev_sdhc=0\0"			\
+	"mmcdev_emmc=1\0"			\
 	"kernel=Image\0"			\
 	"fdt="__stringify(CONFIG_DEFAULT_DEVICE_TREE)".dtb\0"		\
 	"earlycon=pl011,mmio32,0x21c0000\0"	\
@@ -260,8 +267,12 @@ unsigned long get_board_ddr_clk(void);
 		"rootwait\0"                                                   \
 	"uboot=fip_uboot.bin\0"						       \
 	"uboot_spi_offset=0x100000\0"					       \
+	"pbl_mmc_offset=8\0"						       \
+	"uboot_mmc_offset="__stringify(MMC_UBOOT_OFFSET)"\0"                   \
+	"uboot_max_size="__stringify(MAX_UBOOT_SIZE)"\0"                       \
 	"pbl_spi_offset=0x0\0"						       \
 	"pbl_spi=bl2_flexspi_nor.pbl\0"					       \
+	"pbl_mmc=bl2_emmc.pbl\0"					       \
 	"update_uboot_spi=run set_getcmd; if ${get_cmd} ${uboot}; then "       \
 		"if itest ${filesize} > 0; then "                              \
 			"echo Write u-boot image to sf address ${uboot_spi_offset};"\
@@ -288,16 +299,34 @@ unsigned long get_board_ddr_clk(void);
 			"sf update ${fileaddr} Kernel ${filesize};"\
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"					       \
-	"update_fdt_sd=run set_getcmd; if ${get_cmd} ${fdt}; then "       \
+	"update_pbl_mmc=run set_getcmd; if ${get_cmd} ${pbl_mmc}; then "       \
 		"if itest ${filesize} > 0; then "                              \
-			"mmc info"					       \
-			"save mmc ${mmcdev}:${bootpart} ${fileaddr} ${fdt} ${filesize};"		\
+			"mmc dev ${mmcdev_emmc}; mmc rescan; "	               \
+			"setexpr blkc ${filesize} + 0x1ff; "                   \
+			"setexpr blkc ${blkc} / 0x200; "		       \
+			"if itest ${filesize} <= ${uboot_max_size}; then "     \
+				"mmc write ${fileaddr} ${pbl_mmc_offset} ${blkc}; "\
+			"fi; "                                         \
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"					       \
-	"update_kernel_sd=run set_getcmd; if ${get_cmd} ${kernel}; then "       \
+	"update_uboot_mmc=run set_getcmd; if ${get_cmd} ${uboot}; then "       \
 		"if itest ${filesize} > 0; then "                              \
-			"mmc info"					       \
-			"save mmc ${mmcdev}:${bootpart} ${fileaddr} ${kernel} ${filesize};"		\
+			"mmc dev ${mmcdev_emmc}; mmc rescan; "	       \
+			"setexpr blkc ${filesize} + 0x1ff; "           \
+			"setexpr blkc ${blkc} / 0x200; "               \
+			"if itest ${filesize} <= ${uboot_max_size}; then "	       \
+				"mmc write ${fileaddr} ${uboot_mmc_offset} ${blkc}; "\
+			"fi; "                                         \
+		"fi; fi; "                                                     \
+		"setenv filesize;\0"					       \
+	"update_fdt_mmc=run set_getcmd; if ${get_cmd} ${fdt}; then "       \
+		"if itest ${filesize} > 0; then "                              \
+			"save mmc ${mmcdev_emmc}:${bootpart} ${fileaddr} ${fdt} ${filesize};"		\
+		"fi; fi; "                                                     \
+		"setenv filesize;\0"					       \
+	"update_kernel_mmc=run set_getcmd; if ${get_cmd} ${kernel}; then "       \
+		"if itest ${filesize} > 0; then "                              \
+			"save mmc ${mmcdev_emmc}:${bootpart} ${fileaddr} ${kernel} ${filesize};"		\
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"					       \
 	"set_getcmd=if test \"${ip_dyn}\" = yes; then "                        \
@@ -334,6 +363,8 @@ unsigned long get_board_ddr_clk(void);
 	"run distro_bootcmd;run xspi_bootcmd; "
 #define SD_BOOTCOMMAND						\
 	"run distro_bootcmd;run sd_bootcmd;"
+#define SD2_BOOTCOMMAND						\
+	"run distro_bootcmd;run emmc_bootcmd;"
 
 /* Initial environment variables */
 #define CONFIG_EXTRA_ENV_SETTINGS		\
@@ -345,8 +376,17 @@ unsigned long get_board_ddr_clk(void);
 		"fsl_mc lazyapply DPL 0x20d00000; "			       \
 		"booti ${load_addr} - ${fdt_addr_r}\0"			\
 	"sd_bootcmd=echo Trying load from sd card..;"		\
-		"run mmcargs; load mmc ${mmcdev}:${bootpart} ${load_addr} ${kernel};"		\
-		"load mmc ${mmcdev}:${bootpart} ${fdt_addr_r} ${fdt};"		\
+		"run mmcargs; load mmc ${mmcdev_sdhc}:${bootpart} ${load_addr} ${kernel};"		\
+		"load mmc ${mmcdev_sdhc}:${bootpart} ${fdt_addr_r} ${fdt};"		\
+		"load mmc ${mmcdev_sdhc}:${bootpart} 0x80d00000 ${dpl_file};"  \
+		"fsl_mc lazyappply DPL 0x80d00000;"	        \
+		"booti ${load_addr} - ${fdt_addr_r}\0"		\
+	"emmc_bootcmd=echo Trying load from sd card..;"		\
+		"setenv mmcblkdev 1; "				\
+		"run mmcargs; load mmc ${mmcdev_emmc}:${bootpart} ${load_addr} ${kernel};"		\
+		"load mmc ${mmcdev_emmc}:${bootpart} ${fdt_addr_r} ${fdt};"		\
+		"load mmc ${mmcdev_emmc}:${bootpart} 0x80d00000 ${dpl_file};"  \
+		"fsl_mc lazyappply DPL 0x80d00000;"	        \
 		"booti ${load_addr} - ${fdt_addr_r}\0"
 
 #define BOOT_TARGET_DEVICES(func) \
