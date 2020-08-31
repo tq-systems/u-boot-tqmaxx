@@ -20,6 +20,13 @@
 #undef CONFIG_SYS_MALLOC_LEN
 #define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + SZ_1M)
 
+/*
+ * A lot of RAM is reserved for the BL31 or used by U-Boot itself, so we
+ * can test only the lower 368 MiB of RAM
+ */
+#define CONFIG_SYS_MEMTEST_START	0x80000000
+#define CONFIG_SYS_MEMTEST_END		0x97000000
+
 /* FLASH */
 #define CONFIG_SYS_FSL_QSPI_AHB
 
