@@ -17,5 +17,10 @@ config TQC_SCU
 config TQC_RTC
 	bool
 
+#
+# This should be selected by boards that wish to support multiple env locations
+# select ENV_DEFAULT_NOWHERE to use as default if nothing matches.
+#
 config TQC_ENVLOC
 	bool
+	select ENV_DEFAULT_NOWHERE
