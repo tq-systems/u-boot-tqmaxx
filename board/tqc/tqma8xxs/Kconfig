@@ -73,7 +73,6 @@ config TQMA8XXS_DEFAULTS
 	select SPL
 	select SPL_DM
 	select SPL_OF_CONTROL
-	select SPL_LOAD_FIT
 	select SPL_BOARD_INIT
 	select SPL_CLK
 	select SPL_ENV_SUPPORT
