@@ -286,14 +286,21 @@
 #define PHYS_SDRAM_2_SIZE		0x0000000	/* not placed */
 
 #if defined(CONFIG_CMD_MEMTEST)
-#if !defined(CONFIG_SYS_ALT_MEMTEST)
-#define CONFIG_SYS_ALT_MEMTEST
-#endif
-#define CONFIG_SYS_MEMTEST_START	(CONFIG_BOOTAUX_RESERVED_MEM_BASE)
+/*
+ * Use alternative / extended memtest,
+ * start at CONFIG_LOADADDR and use 3/4 of RAM
+ * U-Boot is loaded to 0x80200000 (offset 8 MiB)
+ * and relocated at end of configured RAM
+ */
+#if defined(CONFIG_SYS_ALT_MEMTEST)
+#define CONFIG_SYS_MEMTEST_START	(CONFIG_LOADADDR)
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + \
-					(PHYS_SDRAM_1_SIZE / 4) * 3)
+					((PHYS_SDRAM_1_SIZE / 4) * 3))
 #define CONFIG_SYS_MEMTEST_SCRATCH	CONFIG_SYS_MEMTEST_END
-#endif
+
+#endif /* CONFIG_SYS_ALT_MEMTEST */
+
+#endif /* CONFIG_CMD_MEMTEST */
 
 /* Serial */
 #define CONFIG_BAUDRATE			115200
