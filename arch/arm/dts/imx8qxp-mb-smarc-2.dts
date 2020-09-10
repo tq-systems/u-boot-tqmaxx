@@ -21,7 +21,8 @@
 		regulator-name = "SD1_VMMC";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
-		gpio = <&gpio4 19 GPIO_ACTIVE_LOW>;
+		gpio = <&gpio4 19 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
 		regulator-boot-on;
 	};
 };
