@@ -50,6 +50,7 @@
 };
 
 &reg_sdvmmc {
+	u-boot,off-on-delay-us = <200000>;
 	u-boot,dm-spl;
 };
 
