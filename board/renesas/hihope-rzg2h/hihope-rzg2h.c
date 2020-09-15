@@ -30,6 +30,9 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#define DBSC_DBMEMSWAPCONF0		(0xE6792000)
+#define SWAPMD_MSK			(0xF)
+
 static int board_rev;
 
 void s_init(void)
@@ -120,7 +123,30 @@ int dram_init(void)
 
 int dram_init_banksize(void)
 {
+	int bank;
+	u32 swap_config;
+
+	/* This register describe the swap configration of PHY DRAM */
+	swap_config = readl((uint32_t *)DBSC_DBMEMSWAPCONF0);
 	fdtdec_setup_memory_banksize();
+
+	/* bits[3:0] describe:
+	 *    0000: Non-swap mode
+	 *    0110: Swap mode
+	 * In non-swap mode, the start address of memory bank is changed from
+	 * 0x5 to 0x6 (bits[40:32]), so that we must check it before mapping
+	 * to use.
+	 */
+	if (!(swap_config & SWAPMD_MSK)) {
+		for (bank = 0; bank < CONFIG_NR_DRAM_BANKS; bank++) {
+			if ((gd->bd->bi_dram[bank].start & (0x500000000U)) ==
+							   (0x500000000U)) {
+				gd->bd->bi_dram[bank].start = 
+				  (gd->bd->bi_dram[bank].start & 0x0FFFFFFFFU)
+				  | 0x600000000U;
+			}
+		}
+	}
 
 	return 0;
 }
