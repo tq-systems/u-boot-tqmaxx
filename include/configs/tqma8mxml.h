@@ -241,23 +241,26 @@
 
 #define CONFIG_ENV_OVERWRITE
 
+#define CONFIG_ENV_SIZE			(SZ_32K)
 #define CONFIG_SYS_REDUNDAND_ENVIRONMENT
-
-#if defined(CONFIG_SD_BOOT)
-#define CONFIG_ENV_OFFSET		(64 * SZ_64K)
-#define CONFIG_ENV_SIZE			(SZ_16K)
-#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
 #define CONFIG_ENV_SIZE_REDUND		(CONFIG_ENV_SIZE)
-#define CONFIG_SYS_MMC_ENV_DEV		-1   /* invalid */
-#elif defined(CONFIG_QSPI_BOOT)
-#error
-#else
-#error
-#endif
+
+#define CONFIG_ENV_OFFSET		(SZ_4M)
+/* needs to be equal to the erse sector size */
+#define CONFIG_ENV_SECT_SIZE		(SZ_64K)
+#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + \
+					 CONFIG_ENV_SECT_SIZE)
+
+/*
+ * we use determine it based on current boot device
+ */
+#define CONFIG_SYS_MMC_ENV_DEV		-1	/* invalid */
+#define CONFIG_SYS_MMC_ENV_PART		0	/* user area */
+
+#define CONFIG_SYS_MMC_IMG_LOAD_PART	1
 
 /* Size of malloc() pool */
-#define CONFIG_SYS_MALLOC_LEN		((CONFIG_ENV_SIZE + (2*1024) + \
-					 (16*1024)) * 1024)
+#define CONFIG_SYS_MALLOC_LEN		SZ_64M
 
 #define CONFIG_SYS_SDRAM_BASE		0x40000000
 #define PHYS_SDRAM			0x40000000
