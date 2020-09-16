@@ -37,6 +37,8 @@ choice
 config TQMA8MXX_BB_MBA8MX
 	bool "TQMa8MxML/TQMa8MxNL on MBa8Mx Starterkit"
 	select TQC_SDMMC
+	select TQC_ENVLOC if !IMX8MN
+	select ENV_DEFAULT_NOWHERE
 	select CMD_FUSE
 	select MII
 	select CMD_MII
@@ -96,7 +98,7 @@ config TQMA8MXX_BOOT_SDCARD
 
 config TQMA8MXX_BOOT_FSPI
 	bool "TQMa8MxML/TQMa8MxNL boot from FlexSPI"
-#	default "y"
+	default "y"
 	select QSPI_BOOT
 	select ENV_IS_IN_SPI_FLASH
 	help
@@ -136,6 +138,7 @@ config TQMA8MXX_DEFAULTS
 	select SPI
 	select DM_SPI
 	select SPI_FLASH_MTD
+	select MTD_DEVICE
 	select DM_SPI_FLASH
 	select SPI_FLASH
 	select SPI_FLASH_4BYTES_ADDR
@@ -156,9 +159,12 @@ config TQMA8MXX_DEFAULTS
 	select SPL_I2C_SUPPORT
 	select SPL_LIBGENERIC_SUPPORT
 	select SPL_LIBCOMMON_SUPPORT
+	select SPL_NOR_SUPPORT
+	select SPL_MTD_SUPPORT
 	select SPL_SPI_FLASH_SUPPORT
 	select SPL_SPI_FLASH_TINY
 	select SPL_SPI_SUPPORT
+	select SPL_SPI_LOAD
 
 #
 # default values for FLEXSPI NOR. Will be used also for environment from FLEXSPI
