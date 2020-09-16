@@ -16,10 +16,24 @@
 
 #define CONFIG_SPL_MAX_SIZE		(148 * 1024)
 #define CONFIG_SYS_MONITOR_LEN		(512 * 1024)
+
+/* eMMC specific: support booting from boot / user partition */
+#define CONFIG_SUPPORT_EMMC_BOOT
+
 #define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_USE_SECTOR
+/*
+ * 0x300 sectors -> 384 k -> 0x60000: offset of FIT image created with
+ * imx-mkimage
+ */
 #define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR	0x300
 #define CONFIG_SYS_MMCSD_FS_BOOT_PARTITION	1
-#define CONFIG_SYS_UBOOT_BASE		(QSPI0_AMBA_BASE + CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR * 512)
+/*
+ * we use spl_nor to read FIT image created with imx-mkimage from QSPI
+ * using memory mapped read
+ */
+#define CONFIG_SYS_UBOOT_BASE		(QSPI0_AMBA_BASE + 0x60000)
+/* offset of FIT image created with imx-mkimage */
+#define CONFIG_SYS_SPI_U_BOOT_OFFS	0x60000
 
 #ifdef CONFIG_SPL_BUILD
 /*#define CONFIG_ENABLE_DDR_TRAINING_DEBUG*/
@@ -246,13 +260,13 @@
 #define CONFIG_ENV_SIZE_REDUND		(CONFIG_ENV_SIZE)
 
 #define CONFIG_ENV_OFFSET		(SZ_4M)
-/* needs to be equal to the erse sector size */
+/* needs to be equal to the erase sector size */
 #define CONFIG_ENV_SECT_SIZE		(SZ_64K)
 #define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + \
 					 CONFIG_ENV_SECT_SIZE)
 
 /*
- * we use determine it based on current boot device
+ * we determine it based on current boot device
  */
 #define CONFIG_SYS_MMC_ENV_DEV		-1	/* invalid */
 #define CONFIG_SYS_MMC_ENV_PART		0	/* user area */
@@ -309,9 +323,6 @@
 #define CONFIG_FSL_USDHC
 
 #define CONFIG_SYS_FSL_ESDHC_ADDR	0
-
-#define CONFIG_SUPPORT_EMMC_BOOT	/* eMMC specific */
-#define CONFIG_SYS_MMC_IMG_LOAD_PART	1
 
 #endif
 
