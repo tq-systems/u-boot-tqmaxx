@@ -1,0 +1,22 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Copyright 2020 NXP
+ */
+
+#include "imx8mn-evk-u-boot.dtsi"
+
+&dsi_host {
+	status = "disabled";
+};
+
+&{/rm67199_panel} {
+	status = "disabled";
+};
+
+&lcdif {
+	status = "disabled";
+};
+
+&mipi_dsi {
+	status = "disabled";
+};
