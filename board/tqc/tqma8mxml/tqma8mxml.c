@@ -157,6 +157,9 @@ int print_bootinfo(void)
 	case USB_BOOT:
 		puts("USB\n");
 		break;
+	case QSPI_BOOT:
+		puts("FlexSPI\n");
+		break;
 	default:
 		printf("Unknown/Unsupported device %u\n", bt_dev);
 		break;
