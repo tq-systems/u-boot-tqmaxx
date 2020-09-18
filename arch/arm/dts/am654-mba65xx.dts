@@ -6,7 +6,7 @@
 
 /dts-v1/;
 
-#include "tqma654.dtsi"
+#include "am654-tqma65xx.dtsi"
 #include <dt-bindings/pinctrl/k3.h>
 
 / {
@@ -25,9 +25,9 @@
 
 	memory@80000000 {
 		device_type = "memory";
-		/* 2G RAM */
-		reg = <0x00000000 0x80000000 0x00000000 0x80000000>;
-
+		/* 4G RAM */
+		reg = <0x00000000 0x80000000 0x00000000 0x80000000>,
+		      <0x00000008 0x80000000 0x00000000 0x80000000>;
 	};
 
 	reserved-memory {

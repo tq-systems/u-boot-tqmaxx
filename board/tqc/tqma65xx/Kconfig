@@ -65,3 +65,6 @@ config SPL_LDSCRIPT
 source "board/tqc/common/Kconfig"
 
 endif
+
+config TQMA6548_MODULE_VERSION_P2
+    bool "2GB module version"

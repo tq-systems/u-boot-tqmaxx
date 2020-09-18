@@ -18,12 +18,9 @@
 /* DDR Configuration */
 #define CONFIG_SYS_SDRAM_BASE1		0x880000000
 
-#define SIZE_2GB	0
-#define SIZE_4GB	1
-
-#define CONFIG_SYS_SDRAM_SIZE	SIZE_2GB
-/*Specify the size of the Board's RAM to 2GB.
-Please make sure that the address configuration in the device tree is the same */
+#define CONFIG_CMD_MEMTEST
+#define CONFIG_SYS_MEMTEST_START CONFIG_SYS_SDRAM_BASE /* Start memory location */  
+#define CONFIG_SYS_MEMTEST_END CONFIG_SYS_SDRAM_BASE+0x20000000 /* End memory location*/
 
 /* SPL Loader Configuration */
 #ifdef CONFIG_TARGET_TQMA65XX_MBA65XX_A53
@@ -70,9 +67,9 @@ Please make sure that the address configuration in the device tree is the same *
 	"name=rootfs,start=0,size=-,uuid=${uuid_gpt_rootfs}\0"
 
 /* U-Boot general configuration */
-#define EXTRA_ENV_TQMA65XX_BOARD_SETTINGS					\
+#define EXTRA_ENV_TQMA65XX_BOARD_SETTINGS				\
 	"findfdt="							\
-		"setenv name_fdt tqma654-base-board.dtb;"		\
+		"setenv name_fdt am654-mba65xx.dtb;"		\
 		"setenv fdtfile ${name_fdt}\0"				\
 	"loadaddr=0x80080000\0"						\
 	"fdtaddr=0x82000000\0"						\

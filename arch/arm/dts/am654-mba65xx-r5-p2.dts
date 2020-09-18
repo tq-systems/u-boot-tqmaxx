@@ -6,10 +6,10 @@
 
 /dts-v1/;
 
-#include "tqma654.dtsi"
-#include "tqma654-base-board-u-boot.dtsi"
-#include "tqma654-base-board-ddr4-1600MTs.dtsi"
-#include "tqma654-ddr.dtsi"
+#include "am654-tqma65xx.dtsi"
+#include "am654-mba65xx-p2-u-boot.dtsi"
+#include "am654-mba65xx-p2-ddr4-1600MTs.dtsi"
+#include "am654-tqma65xx-ddr.dtsi"
 
 / {
 	compatible =  "ti,am654-evm", "ti,am654";
