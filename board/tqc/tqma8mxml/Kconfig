@@ -65,22 +65,22 @@ config DEFAULT_FDT_FILE
 	default "imx8mm-mba8mx.dtb" if TQMA8MXX_BB_MBA8MX && IMX8MM
 
 config NR_DRAM_BANKS
-	default 1 
+	default 1
 
 config SYS_TEXT_BASE
-	default 0x40200000 
+	default 0x40200000
 
 config SYS_MALLOC_F_LEN
-	default 0x2000 
+	default 0x2000
 
 config SAVED_DRAM_TIMING_BASE
-	default 0x40000000 
+	default 0x40000000
 
 config FIT_EXTERNAL_OFFSET
-	default 0x3000 
+	default 0x3000
 
 config SPL_FIT_GENERATOR
-	default "arch/arm/mach-imx/mkimage_fit_atf.sh" 
+	default "arch/arm/mach-imx/mkimage_fit_atf.sh"
 
 config SYS_EXTRA_OPTIONS
 	default "IMX_CONFIG=arch/arm/mach-imx/imx8m/imximage.cfg,SPL_TEXT_BASE=0x7E1000" if TARGET_TQMA8MXML
