@@ -73,8 +73,14 @@ config SYS_TEXT_BASE
 config SYS_MALLOC_F_LEN
 	default 0x2000
 
+#
+# even if this is the Kconfig default in the memory controller Kconfig for
+# i.MX8M, we set this here for completeness. This value is hard coded in the
+# TF-A port (imx-atf) for i.MXMM / i.MXNN
+#
 config SAVED_DRAM_TIMING_BASE
-	default 0x40000000
+	default 0x180000 if IMX8MM
+	default 0x180000 if IMX8MN
 
 config FIT_EXTERNAL_OFFSET
 	default 0x3000
