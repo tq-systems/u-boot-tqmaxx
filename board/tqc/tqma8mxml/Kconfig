@@ -88,15 +88,19 @@ config FIT_EXTERNAL_OFFSET
 config SPL_FIT_GENERATOR
 	default "arch/arm/mach-imx/mkimage_fit_atf.sh"
 
+#
+# TODO: delete as soon as SPL_TEXT_BASE is moved to Kconfig
+# Attention: i.MX8MM has different settings for SPL_TEXT_BASE depending on boot
+# device
+#
 config SYS_EXTRA_OPTIONS
-	default "IMX_CONFIG=arch/arm/mach-imx/imx8m/imximage.cfg,SPL_TEXT_BASE=0x7E1000" if TARGET_TQMA8MXML
-	default "IMX_CONFIG=arch/arm/mach-imx/imx8m/imximage.cfg,SPL_TEXT_BASE=0x912000" if TARGET_TQMA8MXNL
+	default "IMX_CONFIG=arch/arm/mach-imx/imx8m/imximage.cfg,SPL_TEXT_BASE=0x912000" if IMX8MN
 
 menu "TQMa8MXX boot device"
 
 config TQMA8MXX_BOOT_SDCARD
 	bool "TQMa8MxML/TQMa8MxNL boot from SD / e-MMC"
-	default "y"
+	default "y" if IMX8MN
 	select SD_BOOT
 	select ENV_IS_IN_MMC
 	help
@@ -104,7 +108,7 @@ config TQMA8MXX_BOOT_SDCARD
 
 config TQMA8MXX_BOOT_FSPI
 	bool "TQMa8MxML/TQMa8MxNL boot from FlexSPI"
-	default "y"
+	default "y" if IMX8MN
 	select QSPI_BOOT
 	select ENV_IS_IN_SPI_FLASH
 	help
