@@ -179,6 +179,8 @@
 		#address-cells = <1>;
 		#size-cells = <1>;
 		compatible = "jedec,spi-nor";
+		spi-tx-bus-width = <1>;
+		spi-rx-bus-width = <1>;
 		spi-nor,ddr-quad-read-dummy = <6>;
 	};
 };

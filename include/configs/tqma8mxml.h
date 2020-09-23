@@ -352,6 +352,11 @@
 #define FSPI0_AMBA_BASE			0x0
 
 #define CONFIG_SYS_FSL_FSPI_AHB
+
+/*
+ * TODO: not working at the moment
+ * #define CONFIG_FSPI_QUAD_SUPPORT
+ */
 #endif
 
 #define CONFIG_MXC_OCOTP
