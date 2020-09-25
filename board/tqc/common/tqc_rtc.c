@@ -34,7 +34,7 @@ int tqc_pcf85063_adjust_capacity(int bus, int address, int quartz_load)
 			break;
 	}
 
-	ret = dm_i2c_reg_write(dev, 0x00, val);
+	ret = dm_i2c_reg_write(dev, PCF85063_REG_CTRL1, val);
 
 	return ret;
 }
