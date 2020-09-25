@@ -9,7 +9,7 @@
 #include <dt-bindings/net/ti-dp83867.h>
 
 / {
-	model = "TQ Systems GmbH i.MX8MN TQMa8MN on MBa8MX";
+	model = "TQ Systems GmbH i.MX8MN TQMa8MxNL on MBa8Mx";
 	compatible = "tq,imx8mn-mba8mx", "tq,imx8mn-tqma8mxnl", "fsl,imx8mn";
 
 	chosen {

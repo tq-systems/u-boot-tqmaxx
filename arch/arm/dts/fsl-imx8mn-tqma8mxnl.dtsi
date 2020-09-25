@@ -6,7 +6,7 @@
 #include "fsl-imx8mn.dtsi"
 
 / {
-	model = "TQ Systems i.MX8MN TQMa8MN";
+	model = "TQ Systems i.MX8MN TQMa8MxNL";
 	compatible = "tq,imx8mn-tqma8mxnl", "fsl,imx8mn";
 
 	config {
