@@ -113,7 +113,8 @@ config FASTBOOT_USB_DEV
 endif
 
 config NR_DRAM_BANKS
-	default 1 if TARGET_TQMA8MX
+	default 1 if (TQMA8MX_RAM_2G || TQMA8MX_RAM_1G)
+	default 2 if TQMA8MX_RAM_4G
 
 config SYS_TEXT_BASE
 	default 0x40200000 if TARGET_TQMA8MX
@@ -138,6 +139,11 @@ choice
 	default TQMA8MX_RAM_2G
 	help
 	  Select memory variant for TQMa8MX
+
+config TQMA8MX_RAM_4G
+	bool "TQMa8MX with 4GB LPDDR4"
+	help
+	  Select module with 4GB LPDDR4"
 
 config TQMA8MX_RAM_2G
 	bool "TQMa8MX with 2GB LPDDR4"

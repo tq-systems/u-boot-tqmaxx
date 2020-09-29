@@ -244,10 +244,14 @@
 #define CONFIG_SYS_SDRAM_BASE		0x40000000
 #define PHYS_SDRAM			0x40000000
 
-#if defined(CONFIG_TQMA8MX_RAM_2G)
-#define PHYS_SDRAM_SIZE			0x80000000 /* 2GB LPDDR4 */
+#if defined(CONFIG_TQMA8MX_RAM_4G)
+#define PHYS_SDRAM_SIZE			0xc0000000ull /* 3GB LPDDR4 */
+#define PHYS_SDRAM_2			0x100000000ull
+#define PHYS_SDRAM_2_SIZE		0x40000000ull /* 1GB */
+#elif defined(CONFIG_TQMA8MX_RAM_2G)
+#define PHYS_SDRAM_SIZE			0x80000000ull /* 2GB LPDDR4 */
 #elif defined (CONFIG_TQMA8MX_RAM_1G)
-#define PHYS_SDRAM_SIZE			0x40000000 /* 1GB LPDDR4 */
+#define PHYS_SDRAM_SIZE			0x40000000ull /* 1GB LPDDR4 */
 #else
 #error
 #endif
@@ -258,6 +262,9 @@
  * leave 128 MiB free at start
  * U-Boot is loaded to 0x40200000 (offset 2 MiB)
  * and relocated at end of configured RAM
+ * for total ram size > 0xc0000000 we limit to the first
+ * bank (0x40000000ull ... 0x100000000ull) since this it what we can use in
+ * U-Boot without hassle. See get_effective_memsize for this board.
  */
 #if defined(CONFIG_SYS_ALT_MEMTEST)
 #define CONFIG_SYS_MEMTEST_START	(CONFIG_SYS_SDRAM_BASE + SZ_128M)
