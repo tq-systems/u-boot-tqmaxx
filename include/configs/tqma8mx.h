@@ -17,8 +17,16 @@
 #define CONFIG_SPL_TEXT_BASE		0x7E1000
 #define CONFIG_SPL_MAX_SIZE		(148 * 1024)
 #define CONFIG_SYS_MONITOR_LEN		(512 * 1024)
+
+/* eMMC specific: support booting from boot / user partition */
+#define CONFIG_SUPPORT_EMMC_BOOT
+
 #if defined(CONFIG_SD_BOOT)
 #define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_USE_SECTOR
+/*
+ * 0x300 sectors -> 384 k -> 0x60000: offset of FIT image created with
+ * imx-mkimage
+ */
 #define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR	0x300
 #define CONFIG_SYS_MMCSD_FS_BOOT_PARTITION	1
 #else
@@ -87,6 +95,54 @@
 	"initrd_high=0xffffffffffffffff\0" \
 	"emmc_dev=0\0"\
 	"sd_dev=1\0" \
+
+#if defined(CONFIG_IMX_BOOTAUX)
+
+/*
+ * cm_loadaddr is set to TCML per default.
+ * cm_maxsize is used to prevent loading too large images. This limit is
+ * 128 kiByte for TCML.
+ * Size and base address can be changed to RAM address or SPI NOR if larger
+ * images are needed. In this case further adaption is needed.
+ */
+#define TQMA8MX_CM_ENV_SETTINGS							\
+	"cm_image=cm.bin\0"							\
+	"cm_loadaddr=0x7e0000\0"						\
+	"cm_maxsize=0x20000\0"							\
+	"boot_cm_mmc=if load mmc ${mmcdev}:${mmcpart} ${loadaddr} "		\
+				"${mmcpath}/${cm_image}; then "			\
+			"if itest ${filesize} > 0; then "			\
+				"if itest ${filesize} <= ${cm_maxsize}; then "	\
+					"cp.b ${loadaddr} ${cm_loadaddr} "	\
+						"${filesize};"			\
+					"dcache flush; "			\
+					"bootaux ${cm_loadaddr}; "		\
+				"else "						\
+					"echo ${filesize} > ${cm_maxsize}; "	\
+					"false; "				\
+				"fi; "						\
+			"else "							\
+				"echo invalid data size; "			\
+				"false; "					\
+			"fi; "							\
+		"else "								\
+			"echo file not loaded; "				\
+			"false; "						\
+		"fi; setenv filesize;\0"					\
+	"update_cm_mmc=run set_getcmd; "					\
+		"if ${get_cmd} ${cm_image}; then "				\
+			"if itest ${filesize} > 0; then "			\
+				"echo Write CM image to mmc ...; "		\
+				"save mmc ${mmcdev}:${mmcpart} ${loadaddr} "	\
+					"${mmcpath}${cm_image} ${filesize}; "	\
+			"fi; "							\
+		"fi; "								\
+		"setenv filesize; setenv get_cmd\0"
+#else
+
+#define TQMA8MX_CM_ENV_SETTINGS
+
+#endif
 
 /* Initial environment variables */
 #define TQMA8MX_MODULE_ENV_SETTINGS		\
@@ -223,23 +279,23 @@
 
 #define CONFIG_ENV_OVERWRITE
 
+#define CONFIG_ENV_SIZE			(SZ_32K)
 #define CONFIG_SYS_REDUNDAND_ENVIRONMENT
-
-#if defined(CONFIG_SD_BOOT)
-#define CONFIG_ENV_OFFSET		(64 * SZ_64K)
-#define CONFIG_ENV_SIZE			SZ_16K
-#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
 #define CONFIG_ENV_SIZE_REDUND		(CONFIG_ENV_SIZE)
 
-#define CONFIG_SYS_MMC_ENV_DEV		-1   /* invalid */
-#elif defined(CONFIG_QSPI_BOOT)
-#error
-#else
-#error
-#endif
+#define CONFIG_ENV_OFFSET		(SZ_4M)
+#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
+
+/*
+ * we determine it based on current boot device
+ */
+#define CONFIG_SYS_MMC_ENV_DEV		-1	/* invalid */
+#define CONFIG_SYS_MMC_ENV_PART		0	/* user area */
+
+#define CONFIG_SYS_MMC_IMG_LOAD_PART	1
 
 /* Size of malloc() pool */
-#define CONFIG_SYS_MALLOC_LEN		((CONFIG_ENV_SIZE + (2*1024) + (16*1024)) * 1024)
+#define CONFIG_SYS_MALLOC_LEN		SZ_64M
 
 #define CONFIG_SYS_SDRAM_BASE		0x40000000
 #define PHYS_SDRAM			0x40000000
@@ -259,7 +315,7 @@
 #if defined(CONFIG_CMD_MEMTEST)
 /*
  * Use alternative / extended memtest,
- * leave 128 MiB free at start
+ * start at CONFIG_LOADADDR and use 3/4 of RAM
  * U-Boot is loaded to 0x40200000 (offset 2 MiB)
  * and relocated at end of configured RAM
  * for total ram size > 0xc0000000 we limit to the first
@@ -267,9 +323,10 @@
  * U-Boot without hassle. See get_effective_memsize for this board.
  */
 #if defined(CONFIG_SYS_ALT_MEMTEST)
-#define CONFIG_SYS_MEMTEST_START	(CONFIG_SYS_SDRAM_BASE + SZ_128M)
-#define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + (PHYS_SDRAM_SIZE / 4) * 3)
-#define CONFIG_SYS_MEMTEST_SCRATCH CONFIG_SYS_MEMTEST_END
+#define CONFIG_SYS_MEMTEST_START	(CONFIG_LOADADDR)
+#define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + \
+					((PHYS_SDRAM_SIZE / 4) * 3))
+#define CONFIG_SYS_MEMTEST_SCRATCH	CONFIG_SYS_MEMTEST_END
 
 #endif /* CONFIG_SYS_ALT_MEMTEST */
 
@@ -287,28 +344,6 @@
 #define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
 					sizeof(CONFIG_SYS_PROMPT) + 16)
 
-#if defined(CONFIG_IMX_BOOTAUX)
-
-#define TQMA8MX_CM4_ENV_SETTINGS						\
-	"m4_image=test.bin\0"							\
-	"m4_loadaddr=0x7e0000\0"						\
-	"load_m4=load mmc ${mmcdev}:${mmcpart} ${m4_loadaddr} ${m4_image}\0"	\
-	"boot_m4=run load_m4; bootaux ${m4_loadaddr}\0"				\
-	"update_m4=run set_getcmd; "                                            \
-		"if ${get_cmd} ${m4_image}; then "                              \
-			"if itest ${filesize} > 0; then "                       \
-				"echo Write M4 image to mmc ${mmcdev}:${mmcpart}...; " \
-				"save mmc ${mmcdev}:${mmcpart} ${loadaddr} "   \
-					"${m4_image} ${filesize}; "            \
-			"fi; "                                                 \
-		"fi; "                                                         \
-		"setenv filesize; setenv get_cmd \0"                           \
-
-#else
-
-#define TQMA8MX_CM4_ENV_SETTINGS
-
-#endif
 
 #if defined(CONFIG_FSL_ESDHC)
 
@@ -317,9 +352,6 @@
 #define CONFIG_SYS_FSL_ESDHC_ADDR	0
 
 #endif
-
-#define CONFIG_SUPPORT_EMMC_BOOT	/* eMMC specific */
-#define CONFIG_SYS_MMC_IMG_LOAD_PART	1
 
 #ifdef CONFIG_FSL_QSPI
 
@@ -362,7 +394,7 @@
 #endif
 
 #define CONFIG_EXTRA_ENV_SETTINGS		\
-	TQMA8MX_CM4_ENV_SETTINGS		\
+	TQMA8MX_CM_ENV_SETTINGS		\
 	TQMA8MX_MODULE_ENV_SETTINGS		\
 	BB_ENV_SETTINGS
 
@@ -373,4 +405,4 @@
 #include <config_distro_bootcmd.h>
 #endif
 
-#endif
+#endif /* TQMa8Mx */
