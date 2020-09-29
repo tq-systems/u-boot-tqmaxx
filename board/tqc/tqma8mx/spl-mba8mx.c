@@ -162,8 +162,6 @@ static void dwc3_nxp_usb_phy_init(struct dwc3_device *dwc3)
 
 int board_usb_init(int index, enum usb_init_type init)
 {
-	int ret = 0;
-
 	imx8m_usb_power(index, true);
 
 	if (index == 0 && init == USB_INIT_DEVICE) {
