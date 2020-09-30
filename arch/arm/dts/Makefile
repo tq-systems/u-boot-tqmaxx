@@ -469,6 +469,7 @@ dtb-$(CONFIG_RCAR_GEN3) += \
 	r8a77990-ebisu-4d-u-boot.dtb \
 	r8a77995-draak-u-boot.dtb \
 	r8a774a1-hihope-rzg2m-u-boot.dtb \
+	r8a774a1-tqmarzg2m_e-mbarzg2x-u-boot.dtb \
 	r8a774b1-hihope-rzg2n-u-boot.dtb \
 	r8a774c0-ek874-u-boot.dtb \
 	r8a774c0-ek874-revc-u-boot.dtb \

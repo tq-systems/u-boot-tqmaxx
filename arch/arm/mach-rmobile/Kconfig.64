@@ -81,6 +81,10 @@ config TARGET_HIHOPE_RZG2H
 	help
           Support for RZG2H HiHope platform
 
+config TARGET_TQMARZG2M_E_MBARZG2X
+	bool "TQMaRZG2M board (8GiB)"
+	help
+          Support for TQMaRZG2M platform
 endchoice
 
 config SYS_SOC
@@ -95,5 +99,6 @@ source "board/renesas/ek874/Kconfig"
 source "board/renesas/hihope-rzg2m/Kconfig"
 source "board/renesas/hihope-rzg2n/Kconfig"
 source "board/renesas/hihope-rzg2h/Kconfig"
+source "board/tqc/tqmarzg2m_e-mbarzg2x/Kconfig"
 
 endif
