@@ -15,6 +15,12 @@
 	chosen {
 	};
 
+	config {
+		/* 32 kiB redundant env */
+		u-boot,mmc-env-offset = <0x400000>;
+		u-boot,mmc-env-offset-redundant = <0x408000>;
+	};
+
 	reg_tqma8mx_vcc3v3: regulator-vcc3v3 {
 		compatible = "regulator-fixed";
 		regulator-name = "TQMA8MX_VCC3V3";
