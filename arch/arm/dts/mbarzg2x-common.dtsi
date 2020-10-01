@@ -7,6 +7,7 @@
  */
 
 #include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/net/ti-dp83867.h>
 
 / {
 	aliases {
@@ -128,6 +129,8 @@
 	phy-handle = <&phy0>;
 	phy-mode = "rgmii-txid";
 	status = "okay";
+	ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_NS>;
+	ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_NS>;
 
 	phy0: ethernet-phy@0 {
 		rxc-skew-ps = <1500>;
