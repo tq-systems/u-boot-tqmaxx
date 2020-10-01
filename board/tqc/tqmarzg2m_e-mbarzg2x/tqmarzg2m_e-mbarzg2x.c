@@ -25,6 +25,7 @@
 #include <asm/arch/sh_sdhi.h>
 #include <i2c.h>
 #include <mmc.h>
+#include <miiphy.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -265,6 +266,22 @@ int board_late_init(void)
 
 	return 0;
 }
+
+#if defined(CONFIG_LAST_STAGE_INIT)
+int last_stage_init(void)
+{
+	char *devname = miiphy_get_current_dev();
+
+	/* invert polarity for the ethernet LEDs */
+	miiphy_write(devname, 0, 0x19, 0);
+
+	/* set impedance to minimum (using indirect register access) */
+	miiphy_write(devname, 0, 0x0d, 0x001f);
+	miiphy_write(devname, 0, 0x0e, 0x0170);
+	miiphy_write(devname, 0, 0x0d, 0x401f);
+	miiphy_write(devname, 0, 0x0e, 0x001f);
+}
+#endif
 
 int dram_init(void)
 {
