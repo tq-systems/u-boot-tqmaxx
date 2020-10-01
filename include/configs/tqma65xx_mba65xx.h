@@ -66,11 +66,21 @@
 	/* Linux partitions */ \
 	"name=rootfs,start=0,size=-,uuid=${uuid_gpt_rootfs}\0"
 
+/* Device tree names settings */
+#ifdef CONFIG_TQMA6548_MODULE_VERSION_P2
+#define FDT_ENV_TQMA65XX_BOARD    				\
+	"findfdt=" 									\
+		"setenv name_fdt am654-mba65xx-p2.dtb;" \
+		"setenv fdtfile ${name_fdt}\0"
+#else
+#define FDT_ENV_TQMA65XX_BOARD    				\
+	"findfdt=" 									\
+		"setenv name_fdt am654-mba65xx-p1.dtb;" \
+		"setenv fdtfile ${name_fdt}\0"
+#endif
+
 /* U-Boot general configuration */
 #define EXTRA_ENV_TQMA65XX_BOARD_SETTINGS				\
-	"findfdt="							\
-		"setenv name_fdt am654-mba65xx.dtb;"		\
-		"setenv fdtfile ${name_fdt}\0"				\
 	"loadaddr=0x80080000\0"						\
 	"fdtaddr=0x82000000\0"						\
 	"overlayaddr=0x83000000\0"					\
@@ -137,6 +147,7 @@
 #define CONFIG_EXTRA_ENV_SETTINGS					\
 	DEFAULT_MMC_TI_ARGS						\
 	DEFAULT_FIT_TI_ARGS						\
+	FDT_ENV_TQMA65XX_BOARD						\
 	EXTRA_ENV_TQMA65XX_BOARD_SETTINGS					\
 	EXTRA_ENV_TQMA65XX_BOARD_SETTINGS_MMC				\
 	EXTRA_ENV_TQMA65XX_BOARD_SETTINGS_MTD				\
