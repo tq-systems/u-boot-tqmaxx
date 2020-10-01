@@ -79,6 +79,8 @@ int board_early_init_f(void)
 
 #define	GPIO_REV_BIT1		113	/* GP5_19	*/
 #define	GPIO_REV_BIT0		115	/* GP5_21	*/
+#define	GPIO_USB_HUB_RST	142	/* GP6_22	*/
+
 
 #define CLOCKGEN_I2C_BUS_NUM	4
 #define CLOCKGEN_I2C_ADDR	0x6A
@@ -249,6 +251,10 @@ int board_init(void)
 		board_rev = 0x03 + ((gpio_get_value(GPIO_REV_BIT1) << 1)  | gpio_get_value(GPIO_REV_BIT0));
 	}
 	clear_wlan_bt_reg_on();
+
+	/* MBaRZG2x: release USB hub reset */
+	gpio_request(GPIO_USB_HUB_RST, "usb_hub_rst");
+	gpio_direction_output(GPIO_USB_HUB_RST, 1);
 
 	return 0;
 }
