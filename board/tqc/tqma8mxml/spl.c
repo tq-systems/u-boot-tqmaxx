@@ -197,12 +197,12 @@ int power_init_board(void)
 	/*
 	 * TODO:
 	 * check DVS for BUCK (power save with PMIC_STBY_REQ)
-	 * check VDD_SOC/dRAM -> 0.95 Volt
+	 * check VDD_SOC/DRAM -> 0.95 Volt
 	 * check VDD_SNVS_0V8 -> 0.85V
 	 * see imx8m[m,n]_evk
 	 */
 
-	/* set WDOG_B_CFG to cold reset w/o LDO1/2*/
+	/* set WDOG_B_CFG to cold reset w/o LDO1/2 */
 	pmic_reg_read(p, PCA9450_RESET_CTRL, &regval);
 	regval &= 0x3f;
 	regval |= 0x80;
