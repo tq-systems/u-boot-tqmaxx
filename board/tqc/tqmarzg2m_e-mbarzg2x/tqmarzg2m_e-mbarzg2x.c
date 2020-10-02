@@ -39,6 +39,7 @@ void s_init(void)
 #define GPIO_BT_REG_ON 158
 #define	GPIO_BT_POWER		73	/* GP3_13	*/
 #define	GPIO_WIFI_POWER		82	/* GP4_06	*/
+#define	GPIO_PCIE1_SATA_SEL	25	/* GP1_09	*/
 
 void clear_wlan_bt_reg_on(void)
 {
@@ -256,6 +257,10 @@ int board_init(void)
 	/* MBaRZG2x: release USB hub reset */
 	gpio_request(GPIO_USB_HUB_RST, "usb_hub_rst");
 	gpio_direction_output(GPIO_USB_HUB_RST, 1);
+
+	/* MBaRZG2x: set GP1_09 as input to allow DIP switch S10.1 control PCIE1_SATA_SEL */
+	gpio_request(GPIO_PCIE1_SATA_SEL, "pcie1_sata_sel");
+	gpio_direction_input(GPIO_PCIE1_SATA_SEL);
 
 	return 0;
 }
