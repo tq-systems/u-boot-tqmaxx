@@ -55,6 +55,19 @@ static const struct soc_device_attribute tqma65xx_rev_fdt_match[] = {
 /* Max number of MAC addresses that are parsed/processed per daughter card */
 #define DAUGHTER_CARD_NO_OF_MAC_ADDR	8
 
+#define MAC_ARR_EEPROM_OFFSET 0x23
+
+#define GPIO_PRG_0_ETH 100
+#define GPIO_PRG_1_ETH 101
+
+#define PRG_0_ETHERNET_GPIO_NAME "gpio@20_2"
+#define PRG_1_ETHERNET_GPIO_NAME "gpio@20_5"
+
+#define PRG_0_ETHERNET_DTB_NAME "am654-mba65xx-eth-prg0.dtbo"
+#define PRG_1_ETHERNET_DTB_NAME "am654-mba65xx-eth-prg1.dtbo"
+#define AUDIO_DTB_NAME          "am654-mba65xx-audio.dtbo"
+
+
 DECLARE_GLOBAL_DATA_PTR;
 
 int board_init(void)
@@ -161,6 +174,10 @@ int ft_board_setup(void *blob, bd_t *bd)
 
 const char *k3_dtbo_list[MAX_INTERFACES_CONFIG] = {NULL};
 
+// Store globally  gpio value for read the stat from register only once
+static int gpio_value_prg0_eth = -1;
+static int gpio_value_prg1_eth = -1;
+
 int do_board_detect(void)
 {
 	int ret;
@@ -200,22 +217,105 @@ invalid_eeprom:
 	set_board_info_env_am6(name);
 }
 
+// Read value of gpio input from system
+static int read_gpio_in_value(const char *gpio_name)
+{
+	int ret;
+	struct gpio_desc gpio;
+
+	memset(&gpio, 0, sizeof(gpio));
+
+	ret = dm_gpio_lookup_name(gpio_name, &gpio);
+	if (ret < 0) {
+		pr_err("%s: gpio %s not found: %d\n", __func__, gpio_name, ret);
+		return ret;
+	}
+
+	/* Request GPIO, simply re-using the name as label */
+	ret = dm_gpio_request(&gpio, gpio_name);
+	if (ret < 0) {
+		pr_err("%s: gpio %s request error: %d\n", __func__, gpio_name, ret);
+		return ret;
+	}
+
+	ret = dm_gpio_set_dir_flags(&gpio, GPIOD_IS_IN);
+	if (ret < 0) {
+		pr_err("%s: gpio %s set direction error: %d\n", __func__, gpio_name, ret);
+		return ret;
+	}
+
+	ret = dm_gpio_get_value(&gpio);
+	if (ret < 0) {
+		pr_err("%s: gpio %s geting value error: %d\n", __func__, gpio_name, ret);
+	}
+
+	return ret;
+}
+
+// Get gpio value
+// If value for this GPIO was already read - return value without reading
+static int get_gpio_in_value(int gpio_id)
+{
+	int ret;
+
+	if (gpio_id == GPIO_PRG_0_ETH) {
+		// read gpio if it wasn't read
+		if( gpio_value_prg0_eth < 0 ) {
+			gpio_value_prg0_eth = read_gpio_in_value(PRG_0_ETHERNET_GPIO_NAME);
+		}	
+		ret = gpio_value_prg0_eth;
+
+	} else if (gpio_id == GPIO_PRG_1_ETH) {
+		// read gpio if it wasn't read
+		if( gpio_value_prg1_eth < 0 ) {
+			gpio_value_prg1_eth = read_gpio_in_value(PRG_1_ETHERNET_GPIO_NAME);
+		}	
+		ret = gpio_value_prg1_eth;
+
+	} else {
+		pr_err("%s: unknown gpio id %d\n", __func__, gpio_id);
+		ret = -1;
+	}
+
+	return ret;
+}
+
+
 static int add_mba_interfaces(void)
 {
 	char name_overlays[1024] = { 0 };
-	int nb_dtbos = 0;
-	const char *mba65xx_interfaces_dtboname[MAX_INTERFACES_CONFIG] ={ "am654-mba65xx-interfaces.dtbo" };
+	//int nb_dtbos = 0; // not needed for SPL
+	int ret;
+
+	ret = 0;
 	memset(k3_dtbo_list, 0, sizeof(k3_dtbo_list));
-	int i;
-		const char *dtboname;
-	for (i=0;i<MAX_INTERFACES_CONFIG;i++){
-		dtboname = mba65xx_interfaces_dtboname[i];
-		k3_dtbo_list[nb_dtbos++] = dtboname;
-		
-		if (strlen(name_overlays) + strlen(dtboname) + 2 >  sizeof(name_overlays))
-			return -ENOMEM;
-		/* Append to our list of overlays */
-		strcat(name_overlays, dtboname);
+
+	// Check PRG_Etherenet_0
+	ret = get_gpio_in_value(GPIO_PRG_0_ETH);
+	if (ret < 0) {
+		pr_err("%s: get gpio %s value error: %d\n", 
+			__func__, PRG_0_ETHERNET_GPIO_NAME, ret);
+	} else if (ret == 1) {
+		// Add dtbo for prg0 ethernet
+		//k3_dtbo_list[nb_dtbos++] = PRG_0_ETHERNET_DTB_NAME; // not needed for SPL
+		strcat(name_overlays, PRG_0_ETHERNET_DTB_NAME);
+		strcat(name_overlays, " ");
+	} else {
+		// Add dtbo for audio
+		//k3_dtbo_list[nb_dtbos++] = AUDIO_DTB_NAME; // not needed for SPL
+		strcat(name_overlays, AUDIO_DTB_NAME);
+		strcat(name_overlays, " ");
+	} 
+
+	// Check PRG_Etherenet_1
+	ret = get_gpio_in_value(GPIO_PRG_1_ETH);
+	if (ret < 0) {
+		pr_err("%s: get gpio %s value error: %d\n", 
+			__func__, PRG_1_ETHERNET_GPIO_NAME, ret);
+	} else if (ret == 0) {
+		// Add dtbo for prg1 ethernet
+		//k3_dtbo_list[nb_dtbos++] = PRG_1_ETHERNET_DTB_NAME; // not needed for SPL
+		strcat(name_overlays, PRG_1_ETHERNET_DTB_NAME);
 		strcat(name_overlays, " ");
 	}
 
@@ -226,6 +326,118 @@ static int add_mba_interfaces(void)
 #endif
 	return 0;
 }
+
+// Generation default values for ethernet
+static void get_def_mac(int index, u8 *mac_addr)
+{
+	int i;
+
+	if (index < 0 || index > AM6_EEPROM_HDR_NO_OF_MAC_ADDR) {
+		for (i = 0; i < TI_EEPROM_HDR_ETH_ALEN; ++i) {
+			mac_addr[i] = 0x0;
+		}
+	} else {
+			mac_addr[0] = 0xAA;
+		for (i = 1; i < TI_EEPROM_HDR_ETH_ALEN; ++i) {
+			mac_addr[i] = 15 * (index + 1) + index + 1;
+		}
+	}
+}
+
+// Read MAC array from eeprom
+static int read_mac_arr(int bus_addr, int dev_addr,	u32 size, 
+	uint8_t mac_arr[AM6_EEPROM_HDR_NO_OF_MAC_ADDR][TI_EEPROM_HDR_ETH_ALEN])
+{
+	int ret;
+
+	struct udevice *dev;
+	struct udevice *bus;
+
+	ret = uclass_get_device_by_seq(UCLASS_I2C, bus_addr, &bus);
+	if (ret)
+		return ret;
+
+	ret = dm_i2c_probe(bus, dev_addr, 0, &dev);
+	if (ret)
+		return ret;
+
+	ret = i2c_set_chip_offset_len(dev, 2);
+	if (ret)
+		return ret;
+
+	ret = dm_i2c_read(dev, MAC_ARR_EEPROM_OFFSET, &mac_arr[0][0], size);
+
+	return ret;
+}
+
+static void set_prg_eth(int index, 
+	uint8_t mac_addr_arr[AM6_EEPROM_HDR_NO_OF_MAC_ADDR][TI_EEPROM_HDR_ETH_ALEN])
+{
+	int i;
+	uint8_t *mac_ptr;
+	
+	for (i = 0; i < 2; ++i) {			
+		mac_ptr = &mac_addr_arr[index + i][0];
+
+		if (!is_valid_ethaddr(mac_ptr)) {
+			get_def_mac(index + i, mac_ptr);
+		}
+
+		eth_env_set_enetaddr_by_index("eth", i + index + 1, mac_ptr);
+	}
+}
+
+static int setup_board_prg_eth(void) 
+{
+	const int i2c_bus = 0x00;
+	const int i2c_addr = 0x50;
+
+	uint8_t mac_addr_arr[AM6_EEPROM_HDR_NO_OF_MAC_ADDR][TI_EEPROM_HDR_ETH_ALEN];
+	int ret;
+
+	memset(&mac_addr_arr, 0xFF, AM6_EEPROM_HDR_NO_OF_MAC_ADDR * TI_EEPROM_HDR_ETH_ALEN);
+
+	// Get MAC addresses array
+	ret = read_mac_arr(i2c_bus, i2c_addr, 
+		AM6_EEPROM_HDR_NO_OF_MAC_ADDR * TI_EEPROM_HDR_ETH_ALEN, mac_addr_arr);
+		
+	if (ret) {
+		pr_err("%s: error read MAC addresses from EEPROM bus_addr=0x%02x dev_addr=0x%02x: %d\n",
+			   __func__, i2c_bus, i2c_addr, ret);
+	}
+
+	// Check PRG_Etherenet_0
+	ret = get_gpio_in_value(GPIO_PRG_0_ETH);
+	if (ret < 0) {
+		pr_err("%s: get gpio %s value error: %d\n", 
+			__func__, PRG_0_ETHERNET_GPIO_NAME, ret);
+		return ret;
+	}
+
+	if (ret == 1) {
+		// Set MAC addresses foe ethernet1, ethernet2
+		set_prg_eth(0, mac_addr_arr);
+	}
+
+	// Check PRG_Etherenet_1
+	ret = get_gpio_in_value(GPIO_PRG_1_ETH);
+	if (ret < 0) {
+		pr_err("%s: get gpio %s value error: %d\n", 
+			__func__, PRG_1_ETHERNET_GPIO_NAME, ret);
+		return ret;
+	}
+
+	if (ret == 0) {
+		// Set MAC addresses foe ethernet3, ethernet4
+		set_prg_eth(2, mac_addr_arr);
+	}
+
+	// Set MAC addresses foe ethernet5, ethernet6
+	set_prg_eth(4, mac_addr_arr);
+
+	return 0;
+}
+
 
 static void setup_board_clock_synthesizer(void)
 {
@@ -624,19 +836,12 @@ const uint32_t clock_config[334]={
 
 int board_late_init(void)
 {
-	struct ti_am6_eeprom *ep = TI_AM6_EEPROM_DATA;
 	const struct soc_device_attribute *match;
 	const struct tqma65xx_rev_fdt_data *fdt_data;
 
 	setup_board_eeprom_env();
 
-	/*
-	 * The first MAC address for ethernet a.k.a. ethernet0 comes from
-	 * efuse populated via the tqma654 gigabit eth switch subsystem driver.
-	 * All the other ones are populated via EEPROM, hence continue with
-	 * an index of 1.
-	 */
-	board_ti_am6_set_ethaddr(1, ep->mac_addr_cnt);
+	setup_board_prg_eth();
 
 	/* If we are on SR1 silicon set env to use sr1 dtb for kernel */
 	match = soc_device_match(tqma65xx_rev_fdt_match);

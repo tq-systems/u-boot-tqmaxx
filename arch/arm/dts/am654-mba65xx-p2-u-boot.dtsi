@@ -246,128 +246,19 @@
 		u-boot,dm-spl;
 	};
 
-
-	mcu_i2c_pins_default: mcu-i2c-pins-default {
-		pinctrl-single,pins = <
-			AM65X_WKUP_IOPAD(0x00e8, PIN_INPUT, 0) /* (AD8) MCU_I2C0_SCL */
-			AM65X_WKUP_IOPAD(0x00ec, PIN_INPUT, 0) /* (AD7) MCU_I2C0_SDA */
-		>;
+	mcu_i2c_pins_default {
+		u-boot,dm-spl;
 	};
 };
 
 
 &mcu_i2c0 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&mcu_i2c_pins_default>;
-	clock-frequency = <400000>;
 	u-boot,dm-spl;
-
 	pca9555_D24: gpio@20 {
-		compatible = "nxp,pca9555";
-		reg = <0x20>;
-		gpio-controller;
-		#gpio-cells = <2>;
 		u-boot,dm-spl;
 	};
-
 	pca9555_D25: gpio@21 {
-		compatible = "nxp,pca9555";
-		reg = <0x21>;
-		gpio-controller;
-		#gpio-cells = <2>;
 		u-boot,dm-spl;
-	};
-};
-
-&pca9555_D24 {
-
-	p0 {
-		/* P0 - PRG0_RGMII_RST#_AUDIO_RST# */
-		gpio-hog;
-		gpios = <0x00 GPIO_ACTIVE_HIGH>;
-		output-high;
-		line-name = "PRG0_RGMII_RST#_AUDIO_RST#";
-	};
-	p1 {
-		/* P1 - PRG0_RGMII_INT# */
-		gpio-hog;
-		gpios = <0x01 GPIO_ACTIVE_HIGH>;
-		output-high;
-		line-name = "PRG0_RGMII_INT#";
-	};
-	p2 {
-		/* P2 - GPIOEXP0_IO0_3_PRG0_ETH_EN# */
-		gpio-hog;
-		gpios = <0x02 GPIO_ACTIVE_HIGH>;
-		output-high;
-		line-name = "GPIOEXP0_IO0_3_PRG0_ETH_EN#";
-	};
-	p3 {
-		/* P3 - PRG1_RGMII_RST# */
-		gpio-hog;
-		gpios = <0x03 GPIO_ACTIVE_HIGH>;
-		output-high;
-		line-name = "PRG1_RGMII_RST#";
-	};
-	p5 {
-		/* P5 - PRG1_ETH_EN# */
-		gpio-hog;
-		gpios = <0x05 GPIO_ACTIVE_HIGH>;
-		output-high;
-		line-name = "PRG1_ETH_EN#";
-	};
-	p7 {
-		/* P7 - PRG2_RGMII_RST# */
-		gpio-hog;
-		gpios = <0x07 GPIO_ACTIVE_HIGH>;
-		output-high;
-		line-name = "PRG2_RGMII_RST#";
-	};
-	p9 {
-		/* P9 - MCU_RGMII0_RST# */
-		gpio-hog;
-		gpios = <0x09 GPIO_ACTIVE_HIGH>;
-		output-high;
-		line-name = "MCU_RGMII0_RST#";
-	};
-
-};
-
-&pca9555_D25 {
-	p0 {
-		/* P0 - MPCIE_1V5_EN*/
-		gpio-hog;
-		gpios = <0x00 GPIO_ACTIVE_HIGH>;
-		output-high;
-		line-name = "MPCIE_1V5_EN";
-	};
-	p6 {
-		/* P6 - USB_HUB_RST# */
-		gpio-hog;
-		gpios = <0x06 GPIO_ACTIVE_LOW>;
-		output-low;
-		line-name = "USB_HUB_RST#";
-	};
-	p7 {
-		/* P7 - CLK_PDN# */
-		gpio-hog;
-		gpios = <0x07 GPIO_ACTIVE_HIGH>;
-		output-high;
-		line-name = "CLK_PDN#";
-	};
-	p8 {
-		/* P8 - MPCIE_RST# */
-		gpio-hog;
-		gpios = <0x08 GPIO_ACTIVE_HIGH>;
-		output-high;
-		line-name = "MPCIE_RST#";
-	};
-	p9 {
-		/* P9 - MPCIE_DIS#*/
-		gpio-hog;
-		gpios = <0x09 GPIO_ACTIVE_HIGH>;
-		output-high;
-		line-name = "MPCIE_DIS#";
 	};
 };
 
@@ -552,4 +443,24 @@
 
 &chipid {
 	u-boot,dm-spl;
+};
+
+&pca9555_D24 {
+       p9 {
+               /* P9 - MCU_RGMII0_RST# */
+               gpio-hog;
+               gpios = <0x09 GPIO_ACTIVE_LOW>;
+               output-low;
+               line-name = "MCU_RGMII0_RST#";
+       };
+};
+
+&pca9555_D25 {
+       p6 {
+               /* P6 - USB_HUB_RST# */
+               gpio-hog;
+               gpios = <0x06 GPIO_ACTIVE_HIGH>;
+               output-high;
+               line-name = "USB_HUB_RST#";
+       };
 };

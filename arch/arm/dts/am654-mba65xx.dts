@@ -58,6 +58,13 @@
 		>;
 	};
 
+	mcu_i2c_pins_default: mcu-i2c-pins-default {
+		pinctrl-single,pins = <
+			AM65X_WKUP_IOPAD(0x00e8, PIN_INPUT, 0) /* (AD8) MCU_I2C0_SCL */
+			AM65X_WKUP_IOPAD(0x00ec, PIN_INPUT, 0) /* (AD7) MCU_I2C0_SDA */
+		>;
+	};
+
 	mcu_fss0_ospi0_pins_default: mcu-fss0-ospi0-pins_default {
 		pinctrl-single,pins = <
 			AM65X_WKUP_IOPAD(0x0000, PIN_OUTPUT, 0) /* (V1) MCU_OSPI0_CLK */
@@ -120,5 +127,25 @@
 		cdns,phy-mode;
 		#address-cells = <1>;
 		#size-cells = <1>;
+	};
+};
+
+&mcu_i2c0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&mcu_i2c_pins_default>;
+	clock-frequency = <400000>;
+
+	pca9555_D24: gpio@20 {
+		compatible = "nxp,pca9555";
+		reg = <0x20>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+
+	pca9555_D25: gpio@21 {
+		compatible = "nxp,pca9555";
+		reg = <0x21>;
+		gpio-controller;
+		#gpio-cells = <2>;
 	};
 };
