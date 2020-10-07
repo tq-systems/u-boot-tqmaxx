@@ -117,7 +117,7 @@ void rwdt_set_timeout(unsigned int watchdog_timeout, bool flag)
 	}
 }
 
-static int rwdt_start(struct udevice *watchdog_dev, u16 timeout_ms, bool flag)
+static int rwdt_start(struct udevice *watchdog_dev, u64 timeout_ms, ulong flag)
 {
 	struct rwdt_priv *priv = dev_get_priv(watchdog_dev);
 	u8 val;
@@ -147,8 +147,8 @@ static int rwdt_probe(struct udevice *watchdog_dev)
 	int ret, i;
 	unsigned long clks_per_sec;
 
-	priv->base = devfdt_get_addr(watchdog_dev);
-	printf("WDT:   watchdog@%x\n", priv->base);
+	priv->base = (void *) devfdt_get_addr(watchdog_dev);
+	printf("WDT:   watchdog@%p\n", priv->base);
 	if (!priv->base) {
 		printf("failed to get wdt addr\n");
 		return -EINVAL;

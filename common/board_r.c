@@ -52,6 +52,10 @@
 #include <wdt.h>
 #include <vsprintf.h>
 
+#ifdef CONFIG_WDT_RENESAS
+#include <dm/device-internal.h>
+#endif
+
 DECLARE_GLOBAL_DATA_PTR;
 
 ulong monitor_flash_len;
