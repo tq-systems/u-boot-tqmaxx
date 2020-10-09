@@ -229,12 +229,13 @@ int board_usb_init(int index, enum usb_init_type init)
 	int otg_id;
 	struct gpio_desc *gpio;
 
+	imx8m_usb_power(index, true);
+
 	switch(index) {
 	case 0:
 		otg_id = dm_gpio_get_value(&mba8mx_gid[USB1_OTG_ID].desc);
 		printf("USB0/OTG: ID = %d\n", otg_id);
 		gpio = &mba8mx_gid[USB1_OTG_PWR].desc;
-		imx8m_usb_power(index, true);
 		switch (init) {
 		case USB_INIT_DEVICE:
 			if (otg_id)
@@ -260,7 +261,6 @@ int board_usb_init(int index, enum usb_init_type init)
 		udelay(100);
 		dm_gpio_set_value(gpio, 0);
 		udelay(100);
-		imx8m_usb_power(index, true);
 		break;
 	default:
 		printf("invalid USB port %d\n", index);
@@ -289,18 +289,18 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 			ret = -EINVAL;
 		}
 		dm_gpio_set_value(gpio, 0);
-		imx8m_usb_power(index, false);
 		break;
 	case 1:
 		puts("USB1/HUB\n");
 		gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
 		dm_gpio_set_value(gpio, 1);
-		imx8m_usb_power(index, false);
 		break;
 	default:
 		printf("invalid USB port %d\n", index);
 		ret = -EINVAL;
 	}
+
+	imx8m_usb_power(index, false);
 
 	return ret;
 }
