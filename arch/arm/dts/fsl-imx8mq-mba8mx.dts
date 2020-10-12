@@ -22,6 +22,10 @@
 		regulator-name = "VSD_3V3";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
+		gpio = <&gpio2 19 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		/* can be removed, if only MBa8Mx REV.0300 shall be supported */
+		regulator-always-on;
 	};
 };
 
@@ -129,7 +133,8 @@
 
 	pinctrl_usdhc2_gpio: usdhc2grpgpio {
 		fsl,pins = <
-			MX8MQ_IOMUXC_SD2_CD_B_GPIO2_IO12	0x41
+			MX8MQ_IOMUXC_SD2_CD_B_GPIO2_IO12		0x41
+			MX8MQ_IOMUXC_SD2_RESET_B_GPIO2_IO19		0xc1
 		>;
 	};
 
@@ -225,7 +230,10 @@
 	bus-width = <4>;
 	cd-gpios = <&gpio2 12 GPIO_ACTIVE_LOW>;
 	disable-wp;
-	/* we have VSELECT but no working reset, so disable UHS */
+	/*
+	 * can be removed, if only MBa8Mx REV.0300 shall be supported
+	 * REV.020x has VSELECT but no working reset, so disable UHS in U-Boot
+	 */
 	no-1-8-v;
 	vmmc-supply = <&reg_usdhc2_vmmc>;
 	status = "okay";
