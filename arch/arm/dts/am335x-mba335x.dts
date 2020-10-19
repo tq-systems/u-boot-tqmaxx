@@ -1,0 +1,216 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright (C) 2021 TQ-Systems GmbH - https://www.tq-group.com/
+ *
+ * Based on:
+ * Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+/dts-v1/;
+
+#include "am335x-tqma335x.dtsi"
+#include <dt-bindings/interrupt-controller/irq.h>
+
+/ {
+	model = "TQ-Systems GmbH MBa335x";
+	compatible = "tq,mba335x", "tq,tqma335x", "ti,am33xx";
+
+	chosen {
+		stdout-path = &uart4;
+	};
+};
+
+&am33xx_pinmux {
+	davinci_mdio_default: davinci_mdio_default {
+		pinctrl-single,pins = <
+			/* MDIO */
+			0x148 (PIN_INPUT_PULLUP | SLEWCTRL_FAST | MUX_MODE0)	/* mdio_data.mdio_data */
+			0x14c (PIN_OUTPUT_PULLUP | MUX_MODE0)		/* mdio_clk.mdio_clk */
+		>;
+	};
+
+	expander1_pins: pinmux_expander1_pins {
+		pinctrl-single,pins = <
+			/* Interrupt */
+			0x88 (PIN_INPUT_PULLUP | MUX_MODE7 )            /* gpmc_csn3.gpio2_0 */
+		>;
+	};
+
+	expander2_pins: pinmux_expander2_pins {
+		pinctrl-single,pins = <
+			/* Interrupt */
+			0x78 (PIN_INPUT_PULLUP | MUX_MODE7)             /* gpmc_ben1.gpio1_28 */
+		>;
+	};
+
+	mmc1_pins: mmc1_pins {
+		pinctrl-single,pins = <
+			0x0f0 (PIN_INPUT_PULLUP | MUX_MODE0)		/* mmc0_dat3.mmc0_dat3 */
+			0x0f4 (PIN_INPUT_PULLUP | MUX_MODE0)		/* mmc0_dat2.mmc0_dat2 */
+			0x0f8 (PIN_INPUT_PULLUP | MUX_MODE0)		/* mmc0_dat1.mmc0_dat1 */
+			0x0fc (PIN_INPUT_PULLUP | MUX_MODE0)		/* mmc0_dat0.mmc0_dat0 */
+			0x100 (PIN_INPUT_PULLUP | MUX_MODE0)		/* mmc0_clk.mmc0_clk */
+			0x104 (PIN_INPUT_PULLUP | MUX_MODE0)		/* mmc0_cmd.mmc0_cmd */
+		>;
+	};
+
+	uart0_pins: pinmux_uart0_pins {
+		pinctrl-single,pins = <
+			0x170 (PIN_INPUT_PULLUP | MUX_MODE0)		/* uart0_rxd.uart0_rxd */
+			0x174 (PIN_OUTPUT_PULLDOWN | MUX_MODE0)		/* uart0_txd.uart0_txd */
+		>;
+	};
+
+	uart3_pins: pinmux_uart3_pins {
+		pinctrl-single,pins = <
+			0x160 (PIN_INPUT_PULLUP | MUX_MODE1)		/* spi0_cs1.uart3_rxd */
+			0x164 (PIN_OUTPUT_PULLDOWN | MUX_MODE1)		/* ecap0_in_pwm0_out.uart3_txd */
+		>;
+	};
+
+	uart4_pins: pinmux_uart4_pins {
+		pinctrl-single,pins = <
+			0x70 (PIN_INPUT_PULLUP | MUX_MODE6)		/* gpmc_wait0.uart4_rxd */
+			0x74 (PIN_OUTPUT_PULLDOWN | MUX_MODE6)		/* gpmc_wpn.uart4_txd */
+		>;
+	};
+};
+
+&i2c0 {
+	expander1: gpio-expander@20 {
+		compatible = "nxp,pca9554";
+		reg = <0x20>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&expander1_pins>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-parent = <&gpio2>;
+		interrupts = <0 IRQ_TYPE_EDGE_FALLING>;
+	};
+
+	expander2: gpio-expander@21 {
+		compatible = "nxp,pca9554";
+		reg = <0x21>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&expander2_pins>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <28 IRQ_TYPE_EDGE_FALLING>;
+	};
+};
+
+&mac {
+	status = "okay";
+};
+
+&cpsw_emac0 {
+	phy-handle = <&ethphy0>;
+	phy-mode = "rgmii-txid";
+
+	interrupt-parent = <&gpio0>;
+	interrupts = <18 0>;
+};
+
+&cpsw_emac1 {
+	phy-handle = <&ethphy1>;
+	phy-mode = "rgmii-txid";
+
+	interrupt-parent = <&gpio1>;
+	interrupts = <29 0>;
+};
+
+&davinci_mdio {
+	pinctrl-names = "default";
+	pinctrl-0 = <&davinci_mdio_default>;
+	status = "okay";
+
+	ethphy0: ethernet-phy@0 {
+		reg = <0>;
+
+		rxdv-skew-ps = <0>;
+		txen-skew-ps = <0>;
+		rxd0-skew-ps = <0>;
+		rxd1-skew-ps = <0>;
+		rxd2-skew-ps = <0>;
+		rxd3-skew-ps = <0>;
+		txd0-skew-ps = <0>;
+		txd1-skew-ps = <0>;
+		txd2-skew-ps = <0>;
+		txd3-skew-ps = <0>;
+		rxc-skew-ps = <1860>;
+		txc-skew-ps = <1860>;
+	};
+
+	ethphy1: ethernet-phy@1 {
+		reg = <1>;
+
+		rxdv-skew-ps = <0>;
+		txen-skew-ps = <0>;
+		rxd0-skew-ps = <0>;
+		rxd1-skew-ps = <0>;
+		rxd2-skew-ps = <0>;
+		rxd3-skew-ps = <0>;
+		txd0-skew-ps = <0>;
+		txd1-skew-ps = <0>;
+		txd2-skew-ps = <0>;
+		txd3-skew-ps = <0>;
+		rxc-skew-ps = <1860>;
+		txc-skew-ps = <1860>;
+	};
+};
+
+&mmc1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&mmc1_pins>;
+	status = "okay";
+	vmmc-supply = <&vmmc_reg>;
+	bus-width = <4>;
+};
+
+&uart0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart0_pins>;
+	status = "okay";
+};
+
+&uart3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart3_pins>;
+	status = "okay";
+};
+
+&uart4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart4_pins>;
+	status = "okay";
+};
+
+&usb {
+	status = "okay";
+};
+
+&usb_ctrl_mod {
+	status = "okay";
+};
+
+&usb0_phy {
+	status = "okay";
+};
+
+&usb1_phy {
+	status = "okay";
+};
+
+&usb0 {
+	status = "okay";
+	dr_mode = "host";
+};
+
+&usb1 {
+	status = "okay";
+	dr_mode = "otg";
+};

@@ -78,6 +78,34 @@ config TARGET_AM335X_IGEP003X
 	select DM_SERIAL
 	imply CMD_DM
 
+config TARGET_TQMA335X
+	bool "Support TQMa335x embedded module"
+	select BOARD_LATE_INIT
+	select DM
+	select DM_GPIO
+	select DM_SERIAL
+	imply CMD_DM
+	imply SPL_DM
+	imply SPL_DM_SEQ_ALIAS
+	imply SPL_ENV_SUPPORT
+	imply SPL_FS_EXT4
+	imply SPL_FS_FAT
+	imply SPL_GPIO_SUPPORT
+	imply SPL_I2C_SUPPORT
+	imply SPL_LIBCOMMON_SUPPORT
+	imply SPL_LIBDISK_SUPPORT
+	imply SPL_LIBGENERIC_SUPPORT
+	imply SPL_MMC_SUPPORT
+	imply SPL_OF_LIBFDT
+	imply SPL_POWER_SUPPORT
+	imply SPL_SEPARATE_BSS
+	imply SPL_SERIAL_SUPPORT
+	imply SPL_SYS_MALLOC_SIMPLE
+	imply SPL_WATCHDOG_SUPPORT
+	imply SPL_YMODEM_SUPPORT
+	help
+	  Support for the TQMA335x SoM module.
+
 config TARGET_AM335X_SHC
 	bool "Support am335x based shc board from bosch"
 	select BOARD_LATE_INIT

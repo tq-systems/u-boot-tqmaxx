@@ -1,0 +1,44 @@
+if TARGET_TQMA335X
+
+config SYS_BOARD
+	default "tqma335x"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_SOC
+	default "am33xx"
+
+config SYS_CONFIG_NAME
+	default "tqma335x"
+
+config TQMA335X
+	bool
+	default y
+	select TQC_EEPROM
+
+choice
+	prompt "TQMa335x[L] base board variant"
+	default MBA335X
+	help
+		Select the base board used with the TQMa335x[L].
+
+config MBA335X
+	prompt "TQMa335x[L] on MBa335x Starterkit"
+	bool
+	help
+		Select the MBa335x starterkit as base for the TQMa335x[L].
+
+endchoice
+
+config TQMA335X_512MB
+	prompt "U-Boot for TQMa335x-AB variant (512 MiB RAM)"
+	bool
+	help
+		Select this if for the 512MiB RAM Variant.
+		If not selected the 256MiB configuration is used.
+
+source "board/ti/common/Kconfig"
+source "board/tqc/common/Kconfig"
+
+endif
