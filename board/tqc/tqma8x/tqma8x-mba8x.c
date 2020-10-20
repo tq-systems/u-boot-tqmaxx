@@ -21,6 +21,7 @@
 #include <asm/arch/sys_proto.h>
 #include <asm/gpio.h>
 #include <power-domain.h>
+#include <usb.h>
 
 #include "../common/tqc_bb.h"
 #include "../common/tqc_board_gpio.h"
@@ -177,6 +178,65 @@ int tqc_bb_board_late_init(void)
 
 	return 0;
 }
+
+#if defined(CONFIG_USB)
+
+int board_usb_init(int index, enum usb_init_type init)
+{
+	int ret = 0;
+	struct gpio_desc *gpio;
+
+	switch (index) {
+	case 0:
+		puts("USB_OTG1\n");
+		break;
+	case 1:
+		puts("USB_OTG2/HUB\n");
+		switch (init) {
+		case USB_INIT_HOST:
+			/* HUB reset */
+			gpio = &mba8x_gid[USB_RST_B].desc;
+			dm_gpio_set_value(gpio, 1);
+			udelay(100);
+			dm_gpio_set_value(gpio, 0);
+			udelay(100);
+			break;
+		default:
+			printf("USB_OTG2: only host supported on this board\n");
+			ret = -EINVAL;
+		}
+		break;
+	default:
+		printf("invalid USB port %d\n", index);
+		ret = -EINVAL;
+	}
+
+	return ret;
+}
+
+int board_usb_cleanup(int index, enum usb_init_type init)
+{
+	int ret = 0;
+	struct gpio_desc *gpio;
+
+	switch (index) {
+	case 1:
+		puts("USB_OTG2/HUB\n");
+		/* deactivate HUB */
+		gpio = &mba8x_gid[USB_RST_B].desc;
+		dm_gpio_set_value(gpio, 1);
+		break;
+	case 0:
+		puts("USB_OTG1\n");
+		break;
+	default:
+		printf("invalid USB port %d\n", index);
+		ret = -EINVAL;
+	}
+
+	return ret;
+}
+#endif
 
 #endif /* #if !defined(CONFIG_SPL_BUILD) */
 
