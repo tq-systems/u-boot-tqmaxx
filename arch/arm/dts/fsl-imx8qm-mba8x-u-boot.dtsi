@@ -1,0 +1,188 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Copyright 2018 - 2020 TQ Systems GmbH
+ */
+
+/ {
+	aliases {
+		usbgadget0 = &usbg1;
+		usbg0 = &usbg1;
+	};
+
+	usbg1: usbg1 {
+		compatible = "fsl,imx27-usb-gadget";
+		dr_mode = "peripheral";
+		chipidea,usb = <&usbotg1>;
+		status = "okay";
+		u-boot,dm-spl;
+	};
+};
+
+&{/imx8qm-pm} {
+
+	u-boot,dm-spl;
+};
+
+&mu {
+	u-boot,dm-spl;
+};
+
+&clk {
+	u-boot,dm-spl;
+};
+
+&iomuxc {
+	u-boot,dm-spl;
+};
+
+&reg_mba8x_v3v3 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc2_gpio {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc2 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc2_100mhz {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc2_200mhz {
+	u-boot,dm-spl;
+};
+
+&pinctrl_lpuart0 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc1 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc1_100mhz {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc1_200mhz {
+	u-boot,dm-spl;
+};
+
+&pinctrl_flexspi0 {
+	u-boot,dm-spl;
+};
+
+&pd_lsio {
+	u-boot,dm-spl;
+};
+
+&pd_lsio_gpio2 {
+	u-boot,dm-spl;
+};
+
+&pd_lsio_gpio3 {
+	u-boot,dm-spl;
+};
+
+&pd_lsio_gpio5 {
+	u-boot,dm-spl;
+};
+
+&pd_lsio_flexspi0 {
+	u-boot,dm-spl;
+};
+
+&pd_conn {
+	u-boot,dm-spl;
+};
+
+&pd_conn_sdch0 {
+	u-boot,dm-spl;
+};
+
+&pd_conn_sdch1 {
+	u-boot,dm-spl;
+};
+
+&pd_conn_sdch2 {
+	u-boot,dm-spl;
+};
+
+&pd_conn_usbotg0 {
+	u-boot,dm-spl;
+};
+
+&pd_conn_usbotg0_phy {
+	u-boot,dm-spl;
+};
+
+&pd_conn_usb2 {
+	u-boot,dm-spl;
+};
+
+&pd_conn_usb2_phy {
+	u-boot,dm-spl;
+};
+
+&flexspi0 {
+	u-boot,dm-spl;
+};
+
+&flash0 {
+	u-boot,dm-spl;
+};
+
+&gpio2 {
+	u-boot,dm-spl;
+};
+
+&gpio3 {
+	u-boot,dm-spl;
+};
+
+&gpio5 {
+	u-boot,dm-spl;
+};
+
+&lpuart0 {
+	u-boot,dm-spl;
+};
+
+&usdhc1 {
+	u-boot,dm-spl;
+};
+
+&usdhc2 {
+	u-boot,dm-spl;
+};
+
+&i2c1 {
+	compatible = "fsl,imx8qm-lpi2c", "fsl,imx-virt-i2c";
+};
+
+&wu {
+	u-boot,dm-spl;
+};
+
+&usbmisc1 {
+	u-boot,dm-spl;
+};
+
+&usbphy1 {
+	u-boot,dm-spl;
+};
+
+&usbotg1 {
+	u-boot,dm-spl;
+};
+
+&pd_conn_usbotg0 {
+	u-boot,dm-spl;
+};
+
+&pd_conn_usbotg0_phy {
+	u-boot,dm-spl;
+};

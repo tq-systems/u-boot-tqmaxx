@@ -1,0 +1,170 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Copyright 2018 - 2020 TQ Systems GmbH
+ */
+
+#include "fsl-imx8qm.dtsi"
+
+/ {
+	model = "TQ Systems i.MX8QM TQMa8QM";
+	compatible = "tq,imx8qm-tqma8qm", "fsl,imx8qm";
+
+	config {
+		/* 32 kiB redundant env */
+		u-boot,mmc-env-offset = <0x400000>;
+		u-boot,mmc-env-offset-redundant = <0x408000>;
+	};
+};
+
+&iomuxc {
+	pinctrl_lpi2c1: lpi2c1grp {
+		fsl,pins = <
+			SC_P_GPT0_CAPTURE_DMA_I2C1_SDA		0x0600004c
+			SC_P_GPT0_CLK_DMA_I2C1_SCL		0x0600004c
+		>;
+	};
+
+	pinctrl_usdhc1: usdhc1grp {
+		fsl,pins = <
+			SC_P_EMMC0_CLK_CONN_EMMC0_CLK		0x06000041
+			SC_P_EMMC0_CMD_CONN_EMMC0_CMD		0x00000021
+			SC_P_EMMC0_DATA0_CONN_EMMC0_DATA0	0x00000021
+			SC_P_EMMC0_DATA1_CONN_EMMC0_DATA1	0x00000021
+			SC_P_EMMC0_DATA2_CONN_EMMC0_DATA2	0x00000021
+			SC_P_EMMC0_DATA3_CONN_EMMC0_DATA3	0x00000021
+			SC_P_EMMC0_DATA4_CONN_EMMC0_DATA4	0x00000021
+			SC_P_EMMC0_DATA5_CONN_EMMC0_DATA5	0x00000021
+			SC_P_EMMC0_DATA6_CONN_EMMC0_DATA6	0x00000021
+			SC_P_EMMC0_DATA7_CONN_EMMC0_DATA7	0x00000021
+			SC_P_EMMC0_STROBE_CONN_EMMC0_STROBE	0x00000041
+			SC_P_EMMC0_RESET_B_CONN_EMMC0_RESET_B	0x00000021
+		>;
+	};
+
+	pinctrl_usdhc1_100mhz: usdhc1grp100mhz {
+		fsl,pins = <
+			SC_P_EMMC0_CLK_CONN_EMMC0_CLK		0x06000040
+			SC_P_EMMC0_CMD_CONN_EMMC0_CMD		0x00000020
+			SC_P_EMMC0_DATA0_CONN_EMMC0_DATA0	0x00000020
+			SC_P_EMMC0_DATA1_CONN_EMMC0_DATA1	0x00000020
+			SC_P_EMMC0_DATA2_CONN_EMMC0_DATA2	0x00000020
+			SC_P_EMMC0_DATA3_CONN_EMMC0_DATA3	0x00000020
+			SC_P_EMMC0_DATA4_CONN_EMMC0_DATA4	0x00000020
+			SC_P_EMMC0_DATA5_CONN_EMMC0_DATA5	0x00000020
+			SC_P_EMMC0_DATA6_CONN_EMMC0_DATA6	0x00000020
+			SC_P_EMMC0_DATA7_CONN_EMMC0_DATA7	0x00000020
+			SC_P_EMMC0_STROBE_CONN_EMMC0_STROBE	0x00000040
+			SC_P_EMMC0_RESET_B_CONN_EMMC0_RESET_B	0x00000020
+		>;
+	};
+
+	pinctrl_usdhc1_200mhz: usdhc1grp200mhz {
+		fsl,pins = <
+			SC_P_EMMC0_CLK_CONN_EMMC0_CLK		0x06000040
+			SC_P_EMMC0_CMD_CONN_EMMC0_CMD		0x00000020
+			SC_P_EMMC0_DATA0_CONN_EMMC0_DATA0	0x00000020
+			SC_P_EMMC0_DATA1_CONN_EMMC0_DATA1	0x00000020
+			SC_P_EMMC0_DATA2_CONN_EMMC0_DATA2	0x00000020
+			SC_P_EMMC0_DATA3_CONN_EMMC0_DATA3	0x00000020
+			SC_P_EMMC0_DATA4_CONN_EMMC0_DATA4	0x00000020
+			SC_P_EMMC0_DATA5_CONN_EMMC0_DATA5	0x00000020
+			SC_P_EMMC0_DATA6_CONN_EMMC0_DATA6	0x00000020
+			SC_P_EMMC0_DATA7_CONN_EMMC0_DATA7	0x00000020
+			SC_P_EMMC0_STROBE_CONN_EMMC0_STROBE	0x00000040
+			SC_P_EMMC0_RESET_B_CONN_EMMC0_RESET_B	0x00000020
+		>;
+	};
+
+	pinctrl_flexspi0: flexspi0grp {
+		fsl,pins = <
+			SC_P_QSPI0A_DATA0_LSIO_QSPI0A_DATA0	0x0000004c
+			SC_P_QSPI0A_DATA1_LSIO_QSPI0A_DATA1	0x0000004c
+			SC_P_QSPI0A_DATA2_LSIO_QSPI0A_DATA2	0x0000004c
+			SC_P_QSPI0A_DATA3_LSIO_QSPI0A_DATA3	0x0000004c
+			SC_P_QSPI0A_DQS_LSIO_QSPI0A_DQS		0x0000004c
+			SC_P_QSPI0A_SS0_B_LSIO_QSPI0A_SS0_B	0x0000004c	
+			SC_P_QSPI0A_SS1_B_LSIO_QSPI0A_SS1_B	0x0000004c
+			SC_P_QSPI0A_SCLK_LSIO_QSPI0A_SCLK	0x0000004c
+			SC_P_QSPI0B_SCLK_LSIO_QSPI0B_SCLK	0x0000004c
+			SC_P_QSPI0B_DATA0_LSIO_QSPI0B_DATA0	0x0000004c
+			SC_P_QSPI0B_DATA1_LSIO_QSPI0B_DATA1	0x0000004c
+			SC_P_QSPI0B_DATA2_LSIO_QSPI0B_DATA2	0x0000004c
+			SC_P_QSPI0B_DATA3_LSIO_QSPI0B_DATA3	0x0000004c
+			SC_P_QSPI0B_DQS_LSIO_QSPI0B_DQS		0x0000004c
+			SC_P_QSPI0B_SS0_B_LSIO_QSPI0B_SS0_B	0x0000004c
+			SC_P_QSPI0B_SS1_B_LSIO_QSPI0B_SS1_B	0x0000004c
+		>;
+	};
+};
+
+&flexspi0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexspi0>;
+	status = "okay";
+
+	flash0: flash@0 {
+		reg = <0>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "jedec,spi-nor";
+		spi-max-frequency = <66000000>;
+		spi-nor,ddr-quad-read-dummy = <8>;
+	};
+};
+
+&gpio2 {
+	status = "okay";
+};
+
+&gpio4 {
+	status = "okay";
+};
+
+&gpio5 {
+	status = "okay";
+};
+
+&i2c1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpi2c1>;
+	status = "okay";
+
+	/* NXP SE97BTP with temperature sensor + eeprom */
+	se97: temperature-sensor-eeprom@1b {
+		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+		reg = <0x1b>;
+		status = "okay";
+	};
+
+	pcf85063: rtc@51 {
+		compatible = "nxp,pcf85063a";
+		reg = <0x51>;
+	};
+
+	at24c02: eeprom@53 {
+		compatible = "nxp,se97b", "atmel,24c02";
+		reg = <0x53>;
+		pagesize = <16>;
+		status = "okay";
+	};
+
+	m24c64: eeprom@57 {
+		compatible = "st,24c64", "atmel,24c64";
+		reg = <0x57>;
+		pagesize = <32>;
+		status = "okay";
+	};
+};
+
+&usdhc1 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc1>;
+	pinctrl-1 = <&pinctrl_usdhc1_100mhz>;
+	pinctrl-2 = <&pinctrl_usdhc1_200mhz>;
+	bus-width = <8>;
+	non-removable;
+	status = "okay";
+};
