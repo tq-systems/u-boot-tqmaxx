@@ -11,6 +11,14 @@
 
 #include "imx_env.h"
 
+/* Display configs */
+/* activate only HDP_LOAD because display port needs firmware,
+ * but setting this Option in Kconfig need CONFIG_VIDEO.
+ * This way is the least complex approach.
+ */
+
+#define CONFIG_VIDEO_IMX_HDP_LOAD
+
 #ifdef CONFIG_SPL_BUILD
 #define CONFIG_PARSE_CONTAINER
 #define CONFIG_SPL_TEXT_BASE				0x100000
@@ -123,10 +131,16 @@
 		"${mmcpath}${image}\0" \
 	"loadfdt=load mmc ${mmcdev}:${mmcpart} ${fdt_addr} " \
 		"${mmcpath}${fdt_file}\0" \
+	"hdp_addr=0x9c000000\0" \
+	"hdp_file=dpfw.bin\0" \
+	"loadhdp=load mmc ${mmcdev}:${mmcpart} ${hdp_addr} ${hdp_file}\0" \
 	"loadcntr=load mmc ${mmcdev}:${mmcpart} ${cntr_addr} ${cntr_file}\0" \
 	"auth_os=auth_cntr ${cntr_addr}\0" \
 	"boot_os=booti ${loadaddr} - ${fdt_addr};\0" \
 	"mmcboot=echo Booting from mmc ...; " \
+		"if run loadhdp; then; "\
+			"hdp load ${hdp_addr}; "\
+		"fi;" \
 		"setenv bootargs; " \
 		"run mmcargs; " \
 		"run loadimage; " \
