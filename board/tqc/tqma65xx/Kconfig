@@ -68,3 +68,6 @@ endif
 
 config TQMA6548_MODULE_VERSION_P2
     bool "2GB module version"
+
+config TQMA6548_EMMC_BOOT
+	bool "Boot from eMMC"

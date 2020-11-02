@@ -92,10 +92,19 @@
 	"run_kern=booti ${loadaddr} ${rd_spec} ${fdtaddr}\0"		\
 
 /* U-Boot MMC-specific configuration */
-#define EXTRA_ENV_TQMA65XX_BOARD_SETTINGS_MMC				\
+#ifdef CONFIG_TQMA6548_EMMC_BOOT
+#define EXTRA_ENV_TQMA65XX_BOARD_SETTINGS_MMC_HEAD				\
+	"boot=mmc\0"							\
+	"mmcdev=0\0"							\
+	"bootpart=0:2\0"
+#else
+#define EXTRA_ENV_TQMA65XX_BOARD_SETTINGS_MMC_HEAD				\
 	"boot=mmc\0"							\
 	"mmcdev=1\0"							\
-	"bootpart=1:2\0"						\
+	"bootpart=1:2\0"
+#endif
+
+#define EXTRA_ENV_TQMA65XX_BOARD_SETTINGS_MMC				\
 	"bootdir=/boot\0"						\
 	"rd_spec=-\0"							\
 	"init_mmc=run args_all args_mmc\0"				\
@@ -149,6 +158,7 @@
 	DEFAULT_FIT_TI_ARGS						\
 	FDT_ENV_TQMA65XX_BOARD						\
 	EXTRA_ENV_TQMA65XX_BOARD_SETTINGS					\
+	EXTRA_ENV_TQMA65XX_BOARD_SETTINGS_MMC_HEAD			\
 	EXTRA_ENV_TQMA65XX_BOARD_SETTINGS_MMC				\
 	EXTRA_ENV_TQMA65XX_BOARD_SETTINGS_MTD				\
 	EXTRA_ENV_TQMA65XX_BOARD_SETTINGS_UBI				\

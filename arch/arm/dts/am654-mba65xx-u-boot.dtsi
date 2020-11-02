@@ -453,6 +453,13 @@
                output-low;
                line-name = "MCU_RGMII0_RST#";
        };
+       p11 {
+               /* P11 - LED0 */
+               gpio-hog;
+               gpios = <0x0B GPIO_ACTIVE_HIGH>;
+               output-low;
+               line-name = "LED0";
+       };
 };
 
 &pca9555_D25 {
@@ -462,5 +469,40 @@
                gpios = <0x06 GPIO_ACTIVE_HIGH>;
                output-high;
                line-name = "USB_HUB_RST#";
+       };
+	   p7 {
+			   /* P7 - CLK_PDN# */
+			   gpio-hog;
+			   gpios = <0x07 GPIO_ACTIVE_HIGH>;
+			   output-high;
+			   line-name = "CLK_PDN#";
+		   };
+       p11 {
+               /* P11 - BUTTON0 */
+               gpio-hog;
+               gpios = <0x0B GPIO_ACTIVE_LOW>;
+               input;
+               line-name = "BUTTON0";
+       };
+       p12 {
+               /* P12 - BUTTON1 */
+               gpio-hog;
+               gpios = <0x0C GPIO_ACTIVE_LOW>;
+               input;
+               line-name = "BUTTON1";
+       };
+       p13 {
+               /* P13 - BUTTON2 */
+               gpio-hog;
+               gpios = <0x0D GPIO_ACTIVE_LOW>;
+               input;
+               line-name = "BUTTON2";
+       };
+       p14 {
+               /* P14 - LED0 */
+               gpio-hog;
+               gpios = <0x0E GPIO_ACTIVE_HIGH>;
+               output-low;
+               line-name = "LED0";
        };
 };

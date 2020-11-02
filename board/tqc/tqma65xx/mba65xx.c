@@ -904,7 +904,6 @@ const uint32_t clock_config[334]={
 	struct dm_i2c_chip *chip;
 	struct i2c_msg msg;
 	struct udevice *i2c_clock_synth = NULL;
-	struct udevice *i2c_extender = NULL;
 	const int i2c_bus = 0x01;
 	const int i2c_addr = 0x21;
 	const int CLK_SYNTHESIZER_I2C_ADDR = 0x64;
@@ -913,21 +912,6 @@ const uint32_t clock_config[334]={
 	int reg_index;
 	int tmp = 0;
 
-	tmp= i2c_get_chip_for_busnum(i2c_bus, i2c_addr, 1, &i2c_extender);
-	//enable chip via port expander
-	if(tmp) {		
-		pr_err("setup_board_clock_synthesizer(): error setup port expander\n");
-		
-	} else {
-		dm_i2c_reg_write(i2c_extender, 0x06, 0x7F);
-		dm_i2c_reg_write(i2c_extender, 0x02, 0x80);
-	}
-	// wait 150 ms
-		for (reg_index=0;reg_index<150;reg_index++) // 
-		{
-		   __udelay(2000); // 2000 is max
-		}
-	//
 	tmp = i2c_get_chip_for_busnum(i2c_bus, CLK_SYNTHESIZER_I2C_ADDR, 1, &i2c_clock_synth);
 	if (tmp) {
 		printf("Failed to get device for synthesizer at address 0x%x\n", CLK_SYNTHESIZER_I2C_ADDR);
