@@ -768,8 +768,7 @@ static int esdhc_set_timing(struct mmc *mmc)
 	case MMC_HS_400:
 	case MMC_HS_400_ES:
 		mixctrl |= MIX_CTRL_DDREN | MIX_CTRL_HS400_EN;
-		writel(mixctrl, &regs->mixctrl);
-		esdhc_set_strobe_dll(mmc);
+		esdhc_write32(&regs->mixctrl, mixctrl);
 		break;
 	case MMC_HS:
 	case MMC_HS_52:
@@ -942,6 +941,23 @@ static int esdhc_set_ios_common(struct fsl_esdhc_priv *priv, struct mmc *mmc)
 	int ret __maybe_unused;
 	u32 clock;
 
+#ifdef MMC_SUPPORTS_TUNING
+	/*
+	 * call esdhc_set_timing() before update the clock rate,
+	 * This is because current we support DDR and SDR mode,
+	 * Once the DDR_EN bit is set, the card clock will be
+	 * divide by 2 automatically. So need to do this before
+	 * setting clock rate.
+	 */
+	if (priv->mode != mmc->selected_mode) {
+		ret = esdhc_set_timing(mmc);
+		if (ret) {
+			printf("esdhc_set_timing error %d\n", ret);
+			return ret;
+		}
+	}
+#endif
+
 	/* Set the clock speed */
 	clock = mmc->clock;
 	if (clock < mmc->cfg->f_min)
@@ -966,13 +982,13 @@ static int esdhc_set_ios_common(struct fsl_esdhc_priv *priv, struct mmc *mmc)
 #endif
 	}
 
-	if (priv->mode != mmc->selected_mode) {
-		ret = esdhc_set_timing(mmc);
-		if (ret) {
-			printf("esdhc_set_timing error %d\n", ret);
-			return ret;
-		}
-	}
+	/*
+	 * For HS400/HS400ES mode, make sure set the strobe dll in the
+	 * target clock rate. So call esdhc_set_strobe_dll() after the
+	 * clock updated.
+	 */
+	if (mmc->selected_mode == MMC_HS_400 || mmc->selected_mode == MMC_HS_400_ES)
+		esdhc_set_strobe_dll(mmc);
 
 	if (priv->signal_voltage != mmc->signal_voltage) {
 		ret = esdhc_set_voltage(mmc);
