@@ -100,9 +100,9 @@
 #define TQMLS1028_SPI_PBL_FILE_NAME	"bl2_flexspi_nor.pbl"
 #define TQMLS1028_UBOOT_FILE_NAME	"fip_uboot.bin"
 #define TQMLS1028_MMC_KERNEL_FILE_NAME	"Image.gz"
-#define MAX_PBL_SIZE 1024
+#define MAX_PBL_SIZE 0xff000
 #define MMC_PBL_OFFSET 0x8 /* Blocks */
-#define MAX_UBOOT_SIZE 0x300000
+#define MAX_UBOOT_SIZE 0x400000
 #define MMC_UBOOT_OFFSET 0x800 /* Blocks */
 
 #define TQMLS1028_UPDATE_ENV_SETTINGS                                          \
@@ -164,7 +164,7 @@
 	"update_pbl_spi=run set_getcmd; "                                      \
 		"if ${getcmd} ${pbl_spi_file}; then "                          \
 			"if itest ${filesize} > 0; then "                      \
-				"if itest ${filesize} <= ${uboot_max_size}; then "	       \
+				"if itest ${filesize} <= ${pbl_max_size}; then "	       \
 					"sf probe; sf update ${loadaddr} PBL ${filesize};"\
 				"fi; "                                         \
 			"fi; "                                                 \
