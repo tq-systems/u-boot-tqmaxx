@@ -56,6 +56,7 @@ int checkboard(void)
 	       tqc_bb_get_boardname());
 
 	tqc_scu_checkpmic(true);
+	printf("SCU    %llx\n", tqc_scu_commitid());
 
 	return tqc_bb_checkboard();
 }
