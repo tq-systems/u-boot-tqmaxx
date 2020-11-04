@@ -120,7 +120,7 @@
 	"update_pbl_mmc=run set_getcmd; "                                      \
 		"if ${getcmd} ${pbl_mmc_file}; then "                          \
 			"if itest ${filesize} > 0; then "                      \
-				"mmc dev 0; mmc rescan; "		       \
+				"mmc dev ${mmcdev}; mmc rescan; "		       \
 				"setexpr blkc ${filesize} + 0x1ff; "           \
 				"setexpr blkc ${blkc} / 0x200; "               \
 				"if itest ${filesize} <= ${pbl_max_size}; then "\
