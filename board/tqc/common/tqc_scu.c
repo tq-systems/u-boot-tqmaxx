@@ -32,3 +32,20 @@ int tqc_scu_checkpmic(bool dual)
 
 	return ret;
 }
+
+u64 tqc_scu_commitid(void)
+{
+	u32 fn, p1, p2;
+	int ret;
+	u64 id = 0xffffffffffffffff;
+
+	fn = SCU_IOCTL_COMMITID;
+	ret = sc_misc_board_ioctl(-1, &fn, &p1, &p2);
+	if (!ret) {
+		id = (u64)p1 | (u64)p2 << 32;
+	} else {
+		printf("ERROR: %d query SCU commit ID\n", ret);
+	}
+
+	return id;
+}
