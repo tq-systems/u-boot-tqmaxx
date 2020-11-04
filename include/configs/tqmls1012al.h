@@ -70,8 +70,8 @@
 #define TQMLS1012_SPI_PBL_FILE_NAME	"bl2_qspi.pbl"
 #define TQMLS1012_UBOOT_FILE_NAME	"fip_uboot.bin"
 #define TQMLS1012_MMC_KERNEL_FILE_NAME	"Image.gz"
-#define MAX_PBL_SIZE 1024
-#define MAX_UBOOT_SIZE 0x300000
+#define MAX_PBL_SIZE 0x100000
+#define MAX_UBOOT_SIZE 0x400000
 
 #define TQMLS1012AL_UPDATE_ENV_SETTINGS                                        \
 	"pbl_max_size="__stringify(MAX_PBL_SIZE)"\0"                           \
@@ -83,7 +83,7 @@
 	"update_pbl=run set_getcmd; "                                          \
 		"if ${getcmd} ${pbl_spi_file}; then "                          \
 			"if itest ${filesize} > 0; then "                      \
-				"if itest ${filesize} <= ${uboot_max_size}; then " \
+				"if itest ${filesize} <= ${pbl_max_size}; then " \
 					"sf probe; sf update ${loadaddr} PBL ${filesize};"\
 				"fi; "                                         \
 			"fi; "                                                 \
