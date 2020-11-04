@@ -57,6 +57,7 @@ int checkboard(void)
 	       tqc_bb_get_boardname());
 
 	tqc_scu_checkpmic(false);
+	tqc_scu_commitid();
 
 	return tqc_bb_checkboard();
 }
