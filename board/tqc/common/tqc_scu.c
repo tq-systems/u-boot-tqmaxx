@@ -50,3 +50,36 @@ int tqc_scu_commitid(void)
 
 	return ret;
 }
+
+int tqc_scu_checksdram(void)
+{
+	u32 fn, p1, p2;
+	int ret;
+
+	fn = SCU_IOCTL_SDRAMINFO;
+	ret = sc_misc_board_ioctl(-1, &fn, &p1, &p2);
+	if (!ret) {
+		char *ddr_type = "unknown";
+		u32 type = (p2 >> 16U) & 0xffU;
+
+		switch (type) {
+		case SCU_DDRTYPE_DDR3L:
+			ddr_type = "DDR3L";
+			break;
+		case SCU_DDRTYPE_LPDDR4:
+			ddr_type = "LPDDR4";
+			break;
+		default:
+			printf("WARN: unknown type %u\n", type);
+		}
+
+		printf("SDRAM: %u MiB %s ", p2 & 0xffffU, ddr_type);
+		puts((p2 & SCU_DDRFEAT_ECC) ? "ECC " : "- ");
+		puts((p2 & SCU_DDRFEAT_CBT) ? "CBT " : "- ");
+		printf("@ %u MHz (RPA %04u)\n", p1 & 0xffffU, (p1 >> 16U) & 0xffffU);
+	} else {
+		printf("ERROR: %d query SDRAM info\n", ret);
+	}
+
+	return ret;
+}

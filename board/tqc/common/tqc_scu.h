@@ -14,9 +14,19 @@ enum {
 	SCU_IOCTL_PMICINFO = 0xfffffffd,
 	/* SCU commit ID */
 	SCU_IOCTL_COMMITID = 0xfffffffc,
+	/* Memory info */
+	SCU_IOCTL_SDRAMINFO = 0xfffffffa,
 };
+
+#define SCU_DDRTYPE_UNKNOWN	0U
+#define SCU_DDRTYPE_DDR3L	30U
+#define SCU_DDRTYPE_LPDDR4	40U
+
+#define SCU_DDRFEAT_ECC		0x80000000U
+#define SCU_DDRFEAT_CBT		0x40000000U
 
 int tqc_scu_checkpmic(bool dual);
 int tqc_scu_commitid(void);
+int tqc_scu_checksdram(void);
 
 #endif
