@@ -69,9 +69,10 @@ int board_init(void)
 	return 0;
 }
 
-void detail_board_ddr_info(void)
+void board_add_ram_info(int use_default)
 {
-	puts("\nDDR    ");
+	puts("\n");
+	tqc_scu_checksdram();
 }
 
 /*
