@@ -500,6 +500,32 @@ void sc_misc_get_button_status(sc_ipc_t ipc, sc_bool_t *status)
 	}
 }
 
+int sc_misc_board_ioctl(sc_ipc_t ipc, uint32_t *parm1, uint32_t *parm2,
+			uint32_t *parm3)
+{
+	struct udevice *dev = gd->arch.scu_dev;
+	int size = sizeof(struct sc_rpc_msg_s);
+	struct sc_rpc_msg_s msg;
+	int ret;
+
+	RPC_VER(&msg) = SC_RPC_VERSION;
+	RPC_SIZE(&msg) = 4U;
+	RPC_SVC(&msg) = (u8)(SC_RPC_SVC_MISC);
+	RPC_FUNC(&msg) = (u8)(MISC_FUNC_BOARD_IOCTL);
+
+	RPC_U32(&msg, 0U) = (u32)(*parm1);
+	RPC_U32(&msg, 4U) = (u32)(*parm2);
+	RPC_U32(&msg, 8U) = (u32)(*parm3);
+
+	ret = misc_call(dev, SC_FALSE,  &msg, size, &msg, size);
+
+	*parm1 = (uint32_t)RPC_U32(&msg, 0U);
+	*parm2 = (uint32_t)RPC_U32(&msg, 4U);
+	*parm3 = (uint32_t)RPC_U32(&msg, 8U);
+
+	return ret;
+}
+
 /* RM */
 sc_bool_t sc_rm_is_memreg_owned(sc_ipc_t ipc, sc_rm_mr_t mr)
 {
