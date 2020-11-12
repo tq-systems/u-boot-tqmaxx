@@ -53,6 +53,14 @@ static const struct udevice_id rwdt_match[] = {
 	{ /* sentinel */ }
 };
 
+static void rwdt_wait_cycles(struct rwdt_priv *priv, unsigned int cycles)
+{
+	unsigned int delay;
+
+	delay = DIV_ROUND_UP(cycles * 1000000, priv->clk_rate);
+	udelay(delay);
+}
+
 static void rwdt_write(struct rwdt_priv *priv, u32 val, unsigned int reg)
 {
 	if (reg == RWTCNT) {
