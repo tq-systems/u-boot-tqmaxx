@@ -19,7 +19,7 @@
 
 #define CODE_VAL1       0x5a5a0000 /* Code value of RWTCNT */
 #define CODE_VAL2_3     0xa5a5a500 /* Code value of RWTCSRA and RWTCSRB */
-#define MAX_VAL         65536      /* Max count value of watchdog timer */
+#define MAX_VAL         0xffff	   /* Max count value of watchdog timer */
 #define RWTCNT          0
 #define RWTCSRA         4
 #define RWTCSRA_WRFLG   BIT(5)
@@ -94,6 +94,20 @@ void hw_watchdog_reset(void)
 	uclass_get_device_by_seq(UCLASS_WDT, 0, &watchdog_dev);
 	if (watchdog_dev)
 		rwdt_init_timeout(watchdog_dev);
+}
+
+static int rwdt_expire_now(struct udevice *watchdog_dev, ulong flags)
+{
+	struct rwdt_priv *priv = dev_get_priv(watchdog_dev);
+
+	if (!priv->is_active)
+		return -ENODEV;
+	while (readl(priv->base + RWTCSRA) & RWTCSRA_WRFLG)
+		cpu_relax();
+
+	rwdt_write(priv, MAX_VAL, RWTCNT);
+	hang();
+	return 0;
 }
 
 static int rwdt_stop(struct udevice *watchdog_dev)
@@ -209,6 +223,7 @@ static int rwdt_probe(struct udevice *watchdog_dev)
 static const struct wdt_ops rwdt_ops = {
 	.start		= rwdt_start,
 	.stop		= rwdt_stop,
+	.expire_now	= rwdt_expire_now,
 };
 
 U_BOOT_DRIVER(renesas_wdt) = {
