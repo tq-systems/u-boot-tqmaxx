@@ -96,6 +96,24 @@ void hw_watchdog_reset(void)
 		rwdt_init_timeout(watchdog_dev);
 }
 
+static int rwdt_stop(struct udevice *watchdog_dev)
+{
+	struct rwdt_priv *priv = dev_get_priv(watchdog_dev);
+
+	if (priv->is_active) {
+		rwdt_write(priv, readl(priv->base + RWTCSRA) & ~RWTCSRA_TME,
+			   RWTCSRA);
+		/* Delay 3 cycles before disabling module clock */
+		rwdt_wait_cycles(priv, 3);
+		clk_disable(&priv->clk);
+		priv->is_active = 0;
+		/* Change environment variables */
+		env_set_ulong("wdt_status", 0);
+		env_save();
+	}
+	return 0;
+}
+
 static int rwdt_start(struct udevice *watchdog_dev, u64 timeout, ulong flag)
 {
 	struct rwdt_priv *priv = dev_get_priv(watchdog_dev);
@@ -190,6 +208,7 @@ static int rwdt_probe(struct udevice *watchdog_dev)
 
 static const struct wdt_ops rwdt_ops = {
 	.start		= rwdt_start,
+	.stop		= rwdt_stop,
 };
 
 U_BOOT_DRIVER(renesas_wdt) = {
