@@ -122,6 +122,9 @@ typedef struct global_data {
 	struct list_head log_head;	/* List of struct log_device */
 	int log_fmt;			/* Mask containing log format info */
 #endif
+#if CONFIG_IS_ENABLED(WDT)
+	struct udevice *watchdog_dev;
+#endif
 } gd_t;
 #endif
 
@@ -150,5 +153,6 @@ typedef struct global_data {
 #define GD_FLG_ENV_DEFAULT	0x02000 /* Default variable flag	   */
 #define GD_FLG_SPL_EARLY_INIT	0x04000 /* Early SPL init is done	   */
 #define GD_FLG_LOG_READY	0x08000 /* Log system is ready for use	   */
+#define GD_FLG_WDT_READY	0x10000 /* Watchdog is ready for use	   */
 
 #endif /* __ASM_GENERIC_GBL_DATA_H */

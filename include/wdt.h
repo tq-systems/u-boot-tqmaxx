@@ -103,4 +103,5 @@ struct wdt_ops {
 	int (*expire_now)(struct udevice *dev, ulong flags);
 };
 
+int initr_watchdog(void);
 #endif  /* _WDT_H_ */
