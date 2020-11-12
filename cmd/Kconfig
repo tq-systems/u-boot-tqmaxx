@@ -1044,6 +1044,12 @@ config CMD_USB_MASS_STORAGE
 	help
 	  USB mass storage support
 
+config CMD_WDT
+	bool "wdt"
+	depends on WDT
+	help
+	  This provides commands to control the watchdog timer devices.
+
 config CMD_AXI
 	bool "axi"
 	depends on AXI
