@@ -56,11 +56,6 @@ int wdt_reset(struct udevice *dev);
 int wdt_expire_now(struct udevice *dev, ulong flags);
 
 /*
- * Let user set watchdog timeout depending on their need.
- */
-void rwdt_set_timeout(unsigned int watchdog_timeout, bool flag);
-
-/*
  * struct wdt_ops - Driver model wdt operations
  *
  * The uclass interface is implemented by all wdt devices which use

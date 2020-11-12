@@ -15,6 +15,7 @@
 #include <console.h>
 #include <linux/delay.h>
 #include <linux/types.h>
+#include <environment.h>
 
 #define CODE_VAL1       0x5a5a0000 /* Code value of RWTCNT */
 #define CODE_VAL2_3     0xa5a5a500 /* Code value of RWTCSRA and RWTCSRB */
@@ -24,6 +25,7 @@
 #define RWTCSRA_WRFLG   BIT(5)
 #define RWTCSRA_TME     BIT(7)
 #define RWTCSRB         8
+#define RWDT_DEFAULT_TIMEOUT	60
 
 /*
  * In probe, clk_rate is checked to be not more than 16 bit x biggest
@@ -43,6 +45,7 @@ struct rwdt_priv {
 	u8 cks;
 	unsigned long clk_rate;
 	unsigned int timeout;
+	bool is_active;
 };
 
 static const struct udevice_id rwdt_match[] = {
@@ -93,59 +96,62 @@ void hw_watchdog_reset(void)
 		rwdt_init_timeout(watchdog_dev);
 }
 
-void rwdt_set_timeout(unsigned int watchdog_timeout, bool flag)
-{
-	struct udevice *watchdog_dev;
-
-	uclass_get_device_by_seq(UCLASS_WDT, 0, &watchdog_dev);
-	if (watchdog_dev) {
-		struct rwdt_priv *priv = dev_get_priv(watchdog_dev);
-		u8 val;
-
-		priv->timeout = watchdog_timeout;
-		if (flag == true) {
-			/* Stop the timer of watchdog */
-			val = readl(priv->base + RWTCSRA) & ~RWTCSRA_TME;
-			rwdt_write(priv, val, RWTCSRA);
-
-			/* Re-init timeout of watchdog */
-			rwdt_init_timeout(watchdog_dev);
-
-		/* Write CKS0[2:0] to RWTCSRA and CKS1[5:0] to RWTCSRB */
-			rwdt_write(priv, priv->cks, RWTCSRA);
-			rwdt_write(priv, 0, RWTCSRB);
-
-			/* Wait until bit RWTCSRA_WRFG is 0 */
-			while (readl(priv->base + RWTCSRA) & RWTCSRA_WRFLG)
-				cpu_relax();
-
-			/* Start timer of watchdog */
-			rwdt_write(priv, priv->cks | RWTCSRA_TME, RWTCSRA);
-		}
-	}
-}
-
-static int rwdt_start(struct udevice *watchdog_dev, u64 timeout_ms, ulong flag)
+static int rwdt_start(struct udevice *watchdog_dev, u64 timeout, ulong flag)
 {
 	struct rwdt_priv *priv = dev_get_priv(watchdog_dev);
 	u8 val;
+	int ret;
 
-	priv->timeout = fdtdec_get_int(gd->fdt_blob,
-				dev_of_offset(watchdog_dev), "timeout-sec", 1);
+	/*
+	 * Watchdog timeout must be equal or bigger than
+	 * default timeout to avoid the case watchdog will reset
+	 * when not completing loading Kernel
+	 */
+	if (timeout < RWDT_DEFAULT_TIMEOUT) {
+		printf("Input timeout must be equal or bigger than ");
+		printf("default timeout %d(s)\n", RWDT_DEFAULT_TIMEOUT);
+		priv->timeout = RWDT_DEFAULT_TIMEOUT;
+	} else {
+		priv->timeout = timeout;
+	}
 
-	/* Stop the timer before we modify any register */
-	val = readl(priv->base + RWTCSRA) & ~RWTCSRA_TME;
-	rwdt_write(priv, val, RWTCSRA);
+	if (priv->is_active) {
+		rwdt_init_timeout(watchdog_dev);
+	} else {
+		/* Re-supply clock source for watchdog */
+		ret = clk_enable(&priv->clk);
+		if (ret) {
+			printf("Failed to enable clk for wdt\n");
+			return ret;
+		}
+		priv->clk_rate = clk_get_rate(&priv->clk);
+		/* Stop the timer before we modify any register */
+		val = readl(priv->base + RWTCSRA) & ~RWTCSRA_TME;
+		rwdt_write(priv, val, RWTCSRA);
+		/* Delay 2 cycles before setting watchdog counter */
+		rwdt_wait_cycles(priv, 2);
+		rwdt_init_timeout(watchdog_dev);
+		rwdt_write(priv, priv->cks, RWTCSRA);
+		rwdt_write(priv, 0, RWTCSRB);
 
-	rwdt_init_timeout(watchdog_dev);
+		while (readl(priv->base + RWTCSRA) & RWTCSRA_WRFLG)
+			cpu_relax();
 
-	rwdt_write(priv, priv->cks, RWTCSRA);
-	rwdt_write(priv, 0, RWTCSRB);
+		rwdt_write(priv, priv->cks | RWTCSRA_TME, RWTCSRA);
+		priv->is_active = 1;
+	}
 
-	while (readl(priv->base + RWTCSRA) & RWTCSRA_WRFLG)
-		cpu_relax();
+	/*
+	 * Flag decides to change watchdog environment variables
+	 * flag = 0: Do not change environment variables.
+	 * flag = 1: Change environment variables..
+	 */
+	if (flag) {
+		env_set_ulong("wdt_status", 1);
+		env_set_ulong("wdt_timeout", priv->timeout);
+		env_save();
+	}
 
-	rwdt_write(priv, priv->cks | RWTCSRA_TME, RWTCSRA);
 	return 0;
 }
 
@@ -183,7 +189,7 @@ static int rwdt_probe(struct udevice *watchdog_dev)
 }
 
 static const struct wdt_ops rwdt_ops = {
-	.start    = rwdt_start,
+	.start		= rwdt_start,
 };
 
 U_BOOT_DRIVER(renesas_wdt) = {
