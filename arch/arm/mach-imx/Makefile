@@ -121,6 +121,24 @@ IMAGE_TYPE := imximage
 DEPFILE_EXISTS := 0
 endif
 
+QSPI_HEADER = board/freescale/common/qspi_header
+QSPI_HEADER_OFF = 1
+QSPI_UBOOT_OFF = 4
+ifeq ($(SOC),$(filter $(SOC),mx7))
+QSPI_HEADER_OFF = 0
+QSPI_UBOOT_OFF = 1
+endif
+
+%.qspi: %
+	@rm -f $@.tmp
+	@awk '{s="0000000"$$1;l=length(s);if(!((NR-1)%4))printf "%08x ",(NR-1)*4; \
+		for(i=1;i<8;i+=2)printf " %s",substr(s,l-i,2);if(!(NR%4))printf "\n";}' \
+		$(QSPI_HEADER) | xxd -r | \
+		dd of=$@.tmp bs=1k seek=$(QSPI_HEADER_OFF)
+	@dd if=$^ of=$@.tmp bs=1k seek=$(QSPI_UBOOT_OFF)
+	@mv -f $@.tmp $@
+	@echo "Packed QSPI header with U-boot"
+
 MKIMAGEFLAGS_u-boot.imx = -n $(filter-out $(PLUGIN).bin $< $(PHONY),$^) \
 	-T $(IMAGE_TYPE) -e $(CONFIG_SYS_TEXT_BASE)
 u-boot.imx: MKIMAGEOUTPUT = u-boot.imx.log
