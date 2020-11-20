@@ -9,6 +9,7 @@ config FS_FAT
 config FAT_WRITE
 	bool "Enable FAT filesystem write support"
 	depends on FS_FAT
+	select LIB_RAND
 	help
 	  This provides support for creating and writing new files to an
 	  existing FAT filesystem partition.
