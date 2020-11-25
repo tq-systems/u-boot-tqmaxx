@@ -88,6 +88,22 @@ int wdt_expire_now(struct udevice *dev, ulong flags)
 	return ret;
 }
 
+#if defined(CONFIG_WATCHDOG)
+/*
+ * Called by macro WATCHDOG_RESET. This function be called *very* early,
+ * so we need to make sure, that the watchdog driver is ready before using
+ * it in this function.
+ */
+void watchdog_reset(void)
+{
+	/* Exit if GD is not ready or watchdog is not initialized yet */
+	if (!gd || !(gd->flags & GD_FLG_WDT_READY))
+		return;
+
+	wdt_reset(gd->watchdog_dev);
+}
+#endif
+
 static int wdt_post_bind(struct udevice *dev)
 {
 #if defined(CONFIG_NEEDS_MANUAL_RELOC)
