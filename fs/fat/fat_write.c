@@ -18,6 +18,8 @@
 #include <linux/math64.h>
 #include "fat.c"
 
+static dir_entry *find_directory_entry(fat_itr *itr, char *filename);
+
 /* Characters that may only be used in long file names */
 static const char LONG_ONLY_CHARS[] = "+,;=[]";
 
@@ -62,6 +64,27 @@ static int str2fat(char *dest, char *src, int length)
 }
 
 /**
+ * fat_move_to_cluster() - position to first directory entry in cluster
+ *
+ * @itr:	directory iterator
+ * @cluster	cluster
+ * Return:	0 for success, -EIO on error
+ */
+static int fat_move_to_cluster(fat_itr *itr, unsigned int cluster)
+{
+	unsigned int nbytes;
+
+	/* position to the start of the directory */
+	itr->next_clust = cluster;
+	itr->last_cluster = 0;
+	if (!fat_next_cluster(itr, &nbytes))
+		return -EIO;
+	itr->dent = (dir_entry *)itr->block;
+	itr->remaining = nbytes / sizeof(dir_entry) - 1;
+	return 0;
+}
+
+/**
  * set_name() - set short name in directory entry
  *
  * The function determines if the @filename is a valid short name.
@@ -69,11 +92,12 @@ static int str2fat(char *dest, char *src, int length)
  *
  * If a long name is needed, a short name is constructed.
  *
+ * @itr:	directory iterator
  * @filename:	long file name
  * @shortname:	buffer of 11 bytes to receive chosen short name and extension
  * Return:	number of directory entries needed, negative on error
  */
-static int set_name(const char *filename, char *shortname)
+static int set_name(fat_itr *itr, const char *filename, char *shortname)
 {
 	char *period;
 	char *pos;
@@ -142,9 +166,16 @@ static int set_name(const char *filename, char *shortname)
 		else
 			sprintf(buf, "%.*s", suffix_start + suffix_len,
 				dirent.name);
-		debug("short name: %s\n", buf);
-		/* TODO: Check that the short name does not exist yet. */
+		debug("generated short name: %s\n", buf);
 
+		/* Check that the short name does not exist yet. */
+		ret = fat_move_to_cluster(itr, itr->start_clust);
+		if (ret)
+			return ret;
+		if (find_directory_entry(itr, buf))
+			continue;
+
+		debug("chosen short name: %s\n", buf);
 		/* Each long name directory entry takes 13 characters. */
 		ret = (strlen(filename) + 25) / 13;
 		goto out;
@@ -1259,7 +1290,7 @@ int file_fat_write_at(const char *filename, loff_t pos, void *buffer,
 		}
 
 		/* Check if long name is needed */
-		ret = set_name(filename, shortname);
+		ret = set_name(itr, filename, shortname);
 		if (ret < 0)
 			goto exit;
 		if (ret > 1) {
