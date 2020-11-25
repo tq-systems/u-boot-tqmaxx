@@ -107,7 +107,10 @@ config WDT_CDNS
 config WDT_RENESAS
 	bool "Renesas watchdog timer support"
 	depends on WDT
-	select HW_WATCHDOG
+	imply WATCHDOG
+	help
+	  Select this to enable Renesas watchdog timer, which can be found on some
+	  RZ/G2 Platforms.
 
 config XILINX_TB_WATCHDOG
 	bool "Xilinx Axi watchdog timer support"

@@ -38,6 +38,7 @@
 	DIV_ROUND_UP((d) * (p)->clk_rate, clk_divs[(p)->cks])
 
 static const unsigned int clk_divs[] = { 1, 4, 16, 32, 64, 128, 1024, 4096 };
+static bool second_init;
 
 struct rwdt_priv {
 	struct clk clk;
@@ -87,13 +88,19 @@ static int rwdt_init_timeout(struct udevice *watchdog_dev)
 	return 0;
 }
 
-void hw_watchdog_reset(void)
+int rwdt_reset(struct udevice *watchdog_dev)
 {
-	struct udevice *watchdog_dev;
+	struct rwdt_priv *priv = dev_get_priv(watchdog_dev);
 
-	uclass_get_device_by_seq(UCLASS_WDT, 0, &watchdog_dev);
-	if (watchdog_dev)
+	if (priv->is_active)
 		rwdt_init_timeout(watchdog_dev);
+
+	if (second_init) {
+		env_set_ulong("wdt_status", priv->is_active);
+		env_set_ulong("wdt_timeout", priv->timeout);
+	}
+
+	return 0;
 }
 
 static int rwdt_expire_now(struct udevice *watchdog_dev, ulong flags)
@@ -224,6 +231,7 @@ static const struct wdt_ops rwdt_ops = {
 	.start		= rwdt_start,
 	.stop		= rwdt_stop,
 	.expire_now	= rwdt_expire_now,
+	.reset		= rwdt_reset,
 };
 
 U_BOOT_DRIVER(renesas_wdt) = {
