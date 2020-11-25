@@ -49,7 +49,6 @@
 #include <linux/compiler.h>
 #include <linux/err.h>
 #include <efi_loader.h>
-#include <wdt.h>
 
 #ifdef CONFIG_WDT_RENESAS
 #include <dm/device-internal.h>
@@ -168,30 +167,6 @@ static int initr_reloc_global_data(void)
 
 	return 0;
 }
-
-#ifdef CONFIG_WDT_RENESAS
-static int initr_wdt(void)
-{
-	struct udevice *watchdog_dev;
-	const struct wdt_ops *ops;
-	int ret;
-	bool flag = false;
-
-	if (uclass_get_device_by_seq(UCLASS_WDT, 0, &watchdog_dev)) {
-		printf("Watchdog: Not found by seq!\n");
-		if (uclass_get_device(UCLASS_WDT, 0, &watchdog_dev)) {
-			printf("Watchdog: Not found!\n");
-			return -1;
-		}
-	}
-	device_probe(watchdog_dev);
-	printf("Watchdog: Started!\n");
-
-	ops = device_get_ops(watchdog_dev);
-	ret = ops->start(watchdog_dev, 0, flag);
-	return ret;
-}
-#endif
 
 static int initr_serial(void)
 {
@@ -741,9 +716,6 @@ static init_fnc_t init_sequence_r[] = {
 	efi_memory_init,
 #endif
 	stdio_init_tables,
-#ifdef CONFIG_WDT_RENESAS
-	initr_wdt,
-#endif
 	initr_serial,
 	initr_announce,
 	INIT_FUNC_WATCHDOG_RESET
