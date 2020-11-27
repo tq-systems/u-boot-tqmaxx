@@ -247,15 +247,39 @@
 	};
 
 	sdhi0_pins: sd0 {
-		groups = "sdhi0_data4", "sdhi0_ctrl";
-		function = "sdhi0";
-		power-source = <3300>;
+		mux {
+			groups = "sdhi0_data4", "sdhi0_ctrl";
+			function = "sdhi0";
+			power-source = <3300>;
+		};
+
+		pins_sdhi0_data4 {
+			groups = "sdhi0_data4";
+			drive-strength = <9>;
+		};
+
+		pins_sdhi0_ctrl {
+			groups = "sdhi0_ctrl";
+			drive-strength = <12>;
+		};
 	};
 
 	sdhi0_pins_uhs: sd0_uhs {
-		groups = "sdhi0_data4", "sdhi0_ctrl";
-		function = "sdhi0";
-		power-source = <1800>;
+		mux {
+			groups = "sdhi0_data4", "sdhi0_ctrl";
+			function = "sdhi0";
+			power-source = <1800>;
+		};
+
+		pins_sdhi0_data4 {
+			groups = "sdhi0_data4";
+			drive-strength = <9>;
+		};
+
+		pins_sdhi0_ctrl {
+			groups = "sdhi0_ctrl";
+			drive-strength = <12>;
+		};
 	};
 
 	sdhi3_pins: sd3 {
@@ -265,9 +289,31 @@
 	};
 
 	sdhi3_pins_uhs: sd3_uhs {
-		groups = "sdhi3_data8", "sdhi3_ctrl", "sdhi3_ds";
-		function = "sdhi3";
-		power-source = <1800>;
+		mux {
+			groups = "sdhi3_data8", "sdhi3_ctrl", "sdhi3_ds";
+			function = "sdhi3";
+			power-source = <1800>;
+		};
+
+		pins_sdhi3_ctrl_cmd {
+			pins = "GP_4_8";
+			drive-strength = <6>;
+		};
+
+		pins_sdhi3_ctrl_clk {
+			pins = "GP_4_7";
+			drive-strength = <9>;
+		};
+
+		pins_sdhi3_ds {
+			groups = "sdhi3_ds";
+			drive-strength = <24>;
+		};
+
+		pins_sdhi3_data8 {
+			groups = "sdhi3_data8";
+			drive-strength = <6>;
+		};
 	};
 
 	usb0_pins: usb0 {
