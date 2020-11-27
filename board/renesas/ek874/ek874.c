@@ -23,6 +23,7 @@
 #include <asm/arch/sh_sdhi.h>
 #include <i2c.h>
 #include <mmc.h>
+#include <renesas_wdt.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -94,4 +95,12 @@ void board_add_ram_info(int use_default)
 		      + gd->bd->bi_dram[i].size - 1));
 		print_size(gd->bd->bi_dram[i].size, "\n");
 	};
+}
+
+int board_late_init(void)
+{
+#ifdef CONFIG_WDT_RENESAS
+	reinitr_wdt();
+#endif
+	return 0;
 }

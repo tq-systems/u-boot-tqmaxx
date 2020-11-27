@@ -27,6 +27,7 @@
 #include <linux/bitops.h>
 #include <linux/delay.h>
 #include <asm/arch/rcar-mstp.h>
+#include <renesas_wdt.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -122,10 +123,13 @@ int board_init(void)
 
 	return 0;
 }
+
 int board_late_init(void)
 {
 	env_set_hex("board_rev", board_rev);
-
+#ifdef CONFIG_WDT_RENESAS
+	reinitr_wdt();
+#endif
 	return 0;
 }
 

@@ -49,6 +49,7 @@
 #include <linux/compiler.h>
 #include <linux/err.h>
 #include <efi_loader.h>
+#include <wdt.h>
 
 #ifdef CONFIG_WDT_RENESAS
 #include <dm/device-internal.h>
@@ -718,6 +719,9 @@ static init_fnc_t init_sequence_r[] = {
 	stdio_init_tables,
 	initr_serial,
 	initr_announce,
+#if CONFIG_IS_ENABLED(WDT)
+	initr_watchdog,
+#endif
 	INIT_FUNC_WATCHDOG_RESET
 #ifdef CONFIG_NEEDS_MANUAL_RELOC
 	initr_manual_reloc_cmdtable,
