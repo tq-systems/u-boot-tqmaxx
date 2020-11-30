@@ -74,10 +74,6 @@ static const struct soc_device_attribute tqma65xx_rev_fdt_match[] = {
 #define AUDIO_DTB_NAME          "am654-mba65xx-audio.dtbo"
 #define DISPLAY_DTB_NAME        "am654-mba65xx-lvds-display.dtbo"
 
-#define EMMC_MIN_BOOT_PART_SIZE 16777216
-#define EMMC_DEFAULT_BOOT_PART_SIZE 16  // MiB
-#define EMMC_DEFAULT_RPMB_PART_SIZE 8   // MiB
-
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -454,107 +450,6 @@ static int setup_board_prg_eth(void)
 	return 0;
 }
 
-static int resize_emmc_boot_part(struct mmc *mmc, unsigned int boot_size, 
-	unsigned int rpmb_size)
-{
-	int ret;
-	int jdec_boot_size, jdec_rpmb_size;
-	struct mmc_cmd cmd;
-
-	// Send gagic value specified for eMMC manufacturer
-	cmd.cmdidx = 62;
-	cmd.resp_type = MMC_RSP_R1b;
-	cmd.cmdarg = 0x254ddec4;
-
-	ret = dm_mmc_send_cmd(mmc->dev, &cmd, NULL);
-	if (ret) {
-		pr_err("%s: magic value send error = %d\n", __func__, ret);
-		return ret;
-	}
-
-	// Calculate boot partition according to JDEC
-	jdec_boot_size = (boot_size * 1024) / 128;
-
-	// Send boot partition size
-	cmd.cmdidx = 62;
-	cmd.resp_type = MMC_RSP_R1b;
-	cmd.cmdarg = jdec_boot_size;
-
-	ret = dm_mmc_send_cmd(mmc->dev, &cmd, NULL);
-	if (ret) {
-		pr_err("%s: boot part size send error = %d\n", __func__, ret);
-		return ret;
-	}
-
-	// Calculate rpmb partition according to JDEC
-	jdec_rpmb_size = (rpmb_size * 1024) / 128;
-
-	// Send rpmb partition size
-	cmd.cmdidx = 62;
-	cmd.resp_type = MMC_RSP_R1b;
-	cmd.cmdarg = jdec_rpmb_size;
-
-	ret = dm_mmc_send_cmd(mmc->dev, &cmd, NULL);
-	if (ret) {
-		pr_err("%s: rpmb part size send error = %d\n", __func__, ret);
-		return ret;
-	}
-
-	return 0;
-}
-
-
-static int setup_emmc_partition(void) 
-{
-	const int mmc_slot_n = 0;
-	struct mmc *mmc;
-	bool force_init;
-	int ret;
-
-	force_init = false;
-
-	mmc = find_mmc_device(mmc_slot_n);
-	if (!mmc) {
-		pr_err("%s: no mmc device at slot %d\n", __func__, mmc_slot_n);
-		return -1;
-	}
-
-	if (!mmc_getcd(mmc)) {
-		force_init = true;
-	}
-
-	if (force_init)
-		mmc->has_init = 0;
-
-	ret = mmc_init(mmc);
-	if (ret) {
-		pr_err("%s: mmc_init() failed (err=%d)\n", __func__, ret);
-		return ret;
-	}
-
-#ifdef CONFIG_BLOCK_CACHE
-	struct blk_desc *bd = mmc_get_blk_desc(mmc);
-	blkcache_invalidate(bd->if_type, bd->devnum);
-#endif
-
-	// Check boot partition size
-	if (mmc->capacity_boot < EMMC_MIN_BOOT_PART_SIZE) {
-		// Resize partition
-		ret = resize_emmc_boot_part(mmc, EMMC_DEFAULT_BOOT_PART_SIZE, 
-			EMMC_DEFAULT_RPMB_PART_SIZE);
-
-		if (ret) {
-			pr_err("%s: resize_emmc_boot_part() failed (err=%d)\n",
-			       __func__, ret);
-			return ret;
-		} else {
-			printf("eMMC boot partition was resized\n");
-		}
-	}
-
-	return 0;
-}
-
 static void setup_board_clock_synthesizer(void)
 {
 //config array for clock synthesizer
@@ -905,7 +800,6 @@ const uint32_t clock_config[334]={
 	struct i2c_msg msg;
 	struct udevice *i2c_clock_synth = NULL;
 	const int i2c_bus = 0x01;
-	const int i2c_addr = 0x21;
 	const int CLK_SYNTHESIZER_I2C_ADDR = 0x64;
 	uint8_t buf[3];
 	uint16_t reg_addr;
@@ -958,8 +852,6 @@ int board_late_init(void)
 	/* Check for and probe any plugged-in daughtercards */
 	add_mba_interfaces();
 	setup_board_clock_synthesizer();
-
-	setup_emmc_partition();
 
 	return 0;
 }
