@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 TQ Systems (ported AM57xx IDK to TQMa57xx)
+ * Copyright (C) 2017 TQ-Systems GmbH (ported AM57xx IDK to TQMa57xx)
  *
  * Author: Stefan Lange <s.lange@gateware.de>
  *

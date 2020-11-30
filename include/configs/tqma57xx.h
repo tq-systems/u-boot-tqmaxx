@@ -3,7 +3,7 @@
  * Texas Instruments Incorporated.
  * Felipe Balbi <balbi@ti.com>
  *
- * Copyright (C) 2017 TQ Systems (ported AM57xx IDK to TQMa57xx)
+ * Copyright (C) 2017 TQ-Systems GmbH (ported AM57xx IDK to TQMa57xx)
  * Author: Stefan Lange <s.lange@gateware.de>
  *
  * SPDX-License-Identifier:	GPL-2.0+

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016 Freescale Semiconductor, Inc.
- * Copyright (C) 2018-2019 TQ Systems GmbH
+ * Copyright (C) 2018-2019 TQ-Systems GmbH
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */

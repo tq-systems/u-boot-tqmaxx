@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 TQ Systems
+ * Copyright (C) 2017 TQ-Systems GmbH
  *
  * Author: Stefan Lange <s.lange@gateware.de>
  *
