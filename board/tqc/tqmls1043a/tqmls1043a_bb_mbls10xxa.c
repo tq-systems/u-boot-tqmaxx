@@ -63,6 +63,7 @@ static void _tqmls1043a_bb_serdes_cfg(void)
 {
 	u32 srds_s1;
 	struct ccsr_gur *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
+	struct ccsr_serdes *serdes1_base = (void *)CONFIG_SYS_FSL_SERDES_ADDR;
 	struct tqc_mbls10xxa_serdes lanes[8];
 	int clk_freq;
 
@@ -93,6 +94,10 @@ static void _tqmls1043a_bb_serdes_cfg(void)
 		printf("!!! ATTENTON: SerDes1 RefClk1 is 156.25MHz,\n");
 		printf("!!!  but this is only valid for XFI operation!\n");
 	}
+
+	/* Configure TQ equalization for XFI */
+	if (TQMLS1043A_SRDS1_PROTO(srds_s1, 0) == 0x1)
+		tqc_mbls10xxa_xfi_init(serdes1_base, 0);
 
 	tqc_mbls10xxa_retimer_init();
 }
