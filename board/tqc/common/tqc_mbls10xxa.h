@@ -12,6 +12,8 @@ int tqc_mbls10xxa_i2c_gpios_init(void);
 int tqc_mbls10xxa_i2c_gpio_get(const char *name);
 int tqc_mbls10xxa_i2c_gpio_set(const char *name, int val);
 
+void tqc_mbls10xxa_retimer_init(void);
+
 int tqc_mbls10xxa_clk_cfg_init(void);
 
 enum {

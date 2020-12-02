@@ -10,6 +10,7 @@
 #include <fsl_dtsec.h>
 #include <fsl_mdio.h>
 #include <malloc.h>
+#include <asm/arch/immap_lsch2.h>
 #include "../common/tqc_bb.h"
 #include "../common/tqc_mbls10xxa.h"
 
@@ -58,7 +59,7 @@ static int _tqmls1043a_bb_set_lane(struct tqc_mbls10xxa_serdes *serdes, int port
 	return 0;
 }
 
-static int _tqmls1043a_bb_check_serdes_mux(void)
+static void _tqmls1043a_bb_serdes_cfg(void)
 {
 	u32 srds_s1;
 	struct ccsr_gur *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
@@ -86,14 +87,14 @@ static int _tqmls1043a_bb_check_serdes_mux(void)
 	/* check serdes clock muxing */
 	clk_freq = tqc_mbls10xxa_serdes_clk_get(TQC_MBLS10xxA_SRDS_CLK_1_2);
 	if((clk_freq == 125000000) && (TQMLS1043A_SRDS1_PROTO(srds_s1, 0) == 0x1)) {
-	   printf("!!! ATTENTON: SerDes1 RefClk1 is not 156.25MHz,\n");
-	   printf("!!!  but this is needed for XFI operation!\n");
+		printf("!!! ATTENTON: SerDes1 RefClk1 is not 156.25MHz,\n");
+		printf("!!!  but this is needed for XFI operation!\n");
 	} else if((clk_freq == 156250000) && (TQMLS1043A_SRDS1_PROTO(srds_s1, 0) != 0x1)) {
-	   printf("!!! ATTENTON: SerDes1 RefClk1 is 156.25MHz,\n");
-	   printf("!!!  but this is only valid for XFI operation!\n");
+		printf("!!! ATTENTON: SerDes1 RefClk1 is 156.25MHz,\n");
+		printf("!!!  but this is only valid for XFI operation!\n");
 	}
 
-	return 0;
+	tqc_mbls10xxa_retimer_init();
 }
 #endif /* !CONFIG_SPL_BUILD */
 
@@ -152,9 +153,9 @@ int tqc_bb_misc_init_r(void)
 	/* initialize baseboard io's */
 	ret = tqc_mbls10xxa_i2c_gpios_init();
 
-	/* check if SerDes mux settings match RCW */
-	if(!ret)
-		ret = _tqmls1043a_bb_check_serdes_mux();
+	/* check if SerDes mux settings match RCW and configure */
+	if (!ret)
+		_tqmls1043a_bb_serdes_cfg();
 
 	/* enable USB-C power-controller */
 	tqc_mbls10xxa_i2c_gpio_set("usb_c_pwron", 0);

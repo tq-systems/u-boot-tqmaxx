@@ -188,6 +188,63 @@ int tqc_mbls10xxa_clk_cfg_init(void)
 	return ret;
 }
 
+static void tqc_mbls10xxa_retimer_init_one(uint8_t addr)
+{
+	struct {
+		uint8_t reg;
+		uint8_t value;
+	} const cfg[] = {
+		/* Write all channels */
+		{ 0xff, 0x0c },
+		/* Assert CDR Reset */
+		{ 0x0a, 0x0c },
+		/* Write channel A */
+		{ 0xff, 0x04 },
+		/* Output Voltage 900mV */
+		{ 0x2d, 0x03 },
+		/* De-emphasis -4.5dB */
+		{ 0x15, 0x45 },
+		/* Write channel B B */
+		{ 0xff, 0x05 },
+		/* Output Voltage 1200mV */
+		{ 0x2d, 0x06 },
+		/* De-emphasis -2dB */
+		{ 0x15, 0x42 },
+		/* Write all channels */
+		{ 0xff, 0x0c },
+		/* CDR Reset Release */
+		{ 0x0a, 0x00 },
+	};
+	int ret, i;
+	uint8_t v;
+
+	for (i = 0; i < ARRAY_SIZE(cfg); i++) {
+		v = cfg[i].value;
+		ret = i2c_write(addr, cfg[i].reg, 1,
+				&v, sizeof(v));
+		if (ret != 0) {
+			printf("failed to configure XFI retimer %02x: %d\n",
+			       addr, ret);
+			break;
+		}
+	}
+}
+
+void tqc_mbls10xxa_retimer_init(void)
+{
+	const uint8_t addrs[] = TQC_MBLS10XXA_I2C_RETIMER_ADDRS;
+	unsigned int oldbus;
+	int i;
+
+	oldbus = i2c_get_bus_num();
+	i2c_set_bus_num(TQC_MBLS10XXA_I2C_RETIMER_BUS_NUM);
+
+	for (i = 0; i < ARRAY_SIZE(addrs); i++)
+		tqc_mbls10xxa_retimer_init_one(addrs[i]);
+
+	i2c_set_bus_num(oldbus);
+}
+
 #ifndef CONFIG_SPL_BUILD
 static char *_srds_proto_name(int proto)
 {

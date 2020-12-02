@@ -46,5 +46,9 @@
 #define TQC_MBLS10XXA_I2C_CLKBUF_BUS_NUM  3
 #define TQC_MBLS10xxA_I2C_CLKBUF_ADDR     0x6e
 
+/* I2C XFI retimers on baseboard */
+#define TQC_MBLS10XXA_I2C_RETIMER_BUS_NUM  3
+#define TQC_MBLS10XXA_I2C_RETIMER_ADDRS    { 0x18, 0x19 }
+
 #endif /* __TQC_BB_MBLS10XX_H__ */
 
