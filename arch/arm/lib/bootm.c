@@ -27,6 +27,10 @@
 #include <bootm.h>
 #include <vxworks.h>
 
+#ifdef CONFIG_WDT
+#include <wdt.h>
+#endif
+
 #ifdef CONFIG_ARMV7_NONSEC
 #include <asm/armv7.h>
 #endif
@@ -225,6 +229,11 @@ static void do_nonsec_virt_switch(void)
 static void boot_prep_linux(bootm_headers_t *images)
 {
 	char *commandline = env_get("bootargs");
+
+#ifdef CONFIG_WDT
+	strcat(commandline, " wdt_overflow=");
+	strcat(commandline, simple_itoa(watchdog_overflow));
+#endif
 
 	if (IMAGE_ENABLE_OF_LIBFDT && images->ft_len) {
 #ifdef CONFIG_OF_LIBFDT
