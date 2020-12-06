@@ -1472,8 +1472,9 @@ static int fecmxc_probe(struct udevice *dev)
 
 #ifdef CONFIG_DM_ETH_PHY
 	bus = eth_phy_get_mdio_bus(dev);
-#endif
-
+	if (!bus)
+		bus = fec_get_miibus((ulong)priv->eth, dev->seq);
+#else
 	if (!bus) {
 #ifdef CONFIG_FEC_MXC_MDIO_BASE
 		bus = fec_get_miibus((ulong)CONFIG_FEC_MXC_MDIO_BASE, dev->seq);
@@ -1481,6 +1482,7 @@ static int fecmxc_probe(struct udevice *dev)
 		bus = fec_get_miibus((ulong)priv->eth, dev->seq);
 #endif
 	}
+#endif /* CONFIG_DM_ETH_PHY */
 	if (!bus) {
 		ret = -ENOMEM;
 		goto err_mii;
