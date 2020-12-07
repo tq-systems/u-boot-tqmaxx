@@ -87,6 +87,37 @@ int board_early_init_f(void)
 #define CLOCKGEN_I2C_BUS_NUM	4
 #define CLOCKGEN_I2C_ADDR	0x6A
 
+#define RTC_IIC_BUS_NUM		7
+#define RTC_IIC_ADDR		0x51
+#define RTC_CAP_SEL			1	/* 0=7pF 1=12.5pF */
+
+static int rtc_cap_sel(void)
+{
+	struct udevice dev;
+	struct udevice *pdev = &dev;
+	uint8_t rtc_reg;
+	int ret;
+
+	ret = i2c_get_chip_for_busnum(RTC_IIC_BUS_NUM, RTC_IIC_ADDR, 1, &pdev);
+
+	if (ret)
+		return ret;
+
+	ret = dm_i2c_read(pdev, 0, &rtc_reg, 1);
+
+	if (ret)
+		printf("Error reading from rtc!\n");
+
+	rtc_reg |= RTC_CAP_SEL;
+
+	ret = dm_i2c_write(pdev, 0, &rtc_reg,  1);
+
+	if (ret)
+		printf("Error setting capacitance of RTC!\n");
+
+	return 0;
+}
+
 static int clockgen_init(void)
 {
 	struct udevice dev;
@@ -242,6 +273,9 @@ int board_init(void)
 	setbits_le16(HSUSB_REG_LPSTS, HSUSB_REG_LPSTS_SUSPM_NORMAL);
 
 	clockgen_init();
+
+	/* select RTC oscillator capacitance */
+	rtc_cap_sel();
 
 	if ((rmobile_get_cpu_rev_integer() == 1) && (rmobile_get_cpu_rev_fraction() < 3)) {
 		board_rev = 2;
