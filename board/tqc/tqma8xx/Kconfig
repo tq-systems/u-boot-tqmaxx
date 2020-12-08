@@ -78,6 +78,8 @@ config TQMA8XX_DEFAULTS
 	select SPL_DM_REGULATOR_FIXED
 	select SPL_LIBGENERIC_SUPPORT
 	select SPL_LIBCOMMON_SUPPORT
+	select SYS_REDUNDAND_ENVIRONMENT
+	select ENV_OVERWRITE
 
 config TQMA8XX_MFG_SUPPORT
 	bool "MFG Tool support"
@@ -237,6 +239,11 @@ config TQMBA8XX_BOOT_FSPI
 
 endmenu
 
+#
+# default values for FLEXSPI NOR. Will be used also for environment from FLEXSPI
+# if ENV_SPI_[BUS,CS,MODE,SPEED] are not used to overwrite.
+#
+
 config SF_DEFAULT_BUS
 	default 0
 
@@ -248,6 +255,27 @@ config SF_DEFAULT_SPEED
 
 config SF_DEFAULT_MODE
 	default 0
+
+#
+# environment settings: 32k, offset 4M (SPI NOR sector 64k), redundant env
+# in SPI NOR @ 4M + 64k
+#
+# These should go here, when updating U-Boot to newer Version
+#
+config ENV_SIZE
+	default 0x00008000
+
+config ENV_SECT_SIZE	
+	default 0x00010000
+
+config ENV_OFFSET
+	default 0x00400000
+
+config ENV_SIZE
+	default 0x00008000
+
+config ENV_OFFSET_REDUND
+	default 408000
 
 source "board/tqc/common/Kconfig"
 

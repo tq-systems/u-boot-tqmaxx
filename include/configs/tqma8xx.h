@@ -254,31 +254,17 @@
 
 #define CONFIG_SYS_INIT_SP_ADDR         0x80200000
 
-/* Default environment is in SD */
-#define CONFIG_ENV_SIZE			0x8000
-#if defined(CONFIG_ENV_IS_IN_SPI_FLASH)
-#define CONFIG_ENV_OFFSET	(4 * 1024 * 1024)
-#define CONFIG_ENV_SECT_SIZE	(128 * 1024)
-#define CONFIG_ENV_SPI_BUS	CONFIG_SF_DEFAULT_BUS
-#define CONFIG_ENV_SPI_CS	CONFIG_SF_DEFAULT_CS
-#define CONFIG_ENV_SPI_MODE	CONFIG_SF_DEFAULT_MODE
-#define CONFIG_ENV_SPI_MAX_HZ	CONFIG_SF_DEFAULT_SPEED
-#elif defined(CONFIG_SD_BOOT)
-#define CONFIG_SYS_MMC_ENV_PART		0	/* user area */
-#else
-#error
-#endif
-
-#define CONFIG_SYS_MMC_IMG_LOAD_PART	1
-
 /*
  * USDHC1 is for eMMC, USDHC2 is for SD on CPU board - we use DM and
  * determine it based on current boot device
  */
-#define CONFIG_SYS_MMC_ENV_DEV		-1   /* invalid */
+#define CONFIG_SYS_MMC_ENV_DEV		-1	/* invalid */
+#define CONFIG_SYS_MMC_ENV_PART		0	/* user area */
+
+#define CONFIG_SYS_MMC_IMG_LOAD_PART	1
 
 /* Size of malloc() pool */
-#define CONFIG_SYS_MALLOC_LEN		((CONFIG_ENV_SIZE + (32 * 1024)) * 1024)
+#define CONFIG_SYS_MALLOC_LEN		SZ_64M
 
 #define CONFIG_SYS_SDRAM_BASE		0x80000000
 /* #define CONFIG_NR_DRAM_BANKS		1 */
