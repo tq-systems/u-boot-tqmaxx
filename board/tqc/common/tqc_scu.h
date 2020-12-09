@@ -12,8 +12,11 @@ enum {
 	SCU_IOCTL_TEST = 0xfffffffe,
 	/* PMIC ID / VERSION / PROG_ID */
 	SCU_IOCTL_PMICINFO = 0xfffffffd,
+	/* SCU commit ID */
+	SCU_IOCTL_COMMITID = 0xfffffffc,
 };
 
 int tqc_scu_checkpmic(bool dual);
+int tqc_scu_commitid(void);
 
 #endif
