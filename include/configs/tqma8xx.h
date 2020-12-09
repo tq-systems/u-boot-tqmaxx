@@ -255,8 +255,10 @@
 #define CONFIG_SYS_INIT_SP_ADDR         0x80200000
 
 /* Default environment is in SD */
-#if defined(CONFIG_QSPI_BOOT)
-#define CONFIG_ENV_SECT_SIZE	(64 * 1024)
+#define CONFIG_ENV_SIZE			0x8000
+#if defined(CONFIG_ENV_IS_IN_SPI_FLASH)
+#define CONFIG_ENV_OFFSET	(4 * 1024 * 1024)
+#define CONFIG_ENV_SECT_SIZE	(128 * 1024)
 #define CONFIG_ENV_SPI_BUS	CONFIG_SF_DEFAULT_BUS
 #define CONFIG_ENV_SPI_CS	CONFIG_SF_DEFAULT_CS
 #define CONFIG_ENV_SPI_MODE	CONFIG_SF_DEFAULT_MODE
@@ -281,7 +283,15 @@
 #define CONFIG_SYS_SDRAM_BASE		0x80000000
 /* #define CONFIG_NR_DRAM_BANKS		1 */
 #define PHYS_SDRAM_1			0x80000000
-#define PHYS_SDRAM_1_SIZE		SZ_1G	/* 1 GB */
+#if defined(CONFIG_TQMA8XX_RAM_2048MB)
+#define PHYS_SDRAM_1_SIZE			SZ_2G /* 2GB */
+#elif defined(CONFIG_TQMA8XX_RAM_1024MB)
+#define PHYS_SDRAM_1_SIZE			SZ_1G /* 1GB */
+#elif defined(CONFIG_TQMA8XX_RAM_512MB)
+#define PHYS_SDRAM_1_SIZE			SZ_512M /* 512MB */
+#else
+#error
+#endif
 /* needed for loop in CPU code */
 #define PHYS_SDRAM_2			0x800000000
 #define PHYS_SDRAM_2_SIZE		0x0000000	/* not placed */

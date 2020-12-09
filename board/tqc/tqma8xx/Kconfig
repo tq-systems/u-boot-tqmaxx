@@ -22,11 +22,62 @@ config TQMA8XX_DEFAULTS
 	bool
 	default y if TARGET_TQMA8XX
 	select SMC_FUSE
-	select BOARD_EARLY_INIT_F
+	select CLK_IMX8
 	select TQC_SDMMC
 	select TQC_EEPROM
 	select TQC_SCU
 	select TQC_RTC
+	select BOARD_LATE_INIT
+	select FIT
+	select OF_CONTROL
+	select OF_BOARD_SETUP
+	select OF_SYSTEM_SETUP
+	select PINCTRL
+	select PINCTRL_IMX8
+	select POWER_DOMAIN
+	select IMX8_POWER_DOMAIN
+	select DM
+	select DM_MMC
+	select FSL_USDHC
+	select MMC_IO_VOLTAGE
+	select MMC_UHS_SUPPORT
+	select MMC_HS400_ES_SUPPORT
+	select MMC_HS400_SUPPORT
+	select DM_THERMAL
+	select DM_GPIO
+	select MXC_GPIO
+	select DM_I2C
+	select SYS_I2C_IMX_LPI2C
+	select DM_REGULATOR
+	select DM_REGULATOR_FIXED
+	select MISC
+	select FSL_FSPI
+	select DM_SPI
+	select SPI
+	select DM_SPI_FLASH
+	select MTD
+	select SPI_FLASH_MTD
+	select SPI_FLASH
+	select SPI_FLASH_MACRONIX
+	select SPI_FLASH_SPANSION
+	select SPI_FLASH_STMICRO
+	select SPI_FLASH_SST
+	select SPI_FLASH_WINBOND
+	select SPL
+	select SPL_DM
+	select SPL_OF_CONTROL
+	select SPL_LOAD_IMX_CONTAINER
+	select SPL_BOARD_INIT
+	select SPL_CLK
+	select SPL_GPIO_SUPPORT
+	select SPL_MMC_SUPPORT
+	select SPL_DRIVERS_MISC_SUPPORT
+	select SPL_POWER_SUPPORT
+	select SPL_POWER_DOMAIN
+	select SPL_DM_REGULATOR
+	select SPL_DM_REGULATOR_FIXED
+	select SPL_LIBGENERIC_SUPPORT
+	select SPL_LIBCOMMON_SUPPORT
 
 choice
 	prompt "TQMa8Xx CPU variant"
@@ -43,6 +94,15 @@ endchoice
 
 config NR_DRAM_BANKS
 	default 4
+
+config SYS_TEXT_BASE
+	default 0x80020000
+
+config SYS_MALLOC_F_LEN
+	default 0x8000
+
+config IMX_CONFIG
+	default "board/tqc/tqma8xx/imximage.cfg"
 
 choice
 	prompt "TQMa8Xx RAM size"
@@ -76,8 +136,31 @@ choice
 
 config TQMA8XX_BB_MBA8XX
 	bool "TQMa8Xx on MBa8Xx Starterkit"
-	select TQC_SDMMC
+	select DM_SERIAL
+	select FSL_LPUART
+	select MII
+	select DM_ETH
+	select DM_ETH_PHY
+	select FEC_MXC
+	select PHYLIB
+	select PHY_TI
+	select USB
+	select DM_USB
+	select PHY
+	select MXC_USB_OTG_HACTIVE
+	select USB_XHCI_HCD
+	select USB_XHCI_IMX8
+	select USB_CDNS3
+	select USB_GADGET
+	select USB_CDNS3_GADGET
+	select CDNS3_USB_PHY
+	select SPL_SERIAL_SUPPORT
+	select DM_PCA953X
 	select CMD_FUSE
+	select CMD_MII
+	select CMD_PING
+	select CMD_DHCP
+	select CMD_NET
 	help
 	  Select the MBa8Xx starterkit. This features a GigE Phy, USB, SD-Card
 	  etc.
@@ -105,9 +188,21 @@ config TQMBA8XX_BOOT_FSPI
 	select QSPI_BOOT
 	select ENV_IS_IN_SPI_FLASH
 	help
-	  Select booting from FlexSPI
+	  Select booting from QSPI
 
 endmenu
+
+config SF_DEFAULT_BUS
+	default 0
+
+config SF_DEFAULT_CS
+	default 0
+
+config SF_DEFAULT_SPEED
+	default 40000000
+
+config SF_DEFAULT_MODE
+	default 0
 
 source "board/tqc/common/Kconfig"
 
