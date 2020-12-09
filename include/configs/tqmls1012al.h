@@ -16,10 +16,6 @@
 #undef CONFIG_SYS_I2C
 #define TQMLS1012AL_I2C_EEPROM1_ADDR	0x51
 
-/* CONFIG_SYS_MALLOC_LEN >= 512k for UBI! */
-#undef CONFIG_SYS_MALLOC_LEN
-#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + SZ_1M)
-
 /*
  * A lot of RAM is reserved for the BL31 or used by U-Boot itself, so we
  * can test only the lower 368 MiB of RAM

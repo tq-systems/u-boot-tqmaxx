@@ -35,7 +35,10 @@
 #define CONFIG_LAYERSCAPE_NS_ACCESS
 
 /* Size of malloc() pool */
-#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 128 * 1024)
+#define CONFIG_SYS_MALLOC_LEN		(5 * SZ_1M)
+
+/* PFE */
+#define CONFIG_SYS_QE_FMAN_FW_LENGTH	0x300000
 
 /*SPI device */
 #if defined(CONFIG_QSPI_BOOT) || defined(CONFIG_TFABOOT)
