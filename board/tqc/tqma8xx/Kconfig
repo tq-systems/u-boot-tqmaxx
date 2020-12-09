@@ -1,0 +1,111 @@
+if TARGET_TQMA8XX
+
+config SYS_BOARD
+	default "tqma8xx"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_CONFIG_NAME
+	default "tqma8xx"
+
+config SPL_TEXT_BASE
+	default "0x100000"
+
+#
+# allows building flash.bin without imx-mkimage
+#
+#config IMX_CONTAINER_CFG
+#	default "board/tqc/tqma8xx/uboot-container.cfg"
+
+config TQMA8XX_DEFAULTS
+	bool
+	default y if TARGET_TQMA8XX
+	select SMC_FUSE
+	select BOARD_EARLY_INIT_F
+	select TQC_SDMMC
+
+choice
+	prompt "TQMa8Xx CPU variant"
+	default TQMA8XX_CPU_MX8QXP
+	help
+	  Select cpu variant for TQMa8Xx
+
+config TQMA8XX_CPU_MX8QXP
+	bool "TQMa8Xx with i.MX8QXP / i.MX8DXP"
+	help
+	  Select the CPU variant i.MX8QXP / i.MX8DXP
+
+endchoice
+
+config NR_DRAM_BANKS
+	default 4
+
+choice
+	prompt "TQMa8Xx RAM size"
+	default TQMA8XX_RAM_1024MB if TQMA8XX_CPU_MX8QXP
+	default TQMA8XX_RAM_512MB if TQMA8XX_CPU_MX8DX
+	help
+	  Select RAM size for TQMa8Xx
+
+config TQMA8XX_RAM_512MB
+	bool "TQMa8Xx with 512 MiB RAM"
+	help
+	  Select variant with 512 MiB RAM
+
+config TQMA8XX_RAM_1024MB
+	bool "TQMa8Xx with 1024 MiB RAM"
+	help
+	  Select variant with 1024 MiB RAM
+
+config TQMA8XX_RAM_2048MB
+	bool "TQMa8Xx with 2048 MiB RAM"
+	help
+	  Select variant with 2048 MiB RAM
+
+endchoice
+
+choice
+	prompt "TQMa8Xx base board variant"
+	default TQMA8XX_BB_MBA8XX
+	help
+	  Select base board for TQMa8Xx
+
+config TQMA8XX_BB_MBA8XX
+	bool "TQMa8Xx on MBa8Xx Starterkit"
+	select TQC_SDMMC
+	select CMD_FUSE
+	help
+	  Select the MBa8Xx starterkit. This features a GigE Phy, USB, SD-Card
+	  etc.
+
+endchoice
+
+config DEFAULT_DEVICE_TREE
+	default "imx8qxp-mba8xx" if TQMA8XX_CPU_MX8QXP && TQMA8XX_BB_MBA8XX
+
+config DEFAULT_FDT_FILE
+	default "imx8qxp-mba8xx.dtb" if TQMA8XX_CPU_MX8QXP && TQMA8XX_BB_MBA8XX
+
+menu "TQMa8XQP boot device"
+
+config TQMA8XX_BOOT_SDCARD
+	bool "TQMa8Xx boot from SD / e-MMC"
+	default "y"
+	select SD_BOOT
+	select ENV_IS_IN_MMC
+	help
+	  Select booting from SD / e-MMC
+
+config TQMBA8XX_BOOT_FSPI
+	bool "TQMa8Xx boot from FlexSPI"
+	select QSPI_BOOT
+	select ENV_IS_IN_SPI_FLASH
+	help
+	  Select booting from FlexSPI
+
+endmenu
+
+source "board/tqc/common/Kconfig"
+
+endif
