@@ -274,6 +274,8 @@
 };
 
 &flash0 {
+	spi-tx-bus-width = <1>;
+	spi-rx-bus-width = <1>;
 	u-boot,dm-spl;
 	u-boot,dm-pre-proper;
 };
