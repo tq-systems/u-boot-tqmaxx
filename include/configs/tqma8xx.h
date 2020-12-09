@@ -165,7 +165,7 @@
 				"booti; " \
 			"fi;" \
 		"fi;\0" \
-	"update_kernel=run set_getcmd; "                                       \
+	"update_kernel_mmc=run set_getcmd; "                                   \
 		"if ${get_cmd} ${image}; then "                                \
 			"if itest ${filesize} > 0; then "                      \
 				"echo Write kernel image to mmc ${mmcdev}:${mmcpart}...; " \
@@ -174,7 +174,7 @@
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"setenv filesize; setenv get_cmd \0"                           \
-	"update_fdt=run set_getcmd; "                                          \
+	"update_fdt_mmc=run set_getcmd; "                                      \
 		"if ${get_cmd} ${fdt_file}; then "                             \
 			"if itest ${filesize} > 0; then "                      \
 				"echo Write fdt image to mmc ${mmcdev}:${mmcpart}...; " \
@@ -183,21 +183,29 @@
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"setenv filesize; setenv get_cmd \0"                           \
-	"uboot_start=0x40\0"                                                   \
+	"uboot_mmc_start=0x40\0"                                               \
 	"uboot_size=0xfc0\0"                                                   \
 	"uboot=bootstream.bin\0"                                               \
-	"update_uboot=run set_getcmd; if ${get_cmd} ${uboot}; then "           \
+	"update_uboot_mmc=run set_getcmd; if ${get_cmd} ${uboot}; then "       \
 		"if itest ${filesize} > 0; then "                              \
 			"echo Write u-boot image to mmc ${mmcdev} ...; "       \
 			"mmc dev ${mmcdev}; mmc rescan; "                      \
 			"setexpr blkc ${filesize} + 0x1ff; "                   \
 			"setexpr blkc ${blkc} / 0x200; "                       \
 			"if itest ${blkc} <= ${uboot_size}; then "             \
-				"mmc write ${loadaddr} ${uboot_start} "        \
+				"mmc write ${loadaddr} ${uboot_mmc_start} "    \
 					"${blkc}; "                            \
 			"fi; "                                                 \
 		"fi; fi; "                                                     \
 		"setenv filesize; setenv blkc \0"                              \
+	"update_uboot_spi=run set_getcmd; if ${get_cmd} ${uboot}; then "       \
+		"if itest ${filesize} > 0; then "                              \
+			"echo Write u-boot image to flexspi ...; "             \
+			"if sf probe; then "                                   \
+				"sf update ${loadaddr} 0 ${filesize}; "        \
+			"fi; "                                                 \
+		"fi; fi; "                                                     \
+		"setenv filesize \0"                                           \
 	"set_getcmd=if test \"${ip_dyn}\" = yes; then "                        \
 			"setenv get_cmd dhcp; "                                \
 		"else "                                                        \
