@@ -55,6 +55,7 @@ enum fspi_lut_id {
 	SEQID_WRDI = 23,
 	SEQID_QUAD_PP = 24,
 	SEQID_WRSR = 25,
+	SEQID_RDCR_MCR = 26, /* Macronix CR read, CMD 0x15 */
 	SEQID_END,
 };
 
@@ -455,6 +456,15 @@ static void fspi_set_lut(struct fsl_fspi_priv *priv)
 	fspi_write32(priv->flags, &regs->lut[lut_base], OPRND0(FSPI_CMD_WRSR) |
 		PAD0(LUT_PAD1) | INSTR0(LUT_CMD) | OPRND1(2) |
 		     PAD1(LUT_PAD1) | INSTR1(LUT_WRITE));
+	fspi_write32(priv->flags, &regs->lut[lut_base + 1], 0);
+	fspi_write32(priv->flags, &regs->lut[lut_base + 2], 0);
+	fspi_write32(priv->flags, &regs->lut[lut_base + 3], 0);
+
+	/* Read configuration register, Macronix */
+	lut_base = SEQID_RDCR_MCR * 4;
+	fspi_write32(priv->flags, &regs->lut[lut_base], OPRND0(FSPI_CMD_RDCR_MCR) |
+		PAD0(LUT_PAD1) | INSTR0(LUT_CMD) | OPRND1(1) |
+		PAD1(LUT_PAD1) | INSTR1(LUT_READ));
 	fspi_write32(priv->flags, &regs->lut[lut_base + 1], 0);
 	fspi_write32(priv->flags, &regs->lut[lut_base + 2], 0);
 	fspi_write32(priv->flags, &regs->lut[lut_base + 3], 0);
@@ -866,6 +876,11 @@ static void fspi_op_write(struct fsl_fspi_priv *priv, u8 *txbuf, u32 len)
 		fspi_mem_op_write(priv, SEQID_PP_4B, txbuf, len);
 }
 
+static void fspi_op_rdcr_mcr(struct fsl_fspi_priv *priv, void *rxbuf, u32 len)
+{
+	fspi_mem_op_read_reg(priv, SEQID_RDCR_MCR, rxbuf, len);
+}
+
 static void fspi_op_rdsr(struct fsl_fspi_priv *priv, void *rxbuf, u32 len)
 {
 	fspi_mem_op_read_reg(priv, SEQID_RDSR, rxbuf, len);
@@ -998,6 +1013,8 @@ int fspi_xfer(struct fsl_fspi_priv *priv, unsigned int bitlen,
 			fspi_op_rdid(priv, din, bytes);
 		else if (priv->cur_seqid == FSPI_CMD_RDSR)
 			fspi_op_rdsr(priv, din, bytes);
+		else if (priv->cur_seqid == FSPI_CMD_RDCR_MCR)
+			fspi_op_rdcr_mcr(priv, din, bytes);
 		else if (priv->cur_seqid == FSPI_CMD_RDFSR)
 			fspi_op_rdfsr(priv, din, bytes);
 		else if (priv->cur_seqid == FSPI_CMD_RD_EVCR)
@@ -1216,6 +1233,7 @@ struct fspi_cmd_func_pair fspi_supported_cmds[SEQID_END] = {
 	{FSPI_CMD_WRDI, false, &fspi_mem_op_cmd},
 	{FSPI_CMD_QUAD_PP, true, &fspi_mem_op_write},
 	{FSPI_CMD_WRSR, false, &fspi_mem_op_write},
+	{FSPI_CMD_RDCR_MCR, false, &fspi_mem_op_read_reg},
 };
 
 static int fsl_fspi_child_pre_probe(struct udevice *dev)
