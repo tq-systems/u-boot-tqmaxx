@@ -1286,7 +1286,103 @@ write_err:
 	return ret;
 }
 
+/*
+ * Write status Register and configuration register with 2 bytes
+ * The first byte will be written to the status register, while the
+ * second byte will be written to the configuration register.
+ * Return negative if error occurred.
+ */
+static int write_sr_cr(struct spi_nor *nor, u8 *sr_cr)
+{
+	int ret;
+
+	write_enable(nor);
+
+	ret = nor->write_reg(nor, SPINOR_OP_WRSR, sr_cr, 2);
+	if (ret < 0) {
+		dev_dbg(nor->dev,
+			"error while writing configuration register\n");
+		return -EINVAL;
+	}
+
+	ret = spi_nor_wait_till_ready(nor);
+	if (ret) {
+		dev_dbg(nor->dev,
+			"timeout while writing configuration register\n");
+		return ret;
+	}
+
+	return 0;
+}
+
 #ifdef CONFIG_SPI_FLASH_MACRONIX
+
+/*
+ * Read Macronix configuration register
+ * Return negative if error occurred or configuration register value
+ */
+static int macronix_read_cr(struct spi_nor *nor)
+{
+	int ret;
+	u8 val;
+
+	ret = nor->read_reg(nor, SPINOR_OP_RDCR_MCR, &val, 1);
+	if (ret < 0) {
+		dev_dbg(nor->dev, "error %d reading CR\n", ret);
+		return ret;
+	}
+
+	return val;
+}
+
+/*
+ * Write Macronix configuration register
+ * To preserve the status register, this register is read first
+ * and rewritten together with the configuration register.
+ * Return negative if error occurred
+ */
+static int macronix_write_cr(struct spi_nor *nor, u8 *cr)
+{
+	int val;
+	u8 sr_cr[2];
+
+	val = read_sr(nor);
+	if (val < 0)
+		return val;
+
+	sr_cr[0] = val;
+	sr_cr[1] = *cr;
+
+	return write_sr_cr(nor, sr_cr);
+}
+
+/*
+ * Write Macronix DSR value in configuration register
+ * To preserve the other parts of the register, configuration register is read
+ * first and DSR bits are changed.
+ */
+static void macronix_dsr_init(struct spi_nor *nor)
+{
+	struct udevice *dev = nor->dev;
+	u32 val;
+	int crr;
+	u8 cr;
+
+	/* use default value 0x7 / 24 Ohms (Default) */
+	val = ofnode_read_u32_default(dev->node, "macronix,dsr",
+				      0x7);
+	crr = macronix_read_cr(nor);
+	if (crr >= 0) {
+		val = env_get_ulong("spinor_dsr", 16, val);
+		cr = (u8)(val |= ((u32)crr & 0xf8));
+		macronix_write_cr(nor, &cr);
+		dev_dbg(nor->dev, "wrote CR %x\n",
+			(u32)macronix_read_cr(nor));
+	} else {
+		dev_warn(nor->dev, "read CR failed %d\n", crr);
+	}
+}
+
 /**
  * macronix_quad_enable() - set QE bit in Status Register.
  * @nor:	pointer to a 'struct spi_nor'
@@ -1326,35 +1422,6 @@ static int macronix_quad_enable(struct spi_nor *nor)
 #endif
 
 #if defined(CONFIG_SPI_FLASH_SPANSION) || defined(CONFIG_SPI_FLASH_WINBOND)
-/*
- * Write status Register and configuration register with 2 bytes
- * The first byte will be written to the status register, while the
- * second byte will be written to the configuration register.
- * Return negative if error occurred.
- */
-static int write_sr_cr(struct spi_nor *nor, u8 *sr_cr)
-{
-	int ret;
-
-	write_enable(nor);
-
-	ret = nor->write_reg(nor, SPINOR_OP_WRSR, sr_cr, 2);
-	if (ret < 0) {
-		dev_dbg(nor->dev,
-			"error while writing configuration register\n");
-		return -EINVAL;
-	}
-
-	ret = spi_nor_wait_till_ready(nor);
-	if (ret) {
-		dev_dbg(nor->dev,
-			"timeout while writing configuration register\n");
-		return ret;
-	}
-
-	return 0;
-}
-
 /**
  * spansion_read_cr_quad_enable() - set QE bit in Configuration Register.
  * @nor:	pointer to a 'struct spi_nor'
@@ -2427,6 +2494,11 @@ static int spi_nor_setup(struct spi_nor *nor, const struct flash_info *info,
 static int spi_nor_init(struct spi_nor *nor)
 {
 	int err;
+
+	if (CONFIG_IS_ENABLED(SPI_FLASH_MACRONIX)) {
+		if (JEDEC_MFR(nor->info) == SNOR_MFR_MACRONIX)
+			macronix_dsr_init(nor);
+	}
 
 	/*
 	 * Atmel, SST, Intel/Numonyx, and others serial NOR tend to power up

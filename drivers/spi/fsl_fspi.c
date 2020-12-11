@@ -75,6 +75,9 @@ enum fspi_lut_id {
 #define	FSPI_CMD_WREAR		0xc5	/* EAR register write */
 #define	FSPI_CMD_RDEAR		0xc8	/* EAR reigster read */
 
+/* Used for Macronix flashes only. */
+#define	FSPI_CMD_RDCR_MCR	0x15	/* Macronix control register read */
+
 /* Used for Spansion flashes only. */
 #define	FSPI_CMD_BRRD		0x16	/* Bank register read */
 #define	FSPI_CMD_BRWR		0x17	/* Bank register write */
