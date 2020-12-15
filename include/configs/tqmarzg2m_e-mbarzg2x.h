@@ -26,4 +26,12 @@
 
 #define CONFIG_BOARD_LATE_INIT
 
+/* override bootcmd from rcar-gen3-common.h */
+
+#undef CONFIG_BOOTCOMMAND
+#define CONFIG_BOOTCOMMAND	\
+	"fatload mmc 0:1 0x48080000 Image; " \
+	"fatload mmc 0:1 0x48000000 " CONFIG_DEFAULT_FDT_FILE "; " \
+	"booti 0x48080000 - 0x48000000"
+
 #endif /*__TQMARZG2M_E_MBARZG2X_H */
