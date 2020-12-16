@@ -281,11 +281,8 @@ config ENV_SECT_SIZE
 config ENV_OFFSET
 	default 0x00400000
 
-config ENV_SIZE
-	default 0x00008000
-
 config ENV_OFFSET_REDUND
-	default 408000
+	default 0x00410000
 
 source "board/tqc/common/Kconfig"
 
