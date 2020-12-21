@@ -33,12 +33,12 @@ int tqc_pcf85063_adjust_capacity(int bus, int address, int quartz_load)
 	val = dm_i2c_reg_read(dev, PCF85063_REG_CTRL1);
 	/* Set Bit 0 of Register 0 of RTC to adjust to 12.5 pF */
 	switch (quartz_load) {
-		case 7000:
-			val &= ~PCF85063_REG_CTRL1_CAP_SEL;
-			break;
-		case 12500:
-			val |= PCF85063_REG_CTRL1_CAP_SEL;
-			break;
+	case 7000:
+		val &= ~PCF85063_REG_CTRL1_CAP_SEL;
+		break;
+	case 12500:
+		val |= PCF85063_REG_CTRL1_CAP_SEL;
+		break;
 	}
 
 	ret = dm_i2c_reg_write(dev, PCF85063_REG_CTRL1, val);
