@@ -23,7 +23,6 @@
 		status = "okay";
 		u-boot,dm-spl;
 	};
-
 };
 
 &{/imx8qx-pm} {
