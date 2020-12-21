@@ -264,7 +264,7 @@ config SF_DEFAULT_SPEED
 config SF_DEFAULT_MODE
 	default 0
 
-config SYS_SPI_U_BOOT_OFFS 
+config SYS_SPI_U_BOOT_OFFS
 	default 0x200000
 
 #
@@ -276,7 +276,7 @@ config SYS_SPI_U_BOOT_OFFS
 config ENV_SIZE
 	default 0x00008000
 
-config ENV_SECT_SIZE	
+config ENV_SECT_SIZE
 	default 0x00010000
 
 config ENV_OFFSET
