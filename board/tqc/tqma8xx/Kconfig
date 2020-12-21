@@ -234,7 +234,8 @@ config TQMA8XX_BOOT_SDCARD
 	select SD_BOOT
 	select ENV_IS_IN_MMC
 	help
-	  Select booting from SD / e-MMC
+	  Select booting from SD / e-MMC, you should supply env offsets per
+	  devicetree
 
 config TQMBA8XX_BOOT_FSPI
 	bool "TQMa8Xx boot from FlexSPI"

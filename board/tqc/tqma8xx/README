@@ -1,10 +1,28 @@
 U-Boot for the TQ-Systems i.MX8QXP TQMa8Xx SOM family
 
+Supported variants
+==================
+
+TQMa8QXP / 1 GiB DDR3L ECC / i.MX8QXP C0
+
+configs:
+
+tqma8xqp_mba8xx_defconfig
+tqma8xqp_mba8xx_mfg_defconfig
+
+TQMa8QXP4 / 2 GiB LPDDR4 / i.MX8QXP C0
+
+configs:
+
+tqma8xqp4_mba8xx_defconfig
+tqma8xqp4_mba8xx_mfg_defconfig
+
 Quick Start
 ===========
 
 - Build the ARM Trusted firmware binary
-- Get scfw_tcm.bin and ahab-container.img
+- Get SCU firmware (must match board variant and RAM config)
+- Get SECO firmware
 - Build U-Boot
 - Flash the binary into the SD card
 - Boot
@@ -14,21 +32,24 @@ Get and Build the ARM Trusted firmware
 
 $ git clone https://source.codeaurora.org/external/imx/imx-atf
 $ cd imx-atf/
-$ git checkout origin/imx_4.19.35_1.1.0 -b imx_4.19.35_1.1.0
+$ git checkout origin/imx_5.4.47_2.2.0 -b imx_5.4.47_2.2.0
 $ make PLAT=imx8qx bl31
 
-Get ahab-container.img
-======================
+Get SECO firmware (mx8qxc0-ahab-container.img)
+==============================================
 
 $ wget https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-seco-3.7.1.bin
 $ chmod +x imx-seco-3.7.1.bin
-$ ./imx-seco-2.3.1.bin
+$ ./imx-seco-3.7.1.bin
 
 Get SCFW
 ========
 
-wget https://github.com/tq-systems/meta-tq/raw/zeus-tqma8/dynamic-layers/fsl-bsp-release/recipes-bsp/imx-sc-firmware/imx-sc-firmware/imx-sc-firmware-tq-TQMa8.NXP-v1.3.1.B4124.0029.tar.gz
-tar -xf ./imx-sc-firmware-tq-TQMa8.NXP-v1.3.1.B4124.0029.tar.gz
+TQMa8XQP: mx8qx-tqma8xqp-mba8xx-scfw-tcm.bin
+TQMa8XQP4: mx8qx-tqma8xqp4-mba8xx-scfw-tcm.bin
+
+wget https://github.com/tq-systems/meta-tq/blob/zeus-tqma8/dynamic-layers/fsl-bsp-release/recipes-bsp/imx-sc-firmware/imx-sc-firmware/imx-sc-firmware-tq-TQMa8.NXP-v1.6.0.B4894.0030.tar.gz
+tar -xf ./imx-sc-firmware-tq-TQMa8.NXP-v1.6.0.B4894.0030.tar.gz
 
 Prepare build folder
 ====================
@@ -37,11 +58,11 @@ Copy the following binaries to U-Boot folder:
 
 $ cp imx-atf/build/imx8qx/release/bl31.bin .
 $ cp imx-seco-3.7.1/firmware/seco/mx8qxc0-ahab-container.img ./ahab-container.img
-$ cp imx-sc-firmware-tq-TQMa8.NXP-v1.3.1.B4124.0029/mx8qx-tqma8xqp-mba8xx-scfw-tcm.bin ./mx8qx-mba8xx-scfw-tcm.bin
+$ cp imx-sc-firmware-tq-TQMa8.NXP-v1.6.0.B4894.0030/mx8qx-tqma8xqp[4]-mba8xx-scfw-tcm.bin ./mx8qx-mba8xx-scfw-tcm.bin
 
 Build U-Boot
 ============
-$ make tqma8xqp_mba8xx_mmc_defconfig
+$ make tqma8xqp_mba8xx_defconfig
 $ make flash.bin
 
 Flash the binary into the SD card
