@@ -8,6 +8,7 @@ TQMa8QXPS / 2 GiB LPDDR4 / i.MX8QXP C0
 configs:
 
 tqma8xqps_mb_smarc_2_defconfig
+tqma8xqps_mb_smarc_2_mfg_defconfig
 
 Quick Start
 ===========
