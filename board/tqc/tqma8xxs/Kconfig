@@ -1,0 +1,177 @@
+if TARGET_TQMA8XXS
+
+config SYS_BOARD
+	default "tqma8xxs"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_CONFIG_NAME
+	default "tqma8xxs"
+
+config SPL_TEXT_BASE
+	default "0x100000"
+
+#
+# allows building flash.bin without imx-mkimage
+#
+#config IMX_CONTAINER_CFG
+#	default "board/tqc/tqma8xx/uboot-container.cfg"
+
+config TQMA8XXS_DEFAULTS
+	bool
+	default y if TARGET_TQMA8XXS
+	select SMC_FUSE
+	select CLK_IMX8
+	select TQC_SDMMC
+	select TQC_EEPROM
+	select TQC_SCU
+	select TQC_RTC
+	select TQC_ENVLOC
+	select BOARD_LATE_INIT
+	select BOARD_EARLY_INIT_F
+	select FIT
+	select OF_CONTROL
+	select OF_BOARD_SETUP
+	select OF_SYSTEM_SETUP
+	select PINCTRL
+	select PINCTRL_IMX8
+	select POWER_DOMAIN
+	select IMX8_POWER_DOMAIN
+	select DM
+	select DM_MMC
+	select FSL_USDHC
+	select MMC_IO_VOLTAGE
+	select MMC_UHS_SUPPORT
+	select MMC_HS400_ES_SUPPORT
+	select MMC_HS400_SUPPORT
+	select DM_THERMAL
+	select DM_SERIAL
+	select FSL_LPUART
+	select DM_GPIO
+	select MXC_GPIO
+	select DM_I2C
+	select SYS_I2C_IMX_LPI2C
+	select DM_REGULATOR
+	select DM_REGULATOR_FIXED
+	select MISC
+	select SPL
+	select SPL_DM
+	select SPL_OF_CONTROL
+	select SPL_LOAD_IMX_CONTAINER
+	select SPL_BOARD_INIT
+	select SPL_CLK
+	select SPL_ENV_SUPPORT
+	select SPL_SERIAL_SUPPORT
+	select SPL_GPIO_SUPPORT
+	select SPL_MMC_SUPPORT
+	select SPL_DRIVERS_MISC_SUPPORT
+	select SPL_POWER_SUPPORT
+	select SPL_POWER_DOMAIN
+	select SPL_I2C_SUPPORT
+	select SPL_DM_REGULATOR
+	select SPL_DM_REGULATOR_FIXED
+	select SPL_LIBGENERIC_SUPPORT
+	select SPL_LIBCOMMON_SUPPORT
+	select SPL_DM_SEQ_ALIAS
+	select SYS_REDUNDAND_ENVIRONMENT
+	select ENV_OVERWRITE
+
+choice
+	prompt "TQMa8XxS CPU variant"
+	default TQMA8XXS_CPU_MX8QXP
+	help
+	  Select cpu variant for TQMa8QXS
+
+config TQMA8XXS_CPU_MX8QXP
+	bool "TQMa8XxS with i.MX8QXP"
+	help
+	  Select the CPU variant
+
+endchoice
+
+config NR_DRAM_BANKS
+	default 4
+
+config SYS_TEXT_BASE
+	default 0x80020000
+
+config SYS_MALLOC_F_LEN
+	default 0x8000
+
+config IMX_CONFIG
+	default "board/tqc/tqma8xxs/imximage.cfg"
+
+choice
+	prompt "TQMa8XxS RAM size"
+	default TQMA8XXS_RAM_2048MB if TQMA8XXS_CPU_MX8QXP
+	help
+	  Select RAM size for TQMa8XxS
+
+config TQMA8XXS_RAM_1024MB
+	bool "TQMa8XxS with 1024 MiB RAM"
+	help
+	  Select variant with 1024 MiB RAM
+
+config TQMA8XXS_RAM_2048MB
+	bool "TQMa8XxS with 2048 MiB RAM"
+	help
+	  Select variant with 2048 MiB RAM
+
+endchoice
+
+choice
+	prompt "TQMa8XxS base board variant"
+	default TQMA8XXS_BB_MB_SMARC_2
+	help
+	  Select base board for TQMa8XxS
+
+config TQMA8XXS_BB_MB_SMARC_2
+	bool "TQMa8XxS on MB_SMARC_2 Board"
+	select TQC_ENVLOC
+	select CMD_FUSE
+	help
+	  Select the MB-SMARC-2 board. This is a SMARC2 mainboard
+
+endchoice
+
+config DEFAULT_DEVICE_TREE
+	default "imx8qxp-mb-smarc-2" if TQMA8XXS_CPU_MX8QXP && TQMA8XXS_BB_MB_SMARC_2
+
+config DEFAULT_FDT_FILE
+	default "imx8qxp-mb-smarc-2.dtb" if TQMA8XXS_CPU_MX8QXP && TQMA8XXS_BB_MB_SMARC_2
+
+menu "TQMa8XxS boot device"
+
+config TQMA8XXS_BOOT_SDCARD
+	bool "TQMa8XxS boot from SD / e-MMC"
+	default "y"
+	select SD_BOOT
+	select ENV_IS_IN_MMC
+	help
+	  Select booting from SD / e-MMC, you should supply env offsets per
+	  devicetree
+
+endmenu
+
+#
+# environment settings: 32k, offset 4M (SPI NOR sector 64k), redundant env
+# in SPI NOR @ 4M + 64k
+#
+# These should go here, when updating U-Boot to newer Version
+#
+config ENV_SIZE
+	default 0x00008000
+
+config ENV_SECT_SIZE
+	default 0x00010000
+
+config ENV_OFFSET
+	default 0x00400000
+
+config ENV_OFFSET_REDUND
+	default 0x00410000
+
+source "board/tqc/common/Kconfig"
+
+endif

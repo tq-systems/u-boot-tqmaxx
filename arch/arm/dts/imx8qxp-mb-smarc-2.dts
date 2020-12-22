@@ -1,0 +1,48 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright 2018 - 2020 TQ-Systems GmbH
+ */
+
+/dts-v1/;
+
+#include "imx8qxp-tqma8xqps.dtsi"
+
+/ {
+	model = "TQ-Systems i.MX8QXP TQMa8XQPS on MB-SMARC-2";
+	compatible = "tq,imx8qxp-mb-smarc-2", "tq,imx8qxp-tqma8xqps", "fsl,imx8qxp";
+
+	chosen {
+		bootargs = "console=ttyLP0,115200 earlycon";
+		stdout-path = &lpuart0;
+	};
+
+	reg_sdvmmc: regulator-sdvmmc {
+		compatible = "regulator-fixed";
+		regulator-name = "SD1_VMMC";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&gpio4 19 GPIO_ACTIVE_LOW>;
+		regulator-boot-on;
+	};
+};
+
+&i2c0 {
+	eeprom2: eeprom@57 {
+		compatible = "st,24c32", "atmel,24c32";
+		reg = <0x57>;
+		pagesize = <32>;
+	};
+};
+
+&lpuart0 {
+	status = "okay";
+};
+
+&usdhc2 {
+	cd-gpios = <&gpio4 22 GPIO_ACTIVE_LOW>;
+	wp-gpios = <&gpio4 21 GPIO_ACTIVE_HIGH>;
+	vmmc-supply = <&reg_sdvmmc>;
+	no-mmc;
+	no-sdio;
+	status = "okay";
+};

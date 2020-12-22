@@ -179,6 +179,11 @@ config TARGET_TQMA8XX
 	select BOARD_LATE_INIT
 	select IMX8QXP
 
+config TARGET_TQMA8XXS
+	bool "Support TQMa8XxS board"
+	select BOARD_LATE_INIT
+	select IMX8QXP
+
 endchoice
 
 source "board/freescale/imx8qm_mek/Kconfig"
@@ -192,6 +197,7 @@ source "board/toradex/apalis-imx8/Kconfig"
 source "board/toradex/colibri-imx8x/Kconfig"
 source "board/siemens/capricorn/Kconfig"
 source "board/tqc/tqma8xx/Kconfig"
+source "board/tqc/tqma8xxs/Kconfig"
 
 config SNVS_SEC_SC
 	bool "Support SNVS configuration"
