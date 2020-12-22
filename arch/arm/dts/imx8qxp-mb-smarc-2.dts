@@ -26,6 +26,28 @@
 	};
 };
 
+&ethphy0 {
+	/* LED1: Link, LED2: activity */
+	ti,led-function = <0xc100>;
+	/* active high, LED1/2 driven by phy */
+	ti,led-ctrl = <0x1441>;
+};
+
+&ethphy3 {
+	/* LED1: Link, LED2: activity */
+	ti,led-function = <0xc100>;
+	/* active high, LED1/2 driven by phy */
+	ti,led-ctrl = <0x1441>;
+};
+
+&fec1 {
+	status = "okay";
+};
+
+&fec2 {
+	status = "okay";
+};
+
 &i2c0 {
 	eeprom2: eeprom@57 {
 		compatible = "st,24c32", "atmel,24c32";

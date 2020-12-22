@@ -55,6 +55,13 @@ config TQMA8XXS_DEFAULTS
 	select DM_REGULATOR
 	select DM_REGULATOR_FIXED
 	select MISC
+	select MII
+	select DM_ETH
+	select DM_ETH_PHY
+	select FEC_MXC
+	select PHYLIB
+	select PHY_GIGE
+	select PHY_TI
 	select SPL
 	select SPL_DM
 	select SPL_OF_CONTROL
@@ -130,6 +137,10 @@ config TQMA8XXS_BB_MB_SMARC_2
 	bool "TQMa8XxS on MB_SMARC_2 Board"
 	select TQC_ENVLOC
 	select CMD_FUSE
+	select CMD_MII
+	select CMD_PING
+	select CMD_DHCP
+	select CMD_NET
 	help
 	  Select the MB-SMARC-2 board. This is a SMARC2 mainboard
 

@@ -59,6 +59,10 @@
 #define CONFIG_SUPPORT_EMMC_BOOT	/* eMMC specific */
 #endif
 
+#if defined(CONFIG_FEC_MXC)
+#define FEC_QUIRK_ENET_MAC
+#endif
+
 #define CONFIG_ENV_OVERWRITE
 
 #define CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
