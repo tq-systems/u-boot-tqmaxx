@@ -60,6 +60,11 @@
 	status = "okay";
 };
 
+&usbotg1 {
+	dr_mode = "otg";
+	status = "okay";
+};
+
 &usdhc2 {
 	cd-gpios = <&gpio4 22 GPIO_ACTIVE_LOW>;
 	wp-gpios = <&gpio4 21 GPIO_ACTIVE_HIGH>;

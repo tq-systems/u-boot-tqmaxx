@@ -74,6 +74,18 @@ config TQMA8XXS_DEFAULTS
 	select SPI_FLASH_STMICRO
 	select SPI_FLASH_SST
 	select SPI_FLASH_WINBOND
+	select USB
+	select DM_USB
+	select USB_EHCI_HCD
+	select USB_EHCI_MX6
+	select MXC_USB_OTG_HACTIVE
+	select USB_XHCI_HCD
+	select USB_XHCI_IMX8
+	select USB_GADGET
+	select USB_CDNS3_GADGET
+	select USB_CDNS3
+	select PHY
+	select CDNS3_USB_PHY
 	select SPL
 	select SPL_DM
 	select SPL_OF_CONTROL
