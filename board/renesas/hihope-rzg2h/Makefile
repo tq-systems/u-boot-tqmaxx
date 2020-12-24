@@ -6,4 +6,4 @@
 # SPDX-License-Identifier: GPL-2.0+
 #
 
-obj-y	:= hihope-rzg2h.o
+obj-y	:= ../rzg-common/update_fdt.o hihope-rzg2h.o

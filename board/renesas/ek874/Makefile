@@ -6,4 +6,4 @@
 # SPDX-License-Identifier: GPL-2.0+
 #
 
-obj-y	:= ek874.o
+obj-y	:= ../rzg-common/update_fdt.o ek874.o
