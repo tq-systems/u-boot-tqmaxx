@@ -208,6 +208,24 @@ config TQMA8XXS_RAM_2048MB
 endchoice
 
 choice
+	prompt "TQMa8XxS hardware revision"
+	default TQMA8XXS_R0300
+	help
+	  Select hardware revision of module
+
+config TQMA8XXS_R0300
+	bool "TQMa8XxS with R0300"
+	help
+	  Select hardware revision R0300
+
+config TQMA8XXS_R0200
+	bool "TQMa8XxS with R0200"
+	help
+	  Select hardware revision R0200
+
+endchoice
+
+choice
 	prompt "TQMa8XxS base board variant"
 	default TQMA8XXS_BB_MB_SMARC_2
 	help
@@ -227,10 +245,12 @@ config TQMA8XXS_BB_MB_SMARC_2
 endchoice
 
 config DEFAULT_DEVICE_TREE
-	default "imx8qxp-mb-smarc-2" if TQMA8XXS_CPU_MX8QXP && TQMA8XXS_BB_MB_SMARC_2
+	default "imx8qxp-mb-smarc-2" if TQMA8XXS_CPU_MX8QXP && TQMA8XXS_BB_MB_SMARC_2 && TQMA8XXS_R0300
+	default "imx8qxp-mb-smarc-2-r0200" if TQMA8XXS_CPU_MX8QXP && TQMA8XXS_BB_MB_SMARC_2 && TQMA8XXS_R0200
 
 config DEFAULT_FDT_FILE
-	default "imx8qxp-mb-smarc-2.dtb" if TQMA8XXS_CPU_MX8QXP && TQMA8XXS_BB_MB_SMARC_2
+	default "imx8qxp-mb-smarc-2.dtb" if TQMA8XXS_CPU_MX8QXP && TQMA8XXS_BB_MB_SMARC_2 && TQMA8XXS_R0300
+	default "imx8qxp-mb-smarc-2-r0200.dtb" if TQMA8XXS_CPU_MX8QXP && TQMA8XXS_BB_MB_SMARC_2 && TQMA8XXS_R0200
 
 menu "TQMa8XxS boot device"
 

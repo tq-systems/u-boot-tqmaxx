@@ -1,0 +1,19 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright 2020 TQ-Systems GmbH
+ */
+
+#include "imx8qxp-mb-smarc-2.dts"
+
+/ {
+	model = "TQ-Systems i.MX8QXP TQMa8XQPS REV.020x on MB-SMARC-2";
+};
+
+&reg_sdvmmc {
+	gpio = <&gpio4 19 GPIO_ACTIVE_LOW>;
+	/delete-property/ enable-active-high;
+};
+
+&usdhc2 {
+	no-1-8-v;
+};
