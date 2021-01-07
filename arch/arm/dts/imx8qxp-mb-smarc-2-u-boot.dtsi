@@ -31,6 +31,10 @@
 	u-boot,dm-spl;
 };
 
+&pinctrl_flexspi0 {
+	u-boot,dm-spl;
+};
+
 &pinctrl_usdhc1 {
 	u-boot,dm-spl;
 };
@@ -64,6 +68,11 @@
 };
 
 &pd_lsio {
+	u-boot,dm-pre-proper;
+	u-boot,dm-spl;
+};
+
+&pd_lsio_flexspi0 {
 	u-boot,dm-pre-proper;
 	u-boot,dm-spl;
 };
@@ -192,6 +201,18 @@
 	u-boot,dm-spl;
 	u-boot,dm-pre-proper;
 	sd-uhs-ddr50;
+};
+
+&flexspi0 {
+	u-boot,dm-spl;
+	u-boot,dm-pre-proper;
+};
+
+&flash0 {
+	spi-tx-bus-width = <1>;
+	spi-rx-bus-width = <1>;
+	u-boot,dm-spl;
+	u-boot,dm-pre-proper;
 };
 
 &i2c1 {
