@@ -8,12 +8,14 @@ TQMa8QM / 4 GiB LPDDR4 / i.MX8QM B0
 configs:
 
 tqma8qm_4gb_mba8x_defconfig
+tqma8qm_4gb_mba8x_mfg_defconfig
 
 TQMa8QM / 8 GiB LPDDR4 / i.MX8QM B0
 
 configs:
 
 tqma8qm_8gb_mba8x_defconfig
+tqma8qm_8gb_mba8x_mfg_defconfig
 
 Quick Start
 ===========
