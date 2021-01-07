@@ -149,7 +149,18 @@ config TQMA8X_BB_MBA8X
 	select PHYLIB
 	select PHY_GIGE
 	select PHY_TI
+	select USB
+	select DM_USB
 	select PHY
+	select USB_EHCI_HCD
+	select USB_EHCI_MX6
+	select MXC_USB_OTG_HACTIVE
+	select USB_XHCI_HCD
+	select USB_XHCI_IMX8
+	select USB_CDNS3
+	select USB_GADGET
+	select USB_CDNS3_GADGET
+	select CDNS3_USB_PHY
 	select SPL_SERIAL_SUPPORT
 	select DM_PCA953X
 	select CMD_FUSE

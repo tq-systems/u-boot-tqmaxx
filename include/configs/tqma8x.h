@@ -74,6 +74,11 @@
 #define FEC_QUIRK_ENET_MAC
 #endif
 
+#if defined(CONFIG_USB)
+/* needed for USBOTG1 (chipidea) */
+#define CONFIG_MXC_USB_PORTSC		(PORT_PTS_UTMI | PORT_PTS_PTW)
+#endif
+
 #define CONFIG_ENV_OVERWRITE
 
 #define CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
