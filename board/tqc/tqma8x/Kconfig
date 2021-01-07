@@ -126,9 +126,21 @@ config TQMA8X_BB_MBA8X
 	select TQC_ENVLOC
 	select DM_SERIAL
 	select FSL_LPUART
+	select MII
+	select DM_ETH
+	select DM_ETH_PHY
+	select FEC_MXC
+	select PHYLIB
+	select PHY_GIGE
+	select PHY_TI
+	select PHY
 	select SPL_SERIAL_SUPPORT
 	select DM_PCA953X
 	select CMD_FUSE
+	select CMD_MII
+	select CMD_PING
+	select CMD_DHCP
+	select CMD_NET
 	help
 	  Select the MBa8x starterkit. This features a GigE Phy, USB, SD-Card
 	  etc.
