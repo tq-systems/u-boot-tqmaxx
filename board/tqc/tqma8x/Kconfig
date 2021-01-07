@@ -53,6 +53,18 @@ config TQMA8X_DEFAULTS
 	select DM_REGULATOR
 	select DM_REGULATOR_FIXED
 	select MISC
+	select FSL_FSPI
+	select DM_SPI
+	select SPI
+	select DM_SPI_FLASH
+	select MTD
+	select SPI_FLASH_MTD
+	select SPI_FLASH
+	select SPI_FLASH_MACRONIX
+	select SPI_FLASH_SPANSION
+	select SPI_FLASH_STMICRO
+	select SPI_FLASH_SST
+	select SPI_FLASH_WINBOND
 	select SPL
 	select SPL_DM
 	select SPL_OF_CONTROL
@@ -68,6 +80,10 @@ config TQMA8X_DEFAULTS
 	select SPL_DM_REGULATOR_FIXED
 	select SPL_LIBGENERIC_SUPPORT
 	select SPL_LIBCOMMON_SUPPORT
+	select SPL_SPI_FLASH_SUPPORT
+	select SPL_SPI_FLASH_TINY
+	select SPL_SPI_SUPPORT
+	select SPL_SPI_LOAD
 	select SPL_DM_SEQ_ALIAS
 	select SYS_REDUNDAND_ENVIRONMENT
 	select ENV_OVERWRITE
@@ -164,7 +180,35 @@ config TQMA8X_BOOT_SDCARD
 	  Select booting from SD / e-MMC, you should supply env offsets per
 	  devicetree
 
+config TQMBA8X_BOOT_FSPI
+	bool "TQMa8X boot from FlexSPI"
+	default "y"
+	select QSPI_BOOT
+	select ENV_IS_IN_SPI_FLASH
+	help
+	  Select booting from QSPI NOR at FlexSPI port
+
 endmenu
+
+#
+# default values for FLEXSPI NOR. Will be used also for environment from FLEXSPI
+# if ENV_SPI_[BUS,CS,MODE,SPEED] are not used to overwrite.
+#
+
+config SF_DEFAULT_BUS
+	default 0
+
+config SF_DEFAULT_CS
+	default 0
+
+config SF_DEFAULT_SPEED
+	default 40000000
+
+config SF_DEFAULT_MODE
+	default 0
+
+config SYS_SPI_U_BOOT_OFFS
+	default 0x200000
 
 #
 # environment settings: 32k, offset 4M (SPI NOR sector 64k), redundant env
