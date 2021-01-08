@@ -27,7 +27,6 @@ config TQMA8XX_DEFAULTS
 	select TQC_EEPROM
 	select TQC_SCU
 	select TQC_RTC
-	select TQC_ENVLOC
 	select BOARD_LATE_INIT
 	select FIT
 	select OF_CONTROL
@@ -189,6 +188,7 @@ choice
 
 config TQMA8XX_BB_MBA8XX
 	bool "TQMa8Xx on MBa8Xx Starterkit"
+	select TQC_ENVLOC
 	select DM_SERIAL
 	select FSL_LPUART
 	select MII
