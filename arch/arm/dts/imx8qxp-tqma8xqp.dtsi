@@ -111,22 +111,6 @@
 	};
 };
 
-&gpio0 {
-	status = "okay";
-};
-
-&gpio1 {
-	status = "okay";
-};
-
-&gpio3 {
-	status = "okay";
-};
-
-&gpio4 {
-	status = "okay";
-};
-
 &i2c1 {
 	#address-cells = <1>;
 	#size-cells = <0>;
