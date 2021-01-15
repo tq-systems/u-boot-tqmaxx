@@ -57,7 +57,8 @@ DECLARE_GLOBAL_DATA_PTR;
 	PAD_CTL_DSE_80ohm | PAD_CTL_HYS |			\
 	PAD_CTL_ODE | PAD_CTL_SRE_FAST)
 
-#if defined(CONFIG_TQMA6Q) || defined(CONFIG_TQMA6QP)
+#if defined(CONFIG_TQMA6Q) || defined(CONFIG_TQMA6Q_2GB) || \
+	defined(CONFIG_TQMA6QP)
 
 #define IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII	0x020e0790
 #define IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM	0x020e07ac
@@ -265,7 +266,8 @@ int board_phy_config(struct phy_device *phydev)
  * CONFIG_TQMA6S: i.MX6S
  * CONFIG_TQMA6DL: i.MX6DL
  */
-#if defined(CONFIG_TQMA6Q) || defined(CONFIG_TQMA6QP)
+#if defined(CONFIG_TQMA6Q) || defined(CONFIG_TQMA6Q_2GB) || \
+	defined(CONFIG_TQMA6QP)
 #define MBA6X_KSZ9031_CTRL_SKEW	0x0032
 #define MBA6X_KSZ9031_CLK_SKEW	0x03ff
 #define MBA6X_KSZ9031_RX_SKEW	0x3333
