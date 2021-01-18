@@ -368,6 +368,38 @@
 #endif
 
 /*
+ * MEMTEST configuration
+ */
+
+#if defined(CONFIG_CMD_MEMTEST)
+
+/*
+ * config alternate mtest:
+ * enable 3/4 of RAM to test
+ * U-Boot is relocated to the end of RAM
+ */
+
+#if !defined(__ASSEMBLY__)
+unsigned imx_ddr_size(void);
+#endif
+
+#define CONFIG_SYS_ALT_MEMTEST
+
+#define CONFIG_SYS_MEMTEST_START	CONFIG_SYS_SDRAM_BASE
+
+#ifdef CONFIG_TQMA6QDL
+#define CONFIG_SYS_MEMTEST_END	(CONFIG_SYS_MEMTEST_START + \
+				((SZ_512M / 4) * 3))
+#else
+#define CONFIG_SYS_MEMTEST_END	(CONFIG_SYS_MEMTEST_START + \
+				((imx_ddr_size() / 4) * 3))
+#endif
+
+#define CONFIG_SYS_MEMTEST_SCRATCH	CONFIG_SYS_MEMTEST_END
+
+#endif /* CONFIG_CMD_MEMTEST */
+
+/*
  * All the defines above are for the TQMa6 SoM
  *
  * Now include the baseboard specific configuration
