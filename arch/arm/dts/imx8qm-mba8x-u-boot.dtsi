@@ -49,7 +49,16 @@
 	u-boot,dm-spl;
 };
 
+&reg_v3v3_sd {
+	u-boot,dm-spl;
+	u-boot,off-on-delay-us = <200000>;
+};
+
 &pinctrl_flexspi0 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_reg_v3v3_sd {
 	u-boot,dm-spl;
 };
 
@@ -261,6 +270,7 @@
 &usdhc2 {
 	u-boot,dm-spl;
 	u-boot,dm-pre-proper;
+	sd-uhs-sdr104;
 	sd-uhs-ddr50;
 };
 
