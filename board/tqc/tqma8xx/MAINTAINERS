@@ -7,3 +7,9 @@ F:	include/configs/tqma8xx-mba8xx.h
 F:	configs/tqma8xqp*_defconfig
 F:	arch/arm/dts/imx8qxp-tqma8x*.dtsi
 F:	arch/arm/dts/imx8qxp-mba8xx*.dts
+F:	arch/arm/dts/imx8qxp-mba8xx-u-boot.dtsi
+F:	arch/arm/dts/imx8dxp-tqma8x*.dtsi
+F:	arch/arm/dts/imx8dxp-mba8xx*.dts
+F:	arch/arm/dts/imx8dxp-mba8xx-u-boot.dtsi
+F:	arch/arm/dts/mba8xx.dtsi
+F:	arch/arm/dts/tqma8xx.dtsi

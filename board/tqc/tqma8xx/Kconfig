@@ -138,9 +138,14 @@ choice
 	  Select cpu variant for TQMa8Xx
 
 config TQMA8XX_CPU_MX8QXP
-	bool "TQMa8Xx with i.MX8QXP / i.MX8DXP"
+	bool "TQMa8Xx with i.MX8QXP"
 	help
-	  Select the CPU variant i.MX8QXP / i.MX8DXP
+	  Select the CPU variant i.MX8QXP
+
+config TQMA8XX_CPU_MX8DXP
+	bool "TQMa8Xx with i.MX8DXP"
+	help
+	  Select the CPU variant i.MX8DXP
 
 endchoice
 
@@ -159,6 +164,7 @@ config IMX_CONFIG
 choice
 	prompt "TQMa8Xx RAM size"
 	default TQMA8XX_RAM_1024MB if TQMA8XX_CPU_MX8QXP
+	default TQMA8XX_RAM_1024MB if TQMA8XX_CPU_MX8DXP
 	default TQMA8XX_RAM_512MB if TQMA8XX_CPU_MX8DX
 	help
 	  Select RAM size for TQMa8Xx
@@ -222,9 +228,11 @@ endchoice
 
 config DEFAULT_DEVICE_TREE
 	default "imx8qxp-mba8xx" if TQMA8XX_CPU_MX8QXP && TQMA8XX_BB_MBA8XX
+	default "imx8dxp-mba8xx" if TQMA8XX_CPU_MX8DXP && TQMA8XX_BB_MBA8XX
 
 config DEFAULT_FDT_FILE
 	default "imx8qxp-mba8xx.dtb" if TQMA8XX_CPU_MX8QXP && TQMA8XX_BB_MBA8XX
+	default "imx8dxp-mba8xx.dtb" if TQMA8XX_CPU_MX8DXP && TQMA8XX_BB_MBA8XX
 
 menu "TQMa8XQP boot device"
 
