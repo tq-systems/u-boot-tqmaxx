@@ -28,6 +28,8 @@
 #define CONFIG_SYS_TEXT_BASE		0x2fc00000
 #elif defined(CONFIG_TQMA6Q) || defined(CONFIG_TQMA6DL)
 #define CONFIG_SYS_TEXT_BASE		0x4fc00000
+#elif defined(CONFIG_TQMA6Q_2GB)
+#define CONFIG_SYS_TEXT_BASE		0x8fc00000
 #endif
 
 #include "mx6_common.h"
