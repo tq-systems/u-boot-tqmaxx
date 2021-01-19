@@ -95,6 +95,10 @@
 		};
 	};
 
+	pmu {
+		interrupt-affinity = <&A35_0>, <&A35_1>;
+	};
+
 	memory@80000000 {
 		device_type = "memory";
 		reg = <0x00000000 0x80000000 0 0x40000000>;
