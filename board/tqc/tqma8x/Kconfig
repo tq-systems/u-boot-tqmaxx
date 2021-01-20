@@ -15,8 +15,8 @@ config SPL_TEXT_BASE
 #
 # allows building flash.bin without imx-mkimage
 #
-#config IMX_CONTAINER_CFG
-#	default "board/tqc/tqma8x/uboot-container.cfg"
+config IMX_CONTAINER_CFG
+	default "board/tqc/tqma8x/uboot-container.cfg"
 
 config TQMA8X_DEFAULTS
 	bool
