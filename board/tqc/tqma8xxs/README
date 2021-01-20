@@ -57,7 +57,7 @@ Copy the following binaries to U-Boot folder:
 
 $ cp imx-atf/build/imx8qx/release/bl31.bin .
 $ cp imx-seco-3.7.1/firmware/seco/mx8qxc0-ahab-container.img ./ahab-container.img
-$ cp imx-sc-firmware-tq-TQMa8.NXP-v1.6.0.B4894.0030/tqma8xqps-mb-smarc-2-scfw-tcm.bin ./tqma8xqps-mb-smarc-2-scfw-tcm.bin
+$ cp imx-sc-firmware-tq-TQMa8.NXP-v1.6.0.B4894.0030/tqma8xqps-mb-smarc-2-scfw-tcm.bin ./mx8qx-mb-smarc-2-scfw-tcm.bin
 
 Build U-Boot
 ============
