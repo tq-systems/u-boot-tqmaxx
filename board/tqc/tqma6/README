@@ -21,7 +21,7 @@ To build U-Boot for the TQ Systems TQMa6 modules:
 
 x is a placeholder for the CPU variant
 qdl - means unified config for all CPU variants - necessary for SPL
-pq - means i.MX6QP: TQMa6QP (i.MX6QP)
+qp - means i.MX6QP: TQMa6QP (i.MX6QP)
 q - means i.MX6Q/D: TQMa6Q (i.MX6Q) and TQMa6D  (i.MX6D)
 q_2gb - means i.MX6Q/D: TQMa6Q (i.MX6Q) and TQMa6D  (i.MX6D) with 2 GB RAM (mmc only)
 dl - means i.MX6DL: TQMa6DL  (i.MX6DL)
