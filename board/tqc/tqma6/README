@@ -20,6 +20,7 @@ To build U-Boot for the TQ Systems TQMa6 modules:
 	make
 
 x is a placeholder for the CPU variant
+qp - means i.MX6QP: TQMa6QP (i.MX6QP)
 q - means i.MX6Q/D: TQMa6Q (i.MX6Q) and TQMa6D  (i.MX6D)
 q_2gb - means i.MX6Q/D: TQMa6Q (i.MX6Q) and TQMa6D  (i.MX6D) with 2 GB RAM (mmc only)
 dl - means i.MX6DL: TQMa6DL  (i.MX6DL)
@@ -31,6 +32,8 @@ spi - mean SPI NOR
 
 This gives the following configurations:
 
+tqma6qp_mba6_mmc_defconfig
+tqma6qp_mba6_spi_defconfig
 tqma6q_mba6_mmc_config
 tqma6q_mba6_spi_config
 tqma6q_2gb_mba6_mmc_defconfig

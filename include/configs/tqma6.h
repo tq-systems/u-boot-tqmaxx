@@ -26,7 +26,8 @@
 /* place code in last 4 MiB of RAM */
 #if defined(CONFIG_TQMA6S)
 #define CONFIG_SYS_TEXT_BASE		0x2fc00000
-#elif defined(CONFIG_TQMA6Q) || defined(CONFIG_TQMA6DL)
+#elif defined(CONFIG_TQMA6Q) || defined(CONFIG_TQMA6QP) || \
+	defined(CONFIG_TQMA6DL)
 #define CONFIG_SYS_TEXT_BASE		0x4fc00000
 #elif defined(CONFIG_TQMA6Q_2GB)
 #define CONFIG_SYS_TEXT_BASE		0x8fc00000
