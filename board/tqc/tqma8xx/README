@@ -1,19 +1,23 @@
-U-Boot for the TQ-Systems i.MX8QXP TQMa8Xx SOM family
+U-Boot for the TQ-Systems i.MX8[D,Q]XP TQMa8Xx SOM family
 
 Supported variants
 ==================
 
-TQMa8QXP / 1 GiB DDR3L ECC / i.MX8QXP C0
+TQMa8X[D,Q]P / 1 GiB DDR3L ECC / i.MX8[D,Q]XP C0
 
 configs:
 
+tqma8xdp_mba8xx_defconfig
+tqma8xdp_mba8xx_mfg_defconfig
 tqma8xqp_mba8xx_defconfig
 tqma8xqp_mba8xx_mfg_defconfig
 
-TQMa8QXP4 / 2 GiB LPDDR4 / i.MX8QXP C0
+TQMa8X[D,Q]P4 / 2 GiB LPDDR4 / i.MX8[D,Q]XP C0
 
 configs:
 
+tqma8xdp4_mba8xx_defconfig
+tqma8xdp4_mba8xx_mfg_defconfig
 tqma8xqp4_mba8xx_defconfig
 tqma8xqp4_mba8xx_mfg_defconfig
 
@@ -45,8 +49,8 @@ $ ./imx-seco-3.7.1.bin
 Get SCFW
 ========
 
-TQMa8XQP: mx8qx-tqma8xqp-mba8xx-scfw-tcm.bin
-TQMa8XQP4: mx8qx-tqma8xqp4-mba8xx-scfw-tcm.bin
+TQMa8X[D,Q]P: mx8qx-tqma8xqp-mba8xx-scfw-tcm.bin
+TQMa8X[D,Q]P4: mx8qx-tqma8xqp4-mba8xx-scfw-tcm.bin
 
 wget https://github.com/tq-systems/meta-tq/blob/zeus-tqma8/dynamic-layers/fsl-bsp-release/recipes-bsp/imx-sc-firmware/imx-sc-firmware/imx-sc-firmware-tq-TQMa8.NXP-v1.6.0.B4894.0030.tar.gz
 tar -xf ./imx-sc-firmware-tq-TQMa8.NXP-v1.6.0.B4894.0030.tar.gz
@@ -62,7 +66,7 @@ $ cp imx-sc-firmware-tq-TQMa8.NXP-v1.6.0.B4894.0030/mx8qx-tqma8xqp[4]-mba8xx-scf
 
 Build U-Boot
 ============
-$ make tqma8xqp_mba8xx_defconfig
+$ make tqma8x[d,q]p[4]_mba8xx_defconfig
 $ make flash.bin
 
 Flash the binary into the SD card
