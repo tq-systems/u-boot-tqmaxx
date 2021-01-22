@@ -71,6 +71,7 @@ obj-$(CONFIG_CMD_BMODE) += cmd_bmode.o
 obj-$(CONFIG_CMD_HDMIDETECT) += cmd_hdmidet.o
 obj-$(CONFIG_CMD_DEKBLOB) += cmd_dek.o
 obj-$(CONFIG_CMD_NANDBCB) += cmd_nandbcb.o
+obj-$(CONFIG_CMD_QSPIHDR) += cmd_qspihdr.o
 endif
 
 ifeq ($(CONFIG_SPL_BUILD),y)
