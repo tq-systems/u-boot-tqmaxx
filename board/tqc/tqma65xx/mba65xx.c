@@ -73,7 +73,8 @@ static const struct soc_device_attribute tqma65xx_rev_fdt_match[] = {
 #define PRG_1_ETHERNET_DTB_NAME "am654-mba65xx-eth-prg1.dtbo"
 #define AUDIO_DTB_NAME          "am654-mba65xx-audio.dtbo"
 #define DISPLAY_DTB_NAME        "am654-mba65xx-lvds-display.dtbo"
-
+#define DISPLAY_DC44_DTB_NAME   "am654-mba65xx-dmb-dc44.dtbo"
+#define DISPLAY_FC21_DTB_NAME   "am654-mba65xx-dmb-fc21.dtbo"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -330,6 +331,13 @@ static int add_mba_interfaces(void)
 	//k3_dtbo_list[nb_dtbos++] = DISPLAY_DTB_NAME; // not needed for SPL
 	strcat(name_overlays, DISPLAY_DTB_NAME);
 	strcat(name_overlays, " ");
+    
+    strcat(name_overlays, DISPLAY_DC44_DTB_NAME);
+	strcat(name_overlays, " ");
+    
+    strcat(name_overlays, DISPLAY_FC21_DTB_NAME);
+	strcat(name_overlays, " ");
+    
 
 	#ifndef CONFIG_SPL_BUILD
 	/* Apply device tree overlay(s) to the U-Boot environment, if any */
