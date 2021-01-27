@@ -65,6 +65,7 @@ static int _tqmls1088a_bb_check_serdes_mux(void)
 {
 	u32 srds_s1, srds_s2;
 	struct ccsr_gur *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
+	struct ccsr_serdes *serdes1_base = (void *)CONFIG_SYS_FSL_LSCH3_SERDES_ADDR;
 	struct tqc_mbls10xxa_serdes lanes[8];
 	int clk_freq;
 
@@ -102,6 +103,12 @@ static int _tqmls1088a_bb_check_serdes_mux(void)
 	   printf("!!! ATTENTON: SerDes1 RefClk2 is 156.25MHz,\n");
 	   printf("!!!  but this is only valid for XFI operation!\n");
 	}
+	if (TQMLS1088A_SRDS1_PROTO(srds_s1, 0) == 0x1)
+		tqc_mbls10xxa_xfi_init(serdes1_base, 3);
+	if (TQMLS1088A_SRDS1_PROTO(srds_s1, 1) == 0x1)
+		tqc_mbls10xxa_xfi_init(serdes1_base, 2);
+
+	tqc_mbls10xxa_retimer_init();
 
 	return 0;
 }
