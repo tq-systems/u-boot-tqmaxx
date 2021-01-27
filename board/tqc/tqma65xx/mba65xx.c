@@ -61,7 +61,8 @@ static const struct soc_device_attribute tqma65xx_rev_fdt_match[] = {
 /* Max number of MAC addresses that are parsed/processed per daughter card */
 #define DAUGHTER_CARD_NO_OF_MAC_ADDR	8
 
-#define MAC_ARR_EEPROM_OFFSET 0x23
+#define MAC_ARR_EEPROM_OFFSET     0x23
+#define BOOT_DEVICE_EEPROM_OFFSET 0x53
 
 #define GPIO_PRG_0_ETH 100
 #define GPIO_PRG_1_ETH 101
@@ -380,6 +381,84 @@ static int read_mac_arr(int bus_addr, int dev_addr,	u32 size,
 	ret = dm_i2c_read(dev, MAC_ARR_EEPROM_OFFSET, &mac_arr[0][0], size);
 
 	return ret;
+}
+
+// Save spl boot device to eeprom
+static int save_spl_boot_device_eeprom(u32 boot_dev)
+{
+	const int bus_addr = 0x00;
+	const int dev_addr = 0x50;
+	
+	int ret;
+
+	struct udevice *dev;
+	struct udevice *bus;
+
+	u32 buffer = boot_dev;
+
+	ret = uclass_get_device_by_seq(UCLASS_I2C, bus_addr, &bus);
+	if (ret)
+		return ret;
+
+	ret = dm_i2c_probe(bus, dev_addr, 0, &dev);
+	if (ret)
+		return ret;
+
+	ret = i2c_set_chip_offset_len(dev, 2);
+	if (ret)
+		return ret;
+
+	ret = dm_i2c_write(dev, BOOT_DEVICE_EEPROM_OFFSET, (const uint8_t *)&buffer, sizeof(buffer));
+
+	return ret;
+}
+
+
+// Save spl boot device to eeprom
+static int read_spl_boot_device_eeprom(u32 *boot_dev_u32)
+{
+	const int bus_addr = 0x00;
+	const int dev_addr = 0x50;
+
+	int ret;
+
+	struct udevice *dev;
+	struct udevice *bus;
+
+	if (!boot_dev_u32)
+		return 1;
+
+	ret = uclass_get_device_by_seq(UCLASS_I2C, bus_addr, &bus);
+	if (ret)
+		return ret;
+
+	ret = dm_i2c_probe(bus, dev_addr, 0, &dev);
+	if (ret)
+		return ret;
+
+	ret = i2c_set_chip_offset_len(dev, 2);
+	if (ret)
+		return ret;
+
+	ret = dm_i2c_read(dev, BOOT_DEVICE_EEPROM_OFFSET, (uint8_t *)boot_dev_u32, sizeof(u32));
+
+	return ret;
+}
+
+static void setup_boot_linux_env(void)
+{
+	u32 boot_dev ;
+
+	if(read_spl_boot_device_eeprom(&boot_dev))
+		pr_err("%s: error reading boot device to EEPROM", __func__);
+
+	if (boot_dev == BOOT_DEVICE_MMC1) {
+		env_set("bootpart", "0:2");
+		env_set("mmcdev", "0");
+	} else if (boot_dev == BOOT_DEVICE_MMC2) {
+		env_set("bootpart", "1:2");
+		env_set("mmcdev", "1");
+	}
 }
 
 static void set_prg_eth(int index, 
@@ -837,6 +916,9 @@ int board_late_init(void)
 
 	setup_board_prg_eth();
 
+	// Configure u-boot env accroding spl boot source
+	setup_boot_linux_env();
+
 	/* If we are on SR1 silicon set env to use sr1 dtb for kernel */
 	match = soc_device_match(tqma65xx_rev_fdt_match);
 	if (!match) {
@@ -861,6 +943,10 @@ int board_late_init(void)
 void spl_board_init(void)
 {
 	struct udevice *board;
+
+	// Save spl boot device to eeprom to allow read boot device from u-boot
+	if (save_spl_boot_device_eeprom(spl_boot_device()))
+		pr_err("%s: error saving boot device to EEPROM", __func__);
 
 	/* Check for and probe any plugged-in daughtercards */
 	add_mba_interfaces();
