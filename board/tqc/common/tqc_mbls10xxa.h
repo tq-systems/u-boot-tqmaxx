@@ -7,6 +7,14 @@
 
 #include <pca953x.h>
 
+#if defined(CONFIG_FSL_LSCH3)
+#define serdes_in32(a)       in_le32(a)
+#define serdes_out32(a, v)   out_le32(a, v)
+#elif defined(CONFIG_FSL_LSCH2)
+#define serdes_in32(a)       in_be32(a)
+#define serdes_out32(a, v)   out_be32(a, v)
+#endif
+
 int tqc_mbls10xxa_i2c_gpios_init(void);
 
 int tqc_mbls10xxa_i2c_gpio_get(const char *name);

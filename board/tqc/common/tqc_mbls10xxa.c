@@ -9,7 +9,11 @@
 #include <fsl_dtsec.h>
 #include <fsl_mdio.h>
 #include <asm/io.h>
+#if defined(CONFIG_FSL_LSCH3)
+#include <asm/arch/immap_lsch3.h>
+#elif defined(CONFIG_FSL_LSCH2)
 #include <asm/arch/immap_lsch2.h>
+#endif
 #include "tqc_mbls10xxa.h"
 
 struct tqc_mbls10xxa_i2c_gpio {
@@ -252,20 +256,24 @@ void tqc_mbls10xxa_xfi_init(struct ccsr_serdes *serdes, int lane)
 	u32 gcr0;
 
 	/* Put lane in reset */
-	gcr0 = in_be32(&serdes->lane[lane].gcr0);
+	gcr0 = serdes_in32(&serdes->lane[lane].gcr0);
 	gcr0 &= 0xFF9FFFFF;
-	out_be32(&serdes->lane[lane].gcr0, gcr0);
+	serdes_out32(&serdes->lane[lane].gcr0, gcr0);
 
 	udelay(1);
 
 	/* Set up Transmit Equalization Control Register 0 for XFI */
-	out_be32(&serdes->lane[lane].tecr0, 0x00233827);
+#if defined(CONFIG_FSL_LSCH3)
+	serdes_out32(&serdes->lane[lane].tec0,  0x00233827);
+#elif defined(CONFIG_FSL_LSCH2)
+	serdes_out32(&serdes->lane[lane].tecr0, 0x00233827);
+#endif
 
 	udelay(1);
 
 	/* Take lane out of reset */
 	gcr0 |= 0x00600000;
-	out_be32(&serdes->lane[lane].gcr0, gcr0);
+	serdes_out32(&serdes->lane[lane].gcr0, gcr0);
 }
 
 #ifndef CONFIG_SPL_BUILD
