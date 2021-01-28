@@ -28,6 +28,10 @@ TQMLS1088A board Overview
  - 4 I2C controllers
  - ARM JTAG support
 
+Note: XFI function depends on correct initialization by U-Boot. It will
+not work as expected when booting into an OS kernel directly from SPL
+("Falcon Mode").
+
 Memory map from core's view
 ----------------------------
 Start Address    End Address     Description        Size
@@ -43,7 +47,7 @@ Start Address    End Address     Description        Size
 0x30_0000_0000 - 0x37_FFFF_FFFF  PCI Express3       32G
 
 QSPI flash map:
-Start Address    End Address     Description		Size
+Start Address    End Address     Description	    Size
 0x00_4000_0000 - 0x00_4000_FFFF  RCW,PBI            64KB
 0x00_4001_0000 - 0x00_400C_FFFF  U-Boot             768KB
 0x00_400D_0000 - 0x00_400D_FFFF  U-Boot Env         64KB
@@ -52,7 +56,7 @@ Start Address    End Address     Description		Size
 0x00_4010_0000 - 0x00_402E_FFFF  DPAA2 MC Microcode 1984KB
 0x00_402F_0000 - 0x00_402F_FFFF  Linux device-tree  64KB
 0x00_4030_0000 - 0x00_417F_FFFF  Linux Image        21MB
-0x00_4180_0000 - 0x00_43FF_FFFF  Linux UBI rootfs	40MB
+0x00_4180_0000 - 0x00_43FF_FFFF  Linux UBI rootfs   40MB
 
 Booting Options
 ---------------
