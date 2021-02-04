@@ -265,6 +265,7 @@
 &usdhc2 {
 	u-boot,dm-spl;
 	u-boot,dm-pre-proper;
+	sd-uhs-sdr104;
 	sd-uhs-ddr50;
 };
 

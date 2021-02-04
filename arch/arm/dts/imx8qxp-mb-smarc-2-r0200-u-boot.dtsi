@@ -8,3 +8,8 @@
 &reg_sdvmmc {
 	/delete-property/ u-boot,off-on-delay-us;
 };
+
+&usdhc2 {
+	/delete-property/ sd-uhs-sdr104;
+	/delete-property/ sd-uhs-ddr50;
+};
