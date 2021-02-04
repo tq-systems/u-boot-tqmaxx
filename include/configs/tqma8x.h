@@ -119,23 +119,30 @@
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
 	"mmcpath=/\0" \
 	"mmcautodetect=yes\0" \
-	"loadbootscript=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} " \
-		"${script};\0" \
+	"loadbootscript=mmc dev ${mmcdev}; " \
+		"load mmc ${mmcdev}:${mmcpart} ${loadaddr} " \
+		"${mmcpath}${script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
 		"source\0" \
-	"loadimage=load mmc ${mmcdev}:${mmcpart} ${loadaddr} " \
-		"${mmcpath}${image}\0" \
-	"loadfdt=load mmc ${mmcdev}:${mmcpart} ${fdt_addr} " \
-		"${mmcpath}${fdt_file}\0" \
+	"loadimage=mmc dev ${mmcdev}; " \
+		"load mmc ${mmcdev}:${mmcpart} ${loadaddr} " \
+			"${mmcpath}${image}\0" \
+	"loadfdt=mmc dev ${mmcdev}; " \
+		"load mmc ${mmcdev}:${mmcpart} ${fdt_addr} " \
+			"${mmcpath}${fdt_file}\0" \
+	"loadcntr=mmc dev ${mmcdev}; " \
+		"load mmc ${mmcdev}:${mmcpart} ${cntr_addr} " \
+			"${mmcpath}${cntr_file}\0" \
 	"hdp_addr=0x9c000000\0" \
 	"hdp_file=dpfw.bin\0" \
-	"loadhdp=load mmc ${mmcdev}:${mmcpart} ${hdp_addr} ${hdp_file}\0" \
-	"loadcntr=load mmc ${mmcdev}:${mmcpart} ${cntr_addr} ${cntr_file}\0" \
+	"loadhdp=mmc dev ${mmcdev}; " \
+		"load mmc ${mmcdev}:${mmcpart} ${hdp_addr}" \
+			"${mmcpath}${hdp_file}\0" \
 	"auth_os=auth_cntr ${cntr_addr}\0" \
 	"boot_os=booti ${loadaddr} - ${fdt_addr};\0" \
 	"mmcboot=echo Booting from mmc ...; " \
-		"if run loadhdp; then; "\
-			"hdp load ${hdp_addr}; "\
+		"if run loadhdp; then; " \
+			"hdp load ${hdp_addr}; " \
 		"fi;" \
 		"setenv bootargs; " \
 		"run mmcargs; " \
@@ -185,6 +192,7 @@
 		"if ${get_cmd} ${image}; then "                                \
 			"if itest ${filesize} > 0; then "                      \
 				"echo Write kernel image to mmc ${mmcdev}:${mmcpart}...; " \
+				"mmc dev ${mmcdev}; " \
 				"save mmc ${mmcdev}:${mmcpart} ${loadaddr} "   \
 					"${mmcpath}${image} ${filesize}; "     \
 			"fi; "                                                 \
@@ -194,6 +202,7 @@
 		"if ${get_cmd} ${fdt_file}; then "                             \
 			"if itest ${filesize} > 0; then "                      \
 				"echo Write fdt image to mmc ${mmcdev}:${mmcpart}...; " \
+				"mmc dev ${mmcdev}; " \
 				"save mmc ${mmcdev}:${mmcpart} ${loadaddr} "   \
 					"${mmcpath}${fdt_file} ${filesize}; "  \
 			"fi; "                                                 \
