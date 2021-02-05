@@ -783,6 +783,7 @@ dtb-$(CONFIG_ARCH_IMX8) += \
 	imx8-giedi.dtb \
 	imx8dxp-mba8xx.dtb \
 	imx8qxp-mba8xx.dtb \
+	imx8dxp-mb-smarc-2.dtb \
 	imx8qxp-mb-smarc-2.dtb \
 	imx8qxp-mb-smarc-2-r0200.dtb
 

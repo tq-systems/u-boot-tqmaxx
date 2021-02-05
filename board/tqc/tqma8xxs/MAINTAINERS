@@ -4,6 +4,12 @@ S:	Maintained
 F:	board/tqc/tqma8xxs/
 F:	include/configs/tqma8xxs*.h
 F:	configs/tqma8xqps*_defconfig
+F:	configs/tqma8xdps*_defconfig
+F:	arch/arm/dts/tqma8xxs.dtsi
+F:	arch/arm/dts/mb-smarc-2.dtsi
+F:	arch/arm/dts/imx8dxp-tqma8xdps*.dtsi
+F:	arch/arm/dts/imx8dxp-mb-smarc-2*.dts
+F:	arch/arm/dts/imx8dxp-mb-smarc-2*.dtsi
 F:	arch/arm/dts/imx8qxp-tqma8xqps*.dtsi
 F:	arch/arm/dts/imx8qxp-mb-smarc-2*.dts
 F:	arch/arm/dts/imx8qxp-mb-smarc-2*.dtsi
