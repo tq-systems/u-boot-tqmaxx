@@ -253,10 +253,10 @@
 		"if tftp ${MLO}; then " \
 		"echo updating MLO on mmc${mmcdev}...; " \
 		"mmc dev ${mmcdev}; mmc rescan; " \
-		"fatwrite ${devtype} ${bootpart} ${loadaddr} ${MLO} ${filesize}; " \
+		"fatwrite ${devtype} ${bootpart} ${loadaddr} MLO ${filesize}; " \
 		"fi; if tftp ${u-boot}; then " \
 		"echo updating u-boot on mmc${mmcdev}...; " \
-		"fatwrite ${devtype} ${bootpart} ${loadaddr} ${u-boot} ${filesize}; " \
+		"fatwrite ${devtype} ${bootpart} ${loadaddr} u-boot.img ${filesize}; " \
 		"fi; setenv filesize; \0" \
 	"update_kernel=setenv bootpart ${mmcdev}:1; " \
 		"if tftp ${bootfile}; then " \
