@@ -69,8 +69,15 @@
 
 	pinctrl_i2c1: i2c1grp {
 		fsl,pins = <
-			MX8MN_IOMUXC_I2C1_SCL__I2C1_SCL			0x400001C4
-			MX8MN_IOMUXC_I2C1_SDA__I2C1_SDA			0x400001C4
+			MX8MN_IOMUXC_I2C1_SCL__I2C1_SCL		0x400001C4
+			MX8MN_IOMUXC_I2C1_SDA__I2C1_SDA		0x400001C4
+		>;
+	};
+
+	pinctrl_i2c1_gpio: i2c1gpiogrp {
+		fsl,pins = <
+			MX8MN_IOMUXC_I2C1_SCL__GPIO5_IO14	0x40000004
+			MX8MN_IOMUXC_I2C1_SDA__GPIO5_IO15	0x40000004
 		>;
 	};
 
@@ -147,8 +154,11 @@
 
 &i2c1 {
 	clock-frequency = <100000>;
-	pinctrl-names = "default";
+	pinctrl-names = "default", "gpio";
 	pinctrl-0 = <&pinctrl_i2c1>;
+	pinctrl-1 = <&pinctrl_i2c1_gpio>;
+	scl-gpios = <&gpio5 14 GPIO_ACTIVE_HIGH>;
+	sda-gpios = <&gpio5 15 GPIO_ACTIVE_HIGH>;
 	status = "okay";
 
 	eeprom1: eeprom@53 {
