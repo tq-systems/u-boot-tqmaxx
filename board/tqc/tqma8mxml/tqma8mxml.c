@@ -143,16 +143,22 @@ int print_bootinfo(void)
 	puts("Boot:  ");
 	switch (bt_dev) {
 	case SD1_BOOT:
-		puts("SD0\n");
+		puts("USDHC1(SD)\n");
 		break;
 	case SD2_BOOT:
-		puts("SD1\n");
+		puts("USDHC2(SD)\n");
+		break;
+	case SD3_BOOT:
+		puts("USDHC3(SD)\n");
 		break;
 	case MMC1_BOOT:
-		puts("MMC0\n");
+		puts("USDHC1(e-MMC)\n");
 		break;
 	case MMC2_BOOT:
-		puts("MMC1\n");
+		puts("USDHC2(e-MMC)\n");
+		break;
+	case MMC3_BOOT:
+		puts("USDHC3(e-MMC)\n");
 		break;
 	case USB_BOOT:
 		puts("USB\n");

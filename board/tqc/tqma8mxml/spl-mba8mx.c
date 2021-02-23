@@ -123,7 +123,7 @@ int tqc_bb_board_mmc_init(bd_t *bis)
 	/*
 	 * According to the board_mmc_init() the following map is done:
 	 * (U-Boot device node)    (Physical Port)
-	 * mmc0                    USDHC1
+	 * mmc0                    USDHC1 (REV.0100) / USDHC3 (REV.0200)
 	 * mmc1                    USDHC2
 	 */
 	init_clk_usdhc(1);
@@ -157,14 +157,24 @@ void board_boot_order(u32 *spl_boot_list)
 	enum boot_device boot_device_spl = get_boot_device();
 
 	switch (boot_device_spl) {
-	case SD1_BOOT:
-	case MMC1_BOOT:
-		puts("board_boot_order SD1 -> MMC1\n");
+#if defined(CONFIG_TQMA8MMX_HWREV_0200)
+	case SD3_BOOT:
+	case MMC3_BOOT:
+		puts("boot order USDHC3 -> MMC1\n");
 		spl_boot_list[0] = BOOT_DEVICE_MMC1;
 		break;
+#elif defined(CONFIG_TQMA8MMX_HWREV_0100)
+	case SD1_BOOT:
+	case MMC1_BOOT:
+		puts("boot order USDHC1 -> MMC1\n");
+		spl_boot_list[0] = BOOT_DEVICE_MMC1;
+		break;
+#else
+#error
+#endif
 	case SD2_BOOT:
 	case MMC2_BOOT:
-		puts("board_boot_order SD2 -> MMC2\n");
+		puts("boot order USDHC2 -> MMC2\n");
 		spl_boot_list[0] = BOOT_DEVICE_MMC2;
 		break;
 	default:

@@ -10,9 +10,26 @@ config SYS_CONFIG_NAME
 	default "tqma8mxml"
 
 choice
+	prompt "TQMa8MMX HW revision"
+	default TQMA8MMX_HWREV_0200
+
+config TQMA8MMX_HWREV_0100
+	bool "TQMa8MMx hardware revision 010x"
+	help
+	  Select hardware revision 010x
+
+config TQMA8MMX_HWREV_0200
+	bool "TQMa8MMx hardware revision 020x"
+	help
+	  Select hardware revision 020x
+
+endchoice
+
+choice
 	prompt "TQMa8MMX RAM size"
 	default TQMA8MMX_RAM_1024MB if IMX8MN
-	default TQMA8MMX_RAM_1024MB if IMX8MM
+	default TQMA8MMX_RAM_1024MB if IMX8MM && TQMA8MMX_HWREV_0100
+	default TQMA8MMX_RAM_2048MB if IMX8MM && TQMA8MMX_HWREV_0200
 	help
 	  Select RAM size for TQMa8MMx
 
@@ -57,12 +74,16 @@ config TQMA8MXX_BB_MBA8MX
 endchoice
 
 config DEFAULT_DEVICE_TREE
-	default "fsl-imx8mn-mba8mx" if TQMA8MXX_BB_MBA8MX && IMX8MN
-	default "fsl-imx8mm-mba8mx" if TQMA8MXX_BB_MBA8MX && IMX8MM
+	default "fsl-imx8mn-mba8mx" if TQMA8MXX_BB_MBA8MX && IMX8MN && TQMA8MMX_HWREV_0200
+	default "fsl-imx8mm-mba8mx" if TQMA8MXX_BB_MBA8MX && IMX8MM && TQMA8MMX_HWREV_0200
+	default "fsl-imx8mn-mba8mx-r0100" if TQMA8MXX_BB_MBA8MX && IMX8MN && TQMA8MMX_HWREV_0100
+	default "fsl-imx8mm-mba8mx-r0100" if TQMA8MXX_BB_MBA8MX && IMX8MM && TQMA8MMX_HWREV_0100
 
 config DEFAULT_FDT_FILE
-	default "imx8mn-mba8mx.dtb" if TQMA8MXX_BB_MBA8MX && IMX8MN
-	default "imx8mm-mba8mx.dtb" if TQMA8MXX_BB_MBA8MX && IMX8MM
+	default "imx8mn-mba8mx.dtb" if TQMA8MXX_BB_MBA8MX && IMX8MN && TQMA8MMX_HWREV_0200
+	default "imx8mm-mba8mx.dtb" if TQMA8MXX_BB_MBA8MX && IMX8MM && TQMA8MMX_HWREV_0200
+	default "imx8mn-mba8mx-r0100.dtb" if TQMA8MXX_BB_MBA8MX && IMX8MN && TQMA8MMX_HWREV_0100
+	default "imx8mm-mba8mx-r0100.dtb" if TQMA8MXX_BB_MBA8MX && IMX8MM && TQMA8MMX_HWREV_0100
 
 config NR_DRAM_BANKS
 	default 1

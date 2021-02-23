@@ -216,11 +216,19 @@ static struct tqc_gpio_init_data mba8mx_gid[] = {
 	GPIO_INIT_DATA_ENTRY(CAMX_RST_B, "GPIO@27_14", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
 	GPIO_INIT_DATA_ENTRY(RESET_MIKRO_MODULE_B, "GPIO@27_15", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
 	GPIO_INIT_DATA_ENTRY(GPIO_BTN1, "GPIO1_5", GPIOD_IS_IN),
+#if defined(CONFIG_TQMA8MMX_HWREV_0100)
 	GPIO_INIT_DATA_ENTRY(GPIO_BTN2, "GPIO3_17", GPIOD_IS_IN),
+#elif defined(CONFIG_TQMA8MMX_HWREV_0200)
+	GPIO_INIT_DATA_ENTRY(GPIO_BTN2, "GPIO2_0", GPIOD_IS_IN),
+#endif
 	GPIO_INIT_DATA_ENTRY(GPIO_BTN3, "GPIO1_7", GPIOD_IS_IN),
 
 	GPIO_INIT_DATA_ENTRY(GPIO_LED1, "GPIO1_0", GPIOD_IS_OUT),
+#if defined(CONFIG_TQMA8MMX_HWREV_0100)
 	GPIO_INIT_DATA_ENTRY(GPIO_LED2, "GPIO3_16", GPIOD_IS_OUT),
+#elif defined(CONFIG_TQMA8MMX_HWREV_0200)
+	GPIO_INIT_DATA_ENTRY(GPIO_LED2, "GPIO3_14", GPIOD_IS_OUT),
+#endif
 	GPIO_INIT_DATA_ENTRY(GPIO_LED3, "GPIO1_8", GPIOD_IS_OUT),
 #ifdef CONFIG_IMX8MN
 	GPIO_INIT_DATA_ENTRY(SEL_USB_HUB_B, "GPIO3_18", GPIOD_IS_OUT ),
@@ -288,7 +296,21 @@ int tqc_bb_board_init(void)
  */
 int board_mmc_get_env_dev(int devno)
 {
+#if defined(CONFIG_TQMA8MMX_HWREV_0200)
+	switch (devno) {
+	case 2:
+		return 0;
+	case 1:
+		return 1;
+	default:
+		printf("Error: USDHC%d not handled for environment\n", devno);
+		return env_get_ulong("mmcdev", 10, CONFIG_SYS_MMC_ENV_DEV);
+	}
+#elif defined(CONFIG_TQMA8MMX_HWREV_0100)
 	return devno;
+#else
+#error
+#endif
 }
 
 int mmc_map_to_kernel_blk(int dev_no)

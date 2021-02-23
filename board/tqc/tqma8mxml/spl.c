@@ -32,16 +32,13 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-
-#define USDHC1_PWR_GPIO IMX_GPIO_NR(2, 10)
-
 #define USDHC_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS | PAD_CTL_PUE |PAD_CTL_PE | \
 			 PAD_CTL_FSEL2)
 
 #define USDHC_GPIO_PAD_CTRL (PAD_CTL_HYS | PAD_CTL_DSE1)
 
 
-#ifdef CONFIG_IMX8MN
+#if defined(CONFIG_IMX8MN)
 
 #define I2C_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS | PAD_CTL_PUE | PAD_CTL_PE)
 static struct i2c_pads_info i2c_pad_info = {
@@ -57,7 +54,36 @@ static struct i2c_pads_info i2c_pad_info = {
 	},
 };
 
-static iomux_v3_cfg_t const usdhc1_pads[] = {
+#if defined(CONFIG_TQMA8MMX_HWREV_0200)
+
+#define EMMC_BASE_ADDR	USDHC3_BASE_ADDR
+#define EMMC_PWR_GPIO	IMX_GPIO_NR(3, 16)
+#define EMMC_CLK	MXC_ESDHC3_CLK
+#define EMMC_IDX	2
+
+static iomux_v3_cfg_t const emmc_pads[] = {
+	IMX8MN_PAD_NAND_WE_B__USDHC3_CLK | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MN_PAD_NAND_WP_B__USDHC3_CMD | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MN_PAD_NAND_DATA04__USDHC3_DATA0 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MN_PAD_NAND_DATA05__USDHC3_DATA1 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MN_PAD_NAND_DATA06__USDHC3_DATA2 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MN_PAD_NAND_DATA07__USDHC3_DATA3 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MN_PAD_NAND_RE_B__USDHC3_DATA4 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MN_PAD_NAND_CE2_B__USDHC3_DATA5 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MN_PAD_NAND_CE3_B__USDHC3_DATA6 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MN_PAD_NAND_CLE__USDHC3_DATA7 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MN_PAD_NAND_READY_B__GPIO3_IO16 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
+	IMX8MN_PAD_NAND_CE1_B__USDHC3_STROBE | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
+};
+
+#elif defined(CONFIG_TQMA8MMX_HWREV_0100)
+
+#define EMMC_BASE_ADDR	USDHC1_BASE_ADDR
+#define EMMC_PWR_GPIO	IMX_GPIO_NR(2, 10)
+#define EMMC_CLK	MXC_ESDHC_CLK
+#define EMMC_IDX	0
+
+static iomux_v3_cfg_t const emmc_pads[] = {
 	IMX8MN_PAD_SD1_CLK__USDHC1_CLK | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 	IMX8MN_PAD_SD1_CMD__USDHC1_CMD | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 	IMX8MN_PAD_SD1_DATA0__USDHC1_DATA0 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
@@ -72,8 +98,11 @@ static iomux_v3_cfg_t const usdhc1_pads[] = {
 	IMX8MN_PAD_SD1_STROBE__USDHC1_STROBE | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
 };
 
-extern struct dram_timing_info tqma8mxnl_1gb_lpddr4_timing;
+#else
+#error
+#endif
 
+extern struct dram_timing_info tqma8mxnl_1gb_lpddr4_timing;
 static struct dram_timing_info *default_dram_timing = &tqma8mxnl_1gb_lpddr4_timing;
 
 #elif defined(CONFIG_IMX8MM)
@@ -93,7 +122,36 @@ static struct i2c_pads_info i2c_pad_info = {
 	},
 };
 
-static iomux_v3_cfg_t const usdhc1_pads[] = {
+#if defined(CONFIG_TQMA8MMX_HWREV_0200)
+
+#define EMMC_BASE_ADDR	USDHC3_BASE_ADDR
+#define EMMC_PWR_GPIO	IMX_GPIO_NR(3, 16)
+#define EMMC_CLK	MXC_ESDHC3_CLK
+#define EMMC_IDX	2
+
+static iomux_v3_cfg_t const emmc_pads[] = {
+	IMX8MM_PAD_NAND_WE_B_USDHC3_CLK | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MM_PAD_NAND_WP_B_USDHC3_CMD | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MM_PAD_NAND_DATA04_USDHC3_DATA0 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MM_PAD_NAND_DATA05_USDHC3_DATA1 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MM_PAD_NAND_DATA06_USDHC3_DATA2 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MM_PAD_NAND_DATA07_USDHC3_DATA3 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MM_PAD_NAND_RE_B_USDHC3_DATA4 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MM_PAD_NAND_CE2_B_USDHC3_DATA5 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MM_PAD_NAND_CE3_B_USDHC3_DATA6 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MM_PAD_NAND_CLE_USDHC3_DATA7 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	IMX8MM_PAD_NAND_READY_B_GPIO3_IO16 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
+	IMX8MM_PAD_NAND_CE1_B_USDHC3_STROBE | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
+};
+
+#elif defined(CONFIG_TQMA8MMX_HWREV_0100)
+
+#define EMMC_BASE_ADDR	USDHC1_BASE_ADDR
+#define EMMC_PWR_GPIO	IMX_GPIO_NR(2, 10)
+#define EMMC_CLK	MXC_ESDHC_CLK
+#define EMMC_IDX	0
+
+static iomux_v3_cfg_t const emmc_pads[] = {
 	IMX8MM_PAD_SD1_CLK_USDHC1_CLK | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 	IMX8MM_PAD_SD1_CMD_USDHC1_CMD | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 	IMX8MM_PAD_SD1_DATA0_USDHC1_DATA0 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
@@ -108,15 +166,27 @@ static iomux_v3_cfg_t const usdhc1_pads[] = {
 	IMX8MM_PAD_SD1_STROBE_USDHC1_STROBE | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
 };
 
-extern struct dram_timing_info tqma8mxml_1gb_dram_timing;
+#else
+#error
+#endif
 
+#if defined(CONFIG_TQMA8MMX_HWREV_0200) && defined(CONFIG_TQMA8MMX_RAM_2048MB)
+
+extern struct dram_timing_info tqma8mxml_2gb_dram_timing;
+static struct dram_timing_info *default_dram_timing = &tqma8mxml_2gb_dram_timing;
+
+#elif defined(CONFIG_TQMA8MMX_HWREV_0100) && defined(CONFIG_TQMA8MMX_RAM_1024MB)
+
+extern struct dram_timing_info tqma8mxml_1gb_dram_timing;
 static struct dram_timing_info *default_dram_timing = &tqma8mxml_1gb_dram_timing;
 
 #else
 #error
 #endif
 
-
+#else
+#error
+#endif
 
 static void spl_dram_init(void)
 {
@@ -129,7 +199,7 @@ int board_mmc_getcd(struct mmc *mmc)
 	int ret = 0;
 
 	switch (cfg->esdhc_base) {
-	case USDHC1_BASE_ADDR:
+	case EMMC_BASE_ADDR:
 		ret = 1;
 		break;
 	default:
@@ -141,8 +211,8 @@ int board_mmc_getcd(struct mmc *mmc)
 
 
 
-static struct fsl_esdhc_cfg usdhc1_cfg = {
-	.esdhc_base = USDHC1_BASE_ADDR,
+static struct fsl_esdhc_cfg emmc_cfg = {
+	.esdhc_base = EMMC_BASE_ADDR,
 	.max_bus_width = 8,
 };
 
@@ -154,18 +224,18 @@ int board_mmc_init(bd_t *bis)
 	/*
 	 * According to the board_mmc_init() the following map is done:
 	 * (U-Boot device node)    (Physical Port)
-	 * mmc0                    USDHC1
+	 * mmc0                    USDHC1 (REV.0100) / USDHC3 (REV.0200)
 	 * mmc1                    USDHC2
 	 */
-	init_clk_usdhc(0);
-	usdhc1_cfg.sdhc_clk = mxc_get_clock(MXC_ESDHC_CLK);
+	init_clk_usdhc(EMMC_IDX);
+	emmc_cfg.sdhc_clk = mxc_get_clock(EMMC_CLK);
 	imx_iomux_v3_setup_multiple_pads(
-		usdhc1_pads, ARRAY_SIZE(usdhc1_pads));
-	gpio_request(USDHC1_PWR_GPIO, "usdhc1_reset");
-	gpio_direction_output(USDHC1_PWR_GPIO, 0);
+		emmc_pads, ARRAY_SIZE(emmc_pads));
+	gpio_request(EMMC_PWR_GPIO, "emmc_reset");
+	gpio_direction_output(EMMC_PWR_GPIO, 0);
 	udelay(500);
-	gpio_direction_output(USDHC1_PWR_GPIO, 1);
-	ret = fsl_esdhc_initialize(bis, &usdhc1_cfg);
+	gpio_direction_output(EMMC_PWR_GPIO, 1);
+	ret = fsl_esdhc_initialize(bis, &emmc_cfg);
 	if (ret)
 		return ret;
 
