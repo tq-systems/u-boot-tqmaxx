@@ -51,14 +51,11 @@ static struct tqc_eeprom_data eeprom;
 static int tqc_vard_has_been_read = 0;
 static bool tqc_vard_valid = false;
 
-static int tqc_vard_is_crc_valid(struct tqc_eeprom_data *data, uint16_t *cp)
+static int tqc_vard_cmp_crc(struct tqc_eeprom_data *data, uint16_t *cp)
 {
 	void *crc_offs;
 	int crc_len;
 	uint16_t crc;
-
-	if (tqc_vard_valid)
-		return 1;
 
 	/* calculate crc over all vard data except checksum */
 	crc_offs = (void *)(&data->crc + 1);
@@ -68,9 +65,22 @@ static int tqc_vard_is_crc_valid(struct tqc_eeprom_data *data, uint16_t *cp)
 	if (cp)
 		*cp = crc;
 
-	if (crc != data->crc) {
+	if (crc != data->crc)
+		return -1;
+
+	return 0;
+}
+
+static int tqc_vard_is_crc_valid(void)
+{
+	uint16_t calculated;
+
+	if (tqc_vard_valid)
+		return 1;
+
+	if (tqc_vard_cmp_crc(&eeprom, &calculated)) {
 		printf("TQC_VARD: CRC mismatch (%04x != %04x)\n",
-			data->crc, crc);
+			eeprom.crc, calculated);
 		return 0;
 	}
 
@@ -100,8 +110,7 @@ static int tqc_vard_read_eeprom(void)
 
 static inline bool tqc_validate_eeprom(void)
 {
-	if (!tqc_vard_read_eeprom() &&
-	     tqc_vard_is_crc_valid(&eeprom, NULL))
+	if (!tqc_vard_read_eeprom() && tqc_vard_is_crc_valid())
 		return true;
 	else
 		return false;
@@ -327,9 +336,9 @@ static int do_tqeeprom(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]
 		if (ret)
 			return ret;
 
-		if (tqc_vard_is_crc_valid(&eeprom_for_crc, &crc))
-			printf("CRC16 stored: %04x, calculated: %04x\n",
-				eeprom_for_crc.crc, crc);
+		tqc_vard_cmp_crc(&eeprom_for_crc, &crc);
+		printf("CRC16 stored: %04x, calculated: %04x\n",
+			eeprom_for_crc.crc, crc);
 		return 0;
 	}
 
