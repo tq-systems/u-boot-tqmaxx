@@ -61,7 +61,7 @@ static int tqc_vard_is_crc_valid(struct tqc_eeprom_data *data, uint16_t *cp)
 		return 1;
 
 	/* calculate crc over all vard data except checksum */
-	crc_offs = (void *)(&data->crc + sizeof(data->crc));
+	crc_offs = (void *)(&data->crc + 1);
 	crc_len = 0x20 - sizeof(data->crc);
 	crc = crc16_ccitt(0, crc_offs, crc_len);
 
