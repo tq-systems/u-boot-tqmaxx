@@ -1,0 +1,84 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Copyright 2020 - 2021 TQ-Systems GmbH
+ */
+
+#include "fsl-imx8mm-tqma8mxml.dtsi"
+
+/delete-node/ &pinctrl_emmc;
+/delete-node/ &pinctrl_emmc_100mhz;
+/delete-node/ &pinctrl_emmc_200mhz;
+
+/ {
+	model = "TQ Systems i.MX8MM TQMa8MxML REV.0100";
+	compatible = "tq,tqma8mxml-r0100", "fsl,imx8mm";
+};
+
+&iomuxc {
+	pinctrl_emmc: usdhc1grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_SD1_CLK_USDHC1_CLK			0x1d4
+			MX8MM_IOMUXC_SD1_CMD_USDHC1_CMD			0x1d4
+			MX8MM_IOMUXC_SD1_DATA0_USDHC1_DATA0		0x1d4
+			MX8MM_IOMUXC_SD1_DATA1_USDHC1_DATA1		0x1d4
+			MX8MM_IOMUXC_SD1_DATA2_USDHC1_DATA2		0x1d4
+			MX8MM_IOMUXC_SD1_DATA3_USDHC1_DATA3		0x1d4
+			MX8MM_IOMUXC_SD1_DATA4_USDHC1_DATA4		0x1d4
+			MX8MM_IOMUXC_SD1_DATA5_USDHC1_DATA5		0x1d4
+			MX8MM_IOMUXC_SD1_DATA6_USDHC1_DATA6		0x1d4
+			MX8MM_IOMUXC_SD1_DATA7_USDHC1_DATA7		0x1d4
+			MX8MM_IOMUXC_SD1_STROBE_USDHC1_STROBE		0x1d4
+			MX8MM_IOMUXC_SD1_RESET_B_USDHC1_RESET_B		0x1d4
+		>;
+	};
+
+	pinctrl_emmc_100mhz: usdhc1grp100mhz {
+		fsl,pins = <
+			MX8MM_IOMUXC_SD1_CLK_USDHC1_CLK			0x1d2
+			MX8MM_IOMUXC_SD1_CMD_USDHC1_CMD			0x1d2
+			MX8MM_IOMUXC_SD1_DATA0_USDHC1_DATA0		0x1d2
+			MX8MM_IOMUXC_SD1_DATA1_USDHC1_DATA1		0x1d2
+			MX8MM_IOMUXC_SD1_DATA2_USDHC1_DATA2		0x1d2
+			MX8MM_IOMUXC_SD1_DATA3_USDHC1_DATA3		0x1d2
+			MX8MM_IOMUXC_SD1_DATA4_USDHC1_DATA4		0x1d2
+			MX8MM_IOMUXC_SD1_DATA5_USDHC1_DATA5		0x1d2
+			MX8MM_IOMUXC_SD1_DATA6_USDHC1_DATA6		0x1d2
+			MX8MM_IOMUXC_SD1_DATA7_USDHC1_DATA7		0x1d2
+			MX8MM_IOMUXC_SD1_STROBE_USDHC1_STROBE		0x84
+			MX8MM_IOMUXC_SD1_RESET_B_USDHC1_RESET_B		0x84
+		>;
+	};
+
+	pinctrl_emmc_200mhz: usdhc1grp200mhz {
+		fsl,pins = <
+			MX8MM_IOMUXC_SD1_CLK_USDHC1_CLK			0x1d6
+			MX8MM_IOMUXC_SD1_CMD_USDHC1_CMD			0x1d6
+			MX8MM_IOMUXC_SD1_DATA0_USDHC1_DATA0		0x1d6
+			MX8MM_IOMUXC_SD1_DATA1_USDHC1_DATA1		0x1d6
+			MX8MM_IOMUXC_SD1_DATA2_USDHC1_DATA2		0x1d6
+			MX8MM_IOMUXC_SD1_DATA3_USDHC1_DATA3		0x1d6
+			MX8MM_IOMUXC_SD1_DATA4_USDHC1_DATA4		0x1d6
+			MX8MM_IOMUXC_SD1_DATA5_USDHC1_DATA5		0x1d6
+			MX8MM_IOMUXC_SD1_DATA6_USDHC1_DATA6		0x1d6
+			MX8MM_IOMUXC_SD1_DATA7_USDHC1_DATA7		0x1d6
+			MX8MM_IOMUXC_SD1_STROBE_USDHC1_STROBE		0x84
+			MX8MM_IOMUXC_SD1_RESET_B_USDHC1_RESET_B		0x84
+		>;
+	};
+};
+
+&usdhc1 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_emmc>;
+	pinctrl-1 = <&pinctrl_emmc_100mhz>;
+	pinctrl-2 = <&pinctrl_emmc_200mhz>;
+	bus-width = <8>;
+	non-removable;
+	vmmc-supply = <&reg_tqma8mmx_vcc3v3>;
+	vqmmc-supply = <&reg_tqma8mmx_vcc1v8>;
+	status = "okay";
+};
+
+&usdhc3 {
+	status = "disabled";
+};
