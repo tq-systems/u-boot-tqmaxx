@@ -1,13 +1,13 @@
-TQ Systems GmbH TQMa8MMx Board
+TQ-Systems GmbH TQMa8Mx[M,N]L Board family
 M:	Martin Schmiedel <Martin.Schmiedel@tq-group.com>
 M:	Markus Niebel <Markus.Niebel@tq-group.com>
 S:	Maintained
-F:	board/tqc/tqma8mmx/
-F:	include/configs/tqma8mmx.h
-F:	include/configs/tqma8mmx-mba8mx.h
-F:	configs/tqma8mmx*_defconfig
-F:	configs/tqma8mnx*_defconfig
-F:	arch/arm/dts/*imx8mm-tqma8mmx*.dtsi
-F:	arch/arm/dts/*imx8mm*-mba8mx*.dts
-F:	arch/arm/dts/*imx8mn-tqma8mmx*.dtsi
-F:	arch/arm/dts/*imx8mn*-mba8mx*.dts
+F:	board/tqc/tqma8mxml/
+F:	include/configs/tqma8mxml.h
+F:	include/configs/tqma8mxml-mba8mx.h
+F:	configs/tqma8mxml*_defconfig
+F:	configs/tqma8mxnl*_defconfig
+F:	arch/arm/dts/*imx8mm-tqma8mxml*.dtsi
+F:	arch/arm/dts/*imx8mm-mba8mx*.dts
+F:	arch/arm/dts/*imx8mn-tqma8mxnl*.dtsi
+F:	arch/arm/dts/*imx8mn-mba8mx*.dts
