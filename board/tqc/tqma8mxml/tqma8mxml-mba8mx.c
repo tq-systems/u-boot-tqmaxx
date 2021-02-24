@@ -257,7 +257,7 @@ static int setup_fec(void)
 
 static void tqma8mxml_show_bootcfg(void)
 {
-#if defined(CONFIG_TQMA8MXML)
+#if defined(CONFIG_TARGET_TQMA8MXML)
 	int idx;
 	unsigned int cfg = 0x0;
 
