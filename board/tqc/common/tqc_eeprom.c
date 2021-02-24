@@ -261,8 +261,7 @@ int tqc_read_eeprom_at(unsigned int bus, unsigned int i2c_addr,
 		       struct tqc_eeprom_data *eeprom)
 {
 	return tqc_read_eeprom_buf(bus, i2c_addr, alen, addr, sizeof(*eeprom),
-				   (uchar *)eeprom)
-;
+				   (uchar *)eeprom);
 }
 
 #if defined(CONFIG_SYS_I2C_EEPROM_ADDR_LEN)
@@ -282,7 +281,7 @@ static int do_tqeeprom(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]
 	if (argc > 3)
 		return CMD_RET_USAGE;
 
-	if (strncmp(argv[1], "write", 5) == 0) {
+	if (strcmp(argv[1], "write") == 0) {
 		ulong addr = simple_strtoul(argv[2], NULL, 16);
 		int ret;
 #ifdef CONFIG_DM_I2C
@@ -315,7 +314,7 @@ static int do_tqeeprom(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]
 		return ret;
 	}
 
-	if (strncmp(argv[1], "read", 4) == 0) {
+	if (strcmp(argv[1], "read") == 0) {
 		ulong addr = simple_strtoul(argv[2], NULL, 16);
 
 		return tqc_read_eeprom_buf(TQC_VARD_BUS, TQC_VARD_ADDR,
@@ -324,7 +323,7 @@ static int do_tqeeprom(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]
 				  (void *)addr);
 	}
 
-	if (strncmp(argv[1], "crc", 3) == 0) {
+	if (strcmp(argv[1], "crc") == 0) {
 		int ret;
 		struct tqc_eeprom_data eeprom_for_crc;
 		uint16_t crc;
@@ -342,7 +341,7 @@ static int do_tqeeprom(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]
 		return 0;
 	}
 
-	if (strncmp(argv[1], "protect", 7) == 0) {
+	if (strcmp(argv[1], "protect") == 0) {
 		printf("WARNING! Write-protection is permanent and\n");
 		printf("cannot be released by any command or power-cycle!\n");
 		printf("Device will stop ACK'ing on address 0x37.\n");
