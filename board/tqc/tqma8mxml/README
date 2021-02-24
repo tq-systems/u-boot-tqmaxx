@@ -24,19 +24,26 @@ $ cp firmware-imx-8.6/firmware/ddr/synopsys/lpddr4*.bin $(srctree)
 
 Build U-Boot
 ============
-mem: 
+memory size
 * 1gb for 1GB
 * 2gb for 2GB
 
 baseboard:
 * mba8mx for MBa8Mx starterkit mainboard
 
+module revision:
+* r0100 for old revision
+
 $ export CROSS_COMPILE=aarch64-poky-linux-
-$ make tqma8mx[m,n]l_<mem>_<baseboard>_mmc_defconfig
+$ make tqma8mx[m,n]l_<mem>_<baseboard>_[r0100_]mmc_defconfig
 $ make flash.bin
 
-Burn the flash.bin to MicroSD card offset 32KB
-$sudo dd if=flash.bin of=/dev/sd[x] bs=1k seek=32 conv=fsync
+Burn the flash.bin to MicroSD card.
+
+TQMa8MxML: offset 33kB
+TQMa8MxNL: offset 32kB
+
+$sudo dd if=flash.bin of=/dev/sd[x] bs=1k seek=<offset> conv=fsync
 
 Boot
 ====
