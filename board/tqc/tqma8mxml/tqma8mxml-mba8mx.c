@@ -39,13 +39,13 @@ DECLARE_GLOBAL_DATA_PTR;
 enum {
 	UART1_MUX,
 	UART2_MUX,
-	SD_MUX,
+	I2C_ADDR_SW,
 	DSI_MUX,
 	SPI_MUX,
 	AVCC1V8_LVDS_EN,
 	LVDS_BRIDGE_EN,
 	LVDS_BRIDGE_IRQ,
-	SD_MUX_EN_B,
+	SD_SW_EN_B,
 	EN_HDMI_TERM,
 	DSI_MUX_OE_B,
 	EN_DP_BRIDGE_3V3,
@@ -162,7 +162,7 @@ int tqc_bb_board_early_init_f(void)
 static struct tqc_gpio_init_data mba8mx_gid[] = {
 	GPIO_INIT_DATA_ENTRY(UART1_MUX, "GPIO@23_0", GPIOD_IS_IN),
 	GPIO_INIT_DATA_ENTRY(UART2_MUX, "GPIO@23_1", GPIOD_IS_IN),
-	GPIO_INIT_DATA_ENTRY(SD_MUX, "GPIO@23_2", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(I2C_ADDR_SW, "GPIO@23_2", GPIOD_IS_IN),
 	GPIO_INIT_DATA_ENTRY(DSI_MUX, "GPIO@23_3", GPIOD_IS_IN),
 
 	GPIO_INIT_DATA_ENTRY(SPI_MUX, "GPIO@23_4", GPIOD_IS_IN),
@@ -170,7 +170,7 @@ static struct tqc_gpio_init_data mba8mx_gid[] = {
 	GPIO_INIT_DATA_ENTRY(LVDS_BRIDGE_EN, "GPIO@23_6", GPIOD_IS_OUT),
 	GPIO_INIT_DATA_ENTRY(LVDS_BRIDGE_IRQ, "GPIO@23_7", GPIOD_IS_IN),
 
-	GPIO_INIT_DATA_ENTRY(SD_MUX_EN_B, "GPIO@23_8", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
+	GPIO_INIT_DATA_ENTRY(SD_SW_EN_B, "GPIO@23_8", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
 	GPIO_INIT_DATA_ENTRY(EN_HDMI_TERM, "GPIO@23_9", GPIOD_IS_OUT),
 
 	GPIO_INIT_DATA_ENTRY(DSI_MUX_OE_B, "GPIO@23_10", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW),
@@ -267,6 +267,9 @@ static void tqma8mxml_show_bootcfg(void)
 	env_set_ulong("boot_config", cfg);
 	printf("BOOTCFG: %x\n", cfg);
 #endif
+	printf("I2C_ADDR_SW: %0#02x\n",
+	       (dm_gpio_get_value(&mba8mx_gid[I2C_ADDR_SW].desc) ?
+		0x27 : 0x25));
 }
 
 int tqc_bb_board_init(void)
@@ -279,7 +282,6 @@ int tqc_bb_board_init(void)
 	puts("MUX: ");
 	printf("UART1: %d ", dm_gpio_get_value(&mba8mx_gid[UART1_MUX].desc));
 	printf("UART2: %d ", dm_gpio_get_value(&mba8mx_gid[UART2_MUX].desc));
-	printf("SD: %d ", dm_gpio_get_value(&mba8mx_gid[SD_MUX].desc));
 	printf("DSI: %d ", dm_gpio_get_value(&mba8mx_gid[DSI_MUX].desc));
 	printf("SPI: %d\n", dm_gpio_get_value(&mba8mx_gid[SPI_MUX].desc));
 
