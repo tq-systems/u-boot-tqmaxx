@@ -6,26 +6,29 @@
 #include "fsl-imx8mm.dtsi"
 
 / {
-	model = "TQ Systems i.MX8MM TQMa8MxML";
-	compatible = "tq,tqma8mxml", "fsl,imx8mm";
+	model = "TQ-Systems i.MX8MM TQMa8MxML";
+	compatible = "tq,imx8mm-tqma8mxml", "fsl,imx8mm";
 
+	/* TODO: move to -u-boot.dtsi */
 	config {
 		/* 32 kiB redundant env */
 		u-boot,mmc-env-offset = <0x400000>;
 		u-boot,mmc-env-offset-redundant = <0x408000>;
 	};
 
-	reg_tqma8mmx_vcc3v3: regulator-vcc3v3 {
+	/* identical to buck4_reg, but should never change */
+	reg_vcc3v3: regulator-vcc3v3 {
 		compatible = "regulator-fixed";
-		regulator-name = "TQMA8MMX_VCC3V3";
+		regulator-name = "TQMA8MXML_VCC3V3";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		regulator-always-on;
 	};
 
-	reg_tqma8mmx_vcc1v8: regulator-vcc1v8 {
+	/* e-MMC IO, needed for HS modes */
+	reg_vcc1v8: regulator-vcc1v8 {
 		compatible = "regulator-fixed";
-		regulator-name = "TQMA8MMX_VCC1V8";
+		regulator-name = "TQMA8MXML_VCC1V8";
 		regulator-min-microvolt = <1800000>;
 		regulator-max-microvolt = <1800000>;
 		regulator-always-on;
@@ -44,10 +47,13 @@
 		#address-cells = <1>;
 		#size-cells = <1>;
 		compatible = "jedec,spi-nor";
+		/* TODO: move bus-width to -u-boot.dtsi */
 		spi-tx-bus-width = <1>;
 		spi-rx-bus-width = <1>;
 		spi-max-frequency = <29000000>;
 		spi-nor,ddr-quad-read-dummy = <8>;
+		/* used for macronix flash only */
+		macronix,dsr = <0x3>;
 	};
 };
 
@@ -102,6 +108,7 @@
 
 	pinctrl_flexspi: flexspigrp {
 		fsl,pins = <
+			/* TODO: kernel sets 0x84 for sclk */
 			MX8MM_IOMUXC_NAND_ALE_QSPI_A_SCLK		0x184
 			MX8MM_IOMUXC_NAND_CE0_B_QSPI_A_SS0_B		0x84
 			MX8MM_IOMUXC_NAND_DATA00_QSPI_A_DATA0		0x84
@@ -182,19 +189,16 @@
 	status = "okay";
 
 	eeprom1: eeprom@53 {
-		compatible = "atmel,24c02";
+		compatible = "nxp,se97b", "atmel,24c02";
 		reg = <0x53>;
 		pagesize = <16>;
-		status = "okay";
 	};
 
 	eeprom0: eeprom@57 {
-		compatible = "st,24c64", "atmel,24c64", "at24";
+		compatible = "atmel,24c64";
 		reg = <0x57>;
 		pagesize = <32>;
-		status = "okay";
 	};
-
 };
 
 &usdhc3 {
@@ -206,8 +210,9 @@
 	non-removable;
 	no-sd;
 	no-sdio;
+	/* TODO: move to -u-boot.dtsi */
 	mmc-hs400-1_8v;
-	vmmc-supply = <&reg_tqma8mmx_vcc3v3>;
-	vqmmc-supply = <&reg_tqma8mmx_vcc1v8>;
+	vmmc-supply = <&reg_vcc3v3>;
+	vqmmc-supply = <&reg_vcc1v8>;
 	status = "okay";
 };

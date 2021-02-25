@@ -74,8 +74,8 @@
 	pinctrl-2 = <&pinctrl_emmc_200mhz>;
 	bus-width = <8>;
 	non-removable;
-	vmmc-supply = <&reg_tqma8mmx_vcc3v3>;
-	vqmmc-supply = <&reg_tqma8mmx_vcc1v8>;
+	vmmc-supply = <&reg_vcc3v3>;
+	vqmmc-supply = <&reg_vcc1v8>;
 	status = "okay";
 };
 
