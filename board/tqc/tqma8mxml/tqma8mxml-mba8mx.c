@@ -88,7 +88,6 @@ enum {
 	GPIO_BTN3,
 	GPIO_LED1,
 	GPIO_LED2,
-	GPIO_LED3,
 #ifdef CONFIG_IMX8MN
 	SEL_USB_HUB_B,
 #endif
@@ -229,7 +228,6 @@ static struct tqc_gpio_init_data mba8mx_gid[] = {
 #elif defined(CONFIG_TQMA8MMX_HWREV_0200)
 	GPIO_INIT_DATA_ENTRY(GPIO_LED2, "GPIO3_14", GPIOD_IS_OUT),
 #endif
-	GPIO_INIT_DATA_ENTRY(GPIO_LED3, "GPIO1_8", GPIOD_IS_OUT),
 #ifdef CONFIG_IMX8MN
 	GPIO_INIT_DATA_ENTRY(SEL_USB_HUB_B, "GPIO3_18", GPIOD_IS_OUT ),
 #endif
