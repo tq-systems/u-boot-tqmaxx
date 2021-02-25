@@ -6,7 +6,7 @@
 #include <dt-bindings/net/ti-dp83867.h>
 
 / {
-	model = "TQ Systems GmbH i.MX8MN TQMa8MxNL on MBa8Mx";
+	model = "TQ-Systems i.MX8MN TQMa8MxNL on MBa8Mx";
 	compatible = "tq,imx8mn-mba8mx", "tq,imx8mn-tqma8mxnl", "fsl,imx8mn";
 
 	aliases {
@@ -20,6 +20,7 @@
 		stdout-path = &uart3;
 	};
 
+	/* TODO: move to -u-boot.dtsi */
 	config {
 		u-boot,mmc-env-offset = <0x400000>;
 		u-boot,mmc-env-offset-redundant = <0x404000>;
@@ -117,26 +118,10 @@
 	 * ENET_GPIO: 0x10 [fast|x1] (no pull up)
 	 */
 
-	pinctrl_gpiobutton: gpiobuttongrp {
-		fsl,pins = <
-			MX8MN_IOMUXC_GPIO1_IO05__GPIO1_IO5	0x84
-			MX8MN_IOMUXC_GPIO1_IO07__GPIO1_IO7	0x84
-			MX8MN_IOMUXC_SD1_CLK__GPIO2_IO0		0x84
-		>;
-	};
-
-	pinctrl_gpioled: gpioledgrp {
-		fsl,pins = <
-			MX8MN_IOMUXC_GPIO1_IO00__GPIO1_IO0	0x84
-			MX8MN_IOMUXC_GPIO1_IO08__GPIO1_IO8	0x84
-			MX8MN_IOMUXC_NAND_DQS__GPIO3_IO14	0x84
-		>;
-	};
-
 	pinctrl_fec1: fec1grp {
 		fsl,pins = <
-			MX8MN_IOMUXC_ENET_MDC__ENET1_MDC		0x2
-			MX8MN_IOMUXC_ENET_MDIO__ENET1_MDIO	0x2
+			MX8MN_IOMUXC_ENET_MDC__ENET1_MDC	0x4000002
+			MX8MN_IOMUXC_ENET_MDIO__ENET1_MDIO	0x4000002
 			MX8MN_IOMUXC_ENET_TD3__ENET1_RGMII_TD3	0x16
 			MX8MN_IOMUXC_ENET_TD2__ENET1_RGMII_TD2	0x16
 			MX8MN_IOMUXC_ENET_TD1__ENET1_RGMII_TD1	0x16
@@ -150,6 +135,23 @@
 			MX8MN_IOMUXC_ENET_RX_CTL__ENET1_RGMII_RX_CTL	0x90
 			MX8MN_IOMUXC_ENET_TX_CTL__ENET1_RGMII_TX_CTL	0x16
 			MX8MN_IOMUXC_SAI2_RXC__GPIO4_IO22	0x10
+		>;
+	};
+
+	pinctrl_gpiobutton: gpiobuttongrp {
+		fsl,pins = <
+			/* TODO: kernel has 0x41 */
+			MX8MN_IOMUXC_GPIO1_IO05__GPIO1_IO5	0x84
+			MX8MN_IOMUXC_GPIO1_IO07__GPIO1_IO7	0x84
+			MX8MN_IOMUXC_SD1_CLK__GPIO2_IO0		0x84
+		>;
+	};
+
+	pinctrl_gpioled: gpioledgrp {
+		fsl,pins = <
+			/* TODO: kernel has 0x41 */
+			MX8MN_IOMUXC_GPIO1_IO00__GPIO1_IO0	0x84
+			MX8MN_IOMUXC_NAND_DQS__GPIO3_IO14	0x84
 		>;
 	};
 
@@ -263,6 +265,7 @@
 	status = "okay";
 };
 
+/* TODO: move usbg1 to -u-boot.dtsi */
 &usbg1 {
 	status = "disabled";
 };
