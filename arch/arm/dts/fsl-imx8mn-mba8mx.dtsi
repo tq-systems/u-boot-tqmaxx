@@ -79,7 +79,9 @@
 
 &iomuxc {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_gpioled>, <&pinctrl_gpiobutton>;
+	pinctrl-0 = <&pinctrl_gpioled>, <&pinctrl_gpiobutton>, <&pinctrl_wdog>,
+		    <&pinctrl_usb0hub_sel>;
+
 	/*
 	 * Pad Control Register
 	 *
@@ -169,14 +171,19 @@
 		>;
 	};
 
+	pinctrl_usb0hub_sel: usb0hub_sel {
+		fsl,pins = <
+			/* SEL_USB_HUB_B */
+			MX8MN_IOMUXC_SD1_CMD__GPIO2_IO1		0x84
+		>;
+	};
+
 	pinctrl_usbotg1: usbotg1grp {
 		fsl,pins = <
 			/* ID (PU needed for working detection) */
 			MX8MN_IOMUXC_GPIO1_IO10__USB1_OTG_ID	0x1C4
 			/* OC */
 			MX8MN_IOMUXC_GPIO1_IO13__USB1_OTG_OC	0x84
-			/* SEL_USB_HUB_B */
-			MX8MN_IOMUXC_NAND_WP_B__GPIO3_IO18	0x84
 		>;
 	};
 
