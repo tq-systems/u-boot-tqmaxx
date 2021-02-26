@@ -229,7 +229,11 @@ static struct tqc_gpio_init_data mba8mx_gid[] = {
 	GPIO_INIT_DATA_ENTRY(GPIO_LED2, "GPIO3_14", GPIOD_IS_OUT),
 #endif
 #ifdef CONFIG_IMX8MN
+#if defined(CONFIG_TQMA8MMX_HWREV_0100)
 	GPIO_INIT_DATA_ENTRY(SEL_USB_HUB_B, "GPIO3_18", GPIOD_IS_OUT ),
+#elif defined(CONFIG_TQMA8MMX_HWREV_0200)
+	GPIO_INIT_DATA_ENTRY(SEL_USB_HUB_B, "GPIO2_1", GPIOD_IS_OUT),
+#endif
 #endif
 };
 
