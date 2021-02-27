@@ -166,6 +166,17 @@ static struct mm_region imx8m_mem_map[] = {
 
 struct mm_region *mem_map = imx8m_mem_map;
 
+static unsigned int imx8m_find_dram_entry_in_mem_map(void)
+{
+	int i;
+
+	for (i = 0; i < ARRAY_SIZE(imx8m_mem_map); i++)
+		if (imx8m_mem_map[i].phys == CONFIG_SYS_SDRAM_BASE)
+			return i;
+
+	hang();	/* Entry not found, this must never happen. */
+}
+
 void enable_caches(void)
 {
 	/* If OPTEE runs, remove OPTEE memory from MMU table to avoid speculative prefetch */
@@ -175,12 +186,15 @@ void enable_caches(void)
 		* have been modified update mmu table accordingly
 		*/
 		int i = 0;
-		/* please make sure that entry initial value matches
-		* imx8m_mem_map for DRAM1
-		*/
-		int entry = 5;
+		/*
+		 * please make sure that entry initial value matches
+		 * imx8m_mem_map for DRAM1
+		 */
+		int entry = imx8m_find_dram_entry_in_mem_map();
 		u64 attrs = imx8m_mem_map[entry].attrs;
-		while (i < CONFIG_NR_DRAM_BANKS && entry < 8) {
+
+		while (i < CONFIG_NR_DRAM_BANKS &&
+		       entry < ARRAY_SIZE(imx8m_mem_map)) {
 			if (gd->bd->bi_dram[i].start == 0)
 				break;
 			imx8m_mem_map[entry].phys = gd->bd->bi_dram[i].start;
@@ -208,6 +222,7 @@ __weak int board_phys_sdram_size(phys_size_t *size)
 
 int dram_init(void)
 {
+	unsigned int entry = imx8m_find_dram_entry_in_mem_map();
 	phys_size_t sdram_size;
 	int ret;
 
@@ -222,7 +237,7 @@ int dram_init(void)
 		gd->ram_size = sdram_size;
 
 	/* also update the SDRAM size in the mem_map used externally */
-	imx8m_mem_map[5].size = sdram_size;
+	imx8m_mem_map[entry].size = sdram_size;
 
 #ifdef PHYS_SDRAM_2_SIZE
 	gd->ram_size += PHYS_SDRAM_2_SIZE;
