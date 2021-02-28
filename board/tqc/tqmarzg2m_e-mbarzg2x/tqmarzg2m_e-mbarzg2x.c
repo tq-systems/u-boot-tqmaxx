@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * board/tqc/tqmarzg2m_e-mbarzg2x/tqmarzg2m_e-mbarzg2x.c
- *     This file provides TQMaRZG2M board support.
+ * board/tqc/tqmarzg2h_c-mbarzg2x/tqmarzg2h_c-mbarzg2x.c
+ *     This file provides TQMaRZG2H board support.
  *
  * Copyright (C) 2015-2019 Renesas Electronics Corporation
  * Copyright (C) 2015 Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
@@ -39,7 +39,6 @@ void s_init(void)
 #define GPIO_BT_REG_ON 158
 #define	GPIO_BT_POWER		73	/* GP3_13	*/
 #define	GPIO_WIFI_POWER		82	/* GP4_06	*/
-#define	GPIO_PCIE1_SATA_SEL	25	/* GP1_09	*/
 
 void clear_wlan_bt_reg_on(void)
 {
@@ -82,6 +81,9 @@ int board_early_init_f(void)
 #define	GPIO_REV_BIT1		113	/* GP5_19	*/
 #define	GPIO_REV_BIT0		115	/* GP5_21	*/
 #define	GPIO_USB_HUB_RST	142	/* GP6_22	*/
+#define	GPIO_PCIE1_SATA_SEL	25	/* GP1_09	*/
+#define	GPIO_M2_PEDET		143	/* GP6_23	*/
+#define	GPIO_PCIE1_RST		146	/* GP6_26	*/
 
 
 #define CLOCKGEN_I2C_BUS_NUM	4
@@ -229,7 +231,7 @@ static int clockgen_init(void)
 		{ 0xB3, 0x00 },
 		{ 0xB4, 0x00 },
 		{ 0xB5, 0x00 },
-		{ 0xB6, 0xDF },
+		{ 0xB6, 0xDF },	/* this is the place to enable OUT5 */
 		{ 0xB7, 0x0D },
 		{ 0xB9, 0x06 },
 		{ 0xBA, 0x1C },
@@ -245,6 +247,13 @@ static int clockgen_init(void)
 		/* End configuration postamble */
 	};
 
+	/*
+	 * Read GPIO_PCIE1_SATA_SEL and GPIO_M2_PEDET.
+	 * If both are high, patch the configuration data stream so that OUT5 is enabled.
+	 */
+	if (gpio_get_value(GPIO_PCIE1_SATA_SEL) && gpio_get_value(GPIO_M2_PEDET))
+		regvals[94][1] = 0xFF;
+
 	for (int i = 0; i < ARRAY_SIZE(regvals); i++) {
 		ret = dm_i2c_write(pdev, regvals[i][0], &regvals[i][1], 1);
 		if (ret) {
@@ -253,6 +262,7 @@ static int clockgen_init(void)
 		}
 	}
 
+	mdelay(10); /* allow some time for clock to stabilize */
 	return 0;
 }
 
@@ -271,6 +281,18 @@ int board_init(void)
 			HSUSB_REG_UGCTRL2_USB0SEL_EHCI);
 	/* low power status */
 	setbits_le16(HSUSB_REG_LPSTS, HSUSB_REG_LPSTS_SUSPM_NORMAL);
+
+	/* MBaRZG2x: set GP1_09 as input to allow DIP switch S10.1 control PCIE1_SATA_SEL */
+	gpio_request(GPIO_PCIE1_SATA_SEL, "pcie1_sata_sel");
+	gpio_direction_input(GPIO_PCIE1_SATA_SEL);
+
+	/* MBaRZG2x: set GP6_23 as input needed in combination with GP1_09 for clock setup */
+	gpio_request(GPIO_M2_PEDET, "m2_pedet");
+	gpio_direction_input(GPIO_M2_PEDET);
+
+	/* MBaRZG2x: force PCIe1 reset */
+	gpio_request(GPIO_PCIE1_RST, "pcie1_rst");
+	gpio_direction_output(GPIO_PCIE1_RST, 0);
 
 	clockgen_init();
 
@@ -292,9 +314,9 @@ int board_init(void)
 	gpio_request(GPIO_USB_HUB_RST, "usb_hub_rst");
 	gpio_direction_output(GPIO_USB_HUB_RST, 1);
 
-	/* MBaRZG2x: set GP1_09 as input to allow DIP switch S10.1 control PCIE1_SATA_SEL */
-	gpio_request(GPIO_PCIE1_SATA_SEL, "pcie1_sata_sel");
-	gpio_direction_input(GPIO_PCIE1_SATA_SEL);
+	/* MBaRZG2x: release PCIe1 reset */
+	gpio_request(GPIO_PCIE1_RST, "pcie1_rst");
+	gpio_set_value(GPIO_PCIE1_RST, 1);
 
 	return 0;
 }
