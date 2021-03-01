@@ -40,7 +40,10 @@ static const char *tqma8xx_get_boardname(void)
 {
 	switch (get_cpu_type()) {
 	case MXC_CPU_IMX8QXP:
-		return "TQMa8XQP";
+		if (CONFIG_IS_ENABLED(TQMA8XX_CPU_MX8QXP))
+			return "TQMa8XQP";
+		else if (CONFIG_IS_ENABLED(TQMA8XX_CPU_MX8DXP))
+			return "TQMa8XDP";
 		break;
 	default:
 		return "??";
