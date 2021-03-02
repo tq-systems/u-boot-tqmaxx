@@ -764,7 +764,6 @@ dtb-$(CONFIG_ARCH_IMX8) += \
 	fsl-imx8qm-lpddr4-val.dtb \
 	fsl-imx8qm-mek-xen.dtb \
 	fsl-imx8qm-mek-auto.dtb \
-	fsl-imx8qm-mek-auto2.dtb \
 	imx8qm-rom7720-a1.dtb \
 	imx8qm-mba8x.dtb \
 	fsl-imx8qxp-ai_ml.dtb \
@@ -778,7 +777,8 @@ dtb-$(CONFIG_ARCH_IMX8) += \
 	fsl-imx8dx-mek.dtb \
 	fsl-imx8dxl-phantom-mek.dtb \
 	fsl-imx8dxl-evk.dtb \
-	fsl-imx8dxl-ddr3-val.dtb \
+	fsl-imx8dxl-evk-lcdif.dtb \
+	fsl-imx8dxl-ddr3-evk.dtb \
 	imx8-deneb.dtb \
 	imx8-giedi.dtb \
 	imx8dxp-mba8xx.dtb \
@@ -789,15 +789,18 @@ dtb-$(CONFIG_ARCH_IMX8) += \
 
 dtb-$(CONFIG_ARCH_IMX8M) += \
 	imx8mm-evk.dtb \
+	imx8mm-evk-qca-wifi.dtb \
 	imx8mm-ddr4-evk.dtb \
 	imx8mm-ddr3l-val.dtb \
 	imx8mm-ddr4-val.dtb \
 	imx8mm-verdin.dtb \
+	imx8mn-ddr3l-evk.dtb \
 	imx8mn-ddr4-evk.dtb \
 	imx8mn-evk.dtb \
 	imx8mq-ddr3l-val.dtb \
 	imx8mq-ddr4-val.dtb \
 	imx8mq-evk.dtb \
+	imx8mp-ddr4-evk.dtb \
 	imx8mp-evk.dtb \
 	imx8mm-ddr4-ab2.dtb \
 	imx8mm-ab2.dtb \

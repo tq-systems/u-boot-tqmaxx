@@ -82,6 +82,12 @@ config TARGET_IMX8MM_EVK
 	select SUPPORT_SPL
 	select IMX8M_LPDDR4
 
+config TARGET_IMX8MM_EVK_QCA
+	bool "imx8mm LPDDR4 EVK Legacy QCA WIFI board"
+	select IMX8MM
+	select SUPPORT_SPL
+	select IMX8M_LPDDR4
+
 config TARGET_IMX8MM_DDR4_EVK
 	bool "imx8mm DDR4 EVK board"
 	select IMX8MM
@@ -100,11 +106,23 @@ config TARGET_IMX8MN_DDR4_EVK
 	select SUPPORT_SPL
 	select IMX8M_DDR4
 
+config TARGET_IMX8MN_DDR3_EVK
+	bool "imx8mn 11x11 DDR3 EVK board"
+	select IMX8MN
+	select SUPPORT_SPL
+	select IMX8M_DDR3L
+
 config TARGET_IMX8MP_EVK
 	bool "imx8mp LPDDR4 EVK board"
 	select IMX8MP
 	select SUPPORT_SPL
 	select IMX8M_LPDDR4
+
+config TARGET_IMX8MP_DDR4_EVK
+	bool "imx8mp DDR4 EVK board"
+	select IMX8MP
+	select SUPPORT_SPL
+	select IMX8M_DDR4
 
 config TARGET_IMX8MM_AB2
 	bool "imx8mm LPDDR4 Audio board 2.0"
