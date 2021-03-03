@@ -136,7 +136,7 @@
 	"hdp_addr=0x9c000000\0" \
 	"hdp_file=dpfw.bin\0" \
 	"loadhdp=mmc dev ${mmcdev}; " \
-		"load mmc ${mmcdev}:${mmcpart} ${hdp_addr}" \
+		"load mmc ${mmcdev}:${mmcpart} ${hdp_addr} " \
 			"${mmcpath}${hdp_file}\0" \
 	"auth_os=auth_cntr ${cntr_addr}\0" \
 	"boot_os=booti ${loadaddr} - ${fdt_addr};\0" \
