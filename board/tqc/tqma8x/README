@@ -30,10 +30,10 @@ Quick Start
 Get and Build the ARM Trusted firmware
 ======================================
 
-$ git clone https://source.codeaurora.org/external/imx/imx-atf
-$ cd imx-atf/
-$ git checkout origin/imx_5.4.47_2.2.0 -b imx_5.4.47_2.2.0
-$ make PLAT=imx8qx bl31
+$ git clone https://github.com/tq-systems/atf.git
+$ cd atf/
+$ git checkout origin/TQMa8-imx_5.4.70_2.3.0 -b TQMa8-imx_5.4.70_2.3.0
+$ make PLAT=imx8qm IMX_DEBUG_UART=0 bl31
 
 Get SECO firmware (mx8qxc0-ahab-container.img)
 ==============================================
