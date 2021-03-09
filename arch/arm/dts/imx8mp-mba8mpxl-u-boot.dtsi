@@ -56,9 +56,20 @@
 
 &iomuxc {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_wdog>;
-
+	pinctrl-0 = <&pinctrl_wdog>, <&pinctrl_gpiobutton>, <&pinctrl_gpioled>,
+		    <&pinctrl_hoggpio>;
 	u-boot,dm-spl;
+
+	pinctrl_hoggpio: gpiohoggrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_NAND_DQS__GPIO3_IO14	0x19
+			MX8MP_IOMUXC_SAI5_RXFS__GPIO3_IO19	0x19
+			MX8MP_IOMUXC_SAI5_RXC__GPIO3_IO20	0x19
+			MX8MP_IOMUXC_SAI1_TXD6__GPIO4_IO18	0x19
+			MX8MP_IOMUXC_SAI1_TXD7__GPIO4_IO19	0x19
+			MX8MP_IOMUXC_SAI1_MCLK__GPIO4_IO20	0x19
+		>;
+	};
 };
 
 &pinctrl_reg_usdhc2_vmmc {
