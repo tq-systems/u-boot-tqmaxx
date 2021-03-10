@@ -687,4 +687,12 @@ config LMB
 	help
 	  Support the library logical memory blocks.
 
+config LMB_MAX_REGIONS
+	int "Number of memory and reserved regions in lmb lib"
+	depends on LMB
+	default 8
+	help
+	  Define the number of supported regions, memory and reserved, in the
+	  library logical memory blocks.
+
 endmenu
