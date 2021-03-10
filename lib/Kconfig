@@ -680,4 +680,11 @@ config TEST_FDTDEC
 config LIB_DATE
 	bool
 
+config LMB
+	bool "Enable the logical memory blocks library (lmb)"
+	default y if ARC || ARM || M68K || MICROBLAZE || MIPS || NDS32 || \
+		     NIOS2 || PPC || RISCV || SANDBOX || SH || X86 || XTENSA
+	help
+	  Support the library logical memory blocks.
+
 endmenu

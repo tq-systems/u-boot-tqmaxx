@@ -16,7 +16,6 @@
  */
 #define CONFIG_PHYSMEM
 
-#define CONFIG_LMB
 
 #undef CONFIG_ZLIB
 #undef CONFIG_GZIP
