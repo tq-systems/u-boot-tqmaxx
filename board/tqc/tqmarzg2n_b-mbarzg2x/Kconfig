@@ -1,0 +1,15 @@
+if TARGET_TQMARZG2N_B_MBARZG2X
+
+config SYS_SOC
+	default "rmobile"
+
+config SYS_BOARD
+	default "tqmarzg2n_b-mbarzg2x"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_CONFIG_NAME
+	default "tqmarzg2n_b-mbarzg2x"
+
+endif

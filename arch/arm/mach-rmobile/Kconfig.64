@@ -90,6 +90,11 @@ config TARGET_TQMARZG2H_C_MBARZG2X
 	bool "TQMaRZG2H board (4GiB)"
 	help
           Support for TQMaRZG2H platform
+
+config TARGET_TQMARZG2N_B_MBARZG2X
+	bool "TQMaRZG2N board (2GiB)"
+	help
+          Support for TQMaRZG2N platform
 endchoice
 
 config SYS_SOC
@@ -106,5 +111,6 @@ source "board/renesas/hihope-rzg2n/Kconfig"
 source "board/renesas/hihope-rzg2h/Kconfig"
 source "board/tqc/tqmarzg2m_e-mbarzg2x/Kconfig"
 source "board/tqc/tqmarzg2h_c-mbarzg2x/Kconfig"
+source "board/tqc/tqmarzg2n_b-mbarzg2x/Kconfig"
 
 endif
