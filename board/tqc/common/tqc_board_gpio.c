@@ -16,11 +16,11 @@ int tqc_board_gpio_init(struct tqc_gpio_init_data *data, int count)
 	for (i = 0; i < count; ++i) {
 		ret = dm_gpio_lookup_name(data[i].name, &data[i].desc);
 		if (ret) {
-			printf("error: gpio lookup %s", data[i].name);
+			printf("error: gpio lookup %s\n", data[i].name);
 		} else {
 			ret = dm_gpio_request(&data[i].desc, data[i].label);
 			if (ret)
-				printf("error: gpio REQ %s", data[i].label);
+				printf("error: gpio REQ %s\n", data[i].label);
 			else
 				dm_gpio_set_dir_flags(&data[i].desc,
 						      data[i].flags);
