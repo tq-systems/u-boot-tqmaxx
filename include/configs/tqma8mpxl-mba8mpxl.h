@@ -6,6 +6,19 @@
 #if !defined(__TQMA8MPXL_MBA8MPXL_H)
 #define __TQMA8MPXL_MBA8MPXL_H
 
+#if defined(CONFIG_FEC_MXC)
+
+#define FEC_QUIRK_ENET_MAC
+
+#endif /* CONFIG_FEC_MXC */
+
+#ifdef CONFIG_DWC_ETH_QOS
+
+#define CONFIG_SYS_NONCACHED_MEMORY	(1 * SZ_1M)
+#define PHY_ANEG_TIMEOUT 20000
+
+#endif /* CONFIG_DWC_ETH_QOS */
+
 #define CONFIG_BAUDRATE			115200
 #define CONFIG_MXC_UART_BASE		UART4_BASE_ADDR
 #define CONSOLE_DEV			"ttymxc3"

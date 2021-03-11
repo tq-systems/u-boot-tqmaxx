@@ -48,8 +48,30 @@ int tqc_bb_checkboard(void)
 	return 0;
 }
 
+static void setup_enet(void)
+{
+	struct iomuxc_gpr_base_regs *gpr =
+		(struct iomuxc_gpr_base_regs *)IOMUXC_GPR_BASE_ADDR;
+
+	if (CONFIG_IS_ENABLED(FEC_MXC)) {
+		/* Enable RGMII TX clk output */
+		setbits_le32(&gpr->gpr[1], BIT(22));
+	}
+
+	if (CONFIG_IS_ENABLED(DWC_ETH_QOS)) {
+		/* set INTF as RGMII, enable RGMII TXC clock */
+		clrsetbits_le32(&gpr->gpr[1],
+				IOMUXC_GPR_GPR1_GPR_ENET_QOS_INTF_SEL_MASK,
+				BIT(16));
+		setbits_le32(&gpr->gpr[1], BIT(19) | BIT(21));
+		set_clk_eqos(ENET_125MHZ);
+	}
+}
+
 int tqc_bb_board_init(void)
 {
+	setup_enet();
+
 	return 0;
 }
 

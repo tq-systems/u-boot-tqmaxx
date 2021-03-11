@@ -128,6 +128,19 @@ config TQMA8MPXL_BB_MBA8MPXL
 	select DM_SERIAL
 	select SPL_SERIAL_SUPPORT
 	select CMD_FUSE
+	select DM_ETH
+	select DWC_ETH_QOS
+	select FEC_MXC
+	select MII
+	select DM_ETH_PHY
+	select PHY_GIGE
+	select PHYLIB
+	select PHY_GIGE
+	select PHY_TI
+	select CMD_MII
+	select CMD_PING
+	select CMD_DHCP
+	select CMD_NET
 	help
 	  Select the MBa8MPxL starterkit for TQMa8MPxL board.
 	  This features most interfaces the CPU can provide
