@@ -720,10 +720,10 @@ static int eqos_read_rom_hwaddr(struct udevice *dev)
 	return !is_valid_ethaddr(pdata->enetaddr);
 }
 
-static int eqos_get_phy_addr(struct eqos_priv *priv, struct udevice *dev)
+static int eqos_phy_init(struct eqos_priv *eqos, struct udevice *dev)
 {
 	struct ofnode_phandle_args phandle_args;
-	int reg;
+	int addr = -1;
 
 	if (dev_read_phandle_with_args(dev, "phy-handle", NULL, 0, 0,
 				       &phandle_args)) {
@@ -731,11 +731,30 @@ static int eqos_get_phy_addr(struct eqos_priv *priv, struct udevice *dev)
 		return -ENODEV;
 	}
 
-	priv->phy_of_node = phandle_args.node;
+	addr = ofnode_read_u32_default(phandle_args.node, "reg", 0);
+#ifdef DWC_NET_PHYADDR
+	addr = DWC_NET_PHYADDR;
+#endif
+	eqos->phy = phy_connect(eqos->mii, addr, dev,
+				eqos->config->interface(dev));
+	if (!eqos->phy) {
+		pr_err("phy_connect() failed");
+		return -ENODEV;
+	}
 
-	reg = ofnode_read_u32_default(phandle_args.node, "reg", 0);
+	if (eqos->max_speed) {
+		int err = phy_set_supported(eqos->phy, eqos->max_speed);
 
-	return reg;
+		if (err) {
+			pr_err("phy_set_supported() failed: %d", err);
+			phy_shutdown(eqos->phy);
+			return err;
+		}
+	}
+
+	eqos->phy->node = phandle_args.node;
+
+	return 0;
 }
 
 static int eqos_start(struct udevice *dev)
@@ -785,27 +804,10 @@ static int eqos_start(struct udevice *dev)
 	 * don't need to reconnect/reconfigure again
 	 */
 	if (!eqos->phy) {
-		int addr = -1;
-		addr = eqos_get_phy_addr(eqos, dev);
-#ifdef DWC_NET_PHYADDR
-		addr = DWC_NET_PHYADDR;
-#endif
-		eqos->phy = phy_connect(eqos->mii, addr, dev,
-					eqos->config->interface(dev));
-		if (!eqos->phy) {
-			pr_err("phy_connect() failed");
+		ret = eqos_phy_init(eqos, dev);
+		if (ret || !eqos->phy)
 			goto err_stop_resets;
-		}
 
-		if (eqos->max_speed) {
-			ret = phy_set_supported(eqos->phy, eqos->max_speed);
-			if (ret) {
-				pr_err("phy_set_supported() failed: %d", ret);
-				goto err_shutdown_phy;
-			}
-		}
-
-		eqos->phy->node = eqos->phy_of_node;
 		ret = phy_config(eqos->phy);
 		if (ret < 0) {
 			pr_err("phy_config() failed: %d", ret);
@@ -1560,6 +1562,14 @@ static int eqos_probe(struct udevice *dev)
 #ifdef CONFIG_DM_ETH_PHY
 	eth_phy_set_mdio_bus(dev, eqos->mii);
 #endif
+
+	ret = eqos_phy_init(eqos, dev);
+	if (ret || !eqos->phy)
+		goto err_free_mdio;
+
+	ret = phy_config(eqos->phy);
+	if (ret < 0)
+		pr_err("phy_config() failed: %d", ret);
 
 	debug("%s: OK\n", __func__);
 	return 0;
