@@ -87,8 +87,8 @@
 	"name_kern=Image\0"						\
 	"console=ttyS2,115200n8\0"					\
 	"stdin=serial,usbkbd\0"						\
-	"args_all=setenv optargs earlycon=ns16550a,mmio32,0x02800000 "  \
-		"${mtdparts}\0"						\
+	"args_mtdparts=setenv optargs ${mtdparts}\0"			\
+	"args_all=setenv optargs earlycon=ns16550a,mmio32,0x02800000\0"	\
 	"run_kern=booti ${loadaddr} ${rd_spec} ${fdtaddr}\0"		\
 
 /* U-Boot MMC-specific configuration */
@@ -107,7 +107,7 @@
 #define EXTRA_ENV_TQMA65XX_BOARD_SETTINGS_MMC				\
 	"bootdir=/boot\0"						\
 	"rd_spec=-\0"							\
-	"init_mmc=run args_all args_mmc\0"				\
+	"init_mmc=run args_mmc args_mtdparts\0"				\
 	"get_fdt_mmc=load mmc ${bootpart} ${fdtaddr} ${bootdir}/${name_fdt}\0" \
 	"get_overlay_mmc="						\
 		"fdt address ${fdtaddr};"				\
