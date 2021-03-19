@@ -301,23 +301,6 @@ static int add_mba_interfaces(void)
 	ret = 0;
 	memset(k3_dtbo_list, 0, sizeof(k3_dtbo_list));
 
-	// Check PRG_Etherenet_0
-	ret = get_gpio_in_value(GPIO_PRG_0_ETH);
-	if (ret < 0) {
-		pr_err("%s: get gpio %s value error: %d\n", 
-			__func__, PRG_0_ETHERNET_GPIO_NAME, ret);
-	} else if (ret == 1) {
-		// Add dtbo for prg0 ethernet
-		//k3_dtbo_list[nb_dtbos++] = PRG_0_ETHERNET_DTB_NAME; // not needed for SPL
-		strcat(name_overlays, PRG_0_ETHERNET_DTB_NAME);
-		strcat(name_overlays, " ");
-	} else {
-		// Add dtbo for audio
-		//k3_dtbo_list[nb_dtbos++] = AUDIO_DTB_NAME; // not needed for SPL
-		strcat(name_overlays, AUDIO_DTB_NAME);
-		strcat(name_overlays, " ");
-	} 
-
 	// Check PRG_Etherenet_1
 	ret = get_gpio_in_value(GPIO_PRG_1_ETH);
 	if (ret < 0) {
@@ -330,12 +313,29 @@ static int add_mba_interfaces(void)
 		strcat(name_overlays, " ");
 	}
 
+	// Check PRG_Etherenet_0
+	ret = get_gpio_in_value(GPIO_PRG_0_ETH);
+	if (ret < 0) {
+		pr_err("%s: get gpio %s value error: %d\n",
+			__func__, PRG_0_ETHERNET_GPIO_NAME, ret);
+	} else if (ret == 1) {
+		// Add dtbo for audio
+		//k3_dtbo_list[nb_dtbos++] = AUDIO_DTB_NAME; // not needed for SPL
+		strcat(name_overlays, AUDIO_DTB_NAME);
+		strcat(name_overlays, " ");
+	} else {
+		// Add dtbo for prg0 ethernet
+		//k3_dtbo_list[nb_dtbos++] = PRG_0_ETHERNET_DTB_NAME; // not needed for SPL
+		strcat(name_overlays, PRG_0_ETHERNET_DTB_NAME);
+		strcat(name_overlays, " ");
+	}
+
 	// Add display
 	//k3_dtbo_list[nb_dtbos++] = DISPLAY_DTB_NAME; // not needed for SPL
 	strcat(name_overlays, DISPLAY_DTB_NAME);
 	strcat(name_overlays, " ");
 
-	#ifndef CONFIG_SPL_BUILD
+#ifndef CONFIG_SPL_BUILD
 	/* Apply device tree overlay(s) to the U-Boot environment, if any */
 	if (strlen(name_overlays))
 		return env_set("name_overlays", name_overlays);
