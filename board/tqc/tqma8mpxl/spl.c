@@ -32,6 +32,9 @@ DECLARE_GLOBAL_DATA_PTR;
 #if defined(CONFIG_TQMA8MPXL_RAM_2048MB)
 extern struct dram_timing_info dram_timing_2gb_no_ecc;
 static struct dram_timing_info *dram_timing_info = &dram_timing_2gb_no_ecc;
+#elif defined(CONFIG_TQMA8MPXL_RAM_2048MB_1G5)
+extern struct dram_timing_info dram_timing_2gb_1G5_no_ecc;
+static struct dram_timing_info *dram_timing_info = &dram_timing_2gb_1G5_no_ecc;
 #endif
 
 void spl_dram_init(void)

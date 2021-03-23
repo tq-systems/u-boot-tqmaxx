@@ -78,9 +78,14 @@ config TQMA8MPXL_DEFAULTS
 
 choice
 	prompt "TQMa8MPXL RAM configuration"
-	default TQMA8MPXL_RAM_2048MB
+	default TQMA8MPXL_RAM_2048MB_1G5
 	help
 	  Select RAM configuration for TQMa8MPXL
+
+config TQMA8MPXL_RAM_2048MB_1G5
+	bool "TQMa8x with 2048 MiB RAM, 1.5 GHz, no ECC"
+	help
+	  Select variant with 2048 MiB RAM / 1.5 GHz and no ECC
 
 config TQMA8MPXL_RAM_2048MB
 	bool "TQMa8x with 2048 MiB RAM, no ECC"
