@@ -294,7 +294,7 @@
 
 	pinctrl_usdhc2_100mhz: usdhc2grp100mhz {
 		fsl,pins = <
-			SC_P_USDHC1_CLK_CONN_USDHC1_CLK		0x06000040
+			SC_P_USDHC1_CLK_CONN_USDHC1_CLK		0x06000041
 			SC_P_USDHC1_CMD_CONN_USDHC1_CMD		0x00000021
 			SC_P_USDHC1_DATA0_CONN_USDHC1_DATA0	0x00000021
 			SC_P_USDHC1_DATA1_CONN_USDHC1_DATA1	0x00000021
@@ -306,7 +306,7 @@
 
 	pinctrl_usdhc2_200mhz: usdhc2grp200mhz {
 		fsl,pins = <
-			SC_P_USDHC1_CLK_CONN_USDHC1_CLK		0x06000040
+			SC_P_USDHC1_CLK_CONN_USDHC1_CLK		0x06000041
 			SC_P_USDHC1_CMD_CONN_USDHC1_CMD		0x00000021
 			SC_P_USDHC1_DATA0_CONN_USDHC1_DATA0	0x00000021
 			SC_P_USDHC1_DATA1_CONN_USDHC1_DATA1	0x00000021
@@ -321,14 +321,12 @@
 	sensor1: jc42@1c {
 		compatible = "nxp,se97", "jedec,jc-42.4-temp";
 		reg = <0x1c>;
-		status = "okay";
 	};
 
 	eeprom2: 24c02@54 {
 		compatible = "atmel,24c02";
 		reg = <0x54>;
 		pagesize = <16>;
-		status = "okay";
 	};
 };
 
