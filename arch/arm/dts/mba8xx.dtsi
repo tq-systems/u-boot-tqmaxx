@@ -59,7 +59,6 @@
 		gpio = <&gpio0 30 GPIO_ACTIVE_HIGH>;
 		startup-delay-us = <1000>;
 		enable-active-high;
-		status = "okay";
 	};
 
 	reg_pcie_3v3: regulator-pcie-3v3 {
@@ -72,7 +71,6 @@
 		gpio = <&gpio0 31 GPIO_ACTIVE_HIGH>;
 		startup-delay-us = <1000>;
 		enable-active-high;
-		status = "okay";
 	};
 };
 
@@ -81,14 +79,12 @@
 	se97b_1c: temperature-sensor-eeprom@1c {
 		compatible = "nxp,se97", "jedec,jc-42.4-temp";
 		reg = <0x1c>;
-		status = "okay";
 	};
 
 	at24c02_54: eeprom@54 {
 		compatible = "nxp,se97b", "atmel,24c02";
 		reg = <0x54>;
 		pagesize = <16>;
-		status = "okay";
 	};
 
 	pca9538: expander@70 {
