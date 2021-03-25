@@ -22,10 +22,14 @@
 #include <fsl_esdhc_imx.h>
 #include <mmc.h>
 #include <spl.h>
+#include <usb.h>
+#include <usb/ehci-ci.h>
 
 #include "../common/tqc_bb.h"
 
 DECLARE_GLOBAL_DATA_PTR;
+
+#define USBNC_OFFSET		0x200UL
 
 #if (CONFIG_MXC_UART_BASE == UART1_BASE_ADDR)
 static const u32 uart_index = 0;
@@ -44,6 +48,11 @@ static const u32 uart_index = 1;
 #define USDHC2_VSELECT_GPIO	IMX_GPIO_NR(1, 4)
 #define USDHC2_CD_GPIO		IMX_GPIO_NR(2, 12)
 
+#ifdef CONFIG_USB
+#define OTG_PWR_PAD		IMX_GPIO_NR(1, 12)
+#define OTG_GPIO_PAD_CTL	(PAD_CTL_HYS | PAD_CTL_DSE1)
+#endif
+
 #ifdef CONFIG_IMX8MN
 	static iomux_v3_cfg_t const usdhc2_pads[] = {
 		IMX8MN_PAD_SD2_CLK__USDHC2_CLK | MUX_PAD_CTRL(USDHC_CTL_PAD_CTRL),
@@ -55,6 +64,14 @@ static const u32 uart_index = 1;
 		IMX8MN_PAD_SD2_CD_B__GPIO2_IO12 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
 		IMX8MN_PAD_GPIO1_IO04__USDHC2_VSELECT | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
 	};
+	#ifdef CONFIG_USB
+	static iomux_v3_cfg_t const usb_otg_pads[] = {
+		/* PWR */
+		IMX8MN_PAD_GPIO1_IO12__GPIO1_IO12 | MUX_PAD_CTRL(OTG_GPIO_PAD_CTL),
+		/* ID */
+		IMX8MN_PAD_GPIO1_IO10__USB1_OTG_ID | MUX_PAD_CTRL(OTG_GPIO_PAD_CTL),
+	};
+	#endif
 #elif defined(CONFIG_IMX8MM)
 	static iomux_v3_cfg_t const usdhc2_pads[] = {
 		IMX8MM_PAD_SD2_CLK_USDHC2_CLK | MUX_PAD_CTRL(USDHC_CTL_PAD_CTRL),
@@ -66,6 +83,14 @@ static const u32 uart_index = 1;
 		IMX8MM_PAD_SD2_CD_B_GPIO2_IO12 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
 		IMX8MM_PAD_GPIO1_IO04_USDHC2_VSELECT | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
 	};
+	#ifdef CONFIG_USB
+	static iomux_v3_cfg_t const usb_otg_pads[] = {
+		/* PWR */
+		IMX8MM_PAD_GPIO1_IO12_GPIO1_IO12 | MUX_PAD_CTRL(OTG_GPIO_PAD_CTL),
+		/* ID */
+		IMX8MM_PAD_GPIO1_IO10_USB1_OTG_ID | MUX_PAD_CTRL(OTG_GPIO_PAD_CTL),
+	};
+	#endif
 #else
 #error
 #endif
@@ -162,6 +187,63 @@ void tqc_bb_board_init_f(ulong dummy)
 
 	init_uart_clk(uart_index);
 }
+
+#if defined(CONFIG_USB)
+
+int board_ehci_hcd_init(int port)
+{
+	pr_debug("%s(idx %d)\n", __func__, port);
+
+	if (port == 0) {
+		u32 *usbnc_usb_ctrl2 = (u32 *)(ulong)(USB_BASE_ADDR +
+						      (0x10000ul * (ulong)port) +
+						      USBNC_OFFSET + 4ul);
+		imx_iomux_v3_setup_multiple_pads(usb_otg_pads,
+						 ARRAY_SIZE(usb_otg_pads));
+
+		pr_debug("USB0/OTG: DIG_ID_SEL %p\n", usbnc_usb_ctrl2);
+		/* Set DIG_ID_SEL to muxable PIN for ID detect */
+		setbits_le32(usbnc_usb_ctrl2, BIT(20));
+
+		gpio_request(OTG_PWR_PAD, "otg_pwr");
+		gpio_direction_output(OTG_PWR_PAD, 0);
+	};
+
+	return 0;
+}
+
+int board_ehci_power(int port, int on)
+{
+	pr_debug("%s(idx %d, %s)\n", __func__, port, (on) ? "ON" : "OFF");
+
+	if (port == 0) {
+		gpio_direction_output(OTG_PWR_PAD, (on) ? 1 : 0);
+	};
+
+	return 0;
+}
+
+int board_usb_init(int index, enum usb_init_type init)
+{
+	int ret;
+
+	pr_debug("%s(idx %d)\n", __func__, index);
+	ret = imx8m_usb_power(index, true);
+
+	return ret;
+}
+
+int board_usb_cleanup(int index, enum usb_init_type init)
+{
+	int ret;
+
+	pr_debug("%s(idx %d)\n", __func__, index);
+	ret = imx8m_usb_power(index, false);
+
+	return ret;
+}
+
+#endif
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
 {

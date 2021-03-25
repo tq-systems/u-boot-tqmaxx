@@ -35,6 +35,18 @@
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 	};
+
+	reg_usbotg1_vbus: regulator-usbotg1-vbus {
+		compatible = "regulator-fixed";
+		regulator-name = "USBOTG1_VBUS";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_usbotg1_vbus>;
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&gpio1 12 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		status = "okay";
+	};
 };
 
 &fec1 {
@@ -146,10 +158,28 @@
 		>;
 	};
 
+	pinctrl_reg_usbotg1_vbus: regusbotg1vbusgrp {
+		fsl,pins = <
+			/* PWR */
+			MX8MN_IOMUXC_GPIO1_IO12_GPIO1_IO12	0x84
+		>;
+	};
+
 	pinctrl_uart3: uart3grp {
 		fsl,pins = <
 			MX8MN_IOMUXC_UART3_RXD_UART3_DCE_RX	0x16
 			MX8MN_IOMUXC_UART3_TXD_UART3_DCE_TX	0x16
+		>;
+	};
+
+	pinctrl_usbotg1: usbotg1grp {
+		fsl,pins = <
+			/* ID (PU needed for working detection) */
+			MX8MN_IOMUXC_GPIO1_IO10_USB1_OTG_ID	0x1C4
+			/* OC */
+			MX8MN_IOMUXC_GPIO1_IO13_USB1_OTG_OC	0x84
+			/* SEL_USB_HUB_B */
+			MX8MN_IOMUXC_NAND_WP_B_GPIO3_IO18	0x84
 		>;
 	};
 
@@ -235,5 +265,17 @@
 	cd-gpios = <&gpio2 12 GPIO_ACTIVE_LOW>;
 	disable-wp;
 	vmmc-supply = <&reg_usdhc2_vmmc>;
+	status = "okay";
+};
+
+&usbotg1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usbotg1>;
+	dr_mode = "otg";
+	vbus-supply = <&reg_usbotg1_vbus>;
+	srp-disable;
+	hnp-disable;
+	adp-disable;
+	power-polarity-active-high;
 	status = "okay";
 };

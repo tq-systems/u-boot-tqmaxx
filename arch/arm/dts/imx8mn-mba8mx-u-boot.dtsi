@@ -4,9 +4,28 @@
  */
 
 / {
+	aliases {
+		usbgadget0 = &usbg1;
+		usbgadget1 = &usbg2;
+	};
+
 	config {
 		u-boot,mmc-env-offset = <0x400000>;
 		u-boot,mmc-env-offset-redundant = <0x408000>;
+	};
+
+	usbg1: usbg1 {
+		compatible = "fsl,imx27-usb-gadget";
+		dr_mode = "peripheral";
+		chipidea,usb = <&usbotg1>;
+		status = "disabled";
+	};
+
+	usbg2: usbg2 {
+		compatible = "fsl,imx27-usb-gadget";
+		dr_mode = "peripheral";
+		chipidea,usb = <&usbotg2>;
+		status = "disabled";
 	};
 };
 

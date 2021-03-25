@@ -29,6 +29,18 @@
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 	};
+
+	reg_usbotg1_vbus: regulator-usbotg1-vbus {
+		compatible = "regulator-fixed";
+		regulator-name = "USBOTG1_VBUS";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_usbotg1_vbus>;
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&gpio1 12 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		status = "okay";
+	};
 };
 
 &fec1 {
@@ -138,10 +150,24 @@
 		>;
 	};
 
+	pinctrl_reg_usbotg1_vbus: regusbotg1vbusgrp {
+		fsl,pins = <
+			/* PWR */
+			MX8MM_IOMUXC_GPIO1_IO12_GPIO1_IO12	0x84
+		>;
+	};
+
 	pinctrl_uart3: uart3grp {
 		fsl,pins = <
 			MX8MM_IOMUXC_UART3_RXD_UART3_DCE_RX	0x16
 			MX8MM_IOMUXC_UART3_TXD_UART3_DCE_TX	0x16
+		>;
+	};
+
+	pinctrl_usbotg1: usbotg1grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_GPIO1_IO13_USB1_OTG_OC	0x84
+			MX8MM_IOMUXC_GPIO1_IO10_USB1_OTG_ID	0x84
 		>;
 	};
 
@@ -232,5 +258,24 @@
 	vmmc-supply = <&reg_usdhc2_vmmc>;
 	/* we have VSELECT but no working reset, so disable UHS */
 	no-1-8-v;
+	status = "okay";
+};
+
+&usbotg1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usbotg1>;
+	vbus-supply = <&reg_usbotg1_vbus>;
+	dr_mode = "otg";
+	srp-disable;
+	hnp-disable;
+	adp-disable;
+	power-polarity-active-high;
+	status = "okay";
+};
+
+&usbotg2 {
+	dr_mode = "host";
+	disable-over-current;
+	power-polarity-active-high;
 	status = "okay";
 };

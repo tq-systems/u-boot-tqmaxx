@@ -156,6 +156,10 @@ config TQMA8MXX_BB_MBA8MX
 	select PHYLIB
 	select PHY_GIGE
 	select PHY_TI
+	select USB
+	select DM_USB
+	select MXC_USB_OTG_HACTIVE
+	select USB_EHCI_HCD
 	select SPL_SERIAL_SUPPORT
 	select DM_PCA953X
 	select CMD_FUSE
@@ -166,7 +170,7 @@ config TQMA8MXX_BB_MBA8MX
 	select SYS_REDUNDAND_ENVIRONMENT
 	select ENV_OVERWRITE
 	help
-	  Select the MBa8Mx starterkit. This features a GigE Phy, SD-Card
+	  Select the MBa8Mx starterkit. This features a GigE Phy, USB, SD-Card
 	  etc.
 
 endchoice

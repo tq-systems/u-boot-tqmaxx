@@ -24,6 +24,8 @@
 #include <asm/arch/clock.h>
 #include <spl.h>
 #include <dm.h>
+#include <usb.h>
+#include <usb/ehci-ci.h>
 
 #include "../common/tqc_bb.h"
 #include "../common/tqc_board_gpio.h"
@@ -31,6 +33,8 @@
 DECLARE_GLOBAL_DATA_PTR;
 
 #define TQMA8MX_BB_NAME "MBa8Mx"
+
+#define USBNC_OFFSET		0x200
 
 enum {
 	UART1_MUX,
@@ -300,6 +304,91 @@ int mmc_map_to_kernel_blk(int dev_no)
 {
 	return dev_no;
 }
+
+#if defined(CONFIG_USB)
+
+int board_usb_init(int index, enum usb_init_type init)
+{
+	int ret = 0;
+	struct gpio_desc *gpio;
+
+	ret = imx8m_usb_power(index, true);
+	if (ret)
+		return ret;
+
+#if defined(CONFIG_IMX8MM)
+	if (index == 1) {
+		debug("init: USB1/HUB\n");
+		if (init != USB_INIT_HOST) {
+			debug("USB1/HUB: wrong init type\n");
+			ret = -EINVAL;
+		} else {
+			gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
+			dm_gpio_set_value(gpio, 1);
+			udelay(100);
+			dm_gpio_set_value(gpio, 0);
+			udelay(1000);
+			debug("USB1/HUB: hub reset\n");
+		}
+	}
+#endif
+
+#if defined(CONFIG_IMX8MN)
+	if (index == 0) {
+		if (dm_gpio_get_value(&mba8mx_gid[SEL_USB_HUB_B].desc)) {
+			debug("init: USB0/HUB\n");
+			if (init != USB_INIT_HOST) {
+				debug("USB0/HUB: wrong init type\n");
+				ret = -EINVAL;
+			} else {
+				gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
+				dm_gpio_set_value(gpio, 1);
+				udelay(100);
+				dm_gpio_set_value(gpio, 0);
+				udelay(1000);
+				debug("USB0/HUB: hub reset\n");
+			}
+		} else {
+			debug("init: USB0/OTG\n");
+		}
+	}
+#endif
+	return ret;
+}
+
+int board_ehci_hcd_init(int port)
+{
+	if (port == 0) {
+		u32 *usbnc_usb_ctrl2 = (u32 *)(ulong)(USB_BASE_ADDR +
+				(0x10000 * (ulong)port) + USBNC_OFFSET + 4);
+
+		debug("USB0/OTG: DIG_ID_SEL");
+		/* Set DIG_ID_SEL to muxable PIN for ID detect */
+		setbits_le32(usbnc_usb_ctrl2, BIT(20));
+	}
+
+	return 0;
+}
+
+int board_usb_cleanup(int index, enum usb_init_type init)
+{
+	struct gpio_desc *gpio;
+
+	imx8m_usb_power(index, false);
+
+#if defined(CONFIG_IMX8MM)
+	if (index == 1) {
+#elif defined(CONFIG_IMX8MN)
+	if (index == 0) {
+#endif
+		debug("USB/HUB\n");
+		gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
+		dm_gpio_set_value(gpio, 1);
+	}
+
+	return 0;
+}
+#endif
 
 int tqc_bb_board_late_init(void)
 {
