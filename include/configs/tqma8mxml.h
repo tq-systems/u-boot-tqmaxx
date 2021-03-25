@@ -167,19 +167,19 @@
 	"boot_fdt=try\0" \
 	"initrd_addr=0x43800000\0"		\
 	"initrd_high=0xffffffffffffffff\0" \
-	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
+	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
 	"mmcpath=/\0" \
 	"mmcautodetect=yes\0" \
-	"loadbootscript=mmc dev ${mmcdev}; " \
+	"loadbootscript=mmc dev ${mmcdev}; mmc rescan;" \
 		"load mmc ${mmcdev}:${mmcpart} ${loadaddr} " \
 		"${mmcpath}${script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
 		"source\0" \
-	"loadimage=mmc dev ${mmcdev}; " \
+	"loadimage=mmc dev ${mmcdev}; mmc rescan;" \
 		"load mmc ${mmcdev}:${mmcpart} ${loadaddr} " \
 			"${mmcpath}${image}\0" \
-	"loadfdt=mmc dev ${mmcdev}; " \
+	"loadfdt=mmc dev ${mmcdev}; mmc rescan;" \
 		"load mmc ${mmcdev}:${mmcpart} ${fdt_addr} " \
 			"${mmcpath}${fdt_file}\0" \
 	"mmcboot=echo Booting from mmc ...; " \
@@ -213,7 +213,7 @@
 		"if ${get_cmd} ${image}; then "                                \
 			"if itest ${filesize} > 0; then "                      \
 				"echo Write kernel image to mmc ${mmcdev}:${mmcpart}...; " \
-				"mmc dev ${mmcdev}; " \
+				"mmc dev ${mmcdev}; mmc rescan;" \
 				"save mmc ${mmcdev}:${mmcpart} ${loadaddr} "   \
 					"${mmcpath}${image} ${filesize}; "     \
 			"fi; "                                                 \
@@ -223,7 +223,7 @@
 		"if ${get_cmd} ${fdt_file}; then "                             \
 			"if itest ${filesize} > 0; then "                      \
 				"echo Write fdt image to mmc ${mmcdev}:${mmcpart}...; " \
-				"mmc dev ${mmcdev}; " \
+				"mmc dev ${mmcdev}; mmc rescan;" \
 				"save mmc ${mmcdev}:${mmcpart} ${loadaddr} "   \
 					"${mmcpath}${fdt_file} ${filesize}; "  \
 			"fi; "                                                 \
@@ -247,8 +247,9 @@
 			"echo Write u-boot image to flexspi ...; "             \
 			"if itest ${filesize} <= ${uboot_fspi_size}; then "    \
 				"if sf probe; then "                           \
-					"sf update ${loadaddr}                 \
-						${uboot_fspi_start} ${filesize}; " \
+					"sf update ${loadaddr} "               \
+						"${uboot_fspi_start} "         \
+						"${filesize}; "                \
 				"fi; "                                         \
 			"fi; "                                                 \
 		"fi; fi; "                                                     \
@@ -269,8 +270,8 @@
 	"addnfs=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/nfs rw "                                            \
 		"nfsroot=${serverip}:${rootpath},v3,tcp;\0"                    \
-	"rootpath=/srv/nfs\0"                                                  \
 	"netdev=eth0\0"                                                        \
+	"rootpath=/srv/nfs\0"                                                  \
 	"ipmode=static\0"                                                      \
 	"addip_static=setenv bootargs ${bootargs} "                            \
 		"ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:"            \
