@@ -138,6 +138,11 @@ struct mxc_uart {
 	u32 ts;
 };
 
+u32 __weak imx_get_uartclk_n(void *uart_base)
+{
+	return imx_get_uartclk();
+}
+
 static void _mxc_serial_init(struct mxc_uart *base, int use_dte)
 {
 	writel(0, &base->cr1);
@@ -188,7 +193,7 @@ static void _mxc_serial_setbrg(struct mxc_uart *base, unsigned long clk,
 
 static void mxc_serial_setbrg(void)
 {
-	u32 clk = imx_get_uartclk();
+	u32 clk = imx_get_uartclk_n(mxc_base);
 
 	if (!gd->baudrate)
 		gd->baudrate = CONFIG_BAUDRATE;
@@ -280,7 +285,7 @@ __weak struct serial_device *default_serial_console(void)
 int mxc_serial_setbrg(struct udevice *dev, int baudrate)
 {
 	struct mxc_serial_platdata *plat = dev->platdata;
-	u32 clk = imx_get_uartclk();
+	u32 clk = imx_get_uartclk_n(plat->reg);
 
 	_mxc_serial_setbrg(plat->reg, clk, baudrate, plat->use_dte);
 
