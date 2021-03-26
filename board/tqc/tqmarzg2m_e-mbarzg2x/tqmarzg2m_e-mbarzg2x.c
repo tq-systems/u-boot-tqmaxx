@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * board/tqc/tqmarzg2h_c-mbarzg2x/tqmarzg2h_c-mbarzg2x.c
- *     This file provides TQMaRZG2H board support.
+ * board/tqc/tqmarzg2m_e-mbarzg2x/tqmarzg2m_e-mbarzg2x.c
+ *     This file provides TQMaRZG2M board support.
  *
  * Copyright (C) 2015-2019 Renesas Electronics Corporation
  * Copyright (C) 2015 Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
- * Copyright (C) 2020 TQ-Systems GmbH
+ * Copyright (C) 2021 TQ-Systems GmbH
  */
 
 #include <common.h>
@@ -83,6 +83,8 @@ int board_early_init_f(void)
 #define	GPIO_USB_HUB_RST	142	/* GP6_22	*/
 #define	GPIO_PCIE1_SATA_SEL	25	/* GP1_09	*/
 #define	GPIO_M2_PEDET		143	/* GP6_23	*/
+#define	GPIO_PCIE0_RST		1	/* GP0_01	*/
+#define	GPIO_PCIE0_DISABLE	2	/* GP0_02	*/
 #define	GPIO_PCIE1_RST		146	/* GP6_26	*/
 
 
@@ -290,8 +292,10 @@ int board_init(void)
 	gpio_request(GPIO_M2_PEDET, "m2_pedet");
 	gpio_direction_input(GPIO_M2_PEDET);
 
-	/* MBaRZG2x: force PCIe1 reset */
+	/* MBaRZG2x: force PCIex reset */
+	gpio_request(GPIO_PCIE0_RST, "pcie0_rst");
 	gpio_request(GPIO_PCIE1_RST, "pcie1_rst");
+	gpio_direction_output(GPIO_PCIE0_RST, 0);
 	gpio_direction_output(GPIO_PCIE1_RST, 0);
 
 	clockgen_init();
@@ -314,9 +318,13 @@ int board_init(void)
 	gpio_request(GPIO_USB_HUB_RST, "usb_hub_rst");
 	gpio_direction_output(GPIO_USB_HUB_RST, 1);
 
-	/* MBaRZG2x: release PCIe1 reset */
-	gpio_request(GPIO_PCIE1_RST, "pcie1_rst");
+	/* MBaRZG2x: release PCIex reset */
+	gpio_set_value(GPIO_PCIE0_RST, 1);
 	gpio_set_value(GPIO_PCIE1_RST, 1);
+
+	/* MBaRZG2x: deactivate PCIe0 disable */
+	gpio_request(GPIO_PCIE0_DISABLE, "pcie0_disable");
+	gpio_direction_output(GPIO_PCIE0_DISABLE, 1);
 
 	return 0;
 }
