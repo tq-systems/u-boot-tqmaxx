@@ -801,6 +801,22 @@ u32 get_arm_core_clk(void)
 	return root_src_clk;
 }
 
+u32 imx_get_uartclk_n(uintptr_t uart_base)
+{
+	switch (uart_base) {
+	case UART1_BASE_ADDR:
+		return get_root_clk(UART1_CLK_ROOT);
+	case UART2_BASE_ADDR:
+		return get_root_clk(UART2_CLK_ROOT);
+	case UART3_BASE_ADDR:
+		return get_root_clk(UART3_CLK_ROOT);
+	case UART4_BASE_ADDR:
+		return get_root_clk(UART4_CLK_ROOT);
+	}
+
+	return 0;
+}
+
 u32 mxc_get_clock(enum mxc_clock clk)
 {
 	u32 val;
@@ -823,7 +839,11 @@ u32 mxc_get_clock(enum mxc_clock clk)
 	case MXC_I2C_CLK:
 		return get_root_clk(I2C1_CLK_ROOT);
 	case MXC_UART_CLK:
+#if defined(CFG_MXC_UART_BASE)
+		return imx_get_uartclk_n(CFG_MXC_UART_BASE);
+#else
 		return get_root_clk(UART1_CLK_ROOT);
+#endif
 	case MXC_QSPI_CLK:
 		return get_root_clk(QSPI_CLK_ROOT);
 	default:

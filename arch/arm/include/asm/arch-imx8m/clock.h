@@ -254,6 +254,7 @@ void dram_enable_bypass(ulong clk_val);
 void dram_disable_bypass(void);
 u32 imx_get_fecclk(void);
 u32 imx_get_uartclk(void);
+u32 imx_get_uartclk_n(uintptr_t uart_base);
 int clock_init(void);
 void init_clk_usdhc(u32 index);
 void init_nand_clk(void);
