@@ -256,6 +256,7 @@ u32 imx_get_fecclk(void);
 u32 imx_get_eqos_csr_clk(void);
 int imx_eqos_txclk_set_rate(unsigned long rate);
 u32 imx_get_uartclk(void);
+u32 imx_get_uartclk_n(uintptr_t uart_base);
 int clock_init(void);
 void init_clk_usdhc(u32 index);
 void init_nand_clk(void);
