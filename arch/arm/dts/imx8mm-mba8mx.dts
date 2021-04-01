@@ -23,13 +23,6 @@
 		stdout-path = &uart3;
 	};
 
-	reg_usdhc2_vmmc: regulator-vmmc {
-		compatible = "regulator-fixed";
-		regulator-name = "VSD_3V3";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-	};
-
 	reg_usbotg1_vbus: regulator-usbotg1-vbus {
 		compatible = "regulator-fixed";
 		regulator-name = "USBOTG1_VBUS";
@@ -39,7 +32,6 @@
 		regulator-max-microvolt = <5000000>;
 		gpio = <&gpio1 12 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
-		status = "okay";
 	};
 };
 
@@ -255,9 +247,8 @@
 	cd-gpios = <&gpio2 12 GPIO_ACTIVE_LOW>;
 	disable-wp;
 	no-mmc;
+	no-sdio;
 	vmmc-supply = <&reg_usdhc2_vmmc>;
-	/* we have VSELECT but no working reset, so disable UHS */
-	no-1-8-v;
 	status = "okay";
 };
 

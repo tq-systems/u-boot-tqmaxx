@@ -29,13 +29,6 @@
 		u-boot,mmc-env-offset-redundant = <0x404000>;
 	};
 
-	reg_usdhc2_vmmc: regulator-vmmc {
-		compatible = "regulator-fixed";
-		regulator-name = "VSD_3V3";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-	};
-
 	reg_usbotg1_vbus: regulator-usbotg1-vbus {
 		compatible = "regulator-fixed";
 		regulator-name = "USBOTG1_VBUS";
@@ -264,6 +257,8 @@
 	bus-width = <4>;
 	cd-gpios = <&gpio2 12 GPIO_ACTIVE_LOW>;
 	disable-wp;
+	no-mmc;
+	no-sdio;
 	vmmc-supply = <&reg_usdhc2_vmmc>;
 	status = "okay";
 };
