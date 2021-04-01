@@ -14,8 +14,9 @@ TQMa8MxNL / 1 GiB LPDDR4 / i.MX8MN
 
 configs:
 
-tqma8mxnl_1gb_mba8mx_mmc_defconfig
-tqma8mxnl_1gb_mba8mx_fspi_defconfig
+tqma8mxnl_1gb_mba8mx_defconfig
+
+Note: bootstream for FlexSPI and SD/e-MMC can use the same U-Boot configuration.
 
 Quick Start
 ===========

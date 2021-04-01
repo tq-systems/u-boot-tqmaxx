@@ -66,12 +66,27 @@ config TQMA8MXX_DEFAULTS
 	select SYS_I2C_MXC_I2C2
 	select SYS_I2C_MXC_I2C3
 	select MISC
+	select FSL_FSPI
+	select DM_SPI
+	select SPI
+	select DM_SPI_FLASH
+	select MTD
+	select SPI_FLASH_MTD
+	select SPI_FLASH
+	select SPI_FLASH_4BYTES_ADDR
+	select SPI_FLASH_MACRONIX
+	select SPI_FLASH_SPANSION
+	select SPI_FLASH_STMICRO
+	select SPI_FLASH_SST
+	select SPI_FLASH_WINBOND
+	select SPI_FLASH_EON
+	select SPI_FLASH_GIGADEVICE
+	select SPI_FLASH_ISSI
 	select SPL
 	select SPL_LOAD_FIT
 	select SPL_BOARD_INIT
 	select SPL_ENV_SUPPORT
 	select SPL_GPIO_SUPPORT
-	select SPL_MMC_SUPPORT
 	select SPL_DRIVERS_MISC_SUPPORT
 	select SPL_POWER_SUPPORT
 	select SPL_I2C_SUPPORT
@@ -95,6 +110,7 @@ config SYS_MALLOC_F_LEN
 #
 config IMX_CONFIG
 	default "arch/arm/mach-imx/imx8m/imximage-8mm-lpddr4.cfg" if IMX8MM && TQMA8MXX_BOOT_SDCARD
+	default "arch/arm/mach-imx/imx8m/imximage-8mm-lpddr4-fspi.cfg" if IMX8MM && TQMA8MXX_BOOT_FSPI
 	default "arch/arm/mach-imx/imx8m/imximage-8mn-lpddr4.cfg" if IMX8MN
 
 choice
@@ -170,10 +186,45 @@ config TQMA8MXX_BOOT_SDCARD
 	default "y" if IMX8MN
 	select SD_BOOT
 	select ENV_IS_IN_MMC
+	select SPL_MMC_SUPPORT
 	help
 	  Select booting from SD / e-MMC
 
+#
+# For booting from FlexSPI it is not needed to setup the FlexSPI controller
+# again. SPL_SPI_<xyz> configs do not need to be selected. Image is loaded using
+# SPL_NOR_SUPPORT. For this to work CONFIG_SYS_UBOOT_BASE must point to
+# AHB Address Base + Offset of the fit image (ATF, U-Boot, etc.) in SPI NOR
+# SPL_NOR_SUPPORT uses reading from FlexSPI AHB adress space the LUT config for
+# AHB setup from boot ROM
+#
+config TQMA8MXX_BOOT_FSPI
+	bool "TQMa8MxML/TQMa8MxNL boot from FlexSPI"
+	default "y" if IMX8MN
+	select QSPI_BOOT
+	select ENV_IS_IN_SPI_FLASH
+	select SPL_NOR_SUPPORT
+	help
+	  Select booting from FlexSPI
+
 endmenu
+
+
+# default values for FLEXSPI NOR. Will be used also for environment from FLEXSPI
+# if ENV_SPI_[BUS,CS,MODE,SPEED] are not used to overwrite.
+#
+
+config SF_DEFAULT_BUS
+	default 0
+
+config SF_DEFAULT_CS
+	default 0
+
+config SF_DEFAULT_SPEED
+	default 40000000
+
+config SF_DEFAULT_MODE
+	default 0
 
 #
 # environment settings: 32k, offset 4M (SPI NOR sector 64k), redundant env

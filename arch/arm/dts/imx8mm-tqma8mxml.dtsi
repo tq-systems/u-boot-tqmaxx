@@ -28,6 +28,27 @@
 	};
 };
 
+&flexspi {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexspi>;
+	spi-max-frequency = <29000000>;
+	num-cs = <1>;
+	status = "okay";
+
+	flash0: flash@0 {
+		reg = <0>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "jedec,spi-nor";
+		spi-tx-bus-width = <4>;
+		spi-rx-bus-width = <4>;
+		spi-max-frequency = <29000000>;
+		spi-nor,ddr-quad-read-dummy = <8>;
+		/* used for macronix flash only */
+		macronix,dsr = <0x3>;
+	};
+};
+
 &iomuxc {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_wdog>;
@@ -72,6 +93,18 @@
 		fsl,pins = <
 			MX8MM_IOMUXC_I2C1_SCL_GPIO5_IO14	0x40000004
 			MX8MM_IOMUXC_I2C1_SDA_GPIO5_IO15	0x40000004
+		>;
+	};
+
+	pinctrl_flexspi: flexspigrp {
+		fsl,pins = <
+			/* TODO: kernel sets 0x84 for sclk */
+			MX8MM_IOMUXC_NAND_ALE_QSPI_A_SCLK		0x184
+			MX8MM_IOMUXC_NAND_CE0_B_QSPI_A_SS0_B		0x84
+			MX8MM_IOMUXC_NAND_DATA00_QSPI_A_DATA0		0x84
+			MX8MM_IOMUXC_NAND_DATA01_QSPI_A_DATA1		0x84
+			MX8MM_IOMUXC_NAND_DATA02_QSPI_A_DATA2		0x84
+			MX8MM_IOMUXC_NAND_DATA03_QSPI_A_DATA3		0x84
 		>;
 	};
 

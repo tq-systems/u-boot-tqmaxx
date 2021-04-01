@@ -125,3 +125,14 @@
 &fec1 {
 	phy-reset-gpios = <&gpio4 22 GPIO_ACTIVE_LOW>;
 };
+
+&flexspi {
+	assigned-clock-rates = <100000000>;
+	assigned-clocks = <&clk IMX8MN_CLK_QSPI>;
+	assigned-clock-parents = <&clk IMX8MN_SYS_PLL1_100M>;
+};
+
+&flash0 {
+	spi-tx-bus-width = <1>;
+	spi-rx-bus-width = <1>;
+};

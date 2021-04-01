@@ -29,7 +29,7 @@
 #define CONFIG_SYS_MMCSD_FS_BOOT_PARTITION	1
 /*
  * we use spl_nor to read FIT image created with imx-mkimage from QSPI
- * using memory mapped read
+ * using memory mapped read. Needs SPL_NOR_SUPPORT to be set!
  */
 #define CONFIG_SYS_UBOOT_BASE		(QSPI0_AMBA_BASE + 0x60000)
 
@@ -356,6 +356,20 @@
 					sizeof(CONFIG_SYS_PROMPT) + 16)
 #if defined(CONFIG_FSL_USDHC)
 #define CONFIG_SYS_FSL_ESDHC_ADDR	0
+#endif
+
+#ifdef CONFIG_FSL_FSPI
+#define FSL_FSPI_FLASH_SIZE		SZ_64M
+#define FSL_FSPI_FLASH_NUM		1
+#define FSPI0_BASE_ADDR			0x30bb0000
+#define FSPI0_AMBA_BASE			0x0
+
+#define CONFIG_SYS_FSL_FSPI_AHB
+
+/*
+ * TODO: not working at the moment
+ * #define CONFIG_FSPI_QUAD_SUPPORT
+ */
 #endif
 
 #if defined(CONFIG_FEC_MXC)
