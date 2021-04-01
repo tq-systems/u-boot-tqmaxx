@@ -200,8 +200,6 @@
 	non-removable;
 	no-sd;
 	no-sdio;
-	/* TODO: move to -u-boot.dtsi */
-	mmc-hs400-1_8v;
 	vmmc-supply = <&reg_vcc3v3>;
 	vqmmc-supply = <&reg_vcc1v8>;
 	status = "okay";

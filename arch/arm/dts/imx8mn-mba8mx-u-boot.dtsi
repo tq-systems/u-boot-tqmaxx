@@ -120,6 +120,8 @@
 
 &usdhc2 {
 	u-boot,dm-spl;
+	sd-uhs-sdr104;
+	sd-uhs-ddr50;
 	assigned-clocks = <&clk IMX8MN_CLK_USDHC2>;
 	assigned-clock-rates = <400000000>;
 	assigned-clock-parents = <&clk IMX8MN_SYS_PLL1_400M>;
@@ -127,6 +129,14 @@
 
 &usdhc3 {
 	u-boot,dm-spl;
+	mmc-hs400-1_8v;
+	mmc-hs400-enhanced-strobe;
+	/*
+	 * prevents voltage switch warn: driver will switch even at
+	 * fixed voltage
+	 */
+	/delete-property/ vmmc-supply;
+	/delete-property/ vqmmc-supply;
 	assigned-clocks = <&clk IMX8MN_CLK_USDHC3>;
 	assigned-clock-rates = <400000000>;
 	assigned-clock-parents = <&clk IMX8MN_SYS_PLL1_400M>;
