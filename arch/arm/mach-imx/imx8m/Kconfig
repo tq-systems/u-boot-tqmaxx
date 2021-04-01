@@ -154,6 +154,18 @@ config TARGET_VERDIN_IMX8MM
        select SUPPORT_SPL
        select IMX8M_LPDDR4
 
+config TARGET_TQMA8MXML
+	bool "TQ Systems GmbH TQMa8MxML SOM family"
+	select IMX8MM
+	select IMX8M_LPDDR4
+	select SUPPORT_SPL
+
+config TARGET_TQMA8MXNL
+	bool "TQ Systems GmbH TQMa8MxNL SOM family"
+	select IMX8MN
+	select IMX8M_LPDDR4
+	select SUPPORT_SPL
+
 endchoice
 
 source "board/freescale/imx8mq_evk/Kconfig"
@@ -164,5 +176,6 @@ source "board/freescale/imx8mm_val/Kconfig"
 source "board/freescale/imx8mn_evk/Kconfig"
 source "board/freescale/imx8mp_evk/Kconfig"
 source "board/toradex/verdin-imx8mm/Kconfig"
+source "board/tqc/tqma8mxml/Kconfig"
 
 endif

@@ -1,0 +1,175 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Copyright 2020 - 2021 TQ-Systems GmbH
+ */
+
+#include "imx8mm.dtsi"
+
+/ {
+	model = "TQ-Systems i.MX8MM TQMa8MxML";
+	compatible = "tq,imx8mm-tqma8mxml", "fsl,imx8mm";
+
+	/* identical to buck4_reg, but should never change */
+	reg_vcc3v3: regulator-vcc3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "TQMA8MXML_VCC3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+	};
+
+	/* e-MMC IO, needed for HS modes */
+	reg_vcc1v8: regulator-vcc1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "TQMA8MXML_VCC1V8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-always-on;
+	};
+};
+
+&iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_wdog>;
+
+	/*
+	 * Pad Control Register
+	 *
+	 * | 8  | 7    | 6   | 5   | 4:3  | 2:0 |
+	 * | 0  | 0    | 0   | 0   | 0x   | 00x |
+	 * | PE | HYS  | PUE | ODE | FSEL | DSE |
+	 *
+	 * PE: Pull Resistors Enable
+	 * HYS: Hysteresis Enable
+	 * PUE:
+	 * 0 — Select pull-down resistors
+	 * 1 — Select pull-up resistors
+	 * ODE: Open Drain Enable
+	 * FSEL:
+	 * 0x - Select slow slew rate (SR=1)
+	 * 1x — Select fast slew rate (SR=0)
+	 * DSE:
+	 * 00x — Drive strength X1
+	 * 10x — Drive strength X2
+	 * 01x — Drive strength X4
+	 * 11x — Drive strength X6
+	 *
+	 * GPIO: 0x84 [HYS|slow|X2] (no pull up)
+	 * I2C: 0x40000004 [SION|slow|x2] (no pull up)
+	 * USDHC: 0x1D4 [HYS|fast|x2] (pull up)
+	 * USDHC100: 0x1D2 [HYS|fast|x4] (pull up)
+	 * USDHC200: 0x1D6 [HYS|fast|x6] (pull up)
+	 */
+
+	pinctrl_i2c1: i2c1grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_I2C1_SCL_I2C1_SCL		0x40000004
+			MX8MM_IOMUXC_I2C1_SDA_I2C1_SDA		0x40000004
+		>;
+	};
+
+	pinctrl_i2c1_gpio: i2c1gpiogrp {
+		fsl,pins = <
+			MX8MM_IOMUXC_I2C1_SCL_GPIO5_IO14	0x40000004
+			MX8MM_IOMUXC_I2C1_SDA_GPIO5_IO15	0x40000004
+		>;
+	};
+
+	pinctrl_emmc: usdhc3grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_NAND_WE_B_USDHC3_CLK		0x1d4
+			MX8MM_IOMUXC_NAND_WP_B_USDHC3_CMD		0x1d4
+			MX8MM_IOMUXC_NAND_DATA04_USDHC3_DATA0		0x1d4
+			MX8MM_IOMUXC_NAND_DATA05_USDHC3_DATA1		0x1d4
+			MX8MM_IOMUXC_NAND_DATA06_USDHC3_DATA2		0x1d4
+			MX8MM_IOMUXC_NAND_DATA07_USDHC3_DATA3		0x1d4
+			MX8MM_IOMUXC_NAND_RE_B_USDHC3_DATA4		0x1d4
+			MX8MM_IOMUXC_NAND_CE2_B_USDHC3_DATA5		0x1d4
+			MX8MM_IOMUXC_NAND_CE3_B_USDHC3_DATA6		0x1d4
+			MX8MM_IOMUXC_NAND_CLE_USDHC3_DATA7		0x1d4
+			MX8MM_IOMUXC_NAND_CE1_B_USDHC3_STROBE		0x84
+			/* option USDHC3_RESET_B not defined, only in RM */
+			MX8MM_IOMUXC_NAND_READY_B_GPIO3_IO16		0x84
+		>;
+	};
+
+	pinctrl_emmc_100mhz: usdhc3grp100mhz {
+		fsl,pins = <
+			MX8MM_IOMUXC_NAND_WE_B_USDHC3_CLK		0x1d2
+			MX8MM_IOMUXC_NAND_WP_B_USDHC3_CMD		0x1d2
+			MX8MM_IOMUXC_NAND_DATA04_USDHC3_DATA0		0x1d2
+			MX8MM_IOMUXC_NAND_DATA05_USDHC3_DATA1		0x1d2
+			MX8MM_IOMUXC_NAND_DATA06_USDHC3_DATA2		0x1d2
+			MX8MM_IOMUXC_NAND_DATA07_USDHC3_DATA3		0x1d2
+			MX8MM_IOMUXC_NAND_RE_B_USDHC3_DATA4		0x1d2
+			MX8MM_IOMUXC_NAND_CE2_B_USDHC3_DATA5		0x1d2
+			MX8MM_IOMUXC_NAND_CE3_B_USDHC3_DATA6		0x1d2
+			MX8MM_IOMUXC_NAND_CLE_USDHC3_DATA7		0x1d2
+			MX8MM_IOMUXC_NAND_CE1_B_USDHC3_STROBE		0x84
+			/* option USDHC3_RESET_B not defined, only in RM */
+			MX8MM_IOMUXC_NAND_READY_B_GPIO3_IO16		0x84
+		>;
+	};
+
+	pinctrl_emmc_200mhz: usdhc3grp200mhz {
+		fsl,pins = <
+			MX8MM_IOMUXC_NAND_WE_B_USDHC3_CLK		0x1d6
+			MX8MM_IOMUXC_NAND_WP_B_USDHC3_CMD		0x1d6
+			MX8MM_IOMUXC_NAND_DATA04_USDHC3_DATA0		0x1d6
+			MX8MM_IOMUXC_NAND_DATA05_USDHC3_DATA1		0x1d6
+			MX8MM_IOMUXC_NAND_DATA06_USDHC3_DATA2		0x1d6
+			MX8MM_IOMUXC_NAND_DATA07_USDHC3_DATA3		0x1d6
+			MX8MM_IOMUXC_NAND_RE_B_USDHC3_DATA4		0x1d6
+			MX8MM_IOMUXC_NAND_CE2_B_USDHC3_DATA5		0x1d6
+			MX8MM_IOMUXC_NAND_CE3_B_USDHC3_DATA6		0x1d6
+			MX8MM_IOMUXC_NAND_CLE_USDHC3_DATA7		0x1d6
+			MX8MM_IOMUXC_NAND_CE1_B_USDHC3_STROBE		0x84
+			/* option USDHC3_RESET_B not defined, only in RM */
+			MX8MM_IOMUXC_NAND_READY_B_GPIO3_IO16		0x84
+		>;
+	};
+
+	pinctrl_wdog: wdoggrp {
+		fsl,pins = <
+			MX8MM_IOMUXC_GPIO1_IO02_WDOG1_WDOG_B		0x84
+		>;
+	};
+};
+
+&i2c1 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default", "gpio";
+	pinctrl-0 = <&pinctrl_i2c1>;
+	pinctrl-1 = <&pinctrl_i2c1_gpio>;
+	scl-gpios = <&gpio5 14 GPIO_ACTIVE_HIGH>;
+	sda-gpios = <&gpio5 15 GPIO_ACTIVE_HIGH>;
+	status = "okay";
+
+	eeprom1: eeprom@53 {
+		compatible = "nxp,se97b", "atmel,24c02";
+		reg = <0x53>;
+		pagesize = <16>;
+	};
+
+	eeprom0: eeprom@57 {
+		compatible = "atmel,24c64";
+		reg = <0x57>;
+		pagesize = <32>;
+	};
+};
+
+&usdhc3 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_emmc>;
+	pinctrl-1 = <&pinctrl_emmc_100mhz>;
+	pinctrl-2 = <&pinctrl_emmc_200mhz>;
+	bus-width = <8>;
+	non-removable;
+	no-sd;
+	no-sdio;
+	/* TODO: move to -u-boot.dtsi */
+	mmc-hs400-1_8v;
+	vmmc-supply = <&reg_vcc3v3>;
+	vqmmc-supply = <&reg_vcc1v8>;
+	status = "okay";
+};

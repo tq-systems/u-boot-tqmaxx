@@ -1,0 +1,198 @@
+if TARGET_TQMA8MXML || TARGET_TQMA8MXNL
+
+config SYS_BOARD
+	default "tqma8mxml"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_CONFIG_NAME
+	default "tqma8mxml"
+
+# Attention: i.MX8MM has different settings for SPL_TEXT_BASE depending on boot
+# device
+
+config SPL_TEXT_BASE
+	default "0x912000" if IMX8MN
+	default "0x7E1000" if IMX8MM && TQMA8MXX_BOOT_SDCARD
+	default "0x7E2000" if IMX8MM && TQMA8MXX_BOOT_FSPI
+
+#
+# even if this is the Kconfig default in the memory controller Kconfig for
+# i.MX8M, we set this here for completeness. This value is hard coded in the
+# TF-A port (imx-atf) for i.MXMM / i.MXNN
+#
+config SAVED_DRAM_TIMING_BASE
+	default 0x180000 if IMX8MM
+	default 0x180000 if IMX8MN
+
+config FIT_EXTERNAL_OFFSET
+	default 0x3000
+
+config SPL_FIT_GENERATOR
+	default "arch/arm/mach-imx/mkimage_fit_atf.sh"
+
+config TQMA8MXX_DEFAULTS
+	bool
+	default y
+	select ARCH_MISC_INIT
+	select CLK_COMPOSITE_CCF
+	select CLK_IMX8MM if IMX8MM
+	select CLK_IMX8MN if IMX8MN
+	select TQC_SDMMC
+	select TQC_EEPROM
+	select TQC_RTC
+	select BOARD_LATE_INIT
+	select BOARD_EARLY_INIT_F
+	select FIT
+	select OF_CONTROL
+	select OF_BOARD_SETUP
+	select OF_SYSTEM_SETUP
+	select PINCTRL
+	select PINCTRL_IMX8M
+	select DM
+	select DM_MMC
+	select FSL_USDHC
+	select MMC_IO_VOLTAGE
+	select MMC_UHS_SUPPORT
+	select MMC_HS400_ES_SUPPORT
+	select MMC_HS400_SUPPORT
+	select DM_THERMAL
+	select DM_GPIO
+	select MXC_GPIO
+	select DM_I2C
+	select SYS_I2C_MXC
+	select SYS_I2C_MXC_I2C1
+	select SYS_I2C_MXC_I2C2
+	select SYS_I2C_MXC_I2C3
+	select MISC
+	select SPL
+	select SPL_LOAD_FIT
+	select SPL_BOARD_INIT
+	select SPL_ENV_SUPPORT
+	select SPL_GPIO_SUPPORT
+	select SPL_MMC_SUPPORT
+	select SPL_DRIVERS_MISC_SUPPORT
+	select SPL_POWER_SUPPORT
+	select SPL_I2C_SUPPORT
+	select SPL_LIBGENERIC_SUPPORT
+	select SPL_LIBCOMMON_SUPPORT
+
+config SPL_IMX_ROMAPI_LOADADDR
+	default 0x48000000 if TARGET_TQMA8MXNL
+
+config NR_DRAM_BANKS
+	default 1
+
+config SYS_TEXT_BASE
+	default 0x40200000
+
+config SYS_MALLOC_F_LEN
+	default 0x2000
+
+#
+# TODO: delete?
+#
+config IMX_CONFIG
+	default "arch/arm/mach-imx/imx8m/imximage-8mm-lpddr4.cfg" if IMX8MM && TQMA8MXX_BOOT_SDCARD
+	default "arch/arm/mach-imx/imx8m/imximage-8mn-lpddr4.cfg" if IMX8MN
+
+choice
+	prompt "TQMa8MMX RAM size"
+	default TQMA8MMX_RAM_1024MB if IMX8MN
+	default TQMA8MMX_RAM_2048MB if IMX8MM
+	help
+	  Select RAM size for TQMa8MMx
+
+config TQMA8MMX_RAM_1024MB
+	bool "TQMa8MMx with 1024 MiB RAM"
+	help
+	  Select variant with 1024 MiB RAM
+
+config TQMA8MMX_RAM_2048MB
+	bool "TQMa8MMx with 2048 MiB RAM"
+	help
+	  Select variant with 2048 MiB RAM
+
+endchoice
+
+choice
+	prompt "TQMa8MXX base board variant"
+	default TQMA8MXX_BB_MBA8MX
+	help
+	  Select base board for TQMa8MxML/TQMa8MxNL
+
+####
+# TODO: DM_SERIAL is not usable, since UART clock not under DM managed clocks
+# but common/board_f initializes early DM stuff before board code can enable
+# UART clk.
+####
+
+config TQMA8MXX_BB_MBA8MX
+	bool "TQMa8MxML/TQMa8MxNL on MBa8Mx Starterkit"
+	select TQC_ENVLOC if !IMX8MN
+	select ENV_IS_NOWHERE
+	select MXC_UART
+	select MII
+	select DM_ETH
+	select DM_ETH_PHY
+	select FEC_MXC
+	select PHYLIB
+	select PHY_GIGE
+	select PHY_TI
+	select SPL_SERIAL_SUPPORT
+	select DM_PCA953X
+	select CMD_FUSE
+	select CMD_MII
+	select CMD_PING
+	select CMD_DHCP
+	select CMD_NET
+	select SYS_REDUNDAND_ENVIRONMENT
+	select ENV_OVERWRITE
+	help
+	  Select the MBa8Mx starterkit. This features a GigE Phy, SD-Card
+	  etc.
+
+endchoice
+
+config DEFAULT_DEVICE_TREE
+	default "imx8mn-mba8mx" if TQMA8MXX_BB_MBA8MX && IMX8MN
+	default "imx8mm-mba8mx" if TQMA8MXX_BB_MBA8MX && IMX8MM
+
+config DEFAULT_FDT_FILE
+	default "imx8mn-mba8mx.dtb" if TQMA8MXX_BB_MBA8MX && IMX8MN
+	default "imx8mm-mba8mx.dtb" if TQMA8MXX_BB_MBA8MX && IMX8MM
+
+menu "TQMa8MXX boot device"
+
+config TQMA8MXX_BOOT_SDCARD
+	bool "TQMa8MxML/TQMa8MxNL boot from SD / e-MMC"
+	default "y" if IMX8MN
+	select SD_BOOT
+	select ENV_IS_IN_MMC
+	help
+	  Select booting from SD / e-MMC
+
+endmenu
+
+#
+# environment settings: 32k, offset 4M (SPI NOR sector 64k), redundant env
+# in SPI NOR @ 4M + 64k
+#
+# These should go here, when updating U-Boot to newer Version
+#
+config ENV_SIZE
+	default 0x00008000
+
+config ENV_SECT_SIZE
+	default 0x00010000
+
+config ENV_OFFSET
+	default 0x00400000
+
+config ENV_OFFSET_REDUND
+	default 0x00410000
+
+source "board/tqc/common/Kconfig"
+
+endif
