@@ -96,49 +96,15 @@ enum {
 #define UART_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_FSEL1)
 
 #if defined(CONFIG_IMX8MN)
-	#if (CONFIG_MXC_UART_BASE == UART1_BASE_ADDR)
-	static iomux_v3_cfg_t const uart_pads[] = {
-		IMX8MN_PAD_UART1_RXD__UART1_DCE_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
-		IMX8MN_PAD_UART1_TXD__UART1_DCE_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
-	};
-	static const u32 uart_index = 0;
-	#elif (CONFIG_MXC_UART_BASE == UART3_BASE_ADDR)
 	static iomux_v3_cfg_t const uart_pads[] = {
 		IMX8MN_PAD_UART3_RXD__UART3_DCE_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
 		IMX8MN_PAD_UART3_TXD__UART3_DCE_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
 	};
-	static const u32 uart_index = 2;
-	#elif (CONFIG_MXC_UART_BASE == UART2_BASE_ADDR)
-	static iomux_v3_cfg_t const uart_pads[] = {
-		IMX8MN_PAD_UART2_TXD__UART2_DCE_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
-		IMX8MN_PAD_UART2_TXD__UART2_DCE_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
-	};
-	static const u32 uart_index = 1;
-	#else
-	#error
-	#endif
 #elif defined(CONFIG_IMX8MM)
-	#if (CONFIG_MXC_UART_BASE == UART1_BASE_ADDR)
-	static iomux_v3_cfg_t const uart_pads[] = {
-		IMX8MM_PAD_UART1_RXD_UART1_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
-		IMX8MM_PAD_UART1_TXD_UART1_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
-	};
-	static const u32 uart_index = 0;
-	#elif (CONFIG_MXC_UART_BASE == UART3_BASE_ADDR)
 	static iomux_v3_cfg_t const uart_pads[] = {
 		IMX8MM_PAD_UART3_RXD_UART3_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
 		IMX8MM_PAD_UART3_TXD_UART3_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
 	};
-	static const u32 uart_index = 2;
-	#elif (CONFIG_MXC_UART_BASE == UART2_BASE_ADDR)
-	static iomux_v3_cfg_t const uart_pads[] = {
-		IMX8MM_PAD_UART2_RXD_UART2_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
-		IMX8MM_PAD_UART2_TXD_UART2_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
-	};
-	static const u32 uart_index = 1;
-	#else
-	#error
-	#endif
 #else
 #error
 #endif
@@ -149,7 +115,7 @@ enum {
 int tqc_bb_board_early_init_f(void)
 {
 	/* Init UART<n> clock */
-	init_uart_clk(uart_index);
+	init_uart_clk(2);
 
 	imx_iomux_v3_setup_multiple_pads(uart_pads, ARRAY_SIZE(uart_pads));
 

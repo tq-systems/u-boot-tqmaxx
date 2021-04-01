@@ -31,16 +31,6 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define USBNC_OFFSET		0x200UL
 
-#if (CONFIG_MXC_UART_BASE == UART1_BASE_ADDR)
-static const u32 uart_index = 0;
-#elif (CONFIG_MXC_UART_BASE == UART3_BASE_ADDR)
-static const u32 uart_index = 2;
-#elif (CONFIG_MXC_UART_BASE == UART2_BASE_ADDR)
-static const u32 uart_index = 1;
-#else
-#error
-#endif
-
 /* TODO: check if IMX8MN needs different settings */
 #define USDHC_CTL_PAD_CTRL	(PAD_CTL_DSE4 | PAD_CTL_HYS | PAD_CTL_FSEL2)
 #define USDHC_DATA_PAD_CTRL	(PAD_CTL_DSE2 | PAD_CTL_HYS | PAD_CTL_FSEL2)
@@ -184,8 +174,6 @@ void tqc_bb_spl_board_init(void)
 void tqc_bb_board_init_f(ulong dummy)
 {
 	debug("%s\n", __func__);
-
-	init_uart_clk(uart_index);
 }
 
 #if defined(CONFIG_USB)
