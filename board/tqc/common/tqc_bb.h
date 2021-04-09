@@ -9,6 +9,8 @@
 
 #include <common.h>
 
+struct mmc;
+
 int tqc_bb_board_mmc_getwp(struct mmc *mmc);
 int tqc_bb_board_mmc_getcd(struct mmc *mmc);
 int tqc_bb_board_mmc_init(bd_t *bis);
