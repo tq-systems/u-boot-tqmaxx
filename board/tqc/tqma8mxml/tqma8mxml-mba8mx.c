@@ -222,7 +222,7 @@ static void tqma8mxml_show_bootcfg(void)
 	env_set_ulong("boot_config", cfg);
 	printf("BOOTCFG: %x\n", cfg);
 #endif
-	printf("I2C_ADDR_SW: %0#02x\n",
+	printf("I2C_ADDR_SW: %#02x\n",
 	       (dm_gpio_get_value(&mba8mx_gid[I2C_ADDR_SW].desc) ?
 		0x27 : 0x25));
 }
