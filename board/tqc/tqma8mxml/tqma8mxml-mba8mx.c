@@ -9,8 +9,6 @@
 #include <asm/io.h>
 #include <asm/mach-imx/iomux-v3.h>
 #include <asm-generic/gpio.h>
-#include <fsl_esdhc.h>
-#include <mmc.h>
 #ifdef CONFIG_IMX8MN
 #include <asm/arch/imx8mn_pins.h>
 #elif defined(CONFIG_IMX8MM)

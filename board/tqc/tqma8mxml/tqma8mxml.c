@@ -20,8 +20,6 @@
 #include <asm/io.h>
 #include <asm/mach-imx/iomux-v3.h>
 #include <asm-generic/gpio.h>
-#include <fsl_esdhc.h>
-#include <mmc.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/mach-imx/boot_mode.h>
 #include <asm/mach-imx/gpio.h>
