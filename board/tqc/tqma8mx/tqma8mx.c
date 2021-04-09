@@ -77,12 +77,64 @@ int board_early_init_f(void)
 }
 
 #ifdef CONFIG_OF_BOARD_SETUP
+static void tqma8mx_ft_qspi_setup(void *blob)
+{
+	int off;
+	bool enable_flash = false;
+	const char *path = "/soc@0/bus@30800000/spi@30bb0000";
+
+	if (get_boot_device() == QSPI_BOOT) {
+		enable_flash = true;
+	} else {
+#if defined(CONFIG_FSL_QSPI) && defined(CONFIG_SPI_FLASH)
+		unsigned int bus = CONFIG_SF_DEFAULT_BUS;
+		unsigned int cs = CONFIG_SF_DEFAULT_CS;
+		unsigned int speed = CONFIG_SF_DEFAULT_SPEED;
+		unsigned int mode = CONFIG_SF_DEFAULT_MODE;
+#ifdef CONFIG_DM_SPI_FLASH
+		struct udevice *new, *bus_dev;
+		int ret;
+
+		/* Remove the old device, otherwise probe will just be a nop */
+		ret = spi_find_bus_and_cs(bus, cs, &bus_dev, &new);
+		if (!ret)
+			device_remove(new, DM_REMOVE_NORMAL);
+
+		ret = spi_flash_probe_bus_cs(bus, cs, speed, mode, &new);
+		if (!ret) {
+			device_remove(new, DM_REMOVE_NORMAL);
+			enable_flash = 1;
+		}
+#else
+		struct spi_flash *new;
+
+		new = spi_flash_probe(bus, cs, speed, mode);
+		if (new) {
+			spi_flash_free(new);
+			enable_flash = 1;
+		}
+#endif
+#endif
+	}
+
+	off = fdt_path_offset(blob, path);
+	if (off >= 0) {
+		printf("%s %s\n", (enable_flash) ? "enable" : "disable",
+		       path);
+		fdt_set_node_status(blob, off, (enable_flash) ?
+				    FDT_STATUS_OKAY : FDT_STATUS_DISABLED,
+				    0);
+	}
+}
+
 int ft_board_setup(void *blob, bd_t *bd)
 {
 	if (env_get("fdt_noauto")) {
 		printf("   Skipping %s (fdt_noauto defined)\n", __func__);
 		return 0;
 	}
+
+	tqma8mx_ft_qspi_setup(blob);
 
 	return tqc_bb_ft_board_setup(blob, bd);
 }
