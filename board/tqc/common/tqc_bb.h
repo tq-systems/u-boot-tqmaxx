@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2013, 2014, 2016 - 2020 TQ-Systems
+ * Copyright (C) 2013, 2014, 2016 - 2021 TQ-Systems
  * Author: Markus Niebel <markus.niebel@tq-group.com>
  */
 
@@ -8,6 +8,8 @@
 #define __TQC_BB__
 
 #include <common.h>
+
+struct mmc;
 
 int tqc_bb_board_mmc_getwp(struct mmc *mmc);
 int tqc_bb_board_mmc_getcd(struct mmc *mmc);
