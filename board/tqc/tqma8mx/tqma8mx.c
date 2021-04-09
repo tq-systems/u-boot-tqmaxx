@@ -31,6 +31,46 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#if defined(CONFIG_FSL_QSPI) && defined(CONFIG_DM_SPI)
+
+static int board_qspi_init(void)
+{
+	struct udevice *bus;
+	struct uclass *uc;
+	int count = 0;
+	int ret;
+
+	set_clk_qspi();
+
+	ret = uclass_get(UCLASS_SPI, &uc);
+	if (ret)
+		return ret;
+
+	uclass_foreach_dev(bus, uc) {
+		/* init SPI controllers */
+		printf("SPI%d:   ", count);
+		count++;
+
+		ret = device_probe(bus);
+		if (ret == -ENODEV) {	/* No such device. */
+			puts("SPI not available.\n");
+			continue;
+		}
+
+		if (ret) {		/* Other error. */
+			printf("probe failed, error %d\n", ret);
+			continue;
+		}
+
+		puts("\n");
+	}
+
+	return 0;
+}
+#else
+static inline int board_qspi_init(void) { return 0; }
+#endif
+
 int board_early_init_f(void)
 {
 	return tqc_bb_board_early_init_f();
@@ -50,6 +90,8 @@ int ft_board_setup(void *blob, bd_t *bd)
 
 int board_init(void)
 {
+	board_qspi_init();
+
 	return tqc_bb_board_init();
 }
 

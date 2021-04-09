@@ -43,6 +43,22 @@ config TQMA8MX_DEFAULTS
 	select DM_REGULATOR
 	select DM_REGULATOR_FIXED
 	select MISC
+	select FSL_QSPI
+	select DM_SPI
+	select SPI
+	select DM_SPI_FLASH
+	select MTD
+	select SPI_FLASH_MTD
+	select SPI_FLASH
+	select SPI_FLASH_MACRONIX
+	select SPI_FLASH_SPANSION
+	select SPI_FLASH_STMICRO
+	select SPI_FLASH_SST
+	select SPI_FLASH_WINBOND
+	select SPI_FLASH_ATMEL
+	select SPI_FLASH_EON
+	select SPI_FLASH_GIGADEVICE
+	select SPI_FLASH_ISSI
 	select FIT
 	select SPL
 	select SPL_ENV_SUPPORT

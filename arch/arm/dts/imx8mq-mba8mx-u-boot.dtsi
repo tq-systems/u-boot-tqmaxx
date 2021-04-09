@@ -11,6 +11,11 @@
 	};
 };
 
+&flash0 {
+	/delete-property/ spi-tx-bus-width;
+	/delete-property/ spi-rx-bus-width;
+};
+
 &usdhc1 {
 	mmc-hs400-1_8v;
 	mmc-hs400-enhanced-strobe;

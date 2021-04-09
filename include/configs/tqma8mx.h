@@ -313,6 +313,13 @@
 #define CONFIG_SYS_FSL_ESDHC_ADDR	0
 #endif
 
+#ifdef CONFIG_FSL_QSPI
+
+#define FSL_QSPI_FLASH_SIZE		(SZ_64M)
+#define FSL_QSPI_FLASH_NUM		1
+
+#endif
+
 #if defined(CONFIG_FEC_MXC)
 #define FEC_QUIRK_ENET_MAC
 #endif
