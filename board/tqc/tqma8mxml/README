@@ -41,17 +41,17 @@ Get the ddr firmware
 $ wget https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-imx-8.9.bin
 $ chmod +x firmware-imx-8.9.bin
 $ ./firmware-imx-8.9.bin
-$ cp firmware-imx-8.9/firmware/ddr/synopsys/lpddr4*.bin $(srctree)
 
 Prepare build folder
 ====================
 
 Copy the following binaries to U-Boot folder:
-$ cp imx-atf/build/imx8m[m,n]/release/bl31.bin .
+$ cp imx-atf/build/imx8m[m,n]/release/bl31.bin $(srctree)
 $ cp firmware-imx-8.9/firmware/ddr/synopsys/lpddr4*.bin $(srctree)
 
 Build U-Boot
 ============
+
 memory size
 * 1gb for 1GB
 * 2gb for 2GB
@@ -73,4 +73,5 @@ $sudo dd if=flash.bin of=/dev/sd[x] bs=1k seek=<offset> conv=fsync
 
 Boot
 ====
+
 Set Boot switch to Boot from SD-Card to boot from Micro SD.
