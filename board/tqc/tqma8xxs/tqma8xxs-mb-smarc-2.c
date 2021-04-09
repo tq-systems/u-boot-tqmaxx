@@ -10,7 +10,6 @@
 #include <linux/libfdt.h>
 #include <malloc.h>
 #include <env.h>
-#include <fsl_esdhc.h>
 
 #include <asm/io.h>
 #include <asm/arch/clock.h>
