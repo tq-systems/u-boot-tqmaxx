@@ -11,7 +11,6 @@
 #include <fdt_support.h>
 #include <linux/libfdt.h>
 #include <env.h>
-#include <fsl_esdhc.h>
 #include <asm/io.h>
 #include <asm/gpio.h>
 #include <asm/arch/clock.h>
