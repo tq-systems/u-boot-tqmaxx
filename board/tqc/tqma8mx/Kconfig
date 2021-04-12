@@ -144,6 +144,12 @@ config TQMA8MX_BB_MBA8MX
 	select PHYLIB
 	select PHY_GIGE
 	select PHY_TI
+	select USB
+	select DM_USB
+	select USB_XHCI_HCD
+	select USB_XHCI_IMX8M
+	select USB_XHCI_DWC3
+	select USB_DWC3
 	select CMD_MII
 	select CMD_PING
 	select CMD_DHCP
