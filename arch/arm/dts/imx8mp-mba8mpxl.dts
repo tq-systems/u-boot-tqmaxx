@@ -117,6 +117,28 @@
 	status = "okay";
 };
 
+&usb3_phy0 {
+	status = "okay";
+};
+
+&usb_dwc3_0 {
+	dr_mode = "otg";
+	hnp-disable;
+	srp-disable;
+	adp-disable;
+	usb-role-switch;
+	status = "okay";
+};
+
+&usb3_phy1 {
+	status = "okay";
+};
+
+&usb_dwc3_1 {
+	dr_mode = "host";
+	status = "okay";
+};
+
 &usdhc2 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
 	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
@@ -223,6 +245,26 @@
 		fsl,pins = <
 			MX8MP_IOMUXC_UART4_RXD__UART4_DCE_RX	0x49
 			MX8MP_IOMUXC_UART4_TXD__UART4_DCE_TX	0x49
+		>;
+	};
+
+	pinctrl_usb0: usb0grp {
+		fsl,pins = <
+			/* ID */
+			MX8MP_IOMUXC_GPIO1_IO10__GPIO1_IO10	0x41
+			/* PWR */
+			MX8MP_IOMUXC_GPIO1_IO12__GPIO1_IO12	0x06
+			/*
+			 * TODO: OC detection not functional in dwc3 on i.mx8mq,
+			 * pin mux will lead to non functional USB
+			 */
+			MX8MP_IOMUXC_GPIO1_IO13__USB1_OTG_OC	0x41
+		>;
+	};
+
+	pinctrl_usbhub: usbhubgrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_GPIO1_IO11__GPIO1_IO11	0x19
 		>;
 	};
 

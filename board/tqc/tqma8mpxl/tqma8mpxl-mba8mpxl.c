@@ -13,16 +13,30 @@
 #include <asm/arch/imx8mp_pins.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/mach-imx/gpio.h>
+#include <usb.h>
+#include <dwc3-uboot.h>
 
 #include "../common/tqc_board_gpio.h"
 
 #define MBA8MPXL_BOARD_NAME "MBa8MPxL"
 
+#define USB_CTRL0_OFFSET	0xF0000
+#define USB_CTRL1_OFFSET	0xF0004
+#define USB_STS0_OFFSET		0xF0020
+#define PHY_CTRL2_OFFSET	0xF0048
+
+#define USB_CTRL0_IDDIG_SEL	BIT(24) /* 0 - ID / 1 - GPIO */
+#define USB_CTRL1_OC_POLARITY	BIT(16) /* 0 - HIGH / 1 - LOW */
+#define USB_CTRL1_PWR_POLARITY	BIT(17) /* 0 - HIGH / 1 - LOW */
+#define USB_STS0_IDDIG		BIT(15) /* 0 - ID GND / 1 - ID float */
+#define PHY_CTRL2_IDPULLUP	BIT(14) /* 1 for ID pin sampling */
+
 DECLARE_GLOBAL_DATA_PTR;
 
 enum {
-	USB_RST_B,
+	USB_OTG_ID,
 	USB_OTG_PWR,
+	USB_RST_B,
 	SWITCH_A,
 	SWITCH_B,
 	USER_LED0,
@@ -75,10 +89,11 @@ int tqc_bb_checkboard(void)
 }
 
 static struct tqc_gpio_init_data mba8mpxl_gid[] = {
+	GPIO_INIT_DATA_ENTRY(USB_OTG_ID, "GPIO1_10", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(USB_OTG_PWR, "GPIO1_12", GPIOD_IS_OUT),
 	GPIO_INIT_DATA_ENTRY(USB_RST_B, "GPIO1_11",
 			     GPIOD_IS_OUT | GPIOD_ACTIVE_LOW |
 			     GPIOD_IS_OUT_ACTIVE),
-	GPIO_INIT_DATA_ENTRY(USB_OTG_PWR, "GPIO1_12", GPIOD_IS_OUT),
 
 	GPIO_INIT_DATA_ENTRY(SWITCH_A, "GPIO5_26", GPIOD_IS_IN),
 	GPIO_INIT_DATA_ENTRY(SWITCH_B, "GPIO5_27", GPIOD_IS_IN),
@@ -129,11 +144,120 @@ static void setup_enet(void)
 	}
 }
 
+#if defined(CONFIG_USB)
+
+int board_usb_init(int index, enum usb_init_type init)
+{
+	int ret = 0;
+	int otg_id;
+	u32 *usb_nc_reg;
+	struct gpio_desc *gpio;
+
+	imx8m_usb_power(index, true);
+
+	switch (index) {
+	case 0:
+		/* Set DIG_ID_SEL to muxable PIN for ID detect */
+		usb_nc_reg = (u32 *)(ulong)(USB1_BASE_ADDR +
+					    USB_CTRL0_OFFSET);
+		setbits_le32(usb_nc_reg, USB_CTRL0_IDDIG_SEL);
+		/* Set polarity for OC & PWR pins */
+		usb_nc_reg = (u32 *)(ulong)(USB1_BASE_ADDR +
+					    USB_CTRL1_OFFSET);
+		setbits_le32(usb_nc_reg, USB_CTRL1_OC_POLARITY);
+		clrbits_le32(usb_nc_reg, USB_CTRL1_PWR_POLARITY);
+		/* pullup ID pin - needed for ID Handling */
+		usb_nc_reg = (u32 *)(ulong)(USB1_BASE_ADDR +
+					    PHY_CTRL2_OFFSET);
+		setbits_le32(usb_nc_reg, PHY_CTRL2_IDPULLUP);
+
+		/*
+		 * TODO:
+		 * use USB_STS0_OFFSET / USB_STS0_IDDIG, saves a GPIO pin
+		 */
+		otg_id = dm_gpio_get_value(&mba8mpxl_gid[USB_OTG_ID].desc);
+		printf("USB0/OTG: ID = %d\n", otg_id);
+		gpio = &mba8mpxl_gid[USB_OTG_PWR].desc;
+		switch (init) {
+		case USB_INIT_DEVICE:
+			if (otg_id)
+				dm_gpio_set_value(gpio, 0);
+			else
+				ret = -ENODEV;
+			break;
+		case USB_INIT_HOST:
+			if (!otg_id)
+				dm_gpio_set_value(gpio, 1);
+			else
+				ret = -ENODEV;
+			break;
+		default:
+			printf("USB0/OTG: unknown init type\n");
+			ret = -EINVAL;
+		}
+		break;
+	case 1:
+		puts("USB1/HUB\n");
+		gpio = &mba8mpxl_gid[USB_RST_B].desc;
+		dm_gpio_set_value(gpio, 1);
+		udelay(100);
+		dm_gpio_set_value(gpio, 0);
+		udelay(100);
+		break;
+	default:
+		printf("invalid USB port %d\n", index);
+		ret = -EINVAL;
+	}
+
+	return ret;
+}
+
+int board_usb_cleanup(int index, enum usb_init_type init)
+{
+	int ret = 0;
+	struct gpio_desc *gpio;
+
+	switch (index) {
+	case 0:
+		puts("USB0/OTG\n");
+		gpio = &mba8mpxl_gid[USB_OTG_PWR].desc;
+		switch (init) {
+		case USB_INIT_DEVICE:
+			break;
+		case USB_INIT_HOST:
+			break;
+		default:
+			printf("USB0/OTG: unknown init type\n");
+			ret = -EINVAL;
+		}
+		dm_gpio_set_value(gpio, 0);
+		break;
+	case 1:
+		puts("USB1/HUB\n");
+		gpio = &mba8mpxl_gid[USB_RST_B].desc;
+		dm_gpio_set_value(gpio, 1);
+		break;
+	default:
+		printf("invalid USB port %d\n", index);
+		ret = -EINVAL;
+	}
+
+	imx8m_usb_power(index, false);
+
+	return ret;
+}
+
+#endif
+
 int tqc_bb_board_init(void)
 {
 	tqc_board_gpio_init(mba8mpxl_gid, ARRAY_SIZE(mba8mpxl_gid));
 
 	setup_enet();
+
+#if defined(CONFIG_USB)
+	init_usb_clk();
+#endif
 
 	return 0;
 }

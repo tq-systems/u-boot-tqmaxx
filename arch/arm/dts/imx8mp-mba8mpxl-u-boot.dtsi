@@ -57,7 +57,7 @@
 &iomuxc {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_wdog>, <&pinctrl_gpiobutton>, <&pinctrl_gpioled>,
-		    <&pinctrl_hoggpio>;
+		    <&pinctrl_hoggpio>, <&pinctrl_usb0>;
 	u-boot,dm-spl;
 
 	pinctrl_hoggpio: gpiohoggrp {
