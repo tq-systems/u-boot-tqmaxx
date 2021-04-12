@@ -524,7 +524,7 @@ int tqc_bb_board_eth_init(int *nr)
 	for (i = 0; i < ARRAY_SIZE(srds_configs); i++) {
 		if (srds_configs[i].serdes_config.srds_s1 == srds_s1 &&
 		    srds_configs[i].serdes_config.srds_s2 == srds_s2) {
-			printf("Configuring Ethernet for SerDes Configuration %d_%d_xx.\n",
+			printf("Configuring Ethernet for Serdes Configuration %d_%d_xx.\n",
 			       srds_s1, srds_s2);
 			found = 1;
 
@@ -543,7 +543,7 @@ int tqc_bb_board_eth_init(int *nr)
 	}
 
 	if (!found)
-		printf("No ethernet configuriation for Serdes %d_%d_xx found.\n", srds_s1, srds_s2);
+		printf("No ethernet configuration for Serdes %d_%d_xx found.\n", srds_s1, srds_s2);
 
 	/* Configure PHY LEDs for all PHYs also if not used */
 	mii_devs = mdio_get_list_head();
