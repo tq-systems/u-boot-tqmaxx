@@ -23,12 +23,6 @@
 		stdout-path = &uart3;
 	};
 
-	/* TODO: move to -u-boot.dtsi */
-	config {
-		u-boot,mmc-env-offset = <0x400000>;
-		u-boot,mmc-env-offset-redundant = <0x404000>;
-	};
-
 	reg_usbotg1_vbus: regulator-usbotg1-vbus {
 		compatible = "regulator-fixed";
 		regulator-name = "USBOTG1_VBUS";
@@ -38,7 +32,6 @@
 		regulator-max-microvolt = <5000000>;
 		gpio = <&gpio1 12 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
-		status = "okay";
 	};
 };
 
@@ -74,8 +67,6 @@
 };
 
 &iomuxc {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_gpioled>, <&pinctrl_gpiobutton>;
 	/*
 	 * Pad Control Register
 	 *
