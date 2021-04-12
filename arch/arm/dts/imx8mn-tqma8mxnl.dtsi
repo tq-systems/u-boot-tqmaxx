@@ -28,8 +28,9 @@
 
 	reg_usdhc2_vmmc: regulator-vmmc {
 		compatible = "regulator-fixed";
-		regulator-name = "VSD_3V3";
+		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_reg_usdhc2_vmmc>;
+		regulator-name = "VSD_3V3";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		gpio = <&gpio2 19 GPIO_ACTIVE_HIGH>;
@@ -99,8 +100,8 @@
 
 	pinctrl_i2c1_gpio: i2c1gpiogrp {
 		fsl,pins = <
-			MX8MN_IOMUXC_I2C1_SCL_GPIO5_IO14	0x40000004
-			MX8MN_IOMUXC_I2C1_SDA_GPIO5_IO15	0x40000004
+			MX8MN_IOMUXC_I2C1_SCL_GPIO5_IO14	0x400001c4
+			MX8MN_IOMUXC_I2C1_SDA_GPIO5_IO15	0x400001c4
 		>;
 	};
 
