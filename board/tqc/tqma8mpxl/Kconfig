@@ -1,0 +1,201 @@
+if TARGET_TQMA8MPXL
+
+config SYS_BOARD
+	default "tqma8mpxl"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_CONFIG_NAME
+	default "tqma8mpxl"
+
+config SPL_TEXT_BASE
+	default "0x920000"
+
+config CSF_SIZE
+	default "0x2000"
+
+config TQMA8MPXL_DEFAULTS
+	bool
+	default y
+	select TQC_SDMMC
+	select TQC_EEPROM
+	select TQC_RTC
+	select BOARD_LATE_INIT
+	select BOARD_EARLY_INIT_F
+	select OF_CONTROL
+	select OF_BOARD_SETUP
+	select OF_SYSTEM_SETUP
+	select PINCTRL
+	select REGMAP
+	select SYSCON
+	select CLK_COMPOSITE_CCF
+	select CLK_IMX8MP
+	select PINCTRL_IMX8M
+	select DM
+	select DM_MMC
+	select FSL_USDHC
+	select MMC_IO_VOLTAGE
+	select MMC_UHS_SUPPORT
+	select MMC_HS400_ES_SUPPORT
+	select MMC_HS400_SUPPORT
+	select DM_THERMAL
+	select DM_GPIO
+	select MXC_GPIO
+	select DM_I2C
+	select SYS_I2C_MXC
+	select SYS_I2C_MXC_I2C1
+	select DM_REGULATOR
+	select DM_REGULATOR_FIXED
+	select MISC
+	select FSL_FSPI
+	select DM_SPI
+	select SPI
+	select DM_SPI_FLASH
+	select MTD
+	select SPI_FLASH_MTD
+	select SPI_FLASH
+	select SPI_FLASH_MACRONIX
+	select SPI_FLASH_SPANSION
+	select SPI_FLASH_STMICRO
+	select SPI_FLASH_SST
+	select SPI_FLASH_WINBOND
+	select SPI_FLASH_EON
+	select SPI_FLASH_GIGADEVICE
+	select SPI_FLASH_ISSI
+	select FIT
+	select SPL
+	select SPL_GPIO_SUPPORT
+	select SPL_DRIVERS_MISC_SUPPORT
+	select SPL_LIBCOMMON_SUPPORT
+	select SPL_LIBGENERIC_SUPPORT
+	select SPL_I2C_SUPPORT
+	select SPL_POWER_SUPPORT
+	select SPL_BOARD_INIT
+	select SPL_LOAD_FIT
+	select SPL_BOOTROM_SUPPORT
+	select SPL_SEPARATE_BSS
+
+choice
+	prompt "TQMa8MPXL RAM configuration"
+	default TQMA8MPXL_RAM_2048MB
+	help
+	  Select RAM configuration for TQMa8MPXL
+
+config TQMA8MPXL_RAM_2048MB
+	bool "TQMa8x with 2048 MiB RAM, no ECC"
+	help
+	  Select variant with 2048 MiB RAM
+
+config TQMA8MPXL_RAM_2048MB_ECC
+	bool "TQMa8x with 2048 MiB RAM, with ECC"
+	select IMX8M_DRAM_INLINE_ECC
+	help
+	  Select variant with 2048 MiB RAM and inline ECC
+
+endchoice
+
+config NR_DRAM_BANKS
+	default 3
+
+config SYS_TEXT_BASE
+	default 0x40200000
+
+config IMX_CONFIG
+	default "arch/arm/mach-imx/imx8m/imximage-8mp-lpddr4.cfg"
+
+config SPL_FIT_GENERATOR
+	default "arch/arm/mach-imx/mkimage_fit_atf.sh"
+
+config FIT_EXTERNAL_OFFSET
+	default "0x3000"
+
+config SPL_IMX_ROMAPI_LOADADDR
+	default "0x48000000"
+
+choice
+	prompt "TQMa8MPxL base board variant"
+	default TQMA8MPXL_BB_MBA8MPXL
+	help
+	  Select base board for TQMa8MPxL
+
+config TQMA8MPXL_BB_MBA8MPXL
+	bool "TQMa8MPxL on MBa8MPxL Starterkit"
+	select ENV_IS_NOWHERE
+	select SYS_REDUNDAND_ENVIRONMENT
+	select ENV_OVERWRITE
+	select MXC_UART
+	select DM_SERIAL
+	select SPL_SERIAL_SUPPORT
+	select CMD_FUSE
+	help
+	  Select the MBa8MPxL starterkit for TQMa8MPxL board.
+	  This features most interfaces the CPU can provide
+
+endchoice
+
+config DEFAULT_DEVICE_TREE
+	default "imx8mp-mba8mpxl" if TQMA8MPXL_BB_MBA8MPXL
+
+config DEFAULT_FDT_FILE
+	default "imx8mp-mba8mpxl.dtb" if TQMA8MPXL_BB_MBA8MPXL
+
+menu "TQMa8MPxL boot device"
+
+config TQMA8MPXL_BOOT_SDCARD
+	bool "TQMa8MPxL boot from SD / e-MMC"
+	default "y"
+	select SD_BOOT
+	select ENV_IS_IN_MMC
+	select SPL_MMC_SUPPORT
+	help
+	  Select booting from SD / e-MMC, you should supply env offsets per
+	  devicetree
+
+config TQMBA8MPXL_BOOT_FSPI
+	bool "TQMa8MPxL boot from FlexSPI"
+	default "y"
+	select QSPI_BOOT
+	select ENV_IS_IN_SPI_FLASH
+	select SPL_NOR_SUPPORT
+	help
+	  Select booting from QSPI NOR at FlexSPI port
+
+endmenu
+
+#
+# default values for FLEXSPI NOR. Will be used also for environment from FLEXSPI
+# if ENV_SPI_[BUS,CS,MODE,SPEED] are not used to overwrite.
+#
+
+config SF_DEFAULT_BUS
+	default 0
+
+config SF_DEFAULT_CS
+	default 0
+
+config SF_DEFAULT_SPEED
+	default 40000000
+
+config SF_DEFAULT_MODE
+	default 0
+
+#
+# environment settings: 32k, offset 4M (SPI NOR sector 64k), redundant env
+# in SPI NOR @ 4M + 64k
+#
+config ENV_SIZE
+	default 0x00008000
+
+config ENV_SECT_SIZE
+	default 0x00010000
+
+config ENV_OFFSET
+	default 0x00400000
+
+config ENV_OFFSET_REDUND
+	default 0x00410000
+
+source "board/tqc/common/Kconfig"
+
+endif

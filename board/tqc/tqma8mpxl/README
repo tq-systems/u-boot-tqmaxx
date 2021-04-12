@@ -1,0 +1,61 @@
+U-Boot for the TQ-Systems i.MX8MP TQMa8MPxL SOM family
+
+Supported variants
+==================
+
+TQMa8MPxL / 2 GiB NO ECC LPDDR4 / i.MX8MP
+
+configs:
+
+tqma8mpxl_2gb_mba8mpxl_defconfig
+
+Quick Start
+===========
+
+- Build the ARM Trusted firmware binary
+- Build U-Boot
+- Flash the binary into the SD card
+- Boot
+
+Get and Build the ARM Trusted firmware
+======================================
+
+$ git clone https://github.com/tq-systems/atf.git
+$ cd atf/
+$ git checkout origin/TQMa8-imx_5.4.70_2.3.0 -b TQMa8-imx_5.4.70_2.3.0
+$ make PLAT=imx8mp IMX_BOOT_UART_BASE=0x30a60000 bl31
+
+Get the ddr and hdmi firmware
+=============================
+
+$ wget https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-imx-8.10.bin
+$ chmod +x firmware-imx-8.10.bin
+$ ./firmware-imx-8.10.bin
+
+Prepare build folder
+====================
+
+Copy the following binaries to U-Boot folder:
+
+$ cp atf/build/imx8mp/release/bl31.bin .
+$ cp firmware-imx-8.10/firmware/hdmi/cadence/signed_hdmi_imx8m.bin .
+$ cp firmware-imx-8.10/firmware/ddr/synopsys/lpddr4*_202006.bin .
+
+
+Build U-Boot
+============
+$ make tqma8mpxl_mba8mpxl_defconfig
+
+$ make flash.bin
+
+Flash the binary into the SD card
+=================================
+
+Burn the flash.bin binary to SD card offset 32KB:
+
+$ sudo dd if=flash.bin of=/dev/sd[x] bs=1024 seek=32
+
+Boot
+====
+
+Set Boot switch SW2[4:1]: 1100.

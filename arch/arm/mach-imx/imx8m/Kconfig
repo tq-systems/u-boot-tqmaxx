@@ -166,6 +166,12 @@ config TARGET_TQMA8MXNL
 	select IMX8M_LPDDR4
 	select SUPPORT_SPL
 
+config TARGET_TQMA8MPXL
+       bool "Support TQ-Systems TQMa8MPxL solder on module"
+       select IMX8MP
+       select SUPPORT_SPL
+       select IMX8M_LPDDR4
+
 endchoice
 
 source "board/freescale/imx8mq_evk/Kconfig"
@@ -177,5 +183,6 @@ source "board/freescale/imx8mn_evk/Kconfig"
 source "board/freescale/imx8mp_evk/Kconfig"
 source "board/toradex/verdin-imx8mm/Kconfig"
 source "board/tqc/tqma8mxml/Kconfig"
+source "board/tqc/tqma8mpxl/Kconfig"
 
 endif
