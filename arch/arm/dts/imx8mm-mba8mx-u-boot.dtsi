@@ -62,6 +62,9 @@
 };
 
 &iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpioled>, <&pinctrl_gpiobutton>, <&pinctrl_wdog>;
+
 	u-boot,dm-spl;
 	u-boot,dm-pre-proper;
 };
