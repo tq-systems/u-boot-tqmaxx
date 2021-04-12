@@ -452,33 +452,45 @@ int checkboard_tqmlx2160a_bb(void)
 	return 0;
 }
 
-static void mblx2160a_configure_ethernet(u32 serdes_nr, u32 mac_nr, int *eth_nr)
+static int mblx2160a_configure_ethernet(u32 serdes_nr, u32 mac_nr)
 {
 	struct mii_dev *mii_dev;
+	int ret = -ENODEV;
 
 	if (srds_configs[serdes_nr].macs[mac_nr] >= ETH_01 &&
 	    srds_configs[serdes_nr].macs[mac_nr] <= ETH_10) {
-		eth_nr++;
-
-		wriop_set_phy_address(mac_to_dpmac[mac_nr], 0,
-				      phy_infos[srds_configs[serdes_nr].macs[mac_nr]].phy_address);
+		ret = wriop_set_phy_address(mac_to_dpmac[mac_nr], 0,
+					    phy_infos[srds_configs[serdes_nr].macs[mac_nr]].phy_address);
+		if (ret)
+			return ret;
 
 		mii_dev = miiphy_get_dev_by_name(phy_infos[srds_configs[serdes_nr].macs[mac_nr]].mdio_bus);
-		wriop_set_mdio(mac_to_dpmac[mac_nr], mii_dev);
+		if (!mii_dev)
+			return -ENODEV;
+
+		ret = wriop_set_mdio(mac_to_dpmac[mac_nr], mii_dev);
+		if (ret)
+			return ret;
 
 		if (phy_infos[srds_configs[serdes_nr].macs[mac_nr]].serdes_nr) {
-			_reconfigure_serdes_tx_lane(phy_infos[srds_configs[serdes_nr].macs[mac_nr]].serdes_nr,
-						    phy_infos[srds_configs[serdes_nr].macs[mac_nr]].serdes_lane,
-						    0x10808c00, 0xFFFFFFFF);
+			ret = _reconfigure_serdes_tx_lane(phy_infos[srds_configs[serdes_nr].macs[mac_nr]].serdes_nr,
+							  phy_infos[srds_configs[serdes_nr].macs[mac_nr]].serdes_lane,
+							  0x10808c00, 0xFFFFFFFF);
+			if (ret)
+				return ret;
 		}
 	} else if (srds_configs[serdes_nr].macs[mac_nr] == XFI_01 ||
 		   srds_configs[serdes_nr].macs[mac_nr] == XFI_02) {
-		eth_nr++;
-		xfi_config(srds_configs[serdes_nr].macs[mac_nr]);
+		ret = xfi_config(srds_configs[serdes_nr].macs[mac_nr]);
+		if (ret)
+			return ret;
 	} else if (srds_configs[serdes_nr].macs[mac_nr] == CAUI_4) {
-		eth_nr++;
-		caui4_config(srds_configs[serdes_nr].macs[mac_nr]);
+		ret = caui4_config(srds_configs[serdes_nr].macs[mac_nr]);
+		if (ret)
+			return ret;
 	}
+
+	return ret;
 }
 
 int tqc_bb_board_eth_init(int *nr)
@@ -516,8 +528,17 @@ int tqc_bb_board_eth_init(int *nr)
 			       srds_s1, srds_s2);
 			found = 1;
 
-			for (int j = 0; j < ARRAY_SIZE(srds_configs[i].macs); j++)
-				mblx2160a_configure_ethernet(i, j, &eth_nr);
+			for (int j = 0; j < ARRAY_SIZE(srds_configs[i].macs); j++) {
+				if (srds_configs[i].macs[j] == ETH_NO)
+					continue;
+
+				if (mblx2160a_configure_ethernet(i, j)) {
+					printf("Failed to configure Ethernet %d for Serdes configuration %d_%d_xx.\n",
+					       mac_to_dpmac[j], srds_s1, srds_s2);
+				} else {
+					eth_nr++;
+				}
+			}
 		}
 	}
 
