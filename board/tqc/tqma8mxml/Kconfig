@@ -35,7 +35,6 @@ config SPL_FIT_GENERATOR
 config TQMA8MXX_DEFAULTS
 	bool
 	default y
-	select ARCH_MISC_INIT
 	select CLK_COMPOSITE_CCF
 	select CLK_IMX8MM if IMX8MM
 	select CLK_IMX8MN if IMX8MN
@@ -73,12 +72,12 @@ config TQMA8MXX_DEFAULTS
 	select MTD
 	select SPI_FLASH_MTD
 	select SPI_FLASH
-	select SPI_FLASH_4BYTES_ADDR
 	select SPI_FLASH_MACRONIX
 	select SPI_FLASH_SPANSION
 	select SPI_FLASH_STMICRO
 	select SPI_FLASH_SST
 	select SPI_FLASH_WINBOND
+	select SPI_FLASH_ATMEL
 	select SPI_FLASH_EON
 	select SPI_FLASH_GIGADEVICE
 	select SPI_FLASH_ISSI
@@ -235,8 +234,12 @@ config TQMA8MXX_BOOT_SDCARD
 	select SD_BOOT
 	select ENV_IS_IN_MMC
 	select SPL_MMC_SUPPORT
+	select SUPPORT_EMMC_BOOT
 	help
-	  Select booting from SD / e-MMC
+	  Select booting from SD / e-MMC. This selects MMC based env, SPL
+	  support for MMC/SD and support for e-MMC boot partitions.
+	  Additionally you should supply env offsets via devicetree config
+	  node
 
 #
 # For booting from FlexSPI it is not needed to setup the FlexSPI controller
@@ -257,7 +260,7 @@ config TQMA8MXX_BOOT_FSPI
 
 endmenu
 
-
+#
 # default values for FLEXSPI NOR. Will be used also for environment from FLEXSPI
 # if ENV_SPI_[BUS,CS,MODE,SPEED] are not used to overwrite.
 #
@@ -277,8 +280,6 @@ config SF_DEFAULT_MODE
 #
 # environment settings: 32k, offset 4M (SPI NOR sector 64k), redundant env
 # in SPI NOR @ 4M + 64k
-#
-# These should go here, when updating U-Boot to newer Version
 #
 config ENV_SIZE
 	default 0x00008000

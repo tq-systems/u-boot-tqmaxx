@@ -17,9 +17,6 @@
 #define CONFIG_SPL_MAX_SIZE		(208 * 1024)
 #define CONFIG_SYS_MONITOR_LEN		SZ_512K
 
-/* eMMC specific: support booting from boot / user partition */
-#define CONFIG_SUPPORT_EMMC_BOOT
-
 #define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_USE_SECTOR
 /*
  * 0x300 sectors -> 384 k -> 0x60000: offset of FIT image created with
