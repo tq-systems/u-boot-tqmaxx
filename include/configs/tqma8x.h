@@ -66,10 +66,6 @@
 
 #undef CONFIG_BOOTM_NETBSD
 
-#if defined(CONFIG_FSL_ESDHC_IMX)
-#define CONFIG_SUPPORT_EMMC_BOOT	/* eMMC specific */
-#endif
-
 #if defined(CONFIG_FEC_MXC)
 #define FEC_QUIRK_ENET_MAC
 #endif
