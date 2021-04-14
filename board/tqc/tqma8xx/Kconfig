@@ -241,9 +241,13 @@ config TQMA8XX_BOOT_SDCARD
 	default "y"
 	select SD_BOOT
 	select ENV_IS_IN_MMC
+	select SPL_MMC_SUPPORT
+	select SUPPORT_EMMC_BOOT
 	help
-	  Select booting from SD / e-MMC, you should supply env offsets per
-	  devicetree
+	  Select booting from SD / e-MMC. This selects MMC based env, SPL
+	  support for MMC/SD and support for e-MMC boot partitions.
+	  Additionally you should supply env offsets via devicetree config
+	  node
 
 config TQMBA8XX_BOOT_FSPI
 	bool "TQMa8Xx boot from FlexSPI"
