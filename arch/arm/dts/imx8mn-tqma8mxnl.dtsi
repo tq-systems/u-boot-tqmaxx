@@ -218,3 +218,10 @@
 	vqmmc-supply = <&reg_vcc1v8>;
 	status = "okay";
 };
+
+&wdog1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_wdog>;
+	fsl,ext-reset-output;
+	status = "okay";
+};
