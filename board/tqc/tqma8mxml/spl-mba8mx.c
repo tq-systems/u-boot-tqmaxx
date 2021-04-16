@@ -31,9 +31,16 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define USBNC_OFFSET		0x200UL
 
-/* TODO: check if IMX8MN needs different settings */
-#define USDHC_CTL_PAD_CTRL	(PAD_CTL_DSE4 | PAD_CTL_HYS | PAD_CTL_FSEL2)
-#define USDHC_DATA_PAD_CTRL	(PAD_CTL_DSE2 | PAD_CTL_HYS | PAD_CTL_FSEL2)
+/*
+ * TODO:
+ * check if i.MX8MN / i.MX8MM need different settings
+ * we use the pull stages although the the errata for i.MX8MM says that the pull
+ * stages drift. For SD pull up in the range of 10 ... 100 kOhm is allowed
+ */
+#define USDHC_CTL_PAD_CTRL	(PAD_CTL_DSE4 | PAD_CTL_HYS | PAD_CTL_FSEL2 | \
+				 PAD_CTL_PE | PAD_CTL_PUE)
+#define USDHC_DATA_PAD_CTRL	(PAD_CTL_DSE2 | PAD_CTL_HYS | PAD_CTL_FSEL2 | \
+				 PAD_CTL_PE | PAD_CTL_PUE)
 #define USDHC_GPIO_PAD_CTRL	(PAD_CTL_HYS | PAD_CTL_DSE1)
 #define USDHC2_CD_GPIO	IMX_GPIO_NR(2, 12)
 #define USDHC2_WP_GPIO	IMX_GPIO_NR(2, 20)
