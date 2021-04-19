@@ -125,6 +125,7 @@
 	"boot_fdt=try\0" \
 	"initrd_addr=0x43800000\0"		\
 	"initrd_high=0xffffffffffffffff\0" \
+	"splashimage=0x50000000\0" \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
 	"mmcpath=/\0" \
@@ -334,6 +335,18 @@
 #undef CONFIG_USB_DWC3_HOST
 #endif /* CONFIG_SPL_USB_GADGET */
 
+#endif
+
+#ifdef CONFIG_DM_VIDEO
+#define CONFIG_VIDEO_LOGO
+#define CONFIG_SPLASH_SCREEN
+#define CONFIG_SPLASH_SCREEN_ALIGN
+#define CONFIG_CMD_BMP
+#define CONFIG_BMP_16BPP
+#define CONFIG_BMP_24BPP
+#define CONFIG_BMP_32BPP
+#define CONFIG_VIDEO_BMP_RLE8
+#define CONFIG_VIDEO_BMP_LOGO
 #endif
 
 #if defined(CONFIG_TQMA8MX_BB_MBA8MX)
