@@ -1,0 +1,200 @@
+if TARGET_TQMA8MX
+
+config SYS_BOARD
+	default "tqma8mx"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_CONFIG_NAME
+	default "tqma8mx"
+
+config SPL_TEXT_BASE
+	default "0x7E1000"
+
+config CSF_SIZE
+	default "0x2000"
+
+config TQMA8MX_DEFAULTS
+	bool
+	default y
+	select TQC_SDMMC
+	select TQC_EEPROM
+	select TQC_RTC
+	select BOARD_LATE_INIT
+	select BOARD_EARLY_INIT_F
+	select OF_CONTROL
+	select OF_BOARD_SETUP
+	select OF_SYSTEM_SETUP
+	select PINCTRL
+	select PINCTRL_IMX8M
+	select DM
+	select DM_MMC
+	select FSL_USDHC
+	select MMC_IO_VOLTAGE
+	select MMC_UHS_SUPPORT
+	select MMC_HS400_ES_SUPPORT
+	select MMC_HS400_SUPPORT
+	select DM_THERMAL
+	select DM_GPIO
+	select MXC_GPIO
+	select DM_I2C
+	select SYS_I2C_MXC
+	select DM_REGULATOR
+	select DM_REGULATOR_FIXED
+	select MISC
+	select FIT
+	select SPL
+	select SPL_ENV_SUPPORT
+	select SPL_GPIO_SUPPORT
+	select SPL_DRIVERS_MISC_SUPPORT
+	select SPL_LIBCOMMON_SUPPORT
+	select SPL_LIBGENERIC_SUPPORT
+	select SPL_I2C_SUPPORT
+	select SPL_POWER_SUPPORT
+	select SPL_BOARD_INIT
+	select SPL_LOAD_FIT
+	select SPL_SEPARATE_BSS
+
+config NR_DRAM_BANKS
+	default 3
+
+config SYS_TEXT_BASE
+	default 0x40200000
+
+config IMX_CONFIG
+	default "arch/arm/mach-imx/imx8m/imximage.cfg"
+
+config SYS_MALLOC_F_LEN
+	default 0x2000
+
+config SAVED_DRAM_TIMING_BASE
+	default 0x40000000
+
+config SPL_FIT_GENERATOR
+	default "arch/arm/mach-imx/mkimage_fit_atf.sh"
+
+config FIT_EXTERNAL_OFFSET
+	default "0x3000"
+
+choice
+	prompt "TQMa8MX Memory variant"
+	default TQMA8MX_RAM_2G
+	help
+	  Select memory variant for TQMa8MX
+
+config TQMA8MX_RAM_4G
+	bool "TQMa8MX with 4GB LPDDR4"
+	help
+	  Select module with 4GB LPDDR4"
+
+config TQMA8MX_RAM_2G
+	bool "TQMa8MX with 2GB LPDDR4"
+	help
+	  Select module with 2GB LPDDR4"
+
+config TQMA8MX_RAM_1G
+	bool "TQMa8MX with 1GB LPDDR4"
+	help
+	  Select module with 1GB LPDDR4"
+
+endchoice
+
+choice
+	prompt "TQMa8MX base board variant"
+	default TQMA8MX_BB_MBA8MX
+	help
+	  Select base board for TQMa8MX
+
+####
+# TODO: DM_SERIAL is not usable, since UART clock not under DM managed clocks
+# but common/board_f initializes early DM stuff before board code can enable
+# UART clk.
+####
+
+config TQMA8MX_BB_MBA8MX
+	bool "TQMa8MX on MBa8MX Starterkit"
+	select TQC_ENVLOC
+	select SYS_REDUNDAND_ENVIRONMENT
+	select ENV_OVERWRITE
+	select MXC_UART
+	select SPL_SERIAL_SUPPORT
+	select CMD_FUSE
+	select DM_ETH
+	select FEC_MXC
+	select MII
+	select DM_ETH_PHY
+	select PHY_GIGE
+	select PHYLIB
+	select PHY_GIGE
+	select PHY_TI
+	select CMD_MII
+	select CMD_PING
+	select CMD_DHCP
+	select CMD_NET
+	help
+	  Select the MBa8Mx starterkit. This features a GigE Phy, USB, SD-Card
+	  etc.
+
+endchoice
+
+config DEFAULT_DEVICE_TREE
+	default "imx8mq-mba8mx" if TQMA8MX_BB_MBA8MX
+
+config DEFAULT_FDT_FILE
+	default "imx8mq-mba8mx.dtb" if TQMA8MX_BB_MBA8MX
+
+
+menu "TQMa8Mx boot device"
+
+config TQMBA8MX_BOOT_SDCARD
+	bool "TQMa8Mx from SD / e-MMC"
+	default "y"
+	select SD_BOOT
+	select ENV_IS_IN_MMC
+	select SPL_MMC_SUPPORT
+	select SUPPORT_EMMC_BOOT
+	help
+	  Select booting from SD / e-MMC. This selects MMC based env, SPL
+	  support for MMC/SD and support for e-MMC boot partitions.
+	  Additionally you should supply env offsets via devicetree config
+	  node
+
+endmenu
+
+#
+# default values for QSPI NOR. Will be used also for environment from QSPI
+# if ENV_SPI_[BUS,CS,MODE,SPEED] are not used to overwrite.
+#
+
+config SF_DEFAULT_BUS
+	default 0
+
+config SF_DEFAULT_CS
+	default 0
+
+config SF_DEFAULT_SPEED
+	default 40000000
+
+config SF_DEFAULT_MODE
+	default 0
+
+#
+# environment settings: 32k, offset 4M (SPI NOR sector 64k), redundant env
+# in SPI NOR @ 4M + 64k
+#
+config ENV_SIZE
+	default 0x00008000
+
+config ENV_SECT_SIZE
+	default 0x00010000
+
+config ENV_OFFSET
+	default 0x00400000
+
+config ENV_OFFSET_REDUND
+	default 0x00410000
+
+source "board/tqc/common/Kconfig"
+
+endif

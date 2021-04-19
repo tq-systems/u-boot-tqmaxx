@@ -1,0 +1,81 @@
+U-Boot for the TQ-Systems TQMa8M[D,Q][L] SOM and Baseboards
+
+Supported variants
+==================
+
+TQMa8M[Q,D][L] / 1 GiB LPDDR4 / i.MX8MM
+
+configs:
+
+tqma8mq_1gb_mba8mx_mmc_defconfig
+tqma8mq_1gb_mba8mx_mfg_defconfig
+
+TQMa8M[Q,D][L] / 2 GiB LPDDR4 / i.MX8MM
+
+configs:
+
+tqma8mq_2gb_mba8mx_mmc_defconfig
+tqma8mq_2gb_mba8mx_mfg_defconfig
+
+TQMa8M[Q,D][L] / 4 GiB LPDDR4 / i.MX8MM
+
+configs:
+
+tqma8mq_4gb_mba8mx_mmc_defconfig
+tqma8mq_4gb_mba8mx_mfg_defconfig
+
+Quick Start
+===========
+
+- Build the ARM Trusted firmware binary
+- Get ddr and hdmi firmware
+- Build U-Boot
+- Flash the binary into the SD card
+- Boot
+
+Get and Build the ARM Trusted firmware
+======================================
+
+$ git clone https://source.codeaurora.org/external/imx/imx-atf
+$ cd imx-atf/
+$ git checkout origin/imx_5.4.70_2.3.0 -b imx_5.4.70_2.3.0
+$ make PLAT=imx8mq bl31
+
+Get the ddr and hdmi firmware
+=============================
+
+$ wget https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-imx-8.10.bin
+$ chmod +x firmware-imx-8.10.bin
+$ ./firmware-imx-8.10.bin
+
+Prepare build folder
+====================
+
+Copy the following binaries to U-Boot folder:
+$ cp imx-atf/build/imx8mq/release/bl31.bin $(srctree)
+$ cp firmware-imx-8.10/firmware/ddr/synopsys/lpddr4*.bin $(srctree)
+$ cp firmware-imx-8.10/firmware/hdmi/cadence/signed_hdmi_imx8m.bin $(srctree)
+
+Build U-Boot
+============
+
+memory size
+* 1gb for 1GB
+* 2gb for 2GB
+* 4gb for 4GB
+
+baseboard:
+* mba8mx for MBa8Mx starterkit mainboard
+
+$ export CROSS_COMPILE=<compiler path and prefix>
+$ export ARCH=arm
+$ make tqma8mq_<mem>_<baseboard>_mmc_defconfig
+$ make flash.bin
+
+Burn the flash.bin to MicroSD card offset 33KB
+$sudo dd if=flash.bin of=/dev/sd[x] bs=1k seek=33 conv=fsync
+
+Boot
+====
+
+Set Boot switch to Boot from SD-Card to boot from Micro SD.

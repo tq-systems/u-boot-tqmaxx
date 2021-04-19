@@ -1,0 +1,47 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright 2019 - 2021 TQ-Systems GmbH
+ */
+
+/{
+	config {
+		/* 32 kiB redundant env */
+		u-boot,mmc-env-offset = <0x400000>;
+		u-boot,mmc-env-offset-redundant = <0x408000>;
+	};
+};
+
+&usdhc1 {
+	mmc-hs400-1_8v;
+	mmc-hs400-enhanced-strobe;
+	/*
+	 * prevents voltage switch warn: driver will switch even at
+	 * fixed voltage
+	 */
+	/delete-property/ vmmc-supply;
+};
+
+&reg_usdhc2_vmmc {
+	/*
+	 * can be removed, if only MBa8Mx REV.0300 shall be supported
+	 * REV.020x has VSELECT but no working reset, so disable UHS in U-Boot
+	 */
+	regulator-always-on;
+};
+
+&usdhc2 {
+	/*
+	 * can be removed, if only MBa8Mx REV.0300 shall be supported
+	 * REV.020x has VSELECT but no working reset, so disable UHS in U-Boot
+	 */
+	no-1-8-v;
+};
+
+&iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpioled>, <&pinctrl_gpiobutton>, <&pinctrl_wdog>;
+};
+
+&wdog1 {
+	status = "disabled";
+};
