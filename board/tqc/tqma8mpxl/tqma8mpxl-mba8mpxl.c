@@ -144,6 +144,31 @@ static void setup_enet(void)
 	}
 }
 
+/*
+ * USDHC3 (devno 2, e-MMC) -> mmc0 / mmcblk0
+ * USDHC2 (devno 1, SD) -> mmc1 / mmcblk1
+ */
+int board_mmc_get_env_dev(int devno)
+{
+	switch (devno) {
+	case 2:
+		return 0;
+	case 1:
+		return 1;
+	default:
+		printf("Error: USDHC%d not handled for environment\n", devno);
+		return env_get_ulong("mmcdev", 10, CONFIG_SYS_MMC_ENV_DEV);
+	}
+}
+
+/*
+ * we use dt alias based indexing, so kernel uses same index. See above
+ */
+int mmc_map_to_kernel_blk(int devno)
+{
+	return devno;
+}
+
 #if defined(CONFIG_USB)
 
 int board_usb_init(int index, enum usb_init_type init)
