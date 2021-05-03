@@ -248,8 +248,8 @@ int tqc_bb_board_init(void)
 }
 
 /*
- * SD1 -> mmc0 / mmcblk0
- * SD2 -> mmc1 / mmcblk1
+ * USDHC3 (devno 2, e-MMC) -> mmc0 / mmcblk0
+ * USDHC2 (devno 1, SD) -> mmc1 / mmcblk1
  */
 int board_mmc_get_env_dev(int devno)
 {
@@ -264,9 +264,9 @@ int board_mmc_get_env_dev(int devno)
 	}
 }
 
-int mmc_map_to_kernel_blk(int dev_no)
+int mmc_map_to_kernel_blk(int devno)
 {
-	return dev_no;
+	return devno;
 }
 
 #if defined(CONFIG_USB)
