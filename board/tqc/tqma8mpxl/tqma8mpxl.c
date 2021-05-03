@@ -11,6 +11,7 @@
 #include <asm-generic/gpio.h>
 #include <asm/arch/imx8mp_pins.h>
 #include <asm/arch/sys_proto.h>
+#include <asm/mach-imx/boot_mode.h>
 #include <asm/mach-imx/gpio.h>
 #include <asm/mach-imx/mxc_i2c.h>
 #include <asm/arch/clock.h>
@@ -60,8 +61,49 @@ static const char *tqc_get_boardname(void)
 	return "UNKNOWN";
 }
 
+int print_bootinfo(void)
+{
+	enum boot_device bt_dev;
+
+	bt_dev = get_boot_device();
+
+	puts("Boot:  ");
+	switch (bt_dev) {
+	case SD1_BOOT:
+		puts("USDHC1(SD)\n");
+		break;
+	case SD2_BOOT:
+		puts("USDHC2(SD)\n");
+		break;
+	case SD3_BOOT:
+		puts("USDHC3(SD)\n");
+		break;
+	case MMC1_BOOT:
+		puts("USDHC1(e-MMC)\n");
+		break;
+	case MMC2_BOOT:
+		puts("USDHC2(e-MMC)\n");
+		break;
+	case MMC3_BOOT:
+		puts("USDHC3(e-MMC)\n");
+		break;
+	case USB_BOOT:
+		puts("USB\n");
+		break;
+	case QSPI_BOOT:
+		puts("FlexSPI\n");
+		break;
+	default:
+		printf("Unknown/Unsupported device %u\n", bt_dev);
+		break;
+	}
+
+	return 0;
+}
+
 int checkboard(void)
 {
+	print_bootinfo();
 	printf("Board: %s on a %s\n", tqc_get_boardname(),
 	       tqc_bb_get_boardname());
 
