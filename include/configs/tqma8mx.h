@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * Copyright 2019 - 2020 TQ Systems GmbH
+ * Copyright 2019 - 2021 TQ-Systems GmbH
  */
 
 #ifndef __TQMA8MX_H
