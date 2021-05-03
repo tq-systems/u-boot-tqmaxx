@@ -347,17 +347,20 @@ int tqc_bb_board_init(void)
 }
 
 /*
- * SD1 -> mmc0 / mmcblk0
- * SD2 -> mmc1 / mmcblk1
+ * USDHC1 -> mmc0 / mmcblk0
+ * USDHC2 -> mmc1 / mmcblk1
  */
 int board_mmc_get_env_dev(int devno)
 {
 	return devno;
 }
 
-int mmc_map_to_kernel_blk(int dev_no)
+/*
+ * we use dt alias based indexing, so kernel uses same index. See above
+ */
+int mmc_map_to_kernel_blk(int devno)
 {
-	return dev_no;
+	return devno;
 }
 
 int tqc_bb_board_late_init(void)
