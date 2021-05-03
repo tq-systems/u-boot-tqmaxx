@@ -137,6 +137,7 @@
 		"setenv filesize; setenv get_cmd \0"                           \
 	"uboot_mmc_start=0x40\0"                                               \
 	"uboot_mmc_size=0xfc0\0"                                               \
+	"uboot_fspi_start=0x0\0"                                               \
 	"uboot_fspi_size=0x400000\0"                                           \
 	"uboot=bootstream.bin\0"                                               \
 	"update_uboot_mmc=run set_getcmd; if ${get_cmd} ${uboot}; then "       \
