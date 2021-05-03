@@ -43,6 +43,8 @@ int board_early_init_f(void)
 	return 0;
 }
 
+#if !defined(CONFIG_SPL_BUILD)
+
 static const char *tqc_get_boardname(void)
 {
 	switch (get_cpu_type()) {
@@ -165,7 +167,6 @@ int ft_board_setup(void *blob, bd_t *bd)
 
 int board_late_init(void)
 {
-#if !defined(CONFIG_SPL_BUILD)
 	struct tqc_eeprom_data eeprom;
 	const char *bname = tqc_get_boardname();
 
@@ -177,7 +178,6 @@ int board_late_init(void)
 	/* set quartz load to 7.000 femtofarads */
 	if (tqc_pcf85063_adjust_capacity(0, 0x51, 7000))
 		puts("PCF85063: adjust error\n");
-#endif
 
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 	env_set("board_name", tqc_bb_get_boardname());
@@ -188,6 +188,8 @@ int board_late_init(void)
 
 	return 0;
 }
+
+#endif
 
 #ifdef CONFIG_IMX_BOOTAUX
 ulong board_get_usable_ram_top(ulong total_size)
