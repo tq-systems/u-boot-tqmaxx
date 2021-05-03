@@ -66,6 +66,8 @@ int board_early_init_f(void)
 	return 0;
 }
 
+#if !defined(CONFIG_SPL_BUILD)
+
 #ifdef CONFIG_OF_BOARD_SETUP
 
 static void tqma8mxml_ft_qspi_setup(void *blob)
@@ -131,7 +133,7 @@ int board_init(void)
 	return tqc_bb_board_init();
 }
 
-static const char *tqma8mxx_get_boardname(void)
+static const char *tqc_get_boardname(void)
 {
 	switch (get_cpu_type()) {
 	case MXC_CPU_IMX8MM:
@@ -160,7 +162,7 @@ static const char *tqma8mxx_get_boardname(void)
 		return "TQMa8MSLNL";
 	default:
 		return "??";
-	};
+	}
 	return "UNKNOWN";
 }
 
@@ -206,9 +208,8 @@ int print_bootinfo(void)
 
 int board_late_init(void)
 {
-#if !defined(CONFIG_SPL_BUILD)
 	struct tqc_eeprom_data eeprom;
-	const char *bname = tqma8mxx_get_boardname();
+	const char *bname = tqc_get_boardname();
 
 	if (!tqc_read_eeprom_at(0, 0x53, 1, 0, &eeprom))
 		tqc_board_handle_eeprom_data(bname, &eeprom);
@@ -217,11 +218,10 @@ int board_late_init(void)
 
 	/* set quartz load to 7.000 femtofarads */
 	tqc_pcf85063_adjust_capacity(0, 0x51, 7000);
-#endif
 
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 	env_set("board_name", tqc_bb_get_boardname());
-	env_set("board_rev", tqma8mxx_get_boardname());
+	env_set("board_rev", tqc_get_boardname());
 #endif
 
 	return tqc_bb_board_late_init();
@@ -230,7 +230,9 @@ int board_late_init(void)
 int checkboard(void)
 {
 	print_bootinfo();
-	printf("Board: %s on a %s\n", tqma8mxx_get_boardname(),
+	printf("Board: %s on a %s\n", tqc_get_boardname(),
 	       tqc_bb_get_boardname());
 	return 0;
 }
+
+#endif
