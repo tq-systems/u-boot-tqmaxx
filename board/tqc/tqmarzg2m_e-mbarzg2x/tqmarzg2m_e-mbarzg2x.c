@@ -27,6 +27,8 @@
 #include <mmc.h>
 #include <miiphy.h>
 
+#include "../common/tqmaxx_eeprom.h"
+
 DECLARE_GLOBAL_DATA_PTR;
 
 void s_init(void)
@@ -328,6 +330,56 @@ int dram_init_banksize(void)
 	fdtdec_setup_memory_banksize();
 
 	return 0;
+}
+
+static int mac_init(int eth_nr)
+{
+	int ret = -1;
+	struct tqmaxx_eeprom_data eepromdata;
+	char safe_string[0x41];
+	char ethaddrstring[9];
+	int i;
+
+	ret = tqmaxx_read_eeprom(CONFIG_SYS_EEPROM_BUS_NUM, CONFIG_SYS_I2C_EEPROM_ADDR, &eepromdata);
+
+	if (ret) {
+		printf("Error reading eeprom.\n");
+		return ret;
+	}
+
+	ret = tqmaxx_parse_eeprom_mac(&eepromdata, safe_string,
+				      ARRAY_SIZE(safe_string));
+	if (!ret) {
+		env_set("ethaddr", safe_string);
+		eth_env_set_enetaddr("ethaddr", (uchar *)safe_string);
+
+		for (i = 1; i <= eth_nr - 1; i++) {
+			ret = tqmaxx_parse_eeprom_mac_additional(&eepromdata, safe_string,
+								 ARRAY_SIZE(safe_string), i,
+								 "%02x:%02x:%02x:%02x:%02x:%02x");
+			if (!ret) {
+				snprintf(ethaddrstring, 9, "eth%daddr", i);
+				env_set(ethaddrstring, safe_string);
+				eth_env_set_enetaddr(ethaddrstring,
+						     (uchar *)safe_string);
+			}
+		}
+
+		tqmaxx_show_eeprom(&eepromdata, "\nTQMaRZG2M");
+	}
+
+	return 0;
+}
+
+int board_eth_init(bd_t *bis)
+{
+#if defined(CONFIG_TQC_EEPROM)
+	int eth_nr = 0;
+
+	return mac_init(eth_nr);
+#else
+	return 0;
+#endif
 }
 
 #define RST_BASE	0xE6160000

@@ -15,6 +15,8 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+int board_eth_init(bd_t *bis);
+
 /**
  * struct eth_device_priv - private structure for each Ethernet device
  *
@@ -389,6 +391,8 @@ int eth_initialize(void)
 	struct udevice *dev;
 
 	eth_common_init();
+	if (board_eth_init(gd->bd) < 0)
+		printf("Board Net Initialization Failed\n");
 
 	/*
 	 * Devices need to write the hwaddr even if not started so that Linux

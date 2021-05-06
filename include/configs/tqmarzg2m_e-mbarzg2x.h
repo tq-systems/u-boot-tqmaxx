@@ -26,6 +26,10 @@
 
 #define CONFIG_BOARD_LATE_INIT
 
+#define CONFIG_SYS_EEPROM_BUS_NUM		7
+#define CONFIG_SYS_I2C_EEPROM_ADDR		0x57
+#define CONFIG_SYS_I2C_EEPROM_ADDR_LEN	1
+
 /* override bootcmd from rcar-gen3-common.h */
 
 #undef CONFIG_BOOTCOMMAND
