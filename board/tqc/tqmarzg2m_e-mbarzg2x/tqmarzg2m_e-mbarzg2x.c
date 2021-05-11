@@ -314,6 +314,8 @@ int last_stage_init(void)
 	miiphy_write(devname, 0, 0x0e, 0x0170);
 	miiphy_write(devname, 0, 0x0d, 0x401f);
 	miiphy_write(devname, 0, 0x0e, 0x001f);
+
+	return 0;
 }
 #endif
 
