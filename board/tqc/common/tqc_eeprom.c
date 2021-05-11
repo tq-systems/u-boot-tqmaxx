@@ -47,6 +47,7 @@ int tqc_read_eeprom_buf(unsigned int bus, unsigned int i2c_addr,
 	return ret;
 }
 
+#ifdef CONFIG_TQC_VARD
 static struct tqc_eeprom_data eeprom;
 static int tqc_vard_has_been_read = 0;
 static bool tqc_vard_valid = false;
@@ -155,6 +156,7 @@ int tqc_has_feature2(u32 mask)
 	else
 		return 0;
 };
+#endif
 
 #if !defined(CONFIG_SPL_BUILD)
 
@@ -274,6 +276,7 @@ int tqc_read_eeprom(unsigned int bus, unsigned int i2c_addr,
 }
 #endif
 
+#ifdef CONFIG_TQC_VARD
 static int do_tqeeprom(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
 	if (argc < 2)
@@ -384,4 +387,5 @@ U_BOOT_CMD(tqeeprom, 3, 0, do_tqeeprom,
 	   "crc          - calculate and compare CRC16\n"
 	   "protect      - write-protect lower 128 byte (PERMANENT!)\n"
 );
+#endif
 #endif

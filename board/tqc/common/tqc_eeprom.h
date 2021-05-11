@@ -16,6 +16,7 @@ int tqc_read_eeprom_buf(unsigned int bus, unsigned int i2c_addr,
  * Bytes 0..31 Variant And Revision Detection
  */
 struct __attribute__ ((__packed__)) tqc_eeprom_data {
+#ifdef CONFIG_TQC_VARD
 	uint16_t crc;		/* checksum of vard data */
 	u8 hwrev;
 	u8 memsize;
@@ -23,6 +24,9 @@ struct __attribute__ ((__packed__)) tqc_eeprom_data {
 	u32 features1;
 	u32 features2;
 	u8 reserved[0x13];
+#else
+	u8 hrcw_primary[0x20];
+#endif
 	u8 mac[6];		/* 0x20 ... 0x25 */
 	u8 rsv1[10];
 	u8 serial[8];		/* 0x30 ... 0x37 */
@@ -30,11 +34,13 @@ struct __attribute__ ((__packed__)) tqc_eeprom_data {
 	u8 id[0x40];		/* 0x40 ... 0x7f */
 };
 
+#ifdef CONFIG_TQC_VARD
 int tqc_has_hwrev(u8 rev);
 int tqc_has_memsize(u8 size);
 int tqc_has_memtype(u8 type);
 int tqc_has_feature1(u32 mask);
 int tqc_has_feature2(u32 mask);
+#endif
 
 #if !defined(CONFIG_SPL_BUILD)
 

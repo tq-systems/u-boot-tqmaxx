@@ -13,6 +13,7 @@ config TQMA57XX
 	bool
 	default y
 	select TQC_EEPROM
+	select TQC_VARD
 
 config TQMA57XX_ECC
 	bool "TQMa57xx module w/ ECC DDR"
