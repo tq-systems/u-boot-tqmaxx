@@ -78,7 +78,7 @@ config TQMA8MPXL_DEFAULTS
 
 choice
 	prompt "TQMa8MPXL RAM configuration"
-	default TQMA8MPXL_RAM_2048MB_1G5
+	default TQMA8MPXL_RAM_2048MB
 	help
 	  Select RAM configuration for TQMa8MPXL
 
