@@ -376,14 +376,16 @@ static void fspi_set_lut(struct fsl_fspi_priv *priv)
 
 	lut_base = SEQID_RDEVCR * 4;
 	fspi_write32(priv->flags, &regs->lut[lut_base], OPRND0(FSPI_CMD_RD_EVCR) |
-		     PAD0(LUT_PAD1) | INSTR0(LUT_CMD));
+		     PAD0(LUT_PAD1) | INSTR0(LUT_CMD) | OPRND1(1) |
+		     PAD1(LUT_PAD1) | INSTR1(LUT_READ));
 	fspi_write32(priv->flags, &regs->lut[lut_base + 1], 0);
 	fspi_write32(priv->flags, &regs->lut[lut_base + 2], 0);
 	fspi_write32(priv->flags, &regs->lut[lut_base + 3], 0);
 
 	lut_base = SEQID_WREVCR * 4;
 	fspi_write32(priv->flags, &regs->lut[lut_base], OPRND0(FSPI_CMD_WR_EVCR) |
-		     PAD0(LUT_PAD1) | INSTR0(LUT_CMD));
+		     PAD0(LUT_PAD1) | INSTR0(LUT_CMD) | OPRND1(1) |
+		     PAD1(LUT_PAD1) | INSTR1(LUT_WRITE));
 	fspi_write32(priv->flags, &regs->lut[lut_base + 1], 0);
 	fspi_write32(priv->flags, &regs->lut[lut_base + 2], 0);
 	fspi_write32(priv->flags, &regs->lut[lut_base + 3], 0);
