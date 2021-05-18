@@ -105,9 +105,28 @@
 	 * ENET_GPIO: 0x10 [fast|x1] (no pull up)
 	 */
 
+	pinctrl_fec1: fec1grp {
+		fsl,pins = <
+			MX8MN_IOMUXC_ENET_MDC_ENET1_MDC		0x40000002
+			MX8MN_IOMUXC_ENET_MDIO_ENET1_MDIO	0x40000002
+			MX8MN_IOMUXC_ENET_TD3_ENET1_RGMII_TD3	0x14
+			MX8MN_IOMUXC_ENET_TD2_ENET1_RGMII_TD2	0x14
+			MX8MN_IOMUXC_ENET_TD1_ENET1_RGMII_TD1	0x14
+			MX8MN_IOMUXC_ENET_TD0_ENET1_RGMII_TD0	0x14
+			MX8MN_IOMUXC_ENET_RD3_ENET1_RGMII_RD3	0x90
+			MX8MN_IOMUXC_ENET_RD2_ENET1_RGMII_RD2	0x90
+			MX8MN_IOMUXC_ENET_RD1_ENET1_RGMII_RD1	0x90
+			MX8MN_IOMUXC_ENET_RD0_ENET1_RGMII_RD0	0x90
+			MX8MN_IOMUXC_ENET_TXC_ENET1_RGMII_TXC	0x14
+			MX8MN_IOMUXC_ENET_RXC_ENET1_RGMII_RXC	0x90
+			MX8MN_IOMUXC_ENET_RX_CTL_ENET1_RGMII_RX_CTL	0x90
+			MX8MN_IOMUXC_ENET_TX_CTL_ENET1_RGMII_TX_CTL	0x14
+			MX8MN_IOMUXC_SAI2_RXC_GPIO4_IO22	0x14
+		>;
+	};
+
 	pinctrl_gpiobutton: gpiobuttongrp {
 		fsl,pins = <
-			/* TODO: kernel has 0x41 */
 			MX8MN_IOMUXC_GPIO1_IO05_GPIO1_IO5	0x84
 			MX8MN_IOMUXC_GPIO1_IO07_GPIO1_IO7	0x84
 			MX8MN_IOMUXC_SD1_CLK_GPIO2_IO0		0x84
@@ -116,29 +135,36 @@
 
 	pinctrl_gpioled: gpioledgrp {
 		fsl,pins = <
-			/* TODO: kernel has 0x41 */
 			MX8MN_IOMUXC_GPIO1_IO00_GPIO1_IO0	0x84
 			MX8MN_IOMUXC_NAND_DQS_GPIO3_IO14	0x84
 		>;
 	};
 
-	pinctrl_fec1: fec1grp {
+	pinctrl_i2c2: i2c2grp {
 		fsl,pins = <
-			MX8MN_IOMUXC_ENET_MDC_ENET1_MDC		0x4000002
-			MX8MN_IOMUXC_ENET_MDIO_ENET1_MDIO	0x4000002
-			MX8MN_IOMUXC_ENET_TD3_ENET1_RGMII_TD3	0x16
-			MX8MN_IOMUXC_ENET_TD2_ENET1_RGMII_TD2	0x16
-			MX8MN_IOMUXC_ENET_TD1_ENET1_RGMII_TD1	0x16
-			MX8MN_IOMUXC_ENET_TD0_ENET1_RGMII_TD0	0x16
-			MX8MN_IOMUXC_ENET_RD3_ENET1_RGMII_RD3	0x90
-			MX8MN_IOMUXC_ENET_RD2_ENET1_RGMII_RD2	0x90
-			MX8MN_IOMUXC_ENET_RD1_ENET1_RGMII_RD1	0x90
-			MX8MN_IOMUXC_ENET_RD0_ENET1_RGMII_RD0	0x90
-			MX8MN_IOMUXC_ENET_TXC_ENET1_RGMII_TXC	0x16
-			MX8MN_IOMUXC_ENET_RXC_ENET1_RGMII_RXC	0x90
-			MX8MN_IOMUXC_ENET_RX_CTL_ENET1_RGMII_RX_CTL	0x90
-			MX8MN_IOMUXC_ENET_TX_CTL_ENET1_RGMII_TX_CTL	0x16
-			MX8MN_IOMUXC_SAI2_RXC_GPIO4_IO22	0x10
+			MX8MN_IOMUXC_I2C2_SCL_I2C2_SCL		0x400001C4
+			MX8MN_IOMUXC_I2C2_SDA_I2C2_SDA		0x400001C4
+		>;
+	};
+
+	pinctrl_i2c2_gpio: i2c2gpiogrp {
+		fsl,pins = <
+			MX8MN_IOMUXC_I2C2_SCL_GPIO5_IO16	0x400001C4
+			MX8MN_IOMUXC_I2C2_SDA_GPIO5_IO17	0x400001C4
+		>;
+	};
+
+	pinctrl_i2c3: i2c3grp {
+		fsl,pins = <
+			MX8MN_IOMUXC_I2C3_SCL_I2C3_SCL		0x400001C4
+			MX8MN_IOMUXC_I2C3_SDA_I2C3_SDA		0x400001C4
+		>;
+	};
+
+	pinctrl_i2c3_gpio: i2c3gpiogrp {
+		fsl,pins = <
+			MX8MN_IOMUXC_I2C3_SCL_GPIO5_IO18	0x400001C4
+			MX8MN_IOMUXC_I2C3_SDA_GPIO5_IO19	0x400001C4
 		>;
 	};
 
@@ -231,6 +257,40 @@
 		gpio-controller;
 		#gpio-cells = <2>;
 	};
+};
+
+&i2c2 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default", "gpio";
+	pinctrl-0 = <&pinctrl_i2c2>;
+	pinctrl-1 = <&pinctrl_i2c2_gpio>;
+	scl-gpios = <&gpio5 16 GPIO_ACTIVE_HIGH>;
+	sda-gpios = <&gpio5 17 GPIO_ACTIVE_HIGH>;
+	status = "okay";
+
+	/*
+	 * NXP SE97BTP with temperature sensor + eeprom
+	 */
+	sensor1: sensor@1f {
+		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+		reg = <0x1f>;
+	};
+
+	eeprom3: eeprom@57 {
+		compatible = "nxp,se97b", "atmel,24c02";
+		reg = <0x57>;
+		pagesize = <16>;
+	};
+};
+
+&i2c3 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default", "gpio";
+	pinctrl-0 = <&pinctrl_i2c3>;
+	pinctrl-1 = <&pinctrl_i2c3_gpio>;
+	scl-gpios = <&gpio5 18 GPIO_ACTIVE_HIGH>;
+	sda-gpios = <&gpio5 19 GPIO_ACTIVE_HIGH>;
+	status = "okay";
 };
 
 /* console */
