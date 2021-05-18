@@ -1421,6 +1421,67 @@ static int macronix_quad_enable(struct spi_nor *nor)
 }
 #endif
 
+#ifdef CONFIG_SPI_FLASH_STMICRO
+/*
+ * Read Micron enhanced volatile configuration register
+ * Return negative if error occurred or configuration register value
+ */
+static int micron_read_evcr(struct spi_nor *nor)
+{
+	int ret;
+	u8 val;
+
+	ret = nor->read_reg(nor, SPINOR_OP_RD_EVCR, &val, 1);
+	if (ret < 0) {
+		dev_dbg(nor->dev, "error %d reading EVCR\n", ret);
+		return ret;
+	}
+
+	return (int)val;
+}
+
+/*
+ * Write Micron enhanced volatile configuration register
+ * Return negative if error occurred or configuration register value
+ */
+static int micron_write_evcr(struct spi_nor *nor, u8 *evcr)
+{
+	int ret;
+
+	write_enable(nor);
+	ret = nor->write_reg(nor, SPINOR_OP_WD_EVCR, evcr, 1);
+	if (ret < 0)
+		debug("SF: fail to write EVCR\n");
+
+	return ret;
+}
+
+/*
+ * Write micron DSR value in enhanced volatile configuration register
+ * To preserve the other parts of the register, first register is read
+ * DSR bits are changed.
+ */
+static void micron_dsr_init(struct spi_nor *nor)
+{
+	struct udevice *dev = nor->dev;
+	u32 val;
+	int evcrr;
+	u8 evcr;
+
+	/* use default value 0x7 / 30 Ohms (Default) */
+	val = ofnode_read_u32_default(dev->node, "micron,dsr", 0x7);
+	evcrr = micron_read_evcr(nor);
+	if (evcrr >= 0) {
+		val = env_get_ulong("spinor_dsr", 16, val);
+		evcr = (u8)(val |= ((u32)evcrr & 0xf8));
+		micron_write_evcr(nor, &evcr);
+		dev_dbg(nor->dev, "wrote EVCR %x\n", (u32)evcr);
+	} else {
+		dev_warn(nor->dev, "read EVCR failed %d\n", evcrr);
+	}
+}
+#endif
+
 #if defined(CONFIG_SPI_FLASH_SPANSION) || defined(CONFIG_SPI_FLASH_WINBOND)
 /**
  * spansion_read_cr_quad_enable() - set QE bit in Configuration Register.
@@ -2498,6 +2559,12 @@ static int spi_nor_init(struct spi_nor *nor)
 	if (CONFIG_IS_ENABLED(SPI_FLASH_MACRONIX)) {
 		if (JEDEC_MFR(nor->info) == SNOR_MFR_MACRONIX)
 			macronix_dsr_init(nor);
+	}
+
+	if (CONFIG_IS_ENABLED(SPI_FLASH_STMICRO)) {
+		if (JEDEC_MFR(nor->info) == SNOR_MFR_MICRON ||
+		    JEDEC_MFR(nor->info) == SNOR_MFR_ST)
+			micron_dsr_init(nor);
 	}
 
 	/*
