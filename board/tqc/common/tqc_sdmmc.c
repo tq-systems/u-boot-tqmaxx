@@ -11,6 +11,8 @@
 #include <mmc.h>
 #include <stdbool.h>
 
+#include "tqc_sdmmc.h"
+
 static int check_mmc_autodetect(void)
 {
 	char *autodetect_str = env_get("mmcautodetect");
