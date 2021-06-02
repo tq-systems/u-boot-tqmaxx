@@ -60,6 +60,57 @@
 	"emmc_dev=0\0"\
 	"sd_dev=1\0" \
 
+#if defined(CONFIG_IMX_BOOTAUX)
+
+/*
+ * cm_loadaddr is set to TCML per default.
+ * cm_maxsize is used to prevent loading too large images. This limit is
+ * 128 kiByte for TCML.
+ * Size and base address can be changed to RAM address or SPI NOR if larger
+ * images are needed. In this case further adaption is needed.
+ */
+#define CM_ENV_SETTINGS                                                        \
+	"cm_image=cm.bin\0"                                                    \
+	"cm_loadaddr=0x7e0000\0"                                               \
+	"cm_maxsize=0x20000\0"                                                 \
+	"boot_cm_mmc=mmc dev ${mmcdev}; mmc rescan; "                          \
+			"if load mmc ${mmcdev}:${mmcpart} ${loadaddr} "        \
+				"${mmcpath}/${cm_image}; then "                \
+			"if itest ${filesize} > 0; then "                      \
+				"if itest ${filesize} <= ${cm_maxsize}; then " \
+					"cp.b ${loadaddr} ${cm_loadaddr} "     \
+						"${filesize};"                 \
+					"dcache flush; "                       \
+					"bootaux ${cm_loadaddr}; "             \
+				"else "                                        \
+					"echo ${filesize} > ${cm_maxsize}; "   \
+					"false; "                              \
+				"fi; "                                         \
+			"else "                                                \
+				"echo invalid data size; "                     \
+				"false; "                                      \
+			"fi; "                                                 \
+		"else "                                                        \
+			"echo file not loaded; "                               \
+			"false; "                                              \
+		"fi; setenv filesize;\0"                                       \
+	"update_cm_mmc=run set_getcmd; "                                       \
+		"if ${get_cmd} ${cm_image}; then "                             \
+			"if itest ${filesize} > 0; then "                      \
+				"mmc dev ${mmcdev}; mmc rescan; "              \
+				"echo Write CM image to mmc ...; "             \
+				"save mmc ${mmcdev}:${mmcpart} ${loadaddr} "   \
+					"${mmcpath}${cm_image} ${filesize}; "  \
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; setenv get_cmd\0"
+
+#else
+
+#define CM_ENV_SETTINGS
+
+#endif
+
 /* Initial environment variables */
 #define MODULE_ENV_SETTINGS		\
 	CONFIG_MFG_ENV_SETTINGS \
@@ -295,6 +346,7 @@
 #endif
 
 #define CONFIG_EXTRA_ENV_SETTINGS	\
+	CM_ENV_SETTINGS			\
 	MODULE_ENV_SETTINGS		\
 	BB_ENV_SETTINGS
 
