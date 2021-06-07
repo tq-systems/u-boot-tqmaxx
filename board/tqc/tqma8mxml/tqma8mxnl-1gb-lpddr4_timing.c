@@ -3,10 +3,11 @@
  * Copyright 2019 NXP
  *
  * Generated code from MX8M_DDR_tool
+ *
  * Align with uboot version:
- * imx_v2018.03_4.14.78_1.0.0_ga ~ imx_v2018.04_4.19.35_1.1.0_ga
- * TQMa8MQNL.1GByte.RAM-Timing.0003.xlsx / MT53D512M16D1DS-046 WT:D (HW REV.010x)
- * from MX8MN_LPDDR4_RPA_v15.xlsx
+ * imx_v2019.04_5.4.x and above version
+ * TQMa8MQNL.1GByte.RAM-Timing.0151.xlsx / K4F8E164HA-MGCL
+ * from MX8MN_LPDDR4_RPA_v5.xlsx
  */
 
 #include <linux/kernel.h>
@@ -801,7 +802,6 @@ static struct dram_cfg_param ddr_fsp0_2d_cfg[] = {
 	{ 0x54008, 0x61 },
 	{ 0x54009, 0xc8 },
 	{ 0x5400b, 0x2 },
-	{ 0x5400d, 0x100 },
 	{ 0x5400f, 0x100 },
 	{ 0x54010, 0x1f7f },
 	{ 0x54012, 0x110 },
