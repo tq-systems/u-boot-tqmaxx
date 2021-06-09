@@ -185,6 +185,36 @@ int board_mmc_init(bd_t *bis)
 
 #define I2C_PMIC	0
 
+#define DEBUG
+
+#if defined(DEBUG)
+static void print_pmic_config(struct pmic *p)
+{
+	u32 regval;
+
+	pmic_reg_read(p, PCA9450_BUCK123_DVS, &regval);
+	printf("PMIC:  PCA9450_BUCK123_DVS=0x%02x\n", regval);
+	pmic_reg_read(p, PCA9450_BUCK1OUT_DVS0, &regval);
+	printf("PMIC:  PCA9450_BUCK1OUT_DVS0=0x%02x\n", regval);
+	pmic_reg_read(p, PCA9450_BUCK1OUT_DVS1, &regval);
+	printf("PMIC:  PCA9450_BUCK1OUT_DVS1=0x%02x\n", regval);
+	pmic_reg_read(p, PCA9450_BUCK1CTRL, &regval);
+	printf("PMIC:  PCA9450_BUCK1CTRL=0x%02x\n", regval);
+	pmic_reg_read(p, PCA9450_BUCK3OUT_DVS0, &regval);
+	printf("PMIC:  PCA9450_BUCK3OUT_DVS0=0x%02x\n", regval);
+	pmic_reg_read(p, PCA9450_BUCK3OUT_DVS1, &regval);
+	printf("PMIC:  PCA9450_BUCK3OUT_DVS1=0x%02x\n", regval);
+	pmic_reg_read(p, PCA9450_BUCK3CTRL, &regval);
+	printf("PMIC:  PCA9450_BUCK3CTRL=0x%02x\n", regval);
+	pmic_reg_read(p, PCA9450_LDO2CTRL, &regval);
+	printf("PMIC:  PCA9450_LDO2CTRL=0x%02x\n", regval);
+	pmic_reg_read(p, PCA9450_RESET_CTRL, &regval);
+	printf("PMIC:  PCA9450_RESET_CTRL=0x%02x\n", regval);
+}
+#else
+static inline void print_pmic_config(struct pmic *p) {}
+#endif
+
 #if defined(CONFIG_POWER_PCA9450)
 int power_init_board(void)
 {
@@ -201,6 +231,7 @@ int power_init_board(void)
 	pmic_reg_read(p, PCA9450_REG_DEV_ID, &regval);
 	printf("PMIC:  PCA9450 ID=0x%02x\n", regval);
 
+	print_pmic_config(p);
 	/*
 	 * TODO:
 	 * check DVS for BUCK (power save with PMIC_STBY_REQ)
@@ -220,7 +251,9 @@ int power_init_board(void)
 
 #endif /* CONFIG_POWER_PCA9450 */
 
-#endif /* CONFIG_POWER */
+#else
+# error "please define CONFIG_POWER"
+#endif
 
 void spl_board_init(void)
 {
