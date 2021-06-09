@@ -240,11 +240,82 @@ int power_init_board(void)
 	 * see imx8m[m,n]_evk
 	 */
 
+	/* BUCKxOUT_DVS0/1 control BUCK123 output, disable PRESET_EN */
+	pmic_reg_write(p, PCA9450_BUCK123_DVS, 0x29);
+#if defined(CONFIG_IMX8MN)
+
+#ifdef CONFIG_IMX8MN_LOW_DRIVE_MODE
+#error "not tested"
+	/* Set VDD_SOC to 0.8v for low drive mode */
+	pmic_reg_write(p, PCA9450_BUCK1OUT_DVS0, 0x10);
+	pmic_reg_write(p, PCA9450_BUCK3OUT_DVS0, 0x10);
+#else
+	/*
+	 * DVS0 @ PMIC_STBY_REQ = L
+	 * increase BUCK1 DVS0 (VDD_SOC) to typical value 0.95V
+	 * increase BUCK3 DVS0 (VDD_GPU / DRAM) to typical value 0.95V
+	 * before first DRAM access
+	 * Datasheet 3.1.3: VDD_DRAM, VDD_SOC, and VDD_GPU are required
+	 * to be tied together and keep same or ground.
+	 */
+	pmic_reg_write(p, PCA9450_BUCK1OUT_DVS0, 0x1C);
+	pmic_reg_write(p, PCA9450_BUCK3OUT_DVS0, 0x1C);
+#endif
+	/*
+	 * DVS1 @ PMIC_STBY_REQ = H
+	 * set BUCK1 DVS1 (VDD_SOC) to 0.85V for suspend
+	 * set BUCK3 DVS1 (VDD_GPU / DRAM) to 0.85V for suspend
+	 */
+	pmic_reg_write(p, PCA9450_BUCK1OUT_DVS1, 0x14);
+	pmic_reg_write(p, PCA9450_BUCK3OUT_DVS1, 0x14);
+	/*
+	 * DVS_CTRL=1 (Enable DVS control through PMIC_STBY_REQ)
+	 * Bx_ENMODE=1 (ON by PMIC_ON_REQ=H)
+	 */
+	pmic_reg_write(p, PCA9450_BUCK1CTRL, 0x59);
+	pmic_reg_write(p, PCA9450_BUCK3CTRL, 0x59);
+	/* TODO: BUCK2 DVS CTRL, see PCA9450DS.pdf, 7.3.7 STANDBY */
+
+	/* set VDD_SNVS_0V8 to 0.8V */
+	pmic_reg_write(p, PCA9450_LDO2CTRL, 0xC0);
+#elif defined(CONFIG_IMX8MM)
+	/*
+	 * DVS0 @ PMIC_STBY_REQ = L
+	 * increase BUCK1 DVS0 (VDD_SOC) to typical value 0.85V with PCIe
+	 * increase BUCK3 DVS0 (VDD_GPU / VPU / DRAM) to typical value 0.95V
+	 * before first DRAM access
+	 * Datasheet 3.1.3: VDD_DRAM, VDD_VPU, and VDD_GPU for overdrive mode
+	 */
+	pmic_reg_write(p, PCA9450_BUCK1OUT_DVS0, 0x14);
+	pmic_reg_write(p, PCA9450_BUCK3OUT_DVS0, 0x1C);
+	/*
+	 * DVS1 @ PMIC_STBY_REQ = H
+	 * set BUCK1 DVS1 (VDD_SOC) to 0.85V for suspend
+	 * set BUCK3 DVS1 (VDD_GPU / VDD_VPU / DRAM) to 0.85V for suspend
+	 */
+	pmic_reg_write(p, PCA9450_BUCK1OUT_DVS1, 0x14);
+	pmic_reg_write(p, PCA9450_BUCK3OUT_DVS1, 0x14);
+	/*
+	 * DVS_CTRL=1 (Enable DVS control through PMIC_STBY_REQ)
+	 * Bx_ENMODE=1 (ON by PMIC_ON_REQ=H)
+	 */
+	pmic_reg_write(p, PCA9450_BUCK1CTRL, 0x59);
+	pmic_reg_write(p, PCA9450_BUCK3CTRL, 0x59);
+	/* TODO: BUCK2 DVS CTRL, see PCA9450DS.pdf, 7.3.7 STANDBY */
+
+	/* set VDD_SNVS_0V8 to 0.8V */
+	pmic_reg_write(p, PCA9450_LDO2CTRL, 0xC0);
+#else
+# error
+#endif
+
 	/* set WDOG_B_CFG to cold reset w/o LDO1/2 */
 	pmic_reg_read(p, PCA9450_RESET_CTRL, &regval);
 	regval &= 0x3f;
 	regval |= 0x80;
 	pmic_reg_write(p, PCA9450_RESET_CTRL, regval);
+
+	print_pmic_config(p);
 
 	return 0;
 }
