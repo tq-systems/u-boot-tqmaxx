@@ -149,6 +149,7 @@ struct i2c_pads_info i2c_pad_info1 = {
 
 #ifdef CONFIG_POWER
 
+#if defined(DEBUG)
 static void print_pmic_config(struct pmic *p)
 {
 	u32 regval;
@@ -164,6 +165,9 @@ static void print_pmic_config(struct pmic *p)
 	pmic_reg_read(p, PCA9450_BUCK2OUT_DVS0, &regval);
 	printf("PMIC:  PCA9450_BUCK2OUT_DVS0=0x%02x\n", regval);
 }
+#else
+static inline void print_pmic_config(struct pmic *p) {}
+#endif
 
 #define I2C_PMIC	0
 
@@ -182,7 +186,6 @@ int power_init_board(void)
 	pmic_reg_read(p, PCA9450_REG_DEV_ID, &regval);
 	printf("PMIC:  PCA9450 ID=0x%02x\n", regval);
 
-	/* TODO: remove before release */
 	print_pmic_config(p);
 	/*
 	 * BUCKxOUT_DVS0/1 control BUCK123 output
@@ -208,7 +211,6 @@ int power_init_board(void)
 	 */
 	pmic_reg_write(p, PCA9450_BUCK2OUT_DVS0, 0x1C);
 
-	/* TODO: remove before release */
 	print_pmic_config(p);
 
 	/*
