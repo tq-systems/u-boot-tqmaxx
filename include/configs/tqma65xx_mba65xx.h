@@ -155,6 +155,43 @@
 /* Incorporate settings into the U-Boot environment */
 #define CONFIG_EXTRA_ENV_SETTINGS					\
 	DEFAULT_MMC_TI_ARGS						\
+		"args_mmc=setenv bootargs console=${console} " \
+		"${optargs} " \
+		"root=/dev/mmcblk${mmcdev}p2 rw " \
+		"rootfstype=${mmcrootfstype}\0" \
+	"sysfw=sysfw.itb\0" \
+	"tiboot3=tiboot3.bin\0" \
+	"tispl=tispl.bin\0" \
+	"u-boot=u-boot.img\0" \
+	"update_firmware=setenv bootpart ${mmcdev}:1; " \
+		"if tftp ${sysfw}; then " \
+		"echo updating sysfw on mmc${mmcdev}...; " \
+		"mmc dev ${mmcdev}; mmc rescan; " \
+		"fatwrite ${devtype} ${bootpart} ${loadaddr} sysfw.itb ${filesize}; " \
+		"fi; if tftp ${tiboot3}; then " \
+		"echo updating tiboot3 on mmc${mmcdev}...; " \
+		"fatwrite ${devtype} ${bootpart} ${loadaddr} tiboot3.bin ${filesize}; " \
+		"fi; if tftp ${tispl}; then " \
+		"echo updating tispl on mmc${mmcdev}...; " \
+		"fatwrite ${devtype} ${bootpart} ${loadaddr} tispl.bin ${filesize}; " \
+		"fi; setenv filesize; \0" \
+	"update_uboot=setenv bootpart ${mmcdev}:1; " \
+		"if tftp ${u-boot}; then " \
+		"echo updating u-boot image (not firmware) on mmc${mmcdev}...; " \
+		"fatwrite ${devtype} ${bootpart} ${loadaddr} u-boot.img ${filesize}; " \
+		"fi; setenv filesize; \0" \
+	"update_kernel=setenv bootpart ${mmcdev}:1; " \
+		"if tftp ${bootfile}; then " \
+		"echo updating ${bootfile} on mmc${bootpart}...; " \
+		"mmc dev ${mmcdev}; mmc rescan; " \
+		"fatwrite ${devtype} ${bootpart} ${loadaddr} ${bootfile} ${filesize}; " \
+		"fi; setenv filesize; \0" \
+	"update_fdt=setenv bootpart ${mmcdev}:1; " \
+		"if tftp ${fdtfile}; then " \
+		"echo updating {fdtfile} on mmc${bootpart}...; " \
+		"mmc dev ${mmcdev}; mmc rescan; " \
+		"fatwrite ${devtype} ${bootpart} ${loadaddr} ${fdtfile} ${filesize}; " \
+		"fi; setenv filesize; \0" \
 	DEFAULT_FIT_TI_ARGS						\
 	FDT_ENV_TQMA65XX_BOARD						\
 	EXTRA_ENV_TQMA65XX_BOARD_SETTINGS					\
