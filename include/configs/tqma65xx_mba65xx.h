@@ -171,6 +171,10 @@
 #define CONFIG_SYS_MMC_ENV_PART	1
 #endif
 
+#define CONFIG_SYS_EEPROM_BUS_NUM 0
+#define CONFIG_SYS_I2C_EEPROM_ADDR 0x57
+#define CONFIG_SYS_I2C_EEPROM_ADDR_LEN 1
+
 /* Now for the remaining common defines */
 #include <configs/ti_armv7_common.h>
 

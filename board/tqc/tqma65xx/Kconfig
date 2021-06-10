@@ -13,6 +13,7 @@ config TARGET_TQMA65XX_MBA65XX_A53
 	select SOC_K3_AM6
 	select SYS_DISABLE_DCACHE_OPS
 	select BOARD_LATE_INIT
+	select TQC_EEPROM
 	imply BOARD
 	imply SPL_BOARD
 	imply BOARD_K3_EVMS
@@ -25,6 +26,7 @@ config TARGET_TQMA65XX_MBA65XX_R5
 	select SOC_K3_AM6
 	select K3_LOAD_SYSFW
 	select K3_AM654_DDRSS
+	select TQC_EEPROM
 	imply BOARD
 	imply SPL_BOARD
 	imply BOARD_K3_EVMS

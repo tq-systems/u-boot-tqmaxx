@@ -30,6 +30,7 @@
 #include <image-sparse.h>
 
 #include "../common/board_detect.h"
+#include "../common/tqc_eeprom.h"
 
 #define board_is_am65x_base_board()	board_ti_is("TQMA6548-P")
 #define MAX_INTERFACES_CONFIG	4
@@ -484,7 +485,7 @@ static int setup_board_prg_eth(void)
 		return ret;
 	}
 
-	if (ret == 1) {
+	if (ret == 0) {
 		// Set MAC addresses foe ethernet1, ethernet2
 		set_prg_eth(0, mac_addr_arr);
 	}
@@ -890,6 +891,14 @@ int board_late_init(void)
 {
 	const struct soc_device_attribute *match;
 	const struct tqma65xx_rev_fdt_data *fdt_data;
+#if !defined(CONFIG_SPL_BUILD)
+	int ret;
+	/* must hold largest field of eeprom data */
+	char safe_string[0x41];
+	struct tqc_eeprom_data eedat;
+	u32 mac;
+	u8 addr[6];
+#endif
 
 	setup_board_eeprom_env();
 
@@ -913,6 +922,73 @@ int board_late_init(void)
 	/* Check for and probe any plugged-in daughtercards */
 	add_mba_interfaces();
 	setup_board_clock_synthesizer();
+
+#if !defined(CONFIG_SPL_BUILD)
+	ret = tqc_read_eeprom_buf(CONFIG_SYS_EEPROM_BUS_NUM, CONFIG_SYS_I2C_EEPROM_ADDR,
+				  CONFIG_SYS_I2C_EEPROM_ADDR_LEN, 0,  sizeof(eedat),
+				  (void *)&eedat);
+	if (!ret) {
+		/* ID */
+		tqc_parse_eeprom_id(&eedat, safe_string, ARRAY_SIZE(safe_string));
+		if (strncmp(safe_string, "TQM", 3) == 0)
+			env_set("boardtype", safe_string);
+		if (tqc_parse_eeprom_serial(&eedat, safe_string, ARRAY_SIZE(safe_string)) == 0)
+			env_set("serial#", safe_string);
+		else
+			env_set("serial#", "???");
+
+		if (tqc_parse_eeprom_mac(&eedat, safe_string, ARRAY_SIZE(safe_string)) == 0) {
+			env_set("eth1addr", safe_string);
+
+			string_to_enetaddr(safe_string, addr);
+			mac = addr[3] << 16 | addr[4] << 8 | addr[5];
+			mac++;
+			mac &= 0xFFFFFF;
+
+			env_set("eth2addr", "");
+			addr[3] = (uint8_t)(mac >> 16);
+			addr[4] = (uint8_t)(mac >>  8);
+			addr[5] = (uint8_t)(mac >>  0);
+			eth_env_set_enetaddr("eth2addr", addr);
+			mac++;
+			mac &= 0xFFFFFF;
+
+			env_set("eth3addr", "");
+			addr[3] = (uint8_t)(mac >> 16);
+			addr[4] = (uint8_t)(mac >>  8);
+			addr[5] = (uint8_t)(mac >>  0);
+			eth_env_set_enetaddr("eth3addr", addr);
+			mac++;
+			mac &= 0xFFFFFF;
+
+			env_set("eth4addr", "");
+			addr[3] = (uint8_t)(mac >> 16);
+			addr[4] = (uint8_t)(mac >>  8);
+			addr[5] = (uint8_t)(mac >>  0);
+			eth_env_set_enetaddr("eth4addr", addr);
+			mac++;
+			mac &= 0xFFFFFF;
+
+			env_set("eth5addr", "");
+			addr[3] = (uint8_t)(mac >> 16);
+			addr[4] = (uint8_t)(mac >>  8);
+			addr[5] = (uint8_t)(mac >>  0);
+			eth_env_set_enetaddr("eth5addr", addr);
+			mac++;
+			mac &= 0xFFFFFF;
+
+			env_set("eth6addr", "");
+			addr[3] = (uint8_t)(mac >> 16);
+			addr[4] = (uint8_t)(mac >>  8);
+			addr[5] = (uint8_t)(mac >>  0);
+			eth_env_set_enetaddr("eth6addr", addr);
+		}
+
+		tqc_show_eeprom(&eedat, "TQM");
+	} else {
+		printf("EEPROM: err %d\n", ret);
+	}
+#endif
 
 	return 0;
 }
