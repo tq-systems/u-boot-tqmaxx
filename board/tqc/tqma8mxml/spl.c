@@ -185,8 +185,6 @@ int board_mmc_init(bd_t *bis)
 
 #define I2C_PMIC	0
 
-#define DEBUG
-
 #if defined(DEBUG)
 static void print_pmic_config(struct pmic *p)
 {
@@ -233,14 +231,10 @@ int power_init_board(void)
 
 	print_pmic_config(p);
 	/*
-	 * TODO:
-	 * check DVS for BUCK (power save with PMIC_STBY_REQ)
-	 * check VDD_SOC/DRAM -> 0.95 Volt
-	 * check VDD_SNVS_0V8 -> 0.85V
-	 * see imx8m[m,n]_evk
+	 * BUCKxOUT_DVS0/1 control BUCK123 output
+	 * clear PRESET_EN,
+	 * BUCK voltage is determined by each BUCKxOUT_DVS0 or BUCKxOUT_DVS1
 	 */
-
-	/* BUCKxOUT_DVS0/1 control BUCK123 output, disable PRESET_EN */
 	pmic_reg_write(p, PCA9450_BUCK123_DVS, 0x29);
 #if defined(CONFIG_IMX8MN)
 
