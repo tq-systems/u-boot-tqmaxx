@@ -40,7 +40,11 @@
 #define JROWN_NS		0x00000008
 #define JRMID_NS		0x00000001
 
+#ifdef CONFIG_IMX8ULP
+#define JRDID_MS_PRIM_DID	7
+#else
 #define JRDID_MS_PRIM_DID	BIT(0)
+#endif
 #define JRDID_MS_PRIM_TZ	BIT(4)
 #define JRDID_MS_TZ_OWN		BIT(15)
 
