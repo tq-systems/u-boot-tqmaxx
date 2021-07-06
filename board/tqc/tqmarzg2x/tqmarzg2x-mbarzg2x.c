@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * board/tqc/tqmarzg2n_b-mbarzg2x/tqmarzg2n_b-mbarzg2x.c
- *     This file provides TQMaRZG2N board support.
+ * board/tqc/tqmarzg2x/tqmarzg2x-mbarzg2x.c
+ *     This file provides common board support for TQMaRZG2x modules.
  *
  * Copyright (C) 2015-2019 Renesas Electronics Corporation
  * Copyright (C) 2015 Nobuhiro Iwamatsu <iwamatsu@nigauri.org>
@@ -247,7 +247,7 @@ static int clockgen_init(void)
 
 int board_init(void)
 {
-	/* addess of boot parameters */
+	/* address of boot parameters */
 	gd->bd->bi_boot_params = CONFIG_SYS_TEXT_BASE + 0x50000;
 
 	/* USB1 pull-up */
@@ -366,7 +366,7 @@ static int mac_init(int eth_nr)
 			}
 		}
 
-		tqmaxx_show_eeprom(&eepromdata, "\nTQMaRZG2N");
+		tqmaxx_show_eeprom(&eepromdata, "\nTQMaRZG2x");
 	}
 
 	return 0;

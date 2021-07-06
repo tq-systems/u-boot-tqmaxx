@@ -3,6 +3,7 @@ M:	Andreas Dumberger <andreas.dumberger@tq-group.com>
 S:	Maintained
 F:	board/tqc/tqmarzg2n_b-mbrzg2x/
 F:	include/configs/tqmarzg2n_b-mbarzg2x.h
+F:	include/configs/tqmarzg2_common.h
 F:	configs/tqmarzg2n_b-mbarzg2x_defconfig
 F:	arch/arm/dts/r8a774b1-tqmarzg2n_b-mbarzg2x.dts
 F:	arch/arm/dts/r8a774b1-tqmarzg2n_b-mbarzg2x-u-boot.dts

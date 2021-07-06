@@ -7,4 +7,4 @@
 # SPDX-License-Identifier: GPL-2.0+
 #
 
-obj-y	:= tqmarzg2n_b-mbarzg2x.o
+obj-y	:= ../tqmarzg2x/tqmarzg2x-mbarzg2x.o
