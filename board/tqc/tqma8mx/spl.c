@@ -35,7 +35,7 @@ static void spl_dram_init(void)
 
 	printf("SPL: CPU rev. %u.%u\n", (rev & 0xf0) >> 4, rev & 0xf);
 	/* ddr init */
-	if (rev == CHIP_REV_2_1) {
+	if (rev >= CHIP_REV_2_1) {
 #if defined(CONFIG_TQMA8MX_RAM_4G)
 		ddr_init(&tqma8mx_4gb_dram_timing);
 #elif defined(CONFIG_TQMA8MX_RAM_2G)
