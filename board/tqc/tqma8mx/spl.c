@@ -157,8 +157,23 @@ int power_init_board(void)
 }
 #endif
 
+#define IMX8MQ_GPR_PCIE_VREG_BYPASS		BIT(12)
+
 void spl_board_init(void)
 {
+	struct iomuxc_gpr_base_regs *const iomuxc_gpr_regs =
+		(struct iomuxc_gpr_base_regs *)IOMUXC_GPR_BASE_ADDR;
+
+	/*
+	 * Regarding to the datasheet, the PCIE_VPH is suggested
+	 * to be 1.8V. If the PCIE_VPH is supplied by 3.3V, the
+	 * VREG_BYPASS should be cleared to zero.
+	 */
+	clrsetbits_le32(&iomuxc_gpr_regs->gpr[14],
+			IMX8MQ_GPR_PCIE_VREG_BYPASS, 0);
+	clrsetbits_le32(&iomuxc_gpr_regs->gpr[16],
+			IMX8MQ_GPR_PCIE_VREG_BYPASS, 0);
+
 #ifndef CONFIG_SPL_USB_SDP_SUPPORT
 	/* Serial download mode */
 	if (is_usb_boot()) {
