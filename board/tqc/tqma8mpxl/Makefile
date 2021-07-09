@@ -3,7 +3,7 @@
 ## Copyright 2021 TQ-Systems GmbH
 ##
 
-obj-y += tqma8mpxl.o
+obj-y += tqma8mpxl.o tqma8mpxl-usbg.o
 obj-$(CONFIG_TQMA8MPXL_BB_MBA8MPXL) += tqma8mpxl-mba8mpxl.o
 
 ifdef CONFIG_SPL_BUILD
