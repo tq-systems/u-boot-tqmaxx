@@ -14,9 +14,9 @@
 #include <asm/arch/sys_proto.h>
 #include <asm/mach-imx/gpio.h>
 #include <usb.h>
-#include <dwc3-uboot.h>
 
 #include "../common/tqc_board_gpio.h"
+#include "tqma8mpxl-usbg.h"
 
 #define MBA8MPXL_BOARD_NAME "MBa8MPxL"
 
@@ -205,10 +205,14 @@ int board_usb_init(int index, enum usb_init_type init)
 		gpio = &mba8mpxl_gid[USB_OTG_PWR].desc;
 		switch (init) {
 		case USB_INIT_DEVICE:
-			if (otg_id)
+			if (otg_id) {
 				dm_gpio_set_value(gpio, 0);
-			else
+#ifdef CONFIG_USB_DWC3_GADGET
+				ret = tqma8mpxl_usb_dwc3_gadget_init();
+#endif
+			} else {
 				ret = -ENODEV;
+			}
 			break;
 		case USB_INIT_HOST:
 			if (!otg_id)
