@@ -153,6 +153,16 @@ int power_init_board(void)
 	pmic_reg_read(p, PFUZE100_DEVICEID, &reg);
 	printf("PMIC:  PFUZE100 ID=0x%02x\n", reg);
 
+	pmic_reg_read(p, PFUZE100_SW3AVOL, &reg);
+	if ((reg & 0x3f) != 0x18) {
+		printf("PMIC:  adjust VDD DRAM (SW3AVOL) %x -> 0x18\n", reg);
+		reg &= ~0x3f;
+		reg |= 0x18;
+		pmic_reg_write(p, PFUZE100_SW3AVOL, reg);
+	}
+
+	/* TODO: set mode to APS_PFM for all SW, SW3A to APS_OFF */
+
 	return 0;
 }
 #endif
