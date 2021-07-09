@@ -265,6 +265,13 @@
 	u-boot,dm-spl;
 	u-boot,dm-pre-proper;
 	mmc-hs400-1_8v;
+	mmc-hs400-enhanced-strobe;
+	/*
+	 * prevents voltage switch warn: driver will switch even at
+	 * fixed voltage
+	 */
+	/delete-property/ vmmc-supply;
+	/delete-property/ vqmmc-supply;
 };
 
 &usdhc2 {
