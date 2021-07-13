@@ -146,6 +146,14 @@
 			<200000000>;
 };
 
+&snvs {
+	status = "disabled";
+};
+
+&snvs_rtc {
+	status = "disabled";
+};
+
 &binman {
 	filename = "flash.bin";
 	section {
