@@ -111,6 +111,10 @@
 	};
 };
 
+&scmi_buf {
+	reg = <0x0 0x1000>; /* Align page size */
+};
+
 &dsi {
 	data-lanes-num = <4>;
 };
