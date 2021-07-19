@@ -70,12 +70,14 @@
 		reg = <0x1b>;
 	};
 
-	pmic: pca9450@25 {
+	pmic: pmic@25 {
 		reg = <0x25>;
 		compatible = "nxp,pca9450c";
 		/* PMIC PCA9450 PMIC_nINT GPIO1_IO8 */
 		pinctrl-0 = <&pinctrl_pmic>;
-		gpio_intr = <&gpio1 8 GPIO_ACTIVE_LOW>;
+		pinctrl-names = "default";
+		interrupt-parent = <&gpio1>;
+		interrupts = <8 IRQ_TYPE_LEVEL_LOW>;
 
 		regulators {
 			#address-cells = <1>;
@@ -85,50 +87,44 @@
 			/* Run/Standby voltage */
 			pca9450,pmic-buck2-dvs-voltage = <950000>, <850000>;
 
+			/* V_0V85_SOC: 0.85 .. 0.95 */
 			buck1_reg: regulator@0 {
 				reg = <0>;
 				regulator-compatible = "buck1";
-				/*
-				 * TODO:
-				 * V_0V85_SOC min = 850.000 max = 950.000
-				 */
-				regulator-min-microvolt = <600000>;
-				regulator-max-microvolt = <2187500>;
+				regulator-min-microvolt = <850000>;
+				regulator-max-microvolt = <950000>;
 				regulator-boot-on;
 				regulator-always-on;
 				regulator-ramp-delay = <3125>;
 			};
 
+			/* VDD_ARM */
 			buck2_reg: regulator@1 {
 				reg = <1>;
 				regulator-compatible = "buck2";
-				/*
-				 * TODO:
-				 *  V_0V85_ARM min = 850.000 max = 950.000
-				 */
-				regulator-min-microvolt = <600000>;
-				regulator-max-microvolt = <2187500>;
+				regulator-min-microvolt = <850000>;
+				regulator-max-microvolt = <1000000>;
 				regulator-boot-on;
 				regulator-always-on;
 				regulator-ramp-delay = <3125>;
 			};
 
+			/* VCC3V3 -> VMMC, ... must not be changed */
 			buck4_reg: regulator@3 {
 				reg = <3>;
 				regulator-compatible = "buck4";
-				/* TODO: V_3V3 min = max = 3.300.000 */
-				regulator-min-microvolt = <600000>;
-				regulator-max-microvolt = <3400000>;
+				regulator-min-microvolt = <3300000>;
+				regulator-max-microvolt = <3300000>;
 				regulator-boot-on;
 				regulator-always-on;
 			};
 
+			/* V_1V8 -> VQMMC, SPI-NOR, ... must not be changed */
 			buck5_reg: regulator@4 {
 				reg = <4>;
 				regulator-compatible = "buck5";
-				/* TODO: V_1V8 min = max = 1.800.000 */
-				regulator-min-microvolt = <600000>;
-				regulator-max-microvolt = <3400000>;
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <1800000>;
 				regulator-boot-on;
 				regulator-always-on;
 			};
@@ -136,19 +132,18 @@
 			buck6_reg: regulator@5 {
 				reg = <5>;
 				regulator-compatible = "buck6";
-				/* TODO: V_1V1 min = max = 1.100.000 */
-				regulator-min-microvolt = <600000>;
-				regulator-max-microvolt = <3400000>;
+				regulator-min-microvolt = <1100000>;
+				regulator-max-microvolt = <1100000>;
 				regulator-boot-on;
 				regulator-always-on;
 			};
 
+			/* V_1V8_SNVS */
 			ldo1_reg: regulator@6 {
 				reg = <6>;
 				regulator-compatible = "ldo1";
-				/* TODO: V_1V8_SNVS min = max = 1.800.000 */
-				regulator-min-microvolt = <1600000>;
-				regulator-max-microvolt = <3300000>;
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <1800000>;
 				regulator-boot-on;
 				regulator-always-on;
 			};
@@ -159,36 +154,36 @@
 				regulator-min-microvolt = <800000>;
 				regulator-max-microvolt = <1150000>;
 				/*
-				 * regulator-boot-on;
-				 * regulator-always-on;
+				 * NOTE:
+				 * even if this is an unused supply, it must not
+				 * disabled, otherwise the system hits an POR
 				 */
-			};
-
-			ldo3_reg: regulator@8 {
-				reg = <8>;
-				regulator-compatible = "ldo3";
-				/* TODO: V_1V8_ANA min = max = 1.800.000 */
-				regulator-min-microvolt = <800000>;
-				regulator-max-microvolt = <3300000>;
 				regulator-boot-on;
 				regulator-always-on;
 			};
 
+			/* V_1V8_ANA */
+			ldo3_reg: regulator@8 {
+				reg = <8>;
+				regulator-compatible = "ldo3";
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <1800000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+
+			/* unused */
 			ldo4_reg: regulator@9 {
 				reg = <9>;
 				regulator-compatible = "ldo4";
 				regulator-min-microvolt = <800000>;
 				regulator-max-microvolt = <3300000>;
-				/*
-				 * regulator-boot-on;
-				 * regulator-always-on;
-				 */
 			};
 
+			/* VCC SD IO - switched using SD2 VSELECT */
 			ldo5_reg: regulator@10 {
 				reg = <10>;
 				regulator-compatible = "ldo5";
-				/* TODO: V_SD2 */
 				regulator-min-microvolt = <1800000>;
 				regulator-max-microvolt = <3300000>;
 			};
