@@ -55,7 +55,8 @@
 };
 
 &i2c1 {
-	clock-frequency = <400000>;
+	/* Errata: limit clk to <= 384000 Hz */
+	clock-frequency = <384000>;
 	pinctrl-names = "default", "gpio";
 	pinctrl-0 = <&pinctrl_i2c1>;
 	pinctrl-1 = <&pinctrl_i2c1_gpio>;
