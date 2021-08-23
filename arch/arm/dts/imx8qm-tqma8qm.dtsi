@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 /*
- * Copyright 2019-2020 TQ-Systems GmbH
+ * Copyright 2019-2021 TQ-Systems GmbH
  */
 
 #include "fsl-imx8qm.dtsi"
@@ -8,12 +8,6 @@
 / {
 	model = "TQ-Systems i.MX8QM TQMa8QM";
 	compatible = "tq,imx8qm-tqma8qm", "fsl,imx8qm";
-
-	config {
-		/* 32 kiB redundant env */
-		u-boot,mmc-env-offset = <0x400000>;
-		u-boot,mmc-env-offset-redundant = <0x408000>;
-	};
 };
 
 &flexspi0 {

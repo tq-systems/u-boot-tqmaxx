@@ -1,12 +1,18 @@
 // SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 /*
- * Copyright 2018 - 2020 TQ-Systems GmbH
+ * Copyright 2018 - 2021 TQ-Systems GmbH
  */
 
 / {
 	aliases {
 		usbhost1 = &usbh3;
 		usbgadget0 = &usbg1;
+	};
+
+	config {
+		/* 32 kiB redundant env */
+		u-boot,mmc-env-offset = <0x400000>;
+		u-boot,mmc-env-offset-redundant = <0x408000>;
 	};
 
 	usbh3: usbh3 {
