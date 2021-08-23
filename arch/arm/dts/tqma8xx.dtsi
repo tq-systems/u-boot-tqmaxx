@@ -3,14 +3,6 @@
  * Copyright 2018 - 2021 TQ-Systems GmbH
  */
 
-/ {
-	config {
-		/* 32 kiB redundant env */
-		u-boot,mmc-env-offset = <0x400000>;
-		u-boot,mmc-env-offset-redundant = <0x408000>;
-	};
-};
-
 &iomuxc {
 	pinctrl_lpi2c1: lpi2c1grp {
 		fsl,pins = <
