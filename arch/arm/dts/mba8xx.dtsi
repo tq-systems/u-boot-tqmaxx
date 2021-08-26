@@ -72,6 +72,40 @@
 		startup-delay-us = <1000>;
 		enable-active-high;
 	};
+
+	/*
+	 * TODO:
+	 * these are defined in CPU part of dtb, which is wrong.
+	 * check when porting to newer release and keep in sync with kernel dtb
+	 */
+#if 0
+	reserved-memory {
+		decoder_boot: decoder-boot@84000000 {
+			reg = <0 0x84000000 0 0x2000000>;
+			no-map;
+		};
+
+		encoder_boot: encoder-boot@86000000 {
+			reg = <0 0x86000000 0 0x200000>;
+			no-map;
+		};
+
+		decoder_rpc: decoder-rpc@0x92000000 {
+			reg = <0 0x92000000 0 0x200000>;
+			no-map;
+		};
+
+		encoder_rpc: encoder-rpc@0x92200000 {
+			reg = <0 0x92200000 0 0x200000>;
+			no-map;
+		};
+
+		encoder_reserved: encoder_reserved@94400000 {
+			reg = <0 0x94400000 0 0x800000>;
+			no-map;
+		};
+	};
+#endif
 };
 
 &i2c1 {
