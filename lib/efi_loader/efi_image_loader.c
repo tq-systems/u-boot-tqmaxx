@@ -275,6 +275,7 @@ efi_status_t efi_load_pe(struct efi_loaded_image_obj *handle, void *efi,
 		image_base = opt->ImageBase;
 		efi_set_code_and_data_type(loaded_image_info, opt->Subsystem);
 		handle->image_type = opt->Subsystem;
+		virt_size = ALIGN(virt_size, opt->SectionAlignment);
 		efi_reloc = efi_alloc(virt_size,
 				      loaded_image_info->image_code_type);
 		if (!efi_reloc) {
@@ -285,12 +286,12 @@ efi_status_t efi_load_pe(struct efi_loaded_image_obj *handle, void *efi,
 		handle->entry = efi_reloc + opt->AddressOfEntryPoint;
 		rel_size = opt->DataDirectory[rel_idx].Size;
 		rel = efi_reloc + opt->DataDirectory[rel_idx].VirtualAddress;
-		virt_size = ALIGN(virt_size, opt->SectionAlignment);
 	} else if (nt->OptionalHeader.Magic == IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
 		IMAGE_OPTIONAL_HEADER32 *opt = &nt->OptionalHeader;
 		image_base = opt->ImageBase;
 		efi_set_code_and_data_type(loaded_image_info, opt->Subsystem);
 		handle->image_type = opt->Subsystem;
+		virt_size = ALIGN(virt_size, opt->SectionAlignment);
 		efi_reloc = efi_alloc(virt_size,
 				      loaded_image_info->image_code_type);
 		if (!efi_reloc) {
@@ -301,7 +302,6 @@ efi_status_t efi_load_pe(struct efi_loaded_image_obj *handle, void *efi,
 		handle->entry = efi_reloc + opt->AddressOfEntryPoint;
 		rel_size = opt->DataDirectory[rel_idx].Size;
 		rel = efi_reloc + opt->DataDirectory[rel_idx].VirtualAddress;
-		virt_size = ALIGN(virt_size, opt->SectionAlignment);
 	} else {
 		printf("%s: Invalid optional header magic %x\n", __func__,
 		       nt->OptionalHeader.Magic);
