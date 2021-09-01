@@ -136,6 +136,11 @@ config TQMA8MPXL_RAM_2048MB
 	help
 	  Select variant with 2048 MiB RAM
 
+config TQMA8MPXL_RAM_8192MB
+	bool "TQMa8x with 8192 MiB RAM, no ECC"
+	help
+	  Select variant with 8192 MiB RAM
+
 config TQMA8MPXL_RAM_2048MB_ECC
 	bool "TQMa8x with 2048 MiB RAM, with ECC"
 	select IMX8M_DRAM_INLINE_ECC

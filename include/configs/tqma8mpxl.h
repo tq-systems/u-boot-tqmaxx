@@ -278,12 +278,20 @@
 
 /* Size of malloc() pool */
 #define CONFIG_SYS_MALLOC_LEN		SZ_64M
-#define CONFIG_SYS_SDRAM_BASE		0x40000000
-#define PHYS_SDRAM			0x40000000
+#define CONFIG_SYS_SDRAM_BASE		0x40000000ull
+#define PHYS_SDRAM			0x40000000ull
+#define PHYS_SDRAM_2			0x100000000ull
 
 #if defined(CONFIG_TQMA8MPXL_RAM_2048MB) || \
 	defined(CONFIG_TQMA8MPXL_RAM_2048MB_1G5)
-#define PHYS_SDRAM_SIZE			0x80000000 /* 2GB LPDDR4 */
+
+#define PHYS_SDRAM_SIZE			(2ull * SZ_1G) /* 2GB LPDDR4 */
+
+#elif defined(CONFIG_TQMA8MPXL_RAM_8192MB)
+
+#define PHYS_SDRAM_SIZE			(3ull * SZ_1G) /* 3GB LPDDR4 */
+#define PHYS_SDRAM_2_SIZE		(5ull * SZ_1G) /* 5GB LPDDR4 */
+
 #else
 #error
 #endif
