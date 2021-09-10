@@ -923,7 +923,8 @@ dtb-$(CONFIG_ARCH_IMX8) += \
 	imx8-capricorn-cxg3.dtb \
 
 dtb-$(CONFIG_ARCH_IMX8ULP) += \
-	imx8ulp-evk.dtb
+	imx8ulp-evk.dtb \
+	imx8ulp-evk-i3c.dtb
 
 dtb-$(CONFIG_ARCH_IMX8M) += \
 	imx8mm-data-modul-edm-sbc.dtb \
