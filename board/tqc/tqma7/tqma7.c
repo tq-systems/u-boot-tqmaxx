@@ -370,7 +370,6 @@ int board_get_dtt_bus(void)
  * Device Tree Support
  */
 #if defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT)
-
 static void tqma7_ft_qspi_setup(void *blob, bd_t *bd)
 {
 	int off;
@@ -476,10 +475,17 @@ int tqma7_ft_m4_setup(void *blob, bd_t *bd)
 inline int tqma7_ft_m4_setup(void *blob, bd_t *bd) {}
 #endif
 
+static const char * const tqma7_emmc_dt_path[] = {
+	"/soc/aips-bus@030800000/usdhc@030b60000",
+	"/soc/aips-bus@30800000/usdhc@30b60000",
+	"/soc/bus@30800000/mmc@30b60000",
+};
+
 #define MODELSTRLEN 32u
 int ft_board_setup(void *blob, bd_t *bd)
 {
 	char modelstr[MODELSTRLEN];
+	int err;
 
 	snprintf(modelstr, MODELSTRLEN, "TQ %s on %s", tqma7_get_boardname(),
 		 tqc_bb_get_boardname());
@@ -488,10 +494,14 @@ int ft_board_setup(void *blob, bd_t *bd)
 	tqma7_ft_m4_setup(blob, bd);
 
 	/* bring in eMMC dsr settings if needed */
-	if (tqma7_emmc_needs_dsr(0) > 0) {
-		tqc_ft_fixup_emmc_dsr(blob,
-				      "/soc/aips-bus@30800000/usdhc@30b60000",
-				      tqma7_emmc_dsr);
+	if (tqma7_emmc_needs_dsr(0)) {
+		err = tqc_ft_try_fixup_emmc_dsr(blob,
+						tqma7_emmc_dt_path,
+						ARRAY_SIZE(tqma7_emmc_dt_path),
+						(u32)tqma7_emmc_dsr
+					       );
+		if (err)
+			puts("ERROR: failed to patch e-MMC DSR in DT\n");
 	}
 
 	tqma7_ft_qspi_setup(blob, bd);
@@ -499,4 +509,6 @@ int ft_board_setup(void *blob, bd_t *bd)
 
 	return 0;
 }
+#else
+#error "need CONFIG_OF_BOARD_SETUP and CONFIG_OF_LIBFDT"
 #endif /* defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT) */
