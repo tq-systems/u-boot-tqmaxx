@@ -479,7 +479,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 		puts("e-MMC: not present?\n");
 	}
 
-	if (SPI_NOR_BOOT== get_boot_device()) {
+	if (SPI_NOR_BOOT == get_boot_device()) {
 		enable_flash = 1;
 	} else {
 #if defined(CONFIG_MXC_SPI)
