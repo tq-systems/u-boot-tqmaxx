@@ -8,6 +8,8 @@
 #define __TQC_EMMC_H__
 
 int tqc_emmc_need_dsr(struct mmc *mmc);
-int tqc_ft_fixup_emmc_dsr(void *blob, const char *path, u32 value);
+void tqc_ft_fixup_emmc_dsr(void *blob, const char *path, u32 value);
+int tqc_ft_try_fixup_emmc_dsr(void *blob, const char * const *path_list,
+			      size_t list_len, u32 dsr_value);
 
 #endif /* __TQC_EMMC_H__ */

@@ -6,6 +6,8 @@
  */
 
 #include <common.h>
+#include <fdt_support.h>
+#include <errno.h>
 #include <mmc.h>
 
 #if defined(CONFIG_SPL_BUILD)
@@ -75,9 +77,24 @@ int tqc_emmc_need_dsr(struct mmc *mmc)
 	return ret;
 }
 
-int tqc_ft_fixup_emmc_dsr(void *blob, const char *path, u32 value)
+void tqc_ft_fixup_emmc_dsr(void *blob, const char *path, u32 value)
 {
 	do_fixup_by_path_u32(blob, path, "dsr", value, 1);
-	return 0;
 }
 
+int tqc_ft_try_fixup_emmc_dsr(void *blob, const char * const *path_list,
+			      size_t list_len, u32 dsr_value)
+{
+	size_t idx;
+	int node_off;
+
+	for (idx = 0; idx < list_len; ++idx) {
+		node_off = fdt_path_offset(blob, path_list[idx]);
+		if (node_off >= 0) {
+			tqc_ft_fixup_emmc_dsr(blob, path_list[idx], dsr_value);
+			break;
+		}
+	}
+
+	return (idx < list_len) ? 0 : -ENOENT;
+}
