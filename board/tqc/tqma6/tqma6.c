@@ -17,6 +17,7 @@
 #include <asm/arch/mx6-pins.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/gpio.h>
+#include <asm/mach-imx/boot_device.h>
 #include <asm/mach-imx/iomux-v3.h>
 #include <asm/mach-imx/mxc_i2c.h>
 #include <asm/mach-imx/spi.h>
@@ -27,12 +28,13 @@
 #include <mmc.h>
 #include <power/pfuze100_pmic.h>
 #include <power/pmic.h>
+#if defined(CONFIG_MXC_SPI)
+#include <spi.h>
 #include <spi_flash.h>
+#endif
 
-#if defined(CONFIG_SPL_BUILD)
 #include <fdt_support.h>
 #include <spl.h>
-#endif
 
 #include "../common/tqc_emmc.h"
 #include "tqma6_bb.h"
@@ -495,6 +497,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 	struct mmc *mmc = find_mmc_device(0);
 	int off;
 	char modelstr[MODELSTRLEN];
+	int enable_flash = 0;
 	int err;
 
 	snprintf(modelstr, MODELSTRLEN, "TQ %s on %s", tqma6_get_boardname(),
@@ -517,7 +520,6 @@ int ft_board_setup(void *blob, bd_t *bd)
 		}
 	}
 
-
 	/* bring in eMMC dsr settings if needed */
 	if (mmc && (!mmc_init(mmc))) {
 		if (tqc_emmc_need_dsr(mmc) > 0) {
@@ -533,6 +535,45 @@ int ft_board_setup(void *blob, bd_t *bd)
 		puts("e-MMC: not present?\n");
 	}
 
+	if (BOOT_DEVICE_SPI == imx_boot_device()) {
+		enable_flash = 1;
+	} else {
+#if defined(CONFIG_MXC_SPI)
+		unsigned int bus = CONFIG_SF_DEFAULT_BUS;
+		unsigned int cs = CONFIG_SF_DEFAULT_CS;
+		unsigned int speed = CONFIG_SF_DEFAULT_SPEED;
+		unsigned int mode = CONFIG_SF_DEFAULT_MODE;
+#ifdef CONFIG_DM_SPI_FLASH
+		struct udevice *new, *bus_dev;
+		int ret;
+
+		/* Remove the old device, otherwise probe will just be a nop */
+		ret = spi_find_bus_and_cs(bus, cs, &bus_dev, &new);
+		if (!ret) {
+			device_remove(new);
+			device_unbind(new);
+		}
+		ret = spi_flash_probe_bus_cs(bus, cs, speed, mode, &new);
+		if (!ret) {
+			device_remove(new);
+			device_unbind(new);
+			enable_flash = 1;
+		}
+#else
+		struct spi_flash *new;
+
+		new = spi_flash_probe(bus, cs, speed, mode);
+		if (new) {
+			spi_flash_free(new);
+			enable_flash = 1;
+		}
+#endif
+#endif
+	}
+	off = fdt_node_offset_by_compatible(blob, -1, "jedec,spi-nor");
+	fdt_set_node_status(blob, off,
+			    (enable_flash) ? FDT_STATUS_OKAY : FDT_STATUS_DISABLED,
+			    0);
 
 	tqma6_bb_ft_board_setup(blob, bd);
 
