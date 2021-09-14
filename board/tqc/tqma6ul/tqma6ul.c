@@ -501,10 +501,18 @@ static void tqma6ul_ft_qspi_setup(void *blob, bd_t *bd)
 				    0);
 }
 
+
+static const char * const tqma6ul_emmc_dt_path[] = {
+	"/soc/aips-bus@02100000/usdhc@02194000",
+	"/soc/aips-bus@2100000/usdhc@2194000",
+	"/soc/bus@2100000/mmc@2194000",
+};
+
 int ft_board_setup(void *blob, bd_t *bd)
 {
 	struct mmc *mmc = find_mmc_device(0);
 	char modelstr[MODELSTRLEN];
+	int err;
 
 	snprintf(modelstr, MODELSTRLEN, "TQ %s on %s", tqma6ul_get_boardname(),
 		 tqc_bb_get_boardname());
@@ -514,9 +522,13 @@ int ft_board_setup(void *blob, bd_t *bd)
 	/* bring in eMMC dsr settings if needed */
 	if (mmc && (!mmc_init(mmc))) {
 		if (tqc_emmc_need_dsr(mmc) > 0) {
-			tqc_ft_fixup_emmc_dsr(blob,
-					      "/soc/aips-bus@02100000/usdhc@02194000",
-					      tqma6ul_emmc_dsr);
+			err = tqc_ft_try_fixup_emmc_dsr(blob,
+							tqma6ul_emmc_dt_path,
+							ARRAY_SIZE(tqma6ul_emmc_dt_path),
+							(u32)tqma6ul_emmc_dsr
+						       );
+			if (err)
+				puts("ERROR: failed to patch e-MMC DSR in DT\n");
 		}
 	} else {
 		puts("e-MMC: not present?\n");
@@ -527,4 +539,6 @@ int ft_board_setup(void *blob, bd_t *bd)
 
 	return 0;
 }
+#else
+#error "need CONFIG_OF_BOARD_SETUP and CONFIG_OF_LIBFDT"
 #endif /* defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT) */
