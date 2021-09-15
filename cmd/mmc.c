@@ -7,6 +7,7 @@
 #include <common.h>
 #include <command.h>
 #include <console.h>
+#include <memalign.h>
 #include <mmc.h>
 #include <sparse_format.h>
 #include <image-sparse.h>
@@ -569,8 +570,34 @@ static int do_mmc_maxhwpartsectors(cmd_tbl_t *cmdtp, int flag, int argc, char * 
 	return 0;
 }
 
-static int parse_hwpart_user(struct mmc_hwpart_conf *pconf,
-			     int argc, char * const argv[])
+static void parse_hwpart_user_enh_size(struct mmc *mmc,
+				       struct mmc_hwpart_conf *pconf,
+				       char *argv)
+{
+	int ret;
+
+	pconf->user.enh_size = 0;
+
+	if (!strcmp(argv, "-"))	{ /* The rest of eMMC */
+		ALLOC_CACHE_ALIGN_BUFFER(u8, ext_csd, MMC_MAX_BLOCK_LEN);
+		ret = mmc_send_ext_csd(mmc, ext_csd);
+		if (ret)
+			return;
+		/* This value is in 512B block units */
+		pconf->user.enh_size =
+			((ext_csd[EXT_CSD_MAX_ENH_SIZE_MULT + 2] << 16) +
+			(ext_csd[EXT_CSD_MAX_ENH_SIZE_MULT + 1] << 8) +
+			ext_csd[EXT_CSD_MAX_ENH_SIZE_MULT]) * 1024 *
+			ext_csd[EXT_CSD_HC_ERASE_GRP_SIZE] *
+			ext_csd[EXT_CSD_HC_WP_GRP_SIZE];
+		pconf->user.enh_size -= pconf->user.enh_start;
+	} else {
+		pconf->user.enh_size = simple_strtoul(argv, NULL, 10);
+	}
+}
+
+static int parse_hwpart_user(struct mmc *mmc, struct mmc_hwpart_conf *pconf,
+			     int argc, char *const argv[])
 {
 	int i = 0;
 
@@ -582,8 +609,7 @@ static int parse_hwpart_user(struct mmc_hwpart_conf *pconf,
 				return -1;
 			pconf->user.enh_start =
 				simple_strtoul(argv[i+1], NULL, 10);
-			pconf->user.enh_size =
-				simple_strtoul(argv[i+2], NULL, 10);
+			parse_hwpart_user_enh_size(mmc, pconf, argv[i + 2]);
 			i += 3;
 		} else if (!strcmp(argv[i], "wrrel")) {
 			if (i + 1 >= argc)
@@ -655,7 +681,7 @@ static int do_mmc_hwpartition(cmd_tbl_t *cmdtp, int flag,
 	while (i < argc) {
 		if (!strcmp(argv[i], "user")) {
 			i++;
-			r = parse_hwpart_user(&pconf, argc-i, &argv[i]);
+			r = parse_hwpart_user(mmc, &pconf, argc - i, &argv[i]);
 			if (r < 0)
 				return CMD_RET_USAGE;
 			i += r;
