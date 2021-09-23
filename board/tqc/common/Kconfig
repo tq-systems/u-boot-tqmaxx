@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Copyright (c) 2016-2022 TQ-Systems GmbH <license@tq-group.com>, D-82229 Seefeld, Germany.
+
+config TQ_EEPROM
+	bool
+	depends on DM_I2C
+	select DM_I2C_EEPROM
+	select I2C_EEPROM
