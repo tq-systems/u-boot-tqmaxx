@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Copyright (C) 2016-2022 TQ-Systems GmbH
+
+config TQ_EEPROM
+	bool
+	select I2C_EEPROM
