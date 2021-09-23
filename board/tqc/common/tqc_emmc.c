@@ -31,7 +31,11 @@ static const struct emmc_dsr_lookup dsr_tbl[] = {
 	{ 0x13, "Q1J54A", 1 },
 	{ 0x13, "Q2J54A", 1 },
 	/* Micron, e-MMC 5.0 8 GB*/
+#if defined (CONFIG_TARGET_TQMLS102XA)
 	{ 0x13, "Q2J55L", 1 },
+#else
+	{ 0x13, "Q2J55L", 0 },
+#endif
 	/* Samsung, e-MMC 5.0 */
 	{ 0x15, "8GSD3R", 0 },
 	{ 0x15, "AGSD3R", 0 },
