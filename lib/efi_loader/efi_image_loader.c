@@ -275,9 +275,9 @@ efi_status_t efi_load_pe(struct efi_loaded_image_obj *handle, void *efi,
 		image_base = opt->ImageBase;
 		efi_set_code_and_data_type(loaded_image_info, opt->Subsystem);
 		handle->image_type = opt->Subsystem;
-		virt_size = ALIGN(virt_size, opt->SectionAlignment);
-		efi_reloc = efi_alloc(virt_size,
-				      loaded_image_info->image_code_type);
+		efi_reloc = efi_alloc_aligned_pages(virt_size,
+						    loaded_image_info->image_code_type,
+						    opt->SectionAlignment);
 		if (!efi_reloc) {
 			printf("%s: Could not allocate %lu bytes\n",
 			       __func__, virt_size);
@@ -291,9 +291,9 @@ efi_status_t efi_load_pe(struct efi_loaded_image_obj *handle, void *efi,
 		image_base = opt->ImageBase;
 		efi_set_code_and_data_type(loaded_image_info, opt->Subsystem);
 		handle->image_type = opt->Subsystem;
-		virt_size = ALIGN(virt_size, opt->SectionAlignment);
-		efi_reloc = efi_alloc(virt_size,
-				      loaded_image_info->image_code_type);
+		efi_reloc = efi_alloc_aligned_pages(virt_size,
+						    loaded_image_info->image_code_type,
+						    opt->SectionAlignment);
 		if (!efi_reloc) {
 			printf("%s: Could not allocate %lu bytes\n",
 			       __func__, virt_size);

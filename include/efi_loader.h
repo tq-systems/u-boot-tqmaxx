@@ -503,6 +503,8 @@ struct efi_file_handle *efi_file_from_path(struct efi_device_path *fp);
 #define efi_size_in_pages(size) ((size + EFI_PAGE_MASK) >> EFI_PAGE_SHIFT)
 /* Generic EFI memory allocator, call this to get memory */
 void *efi_alloc(uint64_t len, int memory_type);
+/* Allocate pages on the specified alignment */
+void *efi_alloc_aligned_pages(u64 len, int memory_type, size_t align);
 /* More specific EFI memory allocator, called by EFI payloads */
 efi_status_t efi_allocate_pages(int type, int memory_type, efi_uintn_t pages,
 				uint64_t *memory);
