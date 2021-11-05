@@ -1,0 +1,9 @@
+TQMaRZG2M BOARD
+M:	Andreas Dumberger <andreas.dumberger@tq-group.com>
+S:	Maintained
+F:	board/tqc/tqmarzg2m_aa-mbrzg2x/
+F:	include/configs/tqmarzg2m_aa-mbarzg2x.h
+F:	include/configs/tqmarzg2_common.h
+F:	configs/tqmarzg2m_aa-mbarzg2x_defconfig
+F:	arch/arm/dts/r8a774a1-tqmarzg2m_aa-mbarzg2x.dts
+F:	arch/arm/dts/r8a774a1-tqmarzg2m_aa-mbarzg2x-u-boot.dts

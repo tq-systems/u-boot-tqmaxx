@@ -1,0 +1,17 @@
+if TARGET_TQMARZG2M_AA_MBARZG2X
+
+config SYS_SOC
+	default "rmobile"
+
+config SYS_BOARD
+	default "tqmarzg2m_aa-mbarzg2x"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_CONFIG_NAME
+	default "tqmarzg2m_aa-mbarzg2x"
+
+source "board/tqc/common/Kconfig"
+
+endif

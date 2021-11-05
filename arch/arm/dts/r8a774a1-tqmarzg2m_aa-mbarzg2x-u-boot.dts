@@ -1,0 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0+ OR MIT
+/*
+ * Device Tree Source for U-Boot for the TQMaRZG2M-AA module on a MBaRZG2x board
+ *
+ * Copyright (C) 2019 Renesas Electronisc Corporation
+ * Copyright (C) 2021 TQ-Systems GmbH
+ */
+
+#include "r8a774a1-tqmarzg2m_aa-mbarzg2x.dts"
+#include "r8a774a1-u-boot.dtsi"

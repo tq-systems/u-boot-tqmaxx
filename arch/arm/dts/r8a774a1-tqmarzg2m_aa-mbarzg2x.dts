@@ -1,0 +1,71 @@
+// SPDX-License-Identifier: GPL-2.0+ OR MIT
+/*
+ * Device Tree Source for U-Boot for the TQMaRZG2M-AA module on a MBaRZG2x board
+ *
+ * Copyright (C) 2019 Renesas Electronics Corporation
+ * Copyright (C) 2021 TQ-Systems GmbH
+ */
+
+/dts-v1/;
+#include "r8a774a1.dtsi"
+#include "mbarzg2x-common.dtsi"
+
+/ {
+	model = "TQ-Systems RZ/G2M platform (mbarzg2x)";
+	compatible = "tq,mbarzg2x", "tq,tqmarzg2m", "renesas,r8a774a1";
+
+	memory@48000000 {
+		device_type = "memory";
+		/* first 128MB is reserved for secure area. */
+		reg = <0x0 0x48000000 0x0 0x78000000>;
+	};
+};
+
+&du {
+	clocks = <&cpg CPG_MOD 724>,
+		 <&cpg CPG_MOD 723>,
+		 <&cpg CPG_MOD 722>,
+		 <&cpg CPG_MOD 727>,
+		 <&versaclock5 1>,
+		 <&x21_clk>,
+		 <&versaclock5 2>;
+	clock-names = "du.0", "du.1", "du.2", "lvds.0",
+		      "dclkin.0", "dclkin.1", "dclkin.2";
+};
+
+&hdmi0 {
+	status = "okay";
+
+	ports {
+		port@1 {
+			reg = <1>;
+			rcar_dw_hdmi0_out: endpoint {
+				remote-endpoint = <&hdmi0_con>;
+			};
+		};
+	};
+};
+
+&hdmi0_con {
+	remote-endpoint = <&rcar_dw_hdmi0_out>;
+};
+
+&ehci0 {
+	status = "okay";
+};
+
+&ehci1 {
+	status = "okay";
+};
+
+&hsusb {
+	status = "okay";
+};
+
+&ohci0 {
+	sattus = "okay";
+};
+
+&ohci1 {
+	sattus = "okay";
+};

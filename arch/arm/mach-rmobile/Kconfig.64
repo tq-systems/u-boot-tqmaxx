@@ -87,6 +87,12 @@ config TARGET_TQMARZG2M_E_MBARZG2X
 	help
           Support for TQMaRZG2M platform
 
+config TARGET_TQMARZG2M_AA_MBARZG2X
+	bool "TQMaRZG2M board (2GiB)"
+	select TQC_EEPROM
+	help
+          Support for TQMaRZG2M platform
+
 config TARGET_TQMARZG2H_C_MBARZG2X
 	bool "TQMaRZG2H board (4GiB)"
 	select TQC_EEPROM
@@ -113,6 +119,7 @@ source "board/renesas/hihope-rzg2m/Kconfig"
 source "board/renesas/hihope-rzg2n/Kconfig"
 source "board/renesas/hihope-rzg2h/Kconfig"
 source "board/tqc/tqmarzg2m_e-mbarzg2x/Kconfig"
+source "board/tqc/tqmarzg2m_aa-mbarzg2x/Kconfig"
 source "board/tqc/tqmarzg2h_c-mbarzg2x/Kconfig"
 source "board/tqc/tqmarzg2n_b-mbarzg2x/Kconfig"
 
