@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: GPL-2.0+ */
+/* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
  * include/configs/tqmrzg2_common.h
  *	Configuration settings for the TQ Systems TQMaRZG2x modules on

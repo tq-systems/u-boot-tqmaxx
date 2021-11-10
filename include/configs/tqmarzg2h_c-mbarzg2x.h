@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: GPL-2.0+ */
+/* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
  * include/configs/tqmrzg2h_c-mbarzg2x.h
  *     This file is TQMaRZG2H-C (4GiB) module on MBaRZG2x board configuration.

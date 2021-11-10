@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-2.0+
+// SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * board/tqc/tqmarzg2x/tqmarzg2x-mbarzg2x.c
  *     This file provides common board support for TQMaRZG2x modules.
