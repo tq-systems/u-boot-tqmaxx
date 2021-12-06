@@ -115,7 +115,7 @@ static iomux_v3_cfg_t const emmc_pads[] = {
 extern struct dram_timing_info tqma8mxml_2gb_dram_timing;
 static struct dram_timing_info *default_dram_timing = &tqma8mxml_2gb_dram_timing;
 
-#elif defined(CONFIG_TQMA8MMX_RAM_1048MB)
+#elif defined(CONFIG_TQMA8MMX_RAM_1024MB)
 
 extern struct dram_timing_info tqma8mxml_1gb_dram_timing;
 static struct dram_timing_info *default_dram_timing = &tqma8mxml_1gb_dram_timing;
