@@ -11,6 +11,14 @@ tqma8mxml_2gb_mba8mx_mmc_defconfig
 tqma8mxml_2gb_mba8mx_fspi_defconfig
 tqma8mxml_2gb_mba8mx_mfg_defconfig
 
+TQMa8MxML / 1 GiB LPDDR4 / i.MX8MM
+
+configs:
+
+tqma8mxml_1gb_mba8mx_mmc_defconfig
+tqma8mxml_1gb_mba8mx_fspi_defconfig
+tqma8mxml_1gb_mba8mx_mfg_defconfig
+
 TQMa8MxNL / 1 GiB LPDDR4 / i.MX8MN
 
 configs:
