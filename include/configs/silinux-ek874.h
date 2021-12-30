@@ -17,4 +17,7 @@
 /* Generic Timer Definitions (use in assembler source) */
 #define COUNTER_FREQUENCY	0xFE502A	/* 16.66MHz from CPclk */
 
+/* Reserved mem for Kernel/dtb ECC area */
+#define CONFIG_PRAM		(32 * 1024)
+
 #endif /* __SILINUX_EK874_H */
