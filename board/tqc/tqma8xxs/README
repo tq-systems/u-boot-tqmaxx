@@ -12,13 +12,6 @@ tqma8xdps_mb_smarc_2_mfg_defconfig
 tqma8xqps_mb_smarc_2_defconfig
 tqma8xqps_mb_smarc_2_mfg_defconfig
 
-TQMa8QXPS hardware revision 020x / 2 GiB LPDDR4 / i.MX8QXP C0
-
-configs:
-
-tqma8xqps_mb_smarc_2_r0200_defconfig
-tqma8xqps_mb_smarc_2_r0200_mfg_defconfig
-
 Quick Start
 ===========
 
@@ -47,7 +40,7 @@ $ ./imx-seco-3.7.1.bin
 Get SCFW
 ========
 
-TQMa8X[D,Q]PS/TQMa8QXPS_R0200: tqma8xqps-mb-smarc-2-scfw-tcm.bin
+TQMa8X[D,Q]PS: tqma8xqps-mb-smarc-2-scfw-tcm.bin
 
 wget https://github.com/tq-systems/meta-tq/blob/zeus-tqma8/dynamic-layers/fsl-bsp-release/recipes-bsp/imx-sc-firmware/imx-sc-firmware/imx-sc-firmware-tq-TQMa8.NXP-v1.6.0.B4894.0030.tar.gz
 tar -xf ./imx-sc-firmware-tq-TQMa8.NXP-v1.6.0.B4894.0030.tar.gz
@@ -64,7 +57,7 @@ $ cp imx-sc-firmware-tq-TQMa8.NXP-v1.6.0.B4894.0030/tqma8xqps-mb-smarc-2-scfw-tc
 Build U-Boot
 ============
 
-$ make tqma8x[d,q]ps_mb_smarc_2[_r0200]_defconfig
+$ make tqma8x[d,q]ps_mb_smarc_2_defconfig
 $ make flash.bin
 
 Flash the binary into the SD card
