@@ -237,8 +237,8 @@ config DEFAULT_DEVICE_TREE
 	default "imx8dxp-mb-smarc-2" if TQMA8XXS_CPU_MX8DXP && TQMA8XXS_BB_MB_SMARC_2
 
 config DEFAULT_FDT_FILE
-	default "imx8qxp-mb-smarc-2.dtb" if TQMA8XXS_CPU_MX8QXP && TQMA8XXS_BB_MB_SMARC_2
-	default "imx8dxp-mb-smarc-2.dtb" if TQMA8XXS_CPU_MX8DXP && TQMA8XXS_BB_MB_SMARC_2
+	default "imx8qxp-tqma8xqps-mb-smarc-2.dtb" if TQMA8XXS_CPU_MX8QXP && TQMA8XXS_BB_MB_SMARC_2
+	default "imx8dxp-tqma8xdps-mb-smarc-2.dtb" if TQMA8XXS_CPU_MX8DXP && TQMA8XXS_BB_MB_SMARC_2
 
 menu "TQMa8XxS boot device"
 
