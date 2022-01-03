@@ -211,7 +211,7 @@ config DEFAULT_DEVICE_TREE
 	default "imx8mp-mba8mpxl" if TQMA8MPXL_BB_MBA8MPXL
 
 config DEFAULT_FDT_FILE
-	default "imx8mp-mba8mpxl.dtb" if TQMA8MPXL_BB_MBA8MPXL
+	default "imx8mp-tqma8mpql-mba8mpxl.dtb" if TQMA8MPXL_BB_MBA8MPXL
 
 menu "TQMa8MPxL boot device"
 
