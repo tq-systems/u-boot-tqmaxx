@@ -231,8 +231,8 @@ config DEFAULT_DEVICE_TREE
 	default "imx8dxp-mba8xx" if TQMA8XX_CPU_MX8DXP && TQMA8XX_BB_MBA8XX
 
 config DEFAULT_FDT_FILE
-	default "imx8qxp-mba8xx.dtb" if TQMA8XX_CPU_MX8QXP && TQMA8XX_BB_MBA8XX
-	default "imx8dxp-mba8xx.dtb" if TQMA8XX_CPU_MX8DXP && TQMA8XX_BB_MBA8XX
+	default "imx8qxp-tqma8xqp-mba8xx.dtb" if TQMA8XX_CPU_MX8QXP && TQMA8XX_BB_MBA8XX
+	default "imx8dxp-tqma8xdp-mba8xx.dtb" if TQMA8XX_CPU_MX8DXP && TQMA8XX_BB_MBA8XX
 
 menu "TQMa8XQP boot device"
 
