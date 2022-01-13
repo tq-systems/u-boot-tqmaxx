@@ -11,7 +11,7 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-u8 tqmls102xa_module_eeprom_addr = CONFIG_SYS_I2C_EEPROM_ADDR;
+static u8 tqmls102xa_module_eeprom_addr = CONFIG_SYS_I2C_EEPROM_ADDR;
 static const uint16_t tqmls102xa_emmc_dsr = 0x0100;
 
 void ddrmc_init(void)
@@ -358,10 +358,43 @@ int tqmls102xa_qspi_has_second_chip(void)
 }
 #endif
 
+
+/*
+ * Device Tree paths for eeprom nodes have been changed in Linux kernel 5.4.
+*/
+static const char * const tqmls102xa_eeprom_dt_path[] = {
+	"/soc/i2c@2180000/24c64@54", /* befor Linux kernel 5.4 */
+	"/soc/i2c@2180000/eeprom@54", /* since Linux kernel 5.4 */
+};
+
+void tqmls102xa_ft_fixup_eeprom(void *blob, const char *path, u32 addr)
+{
+	do_fixup_by_path_u32(blob, path, "reg", addr, 0);
+}
+
+int tqmls102xa_ft_try_fixup_eeprom(void *blob, const char * const *path_list,
+				   size_t list_len, u32 addr)
+{
+	size_t idx;
+	int node_off;
+
+	for (idx = 0; idx < list_len; ++idx) {
+		node_off = fdt_path_offset(blob, path_list[idx]);
+
+		if (node_off >= 0) {
+			tqmls102xa_ft_fixup_eeprom(blob, path_list[idx], addr);
+			break;
+		}
+	}
+
+	return (idx < list_len) ? 0 : -ENOENT;
+};
+
 int ft_board_setup(void *blob, bd_t *bd)
 {
 	int off;
 	int present;
+	int err;
 #ifdef CONFIG_FSL_ESDHC
 	struct mmc *mmc = find_mmc_device(0);
 
@@ -424,13 +457,19 @@ int ft_board_setup(void *blob, bd_t *bd)
 	}
 
 	/* Modify device tree for module eeprom address */
-	if (tqmls102xa_module_eeprom_addr != 0x54) {
-		printf("ft_board_setup: setting module eeprom address to 0x%x\n",
-			tqmls102xa_module_eeprom_addr);
+	if (tqmls102xa_module_eeprom_addr != CONFIG_SYS_I2C_EEPROM_ADDR) {
+		err = tqmls102xa_ft_try_fixup_eeprom(blob,
+						     tqmls102xa_eeprom_dt_path,
+						     ARRAY_SIZE(tqmls102xa_eeprom_dt_path),
+						     (u32)tqmls102xa_module_eeprom_addr
+						    );
 
-		do_fixup_by_path_u32(blob,
-				"/soc/i2c@2180000/24c64@54",
-				"reg", tqmls102xa_module_eeprom_addr, 0);
+		if (err) {
+			puts("ERROR: failed to patch eeprom address in DT\n");
+		} else {
+			printf("ft_board_setup: setting module eeprom address to 0x%x\n",
+			       tqmls102xa_module_eeprom_addr);
+		}
 	}
 
 	return 0;
