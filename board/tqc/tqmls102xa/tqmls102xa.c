@@ -238,7 +238,6 @@ int board_late_init(void)
 	 * try old address in case running on a pre-0203 module
 	 */
 	if (ret && (0x50 != addr)) {
-		printf("EEPROM: (0x%x) err %d\n", addr, ret);
 		addr = 0x50;
 		ret = tqmaxx_read_eeprom(CONFIG_SYS_EEPROM_BUS_NUM,
 					 addr,
@@ -246,7 +245,7 @@ int board_late_init(void)
 	}
 
 	if (ret) {
-		printf("EEPROM: (0x%x) err %d\n", addr, ret);
+		printf("ERROR: Module EEPROM could not be read (err %d)\n", ret);
 	} else {
 		/* ID */
 		tqmaxx_parse_eeprom_id(&eedat, safe_string,
