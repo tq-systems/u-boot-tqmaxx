@@ -95,18 +95,18 @@
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
 	"mmcpath=/\0" \
 	"mmcautodetect=yes\0" \
-	"loadbootscript=mmc dev ${mmcdev}; " \
+	"loadbootscript=mmc dev ${mmcdev}; mmc rescan;" \
 		"load mmc ${mmcdev}:${mmcpart} ${loadaddr} " \
 		"${mmcpath}${script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
 		"source\0" \
-	"loadimage=mmc dev ${mmcdev}; " \
+	"loadimage=mmc dev ${mmcdev}; mmc rescan;" \
 		"load mmc ${mmcdev}:${mmcpart} ${loadaddr} " \
 			"${mmcpath}${image}\0" \
-	"loadfdt=mmc dev ${mmcdev}; " \
+	"loadfdt=mmc dev ${mmcdev}; mmc rescan;" \
 		"load mmc ${mmcdev}:${mmcpart} ${fdt_addr} " \
 			"${mmcpath}${fdt_file}\0" \
-	"loadcntr=mmc dev ${mmcdev}; " \
+	"loadcntr=mmc dev ${mmcdev}; mmc rescan;" \
 		"load mmc ${mmcdev}:${mmcpart} ${cntr_addr} " \
 			"${mmcpath}${cntr_file}\0" \
 	"auth_os=auth_cntr ${cntr_addr}\0" \
@@ -159,8 +159,8 @@
 	"update_kernel_mmc=run set_getcmd; "                                   \
 		"if ${get_cmd} ${image}; then "                                \
 			"if itest ${filesize} > 0; then "                      \
-				"echo Write kernel image to mmc ${mmcdev}:${mmcpart}...; " \
-				"mmc dev ${mmcdev}; " \
+				"echo Write to mmc ${mmcdev}:${mmcpart}...; "  \
+				"mmc dev ${mmcdev}; mmc rescan;" \
 				"save mmc ${mmcdev}:${mmcpart} ${loadaddr} "   \
 					"${mmcpath}${image} ${filesize}; "     \
 			"fi; "                                                 \
@@ -169,15 +169,17 @@
 	"update_fdt_mmc=run set_getcmd; "                                      \
 		"if ${get_cmd} ${fdt_file}; then "                             \
 			"if itest ${filesize} > 0; then "                      \
-				"echo Write fdt image to mmc ${mmcdev}:${mmcpart}...; " \
-				"mmc dev ${mmcdev}; " \
+				"echo Write to mmc ${mmcdev}:${mmcpart}...; "  \
+				"mmc dev ${mmcdev}; mmc rescan;" \
 				"save mmc ${mmcdev}:${mmcpart} ${loadaddr} "   \
 					"${mmcpath}${fdt_file} ${filesize}; "  \
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"setenv filesize; setenv get_cmd \0"                           \
 	"uboot_mmc_start=0x40\0"                                               \
-	"uboot_size=0xfc0\0"                                                   \
+	"uboot_mmc_size=0xfc0\0"                                               \
+	"uboot_fspi_start=0x0\0"                                               \
+	"uboot_fspi_size=0x400000\0"                                           \
 	"uboot=bootstream.bin\0"                                               \
 	"update_uboot_mmc=run set_getcmd; if ${get_cmd} ${uboot}; then "       \
 		"if itest ${filesize} > 0; then "                              \
@@ -185,7 +187,7 @@
 			"mmc dev ${mmcdev}; mmc rescan; "                      \
 			"setexpr blkc ${filesize} + 0x1ff; "                   \
 			"setexpr blkc ${blkc} / 0x200; "                       \
-			"if itest ${blkc} <= ${uboot_size}; then "             \
+			"if itest ${blkc} <= ${uboot_mmc_size}; then "         \
 				"mmc write ${loadaddr} ${uboot_mmc_start} "    \
 					"${blkc}; "                            \
 			"fi; "                                                 \
@@ -194,8 +196,12 @@
 	"update_uboot_spi=run set_getcmd; if ${get_cmd} ${uboot}; then "       \
 		"if itest ${filesize} > 0; then "                              \
 			"echo Write u-boot image to flexspi ...; "             \
-			"if sf probe; then "                                   \
-				"sf update ${loadaddr} 0 ${filesize}; "        \
+			"if itest ${filesize} <= ${uboot_fspi_size}; then "    \
+				"if sf probe; then "                           \
+					"sf update ${loadaddr} "               \
+						"${uboot_fspi_start} "         \
+						"${filesize}; "                \
+				"fi; "                                         \
 			"fi; "                                                 \
 		"fi; fi; "                                                     \
 		"setenv filesize \0"                                           \
