@@ -85,13 +85,6 @@
 #define AHAB_ENV "sec_boot=no\0"
 #endif
 
-/* Boot M4 */
-#define M4_BOOT_ENV \
-	"m4_0_image=m4_0.bin\0" \
-	"loadm4image_0=load mmc ${mmcdev}:${mmcpart} ${loadaddr} " \
-		"${m4_0_image}\0" \
-	"m4boot_0=run loadm4image_0; dcache flush; bootaux ${loadaddr} 0\0" \
-
 #define CONFIG_MFG_ENV_SETTINGS \
 	CONFIG_MFG_ENV_SETTINGS_DEFAULT \
 	"initrd_addr=0x83100000\0" \
@@ -102,11 +95,9 @@
 /* Initial environment variables */
 #define TQMA8X_MODULE_ENV_SETTINGS		\
 	CONFIG_MFG_ENV_SETTINGS \
-	M4_BOOT_ENV \
 	AHAB_ENV \
 	"script=boot.scr\0" \
 	"image=Image\0" \
-	"panel=NULL\0" \
 	"fdt_addr=0x83000000\0"			\
 	"cntr_addr=0x98000000\0"			\
 	"cntr_file=os_cntr_signed.bin\0" \
