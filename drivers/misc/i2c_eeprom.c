@@ -367,4 +367,5 @@ U_BOOT_DRIVER(i2c_eeprom_partition) = {
 UCLASS_DRIVER(i2c_eeprom) = {
 	.id		= UCLASS_I2C_EEPROM,
 	.name		= "i2c_eeprom",
+	.flags		= DM_UC_FLAG_SEQ_ALIAS,
 };
