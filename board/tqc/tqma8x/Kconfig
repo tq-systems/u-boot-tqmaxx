@@ -89,8 +89,6 @@ config TQMA8X_DEFAULTS
 	select SPL_SPI_SUPPORT
 	select SPL_SPI_LOAD
 	select SPL_DM_SEQ_ALIAS
-	select SYS_REDUNDAND_ENVIRONMENT
-	select ENV_OVERWRITE
 
 config TQMA8X_MFG_SUPPORT
 	bool "MFG Tool support"
@@ -194,6 +192,8 @@ choice
 config TQMA8X_BB_MBA8X
 	bool "TQMa8x on MBa8x Starterkit"
 	select TQC_ENVLOC
+	select SYS_REDUNDAND_ENVIRONMENT
+	select ENV_OVERWRITE
 	select DM_SERIAL
 	select FSL_LPUART
 	select MII
