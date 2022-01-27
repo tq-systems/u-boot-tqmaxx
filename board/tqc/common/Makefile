@@ -21,4 +21,5 @@ else
 obj-$(CONFIG_TQC_EEPROM) += tqc_eeprom.o
 obj-$(CONFIG_TQC_EMMC) += tqc_emmc.o
 obj-y += tqc_sdmmc.o
+obj-$(CONFIG_TQC_SPI_NOR) += tqc_spi_nor.o
 endif

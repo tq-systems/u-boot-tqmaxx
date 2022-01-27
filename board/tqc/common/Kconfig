@@ -10,3 +10,7 @@ config TQC_EMMC
 config TQC_VARD
 	bool
 	default n
+
+config TQC_SPI_NOR
+	bool
+	default y if (SPI_FLASH && OF_BOARD_SETUP)
