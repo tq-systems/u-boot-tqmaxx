@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * (C) Copyright 2020 TQ-Systems GmbH
+ * (C) Copyright 2020 - 2022 TQ-Systems GmbH
  * Markus Niebel <Markus.Niebel@tq-group.com>
  */
 
 #include <common.h>
 #include <i2c.h>
+
+#include "tqc_bb.h"
 
 #define PCF85063_REG_CTRL1		0x00 /* status */
 #define PCF85063_REG_CTRL1_CAP_SEL	BIT(0)
