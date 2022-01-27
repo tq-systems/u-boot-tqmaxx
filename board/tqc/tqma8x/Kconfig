@@ -27,6 +27,7 @@ config TQMA8X_DEFAULTS
 	select TQC_EEPROM
 	select TQC_SCU
 	select TQC_RTC
+	select TQC_SPI_NOR
 	select BOARD_LATE_INIT
 	select BOARD_EARLY_INIT_F
 	select IMX_SMMU
@@ -53,7 +54,7 @@ config TQMA8X_DEFAULTS
 	select DM_REGULATOR
 	select DM_REGULATOR_FIXED
 	select MISC
-	select FSL_FSPI
+	select NXP_FSPI
 	select DM_SPI
 	select SPI
 	select DM_SPI_FLASH
@@ -65,6 +66,9 @@ config TQMA8X_DEFAULTS
 	select SPI_FLASH_STMICRO
 	select SPI_FLASH_SST
 	select SPI_FLASH_WINBOND
+	select SPI_FLASH_EON
+	select SPI_FLASH_GIGADEVICE
+	select SPI_FLASH_ISSI
 	select SPL
 	select SPL_DM
 	select SPL_OF_CONTROL
@@ -275,11 +279,16 @@ config SF_DEFAULT_MODE
 config SYS_SPI_U_BOOT_OFFS
 	default 0x200000
 
+
+config MTDPARTS_DEFAULT
+	default "mtdparts=nor0:4m@0k(bootstream),64k@4096k(env0),64k@4160k(env1),58m@4224k(ubi)"
+
+config MTDIDS_DEFAULT
+	default "nor0=nor0"
+
 #
 # environment settings: 32k, offset 4M (SPI NOR sector 64k), redundant env
 # in SPI NOR @ 4M + 64k
-#
-# These should go here, when updating U-Boot to newer Version
 #
 config ENV_SIZE
 	default 0x00008000
