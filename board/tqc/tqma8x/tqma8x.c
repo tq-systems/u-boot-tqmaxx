@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright 2018-2020 TQ-Systems GmbH
+ * Copyright 2018-2022 TQ-Systems GmbH
  */
 #include <bootm.h>
 #include <common.h>
@@ -9,6 +9,8 @@
 #include <netdev.h>
 #include <fsl_ifc.h>
 #include <fdt_support.h>
+#include <mtd_node.h>
+#include <jffs2/load_kernel.h>
 #include <linux/libfdt.h>
 #include <env.h>
 #include <asm/io.h>
@@ -84,6 +86,14 @@ void reset_cpu(ulong addr)
 #ifdef CONFIG_OF_BOARD_SETUP
 int ft_board_setup(void *blob, bd_t *bd)
 {
+	const char * const path = "/bus@5d000000/spi@5d120000";
+	static const struct node_info nodes[] = {
+		{ "jedec,spi-nor",	MTD_DEV_TYPE_NOR, },
+		{ "nxp,imx8qxp-fspi",	MTD_DEV_TYPE_NOR, },
+	};
+
+	tqc_ft_spi_setup(blob, path, nodes, ARRAY_SIZE(nodes));
+
 	return tqc_bb_ft_board_setup(blob, bd);
 }
 #endif
