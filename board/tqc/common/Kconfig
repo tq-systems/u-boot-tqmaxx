@@ -10,6 +10,10 @@ config TQC_SDMMC
 	bool
 	default n
 
+config TQC_SPI_NOR
+	bool
+	default y if (SPI_FLASH && OF_BOARD_SETUP)
+
 config TQC_SCU
 	bool
 	default y if HAVE_SC_FIRMWARE

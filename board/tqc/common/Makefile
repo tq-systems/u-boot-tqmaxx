@@ -23,4 +23,5 @@ obj-$(CONFIG_TQC_SDMMC) += tqc_sdmmc.o
 obj-$(CONFIG_TQC_SCU) += tqc_scu.o
 obj-$(CONFIG_TQC_RTC) += tqc_rtc.o
 obj-$(CONFIG_TQC_ENVLOC) += tqc_envloc.o
+obj-$(CONFIG_TQC_SPI_NOR) += tqc_spi_nor.o
 endif
