@@ -6,7 +6,7 @@
  *
  * Align with uboot version:
  * imx_v2019.04_5.4.x and above version
- * TQMa8MQNL.1GByte.RAM-Timing.0151.xlsx / K4F8E164HA-MGCL
+ * TQMa8MQNL.1GByte.RAM-Timing.0153A.xlsx / MT53D512M16D1DS-046 WT:D
  * from MX8MN_LPDDR4_RPA_v5.xlsx
  */
 
