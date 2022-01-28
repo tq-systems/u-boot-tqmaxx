@@ -109,14 +109,6 @@
 	"loadcntr=mmc dev ${mmcdev}; mmc rescan;" \
 		"load mmc ${mmcdev}:${mmcpart} ${cntr_addr} " \
 			"${mmcpath}${cntr_file}\0" \
-	"loadimage_spi=sf probe; " \
-		"ubi part ${ubirootfspart}; ubifsmount ubi0:${ubirootfsvol}; " \
-		"ubifsload ${loadaddr} /boot/${image}; " \
-		"ubifsumount; ubi detach\0" \
-	"loadfdt_spi=sf probe; " \
-		"ubi part ${ubirootfspart}; ubifsmount ubi0:${ubirootfsvol}; " \
-		"ubifsload ${fdt_addr} /boot/${fdt_file}; " \
-		"ubifsumount; ubi detach\0" \
 	"auth_os=auth_cntr ${cntr_addr}\0" \
 	"boot_os=booti ${loadaddr} - ${fdt_addr};\0" \
 	"mmcboot=echo Booting from mmc ...; " \
@@ -164,16 +156,6 @@
 				"booti; " \
 			"fi;" \
 		"fi;\0" \
-	"ubiboot=echo Booting from UBI ...; " \
-		"setenv bootargs; " \
-		"run ubiargs; " \
-		"if run loadfdt_spi; then " \
-			"if run loadimage_spi; then " \
-				"run boot_os " \
-			"else " \
-				"echo ERR: cannot load FDT; " \
-			"fi; " \
-		"fi;\0" \
 	"update_kernel_mmc=run set_getcmd; "                                   \
 		"if ${get_cmd} ${image}; then "                                \
 			"if itest ${filesize} > 0; then "                      \
@@ -199,10 +181,6 @@
 	"uboot_fspi_start=0x0\0"                                               \
 	"uboot_fspi_size=0x400000\0"                                           \
 	"uboot=bootstream.bin\0"                                               \
-	"ubirootfs=rootfs.ubifs\0"                                             \
-	"ubirootfspart=ubi\0"                                                  \
-	"ubirootfsvol=rootfs\0"                                                \
-	"ubimtdidx=3\0"                                                        \
 	"update_uboot_mmc=run set_getcmd; if ${get_cmd} ${uboot}; then "       \
 		"if itest ${filesize} > 0; then "                              \
 			"echo Write u-boot image to mmc ${mmcdev} ...; "       \
@@ -215,39 +193,12 @@
 			"fi; "                                                 \
 		"fi; fi; "                                                     \
 		"setenv filesize; setenv blkc \0"                              \
-	"update_uboot_spi=run set_getcmd; if ${get_cmd} ${uboot}; then "       \
-		"if itest ${filesize} > 0; then "                              \
-			"echo Write u-boot image to flexspi ...; "             \
-			"if itest ${filesize} <= ${uboot_fspi_size}; then "    \
-				"if sf probe; then "                           \
-					"sf update ${loadaddr} "               \
-						"${uboot_fspi_start} "         \
-						"${filesize}; "                \
-				"fi; "                                         \
-			"fi; "                                                 \
-		"fi; fi; "                                                     \
-		"setenv filesize \0"                                           \
-	"update_rootfs_spi=run set_getcmd; if ${get_cmd} ${ubirootfs}; then "  \
-		"if itest ${filesize} > 0; then "                              \
-			"echo Write rootfs image to UBI ...; "                 \
-			"if sf probe; then "                                   \
-				"ubi part ${ubirootfspart}; "                  \
-				"ubi write ${loadaddr} ${ubirootfsvol} "       \
-					"${filesize}; "                        \
-				"ubi detach; "                                 \
-			"fi; "                                                 \
-		"fi; fi; "                                                     \
-		"setenv filesize \0"                                           \
 	"set_getcmd=if test \"${ip_dyn}\" = yes; then "                        \
 			"setenv get_cmd dhcp; "                                \
 		"else "                                                        \
 			"setenv get_cmd tftp; "                                \
 		"fi; \0"                                                       \
 	"rootfsmode=ro\0"                                                      \
-	"addubi=setenv bootargs ${bootargs} rootfstype=ubifs "                 \
-		"ubi.mtd=${ubimtdidx} "                                        \
-		"root=ubi0:${ubirootfsvol} ${rootfsmode} rootwait\0"           \
-	"ubiargs=run addubi addtty\0"                                          \
 	"addtty=setenv bootargs ${bootargs} console=${console},${baudrate}"    \
 		" earlycon\0"                                                  \
 	"mmcargs=run addmmc addtty\0"                                          \
@@ -367,7 +318,10 @@
 #error
 #endif
 
+#include "tqma8-shared-env.h"
+
 #define CONFIG_EXTRA_ENV_SETTINGS		\
+	TQMA8_SHARED_ENV_SETTINGS		\
 	TQMA8XXS_MODULE_ENV_SETTINGS		\
 	BB_ENV_SETTINGS
 
