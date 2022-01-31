@@ -1,0 +1,111 @@
+# TQ-Systems TQMa65xx
+
+The TQ-Systems TQMa65xx is a System-on-Module based on the TI AM65 SoC family.
+
+## Module variants
+
+The TQMa65xx comes in variants with 2GiB and 4GiB DDR4 RAM. The correct
+defconfig needs to be chosen, as the RAM configuration is not detected at
+runtime.
+
+## Base boards / configurations
+
+The following combinations of base board and module are supported:
+
+* TQ-Systems MBa65xx with 2GiB TQMa65xx
+  - tqma65xx_2gb_mba65xx_r5_defconfig
+  - tqma65xx_2gb_mba65xx_a53_defconfig
+* TQ-Systems MBa65xx with 4GiB TQMa65xx
+  - tqma65xx_4gb_mba65xx_r5_defconfig
+  - tqma65xx_4gb_mba65xx_a53_defconfig
+
+As described in the following section, bootloaders for both the R5 and A53
+cores of the AM65x must be built.
+
+## Boot sequence
+
+The bootloader on the AM65 is loaded in multiple stages. 3 of these stages
+are provided by this U-Boot repository:
+
+* R5 U-Boot SPL (tiboot3.bin)
+* A53 U-Boot SPL (tispl.bin)
+* A53 U-Boot (u-boot.img)
+
+The R5 bootloader is built from the `r5` defconfigs and it requires an ARM-v7
+cross compiler (32bit). Only the SPL component of this build is used.
+
+The R5 bootloader performs the following actions:
+
+* Load system controller firmware (SYSFW)
+* Initialize DDR controller
+* Load `tispl.bin` (which contains ATF, OP-TEE and the A53 SPL) into DDR RAM
+* Boot ATF
+
+The A53 SPL and full U-Boot are both built from the `a53` defconfigs. The build
+requires an ARM-v8/AArch64 cross compiler. `bl31.bin` (ATF) and
+`bl32.bin` (OP-TEE) must be provided in the root of the U-Boot build directory
+to produce a working bootloader.
+
+The next stage is handled by the ATF: It will start the OP-TEE and the A53 SPL,
+which have already been loaded by the R5 bootloader. The A53 SPL then loads and
+starts the full A53 U-Boot from `u-boot.img`.
+
+Finally, the full A53 U-Boot runs, which can provide a command line interface
+and boot into the actual OS depending on its configuration.
+
+## DIP Settings for MMC/SPI-NOR boot
+
+On eMMC/SD card a FAT boot partition is used for the SYSFW and U-Boot.
+On SPI-NOR, separate MTD partitions are defined for the individual stages.
+
+Notes:
+
+* See RM spruid7e.pdf, ch. 4.3.2 BOOTMODE Pin Mapping
+* S8 is for primary/backup boot device selection
+* S9 is for primary boot device configuration
+* S10 is for backup boot device configuration
+* Only primary boot devices are considered below
+* `X`: Position of DIP
+* `-`: Don't care
+
+### SD Card
+
+```
+DIP (S8)    8  7  6  5  4  3  2  1
+BootMode    7  6  5  4  3  2  1  0
+OFF         X  -  -  -  X        X
+ON             -  -  -     X  X
+
+DIP (S9)    8  7  6  5  4  3  2  1
+BootMode    15 14 13 12 11 10 9  8
+OFF         -  -  X     X  X  X  X
+ON          -  -     X
+```
+
+### eMMC
+
+```
+DIP (S8)    8  7  6  5  4  3  2  1
+BootMode    7  6  5  4  3  2  1  0
+OFF         X  -  -  -  X        X
+ON             -  -  -     X  X
+
+DIP (S9)    8  7  6  5  4  3  2  1
+BootMode    15 14 13 12 11 10 9  8
+OFF         -  -     X  X  X  X  X
+ON          -  -  X
+```
+
+### SPI-NOR
+
+```
+DIP (S8)    8  7  6  5  4  3  2  1
+BootMode    7  6  5  4  3  2  1  0
+OFF         X  -  -  -  X  X  X
+ON             -  -  -           X
+
+DIP (S9)    8  7  6  5  4  3  2  1
+BootMode    15 14 13 12 11 10 9  8
+OFF         X     X  X  X     X  X
+ON             X           X
+```

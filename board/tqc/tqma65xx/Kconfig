@@ -1,0 +1,69 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Copyright (C) 2017-2018 Texas Instruments Incorporated - http://www.ti.com/
+# Copyright (C) 2020-2022 TQ-Systems GmbH
+
+choice
+	prompt "TQ-Systems TQMa65xx"
+	optional
+
+config TARGET_AM654_A53_TQMA65XX
+	bool "TQ-Systems TQMa65xx running on A53"
+	select ARM64
+	select SOC_K3_AM6
+	select SYS_DISABLE_DCACHE_OPS
+	select BOARD_LATE_INIT
+	select TQ_BOARD_GPIO
+	select TQ_EEPROM
+
+config TARGET_AM654_R5_TQMA65XX
+	bool "TQ-Systems TQMa65xx running on R5"
+	select CPU_V7R
+	select SYS_THUMB_BUILD
+	select SOC_K3_AM6
+	select K3_LOAD_SYSFW
+	select K3_AM654_DDRSS
+	imply SYS_K3_SPL_ATF
+
+endchoice
+
+if TARGET_AM654_A53_TQMA65XX || TARGET_AM654_R5_TQMA65XX
+
+config SYS_BOARD
+	default "tqma65xx"
+
+config SYS_VENDOR
+	default "tqc"
+
+choice
+	prompt "TQ-Systems TQMa65xx module variant"
+
+config TQMA65XX_MODULE_VERSION_2G
+	bool "TQMa65xx 2GB variant"
+
+config TQMA65XX_MODULE_VERSION_4G
+	bool "TQMa65xx 4GB variant"
+
+endchoice
+
+choice
+	prompt "TQ-Systems TQMa65xx base board"
+
+config TQMA65XX_BOARD_MBA65XX
+	bool "TQ-Systems MBa65xx"
+
+endchoice
+
+config SYS_CONFIG_NAME
+	default "tqma65xx_mba65xx" if TQMA65XX_BOARD_MBA65XX
+
+source "board/tqc/common/Kconfig"
+
+endif
+
+if TARGET_AM654_R5_TQMA65XX
+
+config SPL_LDSCRIPT
+	default "arch/arm/mach-omap2/u-boot-spl.lds"
+
+endif

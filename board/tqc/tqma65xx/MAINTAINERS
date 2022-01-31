@@ -1,0 +1,8 @@
+TQ-SYSTEMS TQMA65XX SOM / MBA65XX BOARD
+M:	Matthias Schiffer <matthias.schiffer@tq-group.com>
+S:	Maintained
+F:	arch/arm/dts/k3-am654-tqma65xx*.dts*
+F:	arch/arm/dts/k3-am654-r5-tqma65xx*.dts*
+F:	board/tqc/tqma65xx/
+F:	configs/tqma65xx_*_mba65xx_*_defconfig
+F:	include/configs/tqma65xx*.h
