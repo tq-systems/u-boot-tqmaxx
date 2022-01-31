@@ -1,0 +1,153 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Copyright (C) 2018 Texas Instruments Incorporated - http://www.ti.com/
+ * Copyright (C) 2020-2022 TQ-Systems GmbH
+ */
+
+/ {
+	aliases {
+		i2c_eeprom0 = &m24c64;
+	};
+
+	config {
+		u-boot,mmc-env-offset = <0x140000>;
+		u-boot,mmc-env-offset-redundant = <0x150000>;
+	};
+};
+
+&cbass_main {
+	u-boot,dm-spl;
+};
+
+&cbass_mcu {
+	u-boot,dm-spl;
+};
+
+&cbass_mcu_navss {
+	u-boot,dm-spl;
+};
+
+&mcu_ringacc {
+	u-boot,dm-spl;
+};
+
+&mcu_udmap {
+	u-boot,dm-spl;
+};
+
+&cbass_wakeup {
+	u-boot,dm-spl;
+};
+
+&cbass_main_navss {
+	u-boot,dm-spl;
+};
+
+&secure_proxy_main {
+	u-boot,dm-spl;
+};
+
+&dmsc {
+	u-boot,dm-spl;
+	k3_sysreset: sysreset-controller {
+		compatible = "ti,sci-sysreset";
+		u-boot,dm-spl;
+	};
+};
+
+&k3_pds {
+	u-boot,dm-spl;
+};
+
+&k3_clks {
+	u-boot,dm-spl;
+};
+
+&k3_reset {
+	u-boot,dm-spl;
+};
+
+&wkup_pmx0 {
+	u-boot,dm-spl;
+};
+
+&main_pmx0 {
+	u-boot,dm-spl;
+};
+
+&main_pmx1 {
+	u-boot,dm-spl;
+};
+
+&wkup_pmx0 {
+	u-boot,dm-spl;
+};
+
+&main_uart0_pins_default {
+	u-boot,dm-spl;
+};
+
+&main_uart0 {
+	u-boot,dm-spl;
+	/delete-property/ power-domains;
+};
+
+&main_mmc0_pins_default {
+	u-boot,dm-spl;
+};
+
+&sdhci0 {
+	u-boot,dm-spl;
+};
+
+&main_mmc1_pins_default {
+	u-boot,dm-spl;
+};
+
+&sdhci1 {
+	u-boot,dm-spl;
+};
+
+&wkup_gpio0 {
+	u-boot,dm-spl;
+};
+
+&wkup_i2c0_pins_default {
+	u-boot,dm-spl;
+};
+
+&wkup_i2c0 {
+	u-boot,dm-spl;
+};
+
+&msmc_ram {
+	icssg0_sram: icssg0-sram@40000 {
+		reg = <0x40000 0x10000>;
+	};
+	icssg1_sram: icssg1-sram@50000 {
+		reg = <0x50000 0x10000>;
+	};
+	icssg2_sram: icssg2-sram@60000 {
+		reg = <0x60000 0x10000>;
+	};
+};
+
+&fss {
+	u-boot,dm-spl;
+};
+
+&nor_flash_pins_default {
+	u-boot,dm-spl;
+};
+
+&ospi0 {
+	u-boot,dm-spl;
+
+	flash@0 {
+		u-boot,dm-spl;
+	};
+};
+
+&chipid {
+	u-boot,dm-spl;
+};
