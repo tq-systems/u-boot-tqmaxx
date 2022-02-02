@@ -17,6 +17,7 @@
 #include <dm/lists.h>
 #include <dma-uclass.h>
 #include <dm/of_access.h>
+#include <eth_phy.h>
 #include <miiphy.h>
 #include <net.h>
 #include <phy.h>
@@ -549,12 +550,22 @@ static int am65_cpsw_mdio_init(struct udevice *dev)
 	if (!priv->has_phy || cpsw_common->bus)
 		return 0;
 
-	cpsw_common->bus = cpsw_mdio_init(dev->name,
-					  cpsw_common->mdio_base,
-					  cpsw_common->bus_freq,
-					  clk_get_rate(&cpsw_common->fclk));
+#ifdef CONFIG_DM_ETH_PHY
+	if (!cpsw_common->bus)
+		cpsw_common->bus = eth_phy_get_mdio_bus(cpsw_common->dev);
+#endif
+	if (!cpsw_common->bus)
+		cpsw_common->bus =
+			cpsw_mdio_init(dev->name,
+				       cpsw_common->mdio_base,
+				       cpsw_common->bus_freq,
+				       clk_get_rate(&cpsw_common->fclk));
 	if (!cpsw_common->bus)
 		return -EFAULT;
+
+#ifdef CONFIG_DM_ETH_PHY
+	eth_phy_set_mdio_bus(cpsw_common->dev, cpsw_common->bus);
+#endif
 
 	return 0;
 }
@@ -679,6 +690,15 @@ static int am65_cpsw_port_probe(struct udevice *dev)
 		goto out;
 out:
 	return ret;
+}
+
+static int am65_cpsw_bind_nuss(struct udevice *dev)
+{
+#ifdef CONFIG_DM_ETH_PHY
+	eth_phy_binds_nodes(dev);
+#endif
+
+	return 0;
 }
 
 static int am65_cpsw_probe_nuss(struct udevice *dev)
@@ -807,6 +827,7 @@ U_BOOT_DRIVER(am65_cpsw_nuss) = {
 	.id	= UCLASS_MISC,
 	.of_match = am65_cpsw_nuss_ids,
 	.probe	= am65_cpsw_probe_nuss,
+	.bind	= am65_cpsw_bind_nuss,
 	.priv_auto_alloc_size = sizeof(struct am65_cpsw_common),
 };
 
