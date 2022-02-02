@@ -14,6 +14,7 @@
 #include <dm/lists.h>
 #include <dma-uclass.h>
 #include <dm/of_access.h>
+#include <eth_phy.h>
 #include <miiphy.h>
 #include <net.h>
 #include <phy.h>
@@ -539,12 +540,21 @@ static int am65_cpsw_mdio_init(struct udevice *dev)
 	if (!priv->has_phy || cpsw_common->bus)
 		return 0;
 
-	cpsw_common->bus = cpsw_mdio_init(dev->name,
-					  cpsw_common->mdio_base,
-					  cpsw_common->bus_freq,
-					  clk_get_rate(&cpsw_common->fclk));
+#ifdef CONFIG_DM_ETH_PHY
+	cpsw_common->bus = eth_phy_get_mdio_bus(dev);
+#endif
+	if (!cpsw_common->bus)
+		cpsw_common->bus =
+			cpsw_mdio_init(dev->name,
+				       cpsw_common->mdio_base,
+				       cpsw_common->bus_freq,
+				       clk_get_rate(&cpsw_common->fclk));
 	if (!cpsw_common->bus)
 		return -EFAULT;
+
+#ifdef CONFIG_DM_ETH_PHY
+	eth_phy_set_mdio_bus(dev, cpsw_common->bus);
+#endif
 
 	return 0;
 }
