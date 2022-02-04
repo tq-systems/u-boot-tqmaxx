@@ -6,7 +6,7 @@
 
 / {
 	aliases {
-		i2c_eeprom0 = &m24c64;
+		i2c_eeprom0 = &eeprom1;
 	};
 
 	config {
