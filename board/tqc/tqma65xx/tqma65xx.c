@@ -236,9 +236,6 @@ int tqma65xx_ft_board_setup(void *blob, bd_t *bd)
 	int ret;
 
 	ret = fdt_fixup_msmc_ram(blob, "/bus@100000", "sram@70000000");
-	if (ret)
-		ret = fdt_fixup_msmc_ram(blob, "/interconnect@100000",
-					 "sram@70000000");
 	if (ret) {
 		printf("%s: fixing up msmc ram failed %d\n", __func__, ret);
 		return ret;
@@ -246,9 +243,7 @@ int tqma65xx_ft_board_setup(void *blob, bd_t *bd)
 
 #if defined(CONFIG_TI_SECURE_DEVICE)
 	/* Make HW RNG reserved for secure world use */
-	ret = fdt_disable_node(blob, "/interconnect@100000/trng@4e10000");
-	if (ret)
-		ret = fdt_disable_node(blob, "/bus@100000/crypto@4e00000/trng@4e10000");
+	ret = fdt_disable_node(blob, "/bus@100000/crypto@4e00000/trng@4e10000");
 	if (ret)
 		printf("%s: disabling TRGN failed %d\n", __func__, ret);
 #endif
