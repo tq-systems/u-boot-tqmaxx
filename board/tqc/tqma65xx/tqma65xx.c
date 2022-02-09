@@ -200,7 +200,7 @@ void tqma65xx_parse_eeprom(void)
 	u8 macaddr[6];
 	int ret;
 
-	snprintf(id_prefix, sizeof(id_prefix), "TQMA%s", tqma65xx_cpu_type());
+	snprintf(id_prefix, sizeof(id_prefix), "TQMa%s", tqma65xx_cpu_type());
 
 	ret = tq_read_eeprom(0, &data);
 	if (ret) {
