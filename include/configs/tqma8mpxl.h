@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Copyright 2021 TQ-Systems GmbH
+ * Copyright 2021 - 2022 TQ-Systems GmbH
  */
 
 #ifndef __TQMA8MPXL_H
@@ -136,6 +136,7 @@
 	"loadfdt=mmc dev ${mmcdev}; mmc rescan;" \
 		"load mmc ${mmcdev}:${mmcpart} ${fdt_addr} " \
 			"${mmcpath}${fdt_file}\0" \
+	"boot_os=booti ${loadaddr} - ${fdt_addr};\0" \
 	"mmcboot=echo Booting from mmc ...; " \
 		"setenv bootargs; " \
 		"run mmcargs; " \
@@ -144,7 +145,7 @@
 		"else " \
 			"if run loadfdt; then " \
 				"if run loadimage; then " \
-					"booti ${loadaddr} - ${fdt_addr}; " \
+					"run boot_os; " \
 				"else " \
 					"echo WARN: Cannot load the kernel; " \
 				"fi; " \
@@ -161,7 +162,7 @@
 			"bootm ${loadaddr}; " \
 		"else " \
 			"if ${get_cmd} ${fdt_addr} ${fdt_file}; then " \
-				"booti ${loadaddr} - ${fdt_addr}; " \
+				"run boot_os; " \
 			"else " \
 				"echo WARN: Cannot load the DT; " \
 			"fi; " \
@@ -203,18 +204,6 @@
 			"fi; "                                                 \
 		"fi; fi; "                                                     \
 		"setenv filesize; setenv blkc \0"                              \
-	"update_uboot_spi=run set_getcmd; if ${get_cmd} ${uboot}; then "       \
-		"if itest ${filesize} > 0; then "                              \
-			"echo Write u-boot image to flexspi ...; "             \
-			"if itest ${filesize} <= ${uboot_fspi_size}; then "    \
-				"if sf probe; then "                           \
-					"sf update ${loadaddr} "               \
-						"${uboot_fspi_start} "         \
-						"${filesize}; "                \
-				"fi; "                                         \
-			"fi; "                                                 \
-		"fi; fi; "                                                     \
-		"setenv filesize \0"                                           \
 	"set_getcmd=if test \"${ip_dyn}\" = yes; then "                        \
 			"setenv get_cmd dhcp; "                                \
 		"else "                                                        \
@@ -222,11 +211,11 @@
 		"fi; \0"                                                       \
 	"rootfsmode=ro\0"                                                      \
 	"addtty=setenv bootargs ${bootargs} console=${console},${baudrate}\0"  \
+	"mmcargs=run addtty addearlycon addmmc\0"                              \
 	"mmcrootpart=2\0"                                                      \
 	"addmmc=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/mmcblk${mmcblkdev}p${mmcrootpart} ${rootfsmode} "   \
 		"rootwait\0"                                                   \
-	"mmcargs=run addtty addearlycon addmmc\0"                              \
 	"netargs=run addnfs addip addtty addearlycon\0"                        \
 	"addnfs=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/nfs rw "                                            \
@@ -353,7 +342,10 @@
 #error
 #endif
 
+#include "tqma8-shared-env.h"
+
 #define CONFIG_EXTRA_ENV_SETTINGS	\
+	TQMA8_SHARED_ENV_SETTINGS	\
 	CM_ENV_SETTINGS			\
 	MODULE_ENV_SETTINGS		\
 	BB_ENV_SETTINGS

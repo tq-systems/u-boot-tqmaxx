@@ -21,6 +21,7 @@ config TQMA8MPXL_DEFAULTS
 	select TQC_SDMMC
 	select TQC_EEPROM
 	select TQC_RTC
+	select TQC_SPI_NOR
 	select BOARD_LATE_INIT
 	select BOARD_EARLY_INIT_F
 	select OF_CONTROL
@@ -255,6 +256,12 @@ config SF_DEFAULT_SPEED
 
 config SF_DEFAULT_MODE
 	default 0
+
+config MTDPARTS_DEFAULT
+	default "mtdparts=30bb0000.spi:4m@0k(bootstream),64k@4096k(env0),64k@4160k(env1),-@6m(ubi)"
+
+config MTDIDS_DEFAULT
+	default "nor0=30bb0000.spi"
 
 #
 # environment settings: 32k, offset 4M (SPI NOR sector 64k), redundant env

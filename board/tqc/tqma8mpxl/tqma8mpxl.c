@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * (C) Copyright 2021 TQ-Systems GmbH
+ * (C) Copyright 2021 - 2022 TQ-Systems GmbH
  * Markus Niebel <Markus.Niebel@tq-group.com>
  */
 
@@ -17,6 +17,8 @@
 #include <asm/arch/clock.h>
 #include <spl.h>
 #include <asm/mach-imx/dma.h>
+#include <jffs2/load_kernel.h>
+#include <mtd_node.h>
 #include <power/pmic.h>
 #include <mmc.h>
 
@@ -160,6 +162,14 @@ int ft_board_setup(void *blob, bd_t *bd)
 	}
 #endif
 #endif
+
+	const char * const path = "/bus@5d000000/spi@5d120000";
+	static const struct node_info nodes[] = {
+		{ "jedec,spi-nor",	MTD_DEV_TYPE_NOR, },
+		{ "nxp,imx8qxp-fspi",	MTD_DEV_TYPE_NOR, },
+	};
+
+	tqc_ft_spi_setup(blob, path, nodes, ARRAY_SIZE(nodes));
 
 	return tqc_bb_ft_board_setup(blob, bd);
 }
