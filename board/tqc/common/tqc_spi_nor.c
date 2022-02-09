@@ -22,7 +22,7 @@
 #include "tqc_bb.h"
 
 /* All this code must be called from ft_board_setup */
-#if defined(CONFIG_OF_BOARD_SETUP)
+#if defined(CONFIG_OF_BOARD_SETUP) && !defined(CONFIG_SPL_BUILD)
 
 static void tqc_ft_fixup_spi_mtdparts(void *blob,
 					     const struct node_info *nodes,
