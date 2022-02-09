@@ -249,10 +249,16 @@ int tqma65xx_ft_board_setup(void *blob, bd_t *bd)
 #endif
 
 #if defined(CONFIG_DM_SPI_FLASH) && defined(CONFIG_FDT_FIXUP_PARTITIONS)
-	/* Update MTD partition nodes using info from mtdparts env var */
-	puts("Updating MTD partitions...\n");
-	spi_flash_probe_bus_cs(bus, cs, speed, mode, &new);
-	fdt_fixup_mtdparts(blob, nodes, ARRAY_SIZE(nodes));
+	puts("Testing for SPI-NOR flash...\n");
+	ret = spi_flash_probe_bus_cs(bus, cs, speed, mode, &new);
+	if (!ret) {
+		puts("Updating MTD partitions...\n");
+		/* Update MTD partition nodes using info from mtdparts env var */
+		fdt_fixup_mtdparts(blob, nodes, ARRAY_SIZE(nodes));
+	} else {
+		puts("No flash found.\n");
+		fdt_disable_node(blob, "/bus@100000/bus@28380000/fss@47000000/spi@47040000/flash@0");
+	}
 #endif
 
 	return 0;
