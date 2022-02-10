@@ -4,6 +4,10 @@
  */
 
 / {
+	aliases {
+		i2c_eeprom0 = &at24c02;
+	};
+
 	config {
 		u-boot,mmc-env-offset = <0x400000>;
 		u-boot,mmc-env-offset-redundant = <0x404000>;
