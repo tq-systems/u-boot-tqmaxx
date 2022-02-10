@@ -169,11 +169,17 @@ int board_late_init(void)
 {
 	struct tqc_eeprom_data eeprom;
 	const char *bname = tqc_get_boardname();
+	int ret;
 
-	if (!tqc_read_eeprom_at(0, 0x53, 1, 0, &eeprom))
-		tqc_board_handle_eeprom_data(bname, &eeprom);
+	if (CONFIG_IS_ENABLED(I2C_EEPROM))
+		ret = tq_read_module_eeprom(&eeprom);
 	else
+		ret = tqc_read_eeprom_at(0, 0x53, 1, 0, &eeprom);
+
+	if (ret)
 		puts("EEPROM: read error\n");
+	else
+		tqc_board_handle_eeprom_data(bname, &eeprom);
 
 	/* set quartz load to 7.000 femtofarads */
 	if (tqc_pcf85063_adjust_capacity(0, 0x51, 7000))
