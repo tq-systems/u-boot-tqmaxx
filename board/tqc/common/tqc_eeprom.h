@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2014 - 2020 TQ-Systems GmbH
+ * Copyright (C) 2014 - 2022 TQ-Systems GmbH
  * Markus Niebel <Markus.Niebel@tq-group.com>
  */
 
@@ -50,6 +50,40 @@ int tqc_board_handle_eeprom_data(const char *board_name,
 int tqc_read_eeprom(unsigned int bus, unsigned int addr,
 		    struct tqc_eeprom_data *eeprom);
 #endif /* CONFIG_SYS_I2C_EEPROM_ADDR_LEN */
+
+#if defined(CONFIG_I2C_EEPROM)
+/*
+ * new versions, to replace above tqc_read_eeprom_at
+ */
+
+/**
+ * Reads a tqc_eeprom_data from an EEPROM, at a given offset
+ * from the start of the EEPROM
+ */
+int tq_read_eeprom_at(int seq, uint offset, struct tqc_eeprom_data *eeprom);
+#else
+static inline int tq_read_eeprom_at(int seq, uint offset,
+				    struct tqc_eeprom_data *eeprom)
+{
+	return -ENOTSUPP;
+}
+#endif
+
+/**
+ * Reads a tqc_eeprom_data from an EEPROM give by seq nr at address zero
+ */
+static inline int tq_read_eeprom(int seq, struct tqc_eeprom_data *eeprom)
+{
+	return tq_read_eeprom_at(seq, 0, eeprom);
+}
+
+/**
+ * Reads a tqc_eeprom_data from EEPROM with by seq nr 0 at address zero
+ */
+static inline int tq_read_module_eeprom(struct tqc_eeprom_data *eeprom)
+{
+	return tq_read_eeprom(0, eeprom);
+}
 
 #endif /* CONFIG_SPL_BUILD */
 

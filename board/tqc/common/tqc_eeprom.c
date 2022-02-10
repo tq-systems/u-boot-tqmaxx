@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2014 - 2020 TQ-Systems GmbH
+ * Copyright (C) 2014 - 2022 TQ-Systems GmbH
  * Markus Niebel <Markus.Niebel@tq-group.com>
  */
 
 #include <common.h>
+#include <dm/uclass.h>
+#include <i2c_eeprom.h>
 #include <i2c.h>
-#include <malloc.h>
 #include <linux/ctype.h>
+#include <malloc.h>
 
 #include "tqc_eeprom.h"
 
@@ -46,6 +48,22 @@ int tqc_read_eeprom_buf(unsigned int bus, unsigned int i2c_addr,
 }
 
 #if !defined(CONFIG_SPL_BUILD)
+
+#if defined(CONFIG_I2C_EEPROM)
+int tq_read_eeprom_at(int seq, uint offset, struct tqc_eeprom_data *eeprom)
+{
+	struct udevice *dev;
+	int ret;
+
+	ret = uclass_get_device_by_seq(UCLASS_I2C_EEPROM, seq, &dev);
+	if (ret) {
+		debug("%s: Cannot find i2c_eeprom%d\n", __func__, seq);
+		return ret;
+	}
+
+	return i2c_eeprom_read(dev, offset, (u8 *)eeprom, sizeof(*eeprom));
+}
+#endif
 
 int tqc_parse_eeprom_mac(struct tqc_eeprom_data * const eeprom, char *buf,
 			 size_t len)
