@@ -282,6 +282,13 @@ int checkboard(void)
 	return 0;
 }
 
+#ifdef CONFIG_LDO_BYPASS_CHECK
+/* TODO, use external pmic, for now always leave default */
+void ldo_mode_set(int ldo_bypass)
+{
+}
+#endif
+
 /*
  * Device Tree Support
  */
