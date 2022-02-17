@@ -1369,17 +1369,20 @@ static void macronix_dsr_init(struct spi_nor *nor)
 	u8 cr;
 
 	/* use default value 0x7 / 24 Ohms (Default) */
-	val = ofnode_read_u32_default(dev->node, "macronix,dsr",
-				      0x7);
+#if defined(CONFIG_OF_CONTROL)
+	val = ofnode_read_u32_default(dev->node, "macronix,dsr", 0x7);
+#else
+	vale = 0x7;
+#endif
 	crr = macronix_read_cr(nor);
 	if (crr >= 0) {
 		val = env_get_ulong("spinor_dsr", 16, val);
 		cr = (u8)(val |= ((u32)crr & 0xf8));
 		macronix_write_cr(nor, &cr);
-		dev_dbg(nor->dev, "wrote CR %x\n",
+		dev_dbg(dev, "wrote CR %x\n",
 			(u32)macronix_read_cr(nor));
 	} else {
-		dev_warn(nor->dev, "read CR failed %d\n", crr);
+		dev_warn(dev, "read CR failed %d\n", crr);
 	}
 }
 
@@ -1419,6 +1422,8 @@ static int macronix_quad_enable(struct spi_nor *nor)
 
 	return 0;
 }
+#else
+static inline void macronix_dsr_init(struct spi_nor *nor) {}
 #endif
 
 #ifdef CONFIG_SPI_FLASH_STMICRO
@@ -1469,17 +1474,23 @@ static void micron_dsr_init(struct spi_nor *nor)
 	u8 evcr;
 
 	/* use default value 0x7 / 30 Ohms (Default) */
+#if defined(CONFIG_OF_CONTROL)
 	val = ofnode_read_u32_default(dev->node, "micron,dsr", 0x7);
+#else
+	val = 0x7;
+#endif
 	evcrr = micron_read_evcr(nor);
 	if (evcrr >= 0) {
 		val = env_get_ulong("spinor_dsr", 16, val);
 		evcr = (u8)(val |= ((u32)evcrr & 0xf8));
 		micron_write_evcr(nor, &evcr);
-		dev_dbg(nor->dev, "wrote EVCR %x\n", (u32)evcr);
+		dev_dbg(dev, "wrote EVCR %x\n", (u32)evcr);
 	} else {
-		dev_warn(nor->dev, "read EVCR failed %d\n", evcrr);
+		dev_warn(dev, "read EVCR failed %d\n", evcrr);
 	}
 }
+#else
+static inline void micron_dsr_init(struct spi_nor *nor) {}
 #endif
 
 #if defined(CONFIG_SPI_FLASH_SPANSION) || defined(CONFIG_SPI_FLASH_WINBOND)
