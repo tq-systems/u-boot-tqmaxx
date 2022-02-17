@@ -651,10 +651,8 @@
 
 	pinctrl_usb0: usb0grp {
 		fsl,pins = <
-			/*
-			 * TODO: OC detection not functional in dwc3 on i.mx8mq,
-			 * pin mux will lead to non functional USB
-			 */
+			/* ID -> via usb-connector */
+			/* PWR -> via regulator @phy */
 			MX8MP_IOMUXC_GPIO1_IO13__USB1_OTG_OC	0x1C0
 		>;
 	};
