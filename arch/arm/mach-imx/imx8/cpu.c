@@ -1048,7 +1048,7 @@ struct udevice * board_imx_vservice_find_mu(struct udevice *dev)
 	}
 
 	err = sc_rm_get_resource_owner(-1, resource_id, &resource_part);
-	if (err != SC_ERR_NONE) {
+	if (err) {
 		printf("%s get resource [%d] owner error: %d\n", __func__, resource_id, err);
 		return NULL;
 	}
@@ -1057,7 +1057,7 @@ struct udevice * board_imx_vservice_find_mu(struct udevice *dev)
 
 	/* MU8 for communication between M4_0 and u-boot, MU9 for M4_1 and u-boot */
 	err = sc_rm_get_resource_owner(-1, SC_R_M4_0_PID0, &m4_parts[0]);
-	if (err != SC_ERR_NONE) {
+	if (err) {
 		printf("%s get resource [%d] owner error: %d\n", __func__, SC_R_M4_0_PID0, err);
 		return NULL;
 	}
@@ -1071,7 +1071,7 @@ struct udevice * board_imx_vservice_find_mu(struct udevice *dev)
 
 	if (is_imx8qm()) {
 		err = sc_rm_get_resource_owner(-1, SC_R_M4_1_PID0, &m4_parts[1]);
-		if (err != SC_ERR_NONE) {
+		if (err) {
 			printf("%s get resource [%d] owner error: %d\n", __func__, SC_R_M4_1_PID0, err);
 			return NULL;
 		}
