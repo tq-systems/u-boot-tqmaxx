@@ -227,7 +227,7 @@ config TQMA8MPXL_REV_0100
 endchoice
 
 config DEFAULT_DEVICE_TREE
-	default "imx8mp-mba8mpxl" if TQMA8MPXL_BB_MBA8MPXL && TQMA8MPXL_REV_0200
+	default "imx8mp-tqma8mpql-mba8mpxl" if TQMA8MPXL_BB_MBA8MPXL && TQMA8MPXL_REV_0200
 	default "imx8mp-mba8mpxl-r0100" if TQMA8MPXL_BB_MBA8MPXL && TQMA8MPXL_REV_0100
 
 config DEFAULT_FDT_FILE
