@@ -145,6 +145,7 @@
 
 	flash@0 {
 		u-boot,dm-spl;
+		cdns,phy-mode;
 	};
 };
 
