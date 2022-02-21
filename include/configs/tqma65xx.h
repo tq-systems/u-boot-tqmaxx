@@ -106,7 +106,7 @@
 
 #define EXTRA_ENV_TQMA65XX_SETTINGS_UBI \
 	"args_ubi=setenv bootargs ${bootargs} " \
-		"rootfstype=ubifs root=ubi0:rootfs rw ubi.mtd=ospi.rootfs\0" \
+		"rootfstype=ubifs root=ubi0:rootfs rw rootwait ubi.mtd=ospi.rootfs\0" \
 	"init_ubi=run args_reset args_ubi args_board args_extra; sf probe; " \
 		"ubi part ospi.rootfs; ubifsmount ubi:rootfs\0" \
 	"get_overlay_ubi=" \
