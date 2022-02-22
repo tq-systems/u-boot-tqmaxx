@@ -19,11 +19,23 @@
 			method = "smc";
 		};
 	};
+
+	gpio-keys {
+		status = "disabled";
+	};
+
+	gpio-leds {
+		status = "disabled";
+	};
 };
 
 &{/soc@0} {
 	u-boot,dm-pre-reloc;
 	u-boot,dm-spl;
+};
+
+&adc {
+	status = "disabled";
 };
 
 &clk {
@@ -34,6 +46,23 @@
 	/delete-property/ assigned-clock-rates;
 
 };
+
+&ecspi2 {
+	status = "disabled";
+};
+
+&ecspi3 {
+	status = "disabled";
+};
+
+&flexcan1 {
+	status = "disabled";
+};
+
+&flexcan2 {
+	status = "disabled";
+};
+
 
 &osc_32k {
 	u-boot,dm-spl;
@@ -101,6 +130,8 @@
 };
 
 &gpio1 {
+	pinctrl-0 = <&pinctrl_gpio1>, <&pinctrl_usbhub>, <&pinctrl_regotgvbus>,
+		    <&pinctrl_usbcon0>;
 	u-boot,dm-spl;
 };
 
@@ -130,6 +161,18 @@
 
 &pinctrl_i2c1 {
 	u-boot,dm-spl;
+};
+
+&tlv320aic3x04 {
+	status = "disabled";
+};
+
+&pcie{
+	status = "disabled";
+};
+
+&pcie_phy{
+	status = "disabled";
 };
 
 &usdhc2 {

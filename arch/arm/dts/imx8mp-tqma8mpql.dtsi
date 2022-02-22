@@ -7,7 +7,7 @@
 
 / {
 	model = "TQ-Systems i.MX8MPlus TQMa8MPxL";
-	compatible = "tq,imx8mp-tqma8mpxl", "fsl,imx8mp";
+	compatible = "tq,imx8mp-tqma8mpql", "fsl,imx8mp";
 
 	memory@40000000 {
 		device_type = "memory";
@@ -17,7 +17,7 @@
 	/* identical to buck4_reg, but should never change */
 	reg_vcc3v3: regulator-vcc3v3 {
 		compatible = "regulator-fixed";
-		regulator-name = "TQMA8MPXL_VCC3V3";
+		regulator-name = "VCC3V3";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		regulator-always-on;
@@ -26,7 +26,7 @@
 	/* e-MMC IO, needed for HS modes */
 	reg_vcc1v8: regulator-vcc1v8 {
 		compatible = "regulator-fixed";
-		regulator-name = "TQMA8MPXL_VCC1V8";
+		regulator-name = "VCC1V8";
 		regulator-min-microvolt = <1800000>;
 		regulator-max-microvolt = <1800000>;
 		regulator-always-on;
@@ -45,7 +45,7 @@
 		#size-cells = <1>;
 		compatible = "jedec,spi-nor";
 		spi-max-frequency = <80000000>;
-		spi-tx-bus-width = <4>;
+		spi-tx-bus-width = <1>;
 		spi-rx-bus-width = <4>;
 		/* used for macronix flash only */
 		macronix,dsr = <0x3>;
@@ -55,7 +55,7 @@
 };
 
 &i2c1 {
-	/* Errata: limit clk to <= 384000 Hz */
+	/* Errata ERR007805: limit clk to <= 384000 Hz */
 	clock-frequency = <384000>;
 	pinctrl-names = "default", "gpio";
 	pinctrl-0 = <&pinctrl_i2c1>;
@@ -208,6 +208,43 @@
 	};
 };
 
+&i2c2 {
+	/* Errata ERR007805: limit clk to <= 384000 Hz */
+	clock-frequency = <384000>;
+};
+
+&i2c4 {
+	/* Errata ERR007805: limit clk to <= 384000 Hz */
+	clock-frequency = <384000>;
+};
+
+&i2c6 {
+	/* Errata ERR007805: limit clk to <= 384000 Hz */
+	clock-frequency = <384000>;
+};
+
+
+&usdhc3 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc3>;
+	pinctrl-1 = <&pinctrl_usdhc3_100mhz>;
+	pinctrl-2 = <&pinctrl_usdhc3_200mhz>;
+	bus-width = <8>;
+	non-removable;
+	no-sd;
+	no-sdio;
+	vmmc-supply = <&reg_vcc3v3>;
+	vqmmc-supply = <&reg_vcc1v8>;
+	status = "okay";
+};
+
+&wdog1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_wdog>;
+	fsl,ext-reset-output;
+	status = "okay";
+};
+
 &iomuxc {
 	pinctrl_flexspi0: flexspi0grp {
 		fsl,pins = <
@@ -227,20 +264,20 @@
 		>;
 	};
 
-	pinctrl_i2c1_gpio: i2c1grp-gpio {
+	pinctrl_i2c1_gpio: i2c1-gpiogrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_I2C1_SCL__GPIO5_IO14	0x400001e2
 			MX8MP_IOMUXC_I2C1_SDA__GPIO5_IO15	0x400001e2
 		>;
 	};
 
-	pinctrl_pmic: pmicirq {
+	pinctrl_pmic: pmicirqgrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_GPIO1_IO08__GPIO1_IO08	0x1c0
 		>;
 	};
 
-	pinctrl_reg_usdhc2_vmmc: regusdhc2vmmc {
+	pinctrl_reg_usdhc2_vmmc: regusdhc2vmmcgrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_SD2_RESET_B__GPIO2_IO19	0x140
 		>;
@@ -263,7 +300,7 @@
 		>;
 	};
 
-	pinctrl_usdhc3_100mhz: usdhc3grp-100mhz {
+	pinctrl_usdhc3_100mhz: usdhc3-100mhzgrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_NAND_WE_B__USDHC3_CLK	0x194
 			MX8MP_IOMUXC_NAND_WP_B__USDHC3_CMD	0x1d4
@@ -280,7 +317,7 @@
 		>;
 	};
 
-	pinctrl_usdhc3_200mhz: usdhc3grp-200mhz {
+	pinctrl_usdhc3_200mhz: usdhc3-200mhzgrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_NAND_WE_B__USDHC3_CLK	0x194
 			MX8MP_IOMUXC_NAND_WP_B__USDHC3_CMD	0x1d4
@@ -302,25 +339,4 @@
 			MX8MP_IOMUXC_GPIO1_IO02__WDOG1_WDOG_B	0x1c4
 		>;
 	};
-};
-
-&usdhc3 {
-	pinctrl-names = "default", "state_100mhz", "state_200mhz";
-	pinctrl-0 = <&pinctrl_usdhc3>;
-	pinctrl-1 = <&pinctrl_usdhc3_100mhz>;
-	pinctrl-2 = <&pinctrl_usdhc3_200mhz>;
-	bus-width = <8>;
-	non-removable;
-	no-sd;
-	no-sdio;
-	vmmc-supply = <&reg_vcc3v3>;
-	vqmmc-supply = <&reg_vcc1v8>;
-	status = "okay";
-};
-
-&wdog1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_wdog>;
-	fsl,ext-reset-output;
-	status = "okay";
 };
