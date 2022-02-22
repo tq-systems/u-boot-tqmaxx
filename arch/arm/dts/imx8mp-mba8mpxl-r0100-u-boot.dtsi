@@ -1,0 +1,179 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright 2021 TQ-Systems GmbH
+ */
+
+/ {
+	aliases {
+		i2c_eeprom0 = &at24c02;
+	};
+
+	config {
+		u-boot,mmc-env-offset = <0x400000>;
+		u-boot,mmc-env-offset-redundant = <0x404000>;
+	};
+
+	firmware {
+		optee {
+			compatible = "linaro,optee-tz";
+			method = "smc";
+		};
+	};
+};
+
+&{/soc@0} {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&clk {
+	u-boot,dm-spl;
+	u-boot,dm-pre-reloc;
+	/delete-property/ assigned-clocks;
+	/delete-property/ assigned-clock-parents;
+	/delete-property/ assigned-clock-rates;
+
+};
+
+&osc_32k {
+	u-boot,dm-spl;
+	u-boot,dm-pre-reloc;
+};
+
+&osc_24m {
+	u-boot,dm-spl;
+	u-boot,dm-pre-reloc;
+};
+
+&aips1 {
+	u-boot,dm-spl;
+	u-boot,dm-pre-reloc;
+};
+
+&aips2 {
+	u-boot,dm-spl;
+};
+
+&aips3 {
+	u-boot,dm-spl;
+};
+
+&iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_wdog>, <&pinctrl_gpiobutton>, <&pinctrl_gpioled>,
+		    <&pinctrl_hoggpio>, <&pinctrl_usb0>;
+	u-boot,dm-spl;
+
+	pinctrl_hoggpio: gpiohoggrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_NAND_DQS__GPIO3_IO14	0x19
+			MX8MP_IOMUXC_SAI5_RXFS__GPIO3_IO19	0x19
+			MX8MP_IOMUXC_SAI5_RXC__GPIO3_IO20	0x19
+			MX8MP_IOMUXC_SAI1_TXD6__GPIO4_IO18	0x19
+			MX8MP_IOMUXC_SAI1_TXD7__GPIO4_IO19	0x19
+			MX8MP_IOMUXC_SAI1_MCLK__GPIO4_IO20	0x19
+		>;
+	};
+};
+
+&pinctrl_reg_usdhc2_vmmc {
+	u-boot,dm-spl;
+};
+
+&reg_usdhc2_vmmc {
+	u-boot,dm-spl;
+};
+
+&pinctrl_uart4 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc2_gpio {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc2 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc3 {
+	u-boot,dm-spl;
+};
+
+&gpio1 {
+	u-boot,dm-spl;
+};
+
+&gpio2 {
+	u-boot,dm-spl;
+};
+
+&gpio3 {
+	u-boot,dm-spl;
+};
+
+&gpio4 {
+	u-boot,dm-spl;
+};
+
+&gpio5 {
+	u-boot,dm-spl;
+};
+
+&uart4 {
+	u-boot,dm-spl;
+};
+
+&i2c1 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_i2c1 {
+	u-boot,dm-spl;
+};
+
+&usdhc2 {
+	u-boot,dm-spl;
+	sd-uhs-sdr104;
+	sd-uhs-ddr50;
+	assigned-clocks = <&clk IMX8MP_CLK_USDHC2>;
+	assigned-clock-rates = <400000000>;
+	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_400M>;
+};
+
+&usdhc3 {
+	u-boot,dm-spl;
+	mmc-hs400-1_8v;
+	mmc-hs400-enhanced-strobe;
+	/*
+	 * prevents voltage switch warn: driver will switch even at
+	 * fixed voltage
+	 */
+	/delete-property/ vmmc-supply;
+	/delete-property/ vqmmc-supply;
+	assigned-clocks = <&clk IMX8MP_CLK_USDHC3>;
+	assigned-clock-rates = <400000000>;
+	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_400M>;
+};
+
+&eqos {
+	compatible = "fsl,imx-eqos";
+	/delete-property/ assigned-clocks;
+	/delete-property/ assigned-clock-parents;
+	/delete-property/ assigned-clock-rates;
+};
+
+&flexspi {
+	assigned-clock-rates = <100000000>;
+	assigned-clocks = <&clk IMX8MP_CLK_QSPI>;
+	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_100M>;
+};
+
+&flash0 {
+	spi-tx-bus-width = <1>;
+	spi-rx-bus-width = <1>;
+};
+
+&wdog1 {
+	status = "disabled";
+};

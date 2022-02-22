@@ -208,11 +208,31 @@ config TQMA8MPXL_BB_MBA8MPXL
 
 endchoice
 
+choice
+	prompt "TQMa8MPxL HW revision"
+	default TQMA8MPXL_REV_0200
+	help
+	  Select Hardware revision
+
+config TQMA8MPXL_REV_0200
+	bool "TQMa8MPxL revision 0x0200"
+	help
+	  Select Hardware revision 0x0200
+
+config TQMA8MPXL_REV_0100
+	bool "TQMa8MPxL revision 0x0100"
+	help
+	  Select Hardware revision 0x0100
+
+endchoice
+
 config DEFAULT_DEVICE_TREE
-	default "imx8mp-mba8mpxl" if TQMA8MPXL_BB_MBA8MPXL
+	default "imx8mp-mba8mpxl" if TQMA8MPXL_BB_MBA8MPXL && TQMA8MPXL_REV_0200
+	default "imx8mp-mba8mpxl-r0100" if TQMA8MPXL_BB_MBA8MPXL && TQMA8MPXL_REV_0100
 
 config DEFAULT_FDT_FILE
-	default "imx8mp-tqma8mpql-mba8mpxl.dtb" if TQMA8MPXL_BB_MBA8MPXL
+	default "imx8mp-tqma8mpql-mba8mpxl.dtb" if TQMA8MPXL_BB_MBA8MPXL && TQMA8MPXL_REV_0200
+	default "imx8mp-tqma8mpql-mba8mpxl-r0100.dtb" if TQMA8MPXL_BB_MBA8MPXL && TQMA8MPXL_REV_0100
 
 menu "TQMa8MPxL boot device"
 
