@@ -127,10 +127,10 @@ choice
 	help
 	  Select RAM configuration for TQMa8MPXL
 
-config TQMA8MPXL_RAM_2048MB_1G5
-	bool "TQMa8x with 2048 MiB RAM, 1.5 GHz, no ECC"
+config TQMA8MPXL_RAM_1024MB
+	bool "TQMa8x with 1024 MiB RAM, no ECC"
 	help
-	  Select variant with 2048 MiB RAM / 1.5 GHz and no ECC
+	  Select variant with 1024 MiB RAM
 
 config TQMA8MPXL_RAM_2048MB
 	bool "TQMa8x with 2048 MiB RAM, no ECC"
