@@ -24,6 +24,7 @@
 #include <dm/root.h>
 
 #ifdef CONFIG_SPL_BUILD
+#define MCU_PADCFG_CTRL0_CFG0_BASE		0x04080000
 #define MCU_CTRL_MMR0_BASE			0x04500000
 #define CTRLMMR_MCU_RST_CTRL			0x04518170
 
@@ -31,6 +32,9 @@ static void ctrl_mmr_unlock(void)
 {
 	/* Unlock all PADCFG_MMR1 module registers */
 	mmr_unlock(PADCFG_MMR1_BASE, 1);
+
+	/* Unlock all PADMMR_MCU_PADCONFIG registers */
+	mmr_unlock(MCU_PADCFG_CTRL0_CFG0_BASE, 1);
 
 	/* Unlock all MCU_CTRL_MMR0 module registers */
 	mmr_unlock(MCU_CTRL_MMR0_BASE, 0);
