@@ -144,6 +144,7 @@ void init_env(void)
 	env_init();
 	env_relocate();
 	switch (spl_boot_device()) {
+	case BOOT_DEVICE_MMC1:
 	case BOOT_DEVICE_MMC2:
 		part = env_get("bootpart");
 		env_set("storage_interface", "mmc");
@@ -174,6 +175,7 @@ int load_firmware(char *name_fw, char *name_loadaddr, u32 *loadaddr)
 	*loadaddr = 0;
 #ifdef CONFIG_SPL_ENV_SUPPORT
 	switch (spl_boot_device()) {
+	case BOOT_DEVICE_MMC1:
 	case BOOT_DEVICE_MMC2:
 		name = env_get(name_fw);
 		*loadaddr = env_get_hex(name_loadaddr, *loadaddr);

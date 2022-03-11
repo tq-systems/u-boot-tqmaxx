@@ -276,16 +276,24 @@ void board_init_f(ulong dummy)
 
 u32 spl_mmc_boot_mode(struct mmc *mmc, const u32 boot_device)
 {
-	switch (boot_device) {
-	case BOOT_DEVICE_MMC1:
+#if defined(CONFIG_SUPPORT_EMMC_BOOT)
+	u32 devstat = readl(CTRLMMR_MAIN_DEVSTAT);
+
+	u32 bootmode = (devstat & MAIN_DEVSTAT_PRIMARY_BOOTMODE_MASK) >>
+			MAIN_DEVSTAT_PRIMARY_BOOTMODE_SHIFT;
+
+	/* eMMC boot0 mode is only supported for primary boot */
+	if (bootindex == K3_PRIMARY_BOOTMODE &&
+	    bootmode == BOOT_DEVICE_MMC1)
 		return MMCSD_MODE_EMMCBOOT;
+#endif
 
-	case BOOT_DEVICE_MMC2:
-		return MMCSD_MODE_FS;
-
-	default:
-		return MMCSD_MODE_RAW;
-	}
+	/* Everything else use filesystem if available */
+#if defined(CONFIG_SPL_FS_FAT) || defined(CONFIG_SPL_FS_EXT4)
+	return MMCSD_MODE_FS;
+#else
+	return MMCSD_MODE_RAW;
+#endif
 }
 
 static u32 __get_backup_bootmedia(u32 main_devstat)
