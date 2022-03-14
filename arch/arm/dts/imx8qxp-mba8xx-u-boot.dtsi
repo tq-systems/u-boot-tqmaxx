@@ -302,6 +302,8 @@
 
 &usbotg1 {
 	u-boot,dm-spl;
+	dr_mode = "peripheral";
+	status = "disabled";
 };
 
 &usbotg3 {
