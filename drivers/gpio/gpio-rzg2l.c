@@ -157,9 +157,9 @@ static int rzg2l_gpio_probe(struct udevice *dev)
 }
 
 U_BOOT_DRIVER(rzg2l_gpio) = {
-	.name   = "rzg2l-gpio",
-	.id     = UCLASS_GPIO,
-	.ops    = &rzg2l_gpio_ops,
-	.priv_auto_alloc_size = sizeof(struct rzg2l_gpio_priv),
-	.probe  = rzg2l_gpio_probe,
+	.name   	= "rzg2l-gpio",
+	.id     	= UCLASS_GPIO,
+	.ops    	= &rzg2l_gpio_ops,
+	.priv_auto	= sizeof(struct rzg2l_gpio_priv),
+	.probe  	= rzg2l_gpio_probe,
 };
