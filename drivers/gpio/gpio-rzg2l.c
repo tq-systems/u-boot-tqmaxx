@@ -12,6 +12,7 @@
 #include <asm/gpio.h>
 #include <asm/io.h>
 #include <linux/bitops.h>
+#include <dm/device_compat.h>
 
 #define P(n)	(0x0000 + 0x10 + (n))	  /* Port Register */
 #define PM(n)	(0x0100 + 0x20 + (n) * 2) /* Port Mode Register */
