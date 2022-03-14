@@ -12,6 +12,7 @@
 #include <linux/bitops.h>
 #include <linux/io.h>
 #include <linux/err.h>
+#include <dm/device_compat.h>
 
 #define P(n)	(0x0000 + 0x10 + (n))	  /* Port Register */
 #define PM(n)	(0x0100 + 0x20 + (n) * 2) /* Port Mode Register */
