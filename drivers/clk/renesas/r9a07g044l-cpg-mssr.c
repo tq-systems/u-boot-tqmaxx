@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*	
  * R-Car R9A07G044L Clock Module
- *
+vers/clk/renesas/r9a07g044l-cpg-mssr.c *
  * Copyright (C) 2020 Renesas Electronics Corp.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -462,7 +462,7 @@ U_BOOT_DRIVER(clk_r9a07g044l) = {
 	.name		= "clk_r9a07g044l",
 	.id		= UCLASS_CLK,
 	.of_match	= r9a07g044l_clk_ids,
-	.priv_auto_alloc_size = sizeof(struct rzg2l_clk_priv),
+	.priv_auto	= sizeof(struct rzg2l_clk_priv),
 	.ops		= &rzg2l_clk_ops,
 	.probe		= rzg2l_clk_probe,
 	.remove		= rzg2l_clk_remove,
