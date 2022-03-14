@@ -132,6 +132,6 @@ U_BOOT_DRIVER(rzg2l_pinctrl) = {
 	.id		= UCLASS_PINCTRL,
 	.of_match	= rzg2l_pinctrl_match,
 	.probe		= rzg2l_pinctrl_probe,
-	.platdata_auto_alloc_size = sizeof(struct rzg2l_pinctrl_priv),
+	.plat_auto	= sizeof(struct rzg2l_pinctrl_priv),
 	.ops		= &rzg2l_pinctrl_ops,
 };
