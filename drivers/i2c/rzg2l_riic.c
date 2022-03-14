@@ -619,6 +619,6 @@ U_BOOT_DRIVER(riic_rzg2l) = {
 	.id             = UCLASS_I2C,
 	.of_match       = riic_ids,
 	.probe          = riic_probe,
-	.priv_auto_alloc_size = sizeof(struct riic_priv),
+	.priv_auto	= sizeof(struct riic_priv),
 	.ops            = &riic_ops,
 };
