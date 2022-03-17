@@ -1,0 +1,18 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright 2022 TQ-Systems GmbH
+ */
+
+/*
+ * original CPU devicetree uses "fsl,imx8mm-flexspi" which is the older
+ * driver for flexspi using a fixed LUT. The new driver (which was
+ * ported from linux) is compatible for imx8mm / imx8mn / imx8mp.
+ * This new driver uses the more flexible spi-mem framework which allows us
+ * better support new / different flashes
+ * TODO: this can bew removed when porting to newer U-Boot supporting the new
+ * driver.
+ */
+&flexspi {
+	compatible = "nxp,imx8mm-fspi";
+	reg-names = "fspi_base", "fspi_mmap";
+};

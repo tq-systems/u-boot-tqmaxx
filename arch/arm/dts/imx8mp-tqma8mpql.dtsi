@@ -4,6 +4,7 @@
  */
 
 #include "imx8mp.dtsi"
+#include "tqma8mpql-flexspi.dtsi"
 
 / {
 	model = "TQ-Systems i.MX8MPlus TQMa8MPxL";

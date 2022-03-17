@@ -4,6 +4,7 @@
  */
 
 #include "imx8mp.dtsi"
+#include "tqma8mpql-flexspi.dtsi"
 
 / {
 	model = "TQ-Systems i.MX8MPlus TQMa8MPxL";
@@ -45,7 +46,7 @@
 		#size-cells = <1>;
 		compatible = "jedec,spi-nor";
 		spi-max-frequency = <80000000>;
-		spi-tx-bus-width = <4>;
+		spi-tx-bus-width = <1>;
 		spi-rx-bus-width = <4>;
 		/* used for macronix flash only */
 		macronix,dsr = <0x3>;
