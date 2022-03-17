@@ -49,7 +49,7 @@ config TQMA8MPXL_DEFAULTS
 	select DM_REGULATOR
 	select DM_REGULATOR_FIXED
 	select MISC
-	select FSL_FSPI
+	select NXP_FSPI
 	select DM_SPI
 	select SPI
 	select DM_SPI_FLASH
