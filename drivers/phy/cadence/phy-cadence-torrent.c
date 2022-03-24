@@ -626,8 +626,9 @@ static int cdns_torrent_phy_probe(struct udevice *dev)
 
 	/* Going through all the available subnodes or children*/
 	ofnode_for_each_subnode(child, dev_ofnode(dev)) {
-		/* PHY subnode name must be a 'link' */
-		if (!ofnode_name_eq(child, "link"))
+		/* PHY subnode name must be a 'phy' or 'link' */
+		if (!ofnode_name_eq(child, "phy") &&
+		    !ofnode_name_eq(child, "link"))
 			continue;
 		cdns_phy->phys[node].lnk_rst =
 				devm_reset_bulk_get_by_node(dev, child);
