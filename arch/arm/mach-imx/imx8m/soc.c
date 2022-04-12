@@ -580,6 +580,11 @@ static void secure_lockup(void)
 int arch_cpu_init(void)
 {
 	struct ocotp_regs *ocotp = (struct ocotp_regs *)OCOTP_BASE_ADDR;
+
+#if !CONFIG_IS_ENABLED(SYS_ICACHE_OFF)
+	icache_enable();
+#endif
+
 	/*
 	 * ROM might disable clock for SCTR,
 	 * enable the clock before timer_init.
