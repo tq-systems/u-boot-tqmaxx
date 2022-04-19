@@ -38,6 +38,7 @@ int select_i2c_ch_pca9547(u8 ch, int bus)
 	return 0;
 }
 
+#ifdef I2C_MUX_PCA_ADDR_SEC
 int select_i2c_ch_pca9547_sec(u8 ch, int bus)
 {
 	int ret;
@@ -58,5 +59,5 @@ int select_i2c_ch_pca9547_sec(u8 ch, int bus)
 
 	return 0;
 }
-
+#endif
 #endif
