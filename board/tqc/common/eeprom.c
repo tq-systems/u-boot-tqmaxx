@@ -11,6 +11,7 @@
 #include <linux/ctype.h>
 #include <malloc.h>
 #include <net.h>
+#include <u-boot/crc.h>
 
 #include "eeprom.h"
 
@@ -97,3 +98,71 @@ void tq_show_eeprom(const struct tq_eeprom_data *eeprom, const char *id_prefix)
 	else
 		printf("  invalid MAC\n");
 }
+
+#if defined(CONFIG_TQ_VARD)
+
+/*
+ * checksum is calculated over whole structure but the CRC field
+ */
+static uint16_t tq_vard_chksum(const struct tq_vard *vard)
+{
+	const unsigned char *start = (const unsigned char *)(vard) +
+		sizeof(vard->crc);
+
+	return crc16_ccitt(0, start, sizeof(*vard) - sizeof(vard->crc));
+}
+
+bool tq_vard_valid(const struct tq_vard *vard)
+{
+	return (vard->crc == tq_vard_chksum(vard));
+}
+
+phys_size_t tq_vard_memsize(u8 val, unsigned int multiply, unsigned int tmask)
+{
+	phys_size_t result = 0;
+
+	if (val != VARD_MEMSIZE_DEFAULT) {
+		result = 1 << (val & VARD_MEMSIZE_MASK_EXP);
+		if (val & tmask)
+			result *= 3;
+		result *= multiply;
+	}
+
+	return result;
+}
+
+bool tq_vard_show(const struct tq_vard *vard)
+{
+	bool valid = tq_vard_valid(vard);
+
+	printf("  VARD CRC: %04x (calculated %04x) [%s]\n",
+	       vard->crc, tq_vard_chksum(vard),
+	       valid ? "OKAY" : "FAIL");
+	/* display data anyway to support developer */
+	printf("  HW REV:   %02uxx\n", vard->hwrev);
+
+	printf("  RAM:      type %u, %lu MiB, %s\n",
+	       (vard->memtype & VARD_MEMTYPE_MASK_TYPE),
+	       (unsigned long)(tq_vard_ramsize(vard) / SZ_1M),
+	       (tq_vard_has_ramecc(vard) ? "ECC" : "no ECC"));
+
+	printf("  RTC:      %s\n", tq_vard_has_rtc(vard) ? "yes" : "no");
+	printf("  SPI-NOR:  %s\n", tq_vard_has_spinor(vard) ? "yes" : "no");
+	printf("  eMMC:     %s\n", tq_vard_has_emmc(vard) ? "yes" : "no");
+	printf("  SE:       %s\n", tq_vard_has_secelem(vard) ? "yes" : "no");
+
+	printf("  EEPROM:   ");
+	if (tq_vard_has_eeprom(vard))
+		printf("type %u, %lu KiB, pagesize %lu\n",
+		       (vard->eepromtype & VARD_EETYPE_MASK_MFR) >> 4,
+		       (unsigned long)(tq_vard_eepromsize(vard) / SZ_1K),
+		       (unsigned long)tq_vard_eeprom_pgsize(vard));
+	else
+		printf("no\n");
+
+	printf("\n");
+
+	return valid;
+}
+
+#endif
