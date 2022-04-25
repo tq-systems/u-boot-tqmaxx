@@ -10,6 +10,7 @@
 #include <i2c.h>
 #include <linux/ctype.h>
 #include <malloc.h>
+#include <u-boot/crc.h>
 
 #include "tqc_eeprom.h"
 
@@ -46,6 +47,63 @@ int tqc_read_eeprom_buf(unsigned int bus, unsigned int i2c_addr,
 #endif
 	return ret;
 }
+
+#if defined(CONFIG_TQC_VARD)
+
+/*
+ * checksum is calculated over whole structure but the CRC field
+ */
+static uint16_t tq_vard_chksum(const struct tq_vard *vard)
+{
+	const unsigned char *start = (const unsigned char *)(vard) +
+		sizeof(vard->crc);
+
+	return crc16_ccitt(0, start, sizeof(*vard) - sizeof(vard->crc));
+}
+
+bool tq_vard_valid(const struct tq_vard *vard)
+{
+	return (vard->crc == tq_vard_chksum(vard));
+}
+
+phys_size_t tq_vard_memsize(u8 val, unsigned int multiply, unsigned int tmask)
+{
+	phys_size_t result = 0;
+
+	if (val != VARD_MEMSIZE_DEFAULT) {
+		result = 1 << (size_t)(val & VARD_MEMSIZE_MASK_EXP);
+		if (val & tmask)
+			result *= 3;
+		result *= multiply;
+	}
+
+	return result;
+}
+
+void tq_vard_show(const struct tq_vard *vard)
+{
+	printf("CRC\t%04x (calculated %04x) [%s]\n",
+	       (unsigned int)vard->crc, (unsigned int)tq_vard_chksum(vard),
+	       tq_vard_valid(vard) ? "OKAY" : "FAIL");
+	/* display data anyway to support developer */
+	printf("HW\tREV.%02uxx\n", (unsigned int)vard->hwrev);
+	printf("RAM\ttype %u, %lu MiB, %s\n",
+	       (unsigned int)(vard->memtype & VARD_MEMTYPE_MASK_TYPE),
+	       (unsigned long)(tq_vard_ramsize(vard) / (SZ_1M)),
+	       (tq_vard_has_ramecc(vard) ? "ECC" : "no ECC"));
+	printf("RTC\t%c\nSPINOR\t%c\ne-MMC\t%c\nSE\t%c\nEEPROM\t%c\n",
+	       (tq_vard_has_rtc(vard) ? 'y' : 'n'),
+	       (tq_vard_has_spinor(vard) ? 'y' : 'n'),
+	       (tq_vard_has_emmc(vard) ? 'y' : 'n'),
+	       (tq_vard_has_secelem(vard) ? 'y' : 'n'),
+	       (tq_vard_has_eeprom(vard) ? 'y' : 'n'));
+	if (tq_vard_has_eeprom(vard))
+		printf("EEPROM\ttype %u, %lu KiB, page %lu\n",
+		       (unsigned int)(vard->eepromtype & VARD_EETYPE_MASK_MFR) >> 4,
+		       (unsigned long)(tq_vard_eepromsize(vard) / (SZ_1K)),
+		       tq_vard_eeprom_pgsize(vard));
+}
+#endif
 
 #if !defined(CONFIG_SPL_BUILD)
 

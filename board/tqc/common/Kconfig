@@ -2,6 +2,11 @@ config TQC_EEPROM
 	bool
 	default n
 
+config TQC_VARD
+	bool
+	depends on TQC_EEPROM
+	select SPL_HASH_SUPPORT if SPL
+
 config TQC_EMMC
 	bool
 	default n
