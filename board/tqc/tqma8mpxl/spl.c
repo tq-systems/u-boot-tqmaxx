@@ -26,6 +26,7 @@
 #include <asm/arch/ddr.h>
 
 #include "../common/tqc_bb.h"
+#include "../common/tqc_eeprom.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -39,6 +40,20 @@ static struct dram_timing_info *dram_timing_info = &dram_timing_2gb_no_ecc;
 extern struct dram_timing_info dram_timing_8gb_no_ecc;
 static struct dram_timing_info *dram_timing_info = &dram_timing_8gb_no_ecc;
 #endif
+
+static struct tq_vard vard;
+
+static int handle_vard(void)
+{
+	if (tq_vard_read(0, 0x53, &vard))
+		puts("ERROR: vard read\n");
+	else if (!tq_vard_valid(&vard))
+		puts("ERROR: vard CRC\n");
+	else
+		return (int)(vard.memtype & VARD_MEMTYPE_MASK_TYPE);
+
+	return VARD_MEMTYPE_DEFAULT;
+};
 
 void spl_dram_init(void)
 {
@@ -280,6 +295,8 @@ void board_init_f(ulong dummy)
 	power_init_board();
 
 	/* DDR initialization */
+	handle_vard();
+	tq_vard_show(&vard);
 	spl_dram_init();
 
 	board_init_r(NULL, 0);

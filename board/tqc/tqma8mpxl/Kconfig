@@ -18,10 +18,11 @@ config CSF_SIZE
 config TQMA8MPXL_DEFAULTS
 	bool
 	default y
-	select TQC_SDMMC
 	select TQC_EEPROM
+	select TQC_SDMMC
 	select TQC_RTC
 	select TQC_SPI_NOR
+	select TQC_VARD
 	select BOARD_LATE_INIT
 	select BOARD_EARLY_INIT_F
 	select OF_CONTROL
