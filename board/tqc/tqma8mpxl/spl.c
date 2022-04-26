@@ -32,25 +32,61 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+/* SPL currently not working with DM, use old style I2C API */
+#define TQC_SYSTEM_EEPROM_BUS	0
+#define TQC_SYSTEM_EEPROM_ADDR	0x53
+
+#if defined(CONFIG_IMX8M_DRAM_INLINE_ECC)
+#error "Inline ECC is not supported yet"
+#else
+
 #if defined(CONFIG_TQMA8MPXL_RAM_1024MB)
 extern struct dram_timing_info dram_timing_1gb_no_ecc;
-static struct dram_timing_info *dram_timing_info = &dram_timing_1gb_no_ecc;
-static const phys_size_t memsize = SZ_1G * 1ULL;
-#elif defined(CONFIG_TQMA8MPXL_RAM_2048MB)
+#endif
+#if defined(CONFIG_TQMA8MPXL_RAM_2048MB)
 extern struct dram_timing_info dram_timing_2gb_no_ecc;
-static struct dram_timing_info *dram_timing_info = &dram_timing_2gb_no_ecc;
-static const phys_size_t memsize = SZ_1G * 2ULL;
-#elif defined(CONFIG_TQMA8MPXL_RAM_8192MB)
+#endif
+#if defined(CONFIG_TQMA8MPXL_RAM_4096MB)
+/* extern struct dram_timing_info dram_timing_4gb_no_ecc; */
+#endif
+#if defined(CONFIG_TQMA8MPXL_RAM_8192MB)
 extern struct dram_timing_info dram_timing_8gb_no_ecc;
-static struct dram_timing_info *dram_timing_info = &dram_timing_8gb_no_ecc;
-static const phys_size_t memsize = SZ_1G * 8ULL;
+#endif
+
+struct dram_info {
+	struct dram_timing_info	*table;
+	phys_size_t		size;
+};
+
+/*
+ * Currently this is known to work with up to four timings in one SPL
+ * Needs to be rechecked when increasing
+ */
+static struct dram_info tqma8mpxl_dram_info[]  = {
+#if defined(CONFIG_TQMA8MPXL_RAM_1024MB)
+	{ &dram_timing_1gb_no_ecc, SZ_1G * 1ULL },
+#endif
+#if defined(CONFIG_TQMA8MPXL_RAM_2048MB)
+	{ &dram_timing_2gb_no_ecc, SZ_1G * 2ULL },
+#endif
+#if defined(CONFIG_TQMA8MPXL_RAM_4096MB)
+/* TODO: timing not validated yet. */
+	{ 0, SZ_1G * 4ULL },
+#endif
+#if defined(CONFIG_TQMA8MPXL_RAM_8192MB)
+	{ &dram_timing_8gb_no_ecc, SZ_1G * 8ULL },
+#endif
+};
+
+static int tqma8mpxl_ram_timing_idx = -1;
+
 #endif
 
 static struct tq_vard vard;
 
 static int handle_vard(void)
 {
-	if (tq_vard_read(0, 0x53, &vard))
+	if (tq_vard_read(TQC_SYSTEM_EEPROM_BUS, TQC_SYSTEM_EEPROM_ADDR, &vard))
 		puts("ERROR: vard read\n");
 	else if (!tq_vard_valid(&vard))
 		puts("ERROR: vard CRC\n");
@@ -60,9 +96,70 @@ static int handle_vard(void)
 	return VARD_MEMTYPE_DEFAULT;
 };
 
-void spl_dram_init(void)
+static int tqma8mpxl_query_ddr_timing(void)
 {
-	ddr_init(dram_timing_info);
+	char sel = '-';
+	phys_size_t ramsize;
+	int idx;
+
+	puts("Warning: no valid EEPROM!\n"
+		"Please enter LPDDR size in GByte to procced.\n"
+		"Valid sizes are 1,2,4 and 8.\n");
+
+	for (;;) {
+		/* Flush input */
+		while (tstc())
+			getc();
+
+		sel = getc();
+		putc('\n');
+
+		if ((sel == '1') || (sel == '2') || (sel == '4') || (sel == '8'))
+			break;
+		else
+			puts("Please enter a valid size.\n");
+	}
+
+	ramsize = (phys_size_t)((unsigned int)sel - (unsigned int)('0')) * SZ_1G;
+	for (idx = 0; idx < ARRAY_SIZE(tqma8mpxl_dram_info); ++idx) {
+		if (ramsize == tqma8mpxl_dram_info[idx].size)
+			break;
+	}
+
+	if (idx >= ARRAY_SIZE(tqma8mpxl_dram_info) ||
+	    !tqma8mpxl_dram_info[idx].table) {
+		puts("ERROR: no valid RAM timing or timing not in image, stop\n");
+		hang();
+	}
+
+	return idx;
+}
+
+static void spl_dram_init(int memtype)
+{
+	phys_size_t ramsize;
+	int idx = -1;
+
+	if (memtype == 1) {
+		ramsize = tq_vard_ramsize(&vard);
+		for (idx = 0; idx < ARRAY_SIZE(tqma8mpxl_dram_info); ++idx) {
+			if (ramsize == tqma8mpxl_dram_info[idx].size)
+				break;
+		}
+		if (idx >= ARRAY_SIZE(tqma8mpxl_dram_info))
+			puts("DRAM init: no matching timing\n");
+	} else if (vard.memtype == VARD_MEMTYPE_DEFAULT) {
+		puts("DRAM init: vard invalid?\n");
+	} else {
+		printf("DRAM init: unknown RAM type %u\n",
+			(unsigned int)vard.memtype);
+	}
+
+	if (idx < 0 || idx >= ARRAY_SIZE(tqma8mpxl_dram_info))
+		idx = tqma8mpxl_query_ddr_timing();
+
+	ddr_init(tqma8mpxl_dram_info[idx].table);
+	tqma8mpxl_ram_timing_idx = idx;
 }
 
 #ifdef CONFIG_SPL_MMC_SUPPORT
@@ -277,8 +374,13 @@ void spl_board_init(void)
 
 	raminfo_blob = bloblist_ensure(BLOBLISTT_TQ_RAMSIZE,
 				       sizeof(*raminfo_blob));
-	if (raminfo_blob)
-		raminfo_blob->memsize = memsize;
+	if (raminfo_blob && tqma8mpxl_ram_timing_idx >= 0) {
+		raminfo_blob->memsize =
+			tqma8mpxl_dram_info[tqma8mpxl_ram_timing_idx].size;
+	} else {
+		printf("ERROR: no valid ram configuration, please reset\n");
+		hang();
+	}
 
 	puts("Normal Boot\n");
 }
@@ -286,6 +388,7 @@ void spl_board_init(void)
 void board_init_f(ulong dummy)
 {
 	int ret;
+	int ramtype;
 
 	/* Clear the BSS. */
 	memset(__bss_start, 0, __bss_end - __bss_start);
@@ -311,9 +414,9 @@ void board_init_f(ulong dummy)
 	power_init_board();
 
 	/* DDR initialization */
-	handle_vard();
+	ramtype = handle_vard();
 	tq_vard_show(&vard);
-	spl_dram_init();
+	spl_dram_init(ramtype);
 
 	board_init_r(NULL, 0);
 }
