@@ -25,6 +25,7 @@ config TQMA8MPXL_DEFAULTS
 	select TQC_VARD
 	select BOARD_LATE_INIT
 	select BOARD_EARLY_INIT_F
+	select BLOBLIST
 	select OF_CONTROL
 	select OF_BOARD_SETUP
 	select OF_SYSTEM_SETUP
@@ -150,6 +151,15 @@ config TQMA8MPXL_RAM_2048MB_ECC
 	  Select variant with 2048 MiB RAM and inline ECC
 
 endchoice
+
+#
+# Bloblist at start of of DRAM
+#
+config BLOBLIST_ADDR
+	default 0x40000000 if BLOBLIST
+
+config BLOBLIST_SIZE
+	default 0x400 if BLOBLIST
 
 config NR_DRAM_BANKS
 	default 3

@@ -17,12 +17,14 @@
 #include <asm/arch/clock.h>
 #include <spl.h>
 #include <asm/mach-imx/dma.h>
+#include <bloblist.h>
 #include <jffs2/load_kernel.h>
 #include <mtd_node.h>
 #include <power/pmic.h>
 #include <mmc.h>
 
 #include "../common/tqc_bb.h"
+#include "../common/tqc_blob.h"
 #include "../common/tqc_eeprom.h"
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -46,6 +48,24 @@ int board_early_init_f(void)
 }
 
 #if !defined(CONFIG_SPL_BUILD)
+
+int board_phys_sdram_size(phys_size_t *size)
+{
+	struct tq_raminfo *raminfo;
+
+	if (!size)
+		return -EINVAL;
+
+	raminfo = bloblist_find(BLOBLISTT_TQ_RAMSIZE, sizeof(*raminfo));
+	if (!raminfo) {
+		printf("Unable to find RAMSIZE blob from SPL\n");
+		return -ENOENT;
+	}
+
+	*size = raminfo->memsize;
+
+	return 0;
+}
 
 static const char *tqc_get_boardname(void)
 {

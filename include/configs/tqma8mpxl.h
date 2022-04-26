@@ -249,8 +249,23 @@
 
 #define CONFIG_SYS_LOAD_ADDR		CONFIG_LOADADDR
 
-#define CONFIG_SYS_INIT_RAM_ADDR	0x40000000
-#define CONFIG_SYS_INIT_RAM_SIZE	0x80000
+#define CONFIG_SYS_SDRAM_BASE		(DDR_CSD1_BASE_ADDR)
+#define PHYS_SDRAM			(DDR_CSD1_BASE_ADDR)
+#define PHYS_SDRAM_SIZE			SZ_1G
+#define PHYS_SDRAM_2			(DDR_CSD2_BASE_ADDR)
+#define PHYS_SDRAM_2_SIZE		0
+
+#if defined(CONFIG_BLOBLIST)
+#if (CONFIG_BLOBLIST_ADDR != CONFIG_SYS_SDRAM_BASE)
+#error "Please place bloblist at the beginning of RAM"
+#endif
+#define CONFIG_SYS_INIT_RAM_ADDR	CONFIG_BLOBLIST_ADDR + \
+					CONFIG_BLOBLIST_SIZE
+#else
+#define CONFIG_SYS_INIT_RAM_ADDR	CONFIG_SYS_SDRAM_BASE
+#endif
+
+#define CONFIG_SYS_INIT_RAM_SIZE	0x100000
 #define CONFIG_SYS_INIT_SP_OFFSET \
 	(CONFIG_SYS_INIT_RAM_SIZE - GENERATED_GBL_DATA_SIZE)
 #define CONFIG_SYS_INIT_SP_ADDR \
@@ -267,33 +282,17 @@
 
 /* Size of malloc() pool */
 #define CONFIG_SYS_MALLOC_LEN		SZ_64M
-#define CONFIG_SYS_SDRAM_BASE		0x40000000ull
-#define PHYS_SDRAM			0x40000000ull
-#define PHYS_SDRAM_2			0x100000000ull
-
-#if defined(CONFIG_TQMA8MPXL_RAM_2048MB)
-
-#define PHYS_SDRAM_SIZE			(2ull * SZ_1G) /* 2GB LPDDR4 */
-
-#elif defined(CONFIG_TQMA8MPXL_RAM_8192MB)
-
-#define PHYS_SDRAM_SIZE			(3ull * SZ_1G) /* 3GB LPDDR4 */
-#define PHYS_SDRAM_2_SIZE		(5ull * SZ_1G) /* 5GB LPDDR4 */
-
-#else
-#error
-#endif
 
 #if defined(CONFIG_CMD_MEMTEST)
 /*
  * Use alternative / extended memtest,
- * start at CONFIG_LOADADDR and use 3/4 of RAM
+ * start at CONFIG_LOADADDR and use 3/4 of smallest RAM size
  * U-Boot is loaded to 0x40200000 (offset 2 MiB)
- * and relocated at end of configured RAM
+ * and relocated at end of configured RAM of first mem region
  */
 #define CONFIG_SYS_MEMTEST_START	(CONFIG_LOADADDR)
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + \
-					((PHYS_SDRAM_SIZE / 4) * 3))
+					((SZ_1G / 4) * 3))
 
 #if defined(CONFIG_SYS_ALT_MEMTEST)
 #define CONFIG_SYS_MEMTEST_SCRATCH	CONFIG_SYS_MEMTEST_END

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * (C) Copyright 2021 TQ-Systems GmbH
+ * (C) Copyright 2021 - 2022 TQ-Systems GmbH
  * Markus Niebel <Markus.Niebel@tq-group.com>
  */
 
@@ -15,6 +15,7 @@
 #include <asm/arch/imx8mp_pins.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/mach-imx/boot_mode.h>
+#include <bloblist.h>
 #include <power/pmic.h>
 
 #include <power/pca9450.h>
@@ -26,6 +27,7 @@
 #include <asm/arch/ddr.h>
 
 #include "../common/tqc_bb.h"
+#include "../common/tqc_blob.h"
 #include "../common/tqc_eeprom.h"
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -33,12 +35,15 @@ DECLARE_GLOBAL_DATA_PTR;
 #if defined(CONFIG_TQMA8MPXL_RAM_1024MB)
 extern struct dram_timing_info dram_timing_1gb_no_ecc;
 static struct dram_timing_info *dram_timing_info = &dram_timing_1gb_no_ecc;
+static const phys_size_t memsize = SZ_1G * 1ULL;
 #elif defined(CONFIG_TQMA8MPXL_RAM_2048MB)
 extern struct dram_timing_info dram_timing_2gb_no_ecc;
 static struct dram_timing_info *dram_timing_info = &dram_timing_2gb_no_ecc;
+static const phys_size_t memsize = SZ_1G * 2ULL;
 #elif defined(CONFIG_TQMA8MPXL_RAM_8192MB)
 extern struct dram_timing_info dram_timing_8gb_no_ecc;
 static struct dram_timing_info *dram_timing_info = &dram_timing_8gb_no_ecc;
+static const phys_size_t memsize = SZ_1G * 8ULL;
 #endif
 
 static struct tq_vard vard;
@@ -251,6 +256,12 @@ int power_init_board(void)
 void spl_board_init(void)
 {
 	/*
+	 * board_init_f runs before bloblist_init, so we need this here in in
+	 * spl_board_init
+	 */
+	struct tq_raminfo *raminfo_blob;
+
+	/*
 	 * Set GIC clock to 500Mhz for OD VDD_SOC. Kernel driver does not allow
 	 * to change it. Should set the clock after PMIC setting done.
 	 * Default is 400Mhz (system_pll1_800m with div = 2) set by ROM for
@@ -263,6 +274,11 @@ void spl_board_init(void)
 	clock_enable(CCGR_GIC, 1);
 #endif
 	tqc_bb_spl_board_init();
+
+	raminfo_blob = bloblist_ensure(BLOBLISTT_TQ_RAMSIZE,
+				       sizeof(*raminfo_blob));
+	if (raminfo_blob)
+		raminfo_blob->memsize = memsize;
 
 	puts("Normal Boot\n");
 }
