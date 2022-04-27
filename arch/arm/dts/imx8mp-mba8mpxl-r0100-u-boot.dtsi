@@ -10,7 +10,7 @@
 
 	config {
 		u-boot,mmc-env-offset = <0x400000>;
-		u-boot,mmc-env-offset-redundant = <0x404000>;
+		u-boot,mmc-env-offset-redundant = <0x408000>;
 	};
 
 	firmware {
