@@ -3,11 +3,60 @@ U-Boot for the TQ-Systems i.MX8MP TQMa8MPxL SOM family
 Supported variants
 ==================
 
+TQMa8MPxL / 1 GiB NO ECC LPDDR4 / i.MX8MP
 TQMa8MPxL / 2 GiB NO ECC LPDDR4 / i.MX8MP
+TQMa8MPxL / 8 GiB NO ECC LPDDR4 / i.MX8MP
 
 configs:
 
+tqma8mpxl_multi_mba8mpxl_defconfig
 tqma8mpxl_2gb_mba8mpxl_defconfig
+
+Memory Usage
+============
+
+SPL
+---
+
+SPL_LOAD_ADDR / SPL_TEXT_BASE	0x920000 (OCRAM) - max size 152 KiB
+CONFIG_SPL_STACK		OCRAM_S (Initial Stack)
+BSS				OCRAM (after Code, 0x0095e000)
+SPL_IMX_ROMAPI_LOADADDR		0x48000000 (RAM, load address for next boot
+				container using ROM API)
+SYS_SPL_MALLOC_START/SIZE	RAM, used after RAM init
+MALLOC_F_ADDR			OCRAM_S, used before RAM init. Located after
+				SAVED_DRAM_TIMING_BASE
+SPL_SYS_MALLOC_F_LEN		length of malloc space before RAM init
+
+see include/configs/tqma8mpxl.h
+
+Shared
+------
+
+SAVED_DRAM_TIMING_BASE		0x180000 (OCRAM_S, used by SPL + ATF/TF-A)
+BLOBLIST_ADDR			0x40000000 (DRAM start, used to transfer Data
+				from SPL to BL33 / U-Boot)
+
+ATF
+---
+
+ATF_LOAD_ADDR			default 0x00970000 (OCRAM) needs to match ATF
+				linker settings
+
+U-Boot
+------
+
+SYS_TEXT_BASE			DRAM U-Boot start address (before relocation)
+SYS_INIT_RAM_ADDR		0x40000000 + BLOBLIST_SIZE (initial RAM used
+				before relocation for SP, malloc, global Data)
+SYS_INIT_RAM_SIZE		size of above memory, default to 
+
+Cortex M
+--------
+
+load address for CortexM:	0x7e0000 (ITCM) if linked for TCM
+
+TODO: TEE/OPTEE
 
 Quick Start
 ===========
@@ -44,8 +93,10 @@ $ cp firmware-imx-8.10/firmware/ddr/synopsys/lpddr4*_202006.bin .
 
 Build U-Boot
 ============
-$ make tqma8mpxl_mba8mpxl_defconfig
 
+$ export CROSS_COMPILE=<compiler prefix>
+$ make tqma8mpxl_mba8mpxl_defconfig
+$ export ATF_LOAD_ADDR=0x00970000
 $ make flash.bin
 
 Flash the binary into the SD card
