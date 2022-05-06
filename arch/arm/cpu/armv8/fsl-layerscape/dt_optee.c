@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Copyright 2021 NXP
+ * Copyright 2021-2022 NXP
  */
 #include <errno.h>
 #include <fdt_support.h>
@@ -32,6 +32,9 @@ int ft_add_optee_overlay(void *fdt, struct bd_info *bd)
 				debug("Overlay applied with success");
 				fdt_pack(fdt);
 			}
+		} else {
+			printf("DTB overlay not present, exiting without applying\n");
+			ret = 0;
 		}
 	}
 	return ret;
