@@ -298,18 +298,6 @@ void sdram_init(void)
 {
 	config_ddr(400, &ioregs, &ddr3_data, &ddr3_cmd_ctrl_data,
 		   &ddr3_emif_reg_data, 0);
-
-	/* Wait 1ms because of L3 timeout error.
-	 *
-	 * In an Upstream Commit [1] another delay is suggested to avoid L3 error.
-	 * However on our module this doesn't seem to work. We need to add the
-	 * delay exactly here at the end of the ddr-config and wait 1ms before
-	 * we can continue. See also [2].
-	 *
-	 * [1] https://source.denx.de/u-boot/u-boot/-/commit/84cf295f8454156be70958c8dba2c1368942626e
-	 * [2] https://lists.denx.de/pipermail/u-boot/2015-July/219367.html
-	 */
-	udelay(1000);
 }
 #endif
 
