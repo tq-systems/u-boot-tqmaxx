@@ -27,16 +27,29 @@ config MBA335X
 	prompt "TQMa335x[L] on MBa335x Starterkit"
 	bool
 	help
-		Select the MBa335x starterkit as base for the TQMa335x[L].
+	  Select the MBa335x starterkit as base for the TQMa335x[L].
 
 endchoice
 
-config TQMA335X_512MB
-	prompt "U-Boot for TQMa335x-AB variant (512 MiB RAM)"
+choice
+	prompt "TQMa335x[L] memory variant"
+	default TQMA335X_256MB
+	help
+	  Select the TQMa335x[L] memory variant.
+
+config TQMA335X_256MB
+	prompt "U-Boot for TQMa335x variants with 256 MiB RAM"
 	bool
 	help
-		Select this if for the 512MiB RAM Variant.
-		If not selected the 256MiB configuration is used.
+	  Select this if building for the 256MiB RAM Variant.
+
+config TQMA335X_512MB
+	prompt "U-Boot for TQMa335x variants with 512 MiB RAM"
+	bool
+	help
+	  Select this if building for the 512MiB RAM Variant.
+
+endchoice
 
 source "board/ti/common/Kconfig"
 source "board/tqc/common/Kconfig"

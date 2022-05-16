@@ -122,7 +122,7 @@ int mmc_get_env_dev(void)
 #ifdef CONFIG_SPL_BUILD
 static struct ctrl_dev *cdev = (struct ctrl_dev *)CTRL_DEVICE_BASE;
 
-#ifdef CONFIG_TQMA335X_512MB
+#if defined(CONFIG_TQMA335X_512MB)
   #define DDR_CMD0_IOCTRL		DDR3L_512MB_IOCTRL_VALUE
   #define DATA_PHY_RD_DQS_SLAVE_RATIO	DDR3L_512MB_RD_DQS
   #define DATA_PHY_FIFO_WE_SLAVE_RATIO	DDR3L_512MB_PHY_FIFO_WE
@@ -137,7 +137,7 @@ static struct ctrl_dev *cdev = (struct ctrl_dev *)CTRL_DEVICE_BASE;
   #define ALLOPP_DDR3_SDRAM_TIMING2	DDR3L_512MB_EMIF_TIM2
   #define ALLOPP_DDR3_SDRAM_TIMING3	DDR3L_512MB_EMIF_TIM3
   #define EMIF_DDR_PHY_CTRL_1_REG	DDR3L_512MB_EMIF_READ_LATENCY
-#else
+#elif defined(CONFIG_TQMA335X_256MB)
   #define DDR_CMD0_IOCTRL		DDR3L_256MB_IOCTRL_VALUE
   #define DATA_PHY_RD_DQS_SLAVE_RATIO	DDR3L_256MB_RD_DQS
   #define DATA_PHY_FIFO_WE_SLAVE_RATIO	DDR3L_256MB_PHY_FIFO_WE
@@ -152,6 +152,8 @@ static struct ctrl_dev *cdev = (struct ctrl_dev *)CTRL_DEVICE_BASE;
   #define ALLOPP_DDR3_SDRAM_TIMING2	DDR3L_256MB_EMIF_TIM2
   #define ALLOPP_DDR3_SDRAM_TIMING3	DDR3L_256MB_EMIF_TIM3
   #define EMIF_DDR_PHY_CTRL_1_REG	DDR3L_256MB_EMIF_READ_LATENCY
+#else
+#error "Undefined or invalid memory size"
 #endif
 
 static const struct ddr_data ddr3_data = {

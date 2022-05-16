@@ -28,10 +28,12 @@
 
 #define CONFIG_SYS_DDR_DATA_INIT	0xdeadbeef
 #define CONFIG_SYS_MEMTEST_START	0x81000000
-#ifdef CONFIG_TQMA335X_512MB
+#if defined(CONFIG_TQMA335X_512MB)
 #define CONFIG_SYS_MEMTEST_END		0x9EFFFFFF
-#else
+#elif defined(CONFIG_TQMA335X_256MB)
 #define CONFIG_SYS_MEMTEST_END		0x8CFFFFFF
+#else
+#error "not a valid memory size config"
 #endif
 
 #define CONFIG_SYS_BOOTM_LEN		SZ_16M
