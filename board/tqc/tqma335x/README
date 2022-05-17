@@ -1,0 +1,50 @@
+U-Boot for TQ-Systems GmbH TQMa335x modules
+
+This file contains information for the port of
+U-Boot to the TQ-Systems TQMa335x[L] modules.
+
+Note: 
+
+- <x> is a placeholder for the exact CPU variant
+- TQMa335x is the click on variant of the SOM, TQMa335xL is the
+  solder on / LGA variant of the SOM
+
+As of now, all CPU variants and both SOM variants share the same bootloader
+configuration.
+
+1. Boot sources
+--------------
+
+The following boot sources are supported:
+
+- SD
+- e-MMC
+
+In the default configuration MLO (aka SPL) is expected in a FAT patition on the boot media.
+The U-Boot 'proper' image is loaded from the very same partition.
+
+
+2. Building
+-----------
+
+To build U-Boot for the TQ-Systems TQMa335x[L] modules:
+
+	export CROSS_COMPILE=
+	export ARCH=arm
+	make tqma57xx_<mem>_<baseboard>_config
+	make
+
+Currently implemented baseboards:
+
+- mba335x (MBa335x Starterkit Mainboard)
+
+Currently implemented memory variants:
+
+- 256mb (256 MiB DDR3)
+- 512mb (512 MiB DDR3)
+
+
+This gives the following configurations:
+
+tqma335x_256mb_mba335x_config
+tqma335x_512mb_mba335x_config
