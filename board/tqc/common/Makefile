@@ -8,3 +8,4 @@
 obj- := __dummy__.o
 
 obj-$(CONFIG_TQ_EEPROM) += tq_eeprom.o
+obj-$(CONFIG_TQ_SPI_NOR) += tq_spi_nor.o

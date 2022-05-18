@@ -1,2 +1,7 @@
 config TQ_EEPROM
 	bool
+
+
+config TQ_SPI_NOR
+	bool
+	default y if (SPI_FLASH && OF_BOARD_SETUP)
