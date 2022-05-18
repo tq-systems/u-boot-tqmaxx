@@ -324,6 +324,22 @@ int board_late_init(void)
 	u32 mac;
 	u8 addr[6];
 
+	puts("BOOT:\t");
+	switch (gd->arch.omap_boot_device) {
+	case BOOT_DEVICE_MMC1:
+		puts("MMC1 (SD)\n");
+		break;
+	case BOOT_DEVICE_MMC2:
+		puts("MMC2 (e-MMC)\n");
+		break;
+	case BOOT_DEVICE_SPI:
+		puts("SPI (SPI-NOR)\n");
+		break;
+	default:
+		printf("unknown (%u)\n", gd->arch.omap_boot_device);
+		break;
+	}
+
 	ret = tqc_read_eeprom_buf(CONFIG_SYS_EEPROM_BUS_NUM, CONFIG_SYS_I2C_EEPROM_ADDR,
 				  CONFIG_SYS_I2C_EEPROM_ADDR_LEN, 0,  sizeof(eedat),
 				  (void *)&eedat);
