@@ -346,7 +346,7 @@ int board_late_init(void)
 	if (!ret) {
 		/* ID */
 		tqc_parse_eeprom_id(&eedat, safe_string, ARRAY_SIZE(safe_string));
-		if (strncmp(safe_string, "TQM", 3) == 0)
+		if (strncmp(safe_string, "TQMA335", 3) == 0)
 			env_set("boardtype", safe_string);
 		if (tqc_parse_eeprom_serial(&eedat, safe_string, ARRAY_SIZE(safe_string)) == 0)
 			env_set("serial#", safe_string);
@@ -367,7 +367,7 @@ int board_late_init(void)
 			eth_env_set_enetaddr("eth1addr", addr);
 		}
 
-		tqc_show_eeprom(&eedat, "TQM");
+		tqc_show_eeprom(&eedat, "TQMA335");
 	} else {
 		printf("EEPROM: err %d\n", ret);
 	}
