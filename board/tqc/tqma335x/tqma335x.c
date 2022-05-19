@@ -365,8 +365,6 @@ int board_late_init(void)
 	/* must hold largest field of eeprom data */
 	char safe_string[0x41];
 	struct tqc_eeprom_data eedat;
-	u32 mac;
-	u8 addr[6];
 
 	puts("BOOT:\t");
 	switch (gd->arch.omap_boot_device) {
@@ -384,32 +382,28 @@ int board_late_init(void)
 		break;
 	}
 
-	ret = tqc_read_eeprom_buf(CONFIG_SYS_EEPROM_BUS_NUM, CONFIG_SYS_I2C_EEPROM_ADDR,
-				  CONFIG_SYS_I2C_EEPROM_ADDR_LEN, 0,  sizeof(eedat),
-				  (void *)&eedat);
+	ret = tqc_read_eeprom_buf(CONFIG_SYS_EEPROM_BUS_NUM,
+				  CONFIG_SYS_I2C_EEPROM_ADDR,
+				  CONFIG_SYS_I2C_EEPROM_ADDR_LEN, 0,
+				  sizeof(eedat), (void *)&eedat);
 	if (!ret) {
 		/* ID */
-		tqc_parse_eeprom_id(&eedat, safe_string, ARRAY_SIZE(safe_string));
-		if (strncmp(safe_string, "TQMA335", 3) == 0)
+		tqc_parse_eeprom_id(&eedat, safe_string,
+				    ARRAY_SIZE(safe_string));
+		if (!strncmp(safe_string, "TQMA335", 3))
 			env_set("boardtype", safe_string);
-		if (tqc_parse_eeprom_serial(&eedat, safe_string, ARRAY_SIZE(safe_string)) == 0)
+		if (!tqc_parse_eeprom_serial(&eedat, safe_string,
+					     ARRAY_SIZE(safe_string)))
 			env_set("serial#", safe_string);
 		else
 			env_set("serial#", "???");
 
-		if (tqc_parse_eeprom_mac(&eedat, safe_string, ARRAY_SIZE(safe_string)) == 0) {
-			env_set("ethaddr", safe_string);
-
-			eth_parse_enetaddr(safe_string, addr);
-			mac = addr[3] << 16 | addr[4] << 8 | addr[5];
-			mac++;
-			mac &= 0xFFFFFF;
-
-			addr[3] = (uint8_t)(mac >> 16);
-			addr[4] = (uint8_t)(mac >>  8);
-			addr[5] = (uint8_t)(mac >>  0);
-			eth_env_set_enetaddr("eth1addr", addr);
-		}
+		/*
+		 * Note: CPSW driver will set ethaddr from efuse if we fail
+		 * here.
+		 */
+		tqc_set_ethaddr(&eedat, "ethaddr", 0);
+		tqc_set_ethaddr(&eedat, "eth1addr", 1);
 
 		tqc_show_eeprom(&eedat, "TQMA335");
 	} else {
