@@ -31,26 +31,6 @@ config MBA335X
 
 endchoice
 
-choice
-	prompt "TQMa335x[L] memory variant"
-	default TQMA335X_256MB
-	help
-	  Select the TQMa335x[L] memory variant.
-
-config TQMA335X_256MB
-	prompt "U-Boot for TQMa335x variants with 256 MiB RAM"
-	bool
-	help
-	  Select this if building for the 256MiB RAM Variant.
-
-config TQMA335X_512MB
-	prompt "U-Boot for TQMa335x variants with 512 MiB RAM"
-	bool
-	help
-	  Select this if building for the 512MiB RAM Variant.
-
-endchoice
-
 source "board/ti/common/Kconfig"
 source "board/tqc/common/Kconfig"
 
