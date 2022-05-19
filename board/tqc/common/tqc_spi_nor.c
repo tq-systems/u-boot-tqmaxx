@@ -86,4 +86,15 @@ void tqc_ft_spi_setup(void *blob, const char *path,
 #endif
 }
 
+void tqc_ft_setup_spinor_by_alias(void *fdt, const char *spi_alias,
+				  const struct node_info *nodes,
+				  size_t node_count)
+{
+	const char *name;
+
+	name = fdt_get_alias(fdt, spi_alias);
+	if (name)
+		tqc_ft_spi_setup(fdt, name, nodes, node_count);
+}
+
 #endif
