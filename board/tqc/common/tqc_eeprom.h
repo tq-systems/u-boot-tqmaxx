@@ -47,6 +47,10 @@ int tqc_has_feature2(u32 mask);
 int tqc_parse_eeprom_mac(struct tqc_eeprom_data *eeprom, char *buf,
 			 size_t len);
 
+int tqc_parse_eeprom_mac_additional(struct tqc_eeprom_data *eeprom,
+				    char *buf, size_t len,
+				    size_t additional);
+
 int tqc_parse_eeprom_serial(struct tqc_eeprom_data *eeprom, char *buf,
 			    size_t len);
 int tqc_parse_eeprom_id(struct tqc_eeprom_data *eeprom, char *buf,

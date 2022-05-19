@@ -160,24 +160,38 @@ int tqc_has_feature2(u32 mask)
 
 #if !defined(CONFIG_SPL_BUILD)
 
-int tqc_parse_eeprom_mac(struct tqc_eeprom_data *eeprom, char *buf,
-			 size_t len)
+int tqc_parse_eeprom_mac_additional(struct tqc_eeprom_data *eeprom,
+				    char *buf, size_t len, size_t additional)
 {
 	u8 *p;
-	int ret;
+	int ret = -1;
+	u32 addr;
 
 	if (!buf || !eeprom)
 		return -1;
-	/* MAC address */
+
 	p = eeprom->mac;
-	ret = snprintf(buf, len, "%02x:%02x:%02x:%02x:%02x:%02x",
-		       p[0], p[1], p[2], p[3], p[4], p[5]);
+
+	addr = p[3] << 16 | p[4] << 8 | p[5];
+	addr += additional;
+	addr = addr & 0x00ffffff;
+
+	ret = snprintf(buf, len,  "%02x:%02x:%02x:%02x:%02x:%02x",
+		       p[0], p[1], p[2], (addr >> 16) & 0xff,
+		       (addr >> 8) & 0xff, addr & 0xff);
+
 	if (ret < 0)
 		return ret;
 	if (ret >= len)
 		return ret;
 
 	return !(is_valid_ethaddr(p));
+}
+
+int tqc_parse_eeprom_mac(struct tqc_eeprom_data *eeprom, char *buf,
+			 size_t len)
+{
+	return tqc_parse_eeprom_mac_additional(eeprom, buf, len, 0);
 }
 
 int tqc_parse_eeprom_serial(struct tqc_eeprom_data *eeprom, char *buf,
