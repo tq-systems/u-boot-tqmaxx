@@ -125,7 +125,6 @@
 #define CONFIG_SYS_NS16550_COM5		0x481a8000	/* UART4 */
 #define CONFIG_SYS_NS16550_COM6		0x481aa000	/* UART5 */
 
-#define CONFIG_ENV_EEPROM_IS_ON_I2C
 #define CONFIG_SYS_EEPROM_BUS_NUM 0
 #define CONFIG_SYS_I2C_EEPROM_ADDR	0x50	/* Main EEPROM */
 #define CONFIG_SYS_I2C_EEPROM_ADDR_LEN	2
@@ -145,9 +144,20 @@
 /* SPL related */
 #define CONFIG_SYS_SPI_U_BOOT_OFFS	0x20000
 
-#define CONFIG_ENV_SECT_SIZE		(4 << 10) /* 4 KB sectors */
-#define CONFIG_ENV_OFFSET		(768 << 10) /* 768 KiB in */
-#define CONFIG_ENV_OFFSET_REDUND	(896 << 10) /* 896 KiB in */
+#ifdef ENV_IS_IN_SPI_FLASH
+
+/* 4 KB sectors should be disabled */
+#if defined(CONFIG_SPI_FLASH_USE_4K_SECTORS)
+#error "settings are only valid with large SPI NOR erase sectors"
+#endif
+
+#define CONFIG_ENV_SECT_SIZE		SZ_64K
+/* 768 KiB */
+#define CONFIG_ENV_OFFSET		(768 * SZ_1K)
+ /* 896 KiB */
+#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
+#endif
+
 #endif
 
 #ifdef CONFIG_ENV_IS_IN_MMC
