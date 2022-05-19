@@ -93,11 +93,12 @@ void set_mux_conf_regs(void)
 	configure_module_pin_mux(rgmii2_pin_mux);
 }
 
-/* At the moment, we do not want to stop booting for any failures here */
-int ft_board_setup(void *fdt, bd_t *bd)
+#if defined(CONFIG_OF_BOARD_SETUP)
+int tqc_bb_ft_board_setup(void *fdt, bd_t *bd)
 {
 	return 0;
 }
+#endif
 
 #if !CONFIG_IS_ENABLED(OF_CONTROL)
 static const struct omap_hsmmc_plat am335x_mmc0_platdata = {

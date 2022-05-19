@@ -32,8 +32,11 @@
 #include <asm/omap_common.h>
 #include <asm/omap_sec_common.h>
 #include <asm/omap_mmc.h>
+#include <jffs2/load_kernel.h>
+#include <mtd_node.h>
 #include <power/tps65910.h>
 
+#include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
 #include "../common/tqc_sdmmc.h"
 #include "tqma335x.h"
@@ -433,4 +436,17 @@ U_BOOT_DEVICE(am335x_mmc1) = {
 	.name = "omap_hsmmc",
 	.platdata = &am335x_mmc1_platdata,
 };
+#endif
+
+#if defined(CONFIG_OF_BOARD_SETUP)
+int ft_board_setup(void *fdt, bd_t *bd)
+{
+	static const struct node_info nodes[] = {
+		{ "jedec,spi-nor",	MTD_DEV_TYPE_NOR, },
+	};
+
+	tqc_ft_setup_spinor_by_alias(fdt, "spi0", nodes, ARRAY_SIZE(nodes));
+
+	return tqc_bb_ft_board_setup(fdt, bd);
+}
 #endif
