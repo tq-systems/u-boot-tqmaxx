@@ -94,11 +94,11 @@ static int do_part_alloc(int argc, char * const argv[])
 	bool restricted = false, isolated = false, grant = false;
 	int ret;
 
-	if (argv[0])
+	if (argc > 0 && argv[0])
 		isolated = simple_strtoul(argv[0], NULL, 10);
-	if (argv[1])
+	if (argc > 1 && argv[1])
 		restricted = simple_strtoul(argv[1], NULL, 10);
-	if (argv[2])
+	if (argc > 2 && argv[2])
 		grant = simple_strtoul(argv[2], NULL, 10);
 
 	ret = partition_alloc(isolated, restricted, grant, NULL);
