@@ -76,9 +76,13 @@ void tqc_ft_spi_setup(void *blob, const char *path,
 	}
 
 	off = fdt_path_offset(blob, path);
+	if (off >= 0)
+		off = fdt_node_offset_by_compatible(blob, off, "jedec,spi-nor");
 	if (off >= 0) {
-		printf("%s %s\n", (enable_flash) ? "enable" : "disable",
-		       path);
+		const char *name = fdt_get_name(blob, off, NULL);
+
+		printf("%s %s/%s\n", (enable_flash) ? "enable" : "disable",
+		       path, name);
 		fdt_set_node_status(blob, off, (enable_flash) ?
 				    FDT_STATUS_OKAY : FDT_STATUS_DISABLED,
 				    0);

@@ -48,7 +48,9 @@ struct node_info;
  *
  * Test if optional SPI NOR is present and enable / disable a child node
  * of the spi controller given with path when it has 'jedec,spi-nor'
- * as compatible.
+ * as compatible. The status property of the SPI controller node is
+ * unchanged so that other devices on the same SPI controller are not
+ * affected by this change.
  * If SPI-NOR is present, use U-Boot standard env variables to add partition
  * info to the SPI NOR device node. This is needed by kernel to use UBIFS in
  * MTD partition as rootfs.
