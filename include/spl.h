@@ -308,7 +308,7 @@ struct spl_image_info {
 	uint *stack_prot;
 	ulong reloc_offset;
 #endif
-#ifdef CONFIG_DUAL_BOOTLOADER
+#ifdef CONFIG_IMX_TRUSTY_OS
 	uint64_t rbindex;
 #endif
 };

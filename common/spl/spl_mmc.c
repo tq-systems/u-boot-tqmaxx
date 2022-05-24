@@ -17,7 +17,7 @@
 #include <image.h>
 #include <imx_container.h>
 
-static ulong h_spl_load_read(struct spl_load_info *load, ulong off,
+ulong h_spl_load_read(struct spl_load_info *load, ulong off,
 			     ulong size, void *buf)
 {
 	struct blk_desc *bd = load->priv;
@@ -42,7 +42,7 @@ int mmc_load_image_raw_sector_dual_uboot(struct spl_image_info *spl_image,
 					 struct spl_boot_device *bootdev, struct mmc *mmc);
 #endif
 
-int __weak mmc_image_load_late(struct mmc *mmc)
+int __weak mmc_image_load_late(struct spl_image_info *spl_image, struct mmc *mmc)
 {
 	return 0;
 }
@@ -64,7 +64,7 @@ int mmc_load_image_raw_sector(struct spl_image_info *spl_image,
 		return ret;
 	}
 
-	ret = mmc_image_load_late(mmc);
+	ret = mmc_image_load_late(spl_image, mmc);
 	return ret;
 }
 
