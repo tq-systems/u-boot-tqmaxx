@@ -44,18 +44,18 @@ int tqc_has_feature2(u32 mask);
 
 #if !defined(CONFIG_SPL_BUILD)
 
-int tqc_parse_eeprom_mac(struct tqc_eeprom_data *eeprom, char *buf,
+int tqc_parse_eeprom_mac(struct tqc_eeprom_data const *eeprom, char *buf,
 			 size_t len);
 
-int tqc_parse_eeprom_mac_additional(struct tqc_eeprom_data *eeprom,
+int tqc_parse_eeprom_mac_additional(struct tqc_eeprom_data const *eeprom,
 				    char *buf, size_t len,
 				    size_t additional);
 
-int tqc_parse_eeprom_serial(struct tqc_eeprom_data *eeprom, char *buf,
+int tqc_parse_eeprom_serial(struct tqc_eeprom_data const *eeprom, char *buf,
 			    size_t len);
-int tqc_parse_eeprom_id(struct tqc_eeprom_data *eeprom, char *buf,
+int tqc_parse_eeprom_id(struct tqc_eeprom_data const *eeprom, char *buf,
 			size_t len);
-int tqc_show_eeprom(struct tqc_eeprom_data *eeprom, const char *id);
+int tqc_show_eeprom(struct tqc_eeprom_data const *eeprom, const char *id);
 int tqc_read_eeprom_at(unsigned int bus, unsigned int i2c_addr,
 		       unsigned int alen, unsigned int addr,
 		       struct tqc_eeprom_data *eeprom);

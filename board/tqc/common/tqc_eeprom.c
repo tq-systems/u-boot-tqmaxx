@@ -160,10 +160,10 @@ int tqc_has_feature2(u32 mask)
 
 #if !defined(CONFIG_SPL_BUILD)
 
-int tqc_parse_eeprom_mac_additional(struct tqc_eeprom_data *eeprom,
+int tqc_parse_eeprom_mac_additional(struct tqc_eeprom_data const *eeprom,
 				    char *buf, size_t len, size_t additional)
 {
-	u8 *p;
+	u8 const *p;
 	int ret = -1;
 	u32 addr;
 
@@ -188,13 +188,13 @@ int tqc_parse_eeprom_mac_additional(struct tqc_eeprom_data *eeprom,
 	return !(is_valid_ethaddr(p));
 }
 
-int tqc_parse_eeprom_mac(struct tqc_eeprom_data *eeprom, char *buf,
+int tqc_parse_eeprom_mac(struct tqc_eeprom_data const *eeprom, char *buf,
 			 size_t len)
 {
 	return tqc_parse_eeprom_mac_additional(eeprom, buf, len, 0);
 }
 
-int tqc_parse_eeprom_serial(struct tqc_eeprom_data *eeprom, char *buf,
+int tqc_parse_eeprom_serial(struct tqc_eeprom_data const *eeprom, char *buf,
 			    size_t len)
 {
 	unsigned int i;
@@ -214,7 +214,7 @@ int tqc_parse_eeprom_serial(struct tqc_eeprom_data *eeprom, char *buf,
 	return 0;
 }
 
-int tqc_parse_eeprom_id(struct tqc_eeprom_data *eeprom, char *buf,
+int tqc_parse_eeprom_id(struct tqc_eeprom_data const *eeprom, char *buf,
 			size_t len)
 {
 	unsigned int i;
@@ -235,7 +235,7 @@ int tqc_parse_eeprom_id(struct tqc_eeprom_data *eeprom, char *buf,
 /*
  * show_eeprom - display the contents of the module EEPROM
  */
-int tqc_show_eeprom(struct tqc_eeprom_data *eeprom, const char *id)
+int tqc_show_eeprom(struct tqc_eeprom_data const *eeprom, const char *id)
 {
 	/* must hold largest field of eeprom data */
 	char safe_string[0x41];
