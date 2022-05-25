@@ -160,6 +160,31 @@ int tqc_has_feature2(u32 mask)
 
 #if !defined(CONFIG_SPL_BUILD)
 
+void tqc_set_ethaddr(struct tqc_eeprom_data const *eedat,
+		     const char *env_var, size_t additional)
+{
+	char safe_string[0x41];
+
+	if (!tqc_parse_eeprom_mac_additional(eedat, safe_string,
+					     ARRAY_SIZE(safe_string),
+					     additional)) {
+		char *ethaddr = env_get(env_var);
+
+		if (ethaddr &&
+		    strncmp(safe_string, ethaddr, 18)) {
+			printf("\n");
+			printf("Warning: MAC addresses for '%s' don't match:\n",
+			       env_var);
+			printf("Address in EEPROM is      %s\n",
+			       safe_string);
+			printf("Address in environment is %s\n",
+			       ethaddr);
+		} else {
+			env_set(env_var, safe_string);
+		}
+	}
+}
+
 int tqc_parse_eeprom_mac_additional(struct tqc_eeprom_data const *eeprom,
 				    char *buf, size_t len, size_t additional)
 {

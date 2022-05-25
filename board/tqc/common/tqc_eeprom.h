@@ -44,6 +44,20 @@ int tqc_has_feature2(u32 mask);
 
 #if !defined(CONFIG_SPL_BUILD)
 
+/**
+ * Set indexed ethaddr env from EEPROM data.
+ *
+ * @param eedat		points to valid tqc_eeprom_data
+ * @param env_var	name of env to set
+ * @param additional	index to add to MAC in eedat
+ *
+ * The environment variable is only set if currently empty. Othrwise a warning
+ * is given for differing addresses. This allows to override the address from
+ * eeprom in environment.
+ */
+void tqc_set_ethaddr(struct tqc_eeprom_data const *eedat,
+		     const char *env_var, size_t additional);
+
 int tqc_parse_eeprom_mac(struct tqc_eeprom_data const *eeprom, char *buf,
 			 size_t len);
 
