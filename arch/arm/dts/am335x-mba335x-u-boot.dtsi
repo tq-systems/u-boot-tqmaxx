@@ -1,0 +1,34 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright (C) 2022 TQ-Systems GmbH - https://www.tq-group.com/
+ *
+ */
+
+
+/ {
+	sound {
+		status = "disabled";
+	};
+};
+
+&dcan0 {
+	status = "disabled";
+};
+
+&dcan1 {
+	status = "disabled";
+};
+
+&mac {
+	/delete-property/ pinctrl-names;
+	/delete-property/pinctrl-0;
+	/delete-property/ dual_emac;
+};
+
+&mcasp0 {
+	status = "disabled";
+};
+
+&tlv320aic32x4 {
+	status = "disabled";
+};

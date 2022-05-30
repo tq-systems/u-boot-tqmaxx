@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 /*
- * Copyright (C) 2014,2021 TQ-Systems GmbH - http://www.tq-group.com/
+ * Copyright (C) 2014, 2021 - 2022 TQ-Systems GmbH - https://www.tq-group.com/
  *
  * Based on:
  * Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
@@ -11,6 +11,8 @@
  */
 
 #include "am33xx.dtsi"
+
+#include "dt-bindings/interrupt-controller/irq.h"
 
 / {
 	model = "TQ-Systems GmbH TQMa335x";
@@ -75,18 +77,45 @@
 	};
 };
 
+&aes {
+	status = "okay";
+};
+
 &i2c0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&i2c0_pins>;
 	clock-frequency = <100000>;
 	status = "okay";
 
+	jc42_1: temp-sensor@1f {
+		compatible = "jedec,jc-42.4-temp";
+		reg = <0x1f>;
+	};
+
 	tps: pmic@2d {
 		compatible = "ti,tps65910";
 		reg = <0x2d>;
 		interrupt-parent = <&expander2>;
-		interrupts = <4 0>;
+		interrupts = <4 IRQ_TYPE_EDGE_RISING>;
 		ti,en-ck32k-xtal;
+	};
+
+	eeprom: eeprom@50 {
+		compatible = "atmel,24c64";
+		pagesize = <32>;
+		reg = <0x50>;
+	};
+
+	se97btp: eeprom@57 {
+		compatible = "atmel,24c02";
+		pagesize = <16>;
+		reg = <0x57>;
+	};
+
+	ds1339: rtc@68 {
+		compatible = "dallas,ds1339";
+		reg = <0x68>;
+		interrupts = <43>;
 	};
 };
 
@@ -97,6 +126,16 @@
 	pinctrl-0 = <&mmc2_pins>;
 	bus-width = <8>;
 	ti,non-removable;
+	no-sd;
+	no-sdio;
+};
+
+&rtc {
+	status = "disabled";
+};
+
+&sham {
+	status = "okay";
 };
 
 /* include after i2c-device described */
