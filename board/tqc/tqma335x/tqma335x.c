@@ -339,8 +339,23 @@ void scale_vcores(void)
 
 	gpi2c_init();
 	freq = am335x_get_efuse_mpu_max_freq(cdev);
-
 	scale_vcores_generic(freq);
+}
+
+void am33xx_spl_board_init(void)
+{
+	struct ctrl_dev *cdev = (struct ctrl_dev *)CTRL_DEVICE_BASE;
+
+	/* Get the frequency */
+	dpll_mpu_opp100.m = am335x_get_efuse_mpu_max_freq(cdev);
+
+	printf("CPU speed grade: %d MHz\n", dpll_mpu_opp100.m);
+
+	/* Set CORE Frequencies to OPP100 */
+	do_setup_dpll(&dpll_core_regs, &dpll_core_opp100);
+
+	/* Set MPU Frequency to what we detected now that voltages are set */
+	do_setup_dpll(&dpll_mpu_regs, &dpll_mpu_opp100);
 }
 
 void sdram_init(void)
