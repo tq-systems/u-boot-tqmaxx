@@ -285,12 +285,15 @@ static void scale_vcores_generic(int freq)
 	 * the frequency we are running at.
 	 */
 #ifndef CONFIG_DM_I2C
-	if (i2c_probe(TPS65910_CTRL_I2C_ADDR))
-		return;
+	if (i2c_probe(TPS65910_CTRL_I2C_ADDR)) {
 #else
-	if (power_tps65910_init(0))
-		return;
+	if (power_tps65910_init(0)) {
 #endif
+		puts("WARN: cannot setup PMIC, not found!\n");
+		return;
+	}
+	puts("PMIC:	TPS65910\n");
+
 	/*
 	 * Depending on MPU clock and PG we will need a different
 	 * VDD to drive at that speed.
@@ -302,12 +305,17 @@ static void scale_vcores_generic(int freq)
 	tps65910_set_i2c_control();
 
 	/* First update MPU voltage. */
-	if (tps65910_voltage_update(MPU, mpu_vdd))
+	if (tps65910_voltage_update(MPU, mpu_vdd)) {
+		puts("WARN: MPU voltage update failed\n");
 		return;
+	}
 
 	/* Second, update the CORE voltage. */
-	if (tps65910_voltage_update(CORE, TPS65910_OP_REG_SEL_1_1_0))
+	if (tps65910_voltage_update(CORE, TPS65910_OP_REG_SEL_1_1_0)) {
+		puts("WARN: CORE voltage update failed\n");
 		return;
+	}
+
 }
 
 void gpi2c_init(void)
