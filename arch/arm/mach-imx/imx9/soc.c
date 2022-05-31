@@ -37,6 +37,7 @@
 #include <asm/mach-imx/ele_api.h>
 #include <fuse.h>
 #include <asm/arch/ddr.h>
+#include <asm/mach-imx/optee.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -743,7 +744,7 @@ int ft_system_setup(void *blob, struct bd_info *bd)
 	if (is_voltage_mode(VOLT_LOW_DRIVE))
 		low_drive_freq_update(blob);
 
-	return 0;
+	return ft_add_optee_node(blob, bd);
 }
 
 #if defined(CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG)
