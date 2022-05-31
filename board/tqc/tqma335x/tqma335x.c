@@ -101,11 +101,15 @@ void enable_i2c0_pin_mux(void)
 	configure_module_pin_mux(i2c0_pin_mux);
 }
 
-void enable_board_pin_mux(void)
+void enable_mmc0_pin_mux(void)
 {
 	configure_module_pin_mux(mmc0_pin_mux);
+}
+
+void set_mux_conf_regs(void)
+{
 	configure_module_pin_mux(i2c0_pin_mux);
-	configure_module_pin_mux(uart4_pin_mux);
+	enable_board_pin_mux();
 }
 
 #ifdef CONFIG_ENV_IS_IN_MMC

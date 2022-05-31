@@ -86,9 +86,10 @@ void set_uart_mux_conf(void)
 	enable_uart4_pin_mux();
 }
 
-void set_mux_conf_regs(void)
+void enable_board_pin_mux(void)
 {
-	enable_board_pin_mux();
+	enable_mmc0_pin_mux();
+	enable_uart4_pin_mux();
 	configure_module_pin_mux(rgmii1_pin_mux);
 	configure_module_pin_mux(rgmii2_pin_mux);
 }
