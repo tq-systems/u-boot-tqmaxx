@@ -108,7 +108,33 @@
 	"upd_uboot_emmc_net=setenv mmcdev 1 && run mmcwrite_uboot\0" \
 	"upd_kernel_sd_net=setenv mmcdev 0 && run mmcwrite_kernel\0" \
 	"upd_kernel_emmc_net=setenv mmcdev 1 && run mmcwrite_kernel\0" \
-	NETARGS \
+	"addtty=setenv bootargs ${bootargs} console=${console}\0"              \
+	"netdev=eth0\0"                                                        \
+	"rootpath=/srv/nfs/exports\0"                                          \
+	"ipmode=static\0"                                                      \
+	"netargs=run addnfs addip addtty\0"                                    \
+	"addnfs=setenv bootargs ${bootargs} "                                  \
+		"root=/dev/nfs rw "                                            \
+		"nfsroot=${serverip}:${rootpath},v3,tcp;\0"                    \
+	"addip_static=setenv bootargs ${bootargs} "                            \
+		"ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:"            \
+		"${hostname}:${netdev}:off\0"                                  \
+	"addip_dynamic=setenv bootargs ${bootargs} ip=dhcp\0"                  \
+	"addip=if test \"${ipmode}\" != static; then "                         \
+		"run addip_dynamic; else run addip_static; fi\0"               \
+	"set_getcmd=if test \"${ipmode}\" != static; then "                    \
+		"setenv getcmd dhcp; setenv autoload yes; "                    \
+		"else setenv getcmd tftp; setenv autoload no; fi\0"            \
+	"netboot=echo Booting from net ...; "                                  \
+		"run set_getcmd; "                                             \
+		"setenv bootargs; "                                            \
+		"run netargs; "                                                \
+		"if ${getcmd} ${bootfile}; then "                              \
+			"if ${getcmd} ${fdtaddr} ${fdtfile}; then "            \
+				"bootz ${loadaddr} - ${fdtaddr}; "             \
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"echo ... failed\0"                                            \
 	DFUARGS \
 	BOOTENV
 #endif
