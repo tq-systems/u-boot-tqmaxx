@@ -42,9 +42,6 @@
 /* Custom script for NOR */
 #define CONFIG_SYS_LDSCRIPT		"board/tqc/tqma335x/u-boot.lds"
 
-/* Always 128 KiB env size */
-#define CONFIG_ENV_SIZE			SZ_128K
-
 #define BOOTENV_DEV_LEGACY_MMC(devtypeu, devtypel, instance) \
 	"bootcmd_" #devtypel #instance "=" \
 	"setexpr bootdev ${mmcdev} ^ " #instance "; " \
@@ -162,12 +159,13 @@
 	DFU_ALT_INFO_RAM
 #endif
 
-#if defined(CONFIG_SPI_BOOT)
 /* SPL related */
 #define CONFIG_SYS_SPI_U_BOOT_OFFS	0x20000
 
-#ifdef ENV_IS_IN_SPI_FLASH
+/* Always 128 KiB env size */
+#define CONFIG_ENV_SIZE			SZ_128K
 
+#ifdef CONFIG_ENV_IS_IN_SPI_FLASH
 /* 4 KB sectors should be disabled */
 #if defined(CONFIG_SPI_FLASH_USE_4K_SECTORS)
 #error "settings are only valid with large SPI NOR erase sectors"
@@ -180,15 +178,18 @@
 #define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
 #endif
 
+#ifdef CONFIG_ENV_IS_IN_MMC
+/*
+ * This is intentionally set to an invalid value and shall be set using a
+ * project / mainboard specific mmc_get_env_dev()
+ * CONFIG_ENV_OFFSET_REDUND and CONFIG_ENV_OFFSET shall be configured via
+ * project / mainboard specific -uboot-dtsi
+ */
+#define CONFIG_SYS_MMC_ENV_DEV		-1
+#define CONFIG_SYS_MMC_ENV_PART		0
 #endif
 
-#ifdef CONFIG_ENV_IS_IN_MMC
-#define CONFIG_SYS_MMC_ENV_DEV		1
-#define CONFIG_SYS_MMC_ENV_PART		0
-#define CONFIG_ENV_OFFSET		0x260000
-#define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + CONFIG_ENV_SIZE)
 #define CONFIG_SYS_MMC_MAX_DEVICE	2
-#endif
 
 #ifdef CONFIG_DRIVER_TI_CPSW
 #define CONFIG_CLOCK_SYNTHESIZER
