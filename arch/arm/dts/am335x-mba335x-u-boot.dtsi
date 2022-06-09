@@ -4,6 +4,7 @@
  *
  */
 
+#include "am335x-tqma335x-u-boot.dtsi"
 
 / {
 	sound {
