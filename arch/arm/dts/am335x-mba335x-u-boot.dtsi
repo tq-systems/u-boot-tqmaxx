@@ -36,6 +36,26 @@
 	status = "disabled";
 };
 
+&mmc1_pins {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&mmc1 {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
 &tlv320aic32x4 {
 	status = "disabled";
+};
+
+&uart4_pins {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&mmc2 {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
 };

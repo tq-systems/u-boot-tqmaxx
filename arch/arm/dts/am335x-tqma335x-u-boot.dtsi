@@ -7,10 +7,52 @@
 
 #include <config.h>
 
+&am33xx_pinmux {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&i2c0_pins {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&i2c0 {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&tps {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&mmc2_pins {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
 &mmc2 {
 	/*
 	 * prevents voltage switch warn: driver will switch even at
 	 * fixed voltage
 	 */
 	/delete-property/ vmmc-supply;
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&spi0_pins {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&spi0 {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+
+	flash@0 {
+		u-boot,dm-pre-reloc;
+		u-boot,dm-spl;
+	};
 };
