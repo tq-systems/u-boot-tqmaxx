@@ -80,31 +80,52 @@
 	"optargs=\0" \
 	"uboot=u-boot.img\0" \
 	"mlo=MLO\0" \
+	"uboot_spi=u-boot.img\0" \
+	"mlo_spi=MLO.byteswap\0" \
 	"init_console=setenv console ttyS4,115200n8\0" \
-	"mmcfatload=mmc dev ${mmcdev} && mmc rescan && " \
-		"fatload mmc ${mmcdev}:1 ${loadaddr} ${fatfile}\0" \
-	"mmcfatwrite= mmc dev ${mmcdev} && mmc rescan && " \
-		"fatwrite mmc ${mmcdev}:1 ${loadaddr} ${fatfile} " \
-			"${filesize}\0" \
-	"mmcwrite_uboot=tftp ${mlo} && " \
-		"setenv fatfile ${mlo} && run  mmcfatwrite && " \
-		"tftp ${uboot} && " \
-		"setenv fatfile ${uboot} && run mmcfatwrite\0" \
-	"mmcwrite_kernel=tftp ${bootfile} && " \
-		"setenv fatfile ${bootfile} && run mmcfatwrite\0" \
-	"upd_uboot_spi_net=tftp ${mlo_spi} && " \
-		"setenv spioffset 0x0 && run spiwrite && " \
-		"tftp ${uboot_spi} && " \
-		"setenv spioffset 0x20000 && run spiwrite\0" \
-	"upd_uboot_spi_sd=setenv mmcdev 0 && " \
-		"setenv fatfile ${mlo_spi} && run mmcfatload && " \
-		"setenv spioffset 0x0 && run spiwrite && " \
-		"setenv fatfile ${uboot_spi} && run mmcfatload &&" \
-		"setenv spioffset 0x20000 && run spiwrite\0" \
-	"upd_uboot_sd_net=setenv mmcdev 0 && run mmcwrite_uboot\0" \
-	"upd_uboot_emmc_net=setenv mmcdev 1 && run mmcwrite_uboot\0" \
-	"upd_kernel_sd_net=setenv mmcdev 0 && run mmcwrite_kernel\0" \
-	"upd_kernel_emmc_net=setenv mmcdev 1 && run mmcwrite_kernel\0" \
+	"update_uboot_mmc=if mmc dev ${mmcdev} && mmc rescan; then " \
+			"run set_getcmd; " \
+			"setenv mlo_load_addr $loadaddr; " \
+			"setexpr uboot_load_addr ${loadaddr} + " __stringify(SZ_256K) "; " \
+			"if ${getcmd} ${mlo_load_addr} ${mlo}; then " \
+				"setenv mlo_size $filesize; " \
+				"if ${getcmd} ${uboot_load_addr} ${uboot}; then " \
+					"fatwrite mmc ${mmcdev}:1 ${mlo_load_addr} ${mlo} ${mlo_size} && " \
+					"fatwrite mmc ${mmcdev}:1 ${uboot_load_addr} ${uboot} ${filesize}; " \
+				"else " \
+					"echo ERROR: {getcmd} ${uboot} failed; " \
+				"fi; " \
+			"else " \
+				"echo ERROR: {getcmd} ${mlo} failed; " \
+			"fi; " \
+		"fi; " \
+		"setenv ${filesize}; setenv getcmd; setenv mlo_load_addr; " \
+		"setenv mlo_size; setenv uboot_load_addr \0" \
+	"update_uboot_spi=if sf probe; then " \
+			"run set_getcmd; " \
+			"setenv mlo_load_addr $loadaddr; " \
+			"setexpr uboot_load_addr $loadaddr + " __stringify(CONFIG_SYS_SPI_U_BOOT_OFFS) "; " \
+			"if ${getcmd} ${mlo_load_addr} ${mlo_spi}; then " \
+				"setenv mlo_size $filesize; " \
+				"if ${getcmd} ${uboot_load_addr} ${uboot_spi}; then " \
+					"if itest ${mlo_size} <= " __stringify(CONFIG_SYS_SPI_U_BOOT_OFFS) "; then " \
+						"sf update ${mlo_load_addr} 0x0 ${mlo_size} && " \
+						"sf update ${uboot_load_addr} " __stringify(CONFIG_SYS_SPI_U_BOOT_OFFS) " ${filesize}; " \
+					"else " \
+						"echo ERROR: ${mlo_spi} to large; " \
+					"fi; " \
+				"else " \
+					"echo ERROR: {getcmd} ${uboot_spi} failed; " \
+				"fi; " \
+			"else " \
+				"echo ERROR: {getcmd} ${mlo_spi} failed; " \
+			"fi; " \
+		"fi; " \
+		"setenv ${filesize}; setenv getcmd; setenv mlo_load_addr; " \
+		"setenv mlo_size; setenv uboot_load_addr \0" \
+	"upd_uboot_spi_net=run update_uboot_spi\0" \
+	"upd_uboot_sd_net=setenv mmcdev 0 && run update_uboot_mmc\0" \
+	"upd_uboot_emmc_net=setenv mmcdev 1 && run update_uboot_mmc\0" \
 	"addtty=setenv bootargs ${bootargs} console=${console}\0"              \
 	"netdev=eth0\0"                                                        \
 	"rootpath=/srv/nfs/exports\0"                                          \
