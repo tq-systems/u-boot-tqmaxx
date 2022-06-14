@@ -112,20 +112,6 @@ void set_mux_conf_regs(void)
 	enable_board_pin_mux();
 }
 
-#ifdef CONFIG_ENV_IS_IN_MMC
-int mmc_get_env_dev(void)
-{
-	switch (gd->arch.omap_boot_device) {
-	case BOOT_DEVICE_MMC1:
-		return 0;
-	case BOOT_DEVICE_MMC2:
-		return 1;
-	default:
-		return -ENODEV;
-	}
-}
-#endif
-
 #ifdef CONFIG_SPL_BUILD
 static struct ctrl_dev *cdev = (struct ctrl_dev *)CTRL_DEVICE_BASE;
 

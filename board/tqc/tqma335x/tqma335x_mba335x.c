@@ -94,6 +94,20 @@ void enable_board_pin_mux(void)
 	configure_module_pin_mux(rgmii2_pin_mux);
 }
 
+#if defined(CONFIG_ENV_IS_IN_MMC)
+int mmc_get_env_dev(void)
+{
+	switch (gd->arch.omap_boot_device) {
+	case BOOT_DEVICE_MMC1:
+		return 0;
+	case BOOT_DEVICE_MMC2:
+		return 1;
+	default:
+		return -ENODEV;
+	}
+}
+#endif
+
 #if defined(CONFIG_OF_BOARD_SETUP)
 int tqc_bb_ft_board_setup(void *fdt, bd_t *bd)
 {
