@@ -31,7 +31,6 @@ config MBA335X
 
 endchoice
 
-source "board/ti/common/Kconfig"
 source "board/tqc/common/Kconfig"
 
 endif

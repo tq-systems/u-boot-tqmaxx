@@ -88,7 +88,6 @@ config TARGET_TQMA335X
 	imply SPL_DM
 	imply SPL_DM_SEQ_ALIAS
 	imply SPL_ENV_SUPPORT
-	imply SPL_FS_EXT4
 	imply SPL_FS_FAT
 	imply SPL_GPIO_SUPPORT
 	imply SPL_I2C_SUPPORT
@@ -102,7 +101,6 @@ config TARGET_TQMA335X
 	imply SPL_SERIAL_SUPPORT
 	imply SPL_SYS_MALLOC_SIMPLE
 	imply SPL_WATCHDOG_SUPPORT
-	imply SPL_YMODEM_SUPPORT
 	help
 	  Support for the TQMA335x SoM module.
 
