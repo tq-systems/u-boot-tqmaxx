@@ -96,6 +96,7 @@ static int handle_vard(void)
 	return VARD_MEMTYPE_DEFAULT;
 };
 
+#if defined(CONFIG_TQMA8MPXL_RAM_MULTI)
 static int tqma8mpxl_query_ddr_timing(void)
 {
 	char sel = '-';
@@ -134,11 +135,15 @@ static int tqma8mpxl_query_ddr_timing(void)
 
 	return idx;
 }
+#endif
 
 static void spl_dram_init(int memtype)
 {
-	phys_size_t ramsize;
 	int idx = -1;
+
+	/* normal configuration */
+#if defined(CONFIG_TQMA8MPXL_RAM_MULTI)
+	phys_size_t ramsize;
 
 	if (memtype == 1) {
 		ramsize = tq_vard_ramsize(&vard);
@@ -157,6 +162,21 @@ static void spl_dram_init(int memtype)
 
 	if (idx < 0 || idx >= ARRAY_SIZE(tqma8mpxl_dram_info))
 		idx = tqma8mpxl_query_ddr_timing();
+	/* REV.020x prototypes without variant data in EEPROM */
+#elif defined(CONFIG_TQMA8MPXL_RAM_SINGLE_2GB)
+	for (idx = 0; idx < ARRAY_SIZE(tqma8mpxl_dram_info); ++idx) {
+		if ((tqma8mpxl_dram_info[idx].size == 2ULL * SZ_1G) &&
+		    tqma8mpxl_dram_info[idx].table)
+			break;
+	}
+#else
+#error "missing or invalid RAM config"
+#endif
+
+	if (idx < 0 || idx >= ARRAY_SIZE(tqma8mpxl_dram_info)) {
+		printf("ERROR: no valid ram configuration, please reset\n");
+		hang();
+	}
 
 	ddr_init(tqma8mpxl_dram_info[idx].table);
 	tqma8mpxl_ram_timing_idx = idx;
