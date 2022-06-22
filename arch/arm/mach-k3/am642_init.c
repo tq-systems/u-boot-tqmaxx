@@ -132,12 +132,16 @@ int fdtdec_board_setup(const void *fdt_blob)
 #endif
 
 #ifdef CONFIG_SPL_OF_LIST
+__weak int do_board_detect(void)
+{
+	return 0;
+}
+
 void do_dt_magic(void)
 {
 	int ret, rescan;
 
-	if (IS_ENABLED(CONFIG_TI_I2C_BOARD_DETECT))
-		do_board_detect();
+	do_board_detect();
 
 	/*
 	 * Board detection has been done.
