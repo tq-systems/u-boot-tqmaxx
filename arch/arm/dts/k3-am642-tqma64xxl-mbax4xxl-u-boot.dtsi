@@ -1,0 +1,218 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * Copyright (C) 2021 Texas Instruments Incorporated - https://www.ti.com/
+ * Copyright (c) 2022 TQ-Systems GmbH <license@tq-group.com>, D-82229 Seefeld, Germany.
+ */
+
+#include "k3-am642-tqma64xxl-u-boot.dtsi"
+#include <config.h>
+
+/ {
+	chosen {
+		stdout-path = "serial2:115200n8";
+	};
+
+	config {
+		u-boot,mmc-env-offset = <0x140000>;
+		u-boot,mmc-env-offset-redundant = <0x150000>;
+	};
+};
+
+&cpsw3g {
+	pinctrl-names = "default";
+	pinctrl-0 = <&cpsw_pins_default &cpsw_mdio_pins_default>;
+};
+
+&cpsw3g_mdio {
+	/*
+	 * The MDIO bus isn't a proper device in U-Boot, so the pinmuxing is
+	 * configured in the cpsw3g node instead
+	 */
+	/delete-property/ pinctrl-names;
+	/delete-property/ pinctrl-0;
+};
+
+&main_gpio0 {
+	line43 {
+		gpio-hog;
+		gpios = <43 0>;
+		line-name = "MMC1_CTRL";
+		output-low;
+	};
+};
+
+&main_uart0 {
+	u-boot,dm-spl;
+};
+
+&sdhci1 {
+	u-boot,dm-spl;
+	no-sdio;
+	status = "okay";
+};
+
+&serdes_ln_ctrl {
+	u-boot,mux-autoprobe;
+};
+
+&usb0 {
+	/*
+	 * The U-Boot driver does not support mode switching. To protect hosts
+	 * connected to the USB-B port of the MBaX4XxL, configure the port
+	 * in peripheral mode.
+	 */
+	dr_mode = "peripheral";
+	u-boot,dm-spl;
+};
+
+&usbss0 {
+	u-boot,dm-spl;
+};
+
+&main_mmc1_pins_default {
+	u-boot,dm-spl;
+};
+
+&main_usb0_pins_default {
+	u-boot,dm-spl;
+};
+
+#ifdef CONFIG_TARGET_AM64_A53_TQMA64XXL
+
+&binman {
+	ti-spl {
+		filename = "tispl.bin";
+		pad-byte = <0xff>;
+
+		fit {
+			description = "Configuration to load ATF and SPL";
+			#address-cells = <1>;
+
+			images {
+
+				atf {
+					description = "ARM Trusted Firmware";
+					type = "firmware";
+					arch = "arm64";
+					compression = "none";
+					os = "arm-trusted-firmware";
+					load = <0x701c0000>;
+					entry = <0x701c0000>;
+					atf-bl31 {
+						filename = "bl31.bin";
+					};
+				};
+
+				tee {
+					description = "OPTEE";
+					type = "tee";
+					arch = "arm64";
+					compression = "none";
+					os = "tee";
+					load = <0x9e800000>;
+					entry = <0x9e800000>;
+					atf-bl32 {
+						filename = "bl32.bin";
+					};
+				};
+
+				dm {
+					description = "DM binary";
+					type = "firmware";
+					arch = "arm32";
+					compression = "none";
+					os = "DM";
+					load = <0x89000000>;
+					entry = <0x89000000>;
+					blob-ext {
+						filename = "/dev/null";
+					};
+				};
+
+				spl {
+					description = "SPL (64-bit)";
+					type = "standalone";
+					os = "U-Boot";
+					arch = "arm64";
+					compression = "none";
+					load = <0x80080000>;
+					entry = <0x80080000>;
+					blob {
+						filename = "spl/u-boot-spl-nodtb.bin";
+					};
+				};
+
+				fdt-1 {
+					description = "k3-am642-tqma64xxl-mbax4xxl";
+					type = "flat_dt";
+					arch = "arm";
+					compression = "none";
+					blob {
+						filename = "arch/arm/dts/k3-am642-tqma64xxl-mbax4xxl.dtb";
+					};
+				};
+			};
+
+			configurations {
+				default = "conf-1";
+
+				conf-1 {
+					description = "k3-am642-tqma64xxl-mbax4xxl";
+					firmware = "atf";
+					loadables = "tee", "dm", "spl";
+					fdt = "fdt-1";
+				};
+			};
+		};
+	};
+
+	u-boot {
+		filename = "u-boot.img";
+		pad-byte = <0xff>;
+
+		fit {
+			description = "FIT image with multiple configurations";
+
+			images {
+				uboot {
+					description = "U-Boot for am64x board";
+					type = "firmware";
+					os = "u-boot";
+					arch = "arm";
+					compression = "none";
+					load = <CONFIG_SYS_TEXT_BASE>;
+					u-boot-nodtb {
+					};
+					hash {
+						algo = "crc32";
+					};
+				};
+
+				fdt-1 {
+					description = "k3-am642-tqma64xxl-mbax4xxl";
+					type = "flat_dt";
+					arch = "arm";
+					compression = "none";
+					blob {
+						filename = "arch/arm/dts/k3-am642-tqma64xxl-mbax4xxl.dtb";
+					};
+					hash {
+						algo = "crc32";
+					};
+				};
+			};
+
+			configurations {
+				default = "conf-1";
+
+				conf-1 {
+					description = "k3-am642-tqma64xxl-mbax4xxl";
+					firmware = "uboot";
+					loadables = "uboot";
+					fdt = "fdt-1";
+				};
+			};
+		};
+	};
+};
+#endif

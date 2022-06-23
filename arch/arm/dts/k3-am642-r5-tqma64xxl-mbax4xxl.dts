@@ -1,0 +1,111 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * Copyright (C) 2021 Texas Instruments Incorporated - https://www.ti.com/
+ * Copyright (c) 2022 TQ-Systems GmbH <license@tq-group.com>, D-82229 Seefeld, Germany.
+ */
+
+/dts-v1/;
+
+#include <dt-bindings/mux/ti-serdes.h>
+#include <dt-bindings/phy/phy.h>
+#include "k3-am642-r5-tqma64xxl.dtsi"
+
+&main_uart0 {
+	/delete-property/ power-domains;
+	/delete-property/ clocks;
+	/delete-property/ clock-names;
+	pinctrl-names = "default";
+	pinctrl-0 = <&main_uart0_pins_default>;
+	status = "okay";
+};
+
+&serdes_ln_ctrl {
+	idle-states = <AM64_SERDES0_LANE0_USB>;
+};
+
+&serdes_wiz0 {
+	status = "okay";
+};
+
+&serdes0 {
+	serdes0_usb_link: phy@0 {
+		reg = <0>;
+		cdns,num-lanes = <1>;
+		#phy-cells = <0>;
+		cdns,phy-type = <PHY_TYPE_USB3>;
+		resets = <&serdes_wiz0 1>;
+	};
+};
+
+&usbss0 {
+	ti,vbus-divider;
+};
+
+&usb0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&main_usb0_pins_default>;
+	dr_mode = "otg";
+	maximum-speed = "super-speed";
+	phys = <&serdes0_usb_link>;
+	phy-names = "cdns3,usb3-phy";
+};
+
+&sdhci1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&main_mmc1_pins_default>;
+	ti,driver-strength-ohm = <50>;
+	disable-wp;
+	no-mmc;
+	clocks = <&clk_200mhz>;
+	clock-names = "clk_xin";
+	/delete-property/ power-domains;
+};
+
+&main_pmx0 {
+	/* Stub sections to allow k3-am642-tqma64xxl-mbax4xxl-u-boot.dtsi to apply */
+	cpsw_pins_default: cpsw-pins-default {
+	};
+
+	cpsw_mdio_pins_default: cpsw-mdio-pins-default {
+	};
+
+	main_uart0_pins_default: main-uart0-pins-default {
+		u-boot,dm-spl;
+		pinctrl-single,pins = <
+			/* (D15) UART0_RXD */
+			AM64X_IOPAD(0x0230, PIN_INPUT, 0)
+			/* (C16) UART0_TXD */
+			AM64X_IOPAD(0x0234, PIN_OUTPUT, 0)
+		>;
+	};
+
+	main_mmc1_pins_default: main-mmc1-pins-default {
+		pinctrl-single,pins = <
+			/* (J19) MMC1_CMD */
+			AM64X_IOPAD(0x0294, PIN_INPUT, 0)
+			/* (L20) MMC1_CLK */
+			AM64X_IOPAD(0x028c, PIN_INPUT, 0)
+			/* (K21) MMC1_DAT0 */
+			AM64X_IOPAD(0x0288, PIN_INPUT, 0)
+			/* (L21) MMC1_DAT1 */
+			AM64X_IOPAD(0x0284, PIN_INPUT, 0)
+			/* (K19) MMC1_DAT2 */
+			AM64X_IOPAD(0x0280, PIN_INPUT, 0)
+			/* (K18) MMC1_DAT3 */
+			AM64X_IOPAD(0x027c, PIN_INPUT, 0)
+			/* (D19) MMC1_SDCD */
+			AM64X_IOPAD(0x0298, PIN_INPUT, 0)
+			/* (#N/A) MMC1_CLKLB */
+			AM64X_IOPAD(0x0290, PIN_INPUT, 0)
+		>;
+	};
+
+	main_usb0_pins_default: main-usb0-pins-default {
+		pinctrl-single,pins = <
+			/* (E19) USB0_DRVVBUS */
+			AM64X_IOPAD(0x02a8, PIN_OUTPUT, 0)
+		>;
+	};
+};
+
+#include "k3-am642-tqma64xxl-mbax4xxl-u-boot.dtsi"
