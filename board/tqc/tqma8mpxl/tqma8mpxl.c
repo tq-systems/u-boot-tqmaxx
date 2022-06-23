@@ -67,17 +67,25 @@ int board_phys_sdram_size(phys_size_t *size)
 	return 0;
 }
 
+/**
+ * Translate detected CPU variante into TQ-Systems SOM variant short name
+ *
+ * return: string consisting of the name or string indicating unknown variant
+ */
 static const char *tqc_get_boardname(void)
 {
 	switch (get_cpu_type()) {
-	case MXC_CPU_IMX8MP:
-		return "TQMa8MP";
-	case MXC_CPU_IMX8MP6:
-		return "TQMa8MP6";
+	/* all normal quad core variants */
+	case MXC_CPU_IMX8MP:	/* NPU */
+	case MXC_CPU_IMX8MP6:	/* w/o NPU */
+		return "TQMa8MPQL";
+	/* quad lite variant */
 	case MXC_CPU_IMX8MPL:
-		return "TQMa8MPL";
+		return "TQMa8MPQLL";
+	/* dual core variant */
 	case MXC_CPU_IMX8MPD:
-		return "TQMa8MPD";
+		return "TQMa8MPDL";
+	/* add more if new variants will be assembled */
 	default:
 		return "??";
 	}
