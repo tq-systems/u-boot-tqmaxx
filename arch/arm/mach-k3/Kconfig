@@ -192,4 +192,5 @@ source "board/ti/am64x/Kconfig"
 source "board/ti/am62x/Kconfig"
 source "board/ti/j721e/Kconfig"
 source "board/ti/j721s2/Kconfig"
+source "board/tqc/tqma64xxl/Kconfig"
 endif

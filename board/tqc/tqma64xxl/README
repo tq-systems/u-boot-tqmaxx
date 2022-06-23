@@ -1,0 +1,140 @@
+# TQ-Systems TQMa64XxL
+
+The TQ-Systems TQMa64XxL is a System-on-Module based on the TI AM64 SoC family.
+
+## Module variants
+
+The TQMa64xxL currently only exists in one variant with 1GiB LPDDR4 RAM.
+
+## Base boards / configurations
+
+The following combinations of base board and module are supported:
+
+* TQ-Systems MBaX4XxL with TQMa64XxL
+  - tqma64xxl_mbax4xxl_r5_defconfig
+  - tqma64xxl_mbax4xxl_a53_defconfig
+
+As described in the following section, bootloaders for both the R5 and A53
+cores of the AM64x must be built.
+
+## Boot sequence
+
+The bootloader on the AM64 is loaded in multiple stages. 3 of these stages
+are provided by this U-Boot repository:
+
+* R5 U-Boot SPL (combined with SYSFW to `tiboot3.bin`; see next section)
+* A53 U-Boot SPL (`tispl.bin`)
+* A53 U-Boot (`u-boot.img`)
+
+The R5 bootloader performs the following actions:
+
+* Initialize DDR controller
+* Load `tispl.bin` (which contains ATF, OP-TEE and the A53 SPL) into DDR RAM
+* Boot ATF
+
+The A53 SPL and full U-Boot are both built from the `a53` defconfigs. The build
+requires an ARM-v8/AArch64 cross compiler. `bl31.bin` (ATF) and
+`bl32.bin` (OP-TEE) must be provided in the root of the U-Boot build directory
+to produce a working bootloader.
+
+The next stage is handled by the ATF: It will start the OP-TEE and the A53 SPL,
+which have already been loaded by the R5 bootloader. The A53 SPL then loads and
+starts the full A53 U-Boot from `u-boot.img`.
+
+Finally, the full A53 U-Boot runs, which can provide a command line interface
+and boot into the actual OS depending on its configuration.
+
+## R5 boot image build
+
+The R5 bootloader is built from the `r5` defconfigs and it requires an ARM-v7
+cross compiler (32bit). Only the SPL component of this build is used.
+
+While this defconfig produces a file called `tiboot3.bin`, this file is
+incomplete, as it does not contain a system controller firmware (SYSFW). A tool
+that performs this step can be found at:
+
+  https://git.ti.com/cgit/k3-image-gen/k3-image-gen/
+
+To produce the combined `tiboot3.bin`, run the following command in
+the k3-image-gen repository:
+
+```
+make CROSS_COMPILE=... SOC=am64x CONFIG=evm SBL=.../spl/u-boot-spl.bin
+```
+
+## DIP Settings for MMC/SPI-NOR boot
+
+On eMMC/SD card a FAT boot partition is used for the SYSFW and U-Boot.
+On SPI-NOR, separate MTD partitions are defined for the individual stages.
+
+Notes:
+
+* See RM spruim2c.pdf, ch. 4.3.1 BOOTMODE Pin Mapping
+* S4/S5 are used for primary boot device selection
+* S5/S6 are used for primary boot device configuration
+* S6/S7 are used for backup boot device selection and configuration
+* Only primary boot devices are considered below
+* `X`: Position of DIP
+* `-`: Don't care
+
+### SD Card
+
+```
+DIP (S4)     4  3  2  1
+BootMode     3  2  1  0
+OFF          X  X
+ON                 X  X
+
+DIP (S5)     4  3  2  1
+BootMode     7  6  5  4
+OFF          X     X  X
+ON              X
+
+DIP (S6)     4  3  2  1
+BootMode     11 10 9  8
+OFF          -  -     -
+ON           -  -  X  -
+```
+
+### eMMC
+
+```
+DIP (S4)     4  3  2  1
+BootMode     3  2  1  0
+OFF          X  X
+ON                 X  X
+
+DIP (S5)     4  3  2  1
+BootMode     7  6  5  4
+OFF          X     X  X
+ON              X
+
+DIP (S6)     4  3  2  1
+BootMode     11 10 9  8
+OFF          -  -  X  -
+ON           -  -     -
+```
+
+Note: This configuration uses the MMCSD mode with port 0 to boot a full
+filesystem image from the eMMC user partition, which is not officially supported
+by TI for the AM64x. Refer to the SoC documentation provided by TI for
+information on the use of the eMMC boot partitions.
+
+### SPI-NOR
+
+```
+DIP (S4)     4  3  2  1
+BootMode     3  2  1  0
+OFF             X
+ON           X     X  X
+
+DIP (S5)     4  3  2  1
+BootMode     7  6  5  4
+OFF          X  X  X
+ON                    X
+
+DIP (S6)     4  3  2  1
+BootMode     11 10 9  8
+OFF          -  -  -  X
+ON           -  -  -
+```
