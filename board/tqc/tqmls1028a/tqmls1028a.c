@@ -60,18 +60,8 @@ int board_early_init_f(void)
 #ifdef CONFIG_OF_BOARD_SETUP
 int ft_board_setup(void *blob, bd_t *bd)
 {
-	u64 base[CONFIG_NR_DRAM_BANKS];
-	u64 size[CONFIG_NR_DRAM_BANKS];
-
 	ft_cpu_setup(blob, bd);
-
-	/* fixup DT for the two GPP DDR banks */
-	base[0] = gd->bd->bi_dram[0].start;
-	size[0] = gd->bd->bi_dram[0].size;
-
-	fdt_fixup_memory_banks(blob, base, size, 2);
-
-	return 0;
+	return arch_fixup_fdt(blob);
 }
 #endif
 
