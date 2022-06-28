@@ -403,13 +403,15 @@ int board_late_init(void)
 		/* ID */
 		tqc_parse_eeprom_id(&eedat, safe_string,
 				    ARRAY_SIZE(safe_string));
-		if (!strncmp(safe_string, "TQMA335", 3))
-			env_set("boardtype", safe_string);
-		if (!tqc_parse_eeprom_serial(&eedat, safe_string,
-					     ARRAY_SIZE(safe_string)))
-			env_set("serial#", safe_string);
-		else
-			env_set("serial#", "???");
+		if (IS_ENABLED(CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG)) {
+			if (!strncmp(safe_string, "TQMA335", 3))
+				env_set("boardtype", safe_string);
+			if (!tqc_parse_eeprom_serial(&eedat, safe_string,
+						     ARRAY_SIZE(safe_string)))
+				env_set("serial#", safe_string);
+			else
+				env_set("serial#", "???");
+		}
 
 		/*
 		 * Note: CPSW driver will set ethaddr from efuse if we fail

@@ -38,6 +38,8 @@ void board_late_mmc_env_init(void)
 	if (!check_mmc_autodetect())
 		return;
 
-	env_set_ulong("mmcdev", dev_no);
-	env_set_ulong("mmcblkdev", mmc_map_to_kernel_blk(dev_no));
+	if (IS_ENABLED(CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG)) {
+		env_set_ulong("mmcdev", dev_no);
+		env_set_ulong("mmcblkdev", mmc_map_to_kernel_blk(dev_no));
+	}
 }
