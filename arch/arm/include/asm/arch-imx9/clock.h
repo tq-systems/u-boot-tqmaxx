@@ -261,6 +261,7 @@ ulong imx_clk_scmi_set_rate(u32 clock_id, ulong rate);
 ulong imx_clk_scmi_get_rate(u32 clock_id);
 int imx_clk_scmi_set_parent(u32 clock_id, u32 parent_id);
 void set_arm_clk(ulong freq);
+void mxs_set_lcdclk(u32 base_addr, u32 freq);
 
 int imx_clk_scmi_enable(u32 clock_id, bool enable);
 ulong imx_clk_scmi_set_rate(u32 clock_id, ulong rate);
