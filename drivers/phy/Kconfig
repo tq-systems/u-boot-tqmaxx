@@ -297,6 +297,15 @@ config PHY_IMX8M_PCIE
 
 	  This PHY is found on i.MX8M devices supporting PCIe.
 
+config PHY_IMX93_MIPI_DPHY
+	bool "NXP i.MX93 MIPI DPHY Driver"
+	depends on PHY
+	depends on ARCH_IMX9
+	select REGMAP
+	help
+	  Enable this to add support for the Synopsys DW MIPI DPHY as found
+	  on NXP's i.MX93 SoC.
+
 config PHY_XILINX_ZYNQMP
 	tristate "Xilinx ZynqMP PHY driver"
 	depends on PHY && ARCH_ZYNQMP
