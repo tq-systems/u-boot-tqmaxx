@@ -7,6 +7,12 @@
 #include "am335x-tqma335x-u-boot.dtsi"
 
 / {
+	config {
+		u-boot,mmc-env-offset = <0x260000>;
+		u-boot,mmc-env-offset-redundant = <0x280000>;
+		u-boot,spl-payload-offset = <0x20000>;
+	};
+
 	sound {
 		status = "disabled";
 	};
