@@ -108,6 +108,34 @@ int mmc_get_env_dev(void)
 }
 #endif
 
+enum env_location board_get_envl(enum env_location loc, enum env_operation op,
+				 int prio)
+{
+#if !defined(CONFIG_SPL_BUILD) && defined(CONFIG_TARGET_TQMA335X)
+	switch (gd->arch.omap_boot_device) {
+	case BOOT_DEVICE_MMC1:
+	case BOOT_DEVICE_MMC2:
+		if (IS_ENABLED(CONFIG_ENV_IS_IN_MMC)) {
+			debug("env + boot SD/e-MMC\n");
+			loc = ENVL_MMC;
+		}
+		break;
+	case BOOT_DEVICE_SPI:
+		if (IS_ENABLED(CONFIG_ENV_IS_IN_SPI_FLASH)) {
+			debug("env + boot SPI NOR\n");
+			loc = ENVL_SPI_FLASH;
+		}
+		break;
+	default:
+		if (IS_ENABLED(CONFIG_ENV_IS_NOWHERE))
+			loc = ENVL_NOWHERE;
+		break;
+	}
+#endif
+
+	return loc;
+}
+
 #if defined(CONFIG_OF_BOARD_SETUP)
 int tqc_bb_ft_board_setup(void *fdt, bd_t *bd)
 {

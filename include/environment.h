@@ -312,6 +312,11 @@ void eth_parse_enetaddr(const char *addr, uint8_t *enetaddr);
 int eth_env_get_enetaddr(const char *name, uint8_t *enetaddr);
 int eth_env_set_enetaddr(const char *name, const uint8_t *enetaddr);
 
+#if defined(CONFIG_TARGET_TQMA335X)
+enum env_location board_get_envl(enum env_location loc, enum env_operation op,
+				 int prio);
+#endif
+
 #endif /* DO_DEPS_ONLY */
 
 #endif /* _ENVIRONMENT_H_ */

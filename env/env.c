@@ -122,10 +122,27 @@ static void env_set_inited(enum env_location location)
  */
 __weak enum env_location env_get_location(enum env_operation op, int prio)
 {
+	enum env_location loc = env_locations[0];
+
 	if (prio >= ARRAY_SIZE(env_locations))
 		return ENVL_UNKNOWN;
+	loc = env_locations[prio];
 
-	return env_locations[prio];
+	/*
+	 *
+	 * TODO: this is just a hack, since overwriting env_get_location does
+	 * not work for unknown reason.
+	 */
+#if !defined(CONFIG_SPL_BUILD) && defined(CONFIG_TARGET_TQMA335X)
+	{
+		enum env_location bloc = board_get_envl(loc, op, prio);
+
+		if (bloc > ENVL_UNKNOWN && bloc < ENVL_COUNT)
+			loc = bloc;
+	}
+#endif
+
+	return loc;
 }
 
 
