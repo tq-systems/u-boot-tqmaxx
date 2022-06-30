@@ -1,6 +1,7 @@
-// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+// SPDX-License-Identifier: GPL-2.0-only
 /*
- * Copyright (C) 2022 TQ-Systems GmbH - https://www.tq-group.com/
+ * Copyright (c) 2022 TQ-Systems GmbH <license@tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
  *
  */
 

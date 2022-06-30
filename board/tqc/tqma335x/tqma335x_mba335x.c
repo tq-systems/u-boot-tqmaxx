@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2021, TQ-Systems GmbH
+ * Copyright (c) 2021 - 2022 TQ-Systems GmbH <license@tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Gregor Herburger
  *
+ * Based on:
  * Copyright (C) 2011, Texas Instruments, Incorporated - http://www.ti.com/
  */
 
