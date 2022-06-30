@@ -61,6 +61,12 @@
 		regulator-min-microvolt = <12000000>;
 		regulator-max-microvolt = <12000000>;
 	};
+
+	reg_vsd: vsd-regulator {
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+	};
 };
 
 &am33xx_pinmux {
@@ -389,8 +395,9 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&mmc1_pins>;
 	status = "okay";
-	vmmc-supply = <&vmmc_reg>;
+	vmmc-supply = <&reg_vsd>;
 	bus-width = <4>;
+	no-1-8-v;
 	no-mmc;
 	no-sdio;
 };
