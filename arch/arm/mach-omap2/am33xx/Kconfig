@@ -84,6 +84,12 @@ config TARGET_TQMA335X
 	select DM
 	select DM_GPIO
 	select DM_SERIAL
+	select DM_I2C
+	imply DM_MMC
+	imply MMC_OMAP_HS
+	imply SPI_FLASH
+	imply SPI
+	imply OMAP3_SPI
 	imply CMD_DM
 	imply SPL_DM
 	imply SPL_DM_SEQ_ALIAS
