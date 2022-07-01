@@ -73,7 +73,7 @@
 	"bootpart=0:2\0" \
 	"bootdir=/boot\0" \
 	"bootfile=zImage\0" \
-	"fdtfile=" CONFIG_DEFAULT_DEVICE_TREE ".dtb\0" \
+	"fdtfile=" CONFIG_DEFAULT_FDT_FILE "\0" \
 	"console=ttyS4,115200n8\0" \
 	"partitions=" \
 		"uuid_disk=${uuid_gpt_disk};" \
