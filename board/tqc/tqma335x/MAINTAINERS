@@ -1,8 +1,8 @@
 TQMA335X MODULE AND BASEBOARDS
 M:	Michael Krummsdorf <michael.krummsdorf@tq-group.com>
 S:	Maintained
-F:	board/tqc/tqma335x/
+F:	board/tqc/tqma335x
 F:	include/configs/tqma335x.h
 F:	configs/tqma335x_*_defconfig
-F:	arch/arm/dts/am335x-mba335x.dts
-F:	arch/arm/dts/am335x-tqma335x.dtsi
+F:	arch/arm/dts/am335x-mba335x*.dts
+F:	arch/arm/dts/am335x-tqma335x*.dtsi
