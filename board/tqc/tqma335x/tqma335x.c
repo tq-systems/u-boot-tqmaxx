@@ -81,6 +81,18 @@ static struct module_pin_mux i2c0_pin_mux[] = {
 	{-1},
 };
 
+static struct module_pin_mux spi0_pin_mux[] = {
+	/* SPI0_SCLK (needs RXACTIVE to work) */
+	{OFFSET(spi0_sclk), (MODE(0) | RXACTIVE | PULLUDEN | PULLUP_EN)},
+	/* SPI0_D0 */
+	{OFFSET(spi0_d0), (MODE(0) | RXACTIVE | PULLUDDIS)},
+	/* SPI0_D1 */
+	{OFFSET(spi0_d1), (MODE(0) | PULLUDEN | PULLUP_EN)},
+	/* SPI0_CS0 */
+	{OFFSET(spi0_cs0), (MODE(0) | PULLUDEN | PULLUP_EN)},
+	{-1},
+};
+
 void enable_uart0_pin_mux(void)
 {
 	configure_module_pin_mux(uart0_pin_mux);
@@ -108,6 +120,7 @@ void enable_mmc0_pin_mux(void)
 
 void set_mux_conf_regs(void)
 {
+	configure_module_pin_mux(spi0_pin_mux);
 	configure_module_pin_mux(i2c0_pin_mux);
 	enable_board_pin_mux();
 }
