@@ -1,9 +1,11 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * Copyright (C) 2016 Freescale Semiconductor, Inc.
- * Copyright (C) 2018-2019 TQ-Systems GmbH
+ * Copyright (c) 2018 - 2022 TQ-Systems GmbH <license@tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Markus Niebel <Markus.Niebel@tq-group.com>
  *
- * SPDX-License-Identifier:	GPL-2.0+
  */
+
 #include <common.h>
 #include <asm/arch/sys_proto.h>
 #include <linux/errno.h>
