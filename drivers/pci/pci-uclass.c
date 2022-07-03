@@ -264,6 +264,8 @@ int pci_bus_write_config(struct udevice *bus, pci_dev_t bdf, int offset,
 	ops = pci_get_ops(bus);
 	if (!ops->write_config)
 		return -ENOSYS;
+	if (offset < 0 || offset >= 4096)
+		return -EINVAL;
 	return ops->write_config(bus, bdf, offset, value, size);
 }
 
@@ -342,8 +344,14 @@ int pci_bus_read_config(struct udevice *bus, pci_dev_t bdf, int offset,
 	struct dm_pci_ops *ops;
 
 	ops = pci_get_ops(bus);
-	if (!ops->read_config)
+	if (!ops->read_config) {
+		*valuep = pci_conv_32_to_size(~0, offset, size);
 		return -ENOSYS;
+	}
+	if (offset < 0 || offset >= 4096) {
+		*valuep = pci_conv_32_to_size(0, offset, size);
+		return -EINVAL;
+	}
 	return ops->read_config(bus, bdf, offset, valuep, size);
 }
 

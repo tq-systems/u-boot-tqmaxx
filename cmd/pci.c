@@ -497,6 +497,9 @@ static int pci_cfg_display(pci_dev_t bdf, ulong addr, enum pci_size_t size,
 	if (length == 0)
 		length = 0x40 / byte_size; /* Standard PCI config space */
 
+	if (addr >= 4096)
+		return 1;
+
 	/* Print the lines.
 	 * once, and all accesses are with the specified bus width.
 	 */
@@ -521,7 +524,10 @@ static int pci_cfg_display(pci_dev_t bdf, ulong addr, enum pci_size_t size,
 			rc = 1;
 			break;
 		}
-	} while (nbytes > 0);
+	} while (nbytes > 0 && addr < 4096);
+
+	if (rc == 0 && nbytes > 0)
+		return 1;
 
 	return (rc);
 }
@@ -555,6 +561,9 @@ static int pci_cfg_modify(pci_dev_t bdf, ulong addr, ulong size, ulong value,
 	ulong	i;
 	int	nbytes;
 	ulong val;
+
+	if (addr >= 4096)
+		return 1;
 
 	/* Print the address, followed by value.  Then accept input for
 	 * the next value.  A non-converted value exits.
@@ -601,7 +610,10 @@ static int pci_cfg_modify(pci_dev_t bdf, ulong addr, ulong size, ulong value,
 					addr += size;
 			}
 		}
-	} while (nbytes);
+	} while (nbytes && addr < 4096);
+
+	if (nbytes)
+		return 1;
 
 	return 0;
 }
