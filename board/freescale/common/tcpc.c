@@ -34,7 +34,7 @@ int tcpc_set_cc_to_source(struct tcpc_port *port)
 	uint8_t valb;
 	int err;
 
-	if (port == NULL)
+	if (port == NULL || port->i2c_dev == NULL)
 		return -EINVAL;
 
 	valb = (TCPC_ROLE_CTRL_CC_RP << TCPC_ROLE_CTRL_CC1_SHIFT) |
@@ -53,7 +53,7 @@ int tcpc_set_cc_to_sink(struct tcpc_port *port)
 	uint8_t valb;
 	int err;
 
-	if (port == NULL)
+	if (port == NULL || port->i2c_dev == NULL)
 		return -EINVAL;
 
 	valb = (TCPC_ROLE_CTRL_CC_RD << TCPC_ROLE_CTRL_CC1_SHIFT) |
@@ -71,7 +71,7 @@ int tcpc_set_plug_orientation(struct tcpc_port *port, enum typec_cc_polarity pol
 	uint8_t valb;
 	int err;
 
-	if (port == NULL)
+	if (port == NULL || port->i2c_dev == NULL)
 		return -EINVAL;
 
 	err = dm_i2c_read(port->i2c_dev, TCPC_TCPC_CTRL, &valb, 1);
@@ -100,7 +100,7 @@ int tcpc_get_cc_status(struct tcpc_port *port, enum typec_cc_polarity *polarity,
 	uint8_t valb_cc, cc2, cc1;
 	int err;
 
-	if (port == NULL || polarity == NULL || state == NULL)
+	if (port == NULL || port->i2c_dev == NULL || polarity == NULL || state == NULL)
 		return -EINVAL;
 
 	err = dm_i2c_read(port->i2c_dev, TCPC_CC_STATUS, (uint8_t *)&valb_cc, 1);
@@ -219,7 +219,7 @@ int tcpc_clear_alert(struct tcpc_port *port, uint16_t clear_mask)
 {
 	int err;
 
-	if (port == NULL)
+	if (port == NULL || port->i2c_dev == NULL)
 		return -EINVAL;
 
 	err = dm_i2c_write(port->i2c_dev, TCPC_ALERT, (const uint8_t *)&clear_mask, 2);
@@ -235,7 +235,7 @@ int tcpc_fault_status_mask(struct tcpc_port *port, uint8_t fault_mask)
 {
 	int err = 0;
 
-	if (!port)
+	if (!port || port->i2c_dev == NULL)
 		return -EINVAL;
 
 	err = dm_i2c_write(port->i2c_dev, TCPC_FAULT_STATUS_MASK, &fault_mask, 1);
@@ -249,7 +249,7 @@ int tcpc_send_command(struct tcpc_port *port, uint8_t command)
 {
 	int err;
 
-	if (port == NULL)
+	if (port == NULL || port->i2c_dev == NULL)
 		return -EINVAL;
 
 	err = dm_i2c_write(port->i2c_dev, TCPC_COMMAND, (const uint8_t *)&command, 1);
@@ -268,7 +268,7 @@ int tcpc_polling_reg(struct tcpc_port *port, uint8_t reg,
 	int err;
 	ulong start;
 
-	if (port == NULL)
+	if (port == NULL || port->i2c_dev == NULL)
 		return -EINVAL;
 
 	tcpc_debug_log(port, "%s reg 0x%x, mask 0x%x, value 0x%x\n", __func__, reg, mask, value);
@@ -309,7 +309,7 @@ int tcpc_setup_dfp_mode(struct tcpc_port *port)
 	enum typec_cc_state state;
 	int ret;
 
-	if ((port == NULL) || (port->i2c_dev == NULL))
+	if (port == NULL)
 		return -EINVAL;
 
 	if (tcpc_pd_sink_check_charging(port)) {
@@ -376,7 +376,7 @@ int tcpc_setup_ufp_mode(struct tcpc_port *port)
 	enum typec_cc_state state;
 	int ret;
 
-	if ((port == NULL) || (port->i2c_dev == NULL))
+	if (port == NULL)
 		return -EINVAL;
 
 	/* Check if the PD charge is working. If not, need to configure CC role for UFP */
@@ -476,7 +476,7 @@ static int tcpc_pd_receive_message(struct tcpc_port *port, struct pd_message *ms
 	uint8_t cnt;
 	uint16_t val;
 
-	if (port == NULL)
+	if (port == NULL || port->i2c_dev == NULL)
 		return -EINVAL;
 
 	/* Generally the max tSenderResponse is 30ms, max tTypeCSendSourceCap is 200ms, we set the timeout to 500ms */
@@ -513,7 +513,7 @@ static int tcpc_pd_transmit_message(struct tcpc_port *port, struct pd_message *m
 	uint8_t valb;
 	uint16_t val = 0;
 
-	if (port == NULL)
+	if (port == NULL || port->i2c_dev == NULL)
 		return -EINVAL;
 
 	if (msg_p == NULL || bytes <= 0)
@@ -795,7 +795,7 @@ bool tcpc_pd_sink_check_charging(struct tcpc_port *port)
 	enum typec_cc_polarity pol;
 	enum typec_cc_state state;
 
-	if (port == NULL)
+	if (port == NULL || port->i2c_dev == NULL)
 		return false;
 
 	/* Check the CC status, must be sink */
@@ -833,7 +833,7 @@ static int tcpc_pd_sink_disable(struct tcpc_port *port)
 	uint8_t valb;
 	int err;
 
-	if (port == NULL)
+	if (port == NULL || port->i2c_dev == NULL)
 		return -EINVAL;
 
 	port->pd_state = UNATTACH;
@@ -876,7 +876,7 @@ static int tcpc_pd_sink_init(struct tcpc_port *port)
 	enum typec_cc_polarity pol;
 	enum typec_cc_state state;
 
-	if (port == NULL)
+	if (port == NULL || port->i2c_dev == NULL)
 		return -EINVAL;
 
 	port->pd_state = UNATTACH;
