@@ -296,7 +296,7 @@ void mxs_set_lcdclk(uint32_t base_addr, uint32_t freq)
 		}
 	}
 
-	printf("Fail to set rate to %dkhz", freq);
+	printf("Fail to set rate to %dkhz\n", freq);
 	return;
 
 find:
