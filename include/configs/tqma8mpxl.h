@@ -356,4 +356,6 @@
 #include <config_distro_bootcmd.h>
 #endif
 
+#define CONFIG_IMX6_PWM_PER_CLK 24000000
+
 #endif /* __TQMA8MPXL_H */
