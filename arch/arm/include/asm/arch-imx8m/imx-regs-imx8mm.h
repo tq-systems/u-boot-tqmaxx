@@ -583,6 +583,24 @@ struct bootrom_sw_info {
 	u32 reserved_3[3];
 };
 
+/* Pulse width modulation */
+#define PWMCR_PRESCALER(x)	(((x - 1) & 0xFFF) << 4)
+#define PWMCR_DOZEEN		(1 << 24)
+#define PWMCR_WAITEN		(1 << 23)
+#define PWMCR_DBGEN		(1 << 22)
+#define PWMCR_CLKSRC_IPG_HIGH	(2 << 16)
+#define PWMCR_CLKSRC_IPG	(1 << 16)
+#define PWMCR_EN		(1 << 0)
+
+struct pwm_regs {
+	u32 cr;	/* Control Register */
+	u32 sr;	/* Status Register */
+	u32 ir;	/* Interrupt Register */
+	u32 sar;	/* Sample Register */
+	u32 pr;	/* Period Register */
+	u32 cnr;	/* Counter Register */
+};
+
 /* ECSPI registers */
 struct cspi_regs {
 	u32 rxdata;
