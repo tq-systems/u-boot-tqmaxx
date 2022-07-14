@@ -94,3 +94,11 @@ config VIDEO_IMX_LCDIFV3
 	help
 	  Support for i.MX8MP LCDIFv3 controller.
 
+config VIDEO_IMX8MP_LDB
+	bool "i.MX8MP LDVS bridge support"
+	default n
+	depends on IMX8MP && DM_VIDEO
+	select DISPLAY
+	select VIDEO_LINK
+	help
+	  Support for i.MX8MP LDVS bridge controller for i.MX8P processors.
