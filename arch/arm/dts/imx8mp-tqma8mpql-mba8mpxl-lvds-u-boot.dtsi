@@ -1,0 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright (c) 2022 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Alexander Stein
+ */
+
+#include "imx8mp-tqma8mpql-mba8mpxl-u-boot.dtsi"
