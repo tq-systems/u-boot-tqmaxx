@@ -51,8 +51,10 @@ enum {
 	GPIN_2,
 	GPIN_3,
 	LVDS_RESET_B,
+#if !defined(CONFIG_TQMA8MPXL_LVDS)
 	LVDS_BLT_EN,
 	LVDS_PWR_EN,
+#endif
 	DP_IRQ,
 	DP_EN,
 	HDMI_OC,
@@ -65,7 +67,9 @@ enum {
 	PCIE_CLKREQ,
 	FAN_PWR,
 	CODEC_RST,
+#if !defined(CONFIG_TQMA8MPXL_LVDS)
 	VCC12V_EN,
+#endif
 	PERST,
 	CLKREQ,
 	PEWAKE,
@@ -134,8 +138,10 @@ static struct tqc_gpio_init_data mba8mpxl_gid[] = {
 	GPIO_INIT_DATA_ENTRY(LVDS_RESET_B, "GPIO3_14",
 			     GPIOD_IS_OUT | GPIOD_ACTIVE_LOW |
 			     GPIOD_IS_OUT_ACTIVE),
+#if !defined(CONFIG_TQMA8MPXL_LVDS)
 	GPIO_INIT_DATA_ENTRY(LVDS_BLT_EN, "GPIO3_19", GPIOD_IS_OUT),
 	GPIO_INIT_DATA_ENTRY(LVDS_PWR_EN, "GPIO3_20", GPIOD_IS_OUT),
+#endif
 
 	GPIO_INIT_DATA_ENTRY(DP_IRQ, "GPIO4_18", GPIOD_IS_IN),
 	GPIO_INIT_DATA_ENTRY(DP_EN, "GPIO4_19", GPIOD_IS_OUT),
@@ -149,7 +155,9 @@ static struct tqc_gpio_init_data mba8mpxl_gid[] = {
 	GPIO_INIT_DATA_ENTRY(PCIE_CLKREQ, "GPIO4_22", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW),
 	GPIO_INIT_DATA_ENTRY(FAN_PWR, "GPIO4_27", GPIOD_IS_OUT),
 	GPIO_INIT_DATA_ENTRY(CODEC_RST, "GPIO4_29", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
+#if !defined(CONFIG_TQMA8MPXL_LVDS)
 	GPIO_INIT_DATA_ENTRY(VCC12V_EN, "GPIO2_6", GPIOD_IS_OUT),
+#endif
 	GPIO_INIT_DATA_ENTRY(PERST, "GPIO2_7", GPIOD_IS_OUT | GPIOD_ACTIVE_LOW | GPIOD_IS_OUT_ACTIVE),
 	GPIO_INIT_DATA_ENTRY(CLKREQ, "GPIO2_14", GPIOD_IS_IN),
 	GPIO_INIT_DATA_ENTRY(PEWAKE, "GPIO2_15", GPIOD_IS_IN),
@@ -314,6 +322,11 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 
 #endif
 
+#define FSL_SIP_GPC			0xC2000000
+#define FSL_SIP_CONFIG_GPC_PM_DOMAIN	0x3
+#define DISPMIX				13
+#define MIPI				15
+
 int tqc_bb_board_init(void)
 {
 	tqc_board_gpio_init(mba8mpxl_gid, ARRAY_SIZE(mba8mpxl_gid));
@@ -323,6 +336,12 @@ int tqc_bb_board_init(void)
 #if defined(CONFIG_USB)
 	init_usb_clk();
 #endif
+
+	if CONFIG_IS_ENABLED(TQMA8MPXL_LVDS) {
+		/* enable the dispmix & mipi phy power domain */
+		call_imx_sip(FSL_SIP_GPC, FSL_SIP_CONFIG_GPC_PM_DOMAIN, DISPMIX, true, 0);
+		call_imx_sip(FSL_SIP_GPC, FSL_SIP_CONFIG_GPC_PM_DOMAIN, MIPI, true, 0);
+	}
 
 	return 0;
 }
