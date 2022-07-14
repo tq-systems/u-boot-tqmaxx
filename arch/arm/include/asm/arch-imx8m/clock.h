@@ -275,6 +275,9 @@ int clock_get_postdiv(enum clk_root_index clock_id,
 		      enum root_post_div *post_div);
 int clock_get_src(enum clk_root_index clock_id, enum clk_root_src *p_clock_src);
 void mxs_set_lcdclk(u32 base_addr, u32 freq);
+#ifdef CONFIG_IMX8MP
+void mxs_set_ldbclk(uint32_t base_addr, uint32_t freq);
+#endif
 int set_clk_qspi(void);
 void init_clk_fspi(int index);
 void enable_ocotp_clk(unsigned char enable);

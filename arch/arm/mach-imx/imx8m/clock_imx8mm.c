@@ -316,6 +316,36 @@ find:
 }
 
 #ifdef CONFIG_IMX8MP
+void mxs_set_ldbclk(uint32_t base_addr, uint32_t freq)
+{
+	uint32_t div, pre, post;
+
+	div = VIDEO_PLL_RATE / 1000;
+	div = (div + freq - 1) / freq;
+
+	if (div < 1)
+		div = 1;
+
+	for (pre = 1; pre <= 8; pre++) {
+		for (post = 1; post <= 64; post++) {
+			if (pre * post == div) {
+				goto find;
+			}
+		}
+	}
+
+	printf("Fail to set rate to %dkhz\n", freq);
+	return;
+
+find:
+	/* Select to video PLL */
+	debug("mxs_set_ldbclk, pre = %d, post = %d\n", pre, post);
+
+	clock_set_target_val(MEDIA_LDB_CLK_ROOT, CLK_ROOT_ON | CLK_ROOT_SOURCE_SEL(7) | CLK_ROOT_PRE_DIV(pre - 1) | CLK_ROOT_POST_DIV(post - 1));
+}
+#endif
+
+#ifdef CONFIG_IMX8MP
 void enable_display_clk(unsigned char enable)
 {
 	if (enable) {
