@@ -274,7 +274,9 @@ int intpll_configure(enum pll_clocks pll, ulong freq)
 	return 0;
 }
 
+#ifndef VIDEO_PLL_RATE
 #define VIDEO_PLL_RATE 594000000U
+#endif
 
 void mxs_set_lcdclk(uint32_t base_addr, uint32_t freq)
 {
