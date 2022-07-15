@@ -247,11 +247,28 @@ config TQMA8MPXL_REV_0100
 
 endchoice
 
+config TQMA8MPXL_LVDS
+	bool "Enable LVDS output"
+	depends on TQMA8MPXL_REV_0200
+	select VIDEO_BRIDGE
+	select VIDEO_IMX_LCDIFV3
+	select VIDEO_IMX8MP_LDB
+	select REGMAP
+	select SYSCON
+	select PWM_IMX
+	select DM_PWM
+	select BACKLIGHT_PWM
+	select SYS_WHITE_ON_BLACK
+	help
+	  Enables LVDS bootsplash on MBa8MPxL.
+
 config DEFAULT_DEVICE_TREE
+	default "imx8mp-tqma8mpql-mba8mpxl-lvds" if TQMA8MPXL_BB_MBA8MPXL && TQMA8MPXL_REV_0200 && TQMA8MPXL_LVDS
 	default "imx8mp-tqma8mpql-mba8mpxl" if TQMA8MPXL_BB_MBA8MPXL && TQMA8MPXL_REV_0200
 	default "imx8mp-mba8mpxl-r0100" if TQMA8MPXL_BB_MBA8MPXL && TQMA8MPXL_REV_0100
 
 config DEFAULT_FDT_FILE
+	default "imx8mp-tqma8mpql-mba8mpxl-lvds.dtb" if TQMA8MPXL_BB_MBA8MPXL && TQMA8MPXL_REV_0200 && TQMA8MPXL_LVDS
 	default "imx8mp-tqma8mpql-mba8mpxl.dtb" if TQMA8MPXL_BB_MBA8MPXL && TQMA8MPXL_REV_0200
 	default "imx8mp-tqma8mpql-mba8mpxl-r0100.dtb" if TQMA8MPXL_BB_MBA8MPXL && TQMA8MPXL_REV_0100
 
