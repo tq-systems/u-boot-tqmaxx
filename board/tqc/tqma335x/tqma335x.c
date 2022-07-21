@@ -429,11 +429,9 @@ int board_late_init(void)
 		}
 
 		/*
-		 * Note: CPSW driver will set ethaddr from efuse if we fail
-		 * here.
+		 * Do not set MAC addresses from EEPROM;
+		 * the CPSW driver will set the correct ethaddrs from efuses
 		 */
-		tqc_set_ethaddr(&eedat, "ethaddr", 0);
-		tqc_set_ethaddr(&eedat, "eth1addr", 1);
 
 		tqc_show_eeprom(&eedat, "TQMA335");
 	} else {
