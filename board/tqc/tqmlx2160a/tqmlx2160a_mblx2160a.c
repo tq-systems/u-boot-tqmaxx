@@ -498,7 +498,7 @@ int tqc_bb_board_eth_init(int *nr)
 #if defined(CONFIG_FSL_MC_ENET)
 	struct mii_dev *mii_dev;
 	struct ccsr_gur *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
-	u32 srds_s1, srds_s2;
+	u32 srds_s1, srds_s2, ec1, ec2;
 	struct list_head *mii_devs, *entry;
 	struct phy_device *dev;
 	int i;
@@ -513,6 +513,14 @@ int tqc_bb_board_eth_init(int *nr)
 	srds_s2 = in_le32(&gur->rcwsr[28]) &
 				FSL_CHASSIS3_RCWSR28_SRDS2_PRTCL_MASK;
 	srds_s2 >>= FSL_CHASSIS3_RCWSR28_SRDS2_PRTCL_SHIFT;
+
+	ec1 = in_le32(&gur->rcwsr[FSL_CHASSIS3_EC1_REGSR - 1]) &
+				FSL_CHASSIS3_EC1_REGSR_PRTCL_MASK;
+	ec1 >>= FSL_CHASSIS3_EC1_REGSR_PRTCL_SHIFT;
+
+	ec2 = in_le32(&gur->rcwsr[FSL_CHASSIS3_EC2_REGSR - 1]) &
+				FSL_CHASSIS3_EC2_REGSR_PRTCL_MASK;
+	ec2 >>= FSL_CHASSIS3_EC2_REGSR_PRTCL_SHIFT;
 
 	/* Reset all Phys */
 	for (int i = 1; i < ARRAY_SIZE(phy_infos); i++)
@@ -531,6 +539,12 @@ int tqc_bb_board_eth_init(int *nr)
 			for (int j = 0; j < ARRAY_SIZE(srds_configs[i].macs); j++) {
 				if (srds_configs[i].macs[j] == ETH_NO)
 					continue;
+
+				if (srds_configs[i].macs[j] == ETH_02 && !ec1)
+					srds_configs[i].macs[j] = ETH_09;
+
+				if (srds_configs[i].macs[j] == ETH_03 && !ec2)
+					srds_configs[i].macs[j] = ETH_10;
 
 				if (mblx2160a_configure_ethernet(i, j)) {
 					printf("Failed to configure Ethernet %d for Serdes configuration %d_%d_xx.\n",
