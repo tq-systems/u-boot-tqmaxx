@@ -243,7 +243,6 @@ unsigned long get_board_ddr_clk(void);
 	"mmcdev_sdhc=0\0"			\
 	"mmcdev_emmc=1\0"			\
 	"kernel=Image\0"			\
-	"fdt_file=" __stringify(CONFIG_DEFAULT_DEVICE_TREE) ".dtb\0"	       \
 	"earlycon=pl011,mmio32,0x21c0000\0"				       \
 	"rootfsmode=ro\0"                                                      \
 	"addtty=setenv bootargs ${bootargs} console=${consoledev},${baudrate}n8\0"\

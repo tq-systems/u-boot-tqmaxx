@@ -494,6 +494,23 @@ static int mblx2160a_configure_ethernet(u32 serdes_nr, u32 mac_nr)
 	return ret;
 }
 
+static int tqc_bb_set_fdt_file(u32 srds_s1, u32 srds_s2)
+{
+	char *format_string_fdt_file = "fsl-lx2160a-tqmlx2160a-mblx2160a-%d-%d-x.dtb";
+	char fdt_filename[64];
+	int len = 0;
+
+	if (env_get("fdt_file"))
+		return 0;
+
+	len = snprintf(fdt_filename, 64, format_string_fdt_file, srds_s1, srds_s2);
+
+	if (len < 0)
+		return -EINVAL;
+
+	return env_set("fdt_file", fdt_filename);
+}
+
 int tqc_bb_board_eth_init(int *nr)
 {
 #if defined(CONFIG_FSL_MC_ENET)
@@ -559,6 +576,9 @@ int tqc_bb_board_eth_init(int *nr)
 
 	if (!found)
 		printf("No ethernet configuration for Serdes %d_%d_xx found.\n", srds_s1, srds_s2);
+
+	if (tqc_bb_set_fdt_file(srds_s1, srds_s2))
+		puts("WARN: Failed to set fdt_file files\n");
 
 	/* Configure PHY LEDs for all PHYs also if not used */
 	mii_devs = mdio_get_list_head();
