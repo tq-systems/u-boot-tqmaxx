@@ -45,6 +45,7 @@ struct scmi_agent_priv {
 	struct udevice *resetdom_dev;
 	struct udevice *voltagedom_dev;
 	struct udevice *pinctrl_dev;
+	struct udevice *sensor_dev;
 };
 
 static inline u32 scmi_version(struct udevice *dev)

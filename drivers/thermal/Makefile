@@ -11,3 +11,4 @@ obj-$(CONFIG_TI_DRA7_THERMAL) += ti-bandgap.o
 obj-$(CONFIG_IMX_TMU) += imx_tmu.o
 obj-$(CONFIG_TI_LM74_THERMAL) += ti-lm74.o
 obj-$(CONFIG_IMX_PMC_TEMPERATURE) += imx_pmc_temperature.o
+obj-$(CONFIG_SCMI_THERMAL) += scmi_thermal.o
