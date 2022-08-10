@@ -9,6 +9,7 @@
 #include <linux/sizes.h>
 #include <linux/stringify.h>
 #include <asm/arch/imx-regs.h>
+#include <env/nxp/imx_env.h>
 
 #define UBOOT_ITB_OFFSET			0x57C00
 #define FSPI_CONF_BLOCK_SIZE		0x1000

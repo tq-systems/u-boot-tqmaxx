@@ -9,6 +9,7 @@
 #include <linux/sizes.h>
 #include <linux/stringify.h>
 #include <asm/arch/imx-regs.h>
+#include <env/nxp/imx_env.h>
 
 #ifdef CONFIG_XPL_BUILD
 /*#define CONFIG_ENABLE_DDR_TRAINING_DEBUG*/
