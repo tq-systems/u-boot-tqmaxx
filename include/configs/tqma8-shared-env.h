@@ -8,6 +8,21 @@
 #define __TQMA8_SHARED_ENV_H
 
 #define TQMA8_SHARED_ENV_SETTINGS \
+	"loadimage_nfs=nfs ${loadaddr} "                               \
+		"${serverip}:${rootpath}/boot/${image}\0"              \
+	"loadfdt_nfs=nfs ${fdt_addr} "                                 \
+		"${serverip}:${rootpath}/boot/${fdt_file}\0"           \
+	"nfsboot=echo Booting from nfs ...; "                          \
+		"setenv bootargs; run netargs; "                       \
+		"if run loadimage_nfs; then "                          \
+			"if run loadfdt_nfs; then "                    \
+				"run boot_os; "                        \
+			"else "                                        \
+				"echo ERR: cannot load FDT; "          \
+			"fi; "                                         \
+		"else "                                                \
+			"echo ERR: cannot load kernel; "               \
+		"fi;\0"                                                \
 	"loadimage_spi=sf probe; "                                     \
 		"ubi part ${ubirootfspart}; "                          \
 		"ubifsmount ubi0:${ubirootfsvol}; "                    \
