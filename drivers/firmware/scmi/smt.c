@@ -39,6 +39,7 @@ int scmi_dt_get_smt_buffer(struct udevice *dev, struct scmi_smt *smt)
 	int ret;
 	struct ofnode_phandle_args args;
 	struct resource resource;
+	u32 align_size __maybe_unused;
 
 	ret = dev_read_phandle_with_args(dev, "shmem", NULL, 0, 0, &args);
 	if (ret)
@@ -62,11 +63,15 @@ int scmi_dt_get_smt_buffer(struct udevice *dev, struct scmi_smt *smt)
 		scmi_smt_enable_intr(smt, true);
 
 #ifdef CONFIG_ARM
-	if (dcache_status())
-		mmu_set_region_dcache_behaviour(ALIGN_DOWN((uintptr_t)smt->buf, MMU_SECTION_SIZE),
-						ALIGN(smt->size, MMU_SECTION_SIZE),
-						DCACHE_OFF);
+	if (dcache_status()) {
+		if (IS_ENABLED(CONFIG_ARM64))
+			align_size = PAGE_SIZE;
+		else
+			align_size = MMU_SECTION_SIZE;
 
+		mmu_set_region_dcache_behaviour(ALIGN_DOWN((uintptr_t)smt->buf, align_size),
+						ALIGN(smt->size, align_size), DCACHE_OFF);
+	}
 #endif
 
 	return 0;
