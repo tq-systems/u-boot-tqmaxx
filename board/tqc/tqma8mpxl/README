@@ -3,15 +3,16 @@ U-Boot for the TQ-Systems i.MX8MP TQMa8MPxL SOM family
 Supported variants
 ==================
 
-TQMa8MPxL / 1 GiB NO ECC LPDDR4 / i.MX8MP (REV.020x only)
+Only REV.020x hardware of SOM is supported.
+
+TQMa8MPxL / 1 GiB NO ECC LPDDR4 / i.MX8MP
 TQMa8MPxL / 2 GiB NO ECC LPDDR4 / i.MX8MP
-TQMa8MPxL / 8 GiB NO ECC LPDDR4 / i.MX8MP (REV.020x only)
+TQMa8MPxL / 8 GiB NO ECC LPDDR4 / i.MX8MP
 
 configs:
 
 tqma8mpxl_multi_mba8mpxl_defconfig (single image for multiple RAM sizes)
 tqma8mpxl_2gb_mba8mpxl_defconfig (REV.020x prototypes, 2GiB RAM without variant data in EEPROM)
-tqma8mpxl_2gb_mba8mpxl_r0100_defconfig (REV.010x prototypes, 2GiB RAM without variant data in EEPROM)
 
 Memory Usage
 ============
