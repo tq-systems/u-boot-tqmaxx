@@ -643,6 +643,41 @@ int arch_misc_init(void)
 	return 0;
 }
 
+static int delete_fdt_nodes(void *blob, const char *const nodes_path[], int size_array)
+{
+	int i = 0;
+	int rc;
+	int nodeoff;
+
+	for (i = 0; i < size_array; i++) {
+		nodeoff = fdt_path_offset(blob, nodes_path[i]);
+		if (nodeoff < 0)
+			continue; /* Not found, skip it */
+
+		debug("Found %s node\n", nodes_path[i]);
+
+		rc = fdt_del_node(blob, nodeoff);
+		if (rc < 0) {
+			printf("Unable to delete node %s, err=%s\n",
+			       nodes_path[i], fdt_strerror(rc));
+		} else {
+			printf("Delete node %s\n", nodes_path[i]);
+		}
+	}
+
+	return 0;
+}
+
+static int disable_npu_nodes(void *blob)
+{
+	static const char * const nodes_path_npu[] = {
+		"/ethosu",
+		"/reserved-memory/ethosu_region@C0000000"
+	};
+
+	return delete_fdt_nodes(blob, nodes_path_npu, ARRAY_SIZE(nodes_path_npu));
+}
+
 struct low_drive_freq_entry {
 	const char *node_path;
 	u32 clk;
@@ -682,6 +717,8 @@ static int low_drive_freq_update(void *blob)
 
 	/* Update kernel dtb clocks for low drive mode */
 	struct low_drive_freq_entry table[] = {
+		{"/soc@0/lcd-controller@4ae30000", 2, 200000000},
+		{"/soc@0/bus@42800000/camera/isi@4ae40000", 0, 200000000},
 		{"/soc@0/bus@42800000/mmc@42850000", 0, 266666667},
 		{"/soc@0/bus@42800000/mmc@42860000", 0, 266666667},
 		{"/soc@0/bus@42800000/mmc@428b0000", 0, 266666667},
@@ -700,6 +737,35 @@ static int low_drive_freq_update(void *blob)
 	return 0;
 }
 
+static int disable_lpm(void *blob)
+{
+	int rc;
+	char path[64];
+	static const char *compat_lpm = "nxp,imx93-lpm";
+
+	int offset = fdt_node_offset_by_compatible(blob, -1, compat_lpm);
+
+	if (offset < 0) {
+		printf("node with compatible \"%s\" not found\n", compat_lpm);
+		return 0;
+	}
+
+	rc = fdt_get_path(blob, offset, path, sizeof(path));
+	if (rc) {
+		printf("Fail to get lpm node path, err=%s\n", fdt_strerror(rc));
+		return -ENOENT;
+	}
+
+	rc = fdt_del_node(blob, offset);
+	if (rc < 0)
+		printf("Unable to delete lpm node %s, err=%s\n",
+		       path, fdt_strerror(rc));
+	else
+		printf("Delete node %s\n", path);
+
+	return 0;
+}
+
 #if defined(CONFIG_OF_BOARD_FIXUP) && !defined(CONFIG_TARGET_PHYCORE_IMX93)
 #ifndef CONFIG_XPL_BUILD
 int board_fix_fdt(void *fdt)
@@ -710,6 +776,7 @@ int board_fix_fdt(void *fdt)
 		int i;
 
 		struct low_drive_freq_entry table[] = {
+			{"/soc@0/lcd-controller@4ae30000", 0, 200000000},
 			{"/soc@0/bus@42800000/mmc@42850000", 0, 266666667},
 			{"/soc@0/bus@42800000/mmc@42860000", 0, 266666667},
 			{"/soc@0/bus@42800000/mmc@428b0000", 0, 266666667},
@@ -741,8 +808,14 @@ int ft_system_setup(void *blob, struct bd_info *bd)
 	if (is_imx9351() || is_imx9331() || is_imx9321() || is_imx9311() || is_imx9301())
 		disable_cpu_nodes(blob, nodes_path, 1, 2);
 
-	if (is_voltage_mode(VOLT_LOW_DRIVE))
+	if (is_imx9332() || is_imx9331() || is_imx9312() || is_imx9311() || is_imx9302() ||
+	    is_imx9301())
+		disable_npu_nodes(blob);
+
+	if (is_voltage_mode(VOLT_LOW_DRIVE)) {
 		low_drive_freq_update(blob);
+		disable_lpm(blob);
+	}
 
 	return ft_add_optee_node(blob, bd);
 }
