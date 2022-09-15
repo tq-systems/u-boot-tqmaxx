@@ -141,13 +141,14 @@
 	"loadfdt=mmc dev ${mmcdev}; mmc rescan;" \
 		"load mmc ${mmcdev}:${mmcpart} ${fdt_addr} " \
 			"${mmcpath}${fdt_file}\0" \
+	"boot_os=booti ${loadaddr} - ${fdt_addr};\0" \
 	"mmcboot=echo Booting from mmc ...; " \
 		"setenv bootargs; " \
 		"run mmcargs; " \
 		"run loadimage; " \
 		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
 			"if run loadfdt; then " \
-				"booti ${loadaddr} - ${fdt_addr}; " \
+				"run boot_os; " \
 			"else " \
 				"echo WARN: Cannot load the DT; " \
 			"fi; " \
@@ -161,7 +162,7 @@
 		"${get_cmd} ${loadaddr} ${image}; " \
 		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
 			"if ${get_cmd} ${fdt_addr} ${fdt_file}; then " \
-				"booti ${loadaddr} - ${fdt_addr}; " \
+				"run boot_os; " \
 			"else " \
 				"echo WARN: Cannot load the DT; " \
 			"fi; " \
@@ -240,7 +241,7 @@
 			   "else run netboot; " \
 			   "fi; " \
 		   "fi; " \
-	   "else booti ${loadaddr} - ${fdt_addr}; fi"
+	   "else run boot_os; fi"
 #endif
 
 /* Link Definitions */

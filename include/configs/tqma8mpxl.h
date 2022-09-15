@@ -243,7 +243,7 @@
 			   "else run netboot; " \
 			   "fi; " \
 		   "fi; " \
-	   "else booti ${loadaddr} - ${fdt_addr}; fi"
+	   "else run boot_os; fi"
 #endif
 
 /* Link Definitions */
