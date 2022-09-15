@@ -4,6 +4,7 @@
  */
 
 #include "imx93-u-boot.dtsi"
+#include "imx93-9x9-qsb-ontat-wvga-panel.dtsi"
 
 / {
 	wdt-reboot {
@@ -238,4 +239,8 @@
 	assigned-clocks = <&clk IMX93_CLK_MEDIA_AXI>, <&clk IMX93_CLK_MEDIA_APB>;
 	assigned-clock-parents = <&clk IMX93_CLK_SYS_PLL_PFD1>, <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
 	assigned-clock-rates = <400000000>, <133333334>;
+};
+
+&parallel_disp_fmt {
+	/delete-property/ power-domains;
 };
