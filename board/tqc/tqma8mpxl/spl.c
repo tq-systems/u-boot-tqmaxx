@@ -47,7 +47,7 @@ extern struct dram_timing_info dram_timing_1gb_no_ecc;
 extern struct dram_timing_info dram_timing_2gb_no_ecc;
 #endif
 #if defined(CONFIG_TQMA8MPXL_RAM_4096MB)
-/* extern struct dram_timing_info dram_timing_4gb_no_ecc; */
+extern struct dram_timing_info dram_timing_4gb_no_ecc;
 #endif
 #if defined(CONFIG_TQMA8MPXL_RAM_8192MB)
 extern struct dram_timing_info dram_timing_8gb_no_ecc;
@@ -70,8 +70,7 @@ static struct dram_info tqma8mpxl_dram_info[]  = {
 	{ &dram_timing_2gb_no_ecc, SZ_1G * 2ULL },
 #endif
 #if defined(CONFIG_TQMA8MPXL_RAM_4096MB)
-/* TODO: timing not validated yet. */
-	{ 0, SZ_1G * 4ULL },
+	{ &dram_timing_4gb_no_ecc, SZ_1G * 4ULL },
 #endif
 #if defined(CONFIG_TQMA8MPXL_RAM_8192MB)
 	{ &dram_timing_8gb_no_ecc, SZ_1G * 8ULL },

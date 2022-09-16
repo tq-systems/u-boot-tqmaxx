@@ -1,6 +1,6 @@
 ## SPDX-License-Identifier: GPL-2.0-or-later
 ##
-## Copyright 2021 TQ-Systems GmbH
+## Copyright 2021 - 2022 TQ-Systems GmbH
 ##
 
 obj-y += tqma8mpxl.o tqma8mpxl-usbg.o
@@ -11,5 +11,6 @@ obj-y += spl.o
 obj-$(CONFIG_TQMA8MPXL_BB_MBA8MPXL) += spl-mba8mpxl.o
 obj-$(CONFIG_TQMA8MPXL_RAM_1024MB) += lpddr4_timing_1gb_no_ecc.o
 obj-$(CONFIG_TQMA8MPXL_RAM_2048MB) += lpddr4_timing_2gb_no_ecc.o
+obj-$(CONFIG_TQMA8MPXL_RAM_4096MB) += lpddr4_timing_4gb_no_ecc.o
 obj-$(CONFIG_TQMA8MPXL_RAM_8192MB) += lpddr4_timing_8gb_no_ecc.o
 endif
