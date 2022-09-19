@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * Copyright 2019 NXP
+ * Copyright (c) 2022 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Danny John
  *
  * Generated code from MX8M_DDR_tool
  *
