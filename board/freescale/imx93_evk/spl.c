@@ -152,7 +152,7 @@ void board_init_f(ulong dummy)
 	power_init_board();
 
 	if (!is_voltage_mode(VOLT_LOW_DRIVE))
-		set_arm_clk(get_cpu_speed_grade_hz());
+		set_arm_core_max_clk();
 
 	/* Init power of mix */
 	soc_power_init();
