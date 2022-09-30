@@ -27,7 +27,6 @@
 #define MCU_PADCFG_CTRL0_CFG0_BASE		0x04080000
 #define MCU_CTRL_MMR0_BASE			0x04500000
 #define CTRLMMR_MCU_RST_CTRL			0x04518170
-#define CTRLMMR_MCU_RST_SRC			0x04518178
 
 static void ctrl_mmr_unlock(void)
 {
@@ -169,31 +168,6 @@ static void enable_mcu_esm_reset(void)
 }
 #endif
 
-/*
- * The CPSW Ethernet controller occasionally hangs after power-on reset (in
- * approximately 1 of 1000 boots). As a workaround, reset the CPU as early as
- * possible after a power-on reset (cold boot).
- *
- * Unfortunately this means that cold and warm boot can't be distinguished by
- * reading the reset source register anymore.
- */
-static void workaround_cpsw_hang(void)
-{
-#ifdef CONFIG_CPU_V7R
-
-#define COLD_BOOT       0
-#define SW_POR_MCU      BIT(24)
-#define SW_POR_MAIN     BIT(25)
-#define SW_MCU_WARMRST	0x600
-
-	u32 rst_src = readl(CTRLMMR_MCU_RST_SRC);
-
-	if (rst_src == COLD_BOOT || rst_src & (SW_POR_MCU | SW_POR_MAIN))
-		writel(SW_MCU_WARMRST, CTRLMMR_MCU_RST_CTRL);
-
-#endif
-}
-
 void board_init_f(ulong dummy)
 {
 #if defined(CONFIG_K3_LOAD_SYSFW) || defined(CONFIG_K3_AM64_DDRSS) || defined(CONFIG_ESM_K3)
@@ -212,8 +186,6 @@ void board_init_f(ulong dummy)
 	store_boot_info_from_rom();
 
 	ctrl_mmr_unlock();
-
-	workaround_cpsw_hang();
 
 	/* Init DM early */
 	spl_early_init();
