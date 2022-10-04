@@ -22,11 +22,18 @@
 #include <dm/pinctrl.h>
 #include <mmc.h>
 #include <dm/root.h>
+#include <command.h>
 
 #ifdef CONFIG_SPL_BUILD
 #define MCU_PADCFG_CTRL0_CFG0_BASE		0x04080000
 #define MCU_CTRL_MMR0_BASE			0x04500000
 #define CTRLMMR_MCU_RST_CTRL			0x04518170
+#define SA2UL_BASE				0x40900000
+
+#define CTRLMMR_MCU_RST_SRC                    (MCU_CTRL_MMR0_BASE + 0x18178)
+#define COLD_BOOT                              0
+#define SW_POR_MCU                             BIT(24)
+#define SW_POR_MAIN                            BIT(25)
 
 static void ctrl_mmr_unlock(void)
 {
@@ -157,6 +164,43 @@ void do_dt_magic(void)
 }
 #endif
 
+/*
+ * Enable one region-based firewall with three regions:
+ * Region 5: Permissions: all (read, write, debug, cache)
+ * Region 1: Permissions: none
+ * Region 0: Permissions: all (read)
+ */
+const struct ti_sci_msg_fwl_region am642_sa2ul_fwls[] = {
+	/* SA2_UL0 - 1 Firewall with 3 Regions */
+	{
+		.fwl_id = 35,
+		.region = 5,
+		.n_permission_regs = 1,
+		.control = 0x31a,
+		.start_address =  0x0,
+		.end_address = 0xffffffff,
+		.permissions = { 0xc3ffff },
+	},
+	{
+		.fwl_id = 35,
+		.region = 0,
+		.n_permission_regs = 1,
+		.control = 0x1a,
+		.start_address = SA2UL_BASE,
+		.end_address = SA2UL_BASE + 0xfff,
+		.permissions = { 0xc32222 },
+	},
+	{
+		.fwl_id = 35,
+		.region = 1,
+		.n_permission_regs = 1,
+		.control = 0x1a,
+		.start_address = SA2UL_BASE + 0x1000,
+		.end_address = SA2UL_BASE + 0x1fff,
+		.permissions = { 0xc50000 },
+	},
+};
+
 #if defined(CONFIG_ESM_K3)
 static void enable_mcu_esm_reset(void)
 {
@@ -173,6 +217,7 @@ void board_init_f(ulong dummy)
 #if defined(CONFIG_K3_LOAD_SYSFW) || defined(CONFIG_K3_AM64_DDRSS) || defined(CONFIG_ESM_K3)
 	struct udevice *dev;
 	int ret;
+	int rst_src;
 #endif
 
 #ifdef CONFIG_CPU_V7R
@@ -217,6 +262,35 @@ void board_init_f(ulong dummy)
 			k3_mmc_restart_clock);
 #endif
 
+#if defined(CONFIG_CPU_V7R)
+	/*
+	 * Errata ID i2331 CPSW: A device lockup can occur during the second
+	 * read of any CPSW subsystem register after any MAIN domain power on
+	 * reset (POR). A MAIN domain POR occurs using the hardware MCU_PORz
+	 * signal, or via software using CTRLMMR_RST_CTRL.SW_MAIN_POR or
+	 * CTRLMMR_MCU_RST_CTRL.SW_MAIN_POR. After these resets, the processor
+	 * and internal bus structures may get into a state which is only
+	 * recoverable with full device reset using MCU_PORz.
+	 * Workaround(s): To avoid the lockup, a warm reset should be issued
+	 * after a MAIN domain POR and before any access to the CPSW registers.
+	 * The warm reset realigns internal clocks and prevents the lockup from
+	 * happening.
+	 */
+	ret = uclass_first_device_err(UCLASS_SYSRESET, &dev);
+	if (ret)
+		printf("\n%s:uclass device error [%d]\n",__func__,ret);
+
+	rst_src = readl(CTRLMMR_MCU_RST_SRC);
+	if (rst_src == COLD_BOOT || rst_src & (SW_POR_MCU | SW_POR_MAIN)) {
+		printf("Resetting on cold boot to workaround ErrataID:i2331\n");
+		do_reset(NULL, 0, 0, NULL);
+	}
+#endif
+
+#if defined(CONFIG_CPU_V7R) && !defined(CONFIG_TI_SECURE_DEVICE)
+	set_fwls(am642_sa2ul_fwls, ARRAY_SIZE(am642_sa2ul_fwls));
+#endif
+
 	/* Output System Firmware version info */
 	k3_sysfw_print_ver();
 
@@ -246,6 +320,7 @@ void board_init_f(ulong dummy)
 		if (uclass_get_device_by_driver(UCLASS_MISC, DM_GET_DRIVER(am65_cpsw_nuss), &cpswdev))
 			printf("Failed to probe am65_cpsw_nuss driver\n");
 	}
+	spl_enable_dcache();
 }
 
 u32 spl_mmc_boot_mode(const u32 boot_device)

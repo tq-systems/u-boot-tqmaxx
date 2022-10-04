@@ -108,6 +108,15 @@ void rtc_erratumi2327_init(void)
 }
 #endif
 
+static __maybe_unused void enable_mcu_esm_reset(void)
+{
+	/* Set CTRLMMR_MCU_RST_CTRL:MCU_ESM_ERROR_RST_EN_Z  to '0' (low active) */
+	u32 stat = readl(CTRLMMR_MCU_RST_CTRL);
+
+	stat &= RST_CTRL_ESM_ERROR_RST_EN_Z_MASK;
+	writel(stat, CTRLMMR_MCU_RST_CTRL);
+}
+
 void board_init_f(ulong dummy)
 {
 	struct udevice *dev;
@@ -187,6 +196,20 @@ void board_init_f(ulong dummy)
 	/* Output System Firmware version info */
 	k3_sysfw_print_ver();
 
+	if (IS_ENABLED(CONFIG_ESM_K3)) {
+		/* Probe/configure ESM0 */
+		ret = uclass_get_device_by_name(UCLASS_MISC, "esm@420000", &dev);
+		if (ret)
+			printf("esm main init failed: %d\n", ret);
+
+		/* Probe/configure MCUESM */
+		ret = uclass_get_device_by_name(UCLASS_MISC, "esm@4100000", &dev);
+		if (ret)
+			printf("esm mcu init failed: %d\n", ret);
+
+		enable_mcu_esm_reset();
+	}
+
 #if defined(CONFIG_K3_AM64_DDRSS)
 	ret = uclass_get_device(UCLASS_RAM, 0, &dev);
 	if (ret)
@@ -201,6 +224,7 @@ void board_init_f(ulong dummy)
 						&cpswdev))
 			printf("Failed to probe am65_cpsw_nuss driver\n");
 	}
+	spl_enable_dcache();
 }
 
 u32 spl_mmc_boot_mode(const u32 boot_device)
@@ -286,6 +310,9 @@ static u32 __get_primary_bootmedia(u32 devstat)
 
 	case BOOT_DEVICE_EMMC:
 		return BOOT_DEVICE_MMC1;
+
+	case BOOT_DEVICE_SERIAL_NAND:
+		return BOOT_DEVICE_SPINAND;
 
 	case BOOT_DEVICE_MMC:
 		if ((bootmode_cfg & MAIN_DEVSTAT_PRIMARY_MMC_PORT_MASK) >>
