@@ -128,7 +128,7 @@ choice
 	default TQMA8MPXL_RAM_MULTI
 	help
 	  Select RAM configuration. Normally use default here but for
-	  specific setup it is possible to us a single RAM size.
+	  specific setup it is possible to use a single RAM size.
 
 config TQMA8MPXL_RAM_MULTI
 	bool "TQMa8MPxL with 1/2/4/8 GB RAM - Single image without ECC"
