@@ -372,7 +372,12 @@ int ddr_init(struct dram_timing_info *dram_timing)
 
 	initial_drate = dram_timing->fsp_msg[0].drate;
 	/* default to the frequency point 0 clock */
-	ddrphy_init_set_dfi_clk(initial_drate);
+	ret = ddrphy_init_set_dfi_clk(initial_drate);
+	if (ret) {
+		pr_err("%s set dfi clk to %u MHz failed with %d\n",
+		       __func__, initial_drate, ret);
+		return ret;
+	}
 
 #if defined(CONFIG_IMX_SNPS_DDR_PHY_QB)
 	/* Configure PHY in QuickBoot mode */

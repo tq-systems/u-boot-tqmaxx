@@ -340,7 +340,12 @@ int ddr_init(struct dram_timing_info *dram_timing)
 	initial_drate = dram_timing->fsp_msg[0].drate;
 	/* default to the frequency point 0 clock */
 	printf("DDRINFO: DRAM rate %dMTS\n", initial_drate);
-	ddrphy_init_set_dfi_clk(initial_drate);
+	ret = ddrphy_init_set_dfi_clk(initial_drate);
+	if (ret) {
+		pr_err("%s set dfi clk to %u MHz failed with %d\n",
+		       __func__, initial_drate, ret);
+		return ret;
+	}
 
 	/* D-aasert the presetn */
 	reg32_write(SRC_DDRC_RCR_ADDR, 0x8F000006);
