@@ -95,7 +95,7 @@ void ddrc_inline_ecc_scrub_end(unsigned int start_address,
 
 /* utils function for ddr phy training */
 int wait_ddrphy_training_complete(void);
-void ddrphy_init_set_dfi_clk(unsigned int drate);
+int ddrphy_init_set_dfi_clk(unsigned int drate);
 void ddrphy_init_read_msg_block(enum fw_type type);
 
 void get_trained_CDD(unsigned int fsp);

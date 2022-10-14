@@ -104,8 +104,10 @@ int wait_ddrphy_training_complete(void)
 	}
 }
 
-void ddrphy_init_set_dfi_clk(unsigned int drate)
+int ddrphy_init_set_dfi_clk(unsigned int drate)
 {
+	int ret = 0;
+
 	switch (drate) {
 	case 4000:
 		dram_pll_init(MHZ(1000));
@@ -160,8 +162,10 @@ void ddrphy_init_set_dfi_clk(unsigned int drate)
 		dram_enable_bypass(MHZ(100));
 		break;
 	default:
-		return;
+		ret = -EINVAL;
 	}
+
+	return ret;
 }
 
 void ddrphy_init_read_msg_block(enum fw_type type)
