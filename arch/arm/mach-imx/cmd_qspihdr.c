@@ -234,6 +234,7 @@ static int do_qspihdr_check(int argc, char * const argv[], int flag)
 	unsigned long addr;
 	char *endp;
 	void *tmp;
+	int ret;
 
 #if defined(CONFIG_MX6) || defined(CONFIG_MX7) || defined(CONFIG_ARCH_MX7ULP)
 	int off = QSPI_HDR_OFF + QSPI_HDR_TAG_OFF;
@@ -265,7 +266,11 @@ static int do_qspihdr_check(int argc, char * const argv[], int flag)
 			return 1;
 		}
 	} else {
-		spi_flash_read(flash, off, 4, &buf);
+		ret = spi_flash_read(flash, off, 4, &buf);
+		if (ret) {
+			printf("flash read failed, ret: %d\n", ret);
+			return -1;
+		}
 
 		if (buf == tag) {
 			if (flag & FLAG_VERBOSE)
@@ -397,6 +402,7 @@ static int do_qspihdr_dump(int argc, char * const argv[])
 	char *endp;
 	void *tmp;
 	void *buf;
+	int ret;
 
 #if defined(CONFIG_MX6) || defined(CONFIG_MX7) || defined(CONFIG_ARCH_MX7ULP)
 	int off = QSPI_HDR_OFF;
@@ -430,7 +436,11 @@ static int do_qspihdr_dump(int argc, char * const argv[])
 			return 0;
 		}
 
-		spi_flash_read(flash, off, HDR_LEN, buf);
+		ret = spi_flash_read(flash, off, HDR_LEN, buf);
+		if (ret) {
+			printf("flash read failed, ret: %d\n", ret);
+			return -1;
+		}
 
 		hdr_dump(buf);
 		free(buf);
