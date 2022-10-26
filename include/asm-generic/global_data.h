@@ -23,8 +23,10 @@
 #include <fdtdec.h>
 #include <membuff.h>
 #include <linux/list.h>
+#if !defined(CONFIG_RZF_DEV)
 #include <linux/build_bug.h>
 #include <asm-offsets.h>
+#endif
 
 struct acpi_ctx;
 struct driver_rt;
@@ -466,8 +468,10 @@ struct global_data {
 	char *smbios_version;
 #endif
 };
+#if !defined(CONFIG_RZF_DEV)
 #ifndef DO_DEPS_ONLY
 static_assert(sizeof(struct global_data) == GD_SIZE);
+#endif
 #endif
 
 /**
