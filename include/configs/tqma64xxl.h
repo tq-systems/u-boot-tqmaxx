@@ -114,6 +114,7 @@
 
 #define EXTRA_ENV_TQMA64XXL_SETTINGS_NET \
 	"autoload=no\0" \
+	"netdev=eth0\0" \
 	"ipmode=static\0" \
 	"rootpath=/srv/nfs/tqma64xxl\0" \
 	"args_net_static=setenv bootargs ${bootargs} " \
