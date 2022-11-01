@@ -10,6 +10,12 @@
 #include <dt-bindings/phy/phy.h>
 #include "k3-am642-r5-tqma64xxl.dtsi"
 
+/ {
+	/* Stub section to allow k3-am642-tqma64xxl-mbax4xxl-u-boot.dtsi to apply */
+	reg_sd: regulator-sd {
+	};
+};
+
 &main_uart0 {
 	/delete-property/ power-domains;
 	/delete-property/ clocks;

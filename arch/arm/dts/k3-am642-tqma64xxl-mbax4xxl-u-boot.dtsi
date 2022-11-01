@@ -47,6 +47,7 @@
 
 &sdhci1 {
 	u-boot,dm-spl;
+	vmmc-supply = <&reg_sd>;
 	no-sdio;
 	status = "okay";
 };
