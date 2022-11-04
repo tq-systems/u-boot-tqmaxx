@@ -1,0 +1,325 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (c) 2022-2024 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
+ */
+
+#include <cpu_func.h>
+#include <hang.h>
+#include <image.h>
+#include <init.h>
+#include <log.h>
+#include <serial.h>
+#include <spl.h>
+#include <asm/global_data.h>
+#include <asm/sections.h>
+#include <asm/arch/clock.h>
+#include <asm/arch/ddr.h>
+#include <asm/arch/mu.h>
+#include <asm/arch/sys_proto.h>
+#include <asm/arch/trdc.h>
+#include <asm/mach-imx/boot_mode.h>
+#include <asm/mach-imx/ele_api.h>
+#include <dm/device.h>
+#include <power/pmic.h>
+#include <power/pca9450.h>
+
+#include "../common/tq_bb.h"
+#include "../common/tq_eeprom.h"
+
+DECLARE_GLOBAL_DATA_PTR;
+
+/* DDR timing / configurtation generated with NXP DDR Tool */
+extern struct dram_timing_info tqma93xxca_dram_timing_1gb;
+extern struct dram_timing_info tqma93xxla_dram_timing_1gb;
+extern struct dram_timing_info tqma93xxla_dram_timing_1gb5;
+extern struct dram_timing_info tqma93xxca_dram_timing_2gb;
+extern struct dram_timing_info tqma93xxla_dram_timing_2gb;
+
+enum tqma93xxxa_ram_size {
+	TQMA93XXXA_RAM_SIZE_1G = 1,
+	TQMA93XXXA_RAM_SIZE_1G5,
+	TQMA93XXXA_RAM_SIZE_2G,
+};
+
+struct dram_info {
+	struct dram_timing_info	*table;  /* from NXP RPA */
+	phys_size_t		size;    /* size of RAM */
+	char			variant; /* char to help user query */
+};
+
+static const struct dram_info tqma93xx_dram_info[]  = {
+	{ &tqma93xxca_dram_timing_1gb, SZ_1G * 1ULL, 'c' },
+	{ &tqma93xxca_dram_timing_2gb, SZ_1G * 2ULL, 'c' },
+	{ &tqma93xxla_dram_timing_1gb, SZ_1G * 1ULL, 'l' },
+	{ &tqma93xxla_dram_timing_1gb5, SZ_512M * 3ULL, 'l' },
+	{ &tqma93xxla_dram_timing_2gb, SZ_1G * 2ULL, 'l' },
+};
+
+static int tqma93xx_ram_timing_idx = -1;
+
+static struct tq_vard vard;
+
+static inline bool is_valid_dram_entry(int idx)
+{
+	if (idx < 0 || idx >= ARRAY_SIZE(tqma93xx_dram_info))
+		return false;
+	if (!tqma93xx_dram_info[idx].table)
+		return false;
+
+	return true;
+}
+
+static int handle_vard(void)
+{
+	if (tq_vard_read(&vard))
+		puts("ERROR: vard read\n");
+	else if (!tq_vard_valid(&vard))
+		puts("ERROR: vard CRC\n");
+	else
+		return (int)(vard.memtype & VARD_MEMTYPE_MASK_TYPE);
+
+	return VARD_MEMTYPE_DEFAULT;
+};
+
+static int tqma93xx_query_ddr_timing(void)
+{
+	char sel = '-';
+	char var = '-';
+	enum tqma93xxxa_ram_size ramsize_choice;
+	phys_size_t ramsize;
+	int idx;
+
+	puts("Warning: no valid EEPROM!\n"
+	     "Please choose LPDDR size to proceed.\n"
+	     "1 -   1 GiB\n"
+	     "2 - 1.5 GiB\n"
+	     "3 -   2 GiB\n");
+
+	for (;;) {
+		/* Flush input */
+		while (serial_tstc())
+			serial_getc();
+
+		sel = serial_getc();
+		putc('\n');
+
+		if ((sel == '1') || (sel == '2') || (sel == '3'))
+			break;
+
+		puts("Please enter a valid size.\n");
+	}
+
+	/*
+	 * We expect ASCII codes from the terminal. So we can easily subtract
+	 * to get the choice.
+	 */
+	ramsize_choice = (unsigned int)sel - (unsigned int)'0';
+
+	switch (ramsize_choice) {
+	case TQMA93XXXA_RAM_SIZE_1G:
+		ramsize = (phys_size_t)1 * SZ_1G;
+		break;
+	case TQMA93XXXA_RAM_SIZE_1G5:
+		ramsize = (phys_size_t)3 * SZ_512M;
+		break;
+	case TQMA93XXXA_RAM_SIZE_2G:
+		ramsize = (phys_size_t)2 * SZ_1G;
+		break;
+	default:
+		puts("ERROR: no valid RAM size given, stop\n");
+		hang();
+	}
+
+	puts("Warning: no valid EEPROM!\n"
+	     "Please enter form factor to proceed.\n"
+	     "Valid are l (LGA variant) and c (click in variant).\n");
+
+	for (;;) {
+		/* Flush input */
+		while (serial_tstc())
+			serial_getc();
+
+		var = serial_getc();
+		putc('\n');
+
+		if ((var == 'l') || (var == 'c'))
+			break;
+
+		puts("Please enter a valid variant.\n");
+	}
+
+	for (idx = 0; idx < ARRAY_SIZE(tqma93xx_dram_info); ++idx) {
+		if (ramsize == tqma93xx_dram_info[idx].size &&
+		    var == tqma93xx_dram_info[idx].variant)
+			break;
+	}
+
+	if (!is_valid_dram_entry(idx)) {
+		puts("ERROR: no valid RAM timing or timing not in image, stop\n");
+		hang();
+	}
+
+	return idx;
+}
+
+static void spl_dram_init(int memtype)
+{
+	int idx = -1;
+	char variant;
+
+	switch (tq_vard_get_formfactor(&vard)) {
+	case VARD_FORMFACTOR_TYPE_LGA:
+		variant = 'l';
+		break;
+	case VARD_FORMFACTOR_TYPE_CONNECTOR:
+		variant = 'c';
+		break;
+	default:
+		variant = '-';
+		break;
+	}
+
+	if (memtype == 1) {
+		phys_size_t ramsize = tq_vard_ramsize(&vard);
+
+		for (idx = 0; idx < ARRAY_SIZE(tqma93xx_dram_info); ++idx) {
+			if (ramsize == tqma93xx_dram_info[idx].size &&
+			    variant == tqma93xx_dram_info[idx].variant)
+				break;
+		}
+		if (!is_valid_dram_entry(idx))
+			puts("DRAM init: no matching timing\n");
+	} else if (vard.memtype == VARD_MEMTYPE_DEFAULT) {
+		puts("DRAM init: vard invalid?\n");
+	} else {
+		printf("DRAM init: unknown RAM type %u\n",
+		       (unsigned int)vard.memtype);
+	}
+
+	if (!is_valid_dram_entry(idx))
+		idx = tqma93xx_query_ddr_timing();
+
+	if (!is_valid_dram_entry(idx)) {
+		puts("ERROR: no valid ram configuration, please reset\n");
+		hang();
+	}
+
+	ddr_init(tqma93xx_dram_info[idx].table);
+	tqma93xx_ram_timing_idx = idx;
+}
+
+int spl_board_boot_device(enum boot_device boot_dev_spl)
+{
+	return BOOT_DEVICE_BOOTROM;
+}
+
+void spl_board_init(void)
+{
+	int ret;
+
+	if (is_usb_boot())
+		puts("USB Boot\n");
+	else
+		puts("Normal Boot\n");
+
+	ret = ele_start_rng();
+	if (ret)
+		printf("Fail to start RNG: %d\n", ret);
+
+	tq_bb_spl_board_init();
+	if (!(is_valid_dram_entry(tqma93xx_ram_timing_idx))) {
+		printf("ERROR: no valid ram configuration, please reset\n");
+		hang();
+	}
+}
+
+static int power_init_board(void)
+{
+	if (CONFIG_IS_ENABLED(DM_PMIC_PCA9450)) {
+		struct udevice *dev;
+		int ret;
+
+		ret = pmic_get("pmic@25", &dev);
+		if (ret == -ENODEV) {
+			puts("ERROR: pca9450@25 not found\n");
+			return 0;
+		}
+		if (ret != 0) {
+			pr_err("ERROR: request pca9450@25 %d\n", ret);
+			return ret;
+		}
+
+		/* BUCKxOUT_DVS0/1 control BUCK123 output */
+		pmic_reg_write(dev, PCA9450_BUCK123_DVS, 0x29);
+
+		/* TODO: LOW_DRIVE_MODE / OVERDRIVE + PWRCTRL_TOFF_DEB -> imx93-evk */
+
+		/* enable DVS control through PMIC_STBY_REQ */
+		pmic_reg_write(dev, PCA9450_BUCK1CTRL, 0x59);
+		/* 0.9 V */
+		pmic_reg_write(dev, PCA9450_BUCK1OUT_DVS0, 0x18);
+		pmic_reg_write(dev, PCA9450_BUCK3OUT_DVS0, 0x18);
+		/* set standby voltage to 0.65v */
+		pmic_reg_write(dev, PCA9450_BUCK1OUT_DVS1, 0x4);
+
+		/* I2C_LT_EN*/
+		pmic_reg_write(dev, 0xa, 0x3);
+
+		/* set WDOG_B_CFG to cold reset */
+		pmic_reg_write(dev, PCA9450_RESET_CTRL, 0xA1);
+	}
+
+	return 0;
+}
+
+void board_init_f(ulong dummy)
+{
+	int ret;
+	int ramtype;
+
+	/* Clear the BSS. */
+	memset(__bss_start, 0, __bss_end - __bss_start);
+
+	timer_init();
+
+	arch_cpu_init();
+
+	board_early_init_f();
+
+	spl_early_init();
+
+	preloader_console_init();
+
+	ret = imx9_probe_mu();
+	if (ret) {
+		printf("ERROR: init ELE API %d\n", ret);
+	} else {
+		printf("SOC rev:   0x%x\n", gd->arch.soc_rev);
+		printf("lifecycle: 0x%x\n", gd->arch.lifecycle);
+	}
+
+	power_init_board();
+
+	if (!IS_ENABLED(CONFIG_IMX9_LOW_DRIVE_MODE))
+		set_arm_core_max_clk();
+
+	/* Init power of mix */
+	soc_power_init();
+
+	/* Setup TRDC for DDR access */
+	trdc_init();
+
+	/* DDR initialization */
+	ramtype = handle_vard();
+	tq_vard_show(&vard);
+	spl_dram_init(ramtype);
+
+	/* Put M33 into CPUWAIT for following kick */
+	ret = m33_prepare();
+	if (ret)
+		printf("ERROR: M33 prepare %d\n", ret);
+
+	board_init_r(NULL, 0);
+}
