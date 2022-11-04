@@ -1,0 +1,49 @@
+if TARGET_TQMA93XX
+
+config SYS_BOARD
+	default "tqma93xx"
+
+config SYS_VENDOR
+	default "tq"
+
+config SYS_CONFIG_NAME
+	default "tqma93xx"
+
+config TQMA93XX_DEFAULTS
+	bool
+	select IMX93
+	select IMX9_LPDDR4X
+	select TQ_BB
+	select TQ_EEPROM
+	select TQ_RTC
+	select TQ_SDMMC
+	imply I2C_EEPROM
+
+choice
+	prompt "TQMa93xx mainboard variant"
+	default TQMA93XX_BB_MBA93XXCA
+	help
+	  Select mainboard variant for the SOM. Default is the
+	  starterkit.
+
+config TQMA93XX_BB_MBA93XXCA
+	bool "MBa93xxCA starterkit"
+	select DM_GPIO
+	select ENV_IS_NOWHERE
+	select TQMA93XX_DEFAULTS
+	help
+	  Select the MBa93xxCA starterkit. The evaluation board can
+	  demonstrate most of the features of the SOM and CPU and can be
+	  used for LGA and connector SOM variants
+
+endchoice
+
+config MTDPARTS_DEFAULT
+	default "mtdparts=425e0000.spi:4m@0k(bootstream),64k@4096k(env0),64k@4160k(env1),-@6m(ubi)"
+
+config MTDIDS_DEFAULT
+	default "nor0=425e0000.spi"
+
+source "board/tq/common/Kconfig"
+
+endif
