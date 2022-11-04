@@ -27,9 +27,12 @@ config TARGET_IMX93_11X11_EVK
 	bool "imx93_11x11_evk"
 	select IMX93
 
+config TARGET_TQMA9XXX
+	bool "TQMa9xxx family of SOM"
+
 endchoice
 
 source "board/freescale/imx93_evk/Kconfig"
+source "board/tq/tqma9xxx/Kconfig"
 
 endif
-

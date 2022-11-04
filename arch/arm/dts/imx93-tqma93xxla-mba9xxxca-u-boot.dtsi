@@ -1,0 +1,181 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Copyright 2022 TQ-Systems GmbH
+ */
+
+/ {
+	aliases {
+		i2c_eeprom0 = &eeprom0;
+	};
+
+	config {
+		u-boot,mmc-env-offset = <0x400000>;
+		u-boot,mmc-env-offset-redundant = <0x408000>;
+	};
+
+	wdt-reboot {
+		compatible = "wdt-reboot";
+		wdt = <&wdog3>;
+		u-boot,dm-spl;
+	};
+
+	firmware {
+		optee {
+			compatible = "linaro,optee-tz";
+			method = "smc";
+		};
+	};
+};
+
+&{/soc@0} {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&aips1 {
+	u-boot,dm-spl;
+	u-boot,dm-pre-reloc;
+};
+
+&aips2 {
+	u-boot,dm-spl;
+};
+
+&aips3 {
+	u-boot,dm-spl;
+};
+
+&iomuxc {
+	u-boot,dm-spl;
+};
+
+&reg_usdhc2_vmmc {
+	u-boot,off-on-delay-us = <20000>;
+	u-boot,dm-spl;
+};
+
+&pinctrl_reg_usdhc2_vmmc {
+	u-boot,dm-spl;
+};
+
+&pinctrl_uart1 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc2_gpio {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc2 {
+	u-boot,dm-spl;
+};
+
+&gpio1 {
+	u-boot,dm-spl;
+};
+
+&gpio2 {
+	u-boot,dm-spl;
+};
+
+&gpio3 {
+	u-boot,dm-spl;
+};
+
+&gpio4 {
+	u-boot,dm-spl;
+};
+
+&lpuart1 {
+	u-boot,dm-spl;
+	clocks = <&clk IMX93_CLK_LPUART1_GATE>, <&clk IMX93_CLK_LPUART1_GATE>;
+	clock-names = "ipg", "per";
+};
+
+&usdhc1 {
+	u-boot,dm-spl;
+	mmc-hs400-1_8v;
+	mmc-hs400-enhanced-strobe;
+	/*
+	 * prevents voltage switch warn: driver will switch even at
+	 * fixed voltage
+	 */
+	/delete-property/ vmmc-supply;
+	/delete-property/ vqmmc-supply;
+};
+
+&usdhc2 {
+	u-boot,dm-spl;
+	fsl,signal-voltage-switch-extra-delay-ms = <8>;
+	sd-uhs-sdr104;
+	sd-uhs-ddr50;
+};
+
+&lpi2c1 {
+	u-boot,dm-spl;
+};
+
+&lpi2c3 {
+	u-boot,dm-spl;
+};
+
+&lpi2c5 {
+	u-boot,dm-spl;
+};
+
+&pca9451a {
+	u-boot,dm-spl;
+};
+
+&pca9451a_regulators {
+	u-boot,dm-spl;
+};
+
+&pinctrl_lpi2c1 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_lpi2c3 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_lpi2c5 {
+	u-boot,dm-spl;
+};
+
+&s4muap {
+	u-boot,dm-spl;
+	status = "okay";
+};
+
+&clk {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+	/delete-property/ assigned-clocks;
+	/delete-property/ assigned-clock-rates;
+};
+
+&osc_32k {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&osc_24m {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&clk_ext1 {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&flexspi {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&pinctrl_flexspi {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};

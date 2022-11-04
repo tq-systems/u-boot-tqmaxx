@@ -1,0 +1,60 @@
+if TARGET_TQMA9XXX
+
+config SYS_BOARD
+	default "tqma9xxx"
+
+config SYS_VENDOR
+	default "tq"
+
+config SYS_CONFIG_NAME
+	default "tqma9xxx"
+
+config TQMA9XXX_DEFAULTS
+	bool
+	select TQ_EEPROM
+	select TQ_RTC
+	select TQ_SDMMC
+	select TQ_BB
+	imply I2C_EEPROM
+
+choice
+	prompt "TQMa9XXX SOM variant"
+	default TQMA93XXLA
+	help
+	  Select board variant. There are multiple variants of the SOM
+	  having the same features but needs slightly different config
+	  options
+
+config TQMA93XXLA
+	bool "TQMA93XX LGA with LPDDR4X"
+	select IMX93
+	select IMX9_LPDDR4X
+	select TQMA9XXX_DEFAULTS
+	help
+	  Select the TQMA93XX LGA variant. This features i.MX93 in
+	  11x11 mm package with LPDDR4, PMIC, e-MMC and optionally
+	  SPI-NOR, EEPROM, IMU, RTC, EEPROM
+
+endchoice
+
+choice
+	prompt "TQMa9XXX mainboard variant"
+	default TQMa9XXX_BB_MBA9XXXCA if TQMA93XXLA
+	help
+	  Select mainboard variant for the SOM. Default is the
+	  starterkit.
+
+config TQMa9XXX_BB_MBA9XXXCA
+	bool "MBA9XXXCA starterkit"
+	depends on TQMA93XXLA
+	select DM_GPIO
+	select ENV_IS_NOWHERE
+	help
+	  Select the MBA9XXXCA starterkit. The evaluation board can
+	  demonstrate most of the features of the SOM and CPU
+
+endchoice
+
+source "board/tq/common/Kconfig"
+
+endif
