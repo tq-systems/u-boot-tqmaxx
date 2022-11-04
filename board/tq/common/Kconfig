@@ -1,0 +1,3 @@
+config TQ_BB
+	bool
+	default y
