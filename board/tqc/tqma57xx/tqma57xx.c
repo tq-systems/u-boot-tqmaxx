@@ -76,41 +76,25 @@ void emif_get_dmm_regs(const struct dmm_lisa_map_regs **dmm_lisa_regs)
  * TQMA571x: DRA722-GP ES2.0
  * TQMa572x: DRA752-GP ES2.0
  * TQMa574x: DRA762-GP ES1.0 ABZ package
+ *
+ * TODO: Should check VARD data in EEPROM
  */
-	if (tqc_has_memsize(TQC_VARD_MEMSIZE_1G)) {
-		switch(omap_revision()) {
-		case DRA722_ES2_0:
-			*dmm_lisa_regs = &tqma571x_lisa_regs;
-			break;
-		default:
-			puts("VARD: Invalid MEMSIZE/CPU combination.\n");
-		}
-	} else if (tqc_has_memsize(TQC_VARD_MEMSIZE_2G)) {
-		switch(omap_revision()) {
-		case DRA752_ES2_0:
-			*dmm_lisa_regs = &tqma572x_lisa_regs;
-			break;
-		case DRA762_ABZ_ES1_0:
-			*dmm_lisa_regs = &tqma574x_lisa_regs;
-			break;
-		default:
-			puts("VARD: Invalid MEMSIZE/CPU combination.\n");
-		}
-	} else {
-		puts("VARD: Invalid MEMSIZE data, fallback to omap_rev()\n");
-		switch(omap_revision()) {
-		case DRA722_ES2_0:
-			*dmm_lisa_regs = &tqma571x_lisa_regs;
-			break;
-		case DRA752_ES2_0:
-			*dmm_lisa_regs = &tqma572x_lisa_regs;
-			break;
-		case DRA762_ABZ_ES1_0:
-			*dmm_lisa_regs = &tqma574x_lisa_regs;
-			break;
-		default:
-			puts("VARD: Invalid omap_revision.\n");
-		}
+
+	switch(omap_revision()) {
+	case DRA722_ES2_0:
+		*dmm_lisa_regs = &tqma571x_lisa_regs;
+		break;
+	case DRA752_ES2_0:
+		*dmm_lisa_regs = &tqma572x_lisa_regs;
+		break;
+	case DRA762_ABZ_ES1_0:
+		*dmm_lisa_regs = &tqma574x_lisa_regs;
+		break;
+	default:
+		/* This error message is not printed, as the serial console has
+		 * not been initialized at this point */
+		puts("VARD: Invalid omap_revision.\n");
+		hang();
 	}
 }
 
