@@ -1729,7 +1729,7 @@
 	};
 
 	eqos: ethernet@5b050000 {
-		compatible = "fsl,imx-eqos";
+		compatible = "nxp,imx8mp-dwmac-eqos";
 		reg = <0x0 0x5b050000 0x0 0x10000>;
 		interrupt-parent = <&wu>;
 		interrupts = <GIC_SPI 163 IRQ_TYPE_LEVEL_HIGH>,

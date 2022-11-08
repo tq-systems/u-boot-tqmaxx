@@ -1106,7 +1106,7 @@
 			};
 
 			eqos: ethernet@428a0000 {
-				compatible = "nxp,imx93-dwmac-eqos", "snps,dwmac-5.10a";
+				compatible = "nxp,imx93-dwmac-eqos", "nxp,imx8mp-dwmac-eqos", "snps,dwmac-5.10a";
 				reg = <0x428a0000 0x10000>;
 				interrupts = <GIC_SPI 183 IRQ_TYPE_LEVEL_HIGH>,
 					     <GIC_SPI 184 IRQ_TYPE_LEVEL_HIGH>;
