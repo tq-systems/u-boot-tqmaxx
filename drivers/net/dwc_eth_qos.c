@@ -799,22 +799,6 @@ static int eqos_start(struct udevice *dev)
 	val = (rate / 1000000) - 1;
 	writel(val, &eqos->mac_regs->us_tic_counter);
 
-	/*
-	 * if PHY was already connected and configured,
-	 * don't need to reconnect/reconfigure again
-	 */
-	if (!eqos->phy) {
-		ret = eqos_phy_init(eqos, dev);
-		if (ret || !eqos->phy)
-			goto err_stop_resets;
-
-		ret = phy_config(eqos->phy);
-		if (ret < 0) {
-			pr_err("phy_config() failed: %d", ret);
-			goto err_shutdown_phy;
-		}
-	}
-
 	ret = phy_startup(eqos->phy);
 	if (ret < 0) {
 		pr_err("phy_startup() failed: %d", ret);
