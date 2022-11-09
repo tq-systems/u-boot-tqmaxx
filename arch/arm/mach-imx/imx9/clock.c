@@ -864,7 +864,7 @@ int do_showclocks(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[]
 	freq = mxc_get_clock(MXC_IPG_CLK);
 	printf("IPG    		%8d MHz\n", freq / 1000000);
 	freq = mxc_get_clock(MXC_UART_CLK);
-	printf("UART3          %8d MHz\n", freq / 1000000);
+	printf("UART1          %8d MHz\n", freq / 1000000);
 	freq = mxc_get_clock(MXC_ESDHC_CLK);
 	printf("USDHC1         %8d MHz\n", freq / 1000000);
 	freq = mxc_get_clock(MXC_FLEXSPI_CLK);
