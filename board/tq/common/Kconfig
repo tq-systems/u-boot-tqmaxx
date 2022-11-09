@@ -1,3 +1,7 @@
+config TQ_BB
+	bool
+	default y
+
 config TQ_BOARDGPIO
 	bool
 	default y if DM_GPIO

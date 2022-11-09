@@ -5,8 +5,8 @@
  * Author: Markus Niebel
  */
 
-#ifndef __TQC_BB__
-#define __TQC_BB__
+#ifndef __TQC_BB_H
+#define __TQC_BB_H
 
 struct mmc;
 struct bd_info;
