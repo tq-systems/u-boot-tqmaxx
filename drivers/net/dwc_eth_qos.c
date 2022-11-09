@@ -1547,7 +1547,8 @@ static int eqos_probe(struct udevice *dev)
 		eqos->mii->read = eqos_mdio_read;
 		eqos->mii->write = eqos_mdio_write;
 		eqos->mii->priv = eqos;
-		strcpy(eqos->mii->name, dev->name);
+		snprintf(eqos->mii->name, ARRAY_SIZE(eqos->mii->name),
+			 "%s-mdio", dev->name);
 
 		ret = mdio_register(eqos->mii);
 		if (ret < 0) {
