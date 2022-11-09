@@ -1,15 +1,29 @@
+config TQC_BB
+	bool
+	default y
+
 config TQC_EEPROM
 	bool
 	default n
 
-config TQC_VARD
-	bool
-	depends on TQC_EEPROM
-	select SPL_HASH_SUPPORT if SPL
-
 config TQC_EMMC
 	bool
 	default n
+
+#
+# This should be selected by boards that wish to support multiple env locations
+# select ENV_IS_NOWHERE to use as default if nothing matches.
+#
+config TQC_ENVLOC
+	bool
+	select ENV_IS_NOWHERE
+
+config TQC_RTC
+	bool
+
+config TQC_SCU
+	bool
+	default y if HAVE_SC_FIRMWARE
 
 config TQC_SDMMC
 	bool
@@ -19,17 +33,7 @@ config TQC_SPI_NOR
 	bool
 	default y if (SPI_FLASH && OF_BOARD_SETUP)
 
-config TQC_SCU
+config TQC_VARD
 	bool
-	default y if HAVE_SC_FIRMWARE
-
-config TQC_RTC
-	bool
-
-#
-# This should be selected by boards that wish to support multiple env locations
-# select ENV_IS_NOWHERE to use as default if nothing matches.
-#
-config TQC_ENVLOC
-	bool
-	select ENV_IS_NOWHERE
+	depends on TQC_EEPROM
+	select SPL_HASH_SUPPORT if SPL

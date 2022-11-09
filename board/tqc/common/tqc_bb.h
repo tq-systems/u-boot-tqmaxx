@@ -1,12 +1,12 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Copyright (c) 2013-2014, 2016-2022 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * Copyright (c) 2013-2014, 2016-2023 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
  * D-82229 Seefeld, Germany.
  * Author: Markus Niebel
  */
 
-#ifndef __TQC_BB__
-#define __TQC_BB__
+#ifndef __TQC_BB_H
+#define __TQC_BB_H
 
 #include <common.h>
 
@@ -55,7 +55,7 @@ void tqc_ft_spi_setup(void *blob, const char *path,
 		      size_t node_count);
 #endif /* defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT) */
 
-#if defined(CONFIG_TQC_RTC) && (CONFIG_DM_I2C)
+#if defined(CONFIG_TQC_RTC) && defined(CONFIG_DM_I2C)
 
 #define TQC_PCF85063_CLKOUT_OFF 0x07
 
