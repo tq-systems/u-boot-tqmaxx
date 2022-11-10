@@ -12,3 +12,7 @@ obj-$(CONFIG_TQ_COMMON_SOM) += tq_som.o
 obj-$(CONFIG_TQ_COMMON_SDMMC) += tq_sdmmc.o
 obj-$(CONFIG_TQ_COMMON_SPI_NOR) += tq_spi_nor.o
 obj-$(CONFIG_TQ_COMMON_VARD) += tq_som_features.o
+
+ifndef CONFIG_XPL_BUILD
+obj-$(CONFIG_TQ_COMMON_TCPC) += tcpc.o
+endif

@@ -37,3 +37,10 @@ config TQ_COMMON_VARD
 	select HASH
 	select SPL_HASH if SPL
 	select TQ_COMMON_EEPROM
+
+config TQ_COMMON_TCPC
+	bool "USB Type-C port controller simple driver"
+	help
+	  Enable NXP USB Type-C port controller (TCPC) driver.
+	  This supports Type-C direction detection and role switching
+	  with NXP PTN5110 IC.
