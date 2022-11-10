@@ -72,3 +72,8 @@ config TQ_VARD
 	select HASH
 	select SPL_HASH if SPL
 	select TQ_EEPROM
+
+config USB_TCPC
+	bool "USB Type-C port controller simple driver"
+	help
+	  Enable USB Type-C port controller (TCPC) driver
