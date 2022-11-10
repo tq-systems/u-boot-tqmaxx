@@ -237,7 +237,8 @@ class Builder:
                  mrproper=False, per_board_out_dir=False,
                  config_only=False, squash_config_y=False,
                  warnings_as_errors=False, work_in_output=False,
-                 test_thread_exceptions=False):
+                 test_thread_exceptions=False,
+                 allow_missing=False):
         """Create a new Builder object
 
         Args:
@@ -267,6 +268,8 @@ class Builder:
             test_thread_exceptions: Uses for tests only, True to make the
                 threads raise an exception instead of reporting their result.
                 This simulates a failure in the code somewhere
+            allow_missing: Run build with BINMAN_ALLOW_MISSING=1
+
         """
         self.toolchains = toolchains
         self.base_dir = base_dir
@@ -302,6 +305,8 @@ class Builder:
         self.squash_config_y = squash_config_y
         self.config_filenames = BASE_CONFIG_FILENAMES
         self.work_in_output = work_in_output
+        self.allow_missing = allow_missing
+
         if not self.squash_config_y:
             self.config_filenames += EXTRA_CONFIG_FILENAMES
 
