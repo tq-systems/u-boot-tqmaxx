@@ -341,11 +341,11 @@ static int do_tqeeprom(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]
 					      TQC_VARD_ADDR, 1, &dev);
 		if (ret) {
 			debug("%s: Cannot find I2C chip for bus %d\n",
-			      __func__, bus);
+			      __func__, TQC_VARD_BUS);
 			return ret;
 		}
 
-		ret = dm_i2c_write(dev, 0, addr,
+		ret = dm_i2c_write(dev, 0, (void *)addr,
 				   sizeof(struct tqc_eeprom_data));
 #else
 		oldbus = i2c_get_bus_num();
@@ -398,7 +398,7 @@ static int do_tqeeprom(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]
 							0x37, 1, &dev);
 			if (ret) {
 				debug("%s: Cannot find I2C chip for bus %d\n",
-			              __func__, bus);
+			              __func__, TQC_VARD_BUS);
 				return ret;
 			}
 
