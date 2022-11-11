@@ -126,9 +126,6 @@
 /* PMIC I2C bus number */
 #define CONFIG_SYS_SPD_BUS_NUM		0
 
-/* PCA9555 GPIO expander support */
-#define CONFIG_PCA953X
-
 /* SD/eMMC */
 #define CONFIG_SUPPORT_EMMC_BOOT
 #define CONFIG_HSMMC2_8BIT

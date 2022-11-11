@@ -288,6 +288,10 @@ void hw_data_init(void)
 	*ctrl = &dra7xx_ctrl;
 }
 
+__weak void gpi2c_init(void)
+{
+}
+
 int board_init(void)
 {
 	gpmc_init();
