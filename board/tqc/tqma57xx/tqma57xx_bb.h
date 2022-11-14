@@ -13,9 +13,11 @@
 
 const char *tqma57xx_bb_get_boardname(void);
 int tqma57xx_bb_recalibrate_iodelay(void);
+int tqma57xx_bb_board_init(void);
 int tqma57xx_bb_board_mmc_init(bd_t *bis);
 int tqma57xx_bb_board_eth_init(bd_t *bis);
 int tqma57xx_bb_board_usb_init(void);
 void tqma57xx_bb_board_late_init(void);
+int tqma57xx_bb_ft_board_setup(void *blob, bd_t *bd);
 
 #endif /* __TQMA57XX_BB__ */

@@ -292,15 +292,15 @@ __weak void gpi2c_init(void)
 {
 }
 
+#if !defined(CONFIG_SPL_BUILD)
 int board_init(void)
 {
 	gpmc_init();
 	gd->bd->bi_boot_params = (CONFIG_SYS_SDRAM_BASE + 0x100);
 
-	return 0;
+	return tqma57xx_bb_board_init();
 }
 
-#if !defined(CONFIG_SPL_BUILD)
 int board_late_init(void)
 {
 	u8 val;
@@ -771,5 +771,5 @@ int ft_board_setup(void *blob, bd_t *bd)
 		}
 	}
 
-	return 0;
+	return tqma57xx_bb_ft_board_setup(blob, bd);
 }

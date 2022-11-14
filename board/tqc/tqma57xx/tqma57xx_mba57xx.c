@@ -13,18 +13,22 @@
  */
 
 #include <common.h>
+#include <asm/gpio.h>
 #include <asm/omap_common.h>
 #include <asm/arch/omap.h>
 #include <asm/arch/dra7xx_iodelay.h>
 #include <asm/arch/mmc_host_def.h>
 #include <asm/arch/mux_dra7xx.h>
 #include <spl.h>
+#include <fdt_support.h>
 #include <i2c.h>
 
 #ifdef CONFIG_DRIVER_TI_CPSW
 #include <cpsw.h>
 #include <miiphy.h>
 #endif
+
+#include "../common/tqc_board_gpio.h"
 
 #define WAKEUP_ENA	(1 << 24)
 
@@ -394,6 +398,8 @@ const struct iodelay_cfg_entry iodelay_cfg_array_bb_tqma57xx[] = {
 };
 #endif
 
+static bool drive_pwr_en_1v1;
+
 const char *tqma57xx_bb_get_boardname(void)
 {
 	return "MBa57xx";
@@ -419,6 +425,55 @@ int tqma57xx_bb_recalibrate_iodelay(void)
 	ret = do_set_iodelay((*ctrl)->iodelay_config_base, bb_iod, bb_iod_sz);
 
 	return ret;
+}
+#endif
+
+#if !defined(CONFIG_SPL_BUILD)
+# ifdef CONFIG_DM_GPIO
+enum {
+	PWR_EN_1V1,
+	USB20_HUB_RST,
+	USB30_HUB_RST,
+};
+
+static struct tqc_gpio_init_data mba57xx_gpios[] = {
+
+	GPIO_INIT_DATA_ENTRY(PWR_EN_1V1, "gpio@21_2", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(USB20_HUB_RST, "gpio@21_12",
+			     GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE | GPIOD_ACTIVE_LOW),
+	GPIO_INIT_DATA_ENTRY(USB30_HUB_RST, "gpio@21_13",
+			     GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE | GPIOD_ACTIVE_LOW),
+};
+# endif
+
+int tqma57xx_bb_board_init(void)
+{
+# ifdef CONFIG_DM_GPIO
+	tqc_board_gpio_init(mba57xx_gpios, ARRAY_SIZE(mba57xx_gpios));
+
+	udelay(100);
+
+	/*
+	 * If the GPIO reads as 1, we are running on a hardware revision where
+	 * this pin is connected to VCC5V. Do not drive it in this case.
+	 */
+	if (dm_gpio_get_value(&mba57xx_gpios[PWR_EN_1V1].desc) == 0) {
+		drive_pwr_en_1v1 = true;
+		dm_gpio_set_dir_flags(&mba57xx_gpios[PWR_EN_1V1].desc,
+				      GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
+	}
+
+	/*
+	 * TUSB8041 wants 3ms from VDD stable to deassertion of reset. Add 2ms
+	 * for ramp-up to be save.
+	 */
+	udelay(5000);
+
+	dm_gpio_set_value(&mba57xx_gpios[USB20_HUB_RST].desc, 0);
+	dm_gpio_set_value(&mba57xx_gpios[USB30_HUB_RST].desc, 0);
+# endif
+
+	return 0;
 }
 #endif
 
@@ -571,4 +626,36 @@ void tqma57xx_bb_board_late_init(void)
 		}
 		printf("Setting fdtfile to %s\n", env_get("fdtfile"));
 	}
+}
+
+int tqma57xx_bb_ft_board_setup(void *blob, bd_t *bd)
+{
+	int offset;
+
+	/*
+	 * VCC1V1 workaround part 1 (for Kernel 5.4 and older)
+	 *
+	 * The regulator enable GPIO will drive against VCC5V on some board
+	 * revisions, and disable the USB hub supply on others. Disable it.
+	 */
+	offset = fdt_path_offset(blob, "/fixedregulator-vcc_1v1");
+	if (offset >= 0)
+		fdt_set_node_status(blob, offset, FDT_STATUS_DISABLED, 0);
+
+	if (drive_pwr_en_1v1) {
+		/*
+		* VCC1V1 workaround part 2 (for Kernel 5.10 and newer)
+		*
+		* To avoid driving against VCC5V, newer kernels hog the PWR_EN_1V1 pin
+		* as input. This will disable power for the on-board USB hub on board
+		* revisions that don't exhibit this issue. Adjust the hog when needed.
+		*/
+		offset = fdt_path_offset(blob, "i2c3/gpio@21/pwr_en_1v1");
+		if (offset >= 0) {
+			fdt_delprop(blob, offset, "input");
+			fdt_setprop_empty(blob, offset, "output-high");
+		}
+	}
+
+	return 0;
 }
