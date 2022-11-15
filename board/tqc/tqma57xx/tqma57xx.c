@@ -403,11 +403,13 @@ int board_late_init(void)
 
 		switch (boot_device) {
 		case BOOT_DEVICE_MMC1:
-			env_set("mmcblkdev", "0");
+			/* SD card */
+			env_set("mmcblkdev", "1");
 			env_set("mmcdev", "0");
 			break;
 		default:
-			env_set("mmcblkdev", "1");
+			/* eMMC */
+			env_set("mmcblkdev", "0");
 			env_set("mmcdev", "1");
 			break;
 		}
