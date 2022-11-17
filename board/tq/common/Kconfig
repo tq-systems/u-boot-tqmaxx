@@ -1,3 +1,11 @@
+#
+# This should be selected by boards that wish to support multiple env locations
+# select ENV_IS_NOWHERE to use as default if nothing matches.
+#
+config TQ_ENVLOC
+	bool
+	select ENV_IS_NOWHERE
+
 config TQ_RTC
 	bool
 
