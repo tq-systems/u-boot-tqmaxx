@@ -14,3 +14,11 @@ config TQ_COMMON_SDMMC
 
 config TQ_COMMON_SOM
 	bool
+
+#
+# This should be selected by boards that wish to support multiple env locations
+# select ENV_IS_NOWHERE to use as default if nothing matches.
+#
+config TQ_COMMON_ENVLOC
+	bool
+	select ENV_IS_NOWHERE
