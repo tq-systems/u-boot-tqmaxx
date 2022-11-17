@@ -37,4 +37,13 @@ struct bd_info;
 int tq_bb_ft_board_setup(void *blob, struct bd_info *bis);
 #endif /* defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT) */
 
+#if defined(CONFIG_TQ_RTC) && defined(CONFIG_DM_I2C)
+
+#define TQ_PCF85063_CLKOUT_OFF 0x07
+
+int tq_pcf85063_adjust_capacity(int bus, int address, int quartz_load);
+int tq_pcf85063_set_clkout(int bus, int address, uint8_t clkout);
+int tq_pcf85063_set_offset(int bus, int address, bool mode, int offset);
+#endif /* CONFIG_TQC_RTC */
+
 #endif /* __TQC_BB_H */

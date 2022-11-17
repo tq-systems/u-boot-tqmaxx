@@ -1,3 +1,6 @@
+config TQ_RTC
+	bool
+
 config TQ_SCU
 	bool
 	default y if HAVE_SC_FIRMWARE
