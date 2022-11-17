@@ -2,6 +2,9 @@ config TQ_BB
 	bool
 	default y
 
+config TQ_RTC
+	bool
+
 #
 # This is only for SOM with i.MX8X / i.MX8 to query information from SCU
 #
