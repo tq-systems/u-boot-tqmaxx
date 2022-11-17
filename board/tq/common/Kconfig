@@ -2,6 +2,11 @@ config TQ_BB
 	bool
 	default y
 
+config TQ_EEPROM
+	bool
+	select DM_I2C
+	select I2C_EEPROM
+
 #
 # This is only needed for boards with hardware revisions with/without serial
 # termination in eMMC signal lines. The code allows to decide upon the eMMC type
@@ -31,3 +36,9 @@ config TQ_SCU
 
 config TQ_SDMMC
 	bool
+
+config TQ_VARD
+	bool
+	select HASH
+	select SPL_HASH if SPL
+	select TQ_EEPROM
