@@ -3,6 +3,15 @@ config TQ_BB
 	default y
 
 #
+# This is only needed for boards with hardware revisions with/without serial
+# termination in eMMC signal lines. The code allows to decide upon the eMMC type
+# if serial termination is present or the optional DSR of the eMMC should be used
+# instead
+#
+config TQ_EMMC
+	bool
+
+#
 # This should be selected by boards that wish to support multiple env locations
 # select ENV_IS_NOWHERE to use as default if nothing matches.
 #
@@ -19,3 +28,6 @@ config TQ_RTC
 config TQ_SCU
 	bool
 	default y if IMX8
+
+config TQ_SDMMC
+	bool

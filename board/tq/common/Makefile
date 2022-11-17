@@ -6,6 +6,8 @@
 #
 
 obj-$(CONFIG_TQ_BB) += tq_bb.o
+obj-$(CONFIG_TQ_EMMC) += tq_emmc.o
 obj-$(CONFIG_TQ_ENVLOC) += tq_envloc.o
 obj-$(CONFIG_TQ_RTC) += tq_rtc.o
 obj-$(CONFIG_TQ_SCU) += tq_scu.o
+obj-$(CONFIG_TQ_SDMMC) += tq_sdmmc.o
