@@ -6,6 +6,8 @@
 #
 
 obj-$(CONFIG_TQ_COMMON_BB) += tq_bb.o
+obj-$(CONFIG_TQ_COMMON_EEPROM) += tq_eeprom.o
 obj-$(CONFIG_TQ_COMMON_ENVLOC) += tq_envloc.o
 obj-$(CONFIG_TQ_COMMON_SOM) += tq_som.o
 obj-$(CONFIG_TQ_COMMON_SDMMC) += tq_sdmmc.o
+obj-$(CONFIG_TQ_COMMON_VARD) += tq_som_features.o

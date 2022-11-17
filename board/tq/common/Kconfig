@@ -9,6 +9,11 @@ config TQ_COMMON_BB
 	bool
 	default y
 
+config TQ_COMMON_EEPROM
+	bool
+	select DM_I2C
+	select I2C_EEPROM
+
 config TQ_COMMON_SDMMC
 	bool
 
@@ -22,3 +27,9 @@ config TQ_COMMON_SOM
 config TQ_COMMON_ENVLOC
 	bool
 	select ENV_IS_NOWHERE
+
+config TQ_COMMON_VARD
+	bool
+	select HASH
+	select SPL_HASH if SPL
+	select TQ_COMMON_EEPROM
