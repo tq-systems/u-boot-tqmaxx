@@ -161,6 +161,7 @@ void reset_cpu(void)
 }
 #endif
 
+#if CONFIG_IS_ENABLED(WDT)
 static int ulp_wdt_start(struct udevice *dev, u64 timeout_ms, ulong flags)
 {
 	struct ulp_wdt_priv *priv = dev_get_priv(dev);
@@ -219,3 +220,4 @@ U_BOOT_DRIVER(ulp_wdt) = {
 	.probe		= ulp_wdt_probe,
 	.ops	= &ulp_wdt_ops,
 };
+#endif
