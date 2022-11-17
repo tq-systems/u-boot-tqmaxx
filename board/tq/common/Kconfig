@@ -41,6 +41,10 @@ config TQ_SCU
 config TQ_SDMMC
 	bool
 
+config TQ_SPI_NOR
+	bool
+	default y if (SPI_FLASH && OF_BOARD_SETUP)
+
 config TQ_VARD
 	bool
 	select HASH
