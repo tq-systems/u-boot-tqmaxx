@@ -21,6 +21,7 @@ enum som_feature {
 	FEATURE_RTC,		/**< discrete RTC */
 	FEATURE_SECELEM,	/**< secure element */
 	FEATURE_SPINOR,		/**< [Q]SPI NOR */
+	FEATURE_TEMP_DISCRETE,	/**< optional tewmp sensor */
 };
 
 /**
