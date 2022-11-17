@@ -28,6 +28,10 @@ config TQ_COMMON_ENVLOC
 	bool
 	select ENV_IS_NOWHERE
 
+config TQ_COMMON_SPI_NOR
+	bool
+	default y if (SPI_FLASH && OF_BOARD_SETUP)
+
 config TQ_COMMON_VARD
 	bool
 	select HASH
