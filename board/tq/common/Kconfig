@@ -1,3 +1,7 @@
+config TQ_EEPROM
+	bool
+	default n
+
 config TQ_EMMC
 	bool
 	default n
@@ -20,3 +24,8 @@ config TQ_SCU
 config TQ_SDMMC
 	bool
 	default n
+
+config TQ_VARD
+	bool
+	depends on TQC_EEPROM
+	select SPL_HASH_SUPPORT if SPL
