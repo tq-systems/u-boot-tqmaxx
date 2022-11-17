@@ -1,3 +1,7 @@
+config TQ_EMMC
+	bool
+	default n
+
 #
 # This should be selected by boards that wish to support multiple env locations
 # select ENV_IS_NOWHERE to use as default if nothing matches.
