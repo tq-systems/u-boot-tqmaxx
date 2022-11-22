@@ -6,12 +6,14 @@
  */
 
 #include <common.h>
+#include <bloblist.h>
 #include <command.h>
 #include <cpu_func.h>
 #include <hang.h>
 #include <image.h>
 #include <init.h>
 #include <log.h>
+#include <serial.h>
 #include <spl.h>
 #include <asm/global_data.h>
 #include <asm/io.h>
@@ -36,10 +38,116 @@
 #include <asm/arch/trdc.h>
 
 #include "../common/tq_bb.h"
+#include "../common/tq_blob.h"
+#include "../common/tq_eeprom.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
+/* SPL currently not working with DM, use old style I2C API */
+#define TQ_SYSTEM_EEPROM_BUS		0
+#define TQ_SYSTEM_EEPROM_ADDR		0x53
+
 extern struct dram_timing_info tqma93xxla_dram_timing;
+
+struct dram_info {
+	struct dram_timing_info	*table; /* from NXP RPA */
+	phys_size_t		size;   /* size of RAM */
+};
+
+static struct dram_info tqma9xxx_dram_info[]  = {
+	{ &tqma93xxla_dram_timing, SZ_1G * 1ULL },
+	/* reserved for 2 GB variant */
+	{ NULL, SZ_1G * 2ULL },
+};
+
+static int tqma9xxx_ram_timing_idx = -1;
+
+static struct tq_vard vard;
+
+static int handle_vard(void)
+{
+	if (tq_vard_read(TQ_SYSTEM_EEPROM_BUS, TQ_SYSTEM_EEPROM_ADDR, &vard))
+		puts("ERROR: vard read\n");
+	else if (!tq_vard_valid(&vard))
+		puts("ERROR: vard CRC\n");
+	else
+		return (int)(vard.memtype & VARD_MEMTYPE_MASK_TYPE);
+
+	return VARD_MEMTYPE_DEFAULT;
+};
+
+static int tqma9xxx_query_ddr_timing(void)
+{
+	char sel = '-';
+	phys_size_t ramsize;
+	int idx;
+
+	puts("Warning: no valid EEPROM!\n"
+		"Please enter LPDDR size in GByte to procced.\n"
+		"Valid sizes are 1 and 2.\n");
+
+	for (;;) {
+		/* Flush input */
+		while (serial_tstc())
+			serial_getc();
+
+		sel = serial_getc();
+		putc('\n');
+
+		if ((sel == '1') || (sel == '2'))
+			break;
+
+		puts("Please enter a valid size.\n");
+	}
+
+	ramsize = (phys_size_t)((unsigned int)sel - (unsigned int)('0')) * SZ_1G;
+	for (idx = 0; idx < ARRAY_SIZE(tqma9xxx_dram_info); ++idx) {
+		if (ramsize == tqma9xxx_dram_info[idx].size)
+			break;
+	}
+
+	if (idx >= ARRAY_SIZE(tqma9xxx_dram_info) ||
+	    !tqma9xxx_dram_info[idx].table) {
+		puts("ERROR: no valid RAM timing or timing not in image, stop\n");
+		hang();
+	}
+
+	return idx;
+}
+
+static void spl_dram_init(int memtype)
+{
+	int idx = -1;
+
+	/* normal configuration */
+	phys_size_t ramsize;
+
+	if (memtype == 1) {
+		ramsize = tq_vard_ramsize(&vard);
+		for (idx = 0; idx < ARRAY_SIZE(tqma9xxx_dram_info); ++idx) {
+			if (ramsize == tqma9xxx_dram_info[idx].size)
+				break;
+		}
+		if (idx >= ARRAY_SIZE(tqma9xxx_dram_info))
+			puts("DRAM init: no matching timing\n");
+	} else if (vard.memtype == VARD_MEMTYPE_DEFAULT) {
+		puts("DRAM init: vard invalid?\n");
+	} else {
+		printf("DRAM init: unknown RAM type %u\n",
+		       (unsigned int)vard.memtype);
+	}
+
+	if (idx < 0 || idx >= ARRAY_SIZE(tqma9xxx_dram_info))
+		idx = tqma9xxx_query_ddr_timing();
+
+	if (idx < 0 || idx >= ARRAY_SIZE(tqma9xxx_dram_info)) {
+		printf("ERROR: no valid ram configuration, please reset\n");
+		hang();
+	}
+
+	ddr_init(tqma9xxx_dram_info[idx].table);
+	tqma9xxx_ram_timing_idx = idx;
+}
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
 {
@@ -48,12 +156,25 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 
 void spl_board_init(void)
 {
-	puts("Normal Boot\n");
-}
+	/*
+	 * board_init_f runs before bloblist_init, so we need this here
+	 * in spl_board_init
+	 */
+	struct tq_raminfo *raminfo_blob;
 
-void spl_dram_init(void)
-{
-	ddr_init(&tqma93xxla_dram_timing);
+	tq_bb_spl_board_init();
+
+	raminfo_blob = bloblist_ensure(BLOBLISTT_TQ_RAMSIZE,
+				       sizeof(*raminfo_blob));
+	if (raminfo_blob && tqma9xxx_ram_timing_idx >= 0) {
+		raminfo_blob->memsize =
+			tqma9xxx_dram_info[tqma9xxx_ram_timing_idx].size;
+	} else {
+		printf("ERROR: no valid ram configuration, please reset\n");
+		hang();
+	}
+
+	puts("Normal Boot\n");
 }
 
 #if CONFIG_IS_ENABLED(DM_PMIC_PCA9450)
@@ -93,6 +214,7 @@ int power_init_board(void)
 void board_init_f(ulong dummy)
 {
 	int ret;
+	int ramtype;
 
 	/* Clear the BSS. */
 	memset(__bss_start, 0, __bss_end - __bss_start);
@@ -128,7 +250,9 @@ void board_init_f(ulong dummy)
 	trdc_init();
 
 	/* DDR initialization */
-	spl_dram_init();
+	ramtype = handle_vard();
+	tq_vard_show(&vard);
+	spl_dram_init(ramtype);
 
 	/* Put M33 into CPUWAIT for following kick */
 	ret = m33_prepare();

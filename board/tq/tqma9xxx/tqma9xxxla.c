@@ -6,6 +6,7 @@
  */
 
 #include <common.h>
+#include <bloblist.h>
 #include <env.h>
 #include <init.h>
 #include <spl.h>
@@ -22,6 +23,7 @@
 #include <dm/uclass.h>
 
 #include "../common/tq_bb.h"
+#include "../common/tq_blob.h"
 #include "../common/tq_eeprom.h"
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -34,6 +36,27 @@ int board_early_init_f(void)
 }
 
 #if !defined(CONFIG_SPL_BUILD)
+
+/**
+ * board specific version to enable support for multiple RAM size/type
+ */
+int board_phys_sdram_size(phys_size_t *size)
+{
+	struct tq_raminfo *raminfo;
+
+	if (!size)
+		return -EINVAL;
+
+	raminfo = bloblist_find(BLOBLISTT_TQ_RAMSIZE, sizeof(*raminfo));
+	if (!raminfo) {
+		printf("Unable to find RAMSIZE blob from SPL\n");
+		return -ENOENT;
+	}
+
+	*size = raminfo->memsize;
+
+	return 0;
+}
 
 /**
  * Translate detected CPU variant into TQ-Systems SOM variant short name

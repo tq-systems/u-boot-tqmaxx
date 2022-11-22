@@ -11,10 +11,12 @@ config SYS_CONFIG_NAME
 
 config TQMA9XXX_DEFAULTS
 	bool
+	select BLOBLIST
+	select TQ_BB
 	select TQ_EEPROM
 	select TQ_RTC
 	select TQ_SDMMC
-	select TQ_BB
+	select TQ_VARD
 	imply I2C_EEPROM
 
 choice
@@ -55,6 +57,15 @@ config TQMa9XXX_BB_MBA9XXXCA
 	  demonstrate most of the features of the SOM and CPU
 
 endchoice
+
+#
+# place blob list at start of DRAM
+#
+config BLOBLIST_ADDR
+	default 0x80000000 if BLOBLIST
+
+config BLOBLIST_SIZE
+	default 0x400 if BLOBLIST
 
 source "board/tq/common/Kconfig"
 
