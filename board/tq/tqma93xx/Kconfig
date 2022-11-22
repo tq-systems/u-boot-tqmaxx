@@ -11,12 +11,14 @@ config SYS_CONFIG_NAME
 
 config TQMA93XX_DEFAULTS
 	bool
+	select BLOBLIST
 	select IMX93
 	select IMX9_LPDDR4X
 	select TQ_BB
 	select TQ_EEPROM
 	select TQ_RTC
 	select TQ_SDMMC
+	select TQ_VARD
 	imply I2C_EEPROM
 
 choice
@@ -44,6 +46,15 @@ config MTDPARTS_DEFAULT
 
 config MTDIDS_DEFAULT
 	default "nor0=425e0000.spi"
+
+#
+# place blob list at start of DRAM
+#
+config BLOBLIST_ADDR
+	default 0x80000000 if BLOBLIST
+
+config BLOBLIST_SIZE
+	default 0x400 if BLOBLIST
 
 source "board/tq/common/Kconfig"
 

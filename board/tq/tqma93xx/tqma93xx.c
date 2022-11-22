@@ -6,6 +6,7 @@
  */
 
 #include <common.h>
+#include <bloblist.h>
 #include <env.h>
 #include <init.h>
 #include <mtd_node.h>
@@ -19,6 +20,7 @@
 #include <jffs2/load_kernel.h>
 
 #include "../common/tq_bb.h"
+#include "../common/tq_blob.h"
 #include "../common/tq_eeprom.h"
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -31,6 +33,34 @@ int board_early_init_f(void)
 }
 
 #if !defined(CONFIG_SPL_BUILD)
+
+/**
+ * Global copy of EEPROM data to prevent multiple reads.
+ *
+ * Data is read during board_late_init
+ */
+static struct tq_eeprom_data eeprom;
+
+/**
+ * board specific version to enable support for multiple RAM size/type
+ */
+int board_phys_sdram_size(phys_size_t *size)
+{
+	struct tq_raminfo *raminfo;
+
+	if (!size)
+		return -EINVAL;
+
+	raminfo = bloblist_find(BLOBLISTT_TQ_RAMSIZE, sizeof(*raminfo));
+	if (!raminfo) {
+		printf("Unable to find RAMSIZE blob from SPL\n");
+		return -ENOENT;
+	}
+
+	*size = raminfo->memsize;
+
+	return 0;
+}
 
 /**
  * Translate detected CPU variant into TQ-Systems SOM variant short name
@@ -93,6 +123,15 @@ int print_bootinfo(void)
 	return 0;
 }
 
+/**
+ * print some useful board information
+ *
+ * When not calling late, VARD is not read yet. Trying to read EEPROM here
+ * will succeed but for unknown reason calling imx9_probe_mu from event callback
+ * EVT_DM_POST_INIT will lead to system failure, since DT data seems corrupt
+ * when EVT_DM_POST_INIT will be issued from initr_dm main device model init.
+ * TODO: check if using DISPLAY_BOARDINFO_LATE
+ */
 int checkboard(void)
 {
 	print_bootinfo();
@@ -118,7 +157,18 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 			{ "jedec,spi-nor",	MTD_DEV_TYPE_NOR, },
 		};
 
-		tq_ft_spi_setup(blob, path, nodes, ARRAY_SIZE(nodes));
+		if (tq_vard_valid(&eeprom.tq_hw_data.vard)) {
+			if (tq_vard_has_spinor(&eeprom.tq_hw_data.vard)) {
+				/*
+				 * Update MTD partition nodes using info
+				 * from mtdparts env var
+				 * for [Q]SPI this needs the device probed.
+				 */
+				puts("   Updating MTD partitions...\n");
+				tq_ft_spi_setup(blob, path, nodes,
+						ARRAY_SIZE(nodes));
+			}
+		}
 	}
 
 	return tq_bb_ft_board_setup(blob, bd);
@@ -127,20 +177,27 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 
 int board_late_init(void)
 {
-	struct tq_eeprom_data eeprom;
 	const char *bname = tq_get_boardname();
 	int ret;
 
 	ret = tq_read_module_eeprom(&eeprom);
 
-	if (ret)
-		puts("EEPROM: read error\n");
-	else
+	if (!ret) {
 		tq_board_handle_eeprom_data(bname, &eeprom);
-
-	/* set quartz load to 7.000 femtofarads */
-	if (tq_pcf85063_adjust_capacity(0, 0x51, 7000))
-		puts("PCF85063A: CAP_SEL adjust error\n");
+		if (tq_vard_valid(&eeprom.tq_hw_data.vard)) {
+			/*
+			 * set quartz load to 7.000 femtofarads
+			 * only if RTC is assembled, to prevent warnings
+			 */
+			if (tq_vard_has_rtc(&eeprom.tq_hw_data.vard)) {
+				/* set quartz load to 7.000 femtofarads */
+				if (tq_pcf85063_adjust_capacity(0, 0x51, 7000))
+					puts("PCF85063A: adjust error\n");
+			}
+		}
+	} else {
+		puts("EEPROM: read error\n");
+	}
 
 	if (CONFIG_IS_ENABLED(ENV_VARS_UBOOT_RUNTIME_CONFIG)) {
 		env_set("board_name", tq_bb_get_boardname());
