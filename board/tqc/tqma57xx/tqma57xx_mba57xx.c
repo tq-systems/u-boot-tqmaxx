@@ -486,18 +486,6 @@ int tqma57xx_bb_board_mmc_init(bd_t *bis)
 }
 #endif /* CONFIG_MMC */
 
-/*Define for building port exp gpio, pin starts from 0*/
-#define PORTEXP_IO_NR(chip, pin) \
-	((chip << 5) + pin)
-
-/*Get the chip addr from a ioexp gpio*/
-#define PORTEXP_IO_TO_CHIP(gpio_nr) \
-	(gpio_nr >> 5)
-
-/*Get the pin number from a ioexp gpio*/
-#define PORTEXP_IO_TO_PIN(gpio_nr) \
-	(gpio_nr & 0x1f)
-
 #if defined(CONFIG_USB_DWC3) || defined(CONFIG_USB_XHCI_OMAP)
 int tqma57xx_bb_board_usb_init(void)
 {
