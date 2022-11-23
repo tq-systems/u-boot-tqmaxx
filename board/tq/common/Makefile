@@ -18,4 +18,5 @@ ifdef MINIMAL
 obj- := __dummy__.o
 else
 obj-$(CONFIG_TQ_BB) += tq_bb.o
+obj-$(CONFIG_TQ_SCU) += tq_scu.o
 endif
