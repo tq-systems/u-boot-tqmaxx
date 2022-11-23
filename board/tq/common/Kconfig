@@ -1,3 +1,10 @@
 config TQ_BB
 	bool
 	default y
+
+#
+# This is only for SOM with i.MX8X / i.MX8 to query information from SCU
+#
+config TQ_SCU
+	bool
+	default y if IMX8

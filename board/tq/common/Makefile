@@ -6,3 +6,4 @@
 #
 
 obj-$(CONFIG_TQ_BB) += tq_bb.o
+obj-$(CONFIG_TQ_SCU) += tq_scu.o
