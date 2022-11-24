@@ -756,6 +756,8 @@ int ft_board_setup(void *blob, bd_t *bd)
 	int present;
 	int offset;
 
+	ft_cpu_setup(blob, bd);
+
 	/* Detect qspi flash chip */
 	present = tqma57xx_qspi_present();
 	if (!present) {
