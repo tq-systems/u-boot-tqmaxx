@@ -316,13 +316,6 @@ int board_late_init(void)
 	palmas_i2c_write_u8(TPS65903X_CHIP_P1, 0xA0, 0x1);
 
 	/*
-	 * Default FIT boot on HS devices. Non FIT images are not allowed
-	 * on HS devices.
-	 */
-	if (get_device_type() == HS_DEVICE)
-		env_set("boot_fit", "1");
-
-	/*
 	 * Set the GPIO7 Pad to POWERHOLD. This has higher priority
 	 * over DEV_CTRL.DEV_ON bit. This can be reset in case of
 	 * PMIC Power off. So to be on the safer side set it back
