@@ -6,6 +6,8 @@
  */
 
 #include <common.h>
+#include <i2c.h>
+#include <usb.h>
 #include <asm/io.h>
 #include <asm/arch/clock.h>
 #include <asm/arch/sys_proto.h>
@@ -14,6 +16,7 @@
 #include <asm/mach-imx/iomux-v3.h>
 #include <asm-generic/gpio.h>
 
+#include "../common/tcpc.h"
 #include "../common/tq_bb.h"
 #include "../common/tq_board_gpio.h"
 
@@ -154,6 +157,140 @@ int mmc_map_to_kernel_blk(int devno)
 	return devno;
 }
 
+#if CONFIG_IS_ENABLED(USB)
+
+#if CONFIG_IS_ENABLED(USB_TCPC)
+
+struct tcpc_port typec_port;
+
+static struct tcpc_port_config typec_port_config = {
+	.i2c_bus = 2, /* I2C3 */
+	.addr = 0x50,
+	.port_type = TYPEC_PORT_UFP, /* Device only */
+/*
+ * We are UFP, no power delivery. For completeness use reasonable values
+ * if we ever want to use this as dual role port in U-Boot.
+ */
+	.max_snk_mv = 5000,
+	.max_snk_ma = 500,
+	.max_snk_mw = 2500,
+	.op_snk_mv = 5000,
+
+	.disable_pd = true,
+};
+
+static int setup_typec(void)
+{
+	int ret;
+
+	debug("tcpc_init port\n");
+	ret = tcpc_init(&typec_port, typec_port_config, NULL);
+	if (ret) {
+		printf("%s: tcpc port init failed, err=%d\n",
+		       __func__, ret);
+	}
+
+	return ret;
+}
+
+int board_ehci_usb_phy_mode(struct udevice *dev)
+{
+	enum typec_cc_polarity pol;
+	enum typec_cc_state state;
+	struct tcpc_port *port_ptr;
+	int ret = 0;
+
+	debug("%s %d\n", __func__, dev_seq(dev));
+	/* dev_seq == 0: USB1, dev_seq == 1: USB2 */
+	if (dev_seq(dev) == 1)
+		return USB_INIT_HOST;
+
+	port_ptr = &typec_port;
+
+	tcpc_setup_ufp_mode(port_ptr);
+	ret = tcpc_get_cc_status(port_ptr, &pol, &state);
+
+	tcpc_print_log(port_ptr);
+	if (!ret) {
+		if (state == TYPEC_STATE_SRC_RD_RA || state == TYPEC_STATE_SRC_RD)
+			return USB_INIT_HOST;
+	} else {
+		printf("ERROR: getting TypeC CC status %d\n", ret);
+	}
+
+	return USB_INIT_DEVICE;
+}
+
+#endif
+
+int board_usb_init(int index, enum usb_init_type init)
+{
+	int ret = 0;
+	struct gpio_desc *usb_reset_gpio = &mba93xxca_gid[USB_RESET_B].desc;
+
+	switch (index) {
+#if CONFIG_IS_ENABLED(USB_TCPC)
+	case 0:
+		debug("USB1/Type-C\n");
+		switch (init) {
+		case USB_INIT_DEVICE:
+			ret = tcpc_setup_ufp_mode(&typec_port);
+			break;
+		case USB_INIT_HOST:
+		default:
+			printf("USB1: unsupported init type\n");
+			ret = -EINVAL;
+		}
+		break;
+#endif
+	case 1:
+		debug("USB2/HUB\n");
+		switch (init) {
+		case USB_INIT_DEVICE:
+			ret = -ENODEV;
+			break;
+		case USB_INIT_HOST:
+			dm_gpio_set_value(usb_reset_gpio, 0);
+			break;
+		default:
+			printf("USB2: unknown init type\n");
+			ret = -EINVAL;
+		}
+		break;
+	default:
+		printf("invalid USB port %d\n", index);
+		ret = -EINVAL;
+	}
+
+	return ret;
+}
+
+int board_usb_cleanup(int index, enum usb_init_type init)
+{
+	int ret = 0;
+	struct gpio_desc *usb_reset_gpio = &mba93xxca_gid[USB_RESET_B].desc;
+
+	switch (index) {
+#if CONFIG_IS_ENABLED(USB_TCPC)
+	case 0:
+		debug("USB1/Type-C\n");
+		if (init == USB_INIT_HOST)
+			ret = tcpc_disable_src_vbus(&typec_port);
+		break;
+#endif
+	case 1:
+		debug("USB2/HUB\n");
+		dm_gpio_set_value(usb_reset_gpio, 1);
+		break;
+	default:
+		printf("invalid USB port %d\n", index);
+		ret = -EINVAL;
+	}
+
+	return ret;
+}
+#endif
+
 static int setup_fec(void)
 {
 	return set_clk_enet(ENET_125MHZ);
@@ -175,6 +312,9 @@ static int setup_eqos(void)
 int tq_bb_board_init(void)
 {
 	tq_board_gpio_init(mba93xxca_gid, ARRAY_SIZE(mba93xxca_gid));
+
+	if (CONFIG_IS_ENABLED(USB_TCPC))
+		setup_typec();
 
 	if (CONFIG_IS_ENABLED(FEC_MXC))
 		setup_fec();

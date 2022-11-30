@@ -31,6 +31,7 @@ config TQMA93XX_BB_MBA93XXCA
 	select DM_GPIO
 	select ENV_IS_NOWHERE
 	select TQMA93XX_DEFAULTS
+	select USB_TCPC if USB
 	help
 	  Select the MBa93xxCA starterkit. The evaluation board can
 	  demonstrate most of the features of the SOM and CPU and can be
