@@ -49,6 +49,7 @@ config TQMa9XXX_BB_MBA9XXXCA
 	depends on TQMA93XXLA
 	select DM_GPIO
 	select ENV_IS_NOWHERE
+	select USB_TCPC if USB
 	help
 	  Select the MBA9XXXCA starterkit. The evaluation board can
 	  demonstrate most of the features of the SOM and CPU

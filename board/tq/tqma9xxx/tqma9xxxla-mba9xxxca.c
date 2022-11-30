@@ -17,9 +17,11 @@
 #include <asm/arch-imx9/ccm_regs.h>
 #include <asm/arch-imx9/imx93_pins.h>
 #include <asm/mach-imx/iomux-v3.h>
+#include <usb.h>
 
 #include "../common/tq_bb.h"
 #include "../common/tq_board_gpio.h"
+#include "../common/tcpc.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -148,6 +150,189 @@ int mmc_map_to_kernel_blk(int devno)
 	return devno;
 }
 
+#if CONFIG_IS_ENABLED(USB)
+
+#if CONFIG_IS_ENABLED(USB_TCPC)
+
+struct tcpc_port port2;
+
+static int setup_pd_switch(u8 i2c_bus, u8 addr)
+{
+	struct udevice *i2c_dev = NULL;
+	struct udevice *bus;
+	uint8_t valb;
+	int ret;
+
+	ret = uclass_get_device_by_seq(UCLASS_I2C, i2c_bus, &bus);
+	if (ret) {
+		printf("%s: Can't find bus\n", __func__);
+		return -EINVAL;
+	}
+
+	ret = dm_i2c_probe(bus, addr, 0, &i2c_dev);
+	if (ret) {
+		printf("%s: Can't find device id=0x%x\n",
+		       __func__, addr);
+		return -ENODEV;
+	}
+
+	ret = dm_i2c_read(i2c_dev, 0xB, &valb, 1);
+	if (ret) {
+		printf("%s dm_i2c_read failed, err %d\n",
+		       __func__, ret);
+		return -EIO;
+	}
+
+	valb |= 0x4; /* Set DB_EXIT to exit dead battery mode */
+	ret = dm_i2c_write(i2c_dev, 0xB, (const uint8_t *)&valb, 1);
+	if (ret) {
+		printf("%s dm_i2c_write failed, err %d\n",
+		       __func__, ret);
+		return -EIO;
+	}
+
+	/* Set OVP threshold to 23V */
+	valb = 0x6;
+	ret = dm_i2c_write(i2c_dev, 0x8, (const uint8_t *)&valb, 1);
+	if (ret) {
+		printf("%s dm_i2c_write failed, err %d\n",
+		       __func__, ret);
+		return -EIO;
+	}
+
+	return 0;
+}
+
+int pd_switch_snk_enable(struct tcpc_port *port)
+{
+	if (port == &port2) {
+		debug("Setup pd switch on port 2\n");
+		return setup_pd_switch(2, 0x73);
+	}
+
+	return -EINVAL;
+}
+
+struct tcpc_port_config port2_config = {
+	.i2c_bus = 2, /* I2C3 */
+	.addr = 0x50,
+	.port_type = TYPEC_PORT_UFP,
+	.max_snk_mv = 9000,
+	.max_snk_ma = 3000,
+	.max_snk_mw = 40000,
+	.op_snk_mv = 9000,
+/*
+ *	TODO: check if this is needed and correct
+ *	.switch_setup_func = &pd_switch_snk_enable,
+ */
+	.disable_pd = true,
+};
+
+static int setup_typec(void)
+{
+	int ret;
+
+	debug("tcpc_init port 2\n");
+	ret = tcpc_init(&port2, port2_config, NULL);
+	if (ret) {
+		printf("%s: tcpc port2 init failed, err=%d\n",
+		       __func__, ret);
+	}
+
+	return ret;
+}
+
+int board_ehci_usb_phy_mode(struct udevice *dev)
+{
+	enum typec_cc_polarity pol;
+	enum typec_cc_state state;
+	struct tcpc_port *port_ptr;
+	int ret = 0;
+
+	debug("%s %d\n", __func__, dev_seq(dev));
+
+	if (dev_seq(dev) == 0)
+		return USB_INIT_HOST;
+
+	port_ptr = &port2;
+
+	tcpc_setup_ufp_mode(port_ptr);
+	ret = tcpc_get_cc_status(port_ptr, &pol, &state);
+
+	tcpc_print_log(port_ptr);
+	if (!ret) {
+		if (state == TYPEC_STATE_SRC_RD_RA || state == TYPEC_STATE_SRC_RD)
+			return USB_INIT_HOST;
+	}
+
+	return USB_INIT_DEVICE;
+}
+
+#endif
+
+int board_usb_init(int index, enum usb_init_type init)
+{
+	int ret = 0;
+	struct gpio_desc *usb_reset_gpio = &mba9xxxca_gid[USB_RESET_B].desc;
+
+	switch (index) {
+	case 0:
+		debug("USB1/HUB\n");
+		switch (init) {
+		case USB_INIT_DEVICE:
+			ret = -ENODEV;
+			break;
+		case USB_INIT_HOST:
+			dm_gpio_set_value(usb_reset_gpio, 0);
+			break;
+		default:
+			printf("USB1: unknown init type\n");
+			ret = -EINVAL;
+		}
+		break;
+#if CONFIG_IS_ENABLED(USB_TCPC)
+	case 1:
+		debug("USB2/Type-C\n");
+		if (init == USB_INIT_HOST)
+			ret = tcpc_setup_dfp_mode(&port2);
+		else
+			ret = tcpc_setup_ufp_mode(&port2);
+
+		break;
+#endif
+	default:
+		printf("invalid USB port %d\n", index);
+		ret = -EINVAL;
+	}
+
+	return ret;
+}
+
+int board_usb_cleanup(int index, enum usb_init_type init)
+{
+	int ret = 0;
+	struct gpio_desc *usb_reset_gpio = &mba9xxxca_gid[USB_RESET_B].desc;
+
+	switch (index) {
+	case 0:
+		debug("USB1/HUB\n");
+		dm_gpio_set_value(usb_reset_gpio, 0);
+		break;
+#if CONFIG_IS_ENABLED(USB_TCPC)
+	case 1:
+		if (init == USB_INIT_HOST)
+			ret = tcpc_disable_src_vbus(&port2);
+		break;
+#endif
+	default:
+		printf("invalid USB port %d\n", index);
+		ret = -EINVAL;
+	}
+
+	return ret;
+}
+#endif
+
 static int setup_fec(void)
 {
 	return set_clk_enet(ENET_125MHZ);
@@ -169,6 +354,9 @@ static int setup_eqos(void)
 int tq_bb_board_init(void)
 {
 	tq_board_gpio_init(mba9xxxca_gid, ARRAY_SIZE(mba9xxxca_gid));
+
+	if (CONFIG_IS_ENABLED(USB_TCPC))
+		setup_typec();
 
 	if (CONFIG_IS_ENABLED(FEC_MXC))
 		setup_fec();

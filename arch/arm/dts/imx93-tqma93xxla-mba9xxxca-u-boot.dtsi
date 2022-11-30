@@ -6,6 +6,7 @@
 / {
 	aliases {
 		i2c_eeprom0 = &eeprom0;
+		usbgadget0 = &usbg2;
 	};
 
 	config {
@@ -17,6 +18,13 @@
 		compatible = "wdt-reboot";
 		wdt = <&wdog3>;
 		u-boot,dm-spl;
+	};
+
+	usbg2: usbg2 {
+		compatible = "fsl,imx27-usb-gadget";
+		dr_mode = "peripheral";
+		chipidea,usb = <&usbotg2>;
+		status = "disabled";
 	};
 
 	firmware {
@@ -141,6 +149,11 @@
 
 &pinctrl_lpi2c5 {
 	u-boot,dm-spl;
+};
+
+&usbotg2 {
+	extcon = <&tcpc>;
+	status = "okay";
 };
 
 &s4muap {
