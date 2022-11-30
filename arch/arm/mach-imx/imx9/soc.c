@@ -245,10 +245,10 @@ static struct mm_region imx93_mem_map[] = {
 			 PTE_BLOCK_NON_SHARE |
 			 PTE_BLOCK_PXN | PTE_BLOCK_UXN
 	}, {
-		/* DRAM1 */
+		/* DRAM1 max 2 GiB starting at 0x80000000UL */
 		.virt = 0x80000000UL,
 		.phys = 0x80000000UL,
-		.size = PHYS_SDRAM_SIZE,
+		.size = SZ_2G,
 		.attrs = PTE_BLOCK_MEMTYPE(MT_NORMAL) |
 			 PTE_BLOCK_OUTER_SHARE
 	}, {
@@ -262,9 +262,88 @@ static struct mm_region imx93_mem_map[] = {
 
 struct mm_region *mem_map = imx93_mem_map;
 
+static unsigned int imx93_find_dram_entry_in_mem_map(void)
+{
+	int i;
+
+	for (i = 0; i < ARRAY_SIZE(imx93_mem_map); i++)
+		if (imx93_mem_map[i].phys == CONFIG_SYS_SDRAM_BASE)
+			return i;
+
+	hang();	/* Entry not found, this must never happen. */
+}
+
+void enable_caches(void)
+{
+	/* TODE: split if OPTEE running
+	 * If OPTEE does not run, still update the MMU table according
+	 * to dram banks structure to set correct dram size from
+	 * board_phys_sdram_size
+	 */
+	int i = 0;
+	/*
+	 * please make sure that entry initial value matches
+	 * imx93_mem_map for DRAM1
+	 */
+	int entry = imx93_find_dram_entry_in_mem_map();
+	u64 attrs = imx93_mem_map[entry].attrs;
+
+	while (i < CONFIG_NR_DRAM_BANKS &&
+	       entry < ARRAY_SIZE(imx93_mem_map)) {
+		if (gd->bd->bi_dram[i].start == 0)
+			break;
+		imx93_mem_map[entry].phys = gd->bd->bi_dram[i].start;
+		imx93_mem_map[entry].virt = gd->bd->bi_dram[i].start;
+		imx93_mem_map[entry].size = gd->bd->bi_dram[i].size;
+		imx93_mem_map[entry].attrs = attrs;
+		debug("Added memory mapping (%d): %llx %llx\n", entry,
+		      imx93_mem_map[entry].phys, imx93_mem_map[entry].size);
+		i++; entry++;
+	}
+
+	icache_enable();
+	dcache_enable();
+}
+
+__weak int board_phys_sdram_size(phys_size_t *size)
+{
+	if (!size)
+		return -EINVAL;
+
+	*size = PHYS_SDRAM_SIZE;
+
+	return 0;
+}
+
 int dram_init(void)
 {
-	gd->ram_size = PHYS_SDRAM_SIZE;
+	phys_size_t sdram_size;
+	int ret;
+
+	ret = board_phys_sdram_size(&sdram_size);
+	if (ret)
+		return ret;
+
+	gd->ram_size = sdram_size;
+
+	return 0;
+}
+
+int dram_init_banksize(void)
+{
+	phys_size_t sdram_size;
+	int ret;
+
+	ret = board_phys_sdram_size(&sdram_size);
+	if (ret)
+		return ret;
+
+	/* Bank 1 can't cross over 4GB space */
+	if (sdram_size > 0x80000000)
+		sdram_size = 0x80000000;
+
+	gd->bd->bi_dram[0].start = PHYS_SDRAM;
+	gd->bd->bi_dram[0].size = sdram_size;
 
 	return 0;
 }
