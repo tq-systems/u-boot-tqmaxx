@@ -19,15 +19,23 @@
 	#size-cells = <2>;
 
 	aliases {
+		ethernet0 = &fec;
+		ethernet1 = &eqos;
 		gpio0 = &gpio1;
 		gpio1 = &gpio2;
 		gpio2 = &gpio3;
 		gpio3 = &gpio4;
+		i2c0 = &lpi2c1;
+		i2c1 = &lpi2c2;
+		i2c2 = &lpi2c3;
+		i2c3 = &lpi2c4;
+		i2c4 = &lpi2c5;
+		i2c5 = &lpi2c6;
+		i2c6 = &lpi2c7;
+		i2c7 = &lpi2c8;
 		mmc0 = &usdhc1;
 		mmc1 = &usdhc2;
 		mmc2 = &usdhc3;
-		ethernet0 = &fec;
-		ethernet1 = &eqos;
 		serial0 = &lpuart1;
 		serial1 = &lpuart2;
 		serial2 = &lpuart3;
@@ -38,14 +46,6 @@
 		serial7 = &lpuart8;
 		spi0 = &flexspi;
 		isi0 = &isi_0;
-		i2c0 = &lpi2c1;
-		i2c1 = &lpi2c2;
-		i2c2 = &lpi2c3;
-		i2c3 = &lpi2c4;
-		i2c4 = &lpi2c5;
-		i2c5 = &lpi2c6;
-		i2c6 = &lpi2c7;
-		i2c7 = &lpi2c8;
 		csi0 = &mipi_csi;
 		usb0 = &usbotg1;
 		usb1 = &usbotg2;
