@@ -163,10 +163,10 @@ static struct mm_region imx93_mem_map[] = {
 			 PTE_BLOCK_NON_SHARE |
 			 PTE_BLOCK_PXN | PTE_BLOCK_UXN
 	}, {
-		/* DRAM1 */
+		/* DRAM1 max 2 GiB starting at 0x80000000UL */
 		.virt = 0x80000000UL,
 		.phys = 0x80000000UL,
-		.size = PHYS_SDRAM_SIZE,
+		.size = SZ_2G,
 		.attrs = PTE_BLOCK_MEMTYPE(MT_NORMAL) |
 			 PTE_BLOCK_OUTER_SHARE
 	}, {
