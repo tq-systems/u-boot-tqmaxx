@@ -39,8 +39,9 @@ config TQ_SPI_NOR
 
 config TQ_VARD
 	bool
-	depends on TQC_EEPROM
-	select SPL_HASH_SUPPORT if SPL
+	depends on TQ_EEPROM
+	select HASH
+	select SPL_HASH if SPL
 
 config USB_TCPC
 	bool "USB Typec port controller simple driver"
