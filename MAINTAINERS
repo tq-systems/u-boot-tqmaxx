@@ -1265,9 +1265,10 @@ S:	Maintained
 F:	drivers/tpm/
 
 TQ GROUP
-#M:	Martin Krause <martin.krause@tq-systems.de>
-S:	Orphaned (Since 2016-02)
-T:	git git://git.denx.de/u-boot-tq-group.git
+M:	Markus Niebel  <Markus.Niebel@ew.tq-group.com>
+R:	TQ-Systems OSS Team <u-boot@ew.tq-group.com>
+S:	Maintained
+F:	board/tq/*
 
 TEE
 M:	Jens Wiklander <jens.wiklander@linaro.org>
