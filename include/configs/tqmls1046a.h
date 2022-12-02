@@ -22,8 +22,11 @@
 #define CONFIG_CHIP_SELECTS_PER_CTRL	4
 #define CONFIG_NR_DRAM_BANKS			2
 
+#ifndef CONFIG_TQMLS1046A_DDR_NO_ECC
 #define CONFIG_DDR_ECC
 #define CONFIG_ECC_INIT_VIA_DDRCONTROLLER
+#endif
+
 #define CONFIG_MEM_INIT_VALUE           0xdeadbeef
 #define CONFIG_FSL_DDR_BIST	/* enable built-in memory test */
 

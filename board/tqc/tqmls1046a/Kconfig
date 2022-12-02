@@ -16,6 +16,10 @@ config TQMLS1046A_DDR_8G
 	bool "TQMLS1046A with 8GB DDR size"
 	default n
 
+config TQMLS1046A_DDR_NO_ECC
+	bool "TQMLS1046A without ECC DDR"
+	default n
+
 source "board/tqc/tqmls1046a/pbi_rcw/Kconfig"
 
 choice

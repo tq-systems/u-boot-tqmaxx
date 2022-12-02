@@ -129,6 +129,10 @@ phys_size_t fixed_sdram(void)
 #else
 	ddr_size = (phys_size_t)2048 * 1024 * 1024;
 #endif
+#ifdef CONFIG_TQMLS1046A_DDR_NO_ECC
+	ddr_cfg_regs.ddr_sdram_cfg &= ~SDRAM_CFG_ECC_EN;
+#endif
+
 	fsl_ddr_set_memctl_regs(&ddr_cfg_regs, 0, 0);
 
 	return ddr_size;
