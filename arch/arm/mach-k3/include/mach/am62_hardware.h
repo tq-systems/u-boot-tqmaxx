@@ -72,7 +72,14 @@
 
 #define ROM_ENTENDED_BOOT_DATA_INFO		0x43c3f1e0
 
-/* Use Last 2K as Scratch pad */
-#define TI_SRAM_SCRATCH_BOARD_EEPROM_START		0x70000000
+#define K3_BOOT_PARAM_TABLE_INDEX_OCRAM		0x7000F290
+
+#ifdef CONFIG_CPU_V7R
+/* Use HSM SRAM scratch pad for R5 SPL */
+#define TI_SRAM_SCRATCH_BOARD_EEPROM_START	0x43c30000
+#else
+/* Use OCRAM as scratch pad for A53 SPL/U-Boot */
+#define TI_SRAM_SCRATCH_BOARD_EEPROM_START	0x70000000
+#endif
 
 #endif /* __ASM_ARCH_AM62_HARDWARE_H */

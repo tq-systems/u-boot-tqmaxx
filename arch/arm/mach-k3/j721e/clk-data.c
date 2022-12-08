@@ -3,9 +3,9 @@
  * J721E specific clock platform data
  *
  * This file is auto generated. Please do not hand edit and report any issues
- * to Dave Gerlach <d-gerlach@ti.com>.
+ * to Bryan Brattlof <bb@ti.com>.
  *
- * Copyright (C) 2020-2021 Texas Instruments Incorporated - https://www.ti.com/
+ * Copyright (C) 2020-2022 Texas Instruments Incorporated - https://www.ti.com/
  */
 
 #include <linux/clk-provider.h>
@@ -33,11 +33,6 @@ static const char * const mcu_ospi1_iclk_sel_out0_parents[] = {
 static const char * const wkup_fref_clksel_out0_parents[] = {
 	"gluelogic_hfosc0_clkout",
 	"j7_wakeup_16ff_wkup_0_wkup_rcosc_12p5m_clk",
-};
-
-static const char * const main_pll_hfosc_sel_out1_parents[] = {
-	"gluelogic_hfosc0_clkout",
-	"board_0_hfosc1_clk_out",
 };
 
 static const char * const k3_pll_ctrl_wrap_wkup_0_sysclkout_clk_parents[] = {
@@ -71,6 +66,11 @@ static const char * const main_pll25_hfosc_sel_out0_parents[] = {
 };
 
 static const char * const main_pll_hfosc_sel_out0_parents[] = {
+	"gluelogic_hfosc0_clkout",
+	"board_0_hfosc1_clk_out",
+};
+
+static const char * const main_pll_hfosc_sel_out1_parents[] = {
 	"gluelogic_hfosc0_clkout",
 	"board_0_hfosc1_clk_out",
 };
@@ -207,6 +207,11 @@ static const char * const mcu_clkout_mux_out0_parents[] = {
 static const char * const k3_pll_ctrl_wrap_main_0_sysclkout_clk_parents[] = {
 	"main_pll_hfosc_sel_out0",
 	"hsdiv4_16fft_main_0_hsdivout0_clk",
+};
+
+static const char * const main_pll8_sel_extwave_out0_parents[] = {
+	"pllfrac2_ssmod_16fft_main_8_foutvcop_clk",
+	"hsdiv0_16fft_main_8_hsdivout0_clk",
 };
 
 static const char * const mcu_obsclk_outmux_out0_parents[] = {
@@ -466,14 +471,9 @@ static const struct clk_data clk_list[] = {
 	CLK_MUX("mcu_ospi1_iclk_sel_out0", mcu_ospi1_iclk_sel_out0_parents, 2, 0x40f08034, 4, 1, 0),
 	CLK_FIXED_RATE("mshsi2c_wkup_0_porscl", 0, 0),
 	CLK_MUX("wkup_fref_clksel_out0", wkup_fref_clksel_out0_parents, 2, 0x43008050, 8, 1, 0),
-	CLK_MUX("main_pll_hfosc_sel_out1", main_pll_hfosc_sel_out1_parents, 2, 0x43008084, 0, 1, 0),
-	CLK_PLL_DEFFREQ("pllfrac2_ssmod_16fft_main_1_foutvcop_clk", "main_pll_hfosc_sel_out1", 0x681000, 0, 1920000000),
-	CLK_DIV("pllfrac2_ssmod_16fft_main_1_foutpostdiv_clk_subdiv", "pllfrac2_ssmod_16fft_main_1_foutvcop_clk", 0x681038, 16, 3, 0, CLK_DIVIDER_ONE_BASED),
-	CLK_DIV("pllfrac2_ssmod_16fft_main_1_foutpostdiv_clk", "pllfrac2_ssmod_16fft_main_1_foutpostdiv_clk_subdiv", 0x681038, 24, 3, 0, CLK_DIVIDER_ONE_BASED),
 	CLK_PLL("pllfrac2_ssmod_16fft_mcu_0_foutvcop_clk", "wkup_fref_clksel_out0", 0x40d00000, 0),
 	CLK_PLL_DEFFREQ("pllfrac2_ssmod_16fft_mcu_1_foutvcop_clk", "wkup_fref_clksel_out0", 0x40d01000, 0, 2400000000),
 	CLK_PLL_DEFFREQ("pllfrac2_ssmod_16fft_mcu_2_foutvcop_clk", "wkup_fref_clksel_out0", 0x40d02000, 0, 2000000000),
-	CLK_DIV("postdiv3_16fft_main_1_hsdivout5_clk", "pllfrac2_ssmod_16fft_main_1_foutpostdiv_clk", 0x681094, 0, 7, 0, 0),
 	CLK_DIV("hsdiv1_16fft_mcu_0_hsdivout0_clk", "pllfrac2_ssmod_16fft_mcu_0_foutvcop_clk", 0x40d00080, 0, 7, 0, 0),
 	CLK_DIV("hsdiv4_16fft_mcu_1_hsdivout3_clk", "pllfrac2_ssmod_16fft_mcu_1_foutvcop_clk", 0x40d0108c, 0, 7, 0, 0),
 	CLK_DIV("hsdiv4_16fft_mcu_1_hsdivout4_clk", "pllfrac2_ssmod_16fft_mcu_1_foutvcop_clk", 0x40d01090, 0, 7, 0, 0),
@@ -487,6 +487,7 @@ static const struct clk_data clk_list[] = {
 	CLK_FIXED_RATE("gluelogic_lpxosc_clkout", 32768, 0),
 	CLK_MUX("main_pll25_hfosc_sel_out0", main_pll25_hfosc_sel_out0_parents, 2, 0x430080e4, 0, 1, 0),
 	CLK_MUX("main_pll_hfosc_sel_out0", main_pll_hfosc_sel_out0_parents, 2, 0x43008080, 0, 1, 0),
+	CLK_MUX("main_pll_hfosc_sel_out1", main_pll_hfosc_sel_out1_parents, 2, 0x43008084, 0, 1, 0),
 	CLK_MUX("main_pll_hfosc_sel_out12", main_pll_hfosc_sel_out12_parents, 2, 0x430080b0, 0, 1, 0),
 	CLK_MUX("main_pll_hfosc_sel_out13", main_pll_hfosc_sel_out13_parents, 2, 0x430080b4, 0, 1, 0),
 	CLK_MUX("main_pll_hfosc_sel_out14", main_pll_hfosc_sel_out14_parents, 2, 0x430080b8, 0, 1, 0),
@@ -518,8 +519,6 @@ static const struct clk_data clk_list[] = {
 	CLK_FIXED_RATE("ddr32ss_16ffc_ew_dv_wrap_main_0_ddrss_io_ck_n", 0, 0),
 	CLK_FIXED_RATE("emmc8ss_16ffc_main_0_emmcss_io_clk", 0, 0),
 	CLK_FIXED_RATE("emmcsd4ss_main_0_emmcsdss_io_clk_o", 0, 0),
-	CLK_DIV_DEFFREQ("hsdiv4_16fft_main_1_hsdivout0_clk", "pllfrac2_ssmod_16fft_main_1_foutvcop_clk", 0x681080, 0, 7, 0, 0, 192000000),
-	CLK_DIV("hsdiv4_16fft_main_1_hsdivout2_clk", "pllfrac2_ssmod_16fft_main_1_foutvcop_clk", 0x681088, 0, 7, 0, 0),
 	CLK_DIV("hsdiv4_16fft_mcu_1_hsdivout1_clk", "pllfrac2_ssmod_16fft_mcu_1_foutvcop_clk", 0x40d01084, 0, 7, 0, 0),
 	CLK_DIV("hsdiv4_16fft_mcu_1_hsdivout2_clk", "pllfrac2_ssmod_16fft_mcu_1_foutvcop_clk", 0x40d01088, 0, 7, 0, 0),
 	CLK_DIV("hsdiv4_16fft_mcu_2_hsdivout0_clk", "pllfrac2_ssmod_16fft_mcu_2_foutvcop_clk", 0x40d02080, 0, 7, 0, 0),
@@ -530,6 +529,9 @@ static const struct clk_data clk_list[] = {
 	CLK_PLL("pllfrac2_ssmod_16fft_main_0_foutvcop_clk", "main_pll_hfosc_sel_out0", 0x680000, 0),
 	CLK_DIV("pllfrac2_ssmod_16fft_main_0_foutpostdiv_clk_subdiv", "pllfrac2_ssmod_16fft_main_0_foutvcop_clk", 0x680038, 16, 3, 0, CLK_DIVIDER_ONE_BASED),
 	CLK_DIV("pllfrac2_ssmod_16fft_main_0_foutpostdiv_clk", "pllfrac2_ssmod_16fft_main_0_foutpostdiv_clk_subdiv", 0x680038, 24, 3, 0, CLK_DIVIDER_ONE_BASED),
+	CLK_PLL_DEFFREQ("pllfrac2_ssmod_16fft_main_1_foutvcop_clk", "main_pll_hfosc_sel_out1", 0x681000, 0, 1920000000),
+	CLK_DIV("pllfrac2_ssmod_16fft_main_1_foutpostdiv_clk_subdiv", "pllfrac2_ssmod_16fft_main_1_foutvcop_clk", 0x681038, 16, 3, 0, CLK_DIVIDER_ONE_BASED),
+	CLK_DIV("pllfrac2_ssmod_16fft_main_1_foutpostdiv_clk", "pllfrac2_ssmod_16fft_main_1_foutpostdiv_clk_subdiv", 0x681038, 24, 3, 0, CLK_DIVIDER_ONE_BASED),
 	CLK_PLL("pllfrac2_ssmod_16fft_main_13_foutvcop_clk", "main_pll_hfosc_sel_out13", 0x68d000, 0),
 	CLK_PLL("pllfrac2_ssmod_16fft_main_14_foutvcop_clk", "main_pll_hfosc_sel_out14", 0x68e000, 0),
 	CLK_PLL("pllfrac2_ssmod_16fft_main_16_foutvcop_clk", "main_pll_hfosc_sel_out16", 0x690000, 0),
@@ -539,21 +541,20 @@ static const struct clk_data clk_list[] = {
 	CLK_PLL("pllfrac2_ssmod_16fft_main_2_foutvcop_clk", "main_pll_hfosc_sel_out2", 0x682000, 0),
 	CLK_PLL("pllfrac2_ssmod_16fft_main_23_foutvcop_clk", "main_pll_hfosc_sel_out23", 0x697000, 0),
 	CLK_PLL("pllfrac2_ssmod_16fft_main_25_foutvcop_clk", "main_pll25_hfosc_sel_out0", 0x699000, 0),
-	CLK_PLL("pllfrac2_ssmod_16fft_main_3_foutvcop_clk", "main_pll_hfosc_sel_out3", 0x683000, 0),
+	CLK_PLL_DEFFREQ("pllfrac2_ssmod_16fft_main_3_foutvcop_clk", "main_pll_hfosc_sel_out3", 0x683000, 0, 2000000000),
 	CLK_PLL("pllfrac2_ssmod_16fft_main_5_foutvcop_clk", "main_pll_hfosc_sel_out5", 0x685000, 0),
 	CLK_PLL("pllfrac2_ssmod_16fft_main_6_foutvcop_clk", "main_pll_hfosc_sel_out6", 0x686000, 0),
 	CLK_PLL("pllfrac2_ssmod_16fft_main_7_foutvcop_clk", "main_pll_hfosc_sel_out7", 0x687000, 0),
 	CLK_PLL("pllfrac2_ssmod_16fft_main_8_foutvcop_clk", "main_pll_hfosc_sel_out8", 0x688000, 0),
 	CLK_PLL("pllfracf_ssmod_16fft_main_12_foutvcop_clk", "main_pll_hfosc_sel_out12", 0x68c000, 0),
 	CLK_DIV("postdiv3_16fft_main_0_hsdivout6_clk", "pllfrac2_ssmod_16fft_main_0_foutpostdiv_clk", 0x680098, 0, 7, 0, 0),
+	CLK_DIV("postdiv3_16fft_main_1_hsdivout5_clk", "pllfrac2_ssmod_16fft_main_1_foutpostdiv_clk", 0x681094, 0, 7, 0, 0),
 	CLK_DIV("postdiv3_16fft_main_1_hsdivout7_clk", "pllfrac2_ssmod_16fft_main_1_foutpostdiv_clk", 0x68109c, 0, 7, 0, 0),
 	CLK_MUX("wkup_obsclk_mux_out0", wkup_obsclk_mux_out0_parents, 16, 0x43008000, 0, 4, 0),
 	CLK_MUX("main_pll15_xref_sel_out0", main_pll15_xref_sel_out0_parents, 2, 0x430080bc, 4, 1, 0),
 	CLK_MUX("main_pll24_hfosc_sel_out0", main_pll24_hfosc_sel_out0_parents, 2, 0x430080e0, 0, 1, 0),
 	CLK_MUX("main_pll4_xref_sel_out0", main_pll4_xref_sel_out0_parents, 2, 0x43008090, 4, 1, 0),
 	CLK_MUX("mcu_clkout_mux_out0", mcu_clkout_mux_out0_parents, 2, 0x40f08010, 0, 1, 0),
-	CLK_DIV_DEFFREQ("usart_programmable_clock_divider_out0", "hsdiv4_16fft_main_1_hsdivout0_clk", 0x1081c0, 0, 2, 0, 0, 48000000),
-	CLK_DIV_DEFFREQ("usart_programmable_clock_divider_out2", "hsdiv4_16fft_main_1_hsdivout0_clk", 0x1081c8, 0, 2, 0, 0, 48000000),
 	CLK_DIV("hsdiv0_16fft_main_12_hsdivout0_clk", "pllfracf_ssmod_16fft_main_12_foutvcop_clk", 0x68c080, 0, 7, 0, 0),
 	CLK_DIV("hsdiv0_16fft_main_6_hsdivout0_clk", "pllfrac2_ssmod_16fft_main_6_foutvcop_clk", 0x686080, 0, 7, 0, 0),
 	CLK_DIV("hsdiv0_16fft_main_7_hsdivout0_clk", "pllfrac2_ssmod_16fft_main_7_foutvcop_clk", 0x687080, 0, 7, 0, 0),
@@ -572,6 +573,8 @@ static const struct clk_data clk_list[] = {
 	CLK_DIV("hsdiv4_16fft_main_0_hsdivout2_clk", "pllfrac2_ssmod_16fft_main_0_foutvcop_clk", 0x680088, 0, 7, 0, 0),
 	CLK_DIV("hsdiv4_16fft_main_0_hsdivout3_clk", "pllfrac2_ssmod_16fft_main_0_foutvcop_clk", 0x68008c, 0, 7, 0, 0),
 	CLK_DIV("hsdiv4_16fft_main_0_hsdivout4_clk", "pllfrac2_ssmod_16fft_main_0_foutvcop_clk", 0x680090, 0, 7, 0, 0),
+	CLK_DIV_DEFFREQ("hsdiv4_16fft_main_1_hsdivout0_clk", "pllfrac2_ssmod_16fft_main_1_foutvcop_clk", 0x681080, 0, 7, 0, 0, 192000000),
+	CLK_DIV("hsdiv4_16fft_main_1_hsdivout2_clk", "pllfrac2_ssmod_16fft_main_1_foutvcop_clk", 0x681088, 0, 7, 0, 0),
 	CLK_DIV("hsdiv4_16fft_main_2_hsdivout0_clk", "pllfrac2_ssmod_16fft_main_2_foutvcop_clk", 0x682080, 0, 7, 0, 0),
 	CLK_DIV("hsdiv4_16fft_main_2_hsdivout1_clk", "pllfrac2_ssmod_16fft_main_2_foutvcop_clk", 0x682084, 0, 7, 0, 0),
 	CLK_DIV("hsdiv4_16fft_main_2_hsdivout2_clk", "pllfrac2_ssmod_16fft_main_2_foutvcop_clk", 0x682088, 0, 7, 0, 0),
@@ -580,6 +583,7 @@ static const struct clk_data clk_list[] = {
 	CLK_DIV("hsdiv4_16fft_main_3_hsdivout2_clk", "pllfrac2_ssmod_16fft_main_3_foutvcop_clk", 0x683088, 0, 7, 0, 0),
 	CLK_MUX_PLLCTRL("k3_pll_ctrl_wrap_main_0_sysclkout_clk", k3_pll_ctrl_wrap_main_0_sysclkout_clk_parents, 2, 0x410000, 0),
 	CLK_DIV("k3_pll_ctrl_wrap_main_0_chip_div1_clk_clk", "k3_pll_ctrl_wrap_main_0_sysclkout_clk", 0x410118, 0, 5, 0, 0),
+	CLK_MUX("main_pll8_sel_extwave_out0", main_pll8_sel_extwave_out0_parents, 2, 0x688040, 0, 1, 0),
 	CLK_DIV("mcu_obsclk_div_out0", "wkup_obsclk_mux_out0", 0x43008000, 8, 4, 0, 0),
 	CLK_MUX("mcu_obsclk_outmux_out0", mcu_obsclk_outmux_out0_parents, 2, 0x43008000, 24, 1, 0),
 	CLK_MUX("obsclk1_mux_out0", obsclk1_mux_out0_parents, 4, 0x108004, 0, 2, 0),
@@ -589,6 +593,8 @@ static const struct clk_data clk_list[] = {
 	CLK_MUX("emmcsd_refclk_sel_out0", emmcsd_refclk_sel_out0_parents, 4, 0x1080b0, 0, 2, 0),
 	CLK_MUX("emmcsd_refclk_sel_out1", emmcsd_refclk_sel_out1_parents, 4, 0x1080b4, 0, 2, 0),
 	CLK_MUX("gtc_clk_mux_out0", gtc_clk_mux_out0_parents, 16, 0x108030, 0, 4, 0),
+	CLK_DIV_DEFFREQ("usart_programmable_clock_divider_out0", "hsdiv4_16fft_main_1_hsdivout0_clk", 0x1081c0, 0, 2, 0, 0, 48000000),
+	CLK_DIV("usart_programmable_clock_divider_out2", "hsdiv4_16fft_main_1_hsdivout0_clk", 0x1081c8, 0, 2, 0, 0),
 	CLK_MUX("gpmc_fclk_sel_out0", gpmc_fclk_sel_out0_parents, 4, 0x1080d0, 0, 2, 0),
 	CLK_DIV("hsdiv0_16fft_main_24_hsdivout0_clk", "plldeskew_16fft_main_24_foutp_clk", 0x698080, 0, 0, 0, 0),
 	CLK_DIV("hsdiv3_16fft_main_15_hsdivout0_clk", "pllfrac2_ssmod_16fft_main_15_foutvcop_clk", 0x68f080, 0, 7, 0, 0),
@@ -779,12 +785,14 @@ static const struct dev_clk soc_dev_clk_data[] = {
 	DEV_CLK(289, 17, "board_0_hfosc1_clk_out"),
 	DEV_CLK(289, 18, "k3_pll_ctrl_wrap_main_0_chip_div1_clk_clk"),
 	DEV_CLK(289, 19, "k3_pll_ctrl_wrap_main_0_chip_div1_clk_clk"),
+	DEV_CLK(342, 0, "main_pll8_sel_extwave_out0"),
+	DEV_CLK(342, 1, "pllfrac2_ssmod_16fft_main_8_foutvcop_clk"),
+	DEV_CLK(342, 2, "hsdiv0_16fft_main_8_hsdivout0_clk"),
 };
 
 const struct ti_k3_clk_platdata j721e_clk_platdata = {
 	.clk_list = clk_list,
-	.clk_list_cnt = 157,
+	.clk_list_cnt = 158,
 	.soc_dev_clk_data = soc_dev_clk_data,
-	.soc_dev_clk_data_cnt = 173,
+	.soc_dev_clk_data_cnt = 176,
 };
-

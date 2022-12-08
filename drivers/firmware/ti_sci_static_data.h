@@ -88,37 +88,38 @@ static struct ti_sci_resource_static_data rm_static_data[] = {
 static struct ti_sci_resource_static_data rm_static_data[] = {
 	/* Free rings */
 	{
-		.dev_id = 321,
+		.dev_id = 328,
 		.subtype = 1,
-		.range_start = 180,
+		.range_start = 208,
 		.range_num = 32,
 	},
 	/* TX channels */
 	{
-		.dev_id = 322,
+		.dev_id = 329,
 		.subtype = 13,
-		.range_start = 12,
-		.range_num = 2,
+		.range_start = 40,
+		.range_num = 3,
 	},
 	/* RX channels */
 	{
-		.dev_id = 322,
+		.dev_id = 329,
 		.subtype = 10,
-		.range_start = 12,
-		.range_num = 2,
+		.range_start = 40,
+		.range_num = 3,
 	},
 	/* RX Free flows */
 	{
-		.dev_id = 322,
+		.dev_id = 329,
 		.subtype = 0,
-		.range_start = 80,
+		.range_start = 84,
 		.range_num = 8,
 	},
 	{ },
 };
 #endif /* CONFIG_TARGET_J784S4_R5_EVM */
 
-#if IS_ENABLED(CONFIG_SOC_K3_AM625)
+#if IS_ENABLED(CONFIG_SOC_K3_AM625) || IS_ENABLED(CONFIG_SOC_K3_AM62A7)
+
 static struct ti_sci_resource_static_data rm_static_data[] = {
 	/* BC channels */
 	{
@@ -129,8 +130,8 @@ static struct ti_sci_resource_static_data rm_static_data[] = {
 	},
 	{ },
 };
-
-#endif /* CONFIG_SOC_K3_AM625 */
+ 
+#endif /* CONFIG_SOC_K3_AM625 || CONFIG_SOC_K3_AM62A7 */
 
 #else
 static struct ti_sci_resource_static_data rm_static_data[] = {

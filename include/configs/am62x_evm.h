@@ -33,7 +33,7 @@
  * our memory footprint. The less we use for BSS the more we have available
  * for everything else.
  */
-#define CONFIG_SPL_BSS_MAX_SIZE		0x5000
+#define CONFIG_SPL_BSS_MAX_SIZE		0x3000
 /*
  * Link BSS to be within SPL in a dedicated region located near the top of
  * the MCU SRAM, this way making it available also before relocation. Note
@@ -42,10 +42,10 @@
  * the boot ROM that we want to read out without any interference from the
  * C context.
  */
-#define CONFIG_SPL_BSS_START_ADDR	(0x43c3c800 -\
+#define CONFIG_SPL_BSS_START_ADDR	(0x43c3e000 -\
 					 CONFIG_SPL_BSS_MAX_SIZE)
 /* Set the stack right below the SPL BSS section */
-#define CONFIG_SYS_INIT_SP_ADDR         0x7000ffff
+#define CONFIG_SYS_INIT_SP_ADDR         0x43c3a7f0
 /* Configure R5 SPL post-relocation malloc pool in DDR */
 #define CONFIG_SYS_SPL_MALLOC_START    0x84000000
 #define CONFIG_SYS_SPL_MALLOC_SIZE     SZ_16M
@@ -70,7 +70,88 @@
 	"name=vbmeta_b,size=64K,uuid=${uuid_gpt_vbmeta_b};" \
 	"name=super,size=4608M,uuid=${uuid_gpt_super};" \
 	"name=metadata,size=16M,uuid=${uuid_gpt_metadata};" \
+	"name=persist,size=32M,uuid=${uuid_gpt_persist};" \
 	"name=userdata,size=-,uuid=${uuid_gpt_userdata}\0"
+
+/* U-Boot general configuration */
+#define EXTRA_ENV_AM625_BOARD_SETTINGS					\
+	"default_device_tree=" CONFIG_DEFAULT_DEVICE_TREE ".dtb\0"	\
+	"findfdt="							\
+		"setenv name_fdt ${default_device_tree};"		\
+		"setenv fdtfile ${name_fdt}\0"				\
+	"name_kern=Image\0"						\
+	"console=ttyS2,115200n8\0"					\
+	"args_all=setenv optargs ${optargs} "				\
+		"earlycon=ns16550a,mmio32,0x02800000 ${mtdparts}\0"	\
+	"run_kern=booti ${loadaddr} ${rd_spec} ${fdtaddr}\0"
+
+/* U-Boot MMC-specific configuration */
+#define EXTRA_ENV_AM625_BOARD_SETTINGS_MMC				\
+	"boot=mmc\0"							\
+	"mmcdev=1\0"							\
+	"bootpart=1:2\0"						\
+	"bootdir=/boot\0"						\
+	"rd_spec=-\0"							\
+	"init_mmc=run args_all args_mmc\0"				\
+	"get_fdt_mmc=load mmc ${bootpart} ${fdtaddr} ${bootdir}/${name_fdt}\0" \
+	"get_overlay_mmc="						\
+		"fdt address ${fdtaddr};"				\
+		"fdt resize 0x100000;"					\
+		"for overlay in $name_overlays;"			\
+		"do;"							\
+		"load mmc ${bootpart} ${dtboaddr} ${bootdir}/${overlay} && "	\
+		"fdt apply ${dtboaddr};"				\
+		"done;\0"						\
+	"get_kern_mmc=load mmc ${bootpart} ${loadaddr} "		\
+		"${bootdir}/${name_kern}\0"				\
+	"get_fit_mmc=load mmc ${bootpart} ${addr_fit} "			\
+		"${bootdir}/${name_fit}\0"				\
+	"partitions=" PARTS_DEFAULT
+
+#define EXTRA_ENV_AM625_BOARD_SETTING_USBMSC				\
+	"args_usb=run finduuid;setenv bootargs console=${console} "	\
+		"${optargs} "						\
+		"root=PARTUUID=${uuid} rw "				\
+		"rootfstype=${mmcrootfstype}\0"				\
+	"init_usb=run args_all args_usb\0"				\
+	"get_fdt_usb=load usb ${bootpart} ${fdtaddr} ${bootdir}/${fdtfile}\0"	\
+	"get_overlay_usb="						\
+		"fdt address ${fdtaddr};"				\
+		"fdt resize 0x100000;"					\
+		"for overlay in $name_overlays;"			\
+		"do;"							\
+		"load usb ${bootpart} ${dtboaddr} ${bootdir}/${overlay} && "	\
+		"fdt apply ${dtboaddr};"				\
+		"done;\0"						\
+	"get_kern_usb=load usb ${bootpart} ${loadaddr} "		\
+		"${bootdir}/${name_kern}\0"				\
+	"get_fit_usb=load usb ${bootpart} ${addr_fit} "			\
+		"${bootdir}/${name_fit}\0"				\
+	"usbboot=setenv boot usb;"					\
+		"setenv bootpart 0:2;"					\
+		"usb start;"						\
+		"run findfdt;"						\
+		"run init_usb;"						\
+		"run get_kern_usb;"					\
+		"run get_fdt_usb;"					\
+		"run run_kern\0"
+
+
+#define BOOTENV_DEV_LINUX(devtypeu, devtypel, instance) \
+	"bootcmd_linux=" \
+		"if test \"${android_boot}\" -eq 0; then;" \
+			"run findfdt; run envboot; run init_${boot};" \
+			"if test ${boot_fit} -eq 1; then;" \
+				"run get_fit_${boot}; run get_fit_${boot}; run get_overlaystring; run run_fit;"\
+			"else;" \
+				"run get_kern_${boot}; run get_fdt_${boot}; run get_overlay_${boot}; run run_kern;" \
+			"fi;" \
+		"fi\0"
+
+#define BOOTENV_DEV_NAME_LINUX(devtypeu, devtypel, instance)	\
+		"linux "
+
+#if defined(CONFIG_ANDROID_BOOT_IMAGE)
 
 /* ANDROID BOOT */
 #ifndef BOOT_PARTITION
@@ -154,78 +235,36 @@
 	"if test $board_name = am62x_skevm; then " \
 		"echo \"  Reading DTB for am62x_skevm...\"; " \
 		"setenv dtb_index 0;" \
+	"elif test $board_name = am62x_lp_skevm; then " \
+		"echo \"  Reading DTB for am62x_lp_skevm...\"; " \
+		"setenv dtb_index 1;" \
 	"else " \
 		"echo Error: Android boot is not supported for $board_name; " \
 		"exit; " \
 	"fi; " \
 	"abootimg get dtb --index=$dtb_index dtb_start dtb_size; " \
 	"cp.b $dtb_start $fdt_addr_r $dtb_size; " \
-	"fdt addr $fdt_addr_r  0x80000; " \
+	"fdt addr $fdt_addr_r $fdt_size; " \
+	"part start mmc ${mmcdev} dtbo${slot_suffix} dtbo_start; " \
+	"part size mmc ${mmcdev} dtbo${slot_suffix} dtbo_size; " \
+	"mmc read ${dtboaddr} ${dtbo_start} ${dtbo_size}; " \
+	"echo \"  Applying DTBOs...\"; " \
+	"adtimg addr $dtboaddr; " \
+	"dtbo_idx=''; " \
+	"for index in $dtbo_index; do " \
+		"adtimg get dt --index=$index dtbo_addr; " \
+		"fdt resize; " \
+		"fdt apply $dtbo_addr; " \
+		"if test $dtbo_idx = ''; then " \
+			"dtbo_idx=${index}; " \
+		"else " \
+			"dtbo_idx=${dtbo_idx},${index}; " \
+		"fi; " \
+	"done; " \
+	"setenv bootargs \"$bootargs androidboot.dtbo_idx=$dtbo_idx \"; "
+
 
 #define BOOT_CMD "bootm ${loadaddr} ${loadaddr} ${fdt_addr_r};"
-
-/* U-Boot general configuration */
-#define EXTRA_ENV_AM625_BOARD_SETTINGS					\
-	"default_device_tree=" CONFIG_DEFAULT_DEVICE_TREE ".dtb\0"	\
-	"findfdt="							\
-		"setenv name_fdt ${default_device_tree};"		\
-		"setenv fdtfile ${name_fdt}\0"				\
-	"name_kern=Image\0"						\
-	"console=ttyS2,115200n8\0"					\
-	"args_all=setenv optargs ${optargs} "				\
-		"earlycon=ns16550a,mmio32,0x02800000 ${mtdparts}\0"	\
-	"run_kern=booti ${loadaddr} ${rd_spec} ${fdtaddr}\0"
-
-/* U-Boot MMC-specific configuration */
-#define EXTRA_ENV_AM625_BOARD_SETTINGS_MMC				\
-	"boot=mmc\0"							\
-	"mmcdev=1\0"							\
-	"bootpart=1:2\0"						\
-	"bootdir=/boot\0"						\
-	"rd_spec=-\0"							\
-	"init_mmc=run args_all args_mmc\0"				\
-	"get_fdt_mmc=load mmc ${bootpart} ${fdtaddr} ${bootdir}/${name_fdt}\0" \
-	"get_overlay_mmc="						\
-		"fdt address ${fdtaddr};"				\
-		"fdt resize 0x100000;"					\
-		"for overlay in $name_overlays;"			\
-		"do;"							\
-		"load mmc ${bootpart} ${dtboaddr} ${bootdir}/${overlay} && "	\
-		"fdt apply ${dtboaddr};"				\
-		"done;\0"						\
-	"get_kern_mmc=load mmc ${bootpart} ${loadaddr} "		\
-		"${bootdir}/${name_kern}\0"				\
-	"get_fit_mmc=load mmc ${bootpart} ${addr_fit} "			\
-		"${bootdir}/${name_fit}\0"				\
-	"partitions=" PARTS_DEFAULT
-
-#define EXTRA_ENV_AM625_BOARD_SETTING_USBMSC				\
-	"args_usb=run finduuid;setenv bootargs console=${console} "	\
-		"${optargs} "						\
-		"root=PARTUUID=${uuid} rw "				\
-		"rootfstype=${mmcrootfstype}\0"				\
-	"init_usb=run args_all args_usb\0"				\
-	"get_fdt_usb=load usb ${bootpart} ${fdtaddr} ${bootdir}/${fdtfile}\0"	\
-	"get_overlay_usb="						\
-		"fdt address ${fdtaddr};"				\
-		"fdt resize 0x100000;"					\
-		"for overlay in $name_overlays;"			\
-		"do;"							\
-		"load usb ${bootpart} ${dtboaddr} ${bootdir}/${overlay} && "	\
-		"fdt apply ${dtboaddr};"				\
-		"done;\0"						\
-	"get_kern_usb=load usb ${bootpart} ${loadaddr} "		\
-		"${bootdir}/${name_kern}\0"				\
-	"get_fit_usb=load usb ${bootpart} ${addr_fit} "			\
-		"${bootdir}/${name_fit}\0"				\
-	"usbboot=setenv boot usb;"					\
-		"setenv bootpart 0:2;"					\
-		"usb start;"						\
-		"run findfdt;"						\
-		"run init_usb;"						\
-		"run get_kern_usb;"					\
-		"run get_fdt_usb;"					\
-		"run run_kern\0"
 
 #define BOOTENV_DEV_FASTBOOT(devtypeu, devtypel, instance) \
 	"bootcmd_fastboot=" \
@@ -342,29 +381,26 @@
 	AVB_VERIFY_CMD                                                \
 	BOOTENV
 
-#define BOOTENV_DEV_LINUX(devtypeu, devtypel, instance) \
-	"bootcmd_linux=" \
-		"if test \"${android_boot}\" -eq 0; then;" \
-			"run findfdt; run envboot;" \
-			"run init_${boot}; run get_kern_${boot}; "\
-			"run get_fdt_${boot}; run get_overlay_${boot}; run run_kern;" \
-		"fi\0"
-
-#define BOOTENV_DEV_NAME_LINUX(devtypeu, devtypel, instance)	\
-		"linux "
-
-#define EXTRA_ENV_DFUARGS \
-	DFU_ALT_INFO_MMC \
-	DFU_ALT_INFO_EMMC \
-	DFU_ALT_INFO_RAM \
-	DFU_ALT_INFO_OSPI
-
 #define BOOT_TARGET_DEVICES(func) \
 	func(LINUX, linux, na) \
 	func(FASTBOOT, fastboot, na) \
 	func(RECOVERY, recovery, na) \
 	func(SYSTEM, system, na) \
 	func(PANIC, panic, na) \
+
+#else
+
+#define EXTRA_ANDROID_ENV_SETTINGS  ""
+#define BOOT_TARGET_DEVICES(func) \
+	func(LINUX, linux, na) \
+
+#endif
+
+#define EXTRA_ENV_DFUARGS \
+	DFU_ALT_INFO_MMC \
+	DFU_ALT_INFO_EMMC \
+	DFU_ALT_INFO_RAM \
+	DFU_ALT_INFO_OSPI
 
 /* Incorporate settings into the U-Boot environment */
 #define CONFIG_EXTRA_ENV_SETTINGS					\
