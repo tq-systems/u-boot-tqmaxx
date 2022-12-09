@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Copyright 2017-2019, 2021 NXP
+ * Copyright 2017-2019, 2021-2022 NXP
  *
  * Peng Fan <peng.fan@nxp.com>
  */
@@ -39,6 +39,7 @@
 #include "../snvs.h"
 #include <asm/setup.h>
 #include <asm/bootm.h>
+#include <fdt_support.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -1441,6 +1442,13 @@ usb_modify_speed:
 	if (IS_ENABLED(CONFIG_IMX8MP) &&
 	    fixup_thermal_trips(blob, "soc-thermal"))
 		printf("Failed to update soc-thermal trip(s)");
+
+	if (IS_ENABLED(CONFIG_DM_RNG)) {
+		int ret = fdt_kaslrseed(blob, true);
+		if (ret)
+			printf("Unable to set property %s, err=%s\n",
+		               "kaslr-seed", fdt_strerror(ret));
+	}
 
 	return ft_add_optee_node(blob, bd);
 }
