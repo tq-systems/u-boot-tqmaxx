@@ -318,7 +318,8 @@
 };
 
 &ethphy0 {
-	reset-deassert-us = <80000>;
+	reset-assert-us = <15000>;
+	reset-deassert-us = <100000>;
 
 	vddio0: vddio-regulator {
 		regulator-name = "VDDIO";
