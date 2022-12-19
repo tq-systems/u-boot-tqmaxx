@@ -22,6 +22,7 @@
 #include <fdt_support.h>
 #include <asm/io.h>
 #include <dm.h>
+#include <asm-generic/gpio.h>
 
 #if !CONFIG_IS_ENABLED(BLK)
 #include "mmc_private.h"
@@ -104,6 +105,10 @@ struct fsl_esdhc_priv {
 	struct udevice *dev;
 	int non_removable;
 	int wp_enable;
+#ifdef CONFIG_DM_GPIO
+	struct gpio_desc cd_gpio;
+	struct gpio_desc wp_gpio;
+#endif
 };
 
 /* Return the XFERTYP flags for a given command and data packet */
@@ -252,6 +257,13 @@ static int esdhc_setup_data(struct fsl_esdhc_priv *priv, struct mmc *mmc,
 				printf("\nThe SD card is locked. Can not write to a locked card.\n\n");
 				return -ETIMEDOUT;
 			}
+		} else {
+#ifdef CONFIG_DM_GPIO
+			if (dm_gpio_is_valid(&priv->wp_gpio) && dm_gpio_get_value(&priv->wp_gpio)) {
+				printf("\nThe SD card is locked. Can not write to a locked card.\n\n");
+				return -ETIMEDOUT;
+			}
+#endif
 		}
 
 		esdhc_clrsetbits32(&regs->wml, WML_WR_WML_MASK,
@@ -610,6 +622,10 @@ static int esdhc_getcd_common(struct fsl_esdhc_priv *priv)
 #if CONFIG_IS_ENABLED(DM_MMC)
 	if (priv->non_removable)
 		return 1;
+#ifdef CONFIG_DM_GPIO
+	if (dm_gpio_is_valid(&priv->cd_gpio))
+		return dm_gpio_get_value(&priv->cd_gpio);
+#endif
 #endif
 
 	if (esdhc_read32(&regs->prsstat) & PRSSTAT_CINS)
@@ -1018,9 +1034,21 @@ static int fsl_esdhc_probe(struct udevice *dev)
 		priv->non_removable = 1;
 	 } else {
 		priv->non_removable = 0;
+#ifdef CONFIG_DM_GPIO
+		gpio_request_by_name(dev, "cd-gpios", 0, &priv->cd_gpio,
+				     GPIOD_IS_IN);
+#endif
 	}
 
-	priv->wp_enable = 1;
+	if (dev_read_prop(dev, "fsl,wp-controller", NULL)) {
+		priv->wp_enable = 1;
+	} else {
+		priv->wp_enable = 0;
+#ifdef CONFIG_DM_GPIO
+		gpio_request_by_name(dev, "wp-gpios", 0, &priv->wp_gpio,
+				     GPIOD_IS_IN);
+#endif
+	}
 
 	if (IS_ENABLED(CONFIG_CLK)) {
 		/* Assigned clock already set clock */
