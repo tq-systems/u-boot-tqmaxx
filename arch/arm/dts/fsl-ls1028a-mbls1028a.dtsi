@@ -53,6 +53,7 @@
 };
 
 &esdhc0 {
+	cd-gpios = <&gpio0 31 GPIO_ACTIVE_LOW>;
 	no-mmc;
 	no-1-8-v;
 	bus-width = <4>;
