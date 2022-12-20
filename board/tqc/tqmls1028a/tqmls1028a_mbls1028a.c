@@ -8,6 +8,8 @@
 #include <common.h>
 #include "tqmls1028a_bb.h"
 #include <asm/arch/soc.h>
+#include <asm/arch-fsl-layerscape/soc.h>
+#include <asm/io.h>
 #include <asm/gpio.h>
 #include <i2c.h>
 
@@ -110,9 +112,29 @@ static void mbls1028a_reset_one_gpio(const char *label, const char *name,
 	dm_gpio_set_value(&gpio, 0);
 }
 
+static void fixup_sdhc_gpios(void)
+{
+	u32 __iomem *dcfg_ccsr = (u32 __iomem *)DCFG_BASE;
+	u32 __iomem *dcfg_rst = (u32 __iomem *)DCFG_RST_BASE;
+	u32 __iomem *dcfg_dcsr = (u32 __iomem *)DCFG_DCSR_BASE;
+	u32 val;
+
+	val = in_le32(dcfg_ccsr + DCFG_PORSR1);
+	/* Clear RCW_SRC */
+	val &= ~RCW_SRC_MASK;
+	out_le32(dcfg_dcsr + DCFG_DCSR_PORCR1, val);
+
+	/* HRESET masked off */
+	out_le32(dcfg_rst + DCFG_RST_RSTCR, DCFG_RST_HRESET);
+}
+
 int board_bb_init(void)
 {
 	int ret;
+
+	/* Workaround to allow pinmuxing of SDHC1 CD/WP pins as gpios when booting from SD-Card */
+	if (get_boot_src() == BOOT_SOURCE_SD_MMC)
+		fixup_sdhc_gpios();
 
 	ret = clockgen_init();
 	if (ret) {
