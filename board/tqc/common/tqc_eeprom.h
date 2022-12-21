@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Copyright (C) 2014 - 2022 TQ-Systems GmbH
+ * Copyright (C) 2014 - 2023 TQ-Systems GmbH
  * Markus Niebel <Markus.Niebel@tq-group.com>
  */
 
@@ -153,6 +153,23 @@ bool tq_vard_has_rtc(const struct tq_vard *vard)
 }
 
 void tq_vard_show(const struct tq_vard *vard);
+
+struct tq_som_feature_list;
+
+/**
+ * fill in presence information from VARD.
+ *
+ * @param[in] vard pointer to VARD structure from SOM EEPROM
+ * @param[in] features SOM specific feature list
+ *
+ * @return 0 on success
+
+ * Must be called after data was read to vard. The function checks
+ * if vard is valid, goes through the list and sets the present flag
+ * for each entry depending on the flags in vard.
+ */
+int tq_vard_detect_features(const struct tq_vard *vard,
+			    struct tq_som_feature_list *features);
 
 #endif
 
