@@ -17,6 +17,7 @@
 #include <usb.h>
 
 #include "../common/tqc_board_gpio.h"
+#include "../common/tq_som_features.h"
 #include "tqma8mpxl-usbg.h"
 
 #define MBA8MPXL_BOARD_NAME "MBa8MPxL"
@@ -344,8 +345,19 @@ int tqc_bb_board_init(void)
 }
 
 #ifdef CONFIG_OF_BOARD_SETUP
+
 int tqc_bb_ft_board_setup(void *blob, bd_t *bd)
 {
+	struct tq_som_feature_list *features;
+
+	features = tq_board_detect_features();
+	if (!features) {
+		pr_warn("tq_board_detect_features failed\n");
+		return -ENODATA;
+	}
+
+	tq_ft_fixup_features(blob, features);
+
 	return 0;
 }
 #endif
