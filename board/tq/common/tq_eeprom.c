@@ -15,6 +15,7 @@
 #include <u-boot/crc.h>
 
 #include "tq_eeprom.h"
+#include "tq_som_features.h"
 
 /*
  * read_eeprom - read the given EEPROM into memory
@@ -120,6 +121,48 @@ void tq_vard_show(const struct tq_vard *vard)
 		       (unsigned long)(tq_vard_eepromsize(vard) / (SZ_1K)),
 		       tq_vard_eeprom_pgsize(vard));
 }
+
+int tq_vard_detect_features(const struct tq_vard *vard,
+			    struct tq_som_feature_list *features)
+{
+	size_t i;
+
+	if (!vard || !features) {
+		pr_err("%s: invalid parameter\n", __func__);
+		return -EINVAL;
+	}
+
+	if (!tq_vard_valid(vard)) {
+		pr_err("%s: VARD invalid\n", __func__);
+		return -ENODATA;
+	}
+
+	for (i = 0; i < features->entries; ++i) {
+		switch (features->list[i].feature) {
+		case FEATURE_EMMC:
+			features->list[i].present = tq_vard_has_emmc(vard);
+			break;
+		case FEATURE_EEPROM:
+			features->list[i].present = tq_vard_has_eeprom(vard);
+			break;
+		case FEATURE_SPINOR:
+			features->list[i].present = tq_vard_has_spinor(vard);
+			break;
+		case FEATURE_SECELEM:
+			features->list[i].present = tq_vard_has_secelem(vard);
+			break;
+		case FEATURE_RTC:
+			features->list[i].present = tq_vard_has_rtc(vard);
+			break;
+		default:
+			pr_warn("%s: unknown feature %d\n", __func__,
+				features->list[i].feature);
+		}
+	}
+
+	return 0;
+}
+
 #endif
 
 #if !defined(CONFIG_SPL_BUILD)
