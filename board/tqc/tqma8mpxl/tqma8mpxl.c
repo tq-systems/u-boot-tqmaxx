@@ -229,13 +229,28 @@ int ft_board_setup(void *blob, bd_t *bd)
 #endif
 #endif
 
-	const char * const path = "/bus@5d000000/spi@5d120000";
-	static const struct node_info nodes[] = {
-		{ "jedec,spi-nor",	MTD_DEV_TYPE_NOR, },
-		{ "nxp,imx8qxp-fspi",	MTD_DEV_TYPE_NOR, },
-	};
+	if (CONFIG_IS_ENABLED(FDT_FIXUP_PARTITIONS)) {
+		const char * const path = "/soc@0/bus@30800000/spi@30bb0000";
+		const struct node_info nodes[] = {
+			{ "jedec,spi-nor",	MTD_DEV_TYPE_NOR, },
+			{ "nxp,imx8mp-fspi",	MTD_DEV_TYPE_NOR, },
+			/* fallback, used by older TQ BSP kernel */
+			{ "nxp,imx8qxp-fspi",	MTD_DEV_TYPE_NOR, },
+		};
 
-	tqc_ft_spi_setup(blob, path, nodes, ARRAY_SIZE(nodes));
+		if (tq_vard_valid(&eeprom.tq_hw_data.vard)) {
+			if (tq_vard_has_spinor(&eeprom.tq_hw_data.vard)) {
+				/*
+				 * Update MTD partition nodes using info from
+				 * mtdparts env var
+				 * for [Q]SPI this needs the device probed.
+				 */
+				puts("   Updating MTD partitions...\n");
+				tqc_ft_spi_setup(blob, path, nodes,
+						 ARRAY_SIZE(nodes));
+			}
+		}
+	}
 
 	return tqc_bb_ft_board_setup(blob, bd);
 }
