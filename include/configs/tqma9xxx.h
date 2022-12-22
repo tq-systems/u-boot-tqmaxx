@@ -148,7 +148,6 @@
 	"addnfs=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/nfs rw "                                            \
 		"nfsroot=${serverip}:${rootpath},v3,tcp;\0"                    \
-	"netdev=eth0\0"                                                        \
 	"rootpath=/srv/nfs\0"                                                  \
 	"ipmode=static\0"                                                      \
 	"addip_static=setenv bootargs ${bootargs} "                            \
@@ -219,6 +218,12 @@
 #error
 #endif
 
+#if defined(CONFIG_ETHPRIME)
+#define NETDEV_ENV "netdev=" CONFIG_ETHPRIME "\0"
+#else
+#define NETDEV_ENV "netdev=eth0\0"
+#endif
+
 #ifdef CONFIG_DISTRO_DEFAULTS
 #define BOOT_TARGET_DEVICES(func) \
 	func(MMC, mmc, 0)                                              \
@@ -239,6 +244,7 @@
 	BB_ENV_SETTINGS                                                \
 	CONFIG_MFG_ENV_SETTINGS                                        \
 	BOOTENV                                                        \
+	NETDEV_ENV                                                     \
 	AHAB_ENV
 
 #endif /* __TQMA9XXX_H */
