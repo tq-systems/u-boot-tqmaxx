@@ -68,12 +68,22 @@
 	};
 };
 
+&{/leds} {
+	/delete-node/ status;
+
+	led-0 {
+		label = "status";
+		gpios = <&gpio3 16 GPIO_ACTIVE_HIGH>;
+		default-state = "on";
+	};
+};
+
 &aips4 {
 	bootph-pre-ram;
 };
 
 &reg_usdhc2_vmmc {
-	u-boot,off-on-delay-us = <20000>;
+	off-on-delay-us = <20000>;
 	bootph-pre-ram;
 };
 
