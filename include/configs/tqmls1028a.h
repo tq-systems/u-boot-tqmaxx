@@ -200,7 +200,6 @@
 #define BOOT_ENV_SETTINGS \
 	BOOT_ENV_BOARD \
 	"loadaddr=0x82000000\0"                                                \
-	"fdtaddr=0x88000000\0"                                                 \
 	"kernel_addr_r=0x82000000\0"                                           \
 	"fdt_addr_r=0x88000000\0"                                              \
 	"pxefile_addr_r=0x88800000\0"                                          \
@@ -208,9 +207,12 @@
 	"addtty=setenv bootargs ${bootargs} console=${console}\0"              \
 	"addmmc=setenv bootargs ${bootargs} root=/dev/mmcblk${mmcdev}p2 rootwait\0" \
 	"firmwarepart=1\0"                                                     \
-	"mmchdpload=load mmc ${mmcdev}:${firmwarepart} ${loadaddr} ls1028a-dp-fw.bin; hdp load ${loadaddr};\0" \
-	"mmcimageload=load mmc ${mmcdev}:${firmarepart} ${fdtaddr} Image.gz; unzip $fdtaddr $loadaddr\0" \
-	"mmcfdtload=load mmc ${mmcdev}:${firmwarepart} ${fdtaddr} ${fdt_file}; fdt addr ${fdtaddr}\0" \
+	"mmchdpload=load mmc ${mmcdev}:${firmwarepart} ${loadaddr} ls1028a-dp-fw.bin;" \
+		"hdp load ${loadaddr};\0"				       \
+	"mmcimageload=load mmc ${mmcdev}:${firmarepart} ${fdt_addr_r} Image.gz;" \
+		"unzip ${fdt_addr_r} ${kernel_addr_r}\0"		       \
+	"mmcfdtload=load mmc ${mmcdev}:${firmwarepart} ${fdt_addr_r} ${fdt_file};" \
+		"fdt addr ${fdt_addr_r}\0"				       \
 	"mmcargs=run addmmc addtty\0"                                          \
 	"mmcboot=echo Booting from MMC ...; "                                  \
 		"setenv bootargs; "                                            \
@@ -218,18 +220,18 @@
 		"run mmchdpload; "                                             \
 		"run mmcimageload; "                                           \
 		"run mmcfdtload;"                                              \
-		"booti ${loadaddr} - ${fdtaddr}\0"                             \
+		"booti ${kernel_addr_r} - ${fdt_addr_r}\0"                     \
 	"rootfs_mtddev=RootFS\0"                                               \
 	"addspi=setenv bootargs ${bootargs} root=ubi0_0 rw "                   \
 		"rootfstype=ubifs ubi.mtd=8\0"                                 \
 	"spiargs=run addspi addtty\0"                                          \
-	"spikernelload=sf probe 0; sf read ${fdtaddr} Linux; "		       \
-		"unzip ${fdtaddr} ${loadaddr}\0"			       \
-	"spifdtload=sf probe 0; sf read ${fdtaddr} DTB; fdt addr ${fdtaddr}\0" \
-	"spihdpload=sf probe; sf read ${loadaddr} HDP; hdp load ${loadaddr};\0" \
+	"spikernelload=sf probe 0; sf read ${fdt_addr_r} Linux; "	       \
+		"unzip ${fdt_addr_r} ${kernel_addr_r}\0"		       \
+	"spifdtload=sf probe 0; sf read ${fdt_addr_r} DTB; fdt addr ${fdt_addr_r}\0" \
+	"spihdpload=sf probe; sf read ${loadaddr} HDP; hdp load ${loadaddr};\0"\
 	"spiboot=echo Booting from SPI NOR flash...; setenv bootargs; "        \
 		"run spiargs; run spihdpload spikernelload spifdtload ; "      \
-		"booti ${loadaddr} - ${fdtaddr};\0"                            \
+		"booti ${kernel_addr_r} - ${fdt_addr_r};\0"                    \
 	"panicboot=echo No boot device !!! reset\0"			       \
 	""
 
