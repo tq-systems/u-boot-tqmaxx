@@ -50,6 +50,13 @@ int board_early_init_f(void)
 
 #if !defined(CONFIG_SPL_BUILD)
 
+/**
+ * Global copy of EEPROM data to prevent multiple reads.
+ *
+ * Data is read during board_late_init
+ */
+static struct tqc_eeprom_data eeprom;
+
 int board_phys_sdram_size(phys_size_t *size)
 {
 	struct tq_raminfo *raminfo;
@@ -206,7 +213,6 @@ int ft_board_setup(void *blob, bd_t *bd)
 
 int board_late_init(void)
 {
-	struct tqc_eeprom_data eeprom;
 	const char *bname = tqc_get_boardname();
 	int ret;
 
