@@ -27,6 +27,7 @@
 #include "../common/tqc_bb.h"
 #include "../common/tqc_blob.h"
 #include "../common/tqc_eeprom.h"
+#include "../common/tq_som_features.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -157,6 +158,35 @@ int board_init(void)
 	return 0;
 }
 
+static struct tq_som_feature tqma8mpxl_som_features[] = {
+	{
+		.feature = FEATURE_EMMC,
+		.dt_path = "/soc@0/bus@30800000/mmc@30b60000",
+	}, {
+		.feature = FEATURE_EEPROM,
+		.dt_path = "/soc@0/bus@30800000/i2c@30a20000/eeprom@57",
+	}, {
+		.feature = FEATURE_SPINOR,
+		.dt_path = "/soc@0/bus@30800000/spi@30bb0000/flash@0",
+	}, {
+		.feature = FEATURE_SECELEM,
+		/* TODO: no driver yet */
+	}, {
+		.feature = FEATURE_RTC,
+		.dt_path = "/soc@0/bus@30800000/i2c@30a20000/rtc@51",
+	},
+};
+
+static struct tq_som_feature_list tqma8mpxl_feature_list = {
+	.list = tqma8mpxl_som_features,
+	.entries = ARRAY_SIZE(tqma8mpxl_som_features),
+};
+
+struct tq_som_feature_list *tq_board_detect_features(void)
+{
+	return &tqma8mpxl_feature_list;
+}
+
 #ifdef CONFIG_OF_BOARD_SETUP
 int ft_board_setup(void *blob, bd_t *bd)
 {
@@ -234,6 +264,13 @@ int board_late_init(void)
 								 7000))
 					puts("PCF85063: adjust error\n");
 			}
+			/*
+			 * fill features present flag from vard
+			 * set list to empty if error
+			 */
+			if (tq_vard_detect_features(&eeprom.tq_hw_data.vard,
+						    &tqma8mpxl_feature_list))
+				tqma8mpxl_feature_list.entries = 0;
 		}
 	} else {
 		pr_err("EEPROM: read error %d\n", ret);
