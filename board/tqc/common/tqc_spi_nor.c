@@ -1,20 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * (C) Copyright 2022 TQ-Systems GmbH
+ * (C) Copyright 2022 - 2023 TQ-Systems GmbH
  * Markus Niebel <Markus.Niebel@tq-group.com>
  */
 
 #include <common.h>
 #include <dm.h>
-#include <dm/device-internal.h>
-#include <dm/lists.h>
-#include <dm/uclass-internal.h>
 #include <fdt_support.h>
 #include <mtd_node.h>
 #include <jffs2/load_kernel.h>
-
-#include <asm/arch/sys_proto.h>
-#include <asm/mach-imx/boot_mode.h>
 
 #include <spi.h>
 #include <spi_flash.h>
@@ -89,4 +83,4 @@ void tqc_ft_spi_setup(void *blob, const char *path,
 #endif
 }
 
-#endif
+#endif /* defined(CONFIG_OF_BOARD_SETUP) && !defined(CONFIG_SPL_BUILD) */
