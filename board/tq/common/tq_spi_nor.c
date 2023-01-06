@@ -7,7 +7,6 @@
 
 #include <common.h>
 #include <dm.h>
-#include <dm/lists.h>
 #include <fdt_support.h>
 #include <jffs2/load_kernel.h>
 #include <mtd_node.h>
