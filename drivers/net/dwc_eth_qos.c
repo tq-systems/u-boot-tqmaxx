@@ -1482,9 +1482,37 @@ static int eqos_remove_resources_stm32(struct udevice *dev)
 	return 0;
 }
 
+struct mii_dev *eqos_get_miibus(struct eqos_priv *eqos,
+				const char *name)
+{
+	struct mii_dev *bus;
+	int ret;
+
+	bus = mdio_alloc();
+	if (!bus) {
+		pr_err("mdio_alloc() failed");
+		return NULL;
+	}
+	bus->read = eqos_mdio_read;
+	bus->write = eqos_mdio_write;
+	bus->priv = eqos;
+	snprintf(bus->name, ARRAY_SIZE(bus->name), "%s-mdio", name);
+
+	ret = mdio_register(bus);
+	if (ret < 0) {
+		pr_err("mdio_register() failed: %d", ret);
+		free(bus);
+		return NULL;
+	}
+
+	return bus;
+}
+
 static int eqos_probe(struct udevice *dev)
 {
 	struct eqos_priv *eqos = dev_get_priv(dev);
+	struct mii_dev *bus = NULL;
+	bool dm_mii_bus = true;
 	int ret;
 
 	debug("%s(dev=%p):\n", __func__, dev);
@@ -1521,45 +1549,41 @@ static int eqos_probe(struct udevice *dev)
 	}
 
 #ifdef CONFIG_DM_ETH_PHY
-	eqos->mii = eth_phy_get_mdio_bus(dev);
+	bus = eth_phy_get_mdio_bus(dev);
 #endif
-	if (!eqos->mii) {
-		eqos->mii = mdio_alloc();
-		if (!eqos->mii) {
-			pr_err("mdio_alloc() failed");
-			ret = -ENOMEM;
-			goto err_stop_clks;
-		}
-		eqos->mii->read = eqos_mdio_read;
-		eqos->mii->write = eqos_mdio_write;
-		eqos->mii->priv = eqos;
-		snprintf(eqos->mii->name, ARRAY_SIZE(eqos->mii->name),
-			 "%s-mdio", dev->name);
+	if (!bus) {
+		dm_mii_bus = false;
+		bus = eqos_get_miibus(eqos, dev->name);
+	}
 
-		ret = mdio_register(eqos->mii);
-		if (ret < 0) {
-			pr_err("mdio_register() failed: %d", ret);
-			goto err_free_mdio;
-		}
+	if (!bus) {
+		ret = -ENOMEM;
+		goto err_stop_clks;
 	}
 
 #ifdef CONFIG_DM_ETH_PHY
-	eth_phy_set_mdio_bus(dev, eqos->mii);
+	eth_phy_set_mdio_bus(dev, bus);
 #endif
 
+	eqos->mii = bus;
 	ret = eqos_phy_init(eqos, dev);
 	if (ret || !eqos->phy)
 		goto err_free_mdio;
 
 	ret = phy_config(eqos->phy);
-	if (ret < 0)
+	if (ret) {
 		pr_err("phy_config() failed: %d", ret);
+		goto err_free_mdio;
+	}
 
 	debug("%s: OK\n", __func__);
 	return 0;
 
 err_free_mdio:
-	mdio_free(eqos->mii);
+	if (!dm_mii_bus) {
+		mdio_unregister(eqos->mii);
+		mdio_free(eqos->mii);
+	}
 err_stop_clks:
 	eqos->config->ops->eqos_stop_clks(dev);
 err_remove_resources_tegra:
