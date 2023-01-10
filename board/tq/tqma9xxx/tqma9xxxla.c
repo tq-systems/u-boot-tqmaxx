@@ -156,14 +156,23 @@ int board_late_init(void)
 
 	ret = tq_read_module_eeprom(&eeprom);
 
-	if (ret)
-		puts("EEPROM: read error\n");
-	else
+	if (!ret) {
 		tq_board_handle_eeprom_data(bname, &eeprom);
-
-	/* set quartz load to 7.000 femtofarads */
-	if (tq_pcf85063_adjust_capacity(0, 0x51, 7000))
-		puts("PCF85063: adjust error\n");
+		if (tq_vard_valid(&eeprom.tq_hw_data.vard)) {
+			/*
+			 * set quartz load to 7.000 femtofarads
+			 * only if RTC is assembled, to prevent warnings
+			 */
+			if (tq_vard_has_rtc(&eeprom.tq_hw_data.vard)) {
+				/* set quartz load to 7.000 femtofarads */
+				if (tq_pcf85063_adjust_capacity(0, 0x51,
+								7000))
+					puts("PCF85063: adjust error\n");
+			}
+		}
+	} else {
+		puts("EEPROM: read error\n");
+	}
 
 	if (CONFIG_IS_ENABLED(ENV_VARS_UBOOT_RUNTIME_CONFIG)) {
 		env_set("board_name", tq_bb_get_boardname());
