@@ -1,7 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Copyright (C) 2022 TQ-Systems
- * Author: Markus Niebel <markus.niebel@tq-group.com>
+ * Copyright (c) 2022-2023 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
  */
 
 #ifndef __TQ_SOM_FEATURES__

@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * (C) Copyright 2017 TQ-Systems GmbH
- * Markus Niebel <Markus.Niebel@tq-group.com>
+ * Copyright (c) 2017 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
  */
 
 #include <common.h>
@@ -76,4 +77,3 @@ int tqc_ft_fixup_emmc_dsr(void *blob, const char *path, u32 value)
 	do_fixup_by_path_u32(blob, path, "dsr", value, 1);
 	return 0;
 }
-
