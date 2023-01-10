@@ -22,6 +22,7 @@
 #include "../common/tq_bb.h"
 #include "../common/tq_blob.h"
 #include "../common/tq_eeprom.h"
+#include "../common/tq_som_features.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -148,6 +149,35 @@ int board_init(void)
 	return 0;
 }
 
+static struct tq_som_feature tqma93xx_som_features[] = {
+	{
+		.feature = FEATURE_EMMC,
+		.dt_path = "/soc@0/bus@42800000/mmc@42850000",
+	}, {
+		.feature = FEATURE_EEPROM,
+		.dt_path = "/soc@0/bus@44000000/i2c@44340000/eeprom@57",
+	}, {
+		.feature = FEATURE_SPINOR,
+		.dt_path = "/soc@0/bus@42000000/spi@425e0000/flash@0",
+	}, {
+		.feature = FEATURE_SECELEM,
+		/* TODO: no driver yet */
+	}, {
+		.feature = FEATURE_RTC,
+		.dt_path = "/soc@0/bus@44000000/i2c@44340000/rtc@51",
+	},
+};
+
+static struct tq_som_feature_list tqma93xx_feature_list = {
+	.list = tqma93xx_som_features,
+	.entries = ARRAY_SIZE(tqma93xx_som_features),
+};
+
+const struct tq_som_feature_list *tq_board_detect_features(void)
+{
+	return &tqma93xx_feature_list;
+}
+
 #if CONFIG_IS_ENABLED(OF_BOARD_SETUP)
 int ft_board_setup(void *blob, struct bd_info *bd)
 {
@@ -178,6 +208,7 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 int board_late_init(void)
 {
 	const char *bname = tq_get_boardname();
+	bool features_detected = false;
 	int ret;
 
 	ret = tq_read_module_eeprom(&eeprom);
@@ -194,9 +225,20 @@ int board_late_init(void)
 				if (tq_pcf85063_adjust_capacity(0, 0x51, 7000))
 					puts("PCF85063A: adjust error\n");
 			}
+			/* fill feature presence flags from vard */
+			if (!tq_vard_detect_features(&eeprom.tq_hw_data.vard,
+						     &tqma93xx_feature_list))
+				features_detected = true;
 		}
 	} else {
 		puts("EEPROM: read error\n");
+	}
+
+	/* mark list as empty to prevent further processing */
+	if (!features_detected) {
+		printf("VARD: data not present or invalid,\n"
+		       "      no fixup in DT for optional devices!\n");
+		tqma93xx_feature_list.entries = 0;
 	}
 
 	if (CONFIG_IS_ENABLED(ENV_VARS_UBOOT_RUNTIME_CONFIG)) {
