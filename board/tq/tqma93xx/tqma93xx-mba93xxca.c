@@ -19,6 +19,7 @@
 #include "../common/tcpc.h"
 #include "../common/tq_bb.h"
 #include "../common/tq_board_gpio.h"
+#include "../common/tq_som_features.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -332,5 +333,22 @@ int tq_bb_board_late_init(void)
 
 	return 0;
 }
+
+#if CONFIG_IS_ENABLED(OF_BOARD_SETUP)
+
+int tq_bb_ft_board_setup(void *blob, struct bd_info *bis)
+{
+	const struct tq_som_feature_list *features = tq_board_detect_features();
+
+	if (!features) {
+		pr_warn("WARN: tq_board_detect_features failed\n");
+		return -ENODATA;
+	}
+
+	tq_ft_fixup_features(blob, features);
+
+	return 0;
+}
+#endif
 
 #endif
