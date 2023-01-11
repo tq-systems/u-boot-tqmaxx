@@ -804,6 +804,8 @@ static int cadence_spi_set_mode(struct udevice *bus, uint mode)
 	/* Enable Direct Access Controller */
 	if (plat->use_dac_mode)
 		cadence_qspi_apb_dac_mode_enable(priv->regbase);
+	else
+		cadence_qspi_apb_dac_mode_disable(priv->regbase);
 
 	/* Enable QSPI */
 	cadence_qspi_apb_controller_enable(priv->regbase);

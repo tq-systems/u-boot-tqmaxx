@@ -76,6 +76,7 @@ void cadence_qspi_apb_controller_init(struct cadence_spi_platdata *plat);
 void cadence_qspi_apb_controller_enable(void *reg_base_addr);
 void cadence_qspi_apb_controller_disable(void *reg_base_addr);
 void cadence_qspi_apb_dac_mode_enable(void *reg_base);
+void cadence_qspi_apb_dac_mode_disable(void *reg_base);
 
 int cadence_qspi_apb_command_read_setup(struct cadence_spi_platdata *plat,
 					const struct spi_mem_op *op);

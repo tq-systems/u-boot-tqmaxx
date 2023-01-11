@@ -250,6 +250,15 @@ void cadence_qspi_apb_dac_mode_enable(void *reg_base)
 	writel(reg, reg_base + CQSPI_REG_CONFIG);
 }
 
+void cadence_qspi_apb_dac_mode_disable(void *reg_base)
+{
+	unsigned int reg;
+
+	reg = readl(reg_base + CQSPI_REG_CONFIG);
+	reg &= ~CQSPI_REG_CONFIG_DIRECT;
+	writel(reg, reg_base + CQSPI_REG_CONFIG);
+}
+
 static unsigned int cadence_qspi_calc_dummy(const struct spi_mem_op *op,
 					    bool dtr)
 {
