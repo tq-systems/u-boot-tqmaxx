@@ -964,9 +964,6 @@ static int cadence_spi_ofdata_to_platdata(struct udevice *bus)
 	plat->trigger_address = dev_read_u32_default(bus,
 						     "cdns,trigger-address",
 						     0);
-	/* Use DAC mode only when MMIO window is at least 8M wide */
-	if (plat->ahbsize >= SZ_8M)
-		plat->use_dac_mode = true;
 
 	/* All other paramters are embedded in the child node */
 	subnode = dev_read_first_subnode(bus);
