@@ -975,11 +975,17 @@ cadence_qspi_apb_indirect_read_execute(struct cadence_spi_platdata *plat,
 			 * Handle non-4-byte aligned access to avoid
 			 * data abort.
 			 */
-			if (((uintptr_t)rxbuf % 4) || (bytes_to_read % 4))
-				readsb(plat->ahbbase, rxbuf, bytes_to_read);
-			else
+			if (((uintptr_t)rxbuf % 4) || (bytes_to_read % 4)) {
+				unsigned int temp;
+
+				temp = readl(plat->ahbbase);
+				if (bytes_to_read > 4)
+					bytes_to_read = 4;
+				memcpy(rxbuf, &temp, bytes_to_read);
+			} else {
 				readsl(plat->ahbbase, rxbuf,
 				       bytes_to_read >> 2);
+			}
 			rxbuf += bytes_to_read;
 			remaining -= bytes_to_read;
 			bytes_to_read = cadence_qspi_get_rd_sram_level(plat);
