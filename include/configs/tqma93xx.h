@@ -5,8 +5,8 @@
  * Author: Markus Niebel
  */
 
-#ifndef __TQMA9XXX_H
-#define __TQMA9XXX_H
+#ifndef __TQMA93XX_H
+#define __TQMA93XX_H
 
 #include <linux/sizes.h>
 #include <linux/stringify.h>
@@ -39,7 +39,7 @@
 	"sd_dev=1\0"
 
 /* Initial environment variables */
-#define TQMA9XXX_MODULE_ENV_SETTINGS		\
+#define TQMA93XX_MODULE_ENV_SETTINGS		\
 	"scriptaddr=0x83500000\0" \
 	"image=Image\0" \
 	"splashimage=0x90000000\0" \
@@ -212,8 +212,8 @@
 #define AHAB_ENV "sec_boot=no\0"
 #endif
 
-#if defined(CONFIG_TQMa9XXX_BB_MBA9XXXCA)
-#include "tqma9xxx-mba9xxxca.h"
+#if defined(CONFIG_TQMa93XX_BB_MBA93XXCA)
+#include "tqma93xx-mba93xxca.h"
 #else
 #error
 #endif
@@ -240,11 +240,11 @@
  */
 
 #define CONFIG_EXTRA_ENV_SETTINGS                                      \
-	TQMA9XXX_MODULE_ENV_SETTINGS                                   \
+	TQMA93XX_MODULE_ENV_SETTINGS                                   \
 	BB_ENV_SETTINGS                                                \
 	CONFIG_MFG_ENV_SETTINGS                                        \
 	BOOTENV                                                        \
 	NETDEV_ENV                                                     \
 	AHAB_ENV
 
-#endif /* __TQMA9XXX_H */
+#endif /* __TQMA93XX_H */

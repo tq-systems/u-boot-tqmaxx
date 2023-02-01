@@ -37,19 +37,19 @@ config TARGET_IMX93_9X9_QSB
 	select IMX93
 	select IMX9_LPDDR4X
 
-config TARGET_TQMA9XXX
-	bool "TQMa9xxx family of SOM"
+config TARGET_TQMA93XX
+	bool "TQMa93xx family of SOM"
 	select IMX93
 	select IMX9_LPDDR4X
 	help
 	  This enables support for TQ-Systems GmbH family of i.MX93
-	  based SOM supporting differnet i.MX93 variants and different
+	  based SOM supporting different i.MX93 variants and different
 	  SOM form factors
 
 endchoice
 
 source "board/freescale/imx93_evk/Kconfig"
 source "board/freescale/imx93_qsb/Kconfig"
-source "board/tq/tqma9xxx/Kconfig"
+source "board/tq/tqma93xx/Kconfig"
 
 endif

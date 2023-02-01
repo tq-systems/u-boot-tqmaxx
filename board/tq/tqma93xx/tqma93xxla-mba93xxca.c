@@ -26,7 +26,7 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#define MBA9XXXCA_BOARD_NAME "MBa9xxxCA"
+#define MBA93XXCA_BOARD_NAME "MBa93xxCA"
 
 #define UART_PAD_CTRL	(PAD_CTL_DSE(6) | PAD_CTL_FSEL2)
 
@@ -80,7 +80,7 @@ enum {
 	USER_LED2,
 };
 
-static struct tq_gpio_init_data mba9xxxca_gid[] = {
+static struct tq_gpio_init_data mba93xxca_gid[] = {
 	/* expander 0 */
 	GPIO_INIT_DATA_ENTRY(FAN_PWR_EN, "gpio@70_0", GPIOD_IS_OUT),
 	GPIO_INIT_DATA_ENTRY(MPCIE_WAKE_B, "gpio@70_1", GPIOD_IS_IN),
@@ -126,7 +126,7 @@ static struct tq_gpio_init_data mba9xxxca_gid[] = {
 
 const char *tq_bb_get_boardname(void)
 {
-	return MBA9XXXCA_BOARD_NAME;
+	return MBA93XXCA_BOARD_NAME;
 }
 
 int tq_bb_checkboard(void)
@@ -274,7 +274,7 @@ int board_ehci_usb_phy_mode(struct udevice *dev)
 int board_usb_init(int index, enum usb_init_type init)
 {
 	int ret = 0;
-	struct gpio_desc *usb_reset_gpio = &mba9xxxca_gid[USB_RESET_B].desc;
+	struct gpio_desc *usb_reset_gpio = &mba93xxca_gid[USB_RESET_B].desc;
 
 	switch (index) {
 	case 0:
@@ -312,7 +312,7 @@ int board_usb_init(int index, enum usb_init_type init)
 int board_usb_cleanup(int index, enum usb_init_type init)
 {
 	int ret = 0;
-	struct gpio_desc *usb_reset_gpio = &mba9xxxca_gid[USB_RESET_B].desc;
+	struct gpio_desc *usb_reset_gpio = &mba93xxca_gid[USB_RESET_B].desc;
 
 	switch (index) {
 	case 0:
@@ -354,7 +354,7 @@ static int setup_eqos(void)
 
 int tq_bb_board_init(void)
 {
-	tq_board_gpio_init(mba9xxxca_gid, ARRAY_SIZE(mba9xxxca_gid));
+	tq_board_gpio_init(mba93xxca_gid, ARRAY_SIZE(mba93xxca_gid));
 
 	if (CONFIG_IS_ENABLED(USB_TCPC))
 		setup_typec();

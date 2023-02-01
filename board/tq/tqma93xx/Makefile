@@ -5,10 +5,10 @@
 # Author: Markus Niebel
 #
 
-obj-y += tqma9xxxla.o
-obj-$(CONFIG_TQMa9XXX_BB_MBA9XXXCA) += tqma9xxxla-mba9xxxca.o
+obj-y += tqma93xxla.o
+obj-$(CONFIG_TQMa93XX_BB_MBA93XXCA) += tqma93xxla-mba93xxca.o
 
 ifdef CONFIG_SPL_BUILD
 obj-y += spl.o
-obj-$(CONFIG_TQMA93XXLA) += lpddr4x_tqma9xxxla_timing.o
+obj-$(CONFIG_TQMA93XXLA) += lpddr4x_tqma93xxla_timing.o
 endif

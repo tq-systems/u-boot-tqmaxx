@@ -54,13 +54,13 @@ struct dram_info {
 	phys_size_t		size;   /* size of RAM */
 };
 
-static struct dram_info tqma9xxx_dram_info[]  = {
+static struct dram_info tqma93xx_dram_info[]  = {
 	{ &tqma93xxla_dram_timing, SZ_1G * 1ULL },
 	/* reserved for 2 GB variant */
 	{ NULL, SZ_1G * 2ULL },
 };
 
-static int tqma9xxx_ram_timing_idx = -1;
+static int tqma93xx_ram_timing_idx = -1;
 
 static struct tq_vard vard;
 
@@ -76,7 +76,7 @@ static int handle_vard(void)
 	return VARD_MEMTYPE_DEFAULT;
 };
 
-static int tqma9xxx_query_ddr_timing(void)
+static int tqma93xx_query_ddr_timing(void)
 {
 	char sel = '-';
 	phys_size_t ramsize;
@@ -101,13 +101,13 @@ static int tqma9xxx_query_ddr_timing(void)
 	}
 
 	ramsize = (phys_size_t)((unsigned int)sel - (unsigned int)('0')) * SZ_1G;
-	for (idx = 0; idx < ARRAY_SIZE(tqma9xxx_dram_info); ++idx) {
-		if (ramsize == tqma9xxx_dram_info[idx].size)
+	for (idx = 0; idx < ARRAY_SIZE(tqma93xx_dram_info); ++idx) {
+		if (ramsize == tqma93xx_dram_info[idx].size)
 			break;
 	}
 
-	if (idx >= ARRAY_SIZE(tqma9xxx_dram_info) ||
-	    !tqma9xxx_dram_info[idx].table) {
+	if (idx >= ARRAY_SIZE(tqma93xx_dram_info) ||
+	    !tqma93xx_dram_info[idx].table) {
 		puts("ERROR: no valid RAM timing or timing not in image, stop\n");
 		hang();
 	}
@@ -124,11 +124,11 @@ static void spl_dram_init(int memtype)
 
 	if (memtype == 1) {
 		ramsize = tq_vard_ramsize(&vard);
-		for (idx = 0; idx < ARRAY_SIZE(tqma9xxx_dram_info); ++idx) {
-			if (ramsize == tqma9xxx_dram_info[idx].size)
+		for (idx = 0; idx < ARRAY_SIZE(tqma93xx_dram_info); ++idx) {
+			if (ramsize == tqma93xx_dram_info[idx].size)
 				break;
 		}
-		if (idx >= ARRAY_SIZE(tqma9xxx_dram_info))
+		if (idx >= ARRAY_SIZE(tqma93xx_dram_info))
 			puts("DRAM init: no matching timing\n");
 	} else if (vard.memtype == VARD_MEMTYPE_DEFAULT) {
 		puts("DRAM init: vard invalid?\n");
@@ -137,16 +137,16 @@ static void spl_dram_init(int memtype)
 		       (unsigned int)vard.memtype);
 	}
 
-	if (idx < 0 || idx >= ARRAY_SIZE(tqma9xxx_dram_info))
-		idx = tqma9xxx_query_ddr_timing();
+	if (idx < 0 || idx >= ARRAY_SIZE(tqma93xx_dram_info))
+		idx = tqma93xx_query_ddr_timing();
 
-	if (idx < 0 || idx >= ARRAY_SIZE(tqma9xxx_dram_info)) {
+	if (idx < 0 || idx >= ARRAY_SIZE(tqma93xx_dram_info)) {
 		printf("ERROR: no valid ram configuration, please reset\n");
 		hang();
 	}
 
-	ddr_init(tqma9xxx_dram_info[idx].table);
-	tqma9xxx_ram_timing_idx = idx;
+	ddr_init(tqma93xx_dram_info[idx].table);
+	tqma93xx_ram_timing_idx = idx;
 }
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
@@ -166,9 +166,9 @@ void spl_board_init(void)
 
 	raminfo_blob = bloblist_ensure(BLOBLISTT_TQ_RAMSIZE,
 				       sizeof(*raminfo_blob));
-	if (raminfo_blob && tqma9xxx_ram_timing_idx >= 0) {
+	if (raminfo_blob && tqma93xx_ram_timing_idx >= 0) {
 		raminfo_blob->memsize =
-			tqma9xxx_dram_info[tqma9xxx_ram_timing_idx].size;
+			tqma93xx_dram_info[tqma93xx_ram_timing_idx].size;
 	} else {
 		printf("ERROR: no valid ram configuration, please reset\n");
 		hang();

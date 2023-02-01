@@ -141,7 +141,7 @@ int board_init(void)
 	return 0;
 }
 
-static struct tq_som_feature tqma9xxxla_som_features[] = {
+static struct tq_som_feature tqma93xxla_som_features[] = {
 	{
 		.feature = FEATURE_EMMC,
 		.dt_path = "/soc@0/bus@42800000/mmc@42850000",
@@ -160,14 +160,14 @@ static struct tq_som_feature tqma9xxxla_som_features[] = {
 	},
 };
 
-static struct tq_som_feature_list tqma9xxxla_feature_list = {
-	.list = tqma9xxxla_som_features,
-	.entries = ARRAY_SIZE(tqma9xxxla_som_features),
+static struct tq_som_feature_list tqma93xxla_feature_list = {
+	.list = tqma93xxla_som_features,
+	.entries = ARRAY_SIZE(tqma93xxla_som_features),
 };
 
 struct tq_som_feature_list *tq_board_detect_features(void)
 {
-	return &tqma9xxxla_feature_list;
+	return &tqma93xxla_feature_list;
 }
 
 #if CONFIG_IS_ENABLED(OF_BOARD_SETUP)
@@ -223,8 +223,8 @@ int board_late_init(void)
 			 * set list to empty if error
 			 */
 			if (tq_vard_detect_features(&eeprom.tq_hw_data.vard,
-						    &tqma9xxxla_feature_list))
-				tqma9xxxla_feature_list.entries = 0;
+						    &tqma93xxla_feature_list))
+				tqma93xxla_feature_list.entries = 0;
 		}
 	} else {
 		puts("EEPROM: read error\n");

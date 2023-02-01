@@ -5,8 +5,8 @@
  * Author: Markus Niebel
  */
 
-#if !defined(__TQMA9XXX_MBA9XXXCA_H)
-#define __TQMA9XXX_MBA9XXXCA_H
+#if !defined(__TQMA93XX_MBA93XXCA_H)
+#define __TQMA93XX_MBA93XXCA_H
 
 #if defined(CONFIG_FEC_MXC)
 
@@ -43,4 +43,4 @@
 #define CONFIG_ETHPRIME				"eth1"
 #endif
 
-#endif /* __TQMA9XXX_MBA9XXXCA_H */
+#endif /* __TQMA93XX_MBA93XXCA_H */
