@@ -5,4 +5,14 @@
  * Author: Paul Gerber
  */
 
-int tqma8mpxl_usb_dwc3_gadget_init(void);
+/**
+ * Initialize USB gadget at port 0 (primary used for SDP / Fastboot)
+ *
+ * @return 0 on success, negative errno otherwise
+ * @param[in] maximum_speed one of the predefined USB_SPEED_xyz
+ *
+ * The function verifies maximum_speed and tries to initialize USB
+ * port 0 with the requested speed. In SPL only USB_SPEED_HIGH is
+ * allowed.
+ */
+int tqma8mpxl_usb_dwc3_gadget_init(enum usb_device_speed maximum_speed);

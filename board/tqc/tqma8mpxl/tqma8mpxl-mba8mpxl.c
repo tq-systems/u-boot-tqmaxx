@@ -247,7 +247,7 @@ static int mba8mpxl_usb0_init(enum usb_init_type init)
 			return -ENODEV;
 		dm_gpio_set_value(&mba8mpxl_gid[USB_OTG_PWR].desc, 0);
 #ifdef CONFIG_USB_DWC3_GADGET
-		ret = tqma8mpxl_usb_dwc3_gadget_init();
+		ret = tqma8mpxl_usb_dwc3_gadget_init(USB_SPEED_SUPER);
 #endif
 		break;
 	case USB_INIT_HOST:

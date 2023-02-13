@@ -92,12 +92,22 @@ static void dwc3_nxp_usb_phy_init(struct dwc3_device *dwc3)
 	writel(RegData, dwc3->base + USB_PHY_CTRL1);
 }
 
-int tqma8mpxl_usb_dwc3_gadget_init(void)
+int tqma8mpxl_usb_dwc3_gadget_init(enum usb_device_speed maximum_speed)
 {
 	int ret = 0;
+
+	switch (maximum_speed) {
+	case USB_SPEED_HIGH:
+#if !defined(CONFIG_SPL_BUILD)
+	case USB_SPEED_SUPER:
+#endif
+		dwc3_device_data.maximum_speed = maximum_speed;
+		break;
+	default:
+		return -ENOTSUPP;
+	}
 
 	dwc3_nxp_usb_phy_init(&dwc3_device_data);
 	ret = dwc3_uboot_init(&dwc3_device_data);
 	return ret;
 }
-
