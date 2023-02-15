@@ -63,24 +63,46 @@ int tqmaxx_parse_eeprom_mac_additional(struct tqmaxx_eeprom_data *eeprom,
 	return !(is_valid_ethaddr(p));
 }
 
-int tqmaxx_parse_eeprom_serial(struct tqmaxx_eeprom_data *eeprom, char *buf,
-			       size_t len)
+static int tqmaxx_parse_eeprom_serial_new(struct tqmaxx_eeprom_data *eeprom, char *buf)
 {
 	unsigned int i;
 
+	for (i = 0; i < (sizeof(eeprom->serial)) &&
+	     (isdigit(eeprom->serial[i]) ||
+	      isupper(eeprom->serial[i])); i++)
+		buf[i] = eeprom->serial[i];
+	buf[i] = '\0';
+	if (sizeof(eeprom->serial) != strlen(buf))
+		return -EINVAL;
+
+	return 0;
+}
+
+static int tqmaxx_parse_eeprom_serial_old(struct tqmaxx_eeprom_data *eeprom, char *buf)
+{
+	unsigned int i;
+
+	for (i = 0; i < (sizeof(eeprom->serial)) && isdigit(eeprom->serial[i]); i++)
+		buf[i] = eeprom->serial[i];
+	buf[i] = '\0';
+	if (sizeof(eeprom->serial) != strlen(buf))
+		return -EINVAL;
+
+	return 0;
+}
+
+int tqmaxx_parse_eeprom_serial(struct tqmaxx_eeprom_data *eeprom, char *buf,
+			       size_t len)
+{
 	if (!buf || !eeprom)
 		return -1;
 	if (len < (sizeof(eeprom->serial) + 1))
 		return -1;
 
-	for (i = 0; i < (sizeof(eeprom->serial)) &&
-	     isdigit(eeprom->serial[i]); i++)
-		buf[i] = eeprom->serial[i];
-	buf[i] = '\0';
-	if (sizeof(eeprom->serial) != strlen(buf))
-		return -1;
-
-	return 0;
+	if (eeprom->serial[0] == 'T' && eeprom->serial[1] == 'Q')
+		return tqmaxx_parse_eeprom_serial_new(eeprom, buf);
+	else
+		return tqmaxx_parse_eeprom_serial_old(eeprom, buf);
 }
 
 int tqmaxx_parse_eeprom_id(struct tqmaxx_eeprom_data *eeprom, char *buf,
