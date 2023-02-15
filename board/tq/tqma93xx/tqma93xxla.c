@@ -201,6 +201,7 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 int board_late_init(void)
 {
 	const char *bname = tq_get_boardname();
+	bool features_detected = false;
 	int ret;
 
 	ret = tq_read_module_eeprom(&eeprom);
@@ -218,16 +219,20 @@ int board_late_init(void)
 								7000))
 					puts("PCF85063: adjust error\n");
 			}
-			/*
-			 * fill features present flag from vard
-			 * set list to empty if error
-			 */
-			if (tq_vard_detect_features(&eeprom.tq_hw_data.vard,
-						    &tqma93xxla_feature_list))
-				tqma93xxla_feature_list.entries = 0;
+			/* fill feature presence flags from vard */
+			if (!tq_vard_detect_features(&eeprom.tq_hw_data.vard,
+						     &tqma93xxla_feature_list))
+				features_detected = true;
 		}
 	} else {
 		puts("EEPROM: read error\n");
+	}
+
+	/* mark list as empty to prevent further processing */
+	if (!features_detected) {
+		printf("VARD: data not present or invalid,\n"
+		       "      no fixup in DT for optional devices!\n");
+		tqma93xxla_feature_list.entries = 0;
 	}
 
 	if (CONFIG_IS_ENABLED(ENV_VARS_UBOOT_RUNTIME_CONFIG)) {
