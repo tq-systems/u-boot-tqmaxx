@@ -120,6 +120,32 @@ void tq_vard_show(const struct tq_vard *vard)
 		       (unsigned int)(vard->eepromtype & VARD_EETYPE_MASK_MFR) >> 4,
 		       (unsigned long)(tq_vard_eepromsize(vard) / (SZ_1K)),
 		       tq_vard_eeprom_pgsize(vard));
+	puts("FORMFACTOR: ");
+	switch (tq_vard_get_formfactor(vard)) {
+	case VARD_FORMFACTOR_TYPE_LGA:
+		puts("LGA\n");
+		break;
+	case VARD_FORMFACTOR_TYPE_CONNECTOR:
+		puts("CONNECTOR\n");
+		break;
+	case VARD_FORMFACTOR_TYPE_SMARC2:
+		puts("SMARC-2\n");
+		break;
+	case VARD_FORMFACTOR_TYPE_NONE:
+		/*
+		 * applies to boards with no variants or older boards
+		 * where this field is not written
+		 */
+		puts("UNSPECIFIED\n");
+		break;
+	default:
+		/*
+		 * generic fall trough
+		 * unhandled form factor or invalid data
+		 */
+		puts("UNKNOWN\n");
+		break;
+	}
 }
 
 int tq_vard_detect_features(const struct tq_vard *vard,

@@ -39,7 +39,8 @@ struct __packed tq_vard {
 	u8 features[VARD_FEATURE_BYTES];	/* feature bitmask */
 	u8 eepromsize;		/* user eeprom size (feature EEPROM) */
 	u8 eepromtype;		/* user eeprom type (feature EEPROM) */
-	u8 rsv[0x11];		/* for future use */
+	u8 formfactor;		/* SOM Form factor. mask 0xf0 */
+	u8 rsv[0x10];		/* for future use */
 };
 
 #define VARD_MEMTYPE_MASK_TYPE		0x7f /* board specific RAM Type */
@@ -65,6 +66,11 @@ struct __packed tq_vard {
 #define VARD_EETYPE_MASK_MFR		0xf0 /* manufacturer / type mask */
 #define VARD_EETYPE_MASK_PGSIZE		0x0f /* page size */
 
+#define VARD_FORMFACTOR_MASK_TYPE	0xf0 /* SOM type mask */
+#define VARD_FORMFACTOR_TYPE_CONNECTOR	0x00 /* SOM with connector, no board standard */
+#define VARD_FORMFACTOR_TYPE_LGA	0x10 /* LGA SOM, no board standard */
+#define VARD_FORMFACTOR_TYPE_SMARC2	0x20 /* SOM conforms to SMARC-2 standard */
+#define VARD_FORMFACTOR_TYPE_NONE	0xf0 /* unspecified SOM type */
 /*
  * read module configuration data from eeprom
  * bus: I2C bus number
@@ -77,7 +83,7 @@ static inline
 int tq_vard_read(unsigned int bus, unsigned int i2c_addr, struct tq_vard *vard)
 {
 	return tq_read_eeprom_buf(bus, i2c_addr, 1, 0, sizeof(*vard),
-				   (uchar *)vard);
+				  (uchar *)vard);
 }
 
 /*
@@ -161,6 +167,29 @@ static inline
 bool tq_vard_has_rtc(const struct tq_vard *vard)
 {
 	return (tq_vard_has_feature(vard, 4, 3) > 0);
+}
+
+static inline u32 tq_vard_get_formfactor(const struct tq_vard *vard)
+{
+	return (u32)(vard->formfactor & VARD_FORMFACTOR_MASK_TYPE);
+};
+
+static inline
+bool tq_vard_is_lga(const struct tq_vard *vard)
+{
+	return (tq_vard_get_formfactor(vard) == VARD_FORMFACTOR_TYPE_LGA);
+}
+
+static inline
+bool tq_vard_is_connector(const struct tq_vard *vard)
+{
+	return (tq_vard_get_formfactor(vard) == VARD_FORMFACTOR_TYPE_CONNECTOR);
+}
+
+static inline
+bool tq_vard_is_smarc2(const struct tq_vard *vard)
+{
+	return (tq_vard_get_formfactor(vard) == VARD_FORMFACTOR_TYPE_SMARC2);
 }
 
 void tq_vard_show(const struct tq_vard *vard);
