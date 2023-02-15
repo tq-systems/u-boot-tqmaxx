@@ -76,8 +76,13 @@ static const char *tq_get_boardname(void)
 	switch (get_cpu_type()) {
 	/* all normal dual core variants */
 	case MXC_CPU_IMX93:
-		return "TQMa9352LA";
-	/* add more if new variants will be assembled */
+		return "TQMa9352"; /* iMX93 Dual core with NPU */
+	case MXC_CPU_IMX9351:
+		return "TQMa9351"; /* iMX93 Single core with NPU */
+	case MXC_CPU_IMX9332:
+		return "TQMa9332"; /* iMX93 Dual core without NPU */
+	case MXC_CPU_IMX9331:
+		return "TQMa9331"; /* iMX93 Single core without NPU */
 	default:
 		return "??";
 	}
