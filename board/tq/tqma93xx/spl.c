@@ -31,17 +31,22 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+extern struct dram_timing_info tqma93xxca_dram_timing;
 extern struct dram_timing_info tqma93xxla_dram_timing;
 
 struct dram_info {
-	struct dram_timing_info	*table; /* from NXP RPA */
-	phys_size_t			size;   /* size of RAM */
+	struct dram_timing_info	*table;  /* from NXP RPA */
+	phys_size_t			size;    /* size of RAM */
+	char				variant; /* char to help user query */
 };
 
 static const struct dram_info tqma93xx_dram_info[]  = {
-	{ &tqma93xxla_dram_timing, SZ_1G * 1ULL },
+	{ &tqma93xxca_dram_timing, SZ_1G * 1ULL, 'c' },
 	/* reserved for 2 GB variant */
-	{ NULL, SZ_1G * 2ULL },
+	{ NULL, SZ_1G * 2ULL, 'c' },
+	{ &tqma93xxla_dram_timing, SZ_1G * 1ULL, 'l' },
+	/* reserved for 2 GB variant */
+	{ NULL, SZ_1G * 2ULL, 'l' },
 };
 
 static int tqma93xx_ram_timing_idx = -1;
@@ -73,6 +78,7 @@ static int handle_vard(void)
 static int tqma93xx_query_ddr_timing(void)
 {
 	char sel = '-';
+	char var = '-';
 	unsigned int ramsize_gb;
 	phys_size_t ramsize;
 	int idx;
@@ -102,8 +108,28 @@ static int tqma93xx_query_ddr_timing(void)
 	 */
 	ramsize_gb = (unsigned int)sel - (unsigned int)'0';
 	ramsize = (phys_size_t)(ramsize_gb) * SZ_1G;
+
+	puts("Warning: no valid EEPROM!\n"
+		"Please enter form factor to proceed.\n"
+		"Valid are l (LGA variant) and c (click in variant).\n");
+
+	for (;;) {
+		/* Flush input */
+		while (serial_tstc())
+			serial_getc();
+
+		var = serial_getc();
+		putc('\n');
+
+		if ((var == 'l') || (var == 'c'))
+			break;
+
+		puts("Please enter a valid variant.\n");
+	}
+
 	for (idx = 0; idx < ARRAY_SIZE(tqma93xx_dram_info); ++idx) {
-		if (ramsize == tqma93xx_dram_info[idx].size)
+		if (ramsize == tqma93xx_dram_info[idx].size &&
+		    var == tqma93xx_dram_info[idx].variant)
 			break;
 	}
 
@@ -118,12 +144,26 @@ static int tqma93xx_query_ddr_timing(void)
 static void spl_dram_init(int memtype)
 {
 	int idx = -1;
+	char variant;
+
+	switch (tq_vard_get_formfactor(&vard)) {
+	case VARD_FORMFACTOR_TYPE_LGA:
+		variant = 'l';
+		break;
+	case VARD_FORMFACTOR_TYPE_CONNECTOR:
+		variant = 'c';
+		break;
+	default:
+		variant = '-';
+		break;
+	}
 
 	if (memtype == 1) {
 		phys_size_t ramsize = tq_vard_ramsize(&vard);
 
 		for (idx = 0; idx < ARRAY_SIZE(tqma93xx_dram_info); ++idx) {
-			if (ramsize == tqma93xx_dram_info[idx].size)
+			if (ramsize == tqma93xx_dram_info[idx].size &&
+			    variant == tqma93xx_dram_info[idx].variant)
 				break;
 		}
 		if (!is_valid_dram_entry(idx))

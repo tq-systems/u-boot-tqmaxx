@@ -11,5 +11,6 @@ obj-$(CONFIG_TQMA93XX_BB_MBA93XXCA) += tqma93xx-mba93xxca.o
 
 ifdef CONFIG_SPL_BUILD
 obj-y += spl.o
+obj-y += lpddr4x_tqma93xxca_timing.o
 obj-y += lpddr4x_tqma93xxla_timing.o
 endif
