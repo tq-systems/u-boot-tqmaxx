@@ -220,24 +220,48 @@ int tqc_parse_eeprom_mac(struct tqc_eeprom_data const *eeprom, char *buf,
 	return tqc_parse_eeprom_mac_additional(eeprom, buf, len, 0);
 }
 
-int tqc_parse_eeprom_serial(struct tqc_eeprom_data const *eeprom, char *buf,
-			    size_t len)
+static int tq_parse_eeprom_serial_new(const struct tqc_eeprom_data *eeprom,
+				      char *buf)
 {
 	unsigned int i;
 
-	if (!buf || !eeprom)
-		return -1;
-	if (len < (sizeof(eeprom->serial) + 1))
-		return -1;
+	for (i = 0; i < (sizeof(eeprom->serial)) &&
+	     (isdigit(eeprom->serial[i]) || isupper(eeprom->serial[i])); i++)
+		buf[i] = eeprom->serial[i];
+	buf[i] = '\0';
+	if (sizeof(eeprom->serial) != strlen(buf))
+		return -EINVAL;
+
+	return 0;
+}
+
+static int tq_parse_eeprom_serial_old(const struct tqc_eeprom_data *eeprom,
+				      char *buf)
+{
+	unsigned int i;
 
 	for (i = 0; i < (sizeof(eeprom->serial)) &&
 	     isdigit(eeprom->serial[i]); i++)
 		buf[i] = eeprom->serial[i];
 	buf[i] = '\0';
 	if (sizeof(eeprom->serial) != strlen(buf))
-		return -1;
+		return -EINVAL;
 
 	return 0;
+}
+
+int tqc_parse_eeprom_serial(const struct tqc_eeprom_data *eeprom,
+			    char *buf, size_t len)
+{
+	if (!buf || !eeprom)
+		return -EINVAL;
+	if (len < (sizeof(eeprom->serial) + 1))
+		return -EINVAL;
+
+	if (eeprom->serial[0] == 'T' && eeprom->serial[1] == 'Q')
+		return tq_parse_eeprom_serial_new(eeprom, buf);
+	else
+		return tq_parse_eeprom_serial_old(eeprom, buf);
 }
 
 int tqc_parse_eeprom_id(struct tqc_eeprom_data const *eeprom, char *buf,
