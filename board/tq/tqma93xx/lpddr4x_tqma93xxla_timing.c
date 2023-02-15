@@ -1455,14 +1455,14 @@ static struct dram_fsp_msg ddr_dram_fsp_msg[] = {
 		.fw_type = FW_1D_IMAGE,
 		.fsp_cfg = ddr_fsp0_cfg,
 		.fsp_cfg_num = ARRAY_SIZE(ddr_fsp0_cfg),
-	 },
+	},
 	{
 		/* P0 3733mts 2D */
 		.drate = 3733,
 		.fw_type = FW_2D_IMAGE,
 		.fsp_cfg = ddr_fsp0_2d_cfg,
 		.fsp_cfg_num = ARRAY_SIZE(ddr_fsp0_2d_cfg),
-	 },
+	},
 };
 
 /* ddr timing config params */
@@ -1477,5 +1477,5 @@ struct dram_timing_info tqma93xxla_dram_timing = {
 	.ddrphy_trained_csr_num = ARRAY_SIZE(ddr_ddrphy_trained_csr),
 	.ddrphy_pie = ddr_phy_pie,
 	.ddrphy_pie_num = ARRAY_SIZE(ddr_phy_pie),
-	.fsp_table = { 3733,  },
+	.fsp_table = { 3733, },
 };
