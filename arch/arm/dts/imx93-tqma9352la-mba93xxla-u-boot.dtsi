@@ -1,0 +1,76 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2022-2023 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
+ */
+
+/*
+ * include the generic, SOM specific part of U-Boot modifications
+ * for device tree
+ */
+#include "imx93-tqma9352la-u-boot.dtsi"
+
+/ {
+	aliases {
+		usbgadget0 = &usbg1;
+	};
+
+	config {
+		u-boot,mmc-env-offset = <0x400000>;
+		u-boot,mmc-env-offset-redundant = <0x408000>;
+	};
+
+	usbg1: usbg1 {
+		compatible = "fsl,imx27-usb-gadget";
+		dr_mode = "peripheral";
+		chipidea,usb = <&usbotg1>;
+		status = "disabled";
+	};
+};
+
+&pinctrl_uart1 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc2_hs {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc2_uhs {
+	u-boot,dm-spl;
+};
+
+&lpuart1 {
+	u-boot,dm-spl;
+	clocks = <&clk IMX93_CLK_LPUART1_GATE>, <&clk IMX93_CLK_LPUART1_GATE>;
+	clock-names = "ipg", "per";
+};
+
+&usdhc2 {
+	u-boot,dm-spl;
+	fsl,signal-voltage-switch-extra-delay-ms = <8>;
+	sd-uhs-sdr104;
+	sd-uhs-ddr50;
+};
+
+&lpi2c3 {
+	u-boot,dm-spl;
+};
+
+&lpi2c5 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_lpi2c3 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_lpi2c5 {
+	u-boot,dm-spl;
+};
+
+&usbotg1 {
+	extcon = <&tcpc>;
+	status = "okay";
+};

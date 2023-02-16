@@ -39,6 +39,16 @@ config TQMA93XX_BB_MBA93XXCA
 	  demonstrate most of the features of the SOM and CPU and can be
 	  used for LGA and connector SOM variants
 
+config TQMA93XX_BB_MBA93XXLA
+	bool "MBa93xxLA SBC"
+	select DM_GPIO
+	select ENV_IS_NOWHERE
+	select TQMA93XX_DEFAULTS
+	select USB_TCPC if USB
+	help
+	  Select the MBa93xxLA SBC. This mainboard has the LGA SOM
+	  variant assembled.
+
 endchoice
 
 #

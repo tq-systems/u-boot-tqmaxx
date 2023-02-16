@@ -1,12 +1,12 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Copyright (c) 2022-2023 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * Copyright (c) 2023 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
  * D-82229 Seefeld, Germany.
  * Author: Markus Niebel
  */
 
-#if !defined(__TQMA93XX_MBA93XXCA_H)
-#define __TQMA93XX_MBA93XXCA_H
+#if !defined(__TQMA93XX_MBA93XXLA_H)
+#define __TQMA93XX_MBA93XXLA_H
 
 #if defined(CONFIG_FEC_MXC)
 
@@ -43,4 +43,4 @@
 #define CONFIG_ETHPRIME				"eth1"
 #endif
 
-#endif /* __TQMA93XX_MBA93XXCA_H */
+#endif /* __TQMA93XX_MBA93XXLA_H */

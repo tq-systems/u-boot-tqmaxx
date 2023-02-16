@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Copyright (c) 2021 - 2022 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * Copyright (c) 2022-2023 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
  * D-82229 Seefeld, Germany.
  * Author: Markus Niebel
  */
@@ -214,8 +214,10 @@
 
 #if defined(CONFIG_TQMA93XX_BB_MBA93XXCA)
 #include "tqma93xx-mba93xxca.h"
+#elif defined(CONFIG_TQMA93XX_BB_MBA93XXLA)
+#include "tqma93xx-mba93xxla.h"
 #else
-#error
+#error "no mainboard variant selected"
 #endif
 
 #if defined(CONFIG_ETHPRIME)

@@ -7,6 +7,7 @@
 
 obj-y += tqma93xx.o
 obj-$(CONFIG_TQMA93XX_BB_MBA93XXCA) += tqma93xxla-mba93xxca.o
+obj-$(CONFIG_TQMA93XX_BB_MBA93XXLA) += tqma93xxla-mba93xxla.o
 
 ifdef CONFIG_SPL_BUILD
 obj-y += spl.o
