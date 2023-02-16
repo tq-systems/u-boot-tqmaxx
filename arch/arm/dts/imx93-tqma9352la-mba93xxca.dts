@@ -6,7 +6,7 @@
  */
 /dts-v1/;
 
-#include "imx93-tqma93xxla.dtsi"
+#include "imx93-tqma9352la.dtsi"
 #include <dt-bindings/input/input.h>
 #include <dt-bindings/leds/common.h>
 #include <dt-bindings/net/ti-dp83867.h>
@@ -14,7 +14,7 @@
 
 /{
 	model = "TQ-Systems i.MX93 TQMa93xxLA on MBa93xxCA starter kit";
-	compatible = "tq,imx93-tqma9352la-mba93xxca", "tq,imx93-tqma93xxla", "fsl,imx93";
+	compatible = "tq,imx93-tqma9352la-mba93xxca", "tq,imx93-tqma9352la", "fsl,imx93";
 
 	chosen {
 		stdout-path = &lpuart1;
