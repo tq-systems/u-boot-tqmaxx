@@ -212,7 +212,7 @@
 #define AHAB_ENV "sec_boot=no\0"
 #endif
 
-#if defined(CONFIG_TQMa93XX_BB_MBA93XXCA)
+#if defined(CONFIG_TQMA93XX_BB_MBA93XXCA)
 #include "tqma93xx-mba93xxca.h"
 #else
 #error

@@ -11,6 +11,8 @@ config SYS_CONFIG_NAME
 
 config TQMA93XX_DEFAULTS
 	bool
+	select IMX93
+	select IMX9_LPDDR4X
 	select BLOBLIST
 	select TQ_BB
 	select TQ_EEPROM
@@ -20,41 +22,22 @@ config TQMA93XX_DEFAULTS
 	imply I2C_EEPROM
 
 choice
-	prompt "TQMa93XX SOM variant"
-	default TQMA93XXLA
-	help
-	  Select board variant. There are multiple variants of the SOM
-	  having the same features but needs slightly different config
-	  options
-
-config TQMA93XXLA
-	bool "TQMA93XX LGA with LPDDR4X"
-	select IMX93
-	select IMX9_LPDDR4X
-	select TQMA93XX_DEFAULTS
-	help
-	  Select the TQMA93XX LGA variant. This features i.MX93 in
-	  11x11 mm package with LPDDR4, PMIC, e-MMC and optionally
-	  SPI-NOR, EEPROM, IMU, RTC, EEPROM
-
-endchoice
-
-choice
-	prompt "TQMa93XX mainboard variant"
-	default TQMa93XX_BB_MBA93XXCA if TQMA93XXLA
+	prompt "TQMa93xx mainboard variant"
+	default TQMA93XX_BB_MBA93XXCA
 	help
 	  Select mainboard variant for the SOM. Default is the
 	  starterkit.
 
-config TQMa93XX_BB_MBA93XXCA
-	bool "MBA93XXCA starterkit"
-	depends on TQMA93XXLA
+config TQMA93XX_BB_MBA93XXCA
+	bool "MBa93xxCA starterkit"
 	select DM_GPIO
 	select ENV_IS_NOWHERE
+	select TQMA93XX_DEFAULTS
 	select USB_TCPC if USB
 	help
 	  Select the MBA93xxCA starterkit. The evaluation board can
-	  demonstrate most of the features of the SOM and CPU
+	  demonstrate most of the features of the SOM and CPU and can be
+	  used for LGA and connector SOM variants
 
 endchoice
 
