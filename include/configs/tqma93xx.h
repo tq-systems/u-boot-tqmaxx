@@ -71,8 +71,9 @@
 #define AHAB_ENV "sec_boot=no\0"
 #endif
 
-#if defined(CONFIG_TQMA93XX_BB_MBA93XXCA)
-#include "tqma93xx-mba93xxca.h"
+/* both variants use the same settings */
+#if defined(CONFIG_TQMA93XX_BB_MBA93XXCA) || defined(CONFIG_TQMA93XX_BB_MBA93XXLA)
+#include "tqma93xx-mba93xx.h"
 #else
 #error "no mainboard variant selected"
 #endif

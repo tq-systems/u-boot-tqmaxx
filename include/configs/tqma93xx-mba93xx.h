@@ -5,8 +5,8 @@
  * Author: Markus Niebel
  */
 
-#if !defined(__TQMA93XX_MBA93XXCA_H)
-#define __TQMA93XX_MBA93XXCA_H
+#if !defined(__TQMA93XX_MBA93XX_H)
+#define __TQMA93XX_MBA93XX_H
 
 #ifdef CONFIG_DWC_ETH_QOS
 
@@ -21,4 +21,4 @@
 #define BB_ENV_SETTINGS \
 	"console=" CONSOLE_DEV "\0" \
 
-#endif /* __TQMA93XX_MBA93XXCA_H */
+#endif /* __TQMA93XX_MBA93XX_H */

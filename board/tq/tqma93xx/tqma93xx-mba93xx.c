@@ -23,8 +23,6 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#define MBA93XXCA_BOARD_NAME "MBa93xxCA"
-
 #define UART_PAD_CTRL	(PAD_CTL_DSE(6) | PAD_CTL_FSEL2)
 
 static const iomux_v3_cfg_t uart_pads[] = {
@@ -44,6 +42,8 @@ int tq_bb_board_early_init_f(void)
 }
 
 #if !defined(CONFIG_SPL_BUILD)
+
+#if CONFIG_IS_ENABLED(TQMA93XX_BB_MBA93XXCA)
 
 enum {
 #if !CONFIG_IS_ENABLED(GPIO_HOG)
@@ -78,7 +78,7 @@ enum {
 	USER_LED2,
 };
 
-static struct tq_gpio_init_data mba93xxca_gid[] = {
+static struct tq_gpio_init_data mba93xx_gid[] = {
 #if !CONFIG_IS_ENABLED(GPIO_HOG)
 	GPIO_INIT_DATA_ENTRY(MPCIE_WAKE_B, "gpio@70_1", GPIOD_IS_IN),
 	GPIO_INIT_DATA_ENTRY(MPCIE_PERST_B, "gpio@70_4",
@@ -131,9 +131,101 @@ static struct tq_gpio_init_data mba93xxca_gid[] = {
 	GPIO_INIT_DATA_ENTRY(USER_LED2, "gpio@72_7", GPIOD_IS_OUT),
 };
 
+#elif CONFIG_IS_ENABLED(TQMA93XX_BB_MBA93XXLA)
+
+enum {
+#if !CONFIG_IS_ENABLED(GPIO_HOG)
+	IOT_WDISABLE,
+	WLAN_PD_B,
+	WLAN_W_DISABLE_B,
+	WLAN_PERST_B,
+#endif
+	/* expander @70 */
+	V3V8_EN,
+	IOT_PWRKEY,
+	IOT_RESET,
+	BUTTON_A_B,
+	BUTTON_B_B,
+#if !CONFIG_IS_ENABLED(NETDEVICES)
+	ENET1_RESET_B,
+	ENET2_RESET_B,
+#endif
+	USB_RESET_B,
+	V12V_EN,
+	/* expander @72 */
+	LCD_RESET_B,
+	LCD_PWR_EN,
+	LCD_BLT_EN,
+	DP_EN,
+	MIPI_CSI_EN,
+	MIPI_CSI_RST_B,
+	USER_LED1,
+	USER_LED2,
+};
+
+static struct tq_gpio_init_data mba93xx_gid[] = {
+#if !CONFIG_IS_ENABLED(GPIO_HOG)
+	GPIO_INIT_DATA_ENTRY(IOT_WDISABLE, "gpio@70_5",
+			     GPIOD_IS_OUT | GPIOD_ACTIVE_LOW |
+			     GPIOD_IS_OUT_ACTIVE),
+	GPIO_INIT_DATA_ENTRY(WLAN_PD_B, "gpio@71_4",
+			     GPIOD_IS_OUT | GPIOD_ACTIVE_LOW |
+			     GPIOD_IS_OUT_ACTIVE),
+	GPIO_INIT_DATA_ENTRY(WLAN_W_DISABLE_B, "gpio@71_5",
+			     GPIOD_IS_OUT | GPIOD_ACTIVE_LOW |
+			     GPIOD_IS_OUT_ACTIVE),
+	GPIO_INIT_DATA_ENTRY(WLAN_PERST_B, "gpio@71_6",
+			     GPIOD_IS_OUT | GPIOD_ACTIVE_LOW |
+			     GPIOD_IS_OUT_ACTIVE),
+#endif
+	/* expander 0 */
+	GPIO_INIT_DATA_ENTRY(V3V8_EN, "gpio@70_0", GPIOD_IS_OUT),
+	GPIO_INIT_DATA_ENTRY(IOT_PWRKEY, "gpio@70_3", GPIOD_IS_OUT),
+	GPIO_INIT_DATA_ENTRY(IOT_RESET, "gpio@70_4",
+			     GPIOD_IS_OUT | GPIOD_ACTIVE_LOW |
+			     GPIOD_IS_OUT_ACTIVE),
+	GPIO_INIT_DATA_ENTRY(BUTTON_A_B, "gpio@70_6", GPIOD_IS_IN),
+	GPIO_INIT_DATA_ENTRY(BUTTON_B_B, "gpio@70_7", GPIOD_IS_IN),
+	/* expander 1 */
+#if !CONFIG_IS_ENABLED(NETDEVICES)
+	GPIO_INIT_DATA_ENTRY(ENET1_RESET_B, "gpio@71_0",
+			     GPIOD_IS_OUT | GPIOD_ACTIVE_LOW |
+			     GPIOD_IS_OUT_ACTIVE),
+	GPIO_INIT_DATA_ENTRY(ENET2_RESET_B, "gpio@71_1",
+			     GPIOD_IS_OUT | GPIOD_ACTIVE_LOW |
+			     GPIOD_IS_OUT_ACTIVE),
+#endif
+	GPIO_INIT_DATA_ENTRY(USB_RESET_B, "gpio@71_2",
+			     GPIOD_IS_OUT | GPIOD_ACTIVE_LOW |
+			     GPIOD_IS_OUT_ACTIVE),
+	GPIO_INIT_DATA_ENTRY(V12V_EN, "gpio@71_7", GPIOD_IS_OUT),
+	/* expander 2 */
+	GPIO_INIT_DATA_ENTRY(LCD_RESET_B, "gpio@72_0",
+			     GPIOD_IS_OUT | GPIOD_ACTIVE_LOW |
+			     GPIOD_IS_OUT_ACTIVE),
+	GPIO_INIT_DATA_ENTRY(LCD_PWR_EN, "gpio@72_1", GPIOD_IS_OUT),
+	GPIO_INIT_DATA_ENTRY(LCD_BLT_EN, "gpio@72_2", GPIOD_IS_OUT),
+	GPIO_INIT_DATA_ENTRY(DP_EN, "gpio@72_3", GPIOD_IS_OUT),
+	GPIO_INIT_DATA_ENTRY(MIPI_CSI_EN, "gpio@72_4", GPIOD_IS_OUT),
+	GPIO_INIT_DATA_ENTRY(MIPI_CSI_RST_B, "gpio@72_5",
+			     GPIOD_IS_OUT | GPIOD_ACTIVE_LOW |
+			     GPIOD_IS_OUT_ACTIVE),
+	GPIO_INIT_DATA_ENTRY(USER_LED1, "gpio@72_6", GPIOD_IS_OUT),
+	GPIO_INIT_DATA_ENTRY(USER_LED2, "gpio@72_7", GPIOD_IS_OUT),
+};
+
+#else
+#error "Mainboard not supported"
+#endif
+
 const char *tq_bb_get_boardname(void)
 {
-	return MBA93XXCA_BOARD_NAME;
+	if (CONFIG_IS_ENABLED(TQMA93XX_BB_MBA93XXCA))
+		return "MBa93xxCA";
+	else if (CONFIG_IS_ENABLED(TQMA93XX_BB_MBA93XXLA))
+		return "MBa93xxLA";
+
+	return "Unknown";
 }
 
 int tq_bb_checkboard(void)
@@ -227,7 +319,7 @@ int board_ehci_usb_phy_mode(struct udevice *dev)
 int board_usb_init(int index, enum usb_init_type init)
 {
 	int ret = 0;
-	struct gpio_desc *usb_reset_gpio = &mba93xxca_gid[USB_RESET_B].desc;
+	struct gpio_desc *usb_reset_gpio = &mba93xx_gid[USB_RESET_B].desc;
 
 	switch (index) {
 #if CONFIG_IS_ENABLED(USB_TCPC)
@@ -269,7 +361,7 @@ int board_usb_init(int index, enum usb_init_type init)
 int board_usb_cleanup(int index, enum usb_init_type init)
 {
 	int ret = 0;
-	struct gpio_desc *usb_reset_gpio = &mba93xxca_gid[USB_RESET_B].desc;
+	struct gpio_desc *usb_reset_gpio = &mba93xx_gid[USB_RESET_B].desc;
 
 	switch (index) {
 #if CONFIG_IS_ENABLED(USB_TCPC)
@@ -312,7 +404,7 @@ static int setup_eqos(void)
 
 int tq_bb_board_init(void)
 {
-	tq_board_gpio_init(mba93xxca_gid, ARRAY_SIZE(mba93xxca_gid));
+	tq_board_gpio_init(mba93xx_gid, ARRAY_SIZE(mba93xx_gid));
 
 	if (CONFIG_IS_ENABLED(USB_TCPC))
 		setup_typec();
