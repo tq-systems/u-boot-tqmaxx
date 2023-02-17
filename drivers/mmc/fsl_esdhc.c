@@ -870,8 +870,12 @@ void fdt_fixup_esdhc(void *blob, struct bd_info *bd)
 	if (IS_ENABLED(CONFIG_FSL_ESDHC_33V_IO_RELIABILITY_WORKAROUND))
 		esdhc_disable_for_no_card(blob);
 
-	do_fixup_by_compat_u32(blob, compat, "clock-frequency",
-			       gd->arch.sdhc_clk, 1);
+	if (gd->arch.sdhc_per_clk)
+		do_fixup_by_compat_u32(blob, compat, "clock-frequency",
+				       gd->arch.sdhc_per_clk, 1);
+	else
+		do_fixup_by_compat_u32(blob, compat, "clock-frequency",
+				       gd->arch.sdhc_clk, 1);
 }
 #endif
 
