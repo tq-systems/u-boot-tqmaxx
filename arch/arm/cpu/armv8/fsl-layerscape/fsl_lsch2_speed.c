@@ -189,10 +189,12 @@ int get_clocks(void)
 #ifdef CONFIG_FSL_ESDHC
 #if defined(CONFIG_ARCH_LS1012A)
 	clock = sys_info.freq_systembus;
-#elif defined(CONFIG_ARCH_LS1043A) || defined(CONFIG_ARCH_LS1046A)
+#elif defined(CONFIG_ARCH_LS1043A)
+	clock = sys_info.freq_cga_m2 / 2;
+#elif defined(CONFIG_ARCH_LS1046A)
 	clock = sys_info.freq_cga_m2;
 #endif
-	gd->arch.sdhc_per_clk = clock / CONFIG_SYS_FSL_SDHC_CLK_DIV;
+	gd->arch.sdhc_per_clk = clock;
 	gd->arch.sdhc_clk = gd->bus_clk / CONFIG_SYS_FSL_SDHC_CLK_DIV;
 #endif
 	if (gd->cpu_clk != 0)
