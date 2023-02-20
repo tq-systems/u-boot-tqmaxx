@@ -1,0 +1,141 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2022-2023 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
+ */
+
+/ {
+	aliases {
+		i2c_eeprom0 = &eeprom0;
+	};
+
+	wdt-reboot {
+		compatible = "wdt-reboot";
+		wdt = <&wdog3>;
+		u-boot,dm-spl;
+	};
+
+	firmware {
+		optee {
+			compatible = "linaro,optee-tz";
+			method = "smc";
+		};
+	};
+};
+
+&{/soc@0} {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&aips1 {
+	u-boot,dm-spl;
+	u-boot,dm-pre-reloc;
+};
+
+&aips2 {
+	u-boot,dm-spl;
+};
+
+&aips3 {
+	u-boot,dm-spl;
+};
+
+&iomuxc {
+	u-boot,dm-spl;
+};
+
+&reg_usdhc2_vmmc {
+	u-boot,off-on-delay-us = <20000>;
+	u-boot,dm-spl;
+};
+
+&pinctrl_reg_usdhc2_vmmc {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc2_gpio {
+	u-boot,dm-spl;
+};
+
+&gpio1 {
+	u-boot,dm-spl;
+};
+
+&gpio2 {
+	u-boot,dm-spl;
+};
+
+&gpio3 {
+	u-boot,dm-spl;
+};
+
+&gpio4 {
+	u-boot,dm-spl;
+};
+
+&usdhc1 {
+	u-boot,dm-spl;
+	mmc-hs400-1_8v;
+	mmc-hs400-enhanced-strobe;
+	/*
+	 * prevents voltage switch warn: driver will switch even at
+	 * fixed voltage
+	 */
+	/delete-property/ vmmc-supply;
+	/delete-property/ vqmmc-supply;
+};
+
+&lpi2c1 {
+	u-boot,dm-spl;
+};
+
+&pca9451a {
+	u-boot,dm-spl;
+};
+
+&pca9451a_regulators {
+	u-boot,dm-spl;
+};
+
+&pinctrl_lpi2c1 {
+	u-boot,dm-spl;
+};
+
+&s4muap {
+	u-boot,dm-spl;
+	status = "okay";
+};
+
+&clk {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+	/delete-property/ assigned-clocks;
+	/delete-property/ assigned-clock-rates;
+};
+
+&osc_32k {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&osc_24m {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&clk_ext1 {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&flexspi {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&pinctrl_flexspi {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
