@@ -135,7 +135,7 @@
 	u-boot,dm-spl;
 };
 
-&pinctrl_flexspi {
+&pinctrl_flexspi1 {
 	u-boot,dm-pre-reloc;
 	u-boot,dm-spl;
 };

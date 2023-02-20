@@ -33,7 +33,11 @@
 	u-boot,dm-spl;
 };
 
-&pinctrl_usdhc2 {
+&pinctrl_usdhc2_hs {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc2_uhs {
 	u-boot,dm-spl;
 };
 
