@@ -1,0 +1,29 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2023 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Gregor Herburger
+ */
+
+/dts-v1/;
+#include "fsl-ls1046a.dtsi"
+#include "fsl-ls1046a-tqmls1046a.dtsi"
+#include "fsl-tqmls10xxa-mbls10xxa.dtsi"
+
+/ {
+	model = "TQMLS1046A on MBLS10xxa Board";
+
+	aliases {
+		ethernet0 = &enet0;
+		ethernet1 = &enet1;
+		ethernet2 = &enet2;
+		ethernet3 = &enet3;
+		ethernet4 = &enet4;
+		ethernet5 = &enet5;
+		ethernet6 = &enet6;
+		ethernet7 = &enet7;
+	};
+};
+
+#include "fsl-ls1046-post.dtsi"
+#include "fsl-tqmls10xxa-mbls10xxa-fman.dtsi"
