@@ -22,6 +22,7 @@
 #include <fdt_support.h>
 #include <asm/cache.h>
 #include <asm/global_data.h>
+#include <asm-generic/gpio.h>
 #include <asm/io.h>
 #include <dm.h>
 #include <dm/device_compat.h>
@@ -106,6 +107,10 @@ struct fsl_esdhc_priv {
 	struct mmc *mmc;
 #endif
 	struct udevice *dev;
+#if CONFIG_IS_ENABLED(DM_GPIO)
+	struct gpio_desc cd_gpio;
+	struct gpio_desc wp_gpio;
+#endif
 	struct sdhci_adma_desc *adma_desc_table;
 	dma_addr_t dma_addr;
 };
@@ -279,7 +284,11 @@ static int esdhc_setup_data(struct fsl_esdhc_priv *priv, struct mmc *mmc,
 	bool is_write = data->flags & MMC_DATA_WRITE;
 	struct fsl_esdhc *regs = priv->esdhc_regs;
 
+#if CONFIG_IS_ENABLED(DM_GPIO)
+	if (is_write && dm_gpio_is_valid(&priv->wp_gpio) && dm_gpio_get_value(&priv->wp_gpio)) {
+#elif
 	if (is_write && !(esdhc_read32(&regs->prsstat) & PRSSTAT_WPSPL)) {
+#endif
 		printf("Can not write to locked SD card.\n");
 		return -EINVAL;
 	}
@@ -776,6 +785,12 @@ static int esdhc_getcd_common(struct fsl_esdhc_priv *priv)
 	if (CONFIG_ESDHC_DETECT_QUIRK)
 		return 1;
 #endif
+
+#if CONFIG_IS_ENABLED(DM_GPIO)
+	if (dm_gpio_is_valid(&priv->cd_gpio))
+		return dm_gpio_get_value(&priv->cd_gpio);
+#endif
+
 	if (esdhc_read32(&regs->prsstat) & PRSSTAT_CINS)
 		return 1;
 
@@ -1003,6 +1018,13 @@ static int fsl_esdhc_probe(struct udevice *dev)
 	priv->esdhc_regs = (struct fsl_esdhc *)addr;
 #endif
 	priv->dev = dev;
+
+#if CONFIG_IS_ENABLED(DM_GPIO)
+	ret = gpio_request_by_name(dev, "wp-gpios", 0, &priv->wp_gpio,
+				   GPIOD_IS_IN);
+	ret = gpio_request_by_name(dev, "cd-gpios", 0, &priv->cd_gpio,
+				   GPIOD_IS_IN);
+#endif
 
 	if (IS_ENABLED(CONFIG_FSL_ESDHC_SUPPORT_ADMA2)) {
 		/*
