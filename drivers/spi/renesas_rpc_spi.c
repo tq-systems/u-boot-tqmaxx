@@ -306,18 +306,41 @@ static int rpc_spi_xfer(struct udevice *dev, unsigned int bitlen,
 
 		if (wlen && flags == SPI_XFER_END) {
 			u32 *datout = (u32 *)dout;
+			u32 data;
 
 			while (wloop--) {
 				smcr = RPC_SMCR_SPIWE | RPC_SMCR_SPIE;
 				if (wloop >= 1)
 					smcr |= RPC_SMCR_SSLKP;
+
+				smenr &= ~(RPC_SMENR_SPIDE(0xf));
+				switch(wlen)
+				{
+					case 1:
+						smenr |= RPC_SMENR_SPIDE(0x8);
+						data = (*datout & 0x0ff) << 24;
+					break;
+					case 2:
+						smenr |= RPC_SMENR_SPIDE(0xc);
+						data = (*datout & 0x0ffff) << 16;
+					break;
+					case 3:
+						smenr |= RPC_SMENR_SPIDE(0xe);
+						data = (*datout & 0x0ffffff) << 8;
+					break;
+					default:
+						smenr |= RPC_SMENR_SPIDE(0xf);
+						data = *datout;
+					break;
+				}
 				writel(smenr, priv->regs + RPC_SMENR);
-				writel(*datout, priv->regs + RPC_SMWDR0);
+				writel(data, priv->regs + RPC_SMWDR0);
 				writel(smcr, priv->regs + RPC_SMCR);
 				ret = rpc_spi_wait_tend(dev);
 				if (ret)
 					goto err;
 				datout++;
+				wlen -= 4;
 				smenr = RPC_SMENR_SPIDE(0xf);
 			}
 
@@ -456,6 +479,11 @@ static const struct udevice_id rpc_spi_ids[] = {
 	{ .compatible = "renesas,rpc-r8a77970" },
 	{ .compatible = "renesas,rpc-r8a77995" },
 	{ .compatible = "renesas,rcar-gen3-rpc" },
+	{ .compatible = "renesas,r9a07g044l-spibsc" },
+	{ .compatible = "renesas,r9a07g043u-spibsc" },
+	{ .compatible = "renesas,r9a07g044c-spibsc" },
+	{ .compatible = "renesas,r9a07g054l-spibsc" },
+	{ .compatible = "renesas,r9a07g043g-spibsc" },
 	{ }
 };
 
