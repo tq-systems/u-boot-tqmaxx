@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 /*
- * Copyright (c) 2021 - 2022 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * Copyright (c) 2021-2023 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
  * D-82229 Seefeld, Germany.
  * Author: Markus Niebel
  */
+
+/* SOM shared settings for U-Boot */
+#include "imx8mp-tqma8mpql-u-boot.dtsi"
 
 / {
 	aliases {
@@ -31,22 +34,8 @@
 	};
 };
 
-&{/soc@0} {
-	u-boot,dm-pre-reloc;
-	u-boot,dm-spl;
-};
-
 &adc {
 	status = "disabled";
-};
-
-&clk {
-	u-boot,dm-spl;
-	u-boot,dm-pre-reloc;
-	/delete-property/ assigned-clocks;
-	/delete-property/ assigned-clock-parents;
-	/delete-property/ assigned-clock-rates;
-
 };
 
 &ecspi2 {
@@ -57,6 +46,13 @@
 	status = "disabled";
 };
 
+&eqos {
+	compatible = "fsl,imx-eqos";
+	/delete-property/ assigned-clocks;
+	/delete-property/ assigned-clock-parents;
+	/delete-property/ assigned-clock-rates;
+};
+
 &flexcan1 {
 	status = "disabled";
 };
@@ -65,28 +61,9 @@
 	status = "disabled";
 };
 
-
-&osc_32k {
-	u-boot,dm-spl;
-	u-boot,dm-pre-reloc;
-};
-
-&osc_24m {
-	u-boot,dm-spl;
-	u-boot,dm-pre-reloc;
-};
-
-&aips1 {
-	u-boot,dm-spl;
-	u-boot,dm-pre-reloc;
-};
-
-&aips2 {
-	u-boot,dm-spl;
-};
-
-&aips3 {
-	u-boot,dm-spl;
+&gpio1 {
+	pinctrl-0 = <&pinctrl_gpio1>, <&pinctrl_usbhub>, <&pinctrl_regotgvbus>,
+		    <&pinctrl_usbcon0>;
 };
 
 &iomuxc {
@@ -107,12 +84,12 @@
 	};
 };
 
-&pinctrl_reg_usdhc2_vmmc {
-	u-boot,dm-spl;
+&pcie {
+	status = "disabled";
 };
 
-&reg_usdhc2_vmmc {
-	u-boot,dm-spl;
+&pcie_phy {
+	status = "disabled";
 };
 
 &pinctrl_uart4 {
@@ -127,54 +104,12 @@
 	u-boot,dm-spl;
 };
 
-&pinctrl_usdhc3 {
-	u-boot,dm-spl;
-};
-
-&gpio1 {
-	pinctrl-0 = <&pinctrl_gpio1>, <&pinctrl_usbhub>, <&pinctrl_regotgvbus>,
-		    <&pinctrl_usbcon0>;
-	u-boot,dm-spl;
-};
-
-&gpio2 {
-	u-boot,dm-spl;
-};
-
-&gpio3 {
-	u-boot,dm-spl;
-};
-
-&gpio4 {
-	u-boot,dm-spl;
-};
-
-&gpio5 {
-	u-boot,dm-spl;
-};
-
-&uart4 {
-	u-boot,dm-spl;
-};
-
-&i2c1 {
-	u-boot,dm-spl;
-};
-
-&pinctrl_i2c1 {
-	u-boot,dm-spl;
-};
-
 &tlv320aic3x04 {
 	status = "disabled";
 };
 
-&pcie{
-	status = "disabled";
-};
-
-&pcie_phy{
-	status = "disabled";
+&uart4 {
+	u-boot,dm-spl;
 };
 
 &usdhc2 {
@@ -184,39 +119,6 @@
 	assigned-clocks = <&clk IMX8MP_CLK_USDHC2>;
 	assigned-clock-rates = <400000000>;
 	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_400M>;
-};
-
-&usdhc3 {
-	u-boot,dm-spl;
-	mmc-hs400-1_8v;
-	mmc-hs400-enhanced-strobe;
-	/*
-	 * prevents voltage switch warn: driver will switch even at
-	 * fixed voltage
-	 */
-	/delete-property/ vmmc-supply;
-	/delete-property/ vqmmc-supply;
-	assigned-clocks = <&clk IMX8MP_CLK_USDHC3>;
-	assigned-clock-rates = <400000000>;
-	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_400M>;
-};
-
-&eqos {
-	compatible = "fsl,imx-eqos";
-	/delete-property/ assigned-clocks;
-	/delete-property/ assigned-clock-parents;
-	/delete-property/ assigned-clock-rates;
-};
-
-&flexspi {
-	assigned-clock-rates = <100000000>;
-	assigned-clocks = <&clk IMX8MP_CLK_QSPI>;
-	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_100M>;
-};
-
-&flash0 {
-	spi-tx-bus-width = <1>;
-	spi-rx-bus-width = <1>;
 };
 
 &wdog1 {
