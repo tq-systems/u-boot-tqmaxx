@@ -213,66 +213,77 @@ int mmc_map_to_kernel_blk(int devno)
 
 #if defined(CONFIG_USB)
 
-int board_usb_init(int index, enum usb_init_type init)
+static int mba8mpxl_usb0_init(enum usb_init_type init)
 {
 	int ret = 0;
 	int otg_id;
 	u32 *usb_nc_reg;
-	struct gpio_desc *gpio;
 
+	/* Set DIG_ID_SEL to muxable PIN for ID detect */
+	usb_nc_reg = (u32 *)(ulong)(USB1_BASE_ADDR +
+				    USB_CTRL0_OFFSET);
+	setbits_le32(usb_nc_reg, USB_CTRL0_IDDIG_SEL);
+	/* Set polarity for OC & PWR pins */
+	usb_nc_reg = (u32 *)(ulong)(USB1_BASE_ADDR +
+				    USB_CTRL1_OFFSET);
+	setbits_le32(usb_nc_reg, USB_CTRL1_OC_POLARITY);
+	clrbits_le32(usb_nc_reg, USB_CTRL1_PWR_POLARITY);
+	/* pullup ID pin - needed for ID Handling */
+	usb_nc_reg = (u32 *)(ulong)(USB1_BASE_ADDR +
+				    PHY_CTRL2_OFFSET);
+	setbits_le32(usb_nc_reg, PHY_CTRL2_IDPULLUP);
+
+	/*
+	 * Using the dedicated ID pin would save a GPIO pin but is not
+	 * supported. So we have to use the muxable pin as GPIO to
+	 * implement ID detection.
+	 */
+	otg_id = dm_gpio_get_value(&mba8mpxl_gid[USB_OTG_ID].desc);
+	printf("USB0/OTG: ID = %d\n", otg_id);
+
+	switch (init) {
+	case USB_INIT_DEVICE:
+		if (!otg_id)
+			return -ENODEV;
+		dm_gpio_set_value(&mba8mpxl_gid[USB_OTG_PWR].desc, 0);
+#ifdef CONFIG_USB_DWC3_GADGET
+		ret = tqma8mpxl_usb_dwc3_gadget_init();
+#endif
+		break;
+	case USB_INIT_HOST:
+		if (otg_id)
+			return -ENODEV;
+		dm_gpio_set_value(&mba8mpxl_gid[USB_OTG_PWR].desc, 1);
+		break;
+	default:
+		printf("USB0/OTG: unknown init type\n");
+		return -EINVAL;
+	}
+
+	return ret;
+}
+
+int board_usb_init(int index, enum usb_init_type init)
+{
+	int ret = 0;
+	struct gpio_desc *reset_gpio;
+
+	/*
+	 * Enable power for IP. Will be disabled by caller in case of
+	 * error in this function.
+	 */
 	imx8m_usb_power(index, true);
 
 	switch (index) {
 	case 0:
-		/* Set DIG_ID_SEL to muxable PIN for ID detect */
-		usb_nc_reg = (u32 *)(ulong)(USB1_BASE_ADDR +
-					    USB_CTRL0_OFFSET);
-		setbits_le32(usb_nc_reg, USB_CTRL0_IDDIG_SEL);
-		/* Set polarity for OC & PWR pins */
-		usb_nc_reg = (u32 *)(ulong)(USB1_BASE_ADDR +
-					    USB_CTRL1_OFFSET);
-		setbits_le32(usb_nc_reg, USB_CTRL1_OC_POLARITY);
-		clrbits_le32(usb_nc_reg, USB_CTRL1_PWR_POLARITY);
-		/* pullup ID pin - needed for ID Handling */
-		usb_nc_reg = (u32 *)(ulong)(USB1_BASE_ADDR +
-					    PHY_CTRL2_OFFSET);
-		setbits_le32(usb_nc_reg, PHY_CTRL2_IDPULLUP);
-
-		/*
-		 * TODO:
-		 * use USB_STS0_OFFSET / USB_STS0_IDDIG, saves a GPIO pin
-		 */
-		otg_id = dm_gpio_get_value(&mba8mpxl_gid[USB_OTG_ID].desc);
-		printf("USB0/OTG: ID = %d\n", otg_id);
-		gpio = &mba8mpxl_gid[USB_OTG_PWR].desc;
-		switch (init) {
-		case USB_INIT_DEVICE:
-			if (otg_id) {
-				dm_gpio_set_value(gpio, 0);
-#ifdef CONFIG_USB_DWC3_GADGET
-				ret = tqma8mpxl_usb_dwc3_gadget_init();
-#endif
-			} else {
-				ret = -ENODEV;
-			}
-			break;
-		case USB_INIT_HOST:
-			if (!otg_id)
-				dm_gpio_set_value(gpio, 1);
-			else
-				ret = -ENODEV;
-			break;
-		default:
-			printf("USB0/OTG: unknown init type\n");
-			ret = -EINVAL;
-		}
+		ret = mba8mpxl_usb0_init(init);
 		break;
 	case 1:
 		puts("USB1/HUB\n");
-		gpio = &mba8mpxl_gid[USB_RST_B].desc;
-		dm_gpio_set_value(gpio, 1);
+		reset_gpio = &mba8mpxl_gid[USB_RST_B].desc;
+		dm_gpio_set_value(reset_gpio, 1);
 		udelay(100);
-		dm_gpio_set_value(gpio, 0);
+		dm_gpio_set_value(reset_gpio, 0);
 		udelay(100);
 		break;
 	default:
