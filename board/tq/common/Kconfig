@@ -22,6 +22,10 @@ config TQ_ENVLOC
 	bool
 	select ENV_IS_NOWHERE
 
+config TQ_MBLS10XXA
+	bool
+	default n
+
 config TQ_RTC
 	bool
 
