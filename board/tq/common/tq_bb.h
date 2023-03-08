@@ -17,8 +17,10 @@ int tq_bb_board_mmc_init(struct bd_info *bis);
 
 void tq_bb_board_init_f(ulong dummy);
 int tq_bb_board_early_init_f(void);
+int tq_bb_board_fix_fdt(void *blob);
 int tq_bb_board_init(void);
 int tq_bb_board_late_init(void);
+int tq_bb_board_misc_init_r(void);
 int tq_bb_checkboard(void);
 void tq_bb_board_quiesce_devices(void);
 

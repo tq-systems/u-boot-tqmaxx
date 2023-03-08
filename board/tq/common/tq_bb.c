@@ -36,12 +36,22 @@ int __weak tq_bb_board_early_init_f(void)
 	return 0;
 }
 
+int __weak tq_bb_board_fix_fdt(void *rw_fdt_blob)
+{
+	return 0;
+}
+
 int __weak tq_bb_board_init(void)
 {
 	return 0;
 }
 
 int __weak tq_bb_board_late_init(void)
+{
+	return 0;
+}
+
+int __weak tq_bb_board_misc_init_r(void)
 {
 	return 0;
 }
