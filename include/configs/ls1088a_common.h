@@ -53,7 +53,9 @@
 
 /* Serial Port */
 #define CONFIG_SYS_NS16550_SERIAL
+#ifndef CONFIG_DM_SERIAL
 #define CONFIG_SYS_NS16550_REG_SIZE     1
+#endif
 #define CONFIG_SYS_NS16550_CLK          (get_bus_freq(0) / 2)
 
 /*
