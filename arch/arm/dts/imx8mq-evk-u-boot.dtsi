@@ -28,6 +28,9 @@
 };
 
 &ethphy0 {
+	reset-assert-us = <15000>;
+	reset-deassert-us = <100000>;
+
 	vddio0: vddio-regulator {
 		regulator-name = "VDDIO";
 		regulator-min-microvolt = <1800000>;
