@@ -32,6 +32,7 @@
 #include <power/pmic.h>
 #include <spi_flash.h>
 
+#include "tqma6.h"
 #include "../common/tq_bb.h"
 #include "../common/tq_emmc.h"
 
@@ -68,6 +69,18 @@ void board_mmc_detect_card_type(struct mmc *mmc)
 
 	if (tq_emmc_need_dsr(mmc) > 0)
 		mmc_set_dsr(mmc, tqma6_emmc_dsr);
+}
+
+/*!
+ * Rev. 0200 and newer optionally implements GIGE ping issue fix
+ * us a global to signal presence of the fix. this should be checked
+ * early. If fix is present, system I2C is I2C1 - otherwise I2C3
+ */
+static int has_enet_workaround = -1;
+
+int tqma6_has_enet_workaround(void)
+{
+	return has_enet_workaround;
 }
 
 int dram_init(void)
@@ -218,8 +231,45 @@ static void tqma6_setup_i2c(void)
 }
 #endif
 
+#define GPIO_REVDET_PAD_CTRL  (PAD_CTL_PUS_100K_DOWN | PAD_CTL_SPEED_LOW | \
+			       PAD_CTL_DSE_40ohm | PAD_CTL_HYS)
+
+static const iomux_v3_cfg_t tqma6_revdet_pads[] = {
+	MX6_PAD_GPIO_6__GPIO1_IO06 | MUX_PAD_CTRL(GPIO_REVDET_PAD_CTRL),
+};
+
+static void tqma6_detect_enet_workaround(void)
+{
+	int ret;
+	struct gpio_desc desc;
+
+	imx_iomux_v3_setup_multiple_pads(tqma6_revdet_pads,
+					 ARRAY_SIZE(tqma6_revdet_pads));
+
+	ret = dm_gpio_lookup_name("GPIO1_6", &desc);
+	if (ret) {
+		pr_err("error: gpio lookup for enet workaround %d\n", ret);
+	} else {
+		ret = dm_gpio_request(&desc, "rev_det");
+		if (ret) {
+			pr_err("error: gpio request  for enet workaround %d\n", ret);
+		} else {
+			dm_gpio_set_dir_flags(&desc, GPIOD_IS_IN);
+			if (dm_gpio_get_value(&desc) == 0) {
+				has_enet_workaround = 1;
+			} else if (dm_gpio_get_value(&desc) > 0) {
+				has_enet_workaround = 0;
+				dm_gpio_set_dir_flags(&desc, GPIOD_IS_OUT |
+						       GPIOD_IS_OUT_ACTIVE);
+			}
+		}
+	}
+}
+
 int board_early_init_f(void)
 {
+	tqma6_detect_enet_workaround();
+
 	return tq_bb_board_early_init_f();
 }
 
@@ -291,6 +341,21 @@ int checkboard(void)
 {
 	printf("Board: %s on a %s\n", tqma6_get_boardname(),
 	       tq_bb_get_boardname());
+
+	puts("Enet workaround: ");
+	switch (tqma6_has_enet_workaround()) {
+	case 0:
+		puts("NO");
+		break;
+	case 1:
+		puts("OK");
+		break;
+	default:
+		puts("???");
+		break;
+	};
+	puts("\n");
+
 	return 0;
 }
 
