@@ -878,6 +878,7 @@ dtb-y += \
 	imx6q-sabresd.dtb \
 	imx6q-tbs2910.dtb \
 	imx6q-wandboard-revd1.dtb \
+	imx6qp-mba6b.dtb \
 	imx6qp-sabreauto.dtb \
 	imx6qp-sabresd.dtb \
 	imx6qp-wandboard-revd1.dtb \
