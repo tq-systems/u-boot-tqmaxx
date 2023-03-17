@@ -60,8 +60,8 @@
 	"mmcargs=run addmmc addtty addmisc\0"	\
 	"mmcdev=0\0"	\
 	"rootpath=/srv/nfs/\0"		\
-	"firmwarepart=1\0"	\
-	"firmwarepath=/\0"	\
+	"firmwarepart=2\0"	\
+	"firmwarepath=/boot/\0"	\
 	"kernel=Image\0"	\
 	"kernel_addr_r=0x81000000\0"	\
 	"fdt_addr_r=0x90000000\0"	\

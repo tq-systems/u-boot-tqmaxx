@@ -1,0 +1,114 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2023 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Gregor Herburger
+ */
+
+/dts-v1/;
+#include "fsl-ls1088a.dtsi"
+#include "fsl-ls1088a-tqmls1088a.dtsi"
+#include "fsl-tqmls10xxa-mbls10xxa.dtsi"
+
+/ {
+	model = "TQMLS1088A on MBLS10xxa Board";
+	aliases {
+		dpmac1 = &dpmac1;
+		dpmac2 = &dpmac2;
+		dpmac3 = &dpmac3;
+		dpmac4 = &dpmac4;
+		dpmac5 = &dpmac5;
+		dpmac6 = &dpmac6;
+		dpmac7 = &dpmac7;
+		dpmac8 = &dpmac8;
+		dpmac9 = &dpmac9;
+		dpmac10 = &dpmac10;
+
+		rgmii_phy1 = &rgmii_phy1;
+		rgmii_phy2 = &rgmii_phy2;
+		qsgmii_s1_p1 = &qsgmii1_phy1;
+		qsgmii_s1_p2 = &qsgmii1_phy2;
+		qsgmii_s1_p3 = &qsgmii1_phy3;
+		qsgmii_s1_p4 = &qsgmii1_phy4;
+		qsgmii_s2_p1 = &qsgmii2_phy1;
+		qsgmii_s2_p2 = &qsgmii2_phy2;
+		qsgmii_s2_p3 = &qsgmii2_phy3;
+		qsgmii_s2_p4 = &qsgmii2_phy4;
+	};
+};
+
+&dpmac4 {
+	status = "okay";
+	phy-handle = <&rgmii_phy1>;
+	phy-connection-type = "rgmii-id";
+};
+
+&dpmac5 {
+	status = "okay";
+	phy-handle = <&rgmii_phy2>;
+	phy-connection-type = "rgmii-id";
+};
+
+&emdio1 {
+	status = "okay";
+	rgmii_phy1: ethernet-phy@0e {
+		compatible = "ethernet-phy-ieee802.3-c22";
+		reg = <0x0e>;
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_50_NS>;
+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_50_NS>;
+		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_8_B_NIB>;
+		/* LED1: Link, LED2: activity */
+		ti,led-function = <0x0100>;
+		/* LED1: active High, LED2: active Low driven by phy function */
+		ti,led-ctrl = <0x1041>;
+	};
+
+	rgmii_phy2: ethernet-phy@0c {
+		compatible = "ethernet-phy-ieee802.3-c22";
+		reg = <0x0c>;
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_50_NS>;
+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_50_NS>;
+		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_8_B_NIB>;
+		/* LED1: Link, LED2: activity */
+		ti,led-function = <0x0100>;
+		/* LED1: active High, LED2: active Low driven by phy function */
+		ti,led-ctrl = <0x1041>;
+	};
+
+	qsgmii1_phy1: ethernet-phy@1c {
+		reg = <0x1c>;
+	};
+
+	qsgmii1_phy2: ethernet-phy@1d {
+		reg = <0x1d>;
+	};
+
+	qsgmii1_phy3: ethernet-phy@1e {
+		reg = <0x1e>;
+	};
+
+	qsgmii1_phy4: ethernet-phy@1f {
+		reg = <0x1f>;
+	};
+
+	qsgmii2_phy1: ethernet-phy@00 {
+		reg = <0x00>;
+	};
+
+	qsgmii2_phy2: ethernet-phy@01 {
+		reg = <0x01>;
+	};
+
+	qsgmii2_phy3: ethernet-phy@02 {
+		reg = <0x02>;
+	};
+
+	qsgmii2_phy4: ethernet-phy@03 {
+		reg = <0x03>;
+	};
+};
+
+&esdhc {
+	cd-gpios = <&gpio2 12 GPIO_ACTIVE_LOW>;
+	wp-gpios = <&gpio2 13 GPIO_ACTIVE_HIGH>;
+};

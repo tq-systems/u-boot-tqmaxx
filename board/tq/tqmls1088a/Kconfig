@@ -1,0 +1,32 @@
+if TARGET_TQMLS1088A
+
+config SYS_BOARD
+	default "tqmls1088a"
+
+config SYS_VENDOR
+	default "tq"
+
+config SYS_SOC
+	default "fsl-layerscape"
+
+config SYS_CONFIG_NAME
+	default "tqmls1088a"
+
+choice
+	prompt "TQMLS1088A base board variant"
+	default TQMLS1088A_BB_MBLS10XXA
+	help
+	  Select base board for TQMLS1088A
+
+config TQMLS1088A_BB_MBLS10XXA
+	bool "TQMLS1088A on MBLS10xxA Starterkit"
+	select TQ_MBLS10XXA
+	help
+	  Select the MBLS10XXA starterkit. This features various SerDes configurations,
+	  Ethernet, 10GBit Ethernet, USB, SD-Card and PCIe.
+
+endchoice
+
+source "board/tq/common/Kconfig"
+
+endif
