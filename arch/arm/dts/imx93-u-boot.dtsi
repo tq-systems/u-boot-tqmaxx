@@ -7,6 +7,65 @@
 	binman: binman {
 		multiple-images;
 	};
+
+	aliases {
+		ethernet0 = &fec;
+		ethernet1 = &eqos;
+		spi0 = &flexspi1;
+		usb0 = &usbotg1;
+		usb1 = &usbotg2;
+	};
+
+	display-subsystem {
+		compatible = "fsl,imx-display-subsystem";
+		ports = <&lcdif_disp>;
+	};
+
+	ldb: ldb-display-controller {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "fsl,imx93-ldb";
+		clocks = <&clk IMX93_CLK_LVDS_GATE>;
+		clock-names = "ldb";
+		assigned-clocks = <&clk IMX93_CLK_MEDIA_LDB>;
+		assigned-clock-parents = <&clk IMX93_CLK_VIDEO_PLL>;
+		gpr = <&media_blk_ctrl>;
+		power-domains = <&mediamix>;
+		status = "disabled";
+
+		lvds-channel@0 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0>;
+			phys = <&ldb_phy1>;
+			phy-names = "ldb_phy";
+			status = "disabled";
+
+			port@0 {
+				reg = <0>;
+
+				ldb_ch0: endpoint {
+					remote-endpoint = <&lcdif_to_ldb>;
+				};
+			};
+		};
+	};
+
+	ldb_phy: ldb-phy {
+		compatible = "fsl,imx93-lvds-phy";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		gpr = <&media_blk_ctrl>;
+		clocks = <&clk IMX93_CLK_MEDIA_APB>;
+		clock-names = "apb";
+		power-domains = <&mediamix>;
+		status = "disabled";
+
+		ldb_phy1: port@0 {
+			reg = <0>;
+			#phy-cells = <0>;
+		};
+	};
 };
 
 &A55_0 {
@@ -15,6 +74,120 @@
 
 &A55_1 {
 	clocks = <&clk IMX93_CLK_ARM_PLL>;
+};
+
+&media_blk_ctrl {
+	reg = <0x4ac10000 0x70>;
+	status = "okay";
+
+	dphy: dphy {
+		compatible = "fsl,imx93-mipi-dphy";
+		clocks = <&clk IMX93_CLK_MIPI_PHY_CFG>,
+			 <&clk IMX93_CLK_24M>;
+		clock-names = "phy_cfg", "phy_ref";
+		assigned-clocks = <&clk IMX93_CLK_MIPI_PHY_CFG>;
+		assigned-clock-parents = <&clk IMX93_CLK_24M>;
+		assigned-clock-rates = <24000000>;
+		#phy-cells = <0>;
+		power-domains = <&media_blk_ctrl IMX93_MEDIABLK_PD_MIPI_DSI>;
+		status = "disabled";
+	};
+
+	parallel_disp_fmt: dpi {
+		compatible = "fsl,imx93-parallel-display-format";
+		power-domains = <&mediamix>;
+		status = "disabled";
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				dpi_to_lcdif: endpoint {
+					remote-endpoint = <&lcdif_to_dpi>;
+				};
+			};
+		};
+	};
+};
+
+&{/soc@0} {
+	dsi: dsi@4ae10000 {
+		compatible = "fsl,imx93-mipi-dsi";
+		reg = <0x4ae10000 0x4000>;
+		interrupts = <GIC_SPI 177 IRQ_TYPE_LEVEL_HIGH>;
+		clocks = <&clk IMX93_CLK_MIPI_TEST_BYTE>,
+			 <&clk IMX93_CLK_MIPI_DSI_GATE>;
+		clock-names = "byte", "pclk";
+		assigned-clocks = <&clk IMX93_CLK_MIPI_TEST_BYTE>,
+				  <&clk IMX93_CLK_MEDIA_APB>;
+		assigned-clock-parents = <&clk IMX93_CLK_SYS_PLL_PFD0>,
+					 <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
+		assigned-clock-rates = <20000000>, <133333333>;
+		phys = <&dphy>;
+		phy-names = "dphy";
+		power-domains = <&media_blk_ctrl IMX93_MEDIABLK_PD_MIPI_DSI>;
+		status = "disabled";
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				dsi_to_lcdif: endpoint {
+					remote-endpoint = <&lcdif_to_dsi>;
+				};
+			};
+		};
+	};
+
+	lcdif: lcd-controller@4ae30000 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "fsl,imx93-lcdif";
+		reg = <0x4ae30000 0x10000>;
+		interrupts = <GIC_SPI 176 IRQ_TYPE_LEVEL_HIGH>;
+		fsl,gpr = <&media_blk_ctrl>;
+		clocks = <&clk IMX93_CLK_MEDIA_DISP_PIX>,
+			 <&clk IMX93_CLK_MEDIA_AXI>,
+			 <&clk IMX93_CLK_LCDIF_GATE>;
+		clock-names = "pix", "disp-axi", "disp-apb";
+		assigned-clocks = <&clk IMX93_CLK_VIDEO_PLL>,
+				  <&clk IMX93_CLK_MEDIA_DISP_PIX>,
+				  <&clk IMX93_CLK_MEDIA_AXI>,
+				  <&clk IMX93_CLK_MEDIA_APB>;
+		assigned-clock-parents = <&clk IMX93_CLK_24M>,
+					 <&clk IMX93_CLK_VIDEO_PLL>,
+					 <&clk IMX93_CLK_SYS_PLL_PFD1>,
+					 <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
+		power-domains = <&media_blk_ctrl IMX93_MEDIABLK_PD_LCDIF>;
+		status = "disabled";
+
+		lcdif_disp: port@0 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0>;
+
+			lcdif_to_dsi: endpoint@0 {
+				reg = <0>;
+				remote-endpoint = <&dsi_to_lcdif>;
+			};
+
+			lcdif_to_ldb: endpoint@1 {
+				reg = <1>;
+				remote-endpoint = <&ldb_ch0>;
+			};
+
+			lcdif_to_dpi: endpoint@2 {
+				reg = <2>;
+				remote-endpoint = <&dpi_to_lcdif>;
+			};
+		};
+	};
 };
 
 &binman {
