@@ -509,10 +509,6 @@ int tq_mbls10xxa_fixup_phy_to_enet(void *fdt, char *enet_alias, char *phy_alias,
 	int offset;
 	int ret;
 
-	ret = fdt_increase_size(fdt, 32);
-	if (ret)
-		return ret;
-
 	path = fdt_get_alias(fdt, phy_alias);
 	if (!path)
 		return -FDT_ERR_BADPATH;
@@ -533,11 +529,12 @@ int tq_mbls10xxa_fixup_phy_to_enet(void *fdt, char *enet_alias, char *phy_alias,
 
 	phy_phandle = cpu_to_fdt32(phy_phandle);
 	ret = fdt_setprop(fdt, offset, "phy-handle", &phy_phandle, sizeof(phy_phandle));
-
 	if (ret)
 		return ret;
 
 	ret = fdt_setprop_string(fdt, offset, "phy-connection-type", connection);
+	if (ret)
+		return ret;
 
 	return fdt_status_okay_by_alias(fdt, enet_alias);
 }
@@ -548,10 +545,6 @@ int tq_mbls10xxa_fixup_enet_fixed_link(void *fdt, char *enet_alias, int id, char
 	const char *path;
 	int offset;
 	int ret;
-
-	ret = fdt_increase_size(fdt, 64);
-	if (ret)
-		return ret;
 
 	path = fdt_get_alias(fdt, enet_alias);
 	if (!path)
@@ -567,7 +560,12 @@ int tq_mbls10xxa_fixup_enet_fixed_link(void *fdt, char *enet_alias, int id, char
 	f_link.pause = 0;
 	f_link.asym_pause = 0;
 	fdt_setprop(fdt, offset, "fixed-link", &f_link, sizeof(f_link));
+	if (ret)
+		return ret;
+
 	fdt_setprop_string(fdt, offset, "phy-connection-type", connection);
+	if (ret)
+		return ret;
 
 	return fdt_status_okay_by_alias(fdt, enet_alias);
 }
