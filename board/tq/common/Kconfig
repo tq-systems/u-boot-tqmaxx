@@ -41,6 +41,10 @@ config TQ_SPI_NOR
 	bool
 	default y if (SPI_FLASH && OF_BOARD_SETUP)
 
+config TQ_TQMLS10XXA_COMMON
+	bool
+	default n
+
 config TQ_VARD
 	bool
 	depends on TQ_EEPROM

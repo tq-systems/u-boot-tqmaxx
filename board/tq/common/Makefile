@@ -27,6 +27,7 @@ obj-$(CONFIG_TQ_RTC) += tq_rtc.o
 obj-$(CONFIG_TQ_SCU) += tq_scu.o
 obj-$(CONFIG_TQ_SDMMC) += tq_sdmmc.o
 obj-$(CONFIG_TQ_SPI_NOR) += tq_spi_nor.o
+obj-$(CONFIG_TQ_TQMLS10XXA_COMMON) += tq_tqmls10xxa_common.o
 obj-$(CONFIG_TQ_VARD) += tq_som_features.o
 
 ifndef CONFIG_SPL_BUILD
