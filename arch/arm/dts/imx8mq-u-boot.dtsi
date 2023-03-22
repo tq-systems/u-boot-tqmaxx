@@ -7,6 +7,11 @@
 	binman: binman {
 	};
 
+	aliases {
+		usb0 = &usb_dwc3_0;
+		usb1 = &usb_dwc3_1;
+		spi0 = &qspi0;
+	};
 };
 
 &soc {
@@ -31,6 +36,74 @@
 
 &iomuxc {
 	bootph-pre-ram;
+};
+
+&clk{
+	assigned-clocks = <&clk IMX8MQ_CLK_A53_SRC>,
+				<&clk IMX8MQ_CLK_A53_CORE>,
+				<&clk IMX8MQ_CLK_NOC>,
+				<&clk IMX8MQ_CLK_AUDIO_AHB>,
+				<&clk IMX8MQ_AUDIO_PLL1_BYPASS>,
+				<&clk IMX8MQ_AUDIO_PLL2_BYPASS>,
+				<&clk IMX8MQ_AUDIO_PLL1>,
+				<&clk IMX8MQ_AUDIO_PLL2>,
+				<&clk IMX8MQ_CLK_NAND_USDHC_BUS>;
+	assigned-clock-rates = <0>, <0>,
+			       <800000000>,
+			       <0>,
+			       <0>,
+			       <0>,
+			       <786432000>,
+			       <722534400>,
+			       <0>;
+	assigned-clock-parents = <&clk IMX8MQ_SYS1_PLL_800M>,
+				 <&clk IMX8MQ_ARM_PLL_OUT>,
+				 <&clk IMX8MQ_SYS1_PLL_800M>,
+				 <&clk IMX8MQ_SYS2_PLL_500M>,
+				 <&clk IMX8MQ_AUDIO_PLL1>,
+				 <&clk IMX8MQ_AUDIO_PLL2>,
+				 <0>,
+			         <0>,
+				 <&clk IMX8MQ_SYS1_PLL_266M>;
+};
+
+&aips4 {
+	hdmi: hdmi@32c00000 {
+		reg = <0x32c00000 0x100000>,
+			<0x32e40000 0x40000>;
+		interrupts = <GIC_SPI 16 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 25 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "plug_in", "plug_out";
+	};
+
+	dcss: display-controller@32e00000 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "nxp,imx8mq-dcss";
+		reg = <0x32e00000 0x2d000>, <0x32e2f000 0x1000>;
+		interrupts = <6>, <8>, <9>, <16>, <17>;
+		interrupt-names = "ctxld", "ctxld_kick", "vblank",
+						  "dtrc_ch1", "dtrc_ch2";
+		interrupt-parent = <&irqsteer>;
+		clocks = <&clk IMX8MQ_CLK_DISP_APB_ROOT>,
+			 <&clk IMX8MQ_CLK_DISP_AXI_ROOT>,
+			 <&clk IMX8MQ_CLK_DISP_RTRM_ROOT>,
+			 <&clk IMX8MQ_VIDEO2_PLL_OUT>,
+			 <&clk IMX8MQ_CLK_DISP_DTRC>,
+			 <&clk IMX8MQ_VIDEO2_PLL1_REF_SEL>,
+			 <&hdmi_phy_27m>;
+		clock-names = "apb", "axi", "rtrm", "pix", "dtrc", "pll_src",
+				      "pll_phy_ref";
+		assigned-clocks = <&clk IMX8MQ_CLK_DISP_AXI>,
+				  <&clk IMX8MQ_CLK_DISP_RTRM>,
+				  <&clk IMX8MQ_VIDEO2_PLL1_REF_SEL>;
+		assigned-clock-parents = <&clk IMX8MQ_SYS1_PLL_800M>,
+					 <&clk IMX8MQ_SYS1_PLL_800M>,
+					 <&clk IMX8MQ_CLK_27M>;
+		assigned-clock-rates = <800000000>,
+					   <400000000>;
+		status = "disabled";
+	};
 };
 
 &binman {
