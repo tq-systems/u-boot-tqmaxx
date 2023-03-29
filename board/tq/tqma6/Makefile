@@ -12,6 +12,7 @@ obj-y += spl.o
 obj-$(CONFIG_TQMA6DL) += tqma6dl.o
 obj-$(CONFIG_TQMA6Q) += tqma6q.o
 obj-$(CONFIG_TQMA6Q_2GB) += tqma6q.o
+obj-$(CONFIG_TQMA6QP) += tqma6qp.o
 obj-$(CONFIG_TQMA6S) += tqma6s.o
 obj-$(CONFIG_MBA6) += spl_mba6.o
 endif
