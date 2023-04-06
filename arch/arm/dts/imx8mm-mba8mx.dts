@@ -15,7 +15,7 @@
 	aliases {
 		mmc0 = &usdhc3;
 		mmc1 = &usdhc2;
-		mmc2 = &usdhc1;
+		/delete-property/ mmc2;
 	};
 
 	chosen {
