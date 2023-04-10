@@ -77,6 +77,9 @@ static const char * const imx8mm_nand_usdhc_sels[] = {"clock-osc-24m", "sys_pll1
 						      "sys_pll2_200m", "sys_pll1_133m", "sys_pll3_out",
 						      "sys_pll2_250m", "audio_pll1_out", };
 
+static const char * const imx8mm_nand_sels[] = {"clock-osc-24m", "sys_pll2_500m", "audio_pll1_out", "sys_pll1_400m",
+					 "audio_pll2_out", "sys_pll3_out", "sys_pll2_250m", "video_pll1_out", };
+
 static const char * const imx8mm_usb_bus_sels[] = {"clock-osc-24m", "sys_pll2_500m", "sys_pll1_800m",
 						   "sys_pll2_100m", "sys_pll2_200m", "clk_ext2",
 						   "clk_ext4", "audio_pll2_out", };
@@ -176,6 +179,7 @@ static const char * const imx8mm_ecspi3_sels[] = {"clock-osc-24m", "sys_pll2_200
 #ifndef CONFIG_XPL_BUILD
 static unsigned int share_count_disp;
 #endif
+static u32 share_count_nand;
 
 static int imx8mm_clk_probe(struct udevice *dev)
 {
@@ -358,6 +362,8 @@ static int imx8mm_clk_probe(struct udevice *dev)
 	       imx8m_clk_composite("pcie1_aux", imx8mm_pcie1_aux_sels,
 				   base + 0xa400));
 #endif
+	clk_dm(IMX8MM_CLK_NAND,
+	       imx8m_clk_composite("nand", imx8mm_nand_sels, base + 0xab00));
 	clk_dm(IMX8MM_CLK_USDHC1,
 	       imx8m_clk_composite("usdhc1", imx8mm_usdhc1_sels,
 				   base + 0xac00));
@@ -405,6 +411,10 @@ static int imx8mm_clk_probe(struct udevice *dev)
 	       imx_clk_gate4("usdhc3_root_clk", "usdhc3", base + 0x45e0, 0));
 	clk_dm(IMX8MM_CLK_USB1_CTRL_ROOT,
 		imx_clk_gate4("usb1_ctrl_root_clk", "usb_bus", base + 0x44d0, 0));
+	clk_dm(IMX8MM_CLK_NAND_ROOT,
+	       imx_clk_gate2_shared2("nand_root_clk", "nand", base + 0x4300, 0, &share_count_nand));
+	clk_dm(IMX8MM_CLK_NAND_USDHC_BUS_RAWNAND_CLK,
+	       imx_clk_gate2_shared2("nand_usdhc_rawnand_clk", "nand_usdhc_bus", base + 0x4300, 0, &share_count_nand));
 
 	/* clks not needed in SPL stage */
 #ifndef CONFIG_XPL_BUILD
