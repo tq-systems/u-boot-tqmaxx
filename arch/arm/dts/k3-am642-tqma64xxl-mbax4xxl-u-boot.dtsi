@@ -57,17 +57,23 @@
 };
 
 &usb0 {
+	u-boot,dm-spl;
+
 	/*
 	 * The U-Boot driver does not support mode switching. To protect hosts
 	 * connected to the USB-B port of the MBaX4XxL, configure the port
 	 * in peripheral mode.
+	 *
+	 * When booting from USB mass storage, the FDT is fixed up to use
+	 * host mode instead.
 	 */
 	dr_mode = "peripheral";
-	u-boot,dm-spl;
+	maximum-speed = "high-speed";
 };
 
 &usbss0 {
 	u-boot,dm-spl;
+	ti,usb2-only;
 };
 
 &main_mmc1_pins_default {
