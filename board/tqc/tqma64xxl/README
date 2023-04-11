@@ -138,3 +138,41 @@ BootMode     11 10 9  8
 OFF          -  -  -  X
 ON           -  -  -
 ```
+
+### USB Host (Mass Storage)
+
+```
+DIP (S4)     4  3  2  1
+BootMode     3  2  1  0
+OFF          X  X
+ON                 X  X
+
+DIP (S5)     4  3  2  1
+BootMode     7  6  5  4
+OFF          X     X
+ON              X     X
+
+DIP (S6)     4  3  2  1
+BootMode     11 10 9  8
+OFF          -  -  -
+ON           -  -  -  X
+```
+
+### USB Peripheral (dfu-util)
+
+```
+DIP (S4)     4  3  2  1
+BootMode     3  2  1  0
+OFF          X  X
+ON                 X  X
+
+DIP (S5)     4  3  2  1
+BootMode     7  6  5  4
+OFF          X     X
+ON              X     X
+
+DIP (S6)     4  3  2  1
+BootMode     11 10 9  8
+OFF          -  -  -  X
+ON           -  -  -
+```
