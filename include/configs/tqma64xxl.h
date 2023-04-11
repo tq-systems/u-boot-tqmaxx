@@ -11,6 +11,7 @@
 
 #include <linux/sizes.h>
 #include <asm/arch/am64_hardware.h>
+#include <environment/ti/k3_dfu.h>
 
 #ifdef CONFIG_SYS_K3_SPL_ATF
 #  define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME	"tispl.bin"
@@ -175,6 +176,12 @@
 		"setenv filesize\0" \
 	""
 
+#define EXTRA_ENV_DFUARGS \
+	DFU_ALT_INFO_MMC \
+	DFU_ALT_INFO_EMMC_COMBINED \
+	DFU_ALT_INFO_RAM \
+	DFU_ALT_INFO_OSPI_COMBINED
+
 /* Incorporate settings into the U-Boot environment */
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	EXTRA_ENV_TQMA64XXL_SETTINGS \
@@ -183,6 +190,7 @@
 	EXTRA_ENV_TQMA64XXL_SETTINGS_NET \
 	EXTRA_ENV_TQMA64XXL_SETTINGS_UPDATE \
 	EXTRA_ENV_TQMA64XXL_SETTINGS_BOARD \
+	EXTRA_ENV_DFUARGS \
 	""
 
 /* Now for the remaining common defines */
