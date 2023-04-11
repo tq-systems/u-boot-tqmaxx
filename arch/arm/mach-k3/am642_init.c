@@ -157,6 +157,7 @@ void do_dt_magic(void)
 	if (IS_ENABLED(CONFIG_CPU_V7R)) {
 		ret = fdtdec_resetup(&rescan);
 		if (!ret && rescan) {
+			fdtdec_board_setup(gd->fdt_blob);
 			dm_uninit();
 			dm_init_and_scan(true);
 		}
