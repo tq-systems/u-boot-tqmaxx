@@ -189,6 +189,25 @@ void spl_board_init(void)
 	writel(val, CTRLMMR_USB0_PHY_CTRL);
 }
 
+static void fixup_usb_boot(struct spl_image_info *spl_image)
+{
+	const char *const value = "host";
+	int ret;
+
+	if (spl_boot_device() == BOOT_DEVICE_USB) {
+		/*
+		 * If the boot mode is host, fixup the dr_mode to host
+		 * before cdns3 bind takes place
+		 */
+		ret = fdt_find_and_setprop(spl_image->fdt_addr,
+					   "/bus@f4000/cdns-usb@f900000/usb@f400000",
+					   "dr_mode", value, strlen(value) + 1, 0);
+		if (ret)
+			printf("%s: fdt_find_and_setprop() failed: %d\n",
+			       __func__, ret);
+	}
+}
+
 static void fixup_memory_node(struct spl_image_info *spl_image)
 {
 	u64 start[CONFIG_NR_DRAM_BANKS], size[CONFIG_NR_DRAM_BANKS];
@@ -210,6 +229,9 @@ static void fixup_memory_node(struct spl_image_info *spl_image)
 void spl_perform_fixups(struct spl_image_info *spl_image)
 {
 	fixup_memory_node(spl_image);
+
+	if (CONFIG_IS_ENABLED(USB_STORAGE))
+		fixup_usb_boot(spl_image);
 }
 
 #else /* CONFIG_SPL_BUILD */
