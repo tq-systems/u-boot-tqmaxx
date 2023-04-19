@@ -43,6 +43,7 @@ struct imx8mp_hsiomix_priv {
 	struct power_domain pd_usb_phy1;
 	struct power_domain pd_usb_phy2;
 	struct power_domain pd_pcie_phy;
+	int pd_usb_count;
 };
 
 static int imx8mp_hsiomix_set(struct power_domain *power_domain, bool power_on)
@@ -83,6 +84,11 @@ static int imx8mp_hsiomix_set(struct power_domain *power_domain, bool power_on)
 	}
 
 	if (power_on) {
+		if (power_domain->id == IMX8MP_HSIOBLK_PD_USB && priv->pd_usb_count > 0) { /* Already on */
+			priv->pd_usb_count++;
+			return 0;
+		}
+
 		ret = power_domain_on(&priv->pd_bus);
 		if (ret)
 			return ret;
@@ -99,9 +105,23 @@ static int imx8mp_hsiomix_set(struct power_domain *power_domain, bool power_on)
 
 		if (gpr_reg0_bits)
 			setbits_le32(priv->base + GPR_REG0, gpr_reg0_bits);
+
+		if (power_domain->id == IMX8MP_HSIOBLK_PD_USB)
+			priv->pd_usb_count++;
 	} else {
-		if (gpr_reg0_bits)
-			clrbits_le32(priv->base + GPR_REG0, gpr_reg0_bits);
+		if (power_domain->id == IMX8MP_HSIOBLK_PD_USB) {
+			if (!priv->pd_usb_count) { /* Already off */
+				return 0;
+			} else if (priv->pd_usb_count > 1) {
+				priv->pd_usb_count--;
+				return 0;
+			}
+
+			priv->pd_usb_count--;
+		} else {
+			if (gpr_reg0_bits)
+				clrbits_le32(priv->base + GPR_REG0, gpr_reg0_bits);
+		}
 
 		if (clk)
 			clk_disable(clk);
