@@ -1,0 +1,17 @@
+config TQ_EEPROM
+	bool
+	depends on I2C_EEPROM
+
+config SPL_TQ_EEPROM
+	bool
+	depends on SPL
+	depends on SPL_I2C_EEPROM || !SPL_DM_I2C
+
+config TQ_EMMC
+	bool
+
+config TQ_SDMMC
+	bool
+
+config TQ_SPI_NOR
+	bool
