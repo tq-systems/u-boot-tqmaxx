@@ -176,8 +176,15 @@ config TQMA8MMX_RAM_1024MB
 
 config TQMA8MMX_RAM_2048MB
 	bool "TQMa8MMx with 2048 MiB RAM"
+	depends on IMX8MM
 	help
 	  Select variant with 2048 MiB RAM
+
+config TQMA8MMX_RAM_4096MB
+	bool "TQMa8MMx with 4096 MiB RAM"
+	depends on IMX8MM
+	help
+	  Select variant with 4096 MiB RAM
 
 endchoice
 

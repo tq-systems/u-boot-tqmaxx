@@ -110,7 +110,12 @@ static iomux_v3_cfg_t const emmc_pads[] = {
 	IMX8MM_PAD_NAND_CE1_B_USDHC3_STROBE | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
 };
 
-#if defined(CONFIG_TQMA8MMX_RAM_2048MB)
+#if defined(CONFIG_TQMA8MMX_RAM_4096MB)
+
+extern struct dram_timing_info tqma8mxml_4gb_dram_timing;
+static struct dram_timing_info *default_dram_timing = &tqma8mxml_4gb_dram_timing;
+
+#elif defined(CONFIG_TQMA8MMX_RAM_2048MB)
 
 extern struct dram_timing_info tqma8mxml_2gb_dram_timing;
 static struct dram_timing_info *default_dram_timing = &tqma8mxml_2gb_dram_timing;
