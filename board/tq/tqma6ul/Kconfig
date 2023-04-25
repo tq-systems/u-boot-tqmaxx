@@ -1,0 +1,90 @@
+if TARGET_TQMA6UL
+
+config SYS_BOARD
+	default "tqma6ul"
+
+config SYS_VENDOR
+	default "tq"
+
+config SYS_CONFIG_NAME
+	default "tqma6ul_mba6ul" if MBA6UL
+
+choice
+	prompt "TQMa6UL module variant"
+	default TQMA6UL_VARIANT_STANDARD
+	help
+	  Configure module variant.
+
+config TQMA6UL_VARIANT_STANDARD
+	bool "standard module with board connector"
+	help
+	  "TQMa6ULx variant with board to board connectors"
+
+config TQMA6UL_VARIANT_LGA
+	bool "LGA module with solder balls"
+	help
+	  "TQMa6ULxL variant LGA with solder balls"
+
+endchoice
+
+choice
+	prompt "TQMa6UL boot configuration"
+	default TQMA6UL_MMC_BOOT
+	help
+	  Configure boot device. This is also used to implement environment
+	  location.
+
+config TQMA6UL_MMC_BOOT
+	bool "MMC / SD Boot"
+	select SD_BOOT
+	help
+	  Boot from eMMC / SD Card
+
+config TQMA6UL_QSPI_BOOT
+	bool "QSPI NOR Boot"
+	select SPI_FLASH
+	select QSPI_BOOT
+	help
+	  Boot from on board QSPI NOR flash
+
+endchoice
+
+
+choice
+	prompt "TQMa6UL DRAM configuration"
+	default TQMA6UL_256MB
+	help
+	  Configure DRAM size
+
+config TQMA6UL_256MB
+	bool "256 MB DRAM"
+	help
+	  configure for variant with 256 MB DRAM
+
+config TQMA6UL_512MB
+	bool "512 MB DRAM"
+	help
+	  configure for variant with 512 MB DRAM
+
+endchoice
+
+choice
+	prompt "TQMa6UL base board variant"
+	default MBA6UL
+
+config MBA6UL
+	bool "TQMa6UL on MBa6ULx Starterkit"
+	help
+	  Select the MBa6ULx starterkit.
+
+endchoice
+
+config IMX_CONFIG
+	default "board/tq/tqma6ul/tqma6ul.cfg" if MX6UL && TQMA6UL_256MB
+	default "board/tq/tqma6ul/tqma6ull.cfg" if MX6ULL && TQMA6UL_256MB
+	default "board/tq/tqma6ul/tqma6ul_512mb.cfg" if MX6UL && TQMA6UL_512MB
+	default "board/tq/tqma6ul/tqma6ull_512mb.cfg" if MX6ULL && TQMA6UL_512MB
+
+source "board/tq/common/Kconfig"
+
+endif
