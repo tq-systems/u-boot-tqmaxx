@@ -1,0 +1,66 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Copyright (c) 2023-2024 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+# D-82229 Seefeld, Germany.
+# Author: Marco Felsch, Markus Niebel, Max Merchel
+#
+
+if TARGET_TQMA6UL
+
+config SYS_BOARD
+	default "tqma6ul"
+
+config SYS_VENDOR
+	default "tq"
+
+config SYS_CONFIG_NAME
+	default "tqma6ul_mba6ul" if MBA6UL
+
+choice
+	prompt "TQMa6UL module variant"
+	default TQMA6UL_VARIANT_STANDARD
+	help
+	  Select the used TQMa6UL SoM module variant
+
+config TQMA6UL_VARIANT_STANDARD
+	bool "standard module with board connector"
+	help
+	  Select for SoM variant with board to board connectors
+
+config TQMA6UL_VARIANT_LGA
+	bool "LGA module with solder balls"
+	help
+	  Select for SoM variant LGA with solder balls
+
+endchoice
+
+choice
+	prompt "TQMa6UL base board variant"
+	default MBA6UL
+
+config MBA6UL
+	bool "TQMa6UL on MBa6ULx Starterkit"
+	select TQ_BB
+	select TQ_ENVLOC
+	select USB
+	select CMD_USB
+	select USB_STORAGE
+	select PHYLIB
+	select PHY_SMSC
+	select MXC_UART
+	select DM_MMC
+	select DM_SPI
+	select DM_GPIO
+	imply DM_SERIAL
+	imply DM_ETH
+	help
+	  Select the MBa6ULx starterkit
+
+endchoice
+
+config IMX_CONFIG
+	default "board/tq/tqma6ul/tqma6ul.cfg"
+
+source "board/tq/common/Kconfig"
+
+endif
