@@ -139,8 +139,14 @@ endif
 config SPL_IMX_ROMAPI_LOADADDR
 	default 0x48000000 if TARGET_TQMA8MXNL
 
+#
+# We need one bank for RAM < 3GB and an additional bank when using with OPTEE.
+# for memory > 3G we need another bank - therefore use 2 banks for i.MX8MN
+# and 3 banks for i.MX8MM, where we support up to 4 GB RAM
+#
 config NR_DRAM_BANKS
-	default 1
+	default 2 if IMX8MN
+	default 3 if IMX8MM
 
 config SYS_TEXT_BASE
 	default 0x40200000
