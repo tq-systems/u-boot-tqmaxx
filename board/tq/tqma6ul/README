@@ -101,3 +101,33 @@ a filename with `.qspi` suffix to make:
 ```
 make u-boot-dtb.imx.qspi
 ```
+
+## USB gadget support
+
+An example configuration tqma6ulx_mba6ul_mmc_fastboot_defconfig with the
+following additions is provided:
+
+### Fastboot gadget
+
+The command `fastboot usb 0` is used to enable the fastboot gadget on the
+Micro-B USB port (X9). The `fastboot` and `uuu` utilities can be used to erase
+and flash SD/eMMC partitions, for example:
+
+```
+# Flash whole SD card (MMC device 1 partition 0)
+#
+# uuu with the -raw2sparse option is recommended to flash large images that
+# have not been converted to sparse format beforehand
+uuu FB: flash -raw2sparse 1:0 tq-image-weston-debug-tqma6ulx-mba6ulx.wic
+
+# Erase first partition on eMMC (MMC device 0 partition 1)
+fastboot erase 0:1
+# or
+uuu FB: erase 0:1
+```
+
+### USB Mass Storage gadget
+
+Allows accessing the eMMC or SD card of the TQMa6UL[L]x[L] and MBa6ULx as a
+USB storage device. Enable using `ums 0 mmc 0` (eMMC) or `ums 0 mmc 1` (SD
+card).
