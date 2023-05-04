@@ -16,7 +16,9 @@ void ft_pci_setup(void *blob, bd_t *bd)
 
 	svr = SVR_SOC_VER(get_svr());
 
-	if (svr == SVR_LX2160A && IS_SVR_REV(get_svr(), 1, 0))
+	if ((svr == SVR_LX2160A ||
+	     svr == SVR_LX2080A ||
+	     svr == SVR_LX2120A) && IS_SVR_REV(get_svr(), 1, 0))
 		ft_pci_setup_ls_gen4(blob, bd);
 	else
 #endif /* CONFIG_PCIE_LAYERSCAPE_GEN4 */
@@ -104,7 +106,9 @@ int pcie_board_fix_fdt(void *fdt)
 
 	svr = SVR_SOC_VER(get_svr());
 
-	if (svr == SVR_LX2160A && IS_SVR_REV(get_svr(), 2, 0))
+	if ((svr == SVR_LX2160A ||
+	     svr == SVR_LX2080A ||
+	     svr == SVR_LX2120A) && IS_SVR_REV(get_svr(), 2, 0))
 		return lx2_board_fix_fdt(fdt);
 
 	return 0;

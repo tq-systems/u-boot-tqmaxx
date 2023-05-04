@@ -604,7 +604,7 @@ static int ls_pcie_probe(struct udevice *dev)
 	else
 		pcie->cfg2_flag = 0;
 
-	if (svr == SVR_LX2160A) {
+	if (svr == SVR_LX2160A || svr == SVR_LX2080A || svr == SVR_LX2120A) {
 		if (IS_SVR_REV(get_svr(), 1, 0))
 			return -ENODEV;
 		pcie->pf1_offset = LX2160_PCIE_PF1_OFFSET;
