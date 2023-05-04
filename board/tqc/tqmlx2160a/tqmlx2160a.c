@@ -103,9 +103,29 @@ int init_func_vid(void)
 }
 #endif
 
+/**
+ * Translate detected SoC variant into TQ-Systems SOM variant short name
+ *
+ * return: string consisting of the name or string indicating unknown variant
+ */
+static const char *tq_get_boardname(void)
+{
+	switch (SVR_SOC_VER(get_svr())) {
+	case SVR_LX2160A:
+		return "TQMLX2160A";
+	case SVR_LX2120A:
+		return "TQMLX2120A";
+	case SVR_LX2080A:
+		return "TQMLX2080A";
+	default:
+		break;
+	}
+	return "UNKNOWN";
+}
+
 int checkboard(void)
 {
-	puts("TQMLX2160A ");
+	printf("%s ", tq_get_boardname());
 	checkboard_tqmlx2160a_bb();
 	puts("\n");
 
@@ -159,7 +179,7 @@ static int mac_init(int eth_nr)
 			}
 		}
 
-		tqmaxx_show_eeprom(&eepromdata, "TQMLX2160A");
+		tqmaxx_show_eeprom(&eepromdata, tq_get_boardname());
 	}
 	return 0;
 }
