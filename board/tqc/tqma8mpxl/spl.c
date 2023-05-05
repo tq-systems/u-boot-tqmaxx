@@ -104,7 +104,7 @@ static int tqma8mpxl_query_ddr_timing(void)
 	int idx;
 
 	puts("Warning: no valid EEPROM!\n"
-		"Please enter LPDDR size in GByte to procced.\n"
+		"Please enter LPDDR size in GByte to proceed.\n"
 		"Valid sizes are 1,2,4 and 8.\n");
 
 	for (;;) {
