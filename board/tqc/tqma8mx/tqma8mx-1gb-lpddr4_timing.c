@@ -1,8 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * Copyright 2018 NXP
+ * Copyright (c) 2018-2023 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Juergen Elst
  *
  * Generated code from MX8M_DDR_tool
+ *
  * Align with uboot-imx_v2018.03_4.14.78_1.0.0_ga
  * REV.0006 1GB_K4F8E3S4HB-MFCJ03V-SEC813 (HW REV.020x)
  * from MX8M_LPDDR4_RPA_v24.xlsx / MX8 DDR Stress Test V2.10
