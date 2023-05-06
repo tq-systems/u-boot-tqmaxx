@@ -11,7 +11,7 @@
 #include <env/nxp/imx_env.h>
 
 #ifdef CONFIG_XPL_BUILD
-#define CFG_MALLOC_F_ADDR		0x22040000
+#define CFG_MALLOC_F_ADDR		0x22048000
 
 #endif
 
