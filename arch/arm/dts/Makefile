@@ -922,6 +922,9 @@ dtb-$(CONFIG_RCAR_GEN3) += \
 	r8a77990-ebisu-u-boot.dtb \
 	r8a77995-draak-u-boot.dtb \
 	r8a779a0-falcon-u-boot.dtb \
+	r8a774a1-tqmarzg2m-mbarzg2x.dtb \
+	r8a774b1-tqmarzg2n-mbarzg2x.dtb \
+	r8a774e1-tqmarzg2h-mbarzg2x.dtb \
 	rzg2l-dev.dtb \
 	smarc-rzg2l.dtb \
 	rzv2l-dev.dtb \

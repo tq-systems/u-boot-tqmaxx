@@ -1,0 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright (c) 2023 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Paul Gerber
+ *
+ */
+
+#include "r8a774a1-u-boot.dtsi"
+#include "tqmarzg2x-u-boot.dtsi"
