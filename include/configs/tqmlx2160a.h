@@ -273,8 +273,7 @@ unsigned long get_board_ddr_clk(void);
 	"uboot_max_size=" __stringify(MAX_UBOOT_SIZE) "\0"                     \
 	"pbl_spi_offset=0x0\0"						       \
 	"pbl_spi=bl2_flexspi_nor.pbl\0"					       \
-	"pbl_mmc=bl2_emmc.pbl\0"					       \
-	"pbl_sd=bl2_sd.pbl\0"					       \
+	"pbl_sdmmc=bl2_auto.pbl\0"					       \
 	"update_uboot_spi=run set_getcmd; if ${get_cmd} ${uboot}; then "       \
 		"if itest ${filesize} > 0; then "                              \
 			"echo Write u-boot image to sf address ${uboot_spi_offset};"\
@@ -301,7 +300,7 @@ unsigned long get_board_ddr_clk(void);
 			"sf update ${fileaddr} Kernel ${filesize};"\
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"					       \
-	"update_pbl_mmc=run set_getcmd; if ${get_cmd} ${pbl_mmc}; then "       \
+	"update_pbl_mmc=run set_getcmd; if ${get_cmd} ${pbl_sdmmc}; then "       \
 		"if itest ${filesize} > 0; then "                              \
 			"mmc dev ${mmcdev_emmc}; mmc rescan; "	               \
 			"setexpr blkc ${filesize} + 0x1ff; "                   \
@@ -331,7 +330,7 @@ unsigned long get_board_ddr_clk(void);
 			"save mmc ${mmcdev_emmc}:${bootpart} ${fileaddr} ${kernel} ${filesize};"\
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"					       \
-	"update_pbl_sd=run set_getcmd; if ${get_cmd} ${pbl_sd}; then "         \
+	"update_pbl_sd=run set_getcmd; if ${get_cmd} ${pbl_mmc}; then "        \
 		"if itest ${filesize} > 0; then "                              \
 			"mmc dev ${mmcdev_sdhc}; mmc rescan; "	               \
 			"setexpr blkc ${filesize} + 0x1ff; "                   \
