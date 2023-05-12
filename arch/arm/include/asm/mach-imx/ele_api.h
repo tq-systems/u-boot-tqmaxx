@@ -193,4 +193,5 @@ int ele_volt_change_start_req(void);
 int ele_volt_change_finish_req(void);
 int ele_message_call(struct ele_msg *msg);
 int ele_set_gmid(u32 *response);
+int ele_get_hw_unique_key(uint8_t *hwkey, size_t key_size, uint8_t *ctx, size_t ctx_size);
 #endif
