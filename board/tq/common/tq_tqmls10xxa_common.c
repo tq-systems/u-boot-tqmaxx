@@ -31,6 +31,13 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#if IS_ENABLED(CONFIG_OF_BOARD_FIXUP)
+int board_fix_fdt(void *blob)
+{
+	return tq_bb_board_fix_fdt(blob);
+}
+#endif
+
 int fsl_initdram(void)
 {
 	gd->ram_size = tfa_get_dram_size();
@@ -122,3 +129,10 @@ void tq_tqmls10xxa_set_macaddrs(u8 *macaddr, int count)
 		printf("Warning: MAC address wrapped around to %pM\n", macaddr);
 	}
 }
+
+#if IS_ENABLED(CONFIG_MISC_INIT_R)
+int misc_init_r(void)
+{
+	return tq_bb_board_misc_init_r();
+}
+#endif

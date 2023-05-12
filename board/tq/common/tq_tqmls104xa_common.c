@@ -34,17 +34,3 @@ int board_early_init_f(void)
 
 	return tq_bb_board_early_init_f();
 }
-
-#if IS_ENABLED(CONFIG_OF_BOARD_FIXUP)
-int board_fix_fdt(void *blob)
-{
-	return tq_bb_board_fix_fdt(blob);
-}
-#endif
-
-#ifdef CONFIG_MISC_INIT_R
-int misc_init_r(void)
-{
-	return tq_bb_board_misc_init_r();
-}
-#endif
