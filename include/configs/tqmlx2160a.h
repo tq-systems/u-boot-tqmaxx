@@ -249,6 +249,7 @@ unsigned long get_board_ddr_clk(void);
 	"kernelhdr_size_sd=0x20\0"              \
 	"consoledev=ttyAMA0\0"			\
 	"bootpart=1\0"				\
+	"rootfspart=2\0"			\
 	"mc_file=mc.itb\0"			\
 	"dpc_file=dpc-warn.dtb\0"		\
 	"dpl_file=dpl-min.dtb\0"		\
@@ -320,16 +321,6 @@ unsigned long get_board_ddr_clk(void);
 			"fi; "						       \
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"					       \
-	"update_fdt_mmc=run set_getcmd; if ${get_cmd} ${fdt_file}; then "      \
-		"if itest ${filesize} > 0; then "                              \
-			"save mmc ${mmcdev_emmc}:${bootpart} ${fileaddr} ${fdt_file} ${filesize};"\
-		"fi; fi; "                                                     \
-		"setenv filesize;\0"					       \
-	"update_kernel_mmc=run set_getcmd; if ${get_cmd} ${kernel}; then "     \
-		"if itest ${filesize} > 0; then "                              \
-			"save mmc ${mmcdev_emmc}:${bootpart} ${fileaddr} ${kernel} ${filesize};"\
-		"fi; fi; "                                                     \
-		"setenv filesize;\0"					       \
 	"update_pbl_sd=run set_getcmd; if ${get_cmd} ${pbl_mmc}; then "        \
 		"if itest ${filesize} > 0; then "                              \
 			"mmc dev ${mmcdev_sdhc}; mmc rescan; "	               \
@@ -348,16 +339,6 @@ unsigned long get_board_ddr_clk(void);
 			"if itest ${filesize} <= ${uboot_max_size}; then "     \
 				"mmc write ${fileaddr} ${uboot_mmc_offset} ${blkc}; " \
 			"fi; "                                                 \
-		"fi; fi; "                                                     \
-		"setenv filesize;\0"					       \
-	"update_fdt_sd=run set_getcmd; if ${get_cmd} ${fdt_file}; then "       \
-		"if itest ${filesize} > 0; then "                              \
-			"save mmc ${mmcdev_sdhc}:${bootpart} ${fileaddr} ${fdt_file} ${filesize};" \
-		"fi; fi; "                                                     \
-		"setenv filesize;\0"					       \
-	"update_kernel_sd=run set_getcmd; if ${get_cmd} ${kernel}; then "      \
-		"if itest ${filesize} > 0; then "                              \
-			"save mmc ${mmcdev_sdhc}:${bootpart} ${fileaddr} ${kernel} ${filesize};" \
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"					       \
 	"set_getcmd=if test \"${ip_dyn}\" = yes; then "                        \
@@ -405,20 +386,20 @@ unsigned long get_board_ddr_clk(void);
 		"sf probe 0:0 && sf read ${load_addr} Kernel ${kernel_size}; "	\
 		"sf read ${fdt_addr_r} Linux-DTB ${dtb_size}; "	\
 		"fsl_mc lazyapply DPL 0x20d00000; "     	\
-		"booti ${load_addr} - ${fdt_addr_r}\0"		\
+		"booti ${load_addr} - ${fdt_addr_r}\0"	\
+	"sdmmc_bootcmd=setenv bootargs; run mmcargs;"		\
+		"load mmc ${mmcblkdev}:${mmcrootpart} ${kernel_addr_r} /boot/${kernel};" \
+		"load mmc ${mmcblkdev}:${mmcrootpart} ${fdt_addr_r} /boot/${fdt_file};" \
+		"load mmc ${mmcblkdev}:${bootpart} 0x80d00000 ${dpl_file};" \
+		"fsl_mc lazyappply DPL 0x80d00000;"	        \
+		"booti ${kernel_addr_r} - ${fdt_addr_r};"	\
+		"setenv mmcdev_root\0"                          \
 	"sd_bootcmd=echo Trying load from sd card..;"		\
-		"run mmcargs; load mmc ${mmcdev_sdhc}:${bootpart} ${load_addr} ${kernel};" \
-		"load mmc ${mmcdev_sdhc}:${bootpart} ${fdt_addr_r} ${fdt_file};" \
-		"load mmc ${mmcdev_sdhc}:${bootpart} 0x80d00000 ${dpl_file};" \
-		"fsl_mc lazyappply DPL 0x80d00000;"	        \
-		"booti ${load_addr} - ${fdt_addr_r}\0"		\
-	"emmc_bootcmd=echo Trying load from sd card..;"		\
-		"setenv mmcblkdev 1; "				\
-		"run mmcargs; load mmc ${mmcdev_emmc}:${bootpart} ${load_addr} ${kernel};" \
-		"load mmc ${mmcdev_emmc}:${bootpart} ${fdt_addr_r} ${fdt_file};" \
-		"load mmc ${mmcdev_emmc}:${bootpart} 0x80d00000 ${dpl_file};" \
-		"fsl_mc lazyappply DPL 0x80d00000;"	        \
-		"booti ${load_addr} - ${fdt_addr_r}\0"
+		"setenv mmcdev_root ${mmcdev_sdhc};"            \
+		"run sdmmc_bootcmd\0"                           \
+	"emmc_bootcmd=echo Trying load from emmc..;"		\
+		"setenv mmcblkdev ${mmcdev_emmc}; "		\
+		"run sdmmc_bootcmd\0"                           \
 
 #define BOOT_TARGET_DEVICES(func) \
 	func(USB, usb, 0) \
