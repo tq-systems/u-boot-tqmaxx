@@ -9,6 +9,7 @@
 #include <asm/arch/stream_id_lsch3.h>
 #include <asm/arch/config.h>
 #include <asm/arch/soc.h>
+#include <linux/sizes.h>
 
 #define CONFIG_REMAKE_ELF
 #define CONFIG_FSL_LAYERSCAPE
@@ -43,10 +44,11 @@
 #define CONFIG_SYS_MONITOR_LEN		(936 * 1024)
 
 #define CONFIG_SYS_MEMTEST_START	CONFIG_SYS_DDR_SDRAM_BASE
-#define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_SDRAM_BASE + (100 * 1024 * 1024))
+#define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_SDRAM_BASE + (100 * SZ_1M))
 
 /* Miscellaneous configurable options */
-#define CONFIG_SYS_LOAD_ADDR	(CONFIG_SYS_DDR_SDRAM_BASE + 0x10000000)
+#define CONFIG_SYS_LOAD_ADDR		0x90000000
+#define CONFIG_LOADADDR			CONFIG_SYS_LOAD_ADDR
 
 /* SMP Definitinos  */
 #define CPU_RELEASE_ADDR		secondary_boot_func
@@ -185,9 +187,9 @@ unsigned long get_board_ddr_clk(void);
 	"80M@48M(RootFS)\0"
 
 #define CONFIG_SYS_MMC_ENV_DEV          0
-#define CONFIG_ENV_SIZE			0x4000
-#define CONFIG_ENV_SECT_SIZE		0x20000
-#define CONFIG_ENV_OFFSET		0x500000
+#define CONFIG_ENV_SIZE			SZ_16K
+#define CONFIG_ENV_SECT_SIZE		SZ_128K
+#define CONFIG_ENV_OFFSET		(5 * SZ_1M)
 #define CONFIG_ENV_ADDR			(CONFIG_SYS_FLASH_BASE + \
 					 CONFIG_ENV_OFFSET)
 
@@ -196,8 +198,6 @@ unsigned long get_board_ddr_clk(void);
 
 /* Monitor Command Prompt */
 #define CONFIG_SYS_CBSIZE		512	/* Console I/O Buffer Size */
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
-					sizeof(CONFIG_SYS_PROMPT) + 16)
 #define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE /* Boot args buffer */
 #define CONFIG_CMDLINE_EDITING		1
 #define CONFIG_SYS_MAXARGS		64	/* max command args */
@@ -228,28 +228,14 @@ unsigned long get_board_ddr_clk(void);
 	"hwconfig=fsl_ddr:bank_intlv=auto\0"	\
 	"ramdisk_addr=0x800000\0"		\
 	"ramdisk_size=0x2000000\0"		\
-	"fdt_high=0xa0000000\0"			\
-	"initrd_high=0xffffffffffffffff\0"	\
-	"fdt_addr=0x64f00000\0"			\
 	"kernel_start=0x1000000\0"		\
 	"kernelheader_start=0x7C0000\0"		\
 	"scriptaddr=0x80000000\0"		\
 	"scripthdraddr=0x80080000\0"		\
-	"fdtheader_addr_r=0x80100000\0"		\
-	"kernelheader_addr_r=0x80200000\0"	\
 	"kernel_addr_r=0x81000000\0"		\
-	"kernelheader_size=0x40000\0"		\
 	"fdt_addr_r=0x90000000\0"		\
-	"dtb_size=0x100000\0"			\
-	"load_addr=0xa0000000\0"		\
-	"kernel_size=0x2000000\0"		\
-	"kernel_addr_sd=0x8000\0"		\
-	"kernelhdr_addr_sd=0x3E00\0"            \
-	"kernel_size_sd=0x1d000\0"              \
-	"kernelhdr_size_sd=0x20\0"              \
 	"consoledev=ttyAMA0\0"			\
 	"bootpart=1\0"				\
-	"rootfspart=2\0"			\
 	"mc_file=mc.itb\0"			\
 	"dpc_file=dpc-warn.dtb\0"		\
 	"dpl_file=dpl-min.dtb\0"		\
@@ -395,17 +381,15 @@ unsigned long get_board_ddr_clk(void);
 		"booti ${kernel_addr_r} - ${fdt_addr_r};"	\
 		"setenv mmcdev_root\0"                          \
 	"sd_bootcmd=echo Trying load from sd card..;"		\
-		"setenv mmcdev_root ${mmcdev_sdhc};"            \
+		"setenv mmcblkdev ${mmcdev_sdhc}; "		\
 		"run sdmmc_bootcmd\0"                           \
 	"emmc_bootcmd=echo Trying load from emmc..;"		\
 		"setenv mmcblkdev ${mmcdev_emmc}; "		\
 		"run sdmmc_bootcmd\0"                           \
 
 #define BOOT_TARGET_DEVICES(func) \
-	func(USB, usb, 0) \
 	func(MMC, mmc, 0) \
-	func(MMC, mmc, 1) \
-	func(SCSI, scsi, 0)
+	func(MMC, mmc, 1)
 
 #include <config_distro_bootcmd.h>
 
