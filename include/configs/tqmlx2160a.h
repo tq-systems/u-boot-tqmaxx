@@ -187,7 +187,7 @@ unsigned long get_board_ddr_clk(void);
 	"112M@16M(RootFS)\0"
 
 #define CONFIG_SYS_MMC_ENV_DEV          0
-#define CONFIG_ENV_SIZE			SZ_16K
+#define CONFIG_ENV_SIZE			SZ_128K
 #define CONFIG_ENV_SECT_SIZE		SZ_128K
 #define CONFIG_ENV_OFFSET		(5 * SZ_1M)
 #define CONFIG_ENV_ADDR			(CONFIG_SYS_FLASH_BASE + \
