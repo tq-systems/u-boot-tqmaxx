@@ -1063,8 +1063,9 @@ static struct dram_cfg_param ddr_ddrphy_trained_csr[] = {
 	{ 0x13730, 0x0 },
 	{ 0x13830, 0x0 },
 };
+
 /* P0 message block paremeter for training firmware */
-struct dram_cfg_param ddr_fsp0_cfg[] = {
+static struct dram_cfg_param ddr_fsp0_cfg[] = {
 	{ 0xd0000, 0x0 },
 	{ 0x54003, 0xfa0 },
 	{ 0x54004, 0x2 },
