@@ -182,9 +182,7 @@ unsigned long get_board_ddr_clk(void);
 	"3M@10M(DPAA2-MC),"                                                    \
 	"1M@13M(DPAA2-DPL),"						       \
 	"1M@14M(DPAA2-DPC),"						       \
-	"1M@15M(Linux-DTB),"						       \
-	"32M@16M(Kernel),"						       \
-	"80M@48M(RootFS)\0"
+	"112M@16M(RootFS)\0"
 
 #define CONFIG_SYS_MMC_ENV_DEV          0
 #define CONFIG_ENV_SIZE			SZ_16K
@@ -256,6 +254,8 @@ unsigned long get_board_ddr_clk(void);
 	"uboot=fip_uboot.bin\0"						       \
 	"uboot_spi_offset=0x100000\0"					       \
 	"pbl_mmc_offset=8\0"						       \
+	"ubirootfspart=RootFS\0"					       \
+	"ubirootfsvol=root\0"						       \
 	"uboot_mmc_offset=" __stringify(MMC_UBOOT_OFFSET) "\0"                 \
 	"uboot_max_size=" __stringify(MAX_UBOOT_SIZE) "\0"                     \
 	"pbl_spi_offset=0x0\0"						       \
@@ -273,18 +273,6 @@ unsigned long get_board_ddr_clk(void);
 			"echo Write rcw-pbl image to address ${pbl_spi_offset};"\
 			"sf probe;"					       \
 			"sf update ${fileaddr} ${pbl_spi_offset} ${filesize};"\
-		"fi; fi; "                                                     \
-		"setenv filesize;\0"					       \
-	"update_fdt_spi=run set_getcmd; if ${get_cmd} ${fdt_file}; then "      \
-		"if itest ${filesize} > 0; then "                              \
-			"sf probe;"					       \
-			"sf update ${fileaddr} Linux-DTB ${filesize};"\
-		"fi; fi; "                                                     \
-		"setenv filesize;\0"					       \
-	"update_kernel_spi=run set_getcmd; if ${get_cmd} ${kernel}; then "       \
-		"if itest ${filesize} > 0; then "                              \
-			"sf probe;"					       \
-			"sf update ${fileaddr} Kernel ${filesize};"\
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"					       \
 	"update_pbl_mmc=run set_getcmd; if ${get_cmd} ${pbl_sdmmc}; then "       \
@@ -334,7 +322,7 @@ unsigned long get_board_ddr_clk(void);
 		"fi; \0"                                                       \
 	"spiargs=run addspi addtty addearlycon\0"                              \
 	"addspi=setenv bootargs ${bootargs} root=ubi0_0 rw "		       \
-		"rootfstype=ubifs ubi.mtd=9\0"                                 \
+		"rootfstype=ubifs ubi.mtd=7\0"                                 \
 	BOOTENV								       \
 	"mcmemsize=0x70000000\0"					       \
 	XSPI_MC_INIT_CMD						       \
@@ -368,11 +356,16 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_EXTRA_ENV_SETTINGS		\
 	EXTRA_ENV_SETTINGS			\
 	"xspi_bootcmd=echo Trying load from flexspi..;"		\
-		"run spiargs; " \
-		"sf probe 0:0 && sf read ${load_addr} Kernel ${kernel_size}; "	\
-		"sf read ${fdt_addr_r} Linux-DTB ${dtb_size}; "	\
+		"setenv bootargs; "				\
+		"run spiargs; "					\
+		"sf probe 0:0; "				\
+		"ubi part ${ubirootfspart}; "			\
+		"ubifsmount ubi0:${ubirootfsvol}; "		\
+		"ubifsload ${kernel_addr_r} /boot/${kernel}; "	\
+		"ubifsload ${fdt_addr_r} /boot/${fdt_file}; "	\
+		"ubifsumount; ubi detach ;"			\
 		"fsl_mc lazyapply DPL 0x20d00000; "     	\
-		"booti ${load_addr} - ${fdt_addr_r}\0"	\
+		"booti ${kernel_addr_r} - ${fdt_addr_r}\0"	\
 	"sdmmc_bootcmd=setenv bootargs; run mmcargs;"		\
 		"load mmc ${mmcblkdev}:${mmcrootpart} ${kernel_addr_r} /boot/${kernel};" \
 		"load mmc ${mmcblkdev}:${mmcrootpart} ${fdt_addr_r} /boot/${fdt_file};" \
