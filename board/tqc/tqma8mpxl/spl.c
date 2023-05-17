@@ -31,32 +31,20 @@
 #include "../common/tqc_blob.h"
 #include "../common/tqc_eeprom.h"
 
+#include "tqma8mpxl-dram.h"
+
 DECLARE_GLOBAL_DATA_PTR;
 
 /* SPL currently not working with DM, use old style I2C API */
 #define TQC_SYSTEM_EEPROM_BUS	0
 #define TQC_SYSTEM_EEPROM_ADDR	0x53
 
-#if defined(CONFIG_IMX8M_DRAM_INLINE_ECC)
-#error "Inline ECC is not supported yet"
-#else
-
-#if defined(CONFIG_TQMA8MPXL_RAM_1024MB)
-extern struct dram_timing_info dram_timing_1gb_no_ecc;
-#endif
-#if defined(CONFIG_TQMA8MPXL_RAM_2048MB)
-extern struct dram_timing_info dram_timing_2gb_no_ecc;
-#endif
-#if defined(CONFIG_TQMA8MPXL_RAM_4096MB)
-extern struct dram_timing_info dram_timing_4gb_no_ecc;
-#endif
-#if defined(CONFIG_TQMA8MPXL_RAM_8192MB)
-extern struct dram_timing_info dram_timing_8gb_no_ecc;
-#endif
-
 struct dram_info {
 	struct dram_timing_info	*table;
 	phys_size_t		size;
+#if defined(CONFIG_IMX8M_DRAM_INLINE_ECC)
+	void			(*board_dram_ecc_scrub)(void);
+#endif
 };
 
 /*
@@ -64,6 +52,23 @@ struct dram_info {
  * Needs to be rechecked when increasing
  */
 static struct dram_info tqma8mpxl_dram_info[]  = {
+#if defined(CONFIG_IMX8M_DRAM_INLINE_ECC)
+
+#if defined(CONFIG_TQMA8MPXL_RAM_1024MB)
+	{ &dram_timing_1gb_ecc, SZ_1G * 1ULL, &board_dram_1gb_ecc_scrub },
+#endif
+#if defined(CONFIG_TQMA8MPXL_RAM_2048MB)
+	{ &dram_timing_2gb_ecc, SZ_1G * 2ULL, &board_dram_2gb_ecc_scrub },
+#endif
+#if defined(CONFIG_TQMA8MPXL_RAM_4096MB)
+	{ &dram_timing_4gb_ecc, SZ_1G * 4ULL, &board_dram_4gb_ecc_scrub },
+#endif
+#if defined(CONFIG_TQMA8MPXL_RAM_8192MB)
+	{ &dram_timing_8gb_ecc, SZ_1G * 8ULL, &board_dram_8gb_ecc_scrub },
+#endif
+
+#else /* !defined(CONFIG_IMX8M_DRAM_INLINE_ECC) */
+
 #if defined(CONFIG_TQMA8MPXL_RAM_1024MB)
 	{ &dram_timing_1gb_no_ecc, SZ_1G * 1ULL },
 #endif
@@ -76,11 +81,11 @@ static struct dram_info tqma8mpxl_dram_info[]  = {
 #if defined(CONFIG_TQMA8MPXL_RAM_8192MB)
 	{ &dram_timing_8gb_no_ecc, SZ_1G * 8ULL },
 #endif
+
+#endif /* !defined(CONFIG_IMX8M_DRAM_INLINE_ECC) */
 };
 
 static int tqma8mpxl_ram_timing_idx = -1;
-
-#endif
 
 static struct tq_vard vard;
 
@@ -137,8 +142,22 @@ static int tqma8mpxl_query_ddr_timing(void)
 }
 #endif
 
+#if defined(CONFIG_IMX8M_DRAM_INLINE_ECC)
+void board_dram_ecc_scrub(void)
+{
+	if (tqma8mpxl_ram_timing_idx >= 0) {
+		tqma8mpxl_dram_info[tqma8mpxl_ram_timing_idx]
+			.board_dram_ecc_scrub();
+	} else {
+		printf("ERROR: no valid ram configuration, please reset\n");
+		hang();
+	}
+}
+#endif
+
 static void spl_dram_init(int memtype)
 {
+	int ret;
 	int idx = -1;
 
 	/* normal configuration */
@@ -178,8 +197,18 @@ static void spl_dram_init(int memtype)
 		hang();
 	}
 
-	ddr_init(tqma8mpxl_dram_info[idx].table);
+	/*
+	 * If inline ECC is enabled, ddr_init calls board_dram_ecc_scrub. The
+	 * TQMa8MPxL implementation of board_dram_ecc_scrub uses
+	 * tqma8mpxl_ram_timing_idx to call the appropriate scrubbing function
+	 * for ram size. Set the index before calling ddr_init.
+	 * In case of initialization error set the index back to -1, so
+	 * later users of this index can handle the error.
+	 */
 	tqma8mpxl_ram_timing_idx = idx;
+	ret = ddr_init(tqma8mpxl_dram_info[idx].table);
+	if (ret)
+		tqma8mpxl_ram_timing_idx = -1;
 }
 
 #ifdef CONFIG_SPL_MMC_SUPPORT
@@ -395,8 +424,25 @@ void spl_board_init(void)
 	raminfo_blob = bloblist_ensure(BLOBLISTT_TQ_RAMSIZE,
 				       sizeof(*raminfo_blob));
 	if (raminfo_blob && tqma8mpxl_ram_timing_idx >= 0) {
+#if defined(CONFIG_IMX8M_DRAM_INLINE_ECC)
+		/*
+		 * All 7 ECC protectable main memory regions (7/8 of main
+		 * memory) are configured to be ECC protected with the
+		 * shipped timings, so the top 1/8 of memory is used for
+		 * ECC parity data.
+		 *
+		 * Hence, if inline ECC is used, only propagate 7/8 of total
+		 * memory to U-Boot proper and Linux. Upper 1/8 is used for
+		 * ECC parity data.
+		 */
+		raminfo_blob->memsize =
+			(tqma8mpxl_dram_info[tqma8mpxl_ram_timing_idx].size /
+			 8ULL) *
+			7ULL;
+#else
 		raminfo_blob->memsize =
 			tqma8mpxl_dram_info[tqma8mpxl_ram_timing_idx].size;
+#endif
 	} else {
 		printf("ERROR: no valid ram configuration, please reset\n");
 		hang();

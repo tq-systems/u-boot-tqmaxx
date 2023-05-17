@@ -113,3 +113,54 @@ Boot
 ====
 
 Set Boot switch SW2[4:1]: 1100.
+
+Inline ECC
+=========
+
+Timings for the inline ECC feature of the i.MX8MP DDRC are shipped. To use
+the inline ECC feature enable CONFIG_IMX8M_DRAM_INLINE_ECC.
+
+The ECC configuration provided with the timing files initializes the whole
+DRAM as ECC protected. To store ECC parity data, the top 1/8 of DRAM is
+used. The other 7/8 of DRAM can be used as usual.
+
+The ECC parity region consists of 8 sections (1/64 of total memory size
+each). Seven of these sections hold ECC parity data for the 7 other main
+memory regions, i.e. ECC parity section N protects main memory region N.
+The other ECC parity region section (the one on the start of the ECC parity
+region) can be used for ordinary user data.
+
+ECC memory layout
+-----------------
+
+TOTAL_MEM_SIZE   = (0x40000000 (1GiB) | 0x80000000 (2GiB) | 0x100000000 (4GiB) | 0x200000000 (8GiB))
+SYS_SDRAM_BASE   = 0x40000000
+MM_REGION_SIZE   = TOTAL_MEM_SIZE / 8
+ECC_SECTION_SIZE = TOTAL_MEM_SIZE / (8 * 8)
+ECC_PARITY_BASE  = SYS_SDRAM_BASE + 7 * MM_REGION_SIZE
+
+ECC parity region
+
+ECC parity region section   | Start address                          | Size             | Memory attribute
+--------------------------- | -------------------------------------- | -----------------| ----------------
+ECC parity region 0 section | ECC_PARITY_BASE + 7 * ECC_SECTION_SIZE | ECC_SECTION_SIZE | inaccessible
+ECC parity region 1 section | ECC_PARITY_BASE + 6 * ECC_SECTION_SIZE | ECC_SECTION_SIZE | inaccessible
+ECC parity region 2 section | ECC_PARITY_BASE + 5 * ECC_SECTION_SIZE | ECC_SECTION_SIZE | inaccessible
+ECC parity region 3 section | ECC_PARITY_BASE + 4 * ECC_SECTION_SIZE | ECC_SECTION_SIZE | inaccessible
+ECC parity region 4 section | ECC_PARITY_BASE + 3 * ECC_SECTION_SIZE | ECC_SECTION_SIZE | inaccessible
+ECC parity region 5 section | ECC_PARITY_BASE + 2 * ECC_SECTION_SIZE | ECC_SECTION_SIZE | inaccessible
+ECC parity region 6 section | ECC_PARITY_BASE + 1 * ECC_SECTION_SIZE | ECC_SECTION_SIZE | inaccessible
+No ECC data                 | ECC_PARITY_BASE                        | ECC_SECTION_SIZE | accessible
+
+Main memory
+
+Main memory region          | Start address                          | Size             | ECC protection
+--------------------------- | -------------------------------------- | -----------------| --------------
+ECC parity region           | SYS_SDRAM_BASE + 7 * MM_REGION_SIZE    | MM_REGION_SIZE   | -
+Main memory region 6        | SYS_SDRAM_BASE + 6 * MM_REGION_SIZE    | MM_REGION_SIZE   | protected
+Main memory region 5        | SYS_SDRAM_BASE + 5 * MM_REGION_SIZE    | MM_REGION_SIZE   | protected
+Main memory region 4        | SYS_SDRAM_BASE + 4 * MM_REGION_SIZE    | MM_REGION_SIZE   | protected
+Main memory region 3        | SYS_SDRAM_BASE + 3 * MM_REGION_SIZE    | MM_REGION_SIZE   | protected
+Main memory region 2        | SYS_SDRAM_BASE + 2 * MM_REGION_SIZE    | MM_REGION_SIZE   | protected
+Main memory region 1        | SYS_SDRAM_BASE + 1 * MM_REGION_SIZE    | MM_REGION_SIZE   | protected
+Main memory region 0        | SYS_SDRAM_BASE                         | MM_REGION_SIZE   | protected

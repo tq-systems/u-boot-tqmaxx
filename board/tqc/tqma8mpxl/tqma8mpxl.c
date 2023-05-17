@@ -147,6 +147,8 @@ int checkboard(void)
 	print_bootinfo();
 	printf("Board: %s on a %s\n", tqc_get_boardname(),
 	       tqc_bb_get_boardname());
+	if (CONFIG_IS_ENABLED(IMX8M_DRAM_INLINE_ECC))
+		puts("Inline ECC\n");
 
 	return tqc_bb_checkboard();
 }
@@ -188,45 +190,40 @@ struct tq_som_feature_list *tq_board_detect_features(void)
 }
 
 #ifdef CONFIG_OF_BOARD_SETUP
+#ifdef CONFIG_IMX8M_DRAM_INLINE_ECC
+int fixup_ecc_reserved_mem(void *blob, bd_t *bd)
+{
+	int ret;
+	phys_size_t ram_size = 0x0;
+	phys_addr_t ecc_start = 0x0;
+	phys_size_t ecc_size = 0x0;
+
+	board_phys_sdram_size(&ram_size);
+
+	/*
+	 * In case of inline ECC, the available ram size has been reduced by
+	 * SPL to 7/8 of total ram size, leaving 1/8 untouched for ECC parity
+	 * data.
+	 * The reserved memory node has therefore a size of 1/7 of the
+	 * available ram size (as returned by board_phys_sdram_size), starting
+	 * on top of the available ram space.
+	 */
+	ecc_size = ram_size / 7ULL;
+	ecc_start = CONFIG_SYS_SDRAM_BASE + ram_size;
+
+	ret = add_res_mem_dt_node(blob, "ecc", ecc_start, ecc_size);
+	if (ret < 0) {
+		printf("Could not create ecc reserved-memory node.\n");
+		return ret;
+	}
+
+	return 0;
+}
+#endif
 int ft_board_setup(void *blob, bd_t *bd)
 {
 #ifdef CONFIG_IMX8M_DRAM_INLINE_ECC
-#error
-#ifdef CONFIG_TARGET_IMX8MP_DDR4_EVK
-	int rc;
-	phys_addr_t ecc_start = 0x120000000;
-	size_t ecc_size = 0x20000000;
-
-	rc = add_res_mem_dt_node(blob, "ecc", ecc_start, ecc_size);
-	if (rc < 0) {
-		printf("Could not create ecc reserved-memory node.\n");
-		return rc;
-	}
-#else
-	int rc;
-	phys_addr_t ecc0_start = 0xb0000000;
-	phys_addr_t ecc1_start = 0x130000000;
-	phys_addr_t ecc2_start = 0x1b0000000;
-	size_t ecc_size = 0x10000000;
-
-	rc = add_res_mem_dt_node(blob, "ecc", ecc0_start, ecc_size);
-	if (rc < 0) {
-		printf("Could not create ecc0 reserved-memory node.\n");
-		return rc;
-	}
-
-	rc = add_res_mem_dt_node(blob, "ecc", ecc1_start, ecc_size);
-	if (rc < 0) {
-		printf("Could not create ecc1 reserved-memory node.\n");
-		return rc;
-	}
-
-	rc = add_res_mem_dt_node(blob, "ecc", ecc2_start, ecc_size);
-	if (rc < 0) {
-		printf("Could not create ecc2 reserved-memory node.\n");
-		return rc;
-	}
-#endif
+	fixup_ecc_reserved_mem(blob, bd);
 #endif
 
 	if (CONFIG_IS_ENABLED(FDT_FIXUP_PARTITIONS)) {
