@@ -2,8 +2,9 @@
 /*
  * TQ TQMLX2160A u-boot specific device tree source
  *
- * Author: Gregor Herburger <gregor.herburger@tq-group.com>
- * Copyright 2020 - 2021 TQ-Systems GmbH
+ * Copyright (c) 2020-2023 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Gregor Herburger
  */
 
 &i2c0 {
