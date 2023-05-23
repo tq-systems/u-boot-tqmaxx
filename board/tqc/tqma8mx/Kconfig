@@ -219,7 +219,7 @@ config DEFAULT_FDT_FILE
 
 menu "TQMa8Mx boot device"
 
-config TQMBA8MX_BOOT_SDCARD
+config TQMA8MX_BOOT_SDCARD
 	bool "TQMa8Mx from SD / e-MMC"
 	default y
 	select SD_BOOT

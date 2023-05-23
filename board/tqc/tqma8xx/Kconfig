@@ -253,7 +253,7 @@ config TQMA8XX_BOOT_SDCARD
 	  Additionally you should supply env offsets via devicetree config
 	  node
 
-config TQMBA8XX_BOOT_FSPI
+config TQMA8XX_BOOT_FSPI
 	bool "TQMa8Xx boot from FlexSPI"
 	default y
 	select QSPI_BOOT
