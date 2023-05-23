@@ -26,6 +26,9 @@ config SAVED_DRAM_TIMING_BASE
 	default 0x180000 if IMX8MM
 	default 0x180000 if IMX8MN
 
+config CSF_SIZE
+	default 0x2000
+
 config FIT_EXTERNAL_OFFSET
 	default 0x3000
 
