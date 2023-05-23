@@ -94,7 +94,7 @@ int tqc_bb_board_mmc_init(bd_t *bis)
 	imx_iomux_v3_setup_multiple_pads(usdhc2_pads, ARRAY_SIZE(usdhc2_pads));
 	gpio_request(USDHC2_PWR_GPIO, "usdhc2_reset");
 	gpio_direction_output(USDHC2_PWR_GPIO, 0);
-	udelay(500);
+	udelay(2000);
 	gpio_direction_output(USDHC2_PWR_GPIO, 1);
 	gpio_request(USDHC2_CD_GPIO, "usdhc2 cd");
 	gpio_direction_input(USDHC2_CD_GPIO);
