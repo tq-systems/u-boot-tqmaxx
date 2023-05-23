@@ -10,7 +10,7 @@ config SYS_CONFIG_NAME
 	default "tqma8xxs"
 
 config SPL_TEXT_BASE
-	default "0x100000"
+	default 0x100000
 
 #
 # allows building flash.bin without imx-mkimage
@@ -248,7 +248,7 @@ menu "TQMa8XxS boot device"
 
 config TQMA8XXS_BOOT_SDCARD
 	bool "TQMa8XxS boot from SD / e-MMC"
-	default "y"
+	default y
 	select SD_BOOT
 	select ENV_IS_IN_MMC
 	select SPL_MMC_SUPPORT
@@ -261,7 +261,7 @@ config TQMA8XXS_BOOT_SDCARD
 
 config TQMA8XXS_BOOT_FSPI
 	bool "TQMa8XxS boot from FlexSPI"
-	default "y"
+	default y
 	select QSPI_BOOT
 	select ENV_IS_IN_SPI_FLASH
 	help

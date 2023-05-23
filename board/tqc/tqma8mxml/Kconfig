@@ -13,9 +13,9 @@ config SYS_CONFIG_NAME
 # device
 
 config SPL_TEXT_BASE
-	default "0x912000" if IMX8MN
-	default "0x7E1000" if IMX8MM && TQMA8MXX_BOOT_SDCARD
-	default "0x7E2000" if IMX8MM && TQMA8MXX_BOOT_FSPI
+	default 0x912000 if IMX8MN
+	default 0x7E1000 if IMX8MM && TQMA8MXX_BOOT_SDCARD
+	default 0x7E2000 if IMX8MM && TQMA8MXX_BOOT_FSPI
 
 #
 # even if this is the Kconfig default in the memory controller Kconfig for
@@ -243,7 +243,7 @@ menu "TQMa8MXX boot device"
 
 config TQMA8MXX_BOOT_SDCARD
 	bool "TQMa8MxML/TQMa8MxNL boot from SD / e-MMC"
-	default "y" if IMX8MN
+	default y if IMX8MN
 	select SD_BOOT
 	select ENV_IS_IN_MMC
 	select SPL_MMC_SUPPORT
@@ -264,7 +264,7 @@ config TQMA8MXX_BOOT_SDCARD
 #
 config TQMA8MXX_BOOT_FSPI
 	bool "TQMa8MxML/TQMa8MxNL boot from FlexSPI"
-	default "y" if IMX8MN
+	default y if IMX8MN
 	select QSPI_BOOT
 	select ENV_IS_IN_SPI_FLASH
 	select SPL_NOR_SUPPORT

@@ -10,10 +10,10 @@ config SYS_CONFIG_NAME
 	default "tqma8mx"
 
 config SPL_TEXT_BASE
-	default "0x7E1000"
+	default 0x7E1000
 
 config CSF_SIZE
-	default "0x2000"
+	default 0x2000
 
 config TQMA8MX_DEFAULTS
 	bool
@@ -140,7 +140,7 @@ config SPL_FIT_GENERATOR
 	default "arch/arm/mach-imx/mkimage_fit_atf.sh"
 
 config FIT_EXTERNAL_OFFSET
-	default "0x3000"
+	default 0x3000
 
 choice
 	prompt "TQMa8MX Memory variant"
@@ -151,17 +151,17 @@ choice
 config TQMA8MX_RAM_4G
 	bool "TQMa8MX with 4GB LPDDR4"
 	help
-	  Select module with 4GB LPDDR4"
+	  Select module with 4GB LPDDR4
 
 config TQMA8MX_RAM_2G
 	bool "TQMa8MX with 2GB LPDDR4"
 	help
-	  Select module with 2GB LPDDR4"
+	  Select module with 2GB LPDDR4
 
 config TQMA8MX_RAM_1G
 	bool "TQMa8MX with 1GB LPDDR4"
 	help
-	  Select module with 1GB LPDDR4"
+	  Select module with 1GB LPDDR4
 
 endchoice
 
@@ -220,7 +220,7 @@ menu "TQMa8Mx boot device"
 
 config TQMBA8MX_BOOT_SDCARD
 	bool "TQMa8Mx from SD / e-MMC"
-	default "y"
+	default y
 	select SD_BOOT
 	select ENV_IS_IN_MMC
 	select SPL_MMC_SUPPORT

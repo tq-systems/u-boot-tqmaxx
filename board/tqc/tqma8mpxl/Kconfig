@@ -10,10 +10,10 @@ config SYS_CONFIG_NAME
 	default "tqma8mpxl"
 
 config SPL_TEXT_BASE
-	default "0x920000"
+	default 0x920000
 
 config CSF_SIZE
-	default "0x2000"
+	default 0x2000
 
 config TQMA8MPXL_DEFAULTS
 	bool
@@ -184,10 +184,10 @@ config SPL_FIT_GENERATOR
 	default "arch/arm/mach-imx/mkimage_fit_atf.sh"
 
 config FIT_EXTERNAL_OFFSET
-	default "0x3000"
+	default 0x3000
 
 config SPL_IMX_ROMAPI_LOADADDR
-	default "0x48000000"
+	default 0x48000000
 
 choice
 	prompt "TQMa8MPxL base board variant"
@@ -255,7 +255,7 @@ menu "TQMa8MPxL boot device"
 
 config TQMA8MPXL_BOOT_SDCARD
 	bool "TQMa8MPxL boot from SD / e-MMC"
-	default "y"
+	default y
 	select SD_BOOT
 	select ENV_IS_IN_MMC
 	select SPL_MMC_SUPPORT
@@ -268,7 +268,7 @@ config TQMA8MPXL_BOOT_SDCARD
 
 config TQMBA8MPXL_BOOT_FSPI
 	bool "TQMa8MPxL boot from FlexSPI"
-	default "y"
+	default y
 	select QSPI_BOOT
 	select ENV_IS_IN_SPI_FLASH
 	select SPL_NOR_SUPPORT
