@@ -12,10 +12,6 @@
 #include <asm/arch/imx-regs.h>
 #include "imx_env.h"
 
-#ifdef CONFIG_SECURE_BOOT
-#define CONFIG_CSF_SIZE			0x2000 /* 8K region */
-#endif
-
 #define CONFIG_SPL_MAX_SIZE		(208 * 1024)
 #define CONFIG_SYS_MONITOR_LEN		SZ_512K
 
