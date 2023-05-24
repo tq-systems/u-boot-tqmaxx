@@ -397,6 +397,9 @@ int ddr_init(struct dram_timing_info *dram_timing)
 
 	debug("DDRINFO: ddrphy config done\n");
 
+	/* save the ddr PHY trained CSR in memory for low power use */
+	ddrphy_trained_csr_save(dram_timing->ddrphy_trained_csr, dram_timing->ddrphy_trained_csr_num);
+
 	/*
 	 * step14 CalBusy.0 =1, indicates the calibrator is actively
 	 * calibrating. Wait Calibrating done.
