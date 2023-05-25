@@ -173,7 +173,6 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_HWCONFIG
 #define HWCONFIG_BUFFER_SIZE		128
 #define CONFIG_MTD_DEVICE
-#define CONFIG_CMD_MTDPARTS
 #define MTDIDS_DEFAULT \
 		"nor0=nor0\0"
 
