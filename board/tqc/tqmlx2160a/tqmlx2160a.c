@@ -15,6 +15,8 @@
 #include <asm/io.h>
 #include <asm/arch/clock.h>
 #include <dm/platform_data/serial_pl01x.h>
+#include <mtd_node.h>
+#include <jffs2/load_kernel.h>
 #include <fsl-mc/ldpaa_wriop.h>
 #include <fsl-mc/fsl_mc.h>
 
@@ -241,6 +243,17 @@ int ft_board_setup(void *blob, bd_t *bd)
 	u64 mc_memory_base = 0;
 	u64 mc_memory_size = 0;
 	u16 total_memory_banks;
+#ifdef CONFIG_FDT_FIXUP_PARTITIONS
+	struct node_info nodes[] = {
+		{"jedec,spi-nor", MTD_DEV_TYPE_NOR},
+	};
+	const unsigned int bus = CONFIG_SF_DEFAULT_BUS;
+	const unsigned int cs = CONFIG_SF_DEFAULT_CS;
+	const unsigned int speed = CONFIG_SF_DEFAULT_SPEED;
+	const unsigned int mode = CONFIG_SF_DEFAULT_MODE;
+	struct udevice *new;
+	int ret;
+#endif
 
 	ft_cpu_setup(blob, bd);
 	fdt_fixup_mc_ddr(&mc_memory_base, &mc_memory_size);
@@ -286,6 +299,12 @@ int ft_board_setup(void *blob, bd_t *bd)
 
 #ifdef CONFIG_USB
 	fsl_fdt_fixup_dr_usb(blob, bd);
+#endif
+
+#ifdef CONFIG_FDT_FIXUP_PARTITIONS
+	ret = spi_flash_probe_bus_cs(bus, cs, speed, mode, &new);
+	if (!ret)
+		fdt_fixup_mtdparts(blob, nodes, ARRAY_SIZE(nodes));
 #endif
 
 #ifdef CONFIG_FSL_MC_ENET
