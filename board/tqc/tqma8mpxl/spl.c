@@ -39,50 +39,23 @@ DECLARE_GLOBAL_DATA_PTR;
 #define TQC_SYSTEM_EEPROM_BUS	0
 #define TQC_SYSTEM_EEPROM_ADDR	0x53
 
-struct dram_info {
-	struct dram_timing_info	*table;
-	phys_size_t		size;
-#if defined(CONFIG_IMX8M_DRAM_INLINE_ECC)
-	void			(*board_dram_ecc_scrub)(void);
-#endif
-};
-
 /*
  * Currently this is known to work with up to four timings in one SPL
  * Needs to be rechecked when increasing
  */
 static struct dram_info tqma8mpxl_dram_info[]  = {
-#if defined(CONFIG_IMX8M_DRAM_INLINE_ECC)
-
 #if defined(CONFIG_TQMA8MPXL_RAM_1024MB)
-	{ &dram_timing_1gb_ecc, SZ_1G * 1ULL, &board_dram_1gb_ecc_scrub },
+	DRAM_INFO_ENTRY(1),
 #endif
 #if defined(CONFIG_TQMA8MPXL_RAM_2048MB)
-	{ &dram_timing_2gb_ecc, SZ_1G * 2ULL, &board_dram_2gb_ecc_scrub },
+	DRAM_INFO_ENTRY(2),
 #endif
 #if defined(CONFIG_TQMA8MPXL_RAM_4096MB)
-	{ &dram_timing_4gb_ecc, SZ_1G * 4ULL, &board_dram_4gb_ecc_scrub },
+	DRAM_INFO_ENTRY(4),
 #endif
 #if defined(CONFIG_TQMA8MPXL_RAM_8192MB)
-	{ &dram_timing_8gb_ecc, SZ_1G * 8ULL, &board_dram_8gb_ecc_scrub },
+	DRAM_INFO_ENTRY(8)
 #endif
-
-#else /* !defined(CONFIG_IMX8M_DRAM_INLINE_ECC) */
-
-#if defined(CONFIG_TQMA8MPXL_RAM_1024MB)
-	{ &dram_timing_1gb_no_ecc, SZ_1G * 1ULL },
-#endif
-#if defined(CONFIG_TQMA8MPXL_RAM_2048MB)
-	{ &dram_timing_2gb_no_ecc, SZ_1G * 2ULL },
-#endif
-#if defined(CONFIG_TQMA8MPXL_RAM_4096MB)
-	{ &dram_timing_4gb_no_ecc, SZ_1G * 4ULL },
-#endif
-#if defined(CONFIG_TQMA8MPXL_RAM_8192MB)
-	{ &dram_timing_8gb_no_ecc, SZ_1G * 8ULL },
-#endif
-
-#endif /* !defined(CONFIG_IMX8M_DRAM_INLINE_ECC) */
 };
 
 static int tqma8mpxl_ram_timing_idx = -1;

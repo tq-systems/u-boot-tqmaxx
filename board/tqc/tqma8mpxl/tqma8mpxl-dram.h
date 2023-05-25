@@ -5,6 +5,16 @@
  * Author: Paul Gerber
  */
 
+#include <linux/types.h>
+
+struct dram_info {
+	struct dram_timing_info *table;
+	phys_size_t size;
+#if defined(CONFIG_IMX8M_DRAM_INLINE_ECC)
+	void (*board_dram_ecc_scrub)(void);
+#endif
+};
+
 #if defined(CONFIG_IMX8M_DRAM_INLINE_ECC)
 
 #if defined(CONFIG_TQMA8MPXL_RAM_1024MB)
@@ -41,3 +51,17 @@ extern struct dram_timing_info dram_timing_8gb_no_ecc;
 
 #endif /* !defined(CONFIG_IMX8M_DRAM_INLINE_ECC) */
 
+#if defined(CONFIG_IMX8M_DRAM_INLINE_ECC)
+#define	DRAM_INFO_ENTRY(SIZE)						       \
+	{								       \
+		.table = &dram_timing_##SIZE##gb_ecc,			       \
+		.size = SZ_1G * SIZE##ULL,				       \
+		.board_dram_ecc_scrub = board_dram_##SIZE##gb_ecc_scrub	       \
+	}
+#else
+#define	DRAM_INFO_ENTRY(SIZE)						       \
+	{								       \
+		.table = &dram_timing_##SIZE##gb_no_ecc,		       \
+		.size = SZ_1G * SIZE##ULL,				       \
+	}
+#endif
