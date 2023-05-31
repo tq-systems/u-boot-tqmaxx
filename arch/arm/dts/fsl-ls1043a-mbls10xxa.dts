@@ -25,5 +25,10 @@
 	};
 };
 
+&esdhc {
+	cd-gpios = <&gpio3 2 GPIO_ACTIVE_LOW>;
+	wp-gpios = <&gpio3 3 GPIO_ACTIVE_HIGH>;
+};
+
 #include "fsl-ls1043-post.dtsi"
 #include "fsl-tqmls10xxa-mbls10xxa-fman.dtsi"
