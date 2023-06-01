@@ -108,6 +108,12 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 	struct udevice *dev;
 	u8 bootsrc;
 	int offset;
+	/* Attention: Path may change to /soc/mmc@ in future linux releases. */
+#if defined(CONFIG_FSL_LSCH3)
+	static const char esdhc_node[] = "/soc/esdhc@2140000";
+#elif defined(CONFIG_FSL_LSCH2)
+	static const char esdhc_node[] = "/soc/esdhc@1560000";
+#endif
 
 	arch_fixup_fdt(blob);
 	ft_cpu_setup(blob, bd);
@@ -117,8 +123,7 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 	bootsrc = dm_i2c_reg_read(dev, SYSC_REG_BOOT_SRC);
 
 	/* get offset of sdhc node */
-	/* Attention: Path may change to /soc/mmc@1560000 in future linux releases. */
-	offset = fdt_path_offset(blob, "/soc/esdhc@1560000");
+	offset = fdt_path_offset(blob, esdhc_node);
 	if (offset < 0)
 		return offset;
 
