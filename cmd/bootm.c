@@ -123,7 +123,7 @@ int do_bootm(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 			return do_bootm_subcommand(cmdtp, flag, argc, argv);
 	}
 
-#ifdef CONFIG_IMX_HAB
+#ifdef CONFIG_IMX_HAB_AUTH_IMG
 	extern int authenticate_image(
 			uint32_t ddr_start, uint32_t raw_image_size);
 

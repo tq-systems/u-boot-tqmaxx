@@ -79,6 +79,17 @@ config IMX_HAB
 	  This option enables the support for secure boot (HAB).
 	  See doc/README.mxc_hab for more details.
 
+config IMX_HAB_AUTH_IMG
+	bool "Implicitly authenticate OS image"
+	depends on IMX_HAB
+	default y
+	help
+	  Implicitly authenticate the OS image in booti/bootm/bootz and similar
+	  commands before booting them when HAB is enabled.
+
+	  When this option is disabled, the image must be verified explicitly using
+	  the hab_auth_img command or other means like FIT image signatures.
+
 config CSF_SIZE
 	hex "Maximum size for Command Sequence File (CSF) binary"
 	default 0x2060

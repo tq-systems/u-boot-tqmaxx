@@ -56,7 +56,7 @@ static int bootz_start(cmd_tbl_t *cmdtp, int flag, int argc,
 	if (bootm_find_images(flag, argc, argv))
 		return 1;
 
-#ifdef CONFIG_IMX_HAB
+#ifdef CONFIG_IMX_HAB_AUTH_IMG
 	extern int authenticate_image(
 			uint32_t ddr_start, uint32_t raw_image_size);
 	if (authenticate_image(images->ep, zi_end - zi_start) != 0) {
