@@ -94,6 +94,17 @@ config IMX_SPL_FIT_FDT_SIGNATURE
 	  Enable SPL to verify signature of FIT FDT during FIT loading.
 	  This needs additional signing to FIT FDT part.
 
+config IMX_HAB_AUTH_IMG
+	bool "Implicitly authenticate OS image"
+	depends on IMX_HAB
+	default y
+	help
+	  Implicitly authenticate the OS image in booti/bootm/bootz and similar
+	  commands before booting them when HAB is enabled.
+
+	  When this option is disabled, the image must be verified explicitly using
+	  the hab_auth_img command or other means like FIT image signatures.
+
 config CSF_SIZE
 	hex "Maximum size for Command Sequence File (CSF) binary"
 	depends on IMX_HAB
