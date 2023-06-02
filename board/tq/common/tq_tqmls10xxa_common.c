@@ -9,9 +9,12 @@
 #include <fdt_support.h>
 #include <fsl_ddr_sdram.h>
 #include <i2c.h>
+#include <jffs2/load_kernel.h>
 #include <linux/printk.h>
+#include <mtd_node.h>
 #include <net.h>
 #include <netdev.h>
+#include <spi_flash.h>
 
 #include "../common/tq_bb.h"
 
@@ -81,6 +84,25 @@ void tq_tqmls10xx_checkboard(void)
 	printf("         CPLD FW Rev: %2d.%02d\n", (cpldrev >> 4) & 0xF, cpldrev & 0xF);
 }
 
+#if IS_ENABLED(CONFIG_FDT_FIXUP_PARTITIONS)
+static void tqmls10xxa_fixup_partitions(void *blob, struct bd_info *bd)
+{
+	struct node_info nodes[] = {
+		{"jedec,spi-nor", MTD_DEV_TYPE_NOR},
+	};
+	const unsigned int bus = CONFIG_SF_DEFAULT_BUS;
+	const unsigned int cs = CONFIG_SF_DEFAULT_CS;
+	const unsigned int speed = CONFIG_SF_DEFAULT_SPEED;
+	const unsigned int mode = CONFIG_SF_DEFAULT_MODE;
+	struct udevice *dev;
+	int ret;
+
+	ret = spi_flash_probe_bus_cs(bus, cs, speed, mode, &dev);
+	if (!ret)
+		fdt_fixup_mtdparts(blob, nodes, ARRAY_SIZE(nodes));
+}
+#endif
+
 int ft_board_setup(void *blob, struct bd_info *bd)
 {
 	struct udevice *dev;
@@ -108,6 +130,10 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 		fdt_delprop(blob, offset, "mmc-hs200-1_8v");
 		fdt_setprop_empty(blob, offset, "no-1-8-v");
 	}
+
+#if (IS_ENABLED(CONFIG_FDT_FIXUP_PARTITIONS))
+	tqmls10xxa_fixup_partitions(blob, bd);
+#endif
 
 	return tq_bb_ft_board_setup(blob, bd);
 }
