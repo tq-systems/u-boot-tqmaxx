@@ -68,6 +68,7 @@
 	"ubirootfspart=rootfs\0"                                          \
 	"ubirootfsvol=root\0"                                        \
 	"ubirootfs=root.ubifs\0"	\
+	"ubimtdpart=5\0"		\
 	"fdtfile=" CONFIG_DEFAULT_FDT_FILE "\0"	\
 	"loadimage=load mmc ${mmcdev}:${firmwarepart} ${kernel_addr_r} ${firmwarepath}/${kernel} \0"	\
 	"loadfdt=load mmc ${mmcdev}:${firmwarepart} ${fdt_addr_r} ${firmwarepath}/${fdtfile} \0" \
@@ -79,7 +80,7 @@
 		"run loadfdt; "	\
 		"booti ${kernel_addr_r} - ${fdt_addr_r};\0"	\
 	"addspi=setenv bootargs ${bootargs} "   \
-		"root=ubi0_0 rw rootfstype=ubifs ubi.mtd=3\0"	\
+		"root=ubi0_0 rw rootfstype=ubifs ubi.mtd=${ubimtdpart}\0"	\
 	"spiargs=run addspi addtty addmisc\0"	\
 	"loadspiimage=sf probe 0; ubi part ${ubirootfspart}; " \
 		"ubifsmount ubi0:${ubirootfsvol}; "\
