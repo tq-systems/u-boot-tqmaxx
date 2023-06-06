@@ -37,6 +37,31 @@ DECLARE_GLOBAL_DATA_PTR;
 #if IS_ENABLED(CONFIG_OF_BOARD_FIXUP)
 int board_fix_fdt(void *blob)
 {
+	struct udevice *dev;
+	int offset, sdsel;
+#if defined(CONFIG_FSL_LSCH3)
+	static const char esdhc_node[] = "/esdhc@2140000";
+#elif defined(CONFIG_FSL_LSCH2)
+	static const char esdhc_node[] = "/soc/esdhc@1560000";
+#endif
+	/* get offset of sdhc node */
+	offset = fdt_path_offset(blob, esdhc_node);
+
+	i2c_get_chip_for_busnum(TQMLS10XXA_SYSC_BUS_NUM, TQMLS10XXA_SYSC_ADDR, 1, &dev);
+	sdsel = dm_i2c_reg_read(dev, SYSC_REG_BOOT_SRC) & SYSC_REG_BOOT_SRC_SDSEL_MSK;
+
+	fdt_increase_size(blob, 32);
+	if (!sdsel) {
+		/* eMMC */
+		fdt_delprop(blob, offset, "cd-gpios");
+		fdt_delprop(blob, offset, "wp-gpios");
+		fdt_setprop_empty(blob, offset, "non-removable");
+		fdt_setprop_empty(blob, offset, "mmc-hs200-1_8v");
+	} else {
+		/* SD-Card */
+		fdt_setprop_empty(blob, offset, "no-1-8-v");
+	}
+
 	return tq_bb_board_fix_fdt(blob);
 }
 #endif
