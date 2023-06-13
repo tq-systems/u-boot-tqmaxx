@@ -115,7 +115,7 @@
 		"run set_getcmd; "	\
 		"setenv bootargs; "	\
 		"run netargs; "	\
-		"if ${getcmd} ${kernel}; then "	\
+		"if ${getcmd} ${kernel_addr_r} ${kernel}; then "	\
 			"if ${getcmd} ${fdt_addr_r} ${fdtfile}; then "	\
 				"booti ${kernel_addr_r} - ${fdt_addr_r}; "    \
 			"fi; "	\
