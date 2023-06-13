@@ -154,15 +154,7 @@ int tq_bb_board_misc_init_r(void)
 	if (!ret)
 		_tqmls1046a_bb_serdes_cfg();
 
-	/* enable USB-C power-controller */
-	tq_mbls10xxa_i2c_gpio_set(USB_C_PWRON, 0);
-	mdelay(10);
-	tq_mbls10xxa_i2c_gpio_set(USB_C_PWRON, 1);
-
-	/* reset usb-hub */
-	tq_mbls10xxa_i2c_gpio_set(USB_H_GRST, 0);
-	mdelay(10);
-	tq_mbls10xxa_i2c_gpio_set(USB_H_GRST, 1);
+	tq_mbls10xxa_reset_usb();
 
 	return 0;
 }

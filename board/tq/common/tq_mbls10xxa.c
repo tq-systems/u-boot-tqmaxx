@@ -159,6 +159,19 @@ static int tq_mbls10xxa_retimer_init_one(struct udevice *dev)
 	return 0;
 }
 
+void tq_mbls10xxa_reset_usb(void)
+{
+	/* enable USB-C power-controller */
+	tq_mbls10xxa_i2c_gpio_set(USB_C_PWRON, 0);
+	mdelay(10);
+	tq_mbls10xxa_i2c_gpio_set(USB_C_PWRON, 1);
+
+	/* reset usb-hub */
+	tq_mbls10xxa_i2c_gpio_set(USB_H_GRST, 1);
+	mdelay(10);
+	tq_mbls10xxa_i2c_gpio_set(USB_H_GRST, 0);
+}
+
 void tq_mbls10xxa_retimer_init(void)
 {
 	const u8 addrs[] = TQ_MBLS10XXA_I2C_RETIMER_ADDRS;
