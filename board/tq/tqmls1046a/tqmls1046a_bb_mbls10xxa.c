@@ -171,6 +171,7 @@ int tq_bb_board_fix_fdt(void *fdt)
 {
 	struct ccsr_gur *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
 	u32 srds_s1, srds_s2;
+	int ret;
 
 	/* read SerDes configuration from RCW */
 	srds_s1 = in_be32(&gur->rcwsr[4]) &
@@ -179,6 +180,10 @@ int tq_bb_board_fix_fdt(void *fdt)
 	srds_s2 = in_be32(&gur->rcwsr[4]) &
 			FSL_CHASSIS2_RCWSR4_SRDS2_PRTCL_MASK;
 	srds_s2 >>= FSL_CHASSIS2_RCWSR4_SRDS2_PRTCL_SHIFT;
+
+	ret = fdt_increase_size(fdt, 1024);
+	if (ret)
+		return ret;
 
 	if (serdes_get_prtcl(0, srds_s1, 3) == SGMII_FM1_DTSEC6)
 		tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet5", "qsgmii_s1_p1", "sgmii");
