@@ -64,10 +64,12 @@
 	"usb_pgood_delay=2000\0" \
 	"bootm_size=0x10000000\0"
 
+#ifndef CONFIG_BOOTCOMMAND
 #define CONFIG_BOOTCOMMAND	\
 	"tftp 0x48080000 Image; " \
 	"tftp 0x48000000 Image-"CONFIG_DEFAULT_FDT_FILE"; " \
 	"booti 0x48080000 - 0x48000000"
+#endif
 
 /* SPL support */
 #if defined(CONFIG_R8A7795) || defined(CONFIG_R8A7796) || defined(CONFIG_R8A77965)
