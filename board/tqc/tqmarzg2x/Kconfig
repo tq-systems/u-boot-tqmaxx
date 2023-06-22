@@ -1,0 +1,66 @@
+if TARGET_TQMARZG2X
+
+config SYS_SOC
+	default "rmobile"
+
+config SYS_BOARD
+	default "tqmarzg2x"
+
+config SYS_VENDOR
+	default "tqc"
+
+config SYS_CONFIG_NAME
+	default "tqmarzg2x"
+
+choice
+	prompt "TQMaRZG2x SoC variant"
+	default TQMARZG2M
+	help
+	  select the TQMaRZG2x module variant. The variants differing in the used
+	  RZ/G2 CPU type and DRAM
+
+config TQMARZG2M
+	bool "TQMaRZG2M"
+	depends on R8A774A1
+	help
+	  select TQMaRZG2M with R8A774A1 and 2GiB DRAM
+
+config TQMARZG2N
+	bool "TQMaRZG2N"
+	depends on R8A774B1
+	help
+	  select TQMaRZG2N with R8A774B1 and 2GiB DRAM
+
+config TQMARZG2H
+	bool "TQMaRZG2H"
+	depends on R8A774E1
+	help
+	  select TQMaRZG2H with R8A774E1 and 4GiB DRAM
+
+endchoice
+
+choice
+	prompt "TQMaRZG2x base board variant"
+	default MBARZG2X
+	help
+	  Select base board for TQMaRZG2x
+
+config MBARZG2X
+	bool "TQMaRZG2x on MBaRZG2x Starterkit"
+	select TQC_EEPROM
+	select DM_ETH
+	select CMD_USB
+	select USB
+	select USB_XHCI_HCD
+	select USB_EHCI_HCD
+	select USB_EHCI_GENERIC
+	select USB_STORAGE
+	select PHY_TI
+	help
+	  Select the MBaRZG2x starterkit.
+
+endchoice
+
+endif
+
+source "board/tqc/common/Kconfig"

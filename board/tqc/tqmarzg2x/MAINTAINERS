@@ -1,0 +1,8 @@
+TQMARZG2X_MBARZG2X BOARD
+M:	Paul Gerber <Paul.Gerber@tq-group.com>
+S:	Maintained
+F:	board/tqc/tqmarzg2x/
+F:	include/configs/tqmarzg2x.h
+F:	configs/tqmarzg2m_mbarzg2x_defconfig
+F:	configs/tqmarzg2n_mbarzg2x_defconfig
+F:	configs/tqmarzg2h_mbarzg2x_defconfig
