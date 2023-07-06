@@ -188,13 +188,19 @@ int tq_bb_board_fix_fdt(void *fdt)
 		tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac10", "qsgmii_s2_p4", "qsgmii");
 	}
 
-	if (serdes_get_prtcl(0, srds_nr, 2) == XFI1)
-		tq_mbls10xxa_fixup_enet_fixed_link(fdt, "dpmac1", 0, "xgmii");
+	if (serdes_get_prtcl(0, srds_nr, 2) == XFI1) {
+		ret = tq_mbls10xxa_fixup_enet_sfp(fdt, "dpmac1", "/sfp1", "10gbase-r");
+		if (ret)
+			tq_mbls10xxa_fixup_enet_fixed_link(fdt, "dpmac1", 0, "xgmii");
+	}
 
-	if (serdes_get_prtcl(0, srds_nr, 3) == XFI2)
-		tq_mbls10xxa_fixup_enet_fixed_link(fdt, "dpmac2", 1, "xgmii");
-	else if (serdes_get_prtcl(0, srds_nr, 3) == SGMII2)
+	if (serdes_get_prtcl(0, srds_nr, 3) == XFI2) {
+		ret = tq_mbls10xxa_fixup_enet_sfp(fdt, "dpmac2", "/sfp2", "10gbase-r");
+		if (ret)
+			tq_mbls10xxa_fixup_enet_fixed_link(fdt, "dpmac2", 1, "xgmii");
+	} else if (serdes_get_prtcl(0, srds_nr, 3) == SGMII2) {
 		tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac2", "qsgmii_s2_p2", "sgmii");
+	}
 
 	return 0;
 }
