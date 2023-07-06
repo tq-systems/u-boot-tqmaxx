@@ -8,6 +8,7 @@
 #include <asm/global_data.h>
 #include <fdt_support.h>
 #include <fsl_ddr_sdram.h>
+#include <fsl-mc/fsl_mc.h>
 #include <i2c.h>
 #include <jffs2/load_kernel.h>
 #include <linux/printk.h>
@@ -163,6 +164,10 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 
 #if (IS_ENABLED(CONFIG_FDT_FIXUP_PARTITIONS))
 	tqmls10xxa_fixup_partitions(blob, bd);
+#endif
+
+#if defined(CONFIG_FSL_LSCH3)
+	fdt_fsl_mc_fixup_iommu_map_entry(blob);
 #endif
 
 	return tq_bb_ft_board_setup(blob, bd);
