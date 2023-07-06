@@ -102,6 +102,20 @@ struct sysinfo_ops {
 	int (*get_str)(struct udevice *dev, int id, size_t size, char *val);
 
 	/**
+	 * get_binary() - Read a specific binary data value that describes the
+	 *	          hardware setup.
+	 * @dev:	The sysinfo instance to gather the data.
+	 * @id:		A unique identifier for the string value to be read.
+	 * @size:	The size of the buffer to receive the binary data.
+	 *		Usually, this must match the size of the queried data
+	 *		exactly.
+	 * @val:	Pointer to a buffer that receives the value read.
+	 *
+	 * Return: 0 if OK, -ve on error.
+	 */
+	int (*get_binary)(struct udevice *dev, int id, size_t size, void *val);
+
+	/**
 	 * get_fit_loadable - Get the name of an image to load from FIT
 	 * This function can be used to provide the image names based on runtime
 	 * detection. A classic use-case would when DTBOs are used to describe
@@ -173,6 +187,19 @@ int sysinfo_get_int(struct udevice *dev, int id, int *val);
 int sysinfo_get_str(struct udevice *dev, int id, size_t size, char *val);
 
 /**
+ * sysinfo_get_binary() - Read a specific binary data value that describes the
+ *			hardware setup.
+ * @dev:	The sysinfo instance to gather the data.
+ * @id:		A unique identifier for the string value to be read.
+ * @size:	The size of the buffer to receive the binary data. Usually,
+ *		this must match the size of the queried data exactly.
+ * @val:	Pointer to a buffer that receives the value read.
+ *
+ * Return: 0 if OK, -ve on error.
+ */
+int sysinfo_get_binary(struct udevice *dev, int id, size_t size, void *val);
+
+/**
  * sysinfo_get() - Return the sysinfo device for the sysinfo in question.
  * @devp: Pointer to structure to receive the sysinfo device.
  *
@@ -223,6 +250,12 @@ static inline int sysinfo_get_int(struct udevice *dev, int id, int *val)
 
 static inline int sysinfo_get_str(struct udevice *dev, int id, size_t size,
 				  char *val)
+{
+	return -ENOSYS;
+}
+
+static inline int sysinfo_get_binary(struct udevice *dev, int id, size_t size,
+				     void *val)
 {
 	return -ENOSYS;
 }
