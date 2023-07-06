@@ -111,6 +111,8 @@ int tq_mbls10xxa_serdes_clk_get(enum tq_mbls10xxa_srds_clk clk);
 int tq_mbls10xxa_board_phy_config(struct phy_device *phydev);
 int tq_mbls10xxa_fixup_phy_to_enet(void *fdt, char *enet_alias, char *phy_alias, char *connection);
 int tq_mbls10xxa_fixup_enet_fixed_link(void *fdt, char *enet_alias, int id, char *connection);
+int tq_mbls10xxa_fixup_enet_sfp(void *fdt, const char *enet_alias, const char *sfp_node,
+				const char *connection);
 
 void tq_mbls10xxa_reset_usb(void);
 

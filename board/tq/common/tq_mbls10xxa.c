@@ -582,3 +582,38 @@ int tq_mbls10xxa_fixup_enet_fixed_link(void *fdt, char *enet_alias, int id, char
 
 	return fdt_status_okay_by_alias(fdt, enet_alias);
 }
+
+int tq_mbls10xxa_fixup_enet_sfp(void *fdt, const char *enet_alias, const char *sfp_node,
+				const char *connection)
+{
+	const char *path;
+	int offset;
+	int ret;
+	u32 phy_phandle;
+
+	offset = fdt_path_offset(fdt, sfp_node);
+	if (offset < 0)
+		return offset;
+
+	phy_phandle = fdt_create_phandle(fdt, offset);
+	if (!phy_phandle)
+		return -FDT_ERR_BADPHANDLE;
+
+	path = fdt_get_alias(fdt, enet_alias);
+	if (!path)
+		return -FDT_ERR_BADPATH;
+
+	offset = fdt_path_offset(fdt, path);
+	if (offset < 0)
+		return offset;
+
+	ret = fdt_setprop_string(fdt, offset, "managed", "in-band-status");
+	if (ret)
+		return ret;
+
+	ret = fdt_setprop_string(fdt, offset, "phy-connection-type", connection);
+	if (ret)
+		return ret;
+
+	return fdt_setprop_u32(fdt, offset, "sfp", phy_phandle);
+}
