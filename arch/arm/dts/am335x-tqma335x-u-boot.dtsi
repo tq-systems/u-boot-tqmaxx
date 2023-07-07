@@ -7,6 +7,8 @@
 
 #include <config.h>
 
+#include "am33xx-u-boot.dtsi"
+
 &am33xx_pinmux {
 	u-boot,dm-pre-reloc;
 	u-boot,dm-spl;
