@@ -171,37 +171,57 @@ int tq_bb_board_fix_fdt(void *fdt)
 		return ret;
 
 	if (serdes_get_prtcl(0, srds_nr, 0) == SGMII3) {
-		ret = tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac3", "qsgmii_s1_p1", "sgmii");
-		tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac4", "rgmii_s1", "rgmii-id");
-		tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac5", "rgmii_s2", "rgmii-id");
+		ret = tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac3", "qsgmii-s1-p1", "sgmii");
+		ret |= tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac4", "rgmii-s1", "rgmii-id");
+		ret |= tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac5", "rgmii-s2", "rgmii-id");
 	} else if (serdes_get_prtcl(0, srds_nr, 0) == QSGMII_A) {
-		tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac3", "qsgmii_s1_p1", "qsgmii");
-		tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac4", "qsgmii_s1_p2", "qsgmii");
-		tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac5", "qsgmii_s1_p3", "qsgmii");
-		tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac6", "qsgmii_s1_p4", "qsgmii");
+		ret = tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac3", "qsgmii-s1-p1", "qsgmii");
+		ret |= tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac4", "qsgmii-s1-p2", "qsgmii");
+		ret |= tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac5", "qsgmii-s1-p3", "qsgmii");
+		ret |= tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac6", "qsgmii-s1-p4", "qsgmii");
+	}
+
+	if (ret) {
+		printf("WARNING: Failed to fix Serdes lane 0 ethernet.\n");
+		return ret;
 	}
 
 	if (serdes_get_prtcl(0, srds_nr, 1) == SGMII7) {
-		ret = tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac7", "qsgmii_s2_p1", "sgmii");
+		ret = tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac7", "qsgmii-s2-p1", "sgmii");
 	} else if (serdes_get_prtcl(0, srds_nr, 1) == QSGMII_B) {
-		tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac7", "qsgmii_s2_p1", "qsgmii");
-		tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac8", "qsgmii_s2_p2", "qsgmii");
-		tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac9", "qsgmii_s2_p3", "qsgmii");
-		tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac10", "qsgmii_s2_p4", "qsgmii");
+		ret = tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac7", "qsgmii-s2-p1", "qsgmii");
+		ret |= tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac8", "qsgmii-s2-p2", "qsgmii");
+		ret |= tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac9", "qsgmii-s2-p3", "qsgmii");
+		ret |= tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac10", "qsgmii-s2-p4", "qsgmii");
+	}
+
+	if (ret) {
+		printf("WARNING: Failed to fix Serdes lane 1 ethernet.\n");
+		return ret;
 	}
 
 	if (serdes_get_prtcl(0, srds_nr, 2) == XFI1) {
 		ret = tq_mbls10xxa_fixup_enet_sfp(fdt, "dpmac1", "/sfp1", "10gbase-r");
 		if (ret)
-			tq_mbls10xxa_fixup_enet_fixed_link(fdt, "dpmac1", 0, "xgmii");
+			ret = tq_mbls10xxa_fixup_enet_fixed_link(fdt, "dpmac1", 0, "xgmii");
+	}
+
+	if (ret) {
+		printf("WARNING: Failed to fix Serdes lane 2 ethernet.\n");
+		return ret;
 	}
 
 	if (serdes_get_prtcl(0, srds_nr, 3) == XFI2) {
 		ret = tq_mbls10xxa_fixup_enet_sfp(fdt, "dpmac2", "/sfp2", "10gbase-r");
 		if (ret)
-			tq_mbls10xxa_fixup_enet_fixed_link(fdt, "dpmac2", 1, "xgmii");
+			ret = tq_mbls10xxa_fixup_enet_fixed_link(fdt, "dpmac2", 1, "xgmii");
 	} else if (serdes_get_prtcl(0, srds_nr, 3) == SGMII2) {
-		tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac2", "qsgmii_s2_p2", "sgmii");
+		ret = tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac2", "qsgmii-s2-p2", "sgmii");
+	}
+
+	if (ret) {
+		printf("WARNING: Failed to fix Serdes lane 3 ethernet.\n");
+		return ret;
 	}
 
 	return 0;
