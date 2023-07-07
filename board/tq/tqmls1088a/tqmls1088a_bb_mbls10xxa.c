@@ -172,6 +172,8 @@ int tq_bb_board_fix_fdt(void *fdt)
 
 	if (serdes_get_prtcl(0, srds_nr, 0) == SGMII3) {
 		ret = tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac3", "qsgmii_s1_p1", "sgmii");
+		tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac4", "rgmii_s1", "rgmii-id");
+		tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac5", "rgmii_s2", "rgmii-id");
 	} else if (serdes_get_prtcl(0, srds_nr, 0) == QSGMII_A) {
 		tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac3", "qsgmii_s1_p1", "qsgmii");
 		tq_mbls10xxa_fixup_phy_to_enet(fdt, "dpmac4", "qsgmii_s1_p2", "qsgmii");
