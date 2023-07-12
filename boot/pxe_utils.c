@@ -102,9 +102,13 @@ static int get_relfile(struct pxe_context *ctx, const char *file_path,
 {
 	size_t path_len;
 	char relfile[MAX_TFTP_PATH_LEN + 1];
+	char substbuf[CONFIG_SYS_CBSIZE];
 	char addr_buf[18];
 	ulong size;
 	int ret;
+
+	cli_simple_process_macros(file_path, substbuf, sizeof(substbuf));
+	file_path = substbuf;
 
 	if (file_path[0] == '/' && ctx->allow_abs_path)
 		*relfile = '\0';
@@ -532,14 +536,18 @@ static int label_boot(struct pxe_context *ctx, struct pxe_label *label)
 	kernel_addr = env_get("kernel_addr_r");
 	/* for FIT, append the configuration identifier */
 	if (label->config) {
-		int len = strlen(kernel_addr) + strlen(label->config) + 1;
+		char config[CONFIG_SYS_CBSIZE];
+		int len;
 
+		cli_simple_process_macros(label->config, config, sizeof(config));
+
+		len = strlen(kernel_addr) + strlen(config) + 1;
 		fit_addr = malloc(len);
 		if (!fit_addr) {
 			printf("malloc fail (FIT address)\n");
 			return 1;
 		}
-		snprintf(fit_addr, len, "%s%s", kernel_addr, label->config);
+		snprintf(fit_addr, len, "%s%s", kernel_addr, config);
 		kernel_addr = fit_addr;
 	}
 
