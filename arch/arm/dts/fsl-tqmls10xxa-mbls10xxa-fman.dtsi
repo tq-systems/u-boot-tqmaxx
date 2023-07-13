@@ -11,16 +11,16 @@
 
 / {
 	aliases {
-		rgmii_phy1 = &rgmii_phy1;
-		rgmii_phy2 = &rgmii_phy2;
-		qsgmii_s1_p1 = &qsgmii1_phy1;
-		qsgmii_s1_p2 = &qsgmii1_phy2;
-		qsgmii_s1_p3 = &qsgmii1_phy3;
-		qsgmii_s1_p4 = &qsgmii1_phy4;
-		qsgmii_s2_p1 = &qsgmii2_phy1;
-		qsgmii_s2_p2 = &qsgmii2_phy2;
-		qsgmii_s2_p3 = &qsgmii2_phy3;
-		qsgmii_s2_p4 = &qsgmii2_phy4;
+		rgmii-phy1 = &rgmii_phy1;
+		rgmii-phy2 = &rgmii_phy2;
+		qsgmii-s1-p1 = &qsgmii1_phy1;
+		qsgmii-s1-p2 = &qsgmii1_phy2;
+		qsgmii-s1-p3 = &qsgmii1_phy3;
+		qsgmii-s1-p4 = &qsgmii1_phy4;
+		qsgmii-s2-p1 = &qsgmii2_phy1;
+		qsgmii-s2-p2 = &qsgmii2_phy2;
+		qsgmii-s2-p3 = &qsgmii2_phy3;
+		qsgmii-s2-p4 = &qsgmii2_phy4;
 	};
 };
 
