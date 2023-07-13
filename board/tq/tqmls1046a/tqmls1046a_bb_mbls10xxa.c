@@ -178,27 +178,52 @@ int tq_bb_board_fix_fdt(void *fdt)
 		return ret;
 
 	if (serdes_get_prtcl(0, srds_s1, 3) == SGMII_FM1_DTSEC6)
-		tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet5", "qsgmii_s1_p1", "sgmii");
+		ret = tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet5", "qsgmii-s1-p1", "sgmii");
+
+	if (ret) {
+		printf("WARNING: Failed to fix Serdes lane 1-3 ethernet.\n");
+		return ret;
+	}
 
 	if (serdes_get_prtcl(0, srds_s1, 2) == SGMII_FM1_DTSEC5) {
-		tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet4", "qsgmii_s2_p1", "sgmii");
+		ret = tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet4", "qsgmii-s2-p1", "sgmii");
 	} else if (serdes_get_prtcl(0, srds_s1, 2) == QSGMII_FM1_A) {
-		tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet5", "qsgmii_s2_p1", "qsgmii");
-		tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet4", "qsgmii_s2_p2", "qsgmii");
-		tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet7", "qsgmii_s2_p3", "qsgmii");
-		tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet0", "qsgmii_s2_p4", "qsgmii");
+		ret = tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet5", "qsgmii-s2-p1", "qsgmii");
+		ret |= tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet4", "qsgmii-s2-p2", "qsgmii");
+		ret |= tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet7", "qsgmii-s2-p3", "qsgmii");
+		ret |= tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet0", "qsgmii-s2-p4", "qsgmii");
+	}
+
+	if (ret) {
+		printf("WARNING: Failed to fix Serdes lane 1-2 ethernet.\n");
+		return ret;
 	}
 
 	if (serdes_get_prtcl(0, srds_s1, 1) == XFI_FM1_MAC10)
-		tq_mbls10xxa_fixup_enet_fixed_link(fdt, "ethernet7", 0, "xgmii");
+		ret = tq_mbls10xxa_fixup_enet_fixed_link(fdt, "ethernet7", 0, "xgmii");
+
+	if (ret) {
+		printf("WARNING: Failed to fix Serdes lane 1-1 ethernet.\n");
+		return ret;
+	}
 
 	if (serdes_get_prtcl(0, srds_s1, 0) == SGMII_FM1_DTSEC9)
-		tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet6", "qsgmii_s2_p2", "sgmii");
+		ret = tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet6", "qsgmii-s2-p2", "sgmii");
 	else if (serdes_get_prtcl(0, srds_s1, 0) == XFI_FM1_MAC9)
-		tq_mbls10xxa_fixup_enet_fixed_link(fdt, "ethernet6", 1, "xgmii");
+		ret = tq_mbls10xxa_fixup_enet_fixed_link(fdt, "ethernet6", 1, "xgmii");
+
+	if (ret) {
+		printf("WARNING: Failed to fix Serdes lane 1-0 ethernet.\n");
+		return ret;
+	}
 
 	if (serdes_get_prtcl(1, srds_s2, 1) == SGMII_FM1_DTSEC2)
-		tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet1", "qsgmii_s1_p2", "sgmii");
+		ret = tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet1", "qsgmii-s1-p2", "sgmii");
+
+	if (ret) {
+		printf("WARNING: Failed to fix Serdes lane 2-1 ethernet.\n");
+		return ret;
+	}
 
 	return 0;
 }
