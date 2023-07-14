@@ -136,6 +136,24 @@ int fs_exists(const char *filename);
 int fs_size(const char *filename, loff_t *size);
 
 /**
+ * fs_path_simplify - resolve ".", ".." and duplicate "/" in paths
+ *
+ * The input path is always considered absolute, regardless of a leading "/".
+ * Trailing "/" are stripped, unless the resulting path is "/".
+ * "/" is considered the parent of "/" when resolving extraneous ".."
+ * components, to match the behavior of Linux.
+ *
+ * An output buffer size of strlen(in)+2 is always sufficient. The input path
+ * may grow by one leading "/" if it did not contain one.
+ *
+ * @out:	output buffer for simplified path
+ * @in:		input path to simplify
+ * @size:	size of the output buffer
+ * Return:	0 on success, -EOVERFLOW when the buffer size was insufficient.
+ */
+int fs_path_simplify(char *out, const char *in, size_t size);
+
+/**
  * fs_read() - read file from the partition previously set by fs_set_blk_dev()
  *
  * Note that not all filesystem drivers support either or both of offset != 0

@@ -575,6 +575,59 @@ static int fs_read_lmb_check(const char *filename, ulong addr, loff_t offset,
 }
 #endif
 
+int fs_path_simplify(char *out, const char *in, size_t size)
+{
+	const char *start = in;
+	size_t outpos;
+
+	outpos = strlcpy(out, "", size);
+	if (outpos >= size)
+		return -EOVERFLOW;
+
+	while (*start) {
+		const char *end = strchrnul(start, '/');
+		size_t len = end - start;
+
+		/* Ignore empty path components and . */
+		if (len == 0 || strncmp(start, ".", len) == 0)
+			goto next;
+
+		/* Remove last path component from out for .. */
+		if (strncmp(start, "..", len) == 0) {
+			char *tmp = strrchr(out, '/');
+
+			if (tmp) {
+				*tmp = '\0';
+				outpos = tmp - out;
+			}
+
+			goto next;
+		}
+
+		outpos = strlcat(out, "/", size);
+
+		/* This checks both the previous strlcat and the following strncat */
+		if (outpos + len >= size)
+			return -EOVERFLOW;
+
+		strncat(&out[outpos], start, len);
+		outpos += len;
+
+next:
+		if (*end == '\0')
+			break;
+
+		start = end + 1;
+	}
+
+	if (outpos == 0) {
+		if (strlcat(out, "/", size) >= size)
+			return -EOVERFLOW;
+	}
+
+	return 0;
+}
+
 static int _fs_read(const char *filename, ulong addr, loff_t offset, loff_t len,
 		    int do_lmb_check, loff_t *actread)
 {
