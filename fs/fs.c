@@ -13,6 +13,7 @@
 #include <env.h>
 #include <lmb.h>
 #include <log.h>
+#include <malloc.h>
 #include <mapmem.h>
 #include <part.h>
 #include <ext4fs.h>
@@ -632,14 +633,24 @@ static int _fs_read(const char *filename, ulong addr, loff_t offset, loff_t len,
 		    int do_lmb_check, loff_t *actread)
 {
 	struct fstype_info *info = fs_get_info(fs_type);
+	size_t filename_buf_len = strlen(filename) + 2;
+	char *filename_buf;
 	void *buf;
 	int ret;
 
+	filename_buf = malloc(filename_buf_len);
+	if (!filename_buf)
+		return -ENOMEM;
+
+	ret = fs_path_simplify(filename_buf, filename, filename_buf_len);
+	if (ret)
+		goto out;
+
 #ifdef CONFIG_LMB
 	if (do_lmb_check) {
-		ret = fs_read_lmb_check(filename, addr, offset, len, info);
+		ret = fs_read_lmb_check(filename_buf, addr, offset, len, info);
 		if (ret)
-			return ret;
+			goto out;
 	}
 #endif
 
@@ -648,14 +659,16 @@ static int _fs_read(const char *filename, ulong addr, loff_t offset, loff_t len,
 	 * means read the whole file.
 	 */
 	buf = map_sysmem(addr, len);
-	ret = info->read(filename, buf, offset, len, actread);
+	ret = info->read(filename_buf, buf, offset, len, actread);
 	unmap_sysmem(buf);
 
 	/* If we requested a specific number of bytes, check we got it */
 	if (ret == 0 && len && *actread != len)
-		log_debug("** %s shorter than offset + len **\n", filename);
+		log_debug("** %s shorter than offset + len **\n", filename_buf);
 	fs_close();
 
+out:
+	free(filename_buf);
 	return ret;
 }
 
@@ -669,19 +682,31 @@ int fs_write(const char *filename, ulong addr, loff_t offset, loff_t len,
 	     loff_t *actwrite)
 {
 	struct fstype_info *info = fs_get_info(fs_type);
+	size_t filename_buf_len = strlen(filename) + 2;
+	char *filename_buf;
 	void *buf;
 	int ret;
 
+	filename_buf = malloc(filename_buf_len);
+	if (!filename_buf)
+		return -ENOMEM;
+
+	ret = fs_path_simplify(filename_buf, filename, filename_buf_len);
+	if (ret)
+		goto out;
+
 	buf = map_sysmem(addr, len);
-	ret = info->write(filename, buf, offset, len, actwrite);
+	ret = info->write(filename_buf, buf, offset, len, actwrite);
 	unmap_sysmem(buf);
 
 	if (ret < 0 && len != *actwrite) {
-		log_err("** Unable to write file %s **\n", filename);
+		log_err("** Unable to write file %s **\n", filename_buf);
 		ret = -1;
 	}
 	fs_close();
 
+out:
+	free(filename_buf);
 	return ret;
 }
 
