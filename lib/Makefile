@@ -96,6 +96,9 @@ ifdef CONFIG_SPL_BUILD
 obj-$(CONFIG_SPL_YMODEM_SUPPORT) += crc16-ccitt.o
 obj-$(CONFIG_$(SPL_TPL_)HASH) += crc16-ccitt.o
 obj-$(CONFIG_MMC_SPI_CRC_ON) += crc16-ccitt.o
+ifdef CONFIG_SPL_SYSINFO
+obj-$(CONFIG_SYSINFO_TQ_EEPROM) += crc16-ccitt.o
+endif
 obj-y += net_utils.o
 endif
 obj-$(CONFIG_ADDR_MAP) += addr_map.o
