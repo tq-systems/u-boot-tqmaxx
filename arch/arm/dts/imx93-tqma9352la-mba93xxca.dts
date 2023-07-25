@@ -136,17 +136,17 @@
 	};
 };
 
-&gpio2 {
+&gpio1 {
 	expander-irq-hog {
 		gpio-hog;
-		gpios = <3 GPIO_ACTIVE_LOW>;
+		gpios = <12 GPIO_ACTIVE_LOW>;
 		input;
 		line-name = "PEXP_INT#";
 	};
 
 	tcpc-irq-hog {
 		gpio-hog;
-		gpios = <7 GPIO_ACTIVE_LOW>;
+		gpios = <2 GPIO_ACTIVE_LOW>;
 		input;
 		line-name = "USB_C_ALERT#";
 	};
@@ -178,7 +178,7 @@
 
 		port {
 			typec_drd_sw: endpoint {
-				remote-endpoint = <&usb2_drd_sw>;
+				remote-endpoint = <&usb1_drd_sw>;
 			};
 		};
 
@@ -210,8 +210,8 @@
 		#gpio-cells = <2>;
 		interrupt-controller;
 		#interrupt-cells = <2>;
-		interrupt-parent = <&gpio2>;
-		interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <12 IRQ_TYPE_LEVEL_LOW>;
 		vcc-supply = <&reg_3v3>;
 	};
 
@@ -268,12 +268,6 @@
 };
 
 &usbotg1 {
-	dr_mode = "host";
-	disable-over-current;
-	status = "okay";
-};
-
-&usbotg2 {
 	dr_mode = "otg";
 	hnp-disable;
 	srp-disable;
@@ -283,10 +277,16 @@
 	status = "okay";
 
 	port {
-		usb2_drd_sw: endpoint {
+		usb1_drd_sw: endpoint {
 			remote-endpoint = <&typec_drd_sw>;
 		};
 	};
+};
+
+&usbotg2 {
+	dr_mode = "host";
+	disable-over-current;
+	status = "okay";
 };
 
 &usdhc2 {
@@ -393,13 +393,13 @@
 
 	pinctrl_pexp_irq: pexpirqgrp {
 		fsl,pins = <
-			MX93_PAD_GPIO_IO03__GPIO2_IO03		0x1306
+			MX93_PAD_SAI1_TXC__GPIO1_IO12		0x1306
 		>;
 	};
 
 	pinctrl_typec: typecgrp {
 		fsl,pins = <
-			MX93_PAD_GPIO_IO07__GPIO2_IO07		0x1306
+			MX93_PAD_I2C2_SCL__GPIO1_IO02		0x1306
 		>;
 	};
 

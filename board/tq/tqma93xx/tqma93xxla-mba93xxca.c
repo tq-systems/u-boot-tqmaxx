@@ -64,7 +64,6 @@ enum {
 	/* assigned */
 	/* ENET2_RESET_B, */
 	USB_RESET_B,
-	USB_H2_SELECT,
 	WLAN_PD_B,
 	WLAN_W_DISABLE_B,
 	WLAN_PERST_B,
@@ -98,7 +97,6 @@ static struct tq_gpio_init_data mba93xxca_gid[] = {
 	GPIO_INIT_DATA_ENTRY(USB_RESET_B, "gpio@71_2",
 			     GPIOD_IS_OUT | GPIOD_ACTIVE_LOW |
 			     GPIOD_IS_OUT_ACTIVE),
-	GPIO_INIT_DATA_ENTRY(USB_H2_SELECT, "gpio@71_3", GPIOD_IS_OUT),
 	GPIO_INIT_DATA_ENTRY(WLAN_PD_B, "gpio@71_4",
 			     GPIOD_IS_OUT | GPIOD_ACTIVE_LOW |
 			     GPIOD_IS_OUT_ACTIVE),
@@ -155,7 +153,7 @@ int mmc_map_to_kernel_blk(int devno)
 
 #if CONFIG_IS_ENABLED(USB_TCPC)
 
-struct tcpc_port port2;
+struct tcpc_port typec_port;
 
 static int setup_pd_switch(u8 i2c_bus, u8 addr)
 {
@@ -206,15 +204,15 @@ static int setup_pd_switch(u8 i2c_bus, u8 addr)
 
 int pd_switch_snk_enable(struct tcpc_port *port)
 {
-	if (port == &port2) {
-		debug("Setup pd switch on port 2\n");
+	if (port == &typec_port) {
+		debug("Setup pd switch on port\n");
 		return setup_pd_switch(2, 0x73);
 	}
 
 	return -EINVAL;
 }
 
-struct tcpc_port_config port2_config = {
+struct tcpc_port_config typec_port_config = {
 	.i2c_bus = 2, /* I2C3 */
 	.addr = 0x50,
 	.port_type = TYPEC_PORT_UFP,
@@ -233,10 +231,10 @@ static int setup_typec(void)
 {
 	int ret;
 
-	debug("tcpc_init port 2\n");
-	ret = tcpc_init(&port2, port2_config, NULL);
+	debug("tcpc_init port\n");
+	ret = tcpc_init(&typec_port, typec_port_config, NULL);
 	if (ret) {
-		printf("%s: tcpc port2 init failed, err=%d\n",
+		printf("%s: tcpc port init failed, err=%d\n",
 		       __func__, ret);
 	}
 
@@ -251,11 +249,11 @@ int board_ehci_usb_phy_mode(struct udevice *dev)
 	int ret = 0;
 
 	debug("%s %d\n", __func__, dev_seq(dev));
-
-	if (dev_seq(dev) == 0)
+	/* dev_seq == 0: USB1, dev_seq == 1: USB2 */
+	if (dev_seq(dev) == 1)
 		return USB_INIT_HOST;
 
-	port_ptr = &port2;
+	port_ptr = &typec_port;
 
 	tcpc_setup_ufp_mode(port_ptr);
 	ret = tcpc_get_cc_status(port_ptr, &pol, &state);
@@ -277,8 +275,18 @@ int board_usb_init(int index, enum usb_init_type init)
 	struct gpio_desc *usb_reset_gpio = &mba93xxca_gid[USB_RESET_B].desc;
 
 	switch (index) {
+#if CONFIG_IS_ENABLED(USB_TCPC)
 	case 0:
-		debug("USB1/HUB\n");
+		debug("USB1/Type-C\n");
+		if (init == USB_INIT_HOST)
+			ret = tcpc_setup_dfp_mode(&typec_port);
+		else
+			ret = tcpc_setup_ufp_mode(&typec_port);
+
+		break;
+#endif
+	case 1:
+		debug("USB2/HUB\n");
 		switch (init) {
 		case USB_INIT_DEVICE:
 			ret = -ENODEV;
@@ -287,20 +295,10 @@ int board_usb_init(int index, enum usb_init_type init)
 			dm_gpio_set_value(usb_reset_gpio, 0);
 			break;
 		default:
-			printf("USB1: unknown init type\n");
+			printf("USB2: unknown init type\n");
 			ret = -EINVAL;
 		}
 		break;
-#if CONFIG_IS_ENABLED(USB_TCPC)
-	case 1:
-		debug("USB2/Type-C\n");
-		if (init == USB_INIT_HOST)
-			ret = tcpc_setup_dfp_mode(&port2);
-		else
-			ret = tcpc_setup_ufp_mode(&port2);
-
-		break;
-#endif
 	default:
 		printf("invalid USB port %d\n", index);
 		ret = -EINVAL;
@@ -315,16 +313,16 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 	struct gpio_desc *usb_reset_gpio = &mba93xxca_gid[USB_RESET_B].desc;
 
 	switch (index) {
-	case 0:
-		debug("USB1/HUB\n");
-		dm_gpio_set_value(usb_reset_gpio, 0);
-		break;
 #if CONFIG_IS_ENABLED(USB_TCPC)
-	case 1:
+	case 0:
 		if (init == USB_INIT_HOST)
-			ret = tcpc_disable_src_vbus(&port2);
+			ret = tcpc_disable_src_vbus(&typec_port);
 		break;
 #endif
+	case 1:
+		debug("USB2/HUB\n");
+		dm_gpio_set_value(usb_reset_gpio, 0);
+		break;
 	default:
 		printf("invalid USB port %d\n", index);
 		ret = -EINVAL;

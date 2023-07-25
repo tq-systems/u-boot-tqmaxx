@@ -13,7 +13,7 @@
 
 / {
 	aliases {
-		usbgadget0 = &usbg2;
+		usbgadget0 = &usbg1;
 	};
 
 	config {
@@ -21,10 +21,10 @@
 		u-boot,mmc-env-offset-redundant = <0x408000>;
 	};
 
-	usbg2: usbg2 {
+	usbg1: usbg1 {
 		compatible = "fsl,imx27-usb-gadget";
 		dr_mode = "peripheral";
-		chipidea,usb = <&usbotg2>;
+		chipidea,usb = <&usbotg1>;
 		status = "disabled";
 	};
 };
@@ -70,7 +70,7 @@
 	u-boot,dm-spl;
 };
 
-&usbotg2 {
+&usbotg1 {
 	extcon = <&tcpc>;
 	status = "okay";
 };
