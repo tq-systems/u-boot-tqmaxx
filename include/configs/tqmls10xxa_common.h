@@ -54,13 +54,12 @@
 	"addtty=setenv bootargs ${bootargs} earlycon=uart8250,mmio,0x21c0600 "	\
 		"console=${consdev},${baudrate}\0"	\
 	"mmcblkdev=0\0"	\
-	"mmcpart=2\0"	\
 	"addmmc=setenv bootargs ${bootargs} "	\
 		"root=/dev/mmcblk${mmcblkdev}p${mmcpart} rw rootwait\0"	\
 	"mmcargs=run addmmc addtty addmisc\0"	\
 	"mmcdev=0\0"	\
 	"rootpath=/srv/nfs/\0"		\
-	"firmwarepart=2\0"	\
+	"mmcpart=1\0"	\
 	"firmwarepath=/boot/\0"	\
 	"kernel=Image\0"	\
 	"kernel_addr_r=0x81000000\0"	\
@@ -70,8 +69,8 @@
 	"ubirootfs=root.ubifs\0"	\
 	"ubimtdpart=5\0"		\
 	"fdtfile=" CONFIG_DEFAULT_FDT_FILE "\0"	\
-	"loadimage=load mmc ${mmcdev}:${firmwarepart} ${kernel_addr_r} ${firmwarepath}/${kernel} \0"	\
-	"loadfdt=load mmc ${mmcdev}:${firmwarepart} ${fdt_addr_r} ${firmwarepath}/${fdtfile} \0" \
+	"loadimage=load mmc ${mmcdev}:${mmcpart} ${kernel_addr_r} ${firmwarepath}/${kernel} \0"	\
+	"loadfdt=load mmc ${mmcdev}:${mmcpart} ${fdt_addr_r} ${firmwarepath}/${fdtfile} \0" \
 	BOOTENV	\
 	"mmcboot=echo Booting from mmc ...; "	\
 		"setenv bootargs; "	\
@@ -188,22 +187,6 @@
 			"fi; "	\
 		"fi; "	\
 		"setenv filesize;\0"	\
-	"update_kernel_mmc=run set_getcmd; "   \
-		"if ${getcmd} ${kernel}; then " \
-			"if itest ${filesize} > 0; then "   \
-				"mmc dev ${mmcdev}; mmc rescan; "   \
-				"echo Write kernel image to mmc ${mmcdev}:${firmwarepart}...; "	\
-				"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} ${kernel} ${filesize}; "\
-			"fi; "  \
-		"fi;\0" \
-	"update_fdt_mmc=run set_getcmd; "	\
-		"if ${getcmd} ${fdtfile}; then " \
-			"if itest ${filesize} > 0; then "   \
-				"mmc dev ${mmcdev}; mmc rescan; "   \
-				"echo Write fdt image to mmc ${mmcdev}:${firmwarepart}...; "	\
-				"save mmc ${mmcdev}:${firmwarepart} ${loadaddr} ${fdtfile} ${filesize}; "\
-			"fi; "  \
-		"fi;\0" \
 	"prepare_ubi_part=if sf probe; then "                          \
 			"mtd erase ${ubirootfspart}; "                 \
 			"ubi part ${ubirootfspart}; "		       \

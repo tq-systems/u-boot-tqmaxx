@@ -37,6 +37,7 @@
 	"fsl_mc lazyapply DPL 0x80a00000;\0"			\
 	"mcdplspiapply=sf probe 0; sf read 0x80a00000 dpaa2-dpl &&"\
 	"fsl_mc lazyapply dpl 0x80a00000;\0"			\
+	"mmcpart=2\0"	\
 	"mmcboot=echo Booting from mmc ...; "			\
 		"setenv bootargs; "				\
 		"run mmcargs; "					\
