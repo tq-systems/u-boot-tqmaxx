@@ -40,6 +40,7 @@ int board_fix_fdt(void *blob)
 {
 	struct udevice *dev;
 	int offset, sdsel;
+	int ret;
 #if defined(CONFIG_FSL_LSCH3)
 	static const char esdhc_node[] = "/esdhc@2140000";
 #elif defined(CONFIG_FSL_LSCH2)
@@ -63,7 +64,12 @@ int board_fix_fdt(void *blob)
 		fdt_setprop_empty(blob, offset, "no-1-8-v");
 	}
 
-	return tq_bb_board_fix_fdt(blob);
+	ret = tq_bb_board_fix_fdt(blob);
+
+	if (ret)
+		printf("WARNING: Failed to fix FDT (%d).\n", ret);
+
+	return 0;
 }
 #endif
 
