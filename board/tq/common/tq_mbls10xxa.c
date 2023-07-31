@@ -15,6 +15,7 @@
 #include <asm/io.h>
 #include <asm/gpio.h>
 #include <linux/delay.h>
+#include <phy_interface.h>
 #if defined(CONFIG_FSL_LSCH3)
 #include <asm/arch/immap_lsch3.h>
 #elif defined(CONFIG_FSL_LSCH2)
@@ -515,7 +516,8 @@ out:
 	return ret;
 }
 
-int tq_mbls10xxa_fixup_phy_to_enet(void *fdt, char *enet_alias, char *phy_alias, char *connection)
+int tq_mbls10xxa_fixup_phy_to_enet(void *fdt, char *enet_alias, char *phy_alias,
+				   phy_interface_t connection)
 {
 	const char *path;
 	u32 phy_phandle;
@@ -531,6 +533,8 @@ int tq_mbls10xxa_fixup_phy_to_enet(void *fdt, char *enet_alias, char *phy_alias,
 		return offset;
 
 	phy_phandle = fdt_create_phandle(fdt, offset);
+	if (!phy_phandle)
+		return -FDT_ERR_BADPHANDLE;
 
 	path = fdt_get_alias(fdt, enet_alias);
 	if (!path)
@@ -540,14 +544,20 @@ int tq_mbls10xxa_fixup_phy_to_enet(void *fdt, char *enet_alias, char *phy_alias,
 	if (offset < 0)
 		return offset;
 
-	phy_phandle = cpu_to_fdt32(phy_phandle);
-	ret = fdt_setprop(fdt, offset, "phy-handle", &phy_phandle, sizeof(phy_phandle));
+	ret = fdt_setprop_u32(fdt, offset, "phy-handle", phy_phandle);
 	if (ret)
 		return ret;
 
-	ret = fdt_setprop_string(fdt, offset, "phy-connection-type", connection);
+	ret = fdt_setprop_string(fdt, offset, "phy-connection-type",
+				 phy_string_for_interface(connection));
 	if (ret)
 		return ret;
+
+	if (connection == PHY_INTERFACE_MODE_SGMII || connection == PHY_INTERFACE_MODE_QSGMII) {
+		ret = fdt_setprop_string(fdt, offset, "managed", "in-band-status");
+		if (ret)
+			return ret;
+	}
 
 	return fdt_status_okay_by_alias(fdt, enet_alias);
 }

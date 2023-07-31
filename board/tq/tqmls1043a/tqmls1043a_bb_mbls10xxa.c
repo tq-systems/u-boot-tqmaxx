@@ -163,7 +163,8 @@ int tq_bb_board_fix_fdt(void *fdt)
 		return ret;
 
 	if (serdes_get_prtcl(0, srds_s1, 0) == SGMII_FM1_DTSEC9)
-		ret = tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet6", "qsgmii-s2-p2", "sgmii");
+		ret = tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet6", "qsgmii-s2-p2",
+						     PHY_INTERFACE_MODE_SGMII);
 	else if (serdes_get_prtcl(0, srds_s1, 0) == XFI_FM1_MAC9)
 		ret = tq_mbls10xxa_fixup_enet_fixed_link(fdt, "ethernet6", 0, "xgmii");
 
@@ -173,12 +174,17 @@ int tq_bb_board_fix_fdt(void *fdt)
 	}
 
 	if (serdes_get_prtcl(0, srds_s1, 1) == SGMII_FM1_DTSEC2) {
-		ret = tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet1", "qsgmii-s2-p1", "sgmii");
+		ret = tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet1", "qsgmii-s2-p1",
+						     PHY_INTERFACE_MODE_SGMII);
 	} else if (serdes_get_prtcl(0, srds_s1, 1) == QSGMII_FM1_A) {
-		ret = tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet0", "qsgmii-s2-p1", "qsgmii");
-		ret |= tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet1", "qsgmii-s2-p2", "qsgmii");
-		ret |= tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet4", "qsgmii-s2-p3", "qsgmii");
-		ret |= tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet5", "qsgmii-s2-p4", "qsgmii");
+		ret = tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet0", "qsgmii-s2-p1",
+						     PHY_INTERFACE_MODE_QSGMII);
+		ret |= tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet1", "qsgmii-s2-p2",
+						      PHY_INTERFACE_MODE_QSGMII);
+		ret |= tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet4", "qsgmii-s2-p3",
+						      PHY_INTERFACE_MODE_QSGMII);
+		ret |= tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet5", "qsgmii-s2-p4",
+						      PHY_INTERFACE_MODE_QSGMII);
 	}
 
 	if (ret) {
@@ -187,7 +193,8 @@ int tq_bb_board_fix_fdt(void *fdt)
 	}
 
 	if (serdes_get_prtcl(0, srds_s1, 3) == SGMII_FM1_DTSEC5) {
-		ret = tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet4", "qsgmii-s1-p2", "sgmii");
+		ret = tq_mbls10xxa_fixup_phy_to_enet(fdt, "ethernet4", "qsgmii-s1-p2",
+						     PHY_INTERFACE_MODE_SGMII);
 
 		if (ret) {
 			printf("WARNING: Failed to fix Serdes lane 1-3 ethernet.\n");

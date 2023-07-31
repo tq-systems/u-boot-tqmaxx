@@ -9,6 +9,7 @@
 #define __TQ_MBLS10XXA_H__
 
 #include <asm-generic/gpio.h>
+#include <phy_interface.h>
 #include "tq_board_gpio.h"
 
 #if defined(CONFIG_FSL_LSCH3)
@@ -109,7 +110,8 @@ int tq_mbls10xxa_serdes_init(struct tq_mbls10xxa_serdes lanes[8]);
 int tq_mbls10xxa_serdes_clk_get(enum tq_mbls10xxa_srds_clk clk);
 
 int tq_mbls10xxa_board_phy_config(struct phy_device *phydev);
-int tq_mbls10xxa_fixup_phy_to_enet(void *fdt, char *enet_alias, char *phy_alias, char *connection);
+int tq_mbls10xxa_fixup_phy_to_enet(void *fdt, char *enet_alias, char *phy_alias,
+				   phy_interface_t connection);
 int tq_mbls10xxa_fixup_enet_fixed_link(void *fdt, char *enet_alias, int id, char *connection);
 int tq_mbls10xxa_fixup_enet_sfp(void *fdt, const char *enet_alias, const char *sfp_node,
 				const char *connection);
