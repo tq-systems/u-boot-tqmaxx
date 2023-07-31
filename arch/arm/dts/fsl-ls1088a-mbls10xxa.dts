@@ -24,8 +24,8 @@
 		dpmac9 = &dpmac9;
 		dpmac10 = &dpmac10;
 
-		rgmii-phy1 = &rgmii_phy1;
-		rgmii-phy2 = &rgmii_phy2;
+		rgmii-s1 = &rgmii_phy1;
+		rgmii-s2 = &rgmii_phy2;
 		qsgmii-s1-p1 = &qsgmii1_phy1;
 		qsgmii-s1-p2 = &qsgmii1_phy2;
 		qsgmii-s1-p3 = &qsgmii1_phy3;
