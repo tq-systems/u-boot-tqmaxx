@@ -40,6 +40,9 @@ static union
 	unsigned char l;
 } endian_test = { {'l', '?', '?', 'b'} };
 
+static int pblimage_verify_header(unsigned char *ptr, int image_size,
+				  struct image_tool_params *params);
+
 #define ENDIANNESS ((char)endian_test.l)
 
 /*
@@ -187,11 +190,46 @@ static void add_end_cmd(void)
 
 void pbl_load_uboot(int ifd, struct image_tool_params *params)
 {
-	FILE *fp_uboot;
+	FILE *fp_uboot, *fp_rcw;
+	uint8_t *data;
 	int size;
+	int rcwsize;
+	int ret;
 
-	/* parse the rcw.cfg file. */
-	pbl_parser(params->imagename);
+	fp_rcw = fopen(params->imagename, "r");
+	if (!fp_rcw)
+		goto err_open;
+
+	ret = fseek(fp_rcw, 0, SEEK_END);
+	if (ret < 0)
+		goto err_file;
+
+	rcwsize = ftell(fp_rcw);
+	if (rcwsize < 0)
+		goto err_file;
+
+	ret = fseek(fp_rcw, 0, SEEK_SET);
+	if (ret < 0)
+		goto err_file;
+
+	data = malloc(rcwsize);
+	if (!data)
+		goto err_alloc;
+
+	if (fread(data, sizeof(*data), rcwsize, fp_rcw) != rcwsize)
+		goto err_alloc;
+
+	fclose(fp_rcw);
+
+	if (pblimage_verify_header(data, rcwsize, params) != 0) {
+		/* Try to parse file */
+		pbl_parser(params->imagename);
+	} else {
+		rcwsize -= 8;
+		memcpy(pmem_buf, data, rcwsize);
+		pmem_buf += rcwsize;
+		pbl_size += rcwsize;
+	}
 
 	/* parse the pbi.cfg file. */
 	if (params->imagename2[0] != '\0')
@@ -216,6 +254,17 @@ void pbl_load_uboot(int ifd, struct image_tool_params *params)
 			params->imagefile, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
+
+	return;
+
+err_alloc:
+	free(data);
+err_file:
+	fclose(fp_rcw);
+err_open:
+	printf("Error:%s - Can't open\n", params->imagename);
+	exit(EXIT_FAILURE);
+
 }
 
 /* This converts PBL RCW/PBI+CRC to binary format. */
