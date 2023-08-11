@@ -1,0 +1,282 @@
+# TQ-Systems TQMa62xx
+
+The TQ-Systems TQMa62xx is a System-on-Module based on the TI AM62 SoC family.
+
+## Module variants
+
+Currently, TQMa62xx variants with 1GiB and 2GiB LPDDR4 RAM are supported.
+The RAM configuration and other optional features (SPI-NOR, Secure Element, ...)
+are detected automatically based on VARD (Variant and Revision Detection) data
+read from an EEPROM.
+
+## Base boards / configurations
+
+The following combinations of base board and module are supported:
+
+* TQ-Systems MBa62xx (REV.010x) with MBa62xx (REV.010x)
+* TQ-Systems MBa62xx with TQMa62xx
+  - tqma62xx_mba62xx_r5_defconfig
+  - tqma62xx_mba62xx_a53_defconfig
+
+As described in the following section, bootloaders for both the R5 and A53
+cores of the AM62x must be built.
+
+## Boot sequence
+
+The bootloader on the AM62 is loaded in multiple stages. 3 of these stages
+are provided by this U-Boot repository:
+
+* R5 U-Boot SPL (combined with firmwares to `tiboot3.bin`)
+* A53 U-Boot SPL (combined with firmwares to `tispl.bin`)
+* A53 U-Boot (`u-boot.img`)
+
+The R5 bootloader performs the following actions:
+
+* Initialize DDR controller
+* Load `tispl.bin` into DDR RAM
+* Boot ATF
+
+The next stage is handled by the ATF. It will start the OP-TEE and the A53 SPL,
+which have already been loaded by the R5 bootloader. The A53 SPL then loads and
+starts the full A53 U-Boot from `u-boot.img`.
+
+Finally, the full A53 U-Boot runs, which can provide a command line interface
+and boot into the actual OS depending on its configuration.
+
+## A53 build
+
+The A53 SPL and full U-Boot are both built from the `a53` defconfigs. The build
+requires an ARM-v8/AArch64 cross compiler.
+
+`atf-bl31` (ATF) and `tee-os` (OP-TEE) must be provided in the root of the
+U-Boot build directory to produce a working bootloader. Alternatively, the
+paths/filenames can be overridden by passing the `BL31` and `TEE` variables to
+`make`.
+
+In addition, a number of TI firmware files must be available during build.
+
+The firmware can be found in the `ti-linux-firmware` branch of:
+
+  https://git.ti.com/git/processor-firmware/ti-linux-firmware.git
+
+A symlink to the `ti-sysfw` directory must then be created in the R5 U-Boot
+build directory:
+
+```
+ln -s /path/to/ti-linux-firmware/ti-sysfw .
+```
+
+## R5 build
+
+The R5 bootloader is built from the `r5` defconfigs and it requires an ARM-v7
+cross compiler (32bit). Only the SPL component of this build is used.
+
+In addition, a number of TI firmware files must be available during build,
+from the same repository used for the A53 build.
+
+Symlink to the `ti-dm` and `ti-sysfw` directories must then be created in the R5
+U-Boot build directory:
+
+```
+ln -s /path/to/ti-linux-firmware/ti-dm .
+ln -s /path/to/ti-linux-firmware/ti-sysfw .
+```
+
+The build will generate R5 SPL binaries for 3 variants of the AM62 SoC:
+
+- tiboot3-am62x-gp-evm.bin: AM62 General Purpose
+- tiboot3-am62x-hs-fs-evm.bin: AM62 High Security - Field Securable
+- tiboot3-am62x-hs-evm.bin: AM62 High Security - Security Enforced
+
+## Memory layout for R5 SPL
+
+HSM SRAM
+
+    0x43c00000+--------------------------+
+              | SPL program image (248K) |
+    0x43c3d800+--------------------------+
+              | DM firmware config data  |
+    0x43c3e000+--------------------------+
+              | Reserved for ROM         |
+    0x43c40000+--------------------------+
+
+R5 TCM
+
+    0x41010000+--------------------------+
+              | Stack (20K)              |
+    0x41014ff0+--------------------------+
+              | Heap (36K)               |
+    0x4101dff0+--------------------------+
+              | (reserved)               |
+    0x4101e000+--------------------------+
+              | BSS (8K)                 |
+    0x41020000+--------------------------+
+
+## Boot from eMMC boot partitions
+
+The following layout is used by default to store U-Boot and its environment
+in the eMMC boot partition. The layout can be modified by changing
+CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR to a different offset for the next stage
+in the R5 and A53 SPLs.
+
+Offsets are given in sectors (512B).
+
+    0x0000+------------------------------+
+          | tiboot3.bin (512 KiB)        |
+    0x0400+------------------------------+
+          | tispl.bin (1280 KiB)         |
+    0x0E00+------------------------------+
+          | u-boot.img (2 MiB)           |
+    0x1E00+------------------------------+
+          | environment (128 KiB)        |
+    0x1F00+------------------------------+
+          | backup environment (128 KiB) |
+    0x2000+------------------------------+
+
+The boot partitions can be enabled or disabled using the following commands:
+```
+mmc partconf 0 1 1 1 # Boot from bootpart 1
+mmc partconf 0 1 2 1 # Boot from bootpart 2
+mmc partconf 0 1 7 1 # Boot from user data area
+```
+
+For boot from a boot partition to work after a reset/reboot without power cycle,
+the reset signal of the eMMC must be enabled using the following command:
+```
+mmc rst-function 0 1
+```
+WARNING: `mmc rst-function` is a write-once configuration that cannot be
+reverted.
+
+U-Boot's environment is stored in the same boot partition that is booted from
+by default (so when switching the boot partition, it may be necessary to copy
+over the environment if it should be preserved).
+
+## MBa62xx DIP settings for boot sources
+
+On eMMC/SD card a FAT boot partition is used for U-Boot by default. On SPI-NOR,
+separate MTD partitions are defined for the individual stages. See the AM62x
+Technical Reference Manual spruiv7a.pdf ch. 5 for details and other available
+boot methods.
+
+Notes:
+
+* S4/S5/S6 are used for primary boot device configuration
+* S6/S7 are used for backup boot device configuration
+* Only primary boot devices are considered below
+* `X`: Position of DIP
+* `-`: Don't care
+
+### SD Card (FAT filesystem)
+
+```
+DIP (S4)     1  2  3  4
+BootMode     0  1  2  3
+ON           X  X
+OFF                X  X
+
+DIP (S5)     1  2  3  4
+BootMode     4  5  6  7
+ON                 X
+OFF          X  X     X
+
+DIP (S6)     1  2  3  4
+BootMode     8  9 10 11
+ON           -  X  -  -
+OFF          -     -  -
+```
+
+### eMMC (User Data Area / FAT filesystem)
+
+```
+DIP (S4)     1  2  3  4
+BootMode     0  1  2  3
+ON           X  X
+OFF                X  X
+
+DIP (S5)     1  2  3  4
+BootMode     4  5  6  7
+ON                 X
+OFF          X  X     X
+
+DIP (S6)     1  2  3  4
+BootMode     8  9 10 11
+ON           -     -  -
+OFF          -  X  -  -
+```
+
+### eMMC (Boot partition - see above)
+
+```
+DIP (S4)     1  2  3  4
+BootMode     0  1  2  3
+ON           X  X     X
+OFF                X
+
+DIP (S5)     1  2  3  4
+BootMode     4  5  6  7
+ON                 X  -
+OFF          X  X     -
+
+DIP (S6)     1  2  3  4
+BootMode     8  9 10 11
+ON           -  -  -  -
+OFF          -  -  -  -
+```
+
+### SPI-NOR
+
+```
+DIP (S4)     1  2  3  4
+BootMode     0  1  2  3
+ON           X  X     X
+OFF                X
+
+DIP (S5)     1  2  3  4
+BootMode     4  5  6  7
+ON           X
+OFF             X  X  X
+
+DIP (S6)     1  2  3  4
+BootMode     8  9 10 11
+ON              -  -  -
+OFF          X  -  -  -
+```
+
+### USB Host (Mass storage)
+
+```
+DIP (S4)     1  2  3  4
+BootMode     0  1  2  3
+ON           X  X
+OFF                X  X
+
+DIP (S5)     1  2  3  4
+BootMode     4  5  6  7
+ON           X     X
+OFF             X     X
+
+DIP (S6)     1  2  3  4
+BootMode     8  9 10 11
+ON           X  X  -  -
+OFF                -  -
+```
+
+### USB Peripheral (dfu-util)
+
+```
+DIP (S4)     1  2  3  4
+BootMode     0  1  2  3
+ON           X  X
+OFF                X  X
+
+DIP (S5)     1  2  3  4
+BootMode     4  5  6  7
+ON           X     X
+OFF             X     X
+
+DIP (S6)     1  2  3  4
+BootMode     8  9 10 11
+ON              X  -  -
+OFF          X     -  -
+```

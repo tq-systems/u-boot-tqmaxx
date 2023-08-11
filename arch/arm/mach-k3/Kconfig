@@ -199,5 +199,6 @@ source "board/ti/j721e/Kconfig"
 source "board/siemens/iot2050/Kconfig"
 source "board/ti/j721s2/Kconfig"
 source "board/ti/j784s4/Kconfig"
+source "board/tq/tqma62xx/Kconfig"
 source "board/tq/tqma64xxl/Kconfig"
 endif
