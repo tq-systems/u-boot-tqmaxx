@@ -12,6 +12,12 @@ ENTRY(lowlevel_init)
 	and	r0, #0xff
 	cmp	r0, #0x0
 	bne	park_cpu
+
+#if IS_ENABLED(CONFIG_SOC_K3_AM625)
+	ldr	r0, =0x41018001
+	mcr	p15, 0, r0, c9, c1, 1
+#endif
+
 	bx	lr
 park_cpu:
 	wfi
