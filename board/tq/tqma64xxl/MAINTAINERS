@@ -1,0 +1,7 @@
+TQ-SYSTEMS TQMA64XXL SOM / MBAX4XXL BOARD
+M:	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+S:	Maintained
+F:	arch/arm/dts/k3-am64*-tqma64xxl*.dts*
+F:	board/tq/tqma64xxl/
+F:	configs/tqma64xxl_mbax4xxl_*_defconfig
+F:	include/configs/tqma64xxl*.h

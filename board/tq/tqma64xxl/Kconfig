@@ -1,0 +1,50 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Copyright (C) 2017-2018 Texas Instruments Incorporated - http://www.ti.com/
+# Copyright (c) 2020-2023 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
+
+choice
+	prompt "TQ-Systems TQMa64xxL"
+	optional
+
+config TARGET_AM64_A53_TQMA64XXL
+	bool "TQ-Systems TQMa64xxL running on A53"
+	select ARM64
+	select SPL_BOARD_INIT
+	select BOARD_LATE_INIT
+	select BINMAN
+
+config TARGET_AM64_R5_TQMA64XXL
+	bool "TQ-Systems TQMa64xxL running on R5"
+	select CPU_V7R
+	select SYS_THUMB_BUILD
+	select K3_LOAD_SYSFW
+	select RAM
+	select SPL_RAM
+	select K3_DDRSS
+	select SPL_BOARD_INIT
+	select BINMAN
+	imply SYS_K3_SPL_ATF
+
+endchoice
+
+if TARGET_AM64_A53_TQMA64XXL || TARGET_AM64_R5_TQMA64XXL
+
+config SYS_BOARD
+	default "tqma64xxl"
+
+config SYS_VENDOR
+	default "tq"
+
+choice
+	prompt "TQ-Systems TQMa64xxL base board"
+
+config TQMA64XXL_BOARD_MBAX4XXL
+	bool "TQ-Systems MBaX4XxL"
+
+endchoice
+
+config SYS_CONFIG_NAME
+	default "tqma64xxl_mbax4xxl" if TQMA64XXL_BOARD_MBAX4XXL
+
+endif
