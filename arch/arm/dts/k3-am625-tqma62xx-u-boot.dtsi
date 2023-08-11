@@ -1,0 +1,179 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Copyright (C) 2021-2022 Texas Instruments Incorporated - https://www.ti.com/
+ * Copyright (c) 2023 TQ-Systems GmbH <u-boot@tq-group.com>, D-82229 Seefeld, Germany.
+ */
+
+/ {
+	chosen {
+		tick-timer = &timer1;
+	};
+
+	config {
+		u-boot,mmc-env-offset = <0x3c0000>;
+		u-boot,mmc-env-offset-redundant = <0x3e0000>;
+	};
+
+	memory@80000000 {
+		bootph-pre-ram;
+	};
+
+	sysinfo: sysinfo {
+		compatible = "tq,eeprom-sysinfo";
+		i2c-eeprom = <&eeprom0>;
+		tq,vard;
+		bootph-pre-ram;
+	};
+};
+
+&cbass_main {
+	bootph-pre-ram;
+
+	timer1: timer@2400000 {
+		compatible = "ti,omap5430-timer";
+		reg = <0x00 0x2400000 0x00 0x80>;
+		clock-frequency = <25000000>;
+		ti,timer-alwon;
+		bootph-pre-ram;
+	};
+};
+
+&cbass_mcu {
+	bootph-pre-ram;
+};
+
+&cbass_wakeup {
+	bootph-pre-ram;
+};
+
+&chipid {
+	bootph-pre-ram;
+};
+
+&cpsw3g {
+	/delete-property/ ranges;
+
+	cpsw-phy-sel@104044 {
+		compatible = "ti,am64-phy-gmii-sel";
+		reg = <0x0 0x00104044 0x0 0x8>;
+	};
+};
+
+&cpsw_port2 {
+	status = "disabled";
+};
+
+&dmss {
+	bootph-pre-ram;
+};
+
+&dmsc {
+	bootph-pre-ram;
+
+	k3_sysreset: sysreset-controller {
+		compatible = "ti,sci-sysreset";
+		bootph-pre-ram;
+	};
+};
+
+&eeprom0 {
+	bootph-pre-ram;
+};
+
+&fss {
+	bootph-pre-ram;
+};
+
+&k3_clks {
+	bootph-pre-ram;
+};
+
+&k3_pds {
+	bootph-pre-ram;
+};
+
+&k3_reset {
+	bootph-pre-ram;
+};
+
+&main_bcdma {
+	reg = <0x00 0x485c0100 0x00 0x100>,
+	      <0x00 0x4c000000 0x00 0x20000>,
+	      <0x00 0x4a820000 0x00 0x20000>,
+	      <0x00 0x4aa40000 0x00 0x20000>,
+	      <0x00 0x4bc00000 0x00 0x100000>,
+	      <0x00 0x48600000 0x00 0x8000>,
+	      <0x00 0x484a4000 0x00 0x2000>,
+	      <0x00 0x484c2000 0x00 0x2000>;
+	reg-names = "gcfg", "bchanrt", "rchanrt", "tchanrt",
+		    "ringrt" , "cfg", "tchan", "rchan";
+};
+
+&main_pktdma {
+	reg = <0x00 0x485c0000 0x00 0x100>,
+	      <0x00 0x4a800000 0x00 0x20000>,
+	      <0x00 0x4aa00000 0x00 0x20000>,
+	      <0x00 0x4b800000 0x00 0x200000>,
+	      <0x00 0x485e0000 0x00 0x10000>,
+	      <0x00 0x484a0000 0x00 0x2000>,
+	      <0x00 0x484c0000 0x00 0x2000>,
+	      <0x00 0x48430000 0x00 0x1000>;
+	reg-names = "gcfg", "rchanrt", "tchanrt", "ringrt",
+		    "cfg", "tchan", "rchan", "rflow";
+};
+
+&main_gpio0 {
+	bootph-pre-ram;
+};
+
+&main_gpio1 {
+	bootph-pre-ram;
+};
+
+&main_i2c0 {
+	bootph-pre-ram;
+};
+
+&main_i2c0_pins {
+	bootph-pre-ram;
+};
+
+&main_mmc0_pins {
+	bootph-pre-ram;
+};
+
+&main_pmx0 {
+	bootph-pre-ram;
+};
+
+&mcu_gpio0 {
+	bootph-pre-ram;
+};
+
+&mcu_pmx0 {
+	bootph-pre-ram;
+};
+
+&ospi0 {
+	bootph-pre-ram;
+
+	flash@0 {
+		bootph-pre-ram;
+	};
+};
+
+&reg_3v3 {
+	bootph-pre-ram;
+};
+
+&sdhci0 {
+	bootph-pre-ram;
+};
+
+&secure_proxy_main {
+	bootph-pre-ram;
+};
+
+&wkup_conf {
+	bootph-pre-ram;
+};

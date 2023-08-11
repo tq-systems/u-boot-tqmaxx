@@ -1,0 +1,64 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * Copyright (C) 2021-2022 Texas Instruments Incorporated - https://www.ti.com/
+ * Copyright (c) 2023 TQ-Systems GmbH <u-boot@tq-group.com>, D-82229 Seefeld, Germany.
+ */
+
+#include "k3-am625-tqma62xx-u-boot.dtsi"
+#include "k3-am625-tqma62xx-mba62xx-binman.dtsi"
+
+/ {
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+};
+
+&cpsw3g {
+	/* Workaround for non-DM MDIO driver */
+	pinctrl-0 = <&main_mdio1_pins &main_rgmii1_pins>;
+};
+
+&main_mmc1_pins {
+	bootph-pre-ram;
+};
+
+&main_uart0 {
+	bootph-pre-ram;
+};
+
+&main_uart0_pins {
+	bootph-pre-ram;
+};
+
+&reg_3v3_sd {
+	bootph-pre-ram;
+};
+
+&reg_3v3_sd_pins {
+	bootph-pre-ram;
+};
+
+&reg_sd {
+	bootph-pre-ram;
+};
+
+&reg_sd_pins {
+	bootph-pre-ram;
+};
+
+&sdhci1 {
+	bootph-pre-ram;
+};
+
+&sdhci2 {
+	status = "disabled";
+};
+
+&usbss0 {
+	bootph-pre-ram;
+};
+
+&usb0 {
+	dr_mode = "peripheral";
+	bootph-pre-ram;
+};

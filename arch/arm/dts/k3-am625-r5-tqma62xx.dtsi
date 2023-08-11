@@ -1,0 +1,51 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * TQ-Systems TQMa62xx - R5 SPL
+ *
+ * Copyright (C) 2021-2022 Texas Instruments Incorporated - https://www.ti.com/
+ * Copyright (c) 2023 TQ-Systems GmbH <linux@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Matthias Schiffer
+ */
+
+#include "k3-am62-r5.dtsi"
+#include "k3-am62x-tqma62xx-1g-lp4-1600MTs.dtsi"
+#include "k3-am62-ddr.dtsi"
+
+/ {
+	memory@80000000 {
+		/* 512M RAM (initial configuration - fixed up by board code) */
+		reg = <0x00000000 0x80000000 0x00000000 0x20000000>;
+	};
+};
+
+&memorycontroller {
+	ram-variants {
+		base-variant = "tqma62xx-1g";
+		bootph-pre-ram;
+
+		variant-2g {
+			variant-name = "tqma62xx-2g";
+			#include "k3-am62x-tqma62xx-2g-lp4-1600MTs-patch.dtsi"
+		};
+	};
+};
+
+&sysinfo {
+	ram-variants {
+		bootph-pre-ram;
+
+		tqma62xx-1g {
+			variant-name = "tqma62xx-1g";
+			ram-size = /bits/ 64 <0x040000000>;
+			ram-type = <1>;
+			bootph-pre-ram;
+		};
+
+		tqma62xx-2g {
+			variant-name = "tqma62xx-2g";
+			ram-size = /bits/ 64 <0x080000000>;
+			ram-type = <1>;
+			bootph-pre-ram;
+		};
+	};
+};
