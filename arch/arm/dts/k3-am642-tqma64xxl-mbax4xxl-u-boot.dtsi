@@ -1,0 +1,84 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * Copyright (C) 2021 Texas Instruments Incorporated - https://www.ti.com/
+ * Copyright (c) 2022 TQ-Systems GmbH <license@tq-group.com>, D-82229 Seefeld, Germany.
+ */
+
+#include "k3-am642-tqma64xxl-u-boot.dtsi"
+#include "k3-am642-tqma64xxl-mbax4xxl-binman.dtsi"
+
+/ {
+	chosen {
+		stdout-path = "serial2:115200n8";
+	};
+};
+
+&cpsw3g {
+	pinctrl-names = "default";
+	pinctrl-0 = <&cpsw_pins &cpsw_mdio_pins>;
+};
+
+&cpsw3g_mdio {
+	/*
+	 * The MDIO bus isn't a proper device in U-Boot, so the pinmuxing is
+	 * configured in the cpsw3g node instead
+	 */
+	/delete-property/ pinctrl-names;
+	/delete-property/ pinctrl-0;
+};
+
+&main_gpio0 {
+	line43 {
+		gpio-hog;
+		gpios = <43 0>;
+		line-name = "MMC1_CTRL";
+		output-low;
+	};
+};
+
+&main_uart0 {
+	bootph-pre-ram;
+};
+
+&sdhci1 {
+	bootph-pre-ram;
+	vmmc-supply = <&reg_sd>;
+	no-sdio;
+	status = "okay";
+};
+
+&serdes_ln_ctrl {
+	u-boot,mux-autoprobe;
+};
+
+&usb0 {
+	bootph-pre-ram;
+
+	/*
+	 * The U-Boot driver does not support mode switching. To protect hosts
+	 * connected to the USB-B port of the MBaX4XxL, configure the port
+	 * in peripheral mode.
+	 *
+	 * When booting from USB mass storage, the FDT is fixed up to use
+	 * host mode instead.
+	 */
+	dr_mode = "peripheral";
+	maximum-speed = "high-speed";
+};
+
+&usbss0 {
+	bootph-pre-ram;
+	ti,usb2-only;
+};
+
+&main_mmc1_pins {
+	bootph-pre-ram;
+};
+
+&main_uart0_pins {
+	bootph-pre-ram;
+};
+
+&main_usb0_pins {
+	bootph-pre-ram;
+};

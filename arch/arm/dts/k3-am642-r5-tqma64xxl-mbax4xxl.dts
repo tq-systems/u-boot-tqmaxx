@@ -1,0 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * Copyright (C) 2021 Texas Instruments Incorporated - https://www.ti.com/
+ * Copyright (c) 2022-2023 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ */
+
+#include "k3-am642-tqma64xxl-mbax4xxl.dts"
+#include "k3-am642-tqma64xxl-mbax4xxl-u-boot.dtsi"
+#include "k3-am642-r5-tqma64xxl.dtsi"
