@@ -1099,7 +1099,9 @@ dtb-$(CONFIG_SOC_K3_J722S) += k3-j722s-r5-evm.dtb \
 
 dtb-$(CONFIG_SOC_K3_AM642) += k3-am642-r5-evm.dtb \
 			      k3-am642-r5-sk.dtb \
-			      k3-am642-r5-phycore-som-2gb.dtb
+			      k3-am642-r5-phycore-som-2gb.dtb \
+			      k3-am642-r5-tqma64xxl-mbax4xxl.dtb \
+			      k3-am642-tqma64xxl-mbax4xxl.dtb
 
 dtb-$(CONFIG_SOC_K3_AM625) += k3-am625-r5-sk.dtb \
 			      k3-am625-r5-beagleplay.dtb \
