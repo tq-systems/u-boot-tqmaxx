@@ -1,0 +1,41 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * Copyright (C) 2021 Texas Instruments Incorporated - https://www.ti.com/
+ * Copyright (c) 2022-2025 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ */
+
+#include "k3-am642-tqma64xxl-u-boot.dtsi"
+#include "k3-am642-tqma64xxl-binman.dtsi"
+
+/ {
+	chosen {
+		stdout-path = "serial2:115200n8";
+	};
+};
+
+&main_gpio0 {
+	line43 {
+		gpio-hog;
+		gpios = <43 0>;
+		line-name = "MMC1_CTRL";
+		output-low;
+	};
+};
+
+&sdhci1 {
+	vmmc-supply = <&reg_sd>;
+	no-sdio;
+	status = "okay";
+};
+
+&usb0 {
+	/*
+	 * The U-Boot driver does not support mode switching. To protect hosts
+	 * connected to the USB-B port of the MBaX4XxL, configure the port
+	 * in peripheral mode.
+	 *
+	 * When booting from USB mass storage, the FDT is fixed up to use
+	 * host mode instead.
+	 */
+	dr_mode = "peripheral";
+};
