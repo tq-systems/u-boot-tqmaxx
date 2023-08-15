@@ -38,17 +38,21 @@ extern struct dram_timing_info dram_timing_4g;
 static void spl_dram_init(void)
 {
 	/* Check PCA6416A IO EXP on 4GB WEVK only */
+#if IS_ENABLED(CONFIG_IMX8MQ_4GB_DDR_TIMING)
 	i2c_set_bus_num(2);
 	if (!i2c_probe(0x20)) {
 		ddr_init(&dram_timing_4g);
 		return;
+	} else {
+		panic("Fail to detect WEVK board but 4GB DDR is enabled\n");
 	}
-
+#else
 	/* ddr init */
 	if (soc_rev() >= CHIP_REV_2_1)
 		ddr_init(&dram_timing);
 	else
 		ddr_init(&dram_timing_b0);
+#endif
 }
 
 #define I2C_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS | PAD_CTL_PUE)
