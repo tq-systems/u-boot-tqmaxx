@@ -76,6 +76,13 @@
 			enable-method = "psci";
 			#cooling-cells = <2>;
 			cpu-idle-states = <&cpu_pd_wait>;
+			i-cache-size = <32768>;
+			i-cache-line-size = <64>;
+			i-cache-sets = <128>;
+			d-cache-size = <32768>;
+			d-cache-line-size = <64>;
+			d-cache-sets = <128>;
+			next-level-cache = <&l2_cache_l0>;
 		};
 
 		A55_1: cpu@100 {
@@ -85,8 +92,43 @@
 			enable-method = "psci";
 			#cooling-cells = <2>;
 			cpu-idle-states = <&cpu_pd_wait>;
+			i-cache-size = <32768>;
+			i-cache-line-size = <64>;
+			i-cache-sets = <128>;
+			d-cache-size = <32768>;
+			d-cache-line-size = <64>;
+			d-cache-sets = <128>;
+			next-level-cache = <&l2_cache_l1>;
 		};
 
+		l2_cache_l0: l2-cache-l0 {
+			compatible = "cache";
+			cache-size = <65536>;
+			cache-line-size = <64>;
+			cache-sets = <256>;
+			cache-level = <2>;
+			cache-unified;
+			next-level-cache = <&l3_cache>;
+		};
+
+		l2_cache_l1: l2-cache-l1 {
+			compatible = "cache";
+			cache-size = <65536>;
+			cache-line-size = <64>;
+			cache-sets = <256>;
+			cache-level = <2>;
+			cache-unified;
+			next-level-cache = <&l3_cache>;
+		};
+
+		l3_cache: l3-cache {
+			compatible = "cache";
+			cache-size = <262144>;
+			cache-line-size = <64>;
+			cache-sets = <256>;
+			cache-level = <3>;
+			cache-unified;
+		};
 	};
 
 	osc_32k: clock-osc-32k {
@@ -179,6 +221,18 @@
 		status = "disabled";
 	};
 
+	mqs1: mqs1 {
+		compatible = "fsl,imx93-mqs";
+		gpr = <&aonmix_ns_gpr>;
+		status = "disabled";
+	};
+
+	mqs2: mqs2 {
+		compatible = "fsl,imx93-mqs";
+		gpr = <&wakeupmix_gpr>;
+		status = "disabled";
+	};
+
 	usbphynop1: usbphynop1 {
 		compatible = "usb-nop-xceiv";
 		#phy-cells = <0>;
@@ -242,6 +296,7 @@
 				      <0x441f0000 0x10000>;
 				#dma-cells = <3>;
 				dma-channels = <31>;
+
 				interrupts = <GIC_SPI 95 IRQ_TYPE_LEVEL_HIGH>,
 					     <GIC_SPI 96 IRQ_TYPE_LEVEL_HIGH>,
 					     <GIC_SPI 97 IRQ_TYPE_LEVEL_HIGH>,
@@ -338,12 +393,12 @@
 				status = "disabled";
 			};
 
-			i3c1: i3c-master@44330000 {
-				#address-cells = <3>;
-				#size-cells = <0>;
-				compatible = "fsl,imx93-i3c-master", "silvaco,i3c-master";
+			i3c1: i3c@44330000 {
+				compatible = "silvaco,i3c-master-v1";
 				reg = <0x44330000 0x10000>;
 				interrupts = <GIC_SPI 12 IRQ_TYPE_LEVEL_HIGH>;
+				#address-cells = <3>;
+				#size-cells = <0>;
 				clocks = <&clk IMX93_CLK_BUS_AON>,
 					 <&clk IMX93_CLK_I3C1_GATE>,
 					 <&clk IMX93_CLK_DUMMY>;
@@ -440,6 +495,7 @@
 					 <&clk IMX93_CLK_SAI1_GATE>, <&clk IMX93_CLK_DUMMY>,
 					 <&clk IMX93_CLK_DUMMY>;
 				clock-names = "bus", "mclk0", "mclk1", "mclk2", "mclk3";
+				#sound-dai-cells = <0>;
 				status = "disabled";
 			};
 
@@ -471,9 +527,8 @@
 				#clock-cells = <1>;
 				clocks = <&osc_32k>, <&osc_24m>, <&clk_ext1>;
 				clock-names = "osc_32k", "osc_24m", "clk_ext1";
-				assigned-clocks = <&clk IMX93_CLK_AUDIO_PLL>, <&clk IMX93_CLK_A55>;
-				assigned-clock-parents = <0>, <&clk IMX93_CLK_SYS_PLL_PFD0>;
-				assigned-clock-rates = <393216000>, <500000000>;
+				assigned-clocks = <&clk IMX93_CLK_AUDIO_PLL>;
+				assigned-clock-rates = <393216000>;
 				status = "okay";
 			};
 
@@ -501,7 +556,7 @@
 				};
 			};
 
-			anatop: anatop@44480000 {
+			clock-controller@44480000 {
 				compatible = "fsl,imx93-anatop";
 				reg = <0x44480000 0x2000>;
 				#clock-cells = <1>;
@@ -510,6 +565,7 @@
 			tmu: tmu@44482000 {
 				compatible = "fsl,imx93-tmu";
 				reg = <0x44482000 0x1000>;
+				interrupts = <GIC_SPI 83 IRQ_TYPE_LEVEL_HIGH>;
 				clocks = <&clk IMX93_CLK_TMC_GATE>;
 				little-endian;
 				fsl,tmu-calibration = <0x0000000e 0x800000da
@@ -531,10 +587,11 @@
 					     <GIC_SPI 199 IRQ_TYPE_LEVEL_HIGH>;
 				clocks = <&clk IMX93_CLK_PDM_IPG>,
 					 <&clk IMX93_CLK_PDM_GATE>,
-					 <&clk IMX93_CLK_AUDIO_PLL>,
-					 <&clk IMX93_CLK_DUMMY>;
-				clock-names = "ipg_clk", "ipg_clk_app",
-					     "pll8k", "clkext3";
+					 <&clk IMX93_CLK_AUDIO_PLL>;
+				clock-names = "ipg_clk", "ipg_clk_app", "pll8k";
+				dmas = <&edma1 29 0 5>;
+				dma-names = "rx";
+				#sound-dai-cells = <0>;
 				status = "disabled";
 			};
 
@@ -543,8 +600,7 @@
 				reg = <0x44530000 0x10000>;
 				interrupts = <GIC_SPI 217 IRQ_TYPE_LEVEL_HIGH>,
 					     <GIC_SPI 218 IRQ_TYPE_LEVEL_HIGH>,
-					     <GIC_SPI 219 IRQ_TYPE_LEVEL_HIGH>,
-					     <GIC_SPI 268 IRQ_TYPE_LEVEL_HIGH>;
+					     <GIC_SPI 219 IRQ_TYPE_LEVEL_HIGH>;
 				clocks = <&clk IMX93_CLK_ADC1_GATE>;
 				clock-names = "ipg";
 				#io-channel-cells = <1>;
@@ -721,7 +777,6 @@
 				interrupts = <GIC_SPI 79 IRQ_TYPE_LEVEL_HIGH>;
 				clocks = <&clk IMX93_CLK_WDOG3_GATE>;
 				timeout-sec = <40>;
-				fsl,ext-reset-output;
 				status = "disabled";
 			};
 
@@ -775,12 +830,12 @@
 				status = "disabled";
 			};
 
-			i3c2: i3c-master@42520000 {
-				#address-cells = <3>;
-				#size-cells = <0>;
-				compatible = "fsl,imx93-i3c-master", "silvaco,i3c-master";
+			i3c2: i3c@42520000 {
+				compatible = "silvaco,i3c-master-v1";
 				reg = <0x42520000 0x10000>;
 				interrupts = <GIC_SPI 61 IRQ_TYPE_LEVEL_HIGH>;
+				#address-cells = <3>;
+				#size-cells = <0>;
 				clocks = <&clk IMX93_CLK_BUS_WAKEUP>,
 					 <&clk IMX93_CLK_I3C2_GATE>,
 					 <&clk IMX93_CLK_DUMMY>;
@@ -910,6 +965,7 @@
 					 <&clk IMX93_CLK_SAI2_GATE>,
 					 <&clk IMX93_CLK_DUMMY>, <&clk IMX93_CLK_DUMMY>;
 				clock-names = "bus", "mclk0", "mclk1", "mclk2", "mclk3";
+				#sound-dai-cells = <0>;
 				status = "disabled";
 			};
 
@@ -921,26 +977,25 @@
 					 <&clk IMX93_CLK_SAI3_GATE>,
 					 <&clk IMX93_CLK_DUMMY>, <&clk IMX93_CLK_DUMMY>;
 				clock-names = "bus", "mclk0", "mclk1", "mclk2", "mclk3";
+				#sound-dai-cells = <0>;
 				status = "disabled";
 			};
 
 			xcvr: xcvr@42680000 {
 				compatible = "fsl,imx93-xcvr";
 				reg = <0x42680000 0x800>,
-					  <0x42680800 0x400>,
-					  <0x42680c00 0x080>,
-					  <0x42680e00 0x080>;
-				reg-names = "ram", "regs", "rxfifo",
-						    "txfifo";
-				interrupts = /* XCVR IRQ 0 */
-					     <GIC_SPI 203 IRQ_TYPE_LEVEL_HIGH>,
-						 /* XCVR IRQ 1 */
+				      <0x42680800 0x400>,
+				      <0x42680c00 0x080>,
+				      <0x42680e00 0x080>;
+				reg-names = "ram", "regs", "rxfifo", "txfifo";
+				interrupts = <GIC_SPI 203 IRQ_TYPE_LEVEL_HIGH>,
 					     <GIC_SPI 204 IRQ_TYPE_LEVEL_HIGH>;
 				clocks = <&clk IMX93_CLK_BUS_WAKEUP>,
 					 <&clk IMX93_CLK_SPDIF_GATE>,
 					 <&clk IMX93_CLK_DUMMY>,
 					 <&clk IMX93_CLK_AUD_XCVR_GATE>;
 				clock-names = "ipg", "phy", "spba", "pll_ipg";
+				#sound-dai-cells = <0>;
 				status = "disabled";
 			};
 
@@ -1079,7 +1134,7 @@
 				assigned-clock-rates = <400000000>;
 				bus-width = <8>;
 				fsl,tuning-start-tap = <1>;
-				fsl,tuning-step= <2>;
+				fsl,tuning-step = <2>;
 				status = "disabled";
 			};
 
@@ -1096,7 +1151,7 @@
 				assigned-clock-rates = <400000000>;
 				bus-width = <4>;
 				fsl,tuning-start-tap = <1>;
-				fsl,tuning-step= <2>;
+				fsl,tuning-step = <2>;
 				status = "disabled";
 			};
 
@@ -1124,6 +1179,8 @@
 				fsl,num-tx-queues = <3>;
 				fsl,num-rx-queues = <3>;
 				fsl,stop-mode = <&wakeupmix_gpr 0x0c 1>;
+				nvmem-cells = <&eth_mac1>;
+				nvmem-cell-names = "mac-address";
 				status = "disabled";
 			};
 
@@ -1145,7 +1202,9 @@
 							 <&clk IMX93_CLK_SYS_PLL_PFD0_DIV2>;
 				assigned-clock-rates = <100000000>, <250000000>;
 				intf_mode = <&wakeupmix_gpr 0x28>;
-				snps,clk-csr = <0>;
+				snps,clk-csr = <6>;
+				nvmem-cells = <&eth_mac2>;
+				nvmem-cell-names = "mac-address";
 				status = "disabled";
 			};
 
@@ -1162,7 +1221,7 @@
 				assigned-clock-rates = <400000000>;
 				bus-width = <4>;
 				fsl,tuning-start-tap = <1>;
-				fsl,tuning-step= <2>;
+				fsl,tuning-step = <2>;
 				status = "disabled";
 			};
 
@@ -1498,8 +1557,8 @@
 
 		usbmisc1: usbmisc@4c100200 {
 			compatible = "fsl,imx8mm-usbmisc", "fsl,imx7d-usbmisc";
-			#index-cells = <1>;
 			reg = <0x4c100200 0x200>;
+			#index-cells = <1>;
 		};
 
 		usbotg2: usb@4c200000 {
@@ -1519,31 +1578,25 @@
 
 		usbmisc2: usbmisc@4c200200 {
 			compatible = "fsl,imx8mm-usbmisc", "fsl,imx7d-usbmisc";
-			#index-cells = <1>;
 			reg = <0x4c200200 0x200>;
+			#index-cells = <1>;
 		};
 
 		ddrmix_blk_ctrl: blk-ctrl@4e010000 {
 			compatible = "nxp,blk-ctrl-ddrmix", "syscon", "simple-mfd";
 			reg = <0x4e010000 0x1000>;
 		};
+
+		ddr-pmu@4e300dc0 {
+			compatible = "fsl,imx93-ddr-pmu";
+			reg = <0x4e300dc0 0x200>;
+			interrupts = <GIC_SPI 90 IRQ_TYPE_LEVEL_HIGH>;
+		};
 	};
 
 	display-subsystem {
 		compatible = "fsl,imx-display-subsystem";
 		ports = <&lcdif_disp>;
-	};
-
-	mqs1: mqs1 {
-		compatible = "fsl,imx93-mqs";
-		gpr = <&aonmix_ns_gpr>;
-		status = "disabled";
-	};
-
-	mqs2: mqs2 {
-		compatible = "fsl,imx93-mqs";
-		gpr = <&wakeupmix_gpr>;
-		status = "disabled";
 	};
 
 	ldb: ldb-display-controller {
