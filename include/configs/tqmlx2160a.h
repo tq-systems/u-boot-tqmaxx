@@ -298,7 +298,7 @@ unsigned long get_board_ddr_clk(void);
 			"fi; "						       \
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"					       \
-	"update_pbl_sd=run set_getcmd; if ${get_cmd} ${pbl_mmc}; then "        \
+	"update_pbl_sd=run set_getcmd; if ${get_cmd} ${pbl_sdmmc}; then "        \
 		"if itest ${filesize} > 0; then "                              \
 			"mmc dev ${mmcdev_sdhc}; mmc rescan; "	               \
 			"setexpr blkc ${filesize} + 0x1ff; "                   \
