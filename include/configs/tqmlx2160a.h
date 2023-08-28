@@ -264,21 +264,21 @@ unsigned long get_board_ddr_clk(void);
 	"pbl_spi_offset=0x0\0"						       \
 	"pbl_spi=bl2_flexspi_nor.pbl\0"					       \
 	"pbl_sdmmc=bl2_auto.pbl\0"					       \
-	"update_uboot_spi=run set_getcmd; if ${get_cmd} ${uboot}; then "       \
+	"update_uboot_spi=run check_ipaddr; if tftp ${uboot}; then "       \
 		"if itest ${filesize} > 0; then "                              \
 			"echo Write u-boot image to sf address ${uboot_spi_offset};"\
 			"sf probe;"					       \
 			"sf update ${fileaddr} ${uboot_spi_offset} ${filesize};"\
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"					       \
-	"update_pbl_spi=run set_getcmd; if ${get_cmd} ${pbl_spi}; then "       \
+	"update_pbl_spi=run check_ipaddr; if tftp ${pbl_spi}; then "       \
 		"if itest ${filesize} > 0; then "                              \
 			"echo Write rcw-pbl image to address ${pbl_spi_offset};"\
 			"sf probe;"					       \
 			"sf update ${fileaddr} ${pbl_spi_offset} ${filesize};"\
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"					       \
-	"update_pbl_mmc=run set_getcmd; if ${get_cmd} ${pbl_sdmmc}; then "       \
+	"update_pbl_mmc=run check_ipaddr; if tftp ${pbl_sdmmc}; then "       \
 		"if itest ${filesize} > 0; then "                              \
 			"mmc dev ${mmcdev_emmc}; mmc rescan; "	               \
 			"setexpr blkc ${filesize} + 0x1ff; "                   \
@@ -288,7 +288,7 @@ unsigned long get_board_ddr_clk(void);
 			"fi; "                                         \
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"					       \
-	"update_uboot_mmc=run set_getcmd; if ${get_cmd} ${uboot}; then "       \
+	"update_uboot_mmc=run check_ipaddr; if tftp ${uboot}; then "       \
 		"if itest ${filesize} > 0; then "                              \
 			"mmc dev ${mmcdev_emmc}; mmc rescan; "		       \
 			"setexpr blkc ${filesize} + 0x1ff; "		       \
@@ -298,7 +298,7 @@ unsigned long get_board_ddr_clk(void);
 			"fi; "						       \
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"					       \
-	"update_pbl_sd=run set_getcmd; if ${get_cmd} ${pbl_sdmmc}; then "        \
+	"update_pbl_sd=run check_ipaddr; if tftp ${pbl_sdmmc}; then "        \
 		"if itest ${filesize} > 0; then "                              \
 			"mmc dev ${mmcdev_sdhc}; mmc rescan; "	               \
 			"setexpr blkc ${filesize} + 0x1ff; "                   \
@@ -308,7 +308,7 @@ unsigned long get_board_ddr_clk(void);
 			"fi; "						       \
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"					       \
-	"update_uboot_sd=run set_getcmd; if ${get_cmd} ${uboot}; then "        \
+	"update_uboot_sd=run check_ipaddr; if tftp ${uboot}; then "        \
 		"if itest ${filesize} > 0; then "                              \
 			"mmc dev ${mmcdev_sdhc}; mmc rescan; "		       \
 			"setexpr blkc ${filesize} + 0x1ff; "		       \
@@ -318,11 +318,6 @@ unsigned long get_board_ddr_clk(void);
 			"fi; "                                                 \
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"					       \
-	"set_getcmd=if test \"${ip_dyn}\" = yes; then "                        \
-			"setenv get_cmd dhcp; "                                \
-		"else "                                                        \
-			"setenv get_cmd tftp; "                                \
-		"fi; \0"                                                       \
 	"spiargs=run addspi addtty addearlycon\0"                              \
 	"addspi=setenv bootargs ${bootargs} root=ubi0_0 rw "		       \
 		"rootfstype=ubifs ubi.mtd=7\0"                                 \
@@ -382,6 +377,37 @@ unsigned long get_board_ddr_clk(void);
 	"emmc_bootcmd=echo Trying load from emmc..;"		\
 		"setenv mmcblkdev ${mmcdev_emmc}; "		\
 		"run sdmmc_bootcmd\0"                           \
+	"addmisc=setenv bootargs ${bootargs}\0"	\
+	"addip="                                                       \
+		"run check_ipaddr; "                                   \
+		"setenv bootargs ${bootargs} "                         \
+		"ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:"    \
+			"${hostname}:${netdev}:off\0"                  \
+	"check_ipaddr="                                                \
+		"if test -n \"${ipaddr}\" && test -n \"${serverip}\"; then " \
+			"exit; "                                       \
+		"fi; " \
+		"echo 'ipaddr or serverip unset, falling back to DHCP...'; " \
+		"dhcp\0"                                               \
+	"addnfs=setenv bootargs ${bootargs} "	\
+		"root=/dev/nfs rw "	\
+		"nfsroot=${serverip}:${rootpath},v3,tcp;\0"	\
+	"netdev=eth0\0"	\
+	"netargs=run addnfs addip addtty addmisc\0"	\
+	"rootpath=/srv/nfs\0"					\
+	"netboot=echo Booting from net ...; "			\
+		"run check_ipaddr; "				\
+		"setenv bootargs; "				\
+		"run netargs; "					\
+		"if tftp ${kernel_addr_r} ${kernel}; then "\
+			"if tftp ${fdt_addr_r} ${fdt_file}; then "\
+				"if tftp 0x80d00000 ${dpl_file}; then "	\
+					"fsl_mc lazyappply DPL 0x80d00000;"     \
+					"booti ${kernel_addr_r} - ${fdt_addr_r}; "    \
+				"fi; "				\
+			"fi; "					\
+		"fi; "						\
+		"echo ... failed\0"				\
 
 #define BOOT_TARGET_DEVICES(func) \
 	func(MMC, mmc, 0) \
