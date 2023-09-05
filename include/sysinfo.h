@@ -240,3 +240,24 @@ static inline int sysinfo_get_fit_loadable(struct udevice *dev, int index,
 
 #endif
 #endif
+
+/**
+ * sysinfo_get_and_detect() - Return the sysinfo device for the sysinfo in
+ * question and runs its detect operation.
+ * @devp: Pointer to structure to receive the sysinfo device.
+ *
+ * Since there can only be at most one sysinfo instance, the API can supply a
+ * function that returns the unique device. This is especially useful for use
+ * in sysinfo files.
+ *
+ * Return: 0 if OK, -ve on error.
+ */
+static inline int sysinfo_get_and_detect(struct udevice **devp)
+{
+	int ret = sysinfo_get(devp);
+
+	if (!ret)
+		ret = sysinfo_detect(*devp);
+
+	return ret;
+}
