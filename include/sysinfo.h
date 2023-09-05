@@ -90,6 +90,17 @@ struct sysinfo_ops {
 	int (*get_int)(struct udevice *dev, int id, int *val);
 
 	/**
+	 * get_uint64() - Read a specific uint64 data value that describes the
+	 *	          hardware setup.
+	 * @dev:       The sysinfo instance to gather the data.
+	 * @id:        A unique identifier for the uint64 value to be read.
+	 * @val:       Pointer to a buffer that receives the value read.
+	 *
+	 * Return: 0 if OK, -ve on error.
+	 */
+	int (*get_uint64)(struct udevice *dev, int id, uint64_t *val);
+
+	/**
 	 * get_str() - Read a specific string data value that describes the
 	 *	       hardware setup.
 	 * @dev:	The sysinfo instance to gather the data.
@@ -174,6 +185,18 @@ int sysinfo_get_bool(struct udevice *dev, int id, bool *val);
 int sysinfo_get_int(struct udevice *dev, int id, int *val);
 
 /**
+ * sysinfo_get_uint64() - Read a specific uint64 data value that describes the
+ *			hardware setup.
+ * @dev:	The sysinfo instance to gather the data.
+ * @id:		A unique identifier for the uint64 value to be read.
+ * @val:	Pointer to a buffer that receives the value read.
+ *
+ * Return: 0 if OK, -EPERM if called before sysinfo_detect(), else -ve on
+ * error.
+ */
+int sysinfo_get_uint64(struct udevice *dev, int id, uint64_t *val);
+
+/**
  * sysinfo_get_str() - Read a specific string data value that describes the
  *		     hardware setup.
  * @dev:	The sysinfo instance to gather the data.
@@ -244,6 +267,11 @@ static inline int sysinfo_get_bool(struct udevice *dev, int id, bool *val)
 }
 
 static inline int sysinfo_get_int(struct udevice *dev, int id, int *val)
+{
+	return -ENOSYS;
+}
+
+static inline int sysinfo_get_uint64(struct udevice *dev, int id, uint64_t *val)
 {
 	return -ENOSYS;
 }

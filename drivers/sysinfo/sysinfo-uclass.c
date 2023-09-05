@@ -89,6 +89,20 @@ int sysinfo_get_int(struct udevice *dev, int id, int *val)
 	return ops->get_int(dev, id, val);
 }
 
+int sysinfo_get_uint64(struct udevice *dev, int id, uint64_t *val)
+{
+	struct sysinfo_priv *priv = dev_get_uclass_priv(dev);
+	struct sysinfo_ops *ops = sysinfo_get_ops(dev);
+
+	if (!priv->detected)
+		return -EPERM;
+
+	if (!ops->get_uint64)
+		return -ENOSYS;
+
+	return ops->get_uint64(dev, id, val);
+}
+
 int sysinfo_get_str(struct udevice *dev, int id, size_t size, char *val)
 {
 	struct sysinfo_priv *priv = dev_get_uclass_priv(dev);
