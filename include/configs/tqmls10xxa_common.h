@@ -127,7 +127,7 @@
 	"pbl_mmc_start=" __stringify(TQMLS10xxA_PBL_MMC_SECT_START) "\0"	\
 	"pbl_mmc_size=" __stringify(TQMLS10xxA_PBL_MMC_SECT_SIZE) "\0"	\
 	"pbl_mmc=bl2_sd.pbl\0"						\
-	"pbl_qspi=bl2_qspi.pbl\0"						\
+	"pbl_spi=bl2_qspi.pbl\0"						\
 	"update_pbl_mmc=run set_getcmd; "	\
 		"if ${getcmd} ${pbl_mmc}; then "	\
 			"if itest ${filesize} > 0; then "	\
@@ -150,15 +150,15 @@
 				"fi; "	\
 			"fi; "	\
 		"fi;\0"	\
-	"update_pbl_qspi=run set_getcmd; "	\
-		"if ${getcmd} ${pbl_qspi}; then "	\
+	"update_pbl_spi=run set_getcmd; "	\
+		"if ${getcmd} ${pbl_spi}; then "	\
 			"if itest ${filesize} > 0; then "	\
 				"sf probe 0; "	\
 				"sf update ${loadaddr} pbl ${filesize}; "	\
 			"fi; "	\
 		"fi; "	\
 		"setenv filesize;\0"	\
-	"update_uboot_qspi=run set_getcmd; "	\
+	"update_uboot_spi=run set_getcmd; "	\
 		"if ${getcmd} ${uboot}; then "	\
 			"if itest ${filesize} > 0; then "	\
 				"sf probe 0; "	\
@@ -179,7 +179,7 @@
 				"fi; "	\
 			"fi; "	\
 		"fi;\0"	\
-	"update_fmucode_qspi=run set_getcmd; "	\
+	"update_fmucode_spi=run set_getcmd; "	\
 		"if ${getcmd} ${fmucode}; then "	\
 			"if itest ${filesize} > 0; then "	\
 				"sf probe 0; "	\
