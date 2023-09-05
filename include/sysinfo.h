@@ -47,6 +47,9 @@ enum sysinfo_id {
 	/* For show_board_info() */
 	SYSINFO_ID_BOARD_MODEL,
 
+	SYSINFO_ID_RAM_SIZE,
+	SYSINFO_ID_RAM_VARIANT,
+
 	/* First value available for downstream/board used */
 	SYSINFO_ID_USER = 0x1000,
 };
