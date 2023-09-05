@@ -157,6 +157,9 @@ enum sysinfo_id {
 	SYSID_PRIOR_STAGE_VERSION,
 	SYSID_PRIOR_STAGE_DATE,
 
+	SYSID_RAM_SIZE,
+	SYSID_RAM_VARIANT,
+
 	/* First value available for downstream/board used */
 	SYSID_USER = 0x1000,
 };
