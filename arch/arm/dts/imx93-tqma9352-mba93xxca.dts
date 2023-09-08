@@ -347,8 +347,8 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_typec>;
 		reg = <0x50>;
-		interrupt-parent = <&gpio2>;
-		interrupts = <7 IRQ_TYPE_EDGE_FALLING>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <2 IRQ_TYPE_EDGE_FALLING>;
 		status = "okay";
 
 		port {
