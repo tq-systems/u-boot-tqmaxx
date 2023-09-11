@@ -289,9 +289,10 @@
 
 	pinctrl_usdhc1: usdhc1grp {
 		fsl,pins = <
-			/* HYS | PU | PD | FSEL_3 | X5 */
-			MX93_PAD_SD1_CLK__USDHC1_CLK		0x17be
-			MX93_PAD_SD1_STROBE__USDHC1_STROBE	0x17be
+			/* PU | PD | FSEL_3 | X5 */
+			MX93_PAD_SD1_CLK__USDHC1_CLK		0x7be
+			/* HYS | PU | PD | FSEL_3 | no drive */
+			MX93_PAD_SD1_STROBE__USDHC1_STROBE	0x1780
 			/* HYS | PU | FSEL_3 | X5 */
 			MX93_PAD_SD1_CMD__USDHC1_CMD		0x13be
 			/* HYS | PU | FSEL_3 | X4 */
