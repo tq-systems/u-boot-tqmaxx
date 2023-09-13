@@ -44,6 +44,7 @@
 		"fsl_mc lazyapply DPL ${dpaa2_dpl_addr_r};\0"	\
 	"mcdplspiapply=sf probe 0; sf read ${dpaa2_dpl_addr_r} dpaa2-dpl &&"\
 		"fsl_mc lazyapply DPL ${dpaa2_dpl_addr_r};\0"	\
+	"mcmemsize=0x20000000\0"				\
 	"mmcpart=2\0"						\
 	"mmcboot=echo Booting from mmc ...; "			\
 		"setenv bootargs; "				\

@@ -135,7 +135,7 @@ static void tqmls10xxa_fixup_partitions(void *blob, struct bd_info *bd)
 }
 #endif
 
-int ft_board_setup(void *blob, struct bd_info *bd)
+int tq_tqmls10xxa_ft_board_setup(void *blob, struct bd_info *bd)
 {
 	struct udevice *dev;
 	u8 bootsrc;
@@ -147,7 +147,6 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 	static const char esdhc_node[] = "/soc/esdhc@1560000";
 #endif
 
-	arch_fixup_fdt(blob);
 	ft_cpu_setup(blob, bd);
 
 	/* get sdhc mux information from SysC */
@@ -170,10 +169,6 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 
 #if (IS_ENABLED(CONFIG_FDT_FIXUP_PARTITIONS))
 	tqmls10xxa_fixup_partitions(blob, bd);
-#endif
-
-#if defined(CONFIG_FSL_LSCH3)
-	fdt_fsl_mc_fixup_iommu_map_entry(blob);
 #endif
 
 	return tq_bb_ft_board_setup(blob, bd);

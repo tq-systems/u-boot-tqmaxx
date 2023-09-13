@@ -7,6 +7,7 @@
 
 #include <common.h>
 #include <env.h>
+#include <fdt_support.h>
 #include <init.h>
 #include <asm/io.h>
 #include <fsl_sec.h>
@@ -62,5 +63,12 @@ int fsl_board_late_init(void)
 		env_set("board_name", bname);
 
 	return 0;
+}
+
+int ft_board_setup(void *blob, struct bd_info *bd)
+{
+	arch_fixup_fdt(blob);
+
+	return tq_tqmls10xxa_ft_board_setup(blob, bd);
 }
 #endif

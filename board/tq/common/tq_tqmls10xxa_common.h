@@ -8,6 +8,7 @@
 #define __TQ_TQMLS10XXA_COMMON
 
 void tq_tqmls10xx_checkboard(void);
+int tq_tqmls10xxa_ft_board_setup(void *blob, struct bd_info *bd);
 void tq_tqmls10xxa_set_macaddrs(u8 *macaddr, int count);
 
 #endif /* __TQ_TQMLS10XXA_COMMON */
