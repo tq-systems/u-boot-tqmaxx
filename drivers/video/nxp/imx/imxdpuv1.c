@@ -4531,11 +4531,17 @@ int imxdpuv1_disp_setup_channel(int8_t imxdpuv1_id,
 		uv_offset = src_width * src_height; /* works for NV12 and NV16*/
 	}
 	ret = imxdpuv1_init_channel(imxdpuv1_id, &channel);
+	if (ret) {
+		return ret;
+	}
 
 	ret = imxdpuv1_init_channel_buffer(imxdpuv1_id, channel.common.chan, channel.common.stride, IMXDPUV1_ROTATE_NONE,
 		disp_addr,
 		uv_offset,
 		0);
+	if (ret) {
+		return ret;
+	}
 
 	ret = imxdpuv1_disp_set_chan_crop(imxdpuv1_id,
 		channel.common.chan,
@@ -4547,6 +4553,9 @@ int imxdpuv1_disp_setup_channel(int8_t imxdpuv1_id,
 		channel.common.dest_left,
 		channel.common.dest_width,
 		channel.common.dest_height);
+	if (ret) {
+		return ret;
+	}
 
 #ifdef DEBUG
 	{
