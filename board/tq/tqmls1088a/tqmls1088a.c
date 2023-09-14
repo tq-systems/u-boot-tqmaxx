@@ -33,6 +33,7 @@
 
 #define SYSC_REG_SYSC_FW_VERS       0x02
 #define SYSC_REG_BOOT_SRC           0x03
+#define SYSC_REG_VID                0x10
 #define SYSC_REG_BOOT_SRC_SDSEL_MSK 0x80
 #define SYSC_REG_CPLD_FW_VERS       0xE1
 
@@ -76,7 +77,7 @@ int init_func_vid(void)
 		printf("Core voltage adjust required (req = 0x%02x, set = 0x%02x)\n",
 		       gur_vid, sysc_vid);
 		printf("New core voltage is applied after reset\n");
-		dm_i2c_reg_write(TQMLS1088A_SYSC_ADDR, SYSC_REG_VID, gur_vid);
+		dm_i2c_reg_write(dev, SYSC_REG_VID, gur_vid);
 	}
 
 	return 0;
