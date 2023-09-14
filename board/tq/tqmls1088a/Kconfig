@@ -12,6 +12,14 @@ config SYS_SOC
 config SYS_CONFIG_NAME
 	default "tqmls1088a"
 
+config VID
+	bool "Enable TQMLS1088A VID setting"
+	depends on I2C || DM_I2C
+	help
+	  This enables init_func_vid to be used in common/board_f.c.
+	  For TQMLS1088A the function writes the correct voltage value to the
+	  system controller. The new value is used after next POR.
+
 choice
 	prompt "TQMLS1088A base board variant"
 	default TQMLS1088A_BB_MBLS10XXA
