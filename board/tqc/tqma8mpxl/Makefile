@@ -7,10 +7,12 @@
 
 obj-y += tqma8mpxl.o tqma8mpxl-usbg.o
 obj-$(CONFIG_TQMA8MPXL_BB_MBA8MPXL) += tqma8mpxl-mba8mpxl.o
+obj-$(CONFIG_TQMA8MPXL_BB_MBA8MP_RAS314) += tqma8mpxl-mba8mp-ras314.o
 
 ifdef CONFIG_SPL_BUILD
 obj-y += spl.o
 obj-$(CONFIG_TQMA8MPXL_BB_MBA8MPXL) += spl-mba8mpxl.o
+obj-$(CONFIG_TQMA8MPXL_BB_MBA8MP_RAS314) += spl-mba8mp-ras314.o
 
 ifdef CONFIG_IMX8M_DRAM_INLINE_ECC
 obj-$(CONFIG_TQMA8MPXL_RAM_1024MB) += lpddr4_timing_1gb_ecc.o

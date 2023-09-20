@@ -227,6 +227,37 @@ config TQMA8MPXL_BB_MBA8MPXL
 	  Select the MBa8MPxL starterkit for TQMa8MPxL board.
 	  This features most interfaces the CPU can provide
 
+config TQMA8MPXL_BB_MBA8MP_RAS314
+	bool "TQMa8MPxL on MBa8MP-RAS314 Starterkit"
+	select ENV_IS_NOWHERE
+	select SYS_REDUNDAND_ENVIRONMENT
+	select ENV_OVERWRITE
+	select MXC_UART
+	select DM_SERIAL
+	select SPL_SERIAL_SUPPORT
+	select CMD_FUSE
+	select DM_ETH
+	select DWC_ETH_QOS
+	select FEC_MXC
+	select MII
+	select DM_ETH_PHY
+	select PHY_GIGE
+	select PHYLIB
+	select PHY_GIGE
+	select PHY_TI
+	select USB
+	select DM_USB
+	select USB_XHCI_HCD
+	select USB_XHCI_IMX8M
+	select USB_XHCI_DWC3
+	select USB_DWC3
+	select CMD_MII
+	select CMD_PING
+	select CMD_DHCP
+	select CMD_NET
+	help
+	  Select the MBa8MP-RAS314 starterkit for TQMa8MPxL board.
+
 endchoice
 
 config TQMA8MPXL_LVDS
@@ -246,10 +277,12 @@ config TQMA8MPXL_LVDS
 config DEFAULT_DEVICE_TREE
 	default "imx8mp-tqma8mpql-mba8mpxl-lvds" if TQMA8MPXL_BB_MBA8MPXL && TQMA8MPXL_LVDS
 	default "imx8mp-tqma8mpql-mba8mpxl" if TQMA8MPXL_BB_MBA8MPXL
+	default "imx8mp-tqma8mpql-mba8mp-ras314" if TQMA8MPXL_BB_MBA8MP_RAS314
 
 config DEFAULT_FDT_FILE
 	default "imx8mp-tqma8mpql-mba8mpxl-lvds.dtb" if TQMA8MPXL_BB_MBA8MPXL && TQMA8MPXL_LVDS
 	default "imx8mp-tqma8mpql-mba8mpxl.dtb" if TQMA8MPXL_BB_MBA8MPXL
+	default "imx8mp-tqma8mpql-mba8mp-ras314.dtb" if TQMA8MPXL_BB_MBA8MP_RAS314
 
 menu "TQMa8MPxL boot device"
 
