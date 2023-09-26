@@ -99,6 +99,13 @@ config K3_AM62A_DDRSS
 
 endchoice
 
+config K3_DDRSS_VARIANTS
+	bool "Enable K3 DDRSS RAM configuration variant support"
+	depends on K3_DDRSS && SPL_SYSINFO
+	help
+	  Allow selecting from multiple RAM configuration variants at runtime
+	  based on sysinfo information.
+
 config IMXRT_SDRAM
 	bool "Enable i.MXRT SDRAM support"
 	depends on RAM

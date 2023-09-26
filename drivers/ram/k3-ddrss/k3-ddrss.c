@@ -17,6 +17,8 @@
 #include <log.h>
 #include <asm/io.h>
 #include <power-domain.h>
+#include <sysinfo.h>
+#include <u-boot/crc.h>
 #include <wait_bit.h>
 #include <power/regulator.h>
 
@@ -502,6 +504,209 @@ static int populate_data_array_from_dt(struct k3_ddrss_desc *ddrss,
 	return 0;
 }
 
+static int k3_ddrss_get_variant_name(char *buf, size_t len)
+{
+	struct udevice *sysinfo;
+	int ret;
+
+	ret = sysinfo_get_and_detect(&sysinfo);
+	if (ret) {
+		debug("Failed to get sysinfo data: %d\n", ret);
+		return ret;
+	}
+
+	ret = sysinfo_get_str(sysinfo, SYSINFO_ID_RAM_VARIANT, len, buf);
+	if (ret) {
+		debug("Failed to get RAM variant: %d\n", ret);
+		return ret;
+	}
+
+	return 0;
+}
+
+static int k3_ddrss_get_variant_node(struct k3_ddrss_desc *ddrss,
+				     ofnode *variant_node)
+{
+	ofnode node, subnode;
+	const char *name;
+	char buf[64];
+	int ret;
+
+	node = dev_read_subnode(ddrss->dev, "ram-variants");
+	if (!ofnode_valid(node)) {
+		debug("No RAM configuration variants\n");
+		*variant_node = ofnode_null();
+		return 0;
+	}
+
+	ret = k3_ddrss_get_variant_name(buf, sizeof(buf));
+	if (ret)
+		return ret;
+
+	dev_info(ddrss->dev, "RAM configuration variant %s\n", buf);
+
+	name = ofnode_read_string(node, "base-variant");
+	if (name && strcmp(buf, name) == 0) {
+		dev_dbg(ddrss->dev, "Using base configuration\n");
+		*variant_node = ofnode_null();
+		return 0;
+	}
+
+	ofnode_for_each_subnode(subnode, node) {
+		if (!ofnode_is_enabled(subnode))
+			continue;
+
+		name = ofnode_read_string(subnode, "variant-name");
+		if (name && strcmp(buf, name) == 0) {
+			dev_dbg(ddrss->dev, "Found variant configuration\n");
+			*variant_node = subnode;
+			return 0;
+		}
+	}
+
+	dev_err(ddrss->dev, "No RAM configuration found for variant %s\n", buf);
+
+	return -ENOENT;
+}
+
+static int k3_ddrss_apply_variant_part(struct k3_ddrss_desc *ddrss,
+				       ofnode variant, const char *part,
+				       u32 *data, size_t reg_count)
+{
+	/* Enough space to spell out "ti,ctl-data-patch" etc. */
+	char part_patch[20], part_crc[20];
+	int patch_size, patch_len, ret, i;
+	const fdt32_t *patch;
+	u32 index, value, crc;
+	u16 crc_computed;
+
+	snprintf(part_patch, sizeof(part_patch), "ti,%s-data-patch", part);
+	snprintf(part_crc, sizeof(part_crc), "ti,%s-data-crc16", part);
+
+	/*
+	 * ofnode_read_u32_array() is not used here to avoid using more
+	 * pre-reloc RAM than necessary
+	 */
+	patch = ofnode_get_property(variant, part_patch, &patch_size);
+	if (!patch) {
+		dev_err(ddrss->dev,
+			"Failed to read %s for selected variant: %d\n",
+			part_patch, patch_size);
+		return patch_size;
+	}
+
+	if (patch_size % 8 != 0) {
+		dev_err(ddrss->dev,
+			"%s has invalid length for selected variant\n",
+			part_patch);
+		return -EINVAL;
+	}
+	patch_len = patch_size / 8;
+
+	ret = ofnode_read_u32(variant, part_crc, &crc);
+	if (ret) {
+		dev_err(ddrss->dev,
+			"Failed to read %s for selected variant: %d\n",
+			part_crc, ret);
+		return ret;
+	}
+
+	for (i = 0; i < patch_len; i++) {
+		index = fdt32_to_cpu(patch[2 * i]);
+		value = fdt32_to_cpu(patch[2 * i + 1]);
+
+		if (index >= reg_count) {
+			dev_err(ddrss->dev,
+				"Index %d is out of bounds in %s for selected variant\n",
+				index, part_patch);
+			return -EINVAL;
+		}
+
+		data[index] = value;
+	}
+
+	crc_computed = crc16_ccitt(0, (const u8 *)data,
+				   sizeof(data[0]) * reg_count);
+	if (crc != crc_computed) {
+		dev_err(ddrss->dev, "Invalid CRC %s for selected variant\n",
+			part_crc);
+		return -EINVAL;
+	}
+
+	return 0;
+}
+
+static int k3_ddrss_apply_variant(struct k3_ddrss_desc *ddrss,
+				  ofnode variant,
+				  struct reginitdata *reginitdata)
+{
+	int ret;
+
+	ret = ofnode_read_u32(variant, "ti,ddr-freq0", &ddrss->ddr_freq0);
+	if (ret) {
+		ddrss->ddr_freq0 = clk_get_rate(&ddrss->osc_clk);
+		dev_dbg(ddrss->dev,
+			"ddr freq0 not populated for selected variant, using bypass frequency.\n");
+	}
+
+	ret = ofnode_read_u32(variant, "ti,ddr-freq1", &ddrss->ddr_freq1);
+	if (ret)
+		dev_err(ddrss->dev,
+			"ddr freq1 not populated for selected variant: %d\n",
+			ret);
+
+	ret = ofnode_read_u32(variant, "ti,ddr-freq2", &ddrss->ddr_freq2);
+	if (ret)
+		dev_err(ddrss->dev,
+			"ddr freq2 not populated for selected variant: %d\n",
+			ret);
+
+	ret = ofnode_read_u32(variant, "ti,ddr-fhs-cnt", &ddrss->ddr_fhs_cnt);
+	if (ret)
+		dev_err(ddrss->dev,
+			"ddr fhs cnt not populated for selected variant: %d\n",
+			ret);
+
+	ddrss->ti_ecc_enabled = ofnode_read_bool(variant, "ti,ecc-enable");
+
+	ret = k3_ddrss_apply_variant_part(ddrss, variant, "ctl",
+					  reginitdata->ctl_regs,
+					  LPDDR4_INTR_CTL_REG_COUNT);
+	if (ret)
+		return ret;
+
+	ret = k3_ddrss_apply_variant_part(ddrss, variant, "pi",
+					  reginitdata->pi_regs,
+					  LPDDR4_INTR_PHY_INDEP_REG_COUNT);
+	if (ret)
+		return ret;
+
+	ret = k3_ddrss_apply_variant_part(ddrss, variant, "phy",
+					  reginitdata->phy_regs,
+					  LPDDR4_INTR_PHY_REG_COUNT);
+	if (ret)
+		return ret;
+
+	return 0;
+}
+
+static int k3_ddrss_handle_variants(struct k3_ddrss_desc *ddrss,
+				    struct reginitdata *reginitdata)
+{
+	ofnode variant;
+	int ret;
+
+	ret = k3_ddrss_get_variant_node(ddrss, &variant);
+	if (ret)
+		return ret;
+
+	/* Use base variant */
+	if (!ofnode_valid(variant))
+		return 0;
+
+	return k3_ddrss_apply_variant(ddrss, variant, reginitdata);
+}
+
 static int k3_lpddr4_hardware_reg_init(struct k3_ddrss_desc *ddrss)
 {
 	u32 status = 0U;
@@ -513,6 +718,12 @@ static int k3_lpddr4_hardware_reg_init(struct k3_ddrss_desc *ddrss)
 	ret = populate_data_array_from_dt(ddrss, &reginitdata);
 	if (ret)
 		return ret;
+
+	if (IS_ENABLED(CONFIG_K3_DDRSS_VARIANTS)) {
+		ret = k3_ddrss_handle_variants(ddrss, &reginitdata);
+		if (ret)
+			return ret;
+	}
 
 	status = driverdt->writectlconfig(pd, reginitdata.ctl_regs,
 					  reginitdata.ctl_regs_offs,

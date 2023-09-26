@@ -42,6 +42,54 @@ Optional properties:
 - ti,ddr-freq0:		Initial frequency set point, if not provided PLL bypass
 			frequency will be used.
 
+Variant configuration
+---------------------
+It is possible to specify multiple RAM configurations in the same Device Tree.
+To reduce the space used by additional configurations, only the differences to
+a base config is stored. This diff can be generated using the k3-ddr-diff.py
+tool distributed with the U-Boot source.
+
+The variant is selected based on a variant name queried from a sysinfo
+provider. Variant names are board-specific and are not part of this binding
+specification.
+
+Variant configuration is done in the "ram-variants" subnode. The ram-variants
+node has the following optional properties:
+
+- base-variant:		Variant name that indicates that the base configuration
+			is to be used rather than applying a variant patch.
+
+Each subnode of ram-variants represents one configuration variant. The
+individual variants have the following required properties:
+
+- variant-name:		Variant name to match against.
+- ti,ddr-freq1:		First frequency set point
+- ti,ddr-freq2:		Second frequency set point
+- ti,ddr-fhs-cnt:	Number of times to communicate to DDR for frequency handshake.
+- ti,ctl-data-patch:	Array containing pairs of index and values that are replaced in the
+			ti,ctl-data array of the base configuration.
+- ti,ctl-data-crc16:	CRC checksum of the ti,ctl-data array after the patch has been applied.
+- ti,pi-data-patch:	Array containing pairs of index and values that are replaced in the
+			ti,pi-data array of the base configuration.
+- ti,pi-data-crc16:	CRC checksum of the ti,pi-data array after the patch has been applied.
+- ti,phy-data-patch:	Array containing pairs of index and values that are replaced in the
+			ti,phy-data array of the base configuration.
+- ti,phy-data-crc16:	CRC checksum of the ti,phy-data array after the patch has been applied.
+
+The CRCs are used to verify that the base configuration is still the same the
+diff was generated from. All CRCs are CRC16-CCITT (XMODEM). The data arrays
+are encoded as Little Endian for the purpose of CRC calculation.
+
+The following properies are optional:
+
+- ti,ecc-enable:	Boolean flag to enable ECC for the variant. This will
+			reduce available DDR by 1/9.
+- ti,ddr-freq0:		Initial frequency set point, if not provided PLL bypass
+			frequency will be used.
+
+Optional properties must be set in each variant to have an effect for the
+variant, they are not inherited from the base configuration.
+
 Example (J721E):
 ================
 
@@ -2249,4 +2297,36 @@ memorycontroller: memorycontroller@0298e000 {
 		DDRSS_PHY_1421_DATA
 		DDRSS_PHY_1422_DATA
 	>;
+
+	/* Optional */
+	ram-variants {
+		base-variant = "1g";
+		bootph-pre-ram;
+
+		variant-2g {
+			variant-name = "2g";
+
+			ti,ddr-freq1 = <400000000>;
+			ti,ddr-freq2 = <400000000>;
+			ti,ddr-fhs-cnt = <3>;
+
+			ti,ctl-data-patch = <
+				45 0x00000a00 /* DDRSS_CTL_45_DATA */
+				48 0x0037000a /* DDRSS_CTL_48_DATA */
+				/* Further values omitted */
+			>;
+			ti,ctl-data-crc16 = <0x7e4a>;
+			ti,pi-data-patch = <
+				77 0x08000100 /* DDRSS_PI_77_DATA */
+				168 0x00000043 /* DDRSS_PI_168_DATA */
+				/* Further values omitted */
+			>;
+			ti,pi-data-crc16 = <0x09ec>;
+			ti,phy-data-patch = <
+			>;
+			ti,phy-data-crc16 = <0xa43e>;
+
+			bootph-pre-ram;
+		};
+	};
 };
