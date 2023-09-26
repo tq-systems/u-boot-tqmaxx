@@ -461,16 +461,18 @@ static void k3_lpddr4_init(struct k3_ddrss_desc *ddrss)
 	}
 }
 
-static void populate_data_array_from_dt(struct k3_ddrss_desc *ddrss,
-					struct reginitdata *reginit_data)
+static int populate_data_array_from_dt(struct k3_ddrss_desc *ddrss,
+				       struct reginitdata *reginit_data)
 {
 	int ret, i;
 
 	ret = dev_read_u32_array(ddrss->dev, "ti,ctl-data",
 				 (u32 *)reginit_data->ctl_regs,
 				 LPDDR4_INTR_CTL_REG_COUNT);
-	if (ret)
-		printf("Error reading ctrl data %d\n", ret);
+	if (ret) {
+		dev_err(ddrss->dev, "Error reading ctrl data %d\n", ret);
+		return ret;
+	}
 
 	for (i = 0; i < LPDDR4_INTR_CTL_REG_COUNT; i++)
 		reginit_data->ctl_regs_offs[i] = i;
@@ -478,8 +480,10 @@ static void populate_data_array_from_dt(struct k3_ddrss_desc *ddrss,
 	ret = dev_read_u32_array(ddrss->dev, "ti,pi-data",
 				 (u32 *)reginit_data->pi_regs,
 				 LPDDR4_INTR_PHY_INDEP_REG_COUNT);
-	if (ret)
-		printf("Error reading PI data\n");
+	if (ret) {
+		dev_err(ddrss->dev, "Error reading PI data\n");
+		return ret;
+	}
 
 	for (i = 0; i < LPDDR4_INTR_PHY_INDEP_REG_COUNT; i++)
 		reginit_data->pi_regs_offs[i] = i;
@@ -487,21 +491,28 @@ static void populate_data_array_from_dt(struct k3_ddrss_desc *ddrss,
 	ret = dev_read_u32_array(ddrss->dev, "ti,phy-data",
 				 (u32 *)reginit_data->phy_regs,
 				 LPDDR4_INTR_PHY_REG_COUNT);
-	if (ret)
-		printf("Error reading PHY data %d\n", ret);
+	if (ret) {
+		dev_err(ddrss->dev, "Error reading PHY data %d\n", ret);
+		return ret;
+	}
 
 	for (i = 0; i < LPDDR4_INTR_PHY_REG_COUNT; i++)
 		reginit_data->phy_regs_offs[i] = i;
+
+	return 0;
 }
 
-static void k3_lpddr4_hardware_reg_init(struct k3_ddrss_desc *ddrss)
+static int k3_lpddr4_hardware_reg_init(struct k3_ddrss_desc *ddrss)
 {
 	u32 status = 0U;
 	struct reginitdata reginitdata;
 	lpddr4_obj *driverdt = ddrss->driverdt;
 	lpddr4_privatedata *pd = &ddrss->pd;
+	int ret;
 
-	populate_data_array_from_dt(ddrss, &reginitdata);
+	ret = populate_data_array_from_dt(ddrss, &reginitdata);
+	if (ret)
+		return ret;
 
 	status = driverdt->writectlconfig(pd, reginitdata.ctl_regs,
 					  reginitdata.ctl_regs_offs,
@@ -518,6 +529,8 @@ static void k3_lpddr4_hardware_reg_init(struct k3_ddrss_desc *ddrss)
 		printf("%s: FAIL\n", __func__);
 		hang();
 	}
+
+	return 0;
 }
 
 static void k3_lpddr4_start(struct k3_ddrss_desc *ddrss)
@@ -631,7 +644,9 @@ static int k3_ddrss_probe(struct udevice *dev)
 
 	k3_lpddr4_probe(ddrss);
 	k3_lpddr4_init(ddrss);
-	k3_lpddr4_hardware_reg_init(ddrss);
+	ret = k3_lpddr4_hardware_reg_init(ddrss);
+	if (ret)
+		return ret;
 
 	ret = k3_ddrss_init_freq(ddrss);
 	if (ret)
