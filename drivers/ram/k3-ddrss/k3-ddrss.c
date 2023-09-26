@@ -416,7 +416,7 @@ static int k3_ddrss_ofdata_to_priv(struct udevice *dev)
 	return ret;
 }
 
-void k3_lpddr4_probe(struct k3_ddrss_desc *ddrss)
+static void k3_lpddr4_probe(struct k3_ddrss_desc *ddrss)
 {
 	u32 status = 0U;
 	u16 configsize = 0U;
@@ -433,7 +433,7 @@ void k3_lpddr4_probe(struct k3_ddrss_desc *ddrss)
 	}
 }
 
-void k3_lpddr4_init(struct k3_ddrss_desc *ddrss)
+static void k3_lpddr4_init(struct k3_ddrss_desc *ddrss)
 {
 	u32 status = 0U;
 	lpddr4_config *config = &ddrss->config;
@@ -464,8 +464,8 @@ void k3_lpddr4_init(struct k3_ddrss_desc *ddrss)
 	}
 }
 
-void populate_data_array_from_dt(struct k3_ddrss_desc *ddrss,
-				 struct reginitdata *reginit_data)
+static void populate_data_array_from_dt(struct k3_ddrss_desc *ddrss,
+					struct reginitdata *reginit_data)
 {
 	int ret, i;
 
@@ -497,7 +497,7 @@ void populate_data_array_from_dt(struct k3_ddrss_desc *ddrss,
 		reginit_data->phy_regs_offs[i] = i;
 }
 
-void k3_lpddr4_hardware_reg_init(struct k3_ddrss_desc *ddrss)
+static void k3_lpddr4_hardware_reg_init(struct k3_ddrss_desc *ddrss)
 {
 	u32 status = 0U;
 	struct reginitdata reginitdata;
@@ -523,7 +523,7 @@ void k3_lpddr4_hardware_reg_init(struct k3_ddrss_desc *ddrss)
 	}
 }
 
-void k3_lpddr4_start(struct k3_ddrss_desc *ddrss)
+static void k3_lpddr4_start(struct k3_ddrss_desc *ddrss)
 {
 	u32 status = 0U;
 	u32 regval = 0U;
