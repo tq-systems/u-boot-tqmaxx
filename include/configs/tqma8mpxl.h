@@ -213,12 +213,12 @@
 		"fi; \0"                                                       \
 	"rootfsmode=ro\0"                                                      \
 	"addtty=setenv bootargs ${bootargs} console=${console},${baudrate}\0"  \
-	"mmcargs=run addtty addearlycon addmmc\0"                              \
-	"mmcrootpart=2\0"                                                      \
+	"mmcargs=run addtty addmmc\0"                              \
+	"mmcrootpart=1\0"                                                      \
 	"addmmc=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/mmcblk${mmcblkdev}p${mmcrootpart} ${rootfsmode} "   \
 		"rootwait\0"                                                   \
-	"netargs=run addnfs addip addtty addearlycon\0"                        \
+	"netargs=run addnfs addip addtty\0"                        \
 	"addnfs=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/nfs rw "                                            \
 		"nfsroot=${serverip}:${rootpath},v3,tcp;\0"                    \
