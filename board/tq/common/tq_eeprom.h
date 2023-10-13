@@ -126,7 +126,7 @@ bool tq_vard_valid(const struct tq_vard *vard);
 static inline
 bool tq_vard_has_ramecc(const struct tq_vard *vard)
 {
-	return (vard->memsize & VARD_MEMTYPE_MASK_ECC);
+	return (vard->memtype & VARD_MEMTYPE_MASK_ECC);
 }
 
 /*
