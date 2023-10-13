@@ -8,6 +8,8 @@
 #ifndef __TQ_EEPROM_H__
 #define __TQ_EEPROM_H__
 
+#include <linux/sizes.h>
+
 #ifdef CONFIG_DM_I2C
 
 int tq_read_eeprom_buf(unsigned int bus, unsigned int i2c_addr,
