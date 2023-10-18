@@ -24,12 +24,6 @@ int tq_read_eeprom_buffer(int seq, uint offset, int buf_size, u_int8_t *buf);
  * starting at offset in EEPROM array.
  */
 int tq_read_eeprom_at(int seq, uint offset, struct tq_eeprom_data *eeprom);
-#if 0
-{
-	return tq_read_eeprom_buffer(seq, offset, sizeof(*eeprom),
-				      (u_int8_t *)eeprom);
-}
-#endif
 
 /**
  * Reads struct tq_eeprom_data from EEPROM given by seq nr
@@ -50,7 +44,7 @@ static inline int tq_read_module_eeprom(struct tq_eeprom_data *eeprom)
 }
 #else
 
-#error
+#error "need CONFIG_I2C_EEPROM"
 
 #endif
 
