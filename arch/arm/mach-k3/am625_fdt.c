@@ -7,14 +7,15 @@
 #include "common_fdt.h"
 #include <fdt_support.h>
 
-static void fdt_fixup_cores_nodes_am625(void *blob, int core_nr)
+static void fdt_fixup_cores_nodes_am625(void *blob, u32 cores)
 {
 	char node_path[32];
+	int core_nr;
 
-	if (core_nr < 1)
-		return;
+	for (core_nr = 1; core_nr < 4; core_nr++) {
+		if (cores & BIT(core_nr))
+			continue;
 
-	for (; core_nr < 4; core_nr++) {
 		snprintf(node_path, sizeof(node_path), "/cpus/cpu@%d", core_nr);
 		fdt_del_node_path(blob, node_path);
 		snprintf(node_path, sizeof(node_path), "/cpus/cpu-map/cluster0/core%d", core_nr);
@@ -24,7 +25,7 @@ static void fdt_fixup_cores_nodes_am625(void *blob, int core_nr)
 	}
 }
 
-static void fdt_fixup_gpu_nodes_am625(void *blob, int has_gpu)
+static void fdt_fixup_gpu_nodes_am625(void *blob, bool has_gpu)
 {
 	if (!has_gpu) {
 		fdt_del_node_path(blob, "/bus@f0000/gpu@fd00000");
@@ -32,38 +33,37 @@ static void fdt_fixup_gpu_nodes_am625(void *blob, int has_gpu)
 	}
 }
 
-static void fdt_fixup_pru_node_am625(void *blob, int has_pru)
+static void fdt_fixup_pru_node_am625(void *blob, bool has_pru)
 {
 	if (!has_pru)
 		fdt_del_node_path(blob, "/bus@f0000/pruss@30040000");
 }
 
-static int k3_get_core_nr(void)
+static u32 k3_get_cores(void)
 {
-	u32 full_devid = readl(CTRLMMR_WKUP_JTAG_DEVICE_ID);
+	u32 feature0 = readl(CTRLMMR_WKUP_DEVICE_FEATURE0);
 
-	return (full_devid & JTAG_DEV_CORE_NR_MASK) >> JTAG_DEV_CORE_NR_SHIFT;
+	return (feature0 & DEVICE_FEATURE0_MPU_CORE_MASK) >>
+		DEVICE_FEATURE0_MPU_CORE_SHIFT;
 }
 
-static int k3_has_pru(void)
+static bool k3_has_pru(void)
 {
-	u32 full_devid = readl(CTRLMMR_WKUP_JTAG_DEVICE_ID);
-	u32 feature_mask = (full_devid & JTAG_DEV_FEATURES_MASK) >>
-			   JTAG_DEV_FEATURES_SHIFT;
+	u32 feature3 = readl(CTRLMMR_WKUP_DEVICE_FEATURE3);
 
-	return !(feature_mask & JTAG_DEV_FEATURE_NO_PRU);
+	return feature3 & DEVICE_FEATURE3_ICSSM0;
 }
 
-static int k3_has_gpu(void)
+static bool k3_has_gpu(void)
 {
-	u32 full_devid = readl(CTRLMMR_WKUP_JTAG_DEVICE_ID);
+	u32 feature1 = readl(CTRLMMR_WKUP_DEVICE_FEATURE1);
 
-	return (full_devid & JTAG_DEV_GPU_MASK) >> JTAG_DEV_GPU_SHIFT;
+	return feature1 & DEVICE_FEATURE1_GPU;
 }
 
 int ft_system_setup(void *blob, struct bd_info *bd)
 {
-	fdt_fixup_cores_nodes_am625(blob, k3_get_core_nr());
+	fdt_fixup_cores_nodes_am625(blob, k3_get_cores());
 	fdt_fixup_gpu_nodes_am625(blob, k3_has_gpu());
 	fdt_fixup_pru_node_am625(blob, k3_has_pru());
 
