@@ -353,8 +353,6 @@ static void tqma64xxl_set_macaddrs(u8 *macaddr)
 	}
 }
 
-#define CTRLMMR_WKUP_JTAG_DEVICE_ID 0x43000018
-
 static const char *tqma64xxl_cpu_type(void)
 {
 	u32 device_id = readl(CTRLMMR_WKUP_JTAG_DEVICE_ID);
