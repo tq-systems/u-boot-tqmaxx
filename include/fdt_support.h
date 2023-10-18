@@ -301,6 +301,8 @@ int fdt_node_offset_by_compat_reg(void *blob, const char *compat,
 int fdt_node_offset_by_pathf(void *blob, const char *fmt, ...)
 	__attribute__ ((format (printf, 2, 3)));
 
+int fdt_del_node_by_pathf(void *fdt, const char *fmt, ...) __printf(2, 3);
+
 #define fdt_for_each_node_by_compatible(node, fdt, start, compat)	\
 	for (node = fdt_node_offset_by_compatible(fdt, start, compat);	\
 	     node >= 0;							\

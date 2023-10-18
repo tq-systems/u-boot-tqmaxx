@@ -1539,6 +1539,27 @@ int fdt_node_offset_by_pathf(void *blob, const char *fmt, ...)
 	return res;
 }
 
+/**
+ * fdt_del_node_by_pathf: Delete node by sprintf formatted path
+ *
+ * @fdt: ptr to device tree
+ * @fmt: path format
+ */
+int fdt_del_node_by_pathf(void *fdt, const char *fmt, ...)
+{
+	va_list ap;
+	int offset;
+
+	va_start(ap, fmt);
+	offset = vnode_offset_by_pathf(fdt, fmt, ap);
+	va_end(ap);
+
+	if (offset < 0)
+		return offset;
+
+	return fdt_del_node(fdt, offset);
+}
+
 /*
  * fdt_set_phandle: Create a phandle property for the given node
  *
