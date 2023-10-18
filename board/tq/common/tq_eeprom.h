@@ -8,6 +8,8 @@
 #ifndef __TQ_EEPROM_H__
 #define __TQ_EEPROM_H__
 
+#include <linux/sizes.h>
+
 struct tq_eeprom_data;
 
 #if defined(CONFIG_I2C_EEPROM)
