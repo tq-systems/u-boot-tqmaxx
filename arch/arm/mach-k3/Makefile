@@ -15,6 +15,9 @@ obj-$(CONFIG_ARM64) += arm64-mmu.o
 obj-$(CONFIG_CPU_V7R) += r5_mpu.o lowlevel_init.o
 obj-$(CONFIG_ARM64) += cache.o
 
+ifeq ($(CONFIG_OF_LIBFDT)$(CONFIG_OF_SYSTEM_SETUP),yy)
+obj-$(CONFIG_SOC_K3_AM642) += am642_fdt.o
+endif
 ifeq ($(CONFIG_SPL_BUILD),y)
 obj-$(CONFIG_K3_LOAD_SYSFW) += sysfw-loader.o
 endif
