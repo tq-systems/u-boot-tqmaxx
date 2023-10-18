@@ -265,6 +265,9 @@ int fdt_node_offset_by_compat_reg(void *blob, const char *compat,
 int fdt_alloc_phandle(void *blob);
 int fdt_node_offset_by_pathf(void *blob, const char *fmt, ...)
 	__attribute__ ((format (printf, 2, 3)));
+
+int fdt_del_node_by_pathf(void *fdt, const char *fmt, ...) __printf(2, 3);
+
 int fdt_set_phandle(void *fdt, int nodeoffset, uint32_t phandle);
 unsigned int fdt_create_phandle(void *fdt, int nodeoffset);
 unsigned int fdt_create_phandle_by_compatible(void *fdt, const char *compat);
