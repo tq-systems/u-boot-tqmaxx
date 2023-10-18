@@ -109,6 +109,61 @@
 #define RST_SRC_MAIN_RESET_PIN			BIT(2)
 #define RST_SRC_MCU_RESET_PIN			BIT(0)
 
+static inline int k3_get_core_nr(void)
+{
+	u32 full_devid = readl(CTRLMMR_WKUP_JTAG_DEVICE_ID);
+
+	return (full_devid & JTAG_DEV_CORE_NR_MASK) >> JTAG_DEV_CORE_NR_SHIFT;
+}
+
+static inline u32 k3_get_cores_r5fss0(void)
+{
+	u32 feature0 = readl(CTRLMMR_WKUP_DEVICE_FEATURE0);
+
+	return (feature0 & DEVICE_FEATURE0_R5FSS0_CORE_MASK) >>
+		DEVICE_FEATURE0_R5FSS0_CORE_SHIFT;
+}
+
+static inline u32 k3_get_cores_r5fss1(void)
+{
+	u32 feature0 = readl(CTRLMMR_WKUP_DEVICE_FEATURE0);
+
+	return (feature0 & DEVICE_FEATURE0_R5FSS1_CORE_MASK) >>
+		DEVICE_FEATURE0_R5FSS1_CORE_SHIFT;
+}
+
+static inline bool k3_has_adc(void)
+{
+	u32 full_devid = readl(CTRLMMR_WKUP_JTAG_DEVICE_ID);
+	u32 devid = (full_devid & JTAG_DEV_ID_MASK) >> JTAG_DEV_ID_SHIFT;
+
+	switch (devid) {
+	case JTAG_DEV_ID_AM6442:
+	case JTAG_DEV_ID_AM6441:
+	case JTAG_DEV_ID_AM6422:
+	case JTAG_DEV_ID_AM6421:
+		return true;
+	default:
+		return false;
+	}
+}
+
+static inline int k3_has_icss(void)
+{
+	u32 full_devid = readl(CTRLMMR_WKUP_JTAG_DEVICE_ID);
+	u32 feature_code = (full_devid & JTAG_DEV_FEATURES_MASK) >>
+			    JTAG_DEV_FEATURES_SHIFT;
+
+	switch (feature_code) {
+	case JTAG_DEV_FEATURES_D:
+	case JTAG_DEV_FEATURES_E:
+	case JTAG_DEV_FEATURES_F:
+		return true;
+	default:
+		return false;
+	}
+}
+
 #if defined(CONFIG_SYS_K3_SPL_ATF) && !defined(__ASSEMBLY__)
 
 #define AM64X_DEV_RTI8			127
