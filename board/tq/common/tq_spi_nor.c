@@ -37,49 +37,30 @@ void tq_ft_spi_setup(void *blob, const char *path,
 		     const struct node_info *nodes,
 		     size_t node_count)
 {
-/* This code is specific for compiled in SPI FLASH support */
-#if defined(CONFIG_SPI_FLASH)
-	int off;
-	bool enable_flash = false;
-
-	unsigned int bus = CONFIG_SF_DEFAULT_BUS;
-	unsigned int cs = CONFIG_SF_DEFAULT_CS;
-	unsigned int speed = CONFIG_SF_DEFAULT_SPEED;
-	unsigned int mode = CONFIG_SF_DEFAULT_MODE;
-
-	/*
-	 * TODO: to make this code portable until we land it in upstream
-	 * U-Boot, we support DM and non DM case at least in theory.
-	 * when upstreaming, non DM code should be deleted
-	 */
+	/* This code is specific for compiled in SPI FLASH support */
 	if (CONFIG_IS_ENABLED(DM_SPI_FLASH)) {
+		int off;
+		bool enable_flash = false;
+		unsigned int bus = CONFIG_SF_DEFAULT_BUS;
+		unsigned int cs = CONFIG_SF_DEFAULT_CS;
+
 		struct udevice *new;
 		int ret;
 
 		ret = spi_flash_probe_bus_cs(bus, cs, &new);
 		if (!ret) {
 			tq_ft_fixup_spi_mtdparts(blob, nodes, node_count);
-			enable_flash = 1;
+			enable_flash = true;
 		}
-	} else {
-		struct spi_flash *new;
 
-		new = spi_flash_probe(bus, cs, speed, mode);
-		if (new) {
-			tq_ft_fixup_spi_mtdparts(blob, nodes, node_count);
-			spi_flash_free(new);
-			enable_flash = 1;
+		off = fdt_path_offset(blob, path);
+		if (off >= 0) {
+			printf("%s %s\n", (enable_flash) ? "enable" : "disable",
+			       path);
+			fdt_set_node_status(blob, off, (enable_flash) ?
+					    FDT_STATUS_OKAY : FDT_STATUS_DISABLED);
 		}
 	}
-
-	off = fdt_path_offset(blob, path);
-	if (off >= 0) {
-		printf("%s %s\n", (enable_flash) ? "enable" : "disable",
-		       path);
-		fdt_set_node_status(blob, off, (enable_flash) ?
-				    FDT_STATUS_OKAY : FDT_STATUS_DISABLED);
-	}
-#endif
 }
 
 #endif
