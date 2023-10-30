@@ -1,0 +1,8 @@
+TQ-Systems GmbH TQMa93xx[CA/LA] SOM / MBa93xx[CA/LA] board
+L:	u-boot@ew.tq-group.com
+W:	https://www.tq-group.com/en/products/tq-embedded/
+S:	Maintained
+F:	arch/arm/dts/imx93*-tqma93*-mba93*.dts*
+F:	board/tq/tqma93xx/
+F:	configs/tqma93*_mba93_*_defconfig
+F:	include/configs/tqma93*.h
