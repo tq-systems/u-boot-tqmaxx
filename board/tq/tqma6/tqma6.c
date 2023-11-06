@@ -234,16 +234,12 @@ static const char *tqma6_get_boardname(void)
 	switch ((cpurev & 0xFF000) >> 12) {
 	case MXC_CPU_MX6SOLO:
 		return "TQMa6S";
-		break;
 	case MXC_CPU_MX6DL:
 		return "TQMa6DL";
-		break;
 	case MXC_CPU_MX6D:
 		return "TQMa6D";
-		break;
 	case MXC_CPU_MX6Q:
 		return "TQMa6Q";
-		break;
 	default:
 		return "??";
 	};
