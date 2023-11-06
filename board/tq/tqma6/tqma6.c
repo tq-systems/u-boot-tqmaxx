@@ -57,7 +57,7 @@ DECLARE_GLOBAL_DATA_PTR;
 	PAD_CTL_DSE_80ohm | PAD_CTL_HYS |			\
 	PAD_CTL_ODE | PAD_CTL_SRE_FAST)
 
-static const u16 tqma6_emmc_dsr = 0x0100;
+const u16 tqma6_emmc_dsr = 0x0100;
 
 /* board-specific MMC card detection / modification */
 void board_mmc_detect_card_type(struct mmc *mmc)
@@ -72,8 +72,8 @@ void board_mmc_detect_card_type(struct mmc *mmc)
 }
 
 /*!
- * Rev. 0200 and newer optionally implements GIGE ping issue fix
- * us a global to signal presence of the fix. this should be checked
+ * Rev. 0200 and newer optionally implements GIGE errata fix.
+ * Use a global var to signal presence of the fix. This should be checked
  * early. If fix is present, system I2C is I2C1 - otherwise I2C3
  */
 static int has_enet_workaround = -1;
@@ -83,9 +83,79 @@ int tqma6_has_enet_workaround(void)
 	return has_enet_workaround;
 }
 
-int dram_init(void)
+#define GPIO_REVDET_PAD_CTRL  (PAD_CTL_PUS_100K_DOWN | PAD_CTL_SPEED_LOW | \
+				PAD_CTL_DSE_40ohm | PAD_CTL_HYS)
+
+static const iomux_v3_cfg_t tqma6_revdet_pads[] = {
+	MX6_PAD_GPIO_6__GPIO1_IO06 | MUX_PAD_CTRL(GPIO_REVDET_PAD_CTRL),
+};
+
+#define TQMA6_REVDET_GPIO IMX_GPIO_NR(1, 6)
+
+void tqma6_detect_enet_workaround(void)
 {
-	gd->ram_size = imx_ddr_size();
+#if defined(CONFIG_SPL_BUILD)
+	int ret;
+
+	imx_iomux_v3_setup_multiple_pads(tqma6_revdet_pads,
+					 ARRAY_SIZE(tqma6_revdet_pads));
+
+	ret = gpio_request(TQMA6_REVDET_GPIO, "tqma6-revdet");
+	if (ret) {
+		pr_err("error: gpio request for enet workaround %d\n", ret);
+	} else {
+		gpio_direction_input(TQMA6_REVDET_GPIO);
+		if (gpio_get_value(TQMA6_REVDET_GPIO) == 0) {
+			has_enet_workaround = 1;
+		} else if (gpio_get_value(TQMA6_REVDET_GPIO) > 0) {
+			has_enet_workaround = 0;
+			gpio_direction_output(TQMA6_REVDET_GPIO, 1);
+		}
+		gpio_free(TQMA6_REVDET_GPIO);
+	}
+#else
+	int ret;
+	struct gpio_desc desc;
+
+	imx_iomux_v3_setup_multiple_pads(tqma6_revdet_pads,
+					 ARRAY_SIZE(tqma6_revdet_pads));
+
+	ret = dm_gpio_lookup_name("GPIO1_6", &desc);
+	if (ret) {
+		pr_err("error: gpio lookup for enet workaround %d\n", ret);
+	} else {
+		ret = dm_gpio_request(&desc, "rev_det");
+		if (ret) {
+			pr_err("error: gpio request  for enet workaround %d\n", ret);
+		} else {
+			dm_gpio_set_dir_flags(&desc, GPIOD_IS_IN);
+			if (dm_gpio_get_value(&desc) == 0) {
+				has_enet_workaround = 1;
+			} else if (dm_gpio_get_value(&desc) > 0) {
+				has_enet_workaround = 0;
+				dm_gpio_set_dir_flags(&desc, GPIOD_IS_OUT |
+						       GPIOD_IS_OUT_ACTIVE);
+			}
+		}
+	}
+#endif
+}
+
+const char *tqma6_get_fdt_configuration(void)
+{
+	if (is_mx6dq())
+		return !tqma6_has_enet_workaround() ? "imx6q-mba6b" : "imx6q-mba6a";
+	if (is_mx6sdl())
+		return !tqma6_has_enet_workaround() ? "imx6dl-mba6b" : "imx6dl-mba6a";
+
+	return NULL;
+}
+
+int board_early_init_f(void)
+{
+	tq_bb_board_early_init_f();
+
+	tqma6_detect_enet_workaround();
 
 	return 0;
 }
@@ -165,6 +235,15 @@ int board_mmc_init(struct bd_info *bis)
 }
 #endif
 
+#if !defined(CONFIG_SPL_BUILD)
+
+int dram_init(void)
+{
+	gd->ram_size = imx_ddr_size();
+
+	return 0;
+}
+
 #ifndef CONFIG_DM_SPI
 static iomux_v3_cfg_t const tqma6_ecspi1_pads[] = {
 	/* SS1 */
@@ -231,48 +310,6 @@ static void tqma6_setup_i2c(void)
 }
 #endif
 
-#define GPIO_REVDET_PAD_CTRL  (PAD_CTL_PUS_100K_DOWN | PAD_CTL_SPEED_LOW | \
-			       PAD_CTL_DSE_40ohm | PAD_CTL_HYS)
-
-static const iomux_v3_cfg_t tqma6_revdet_pads[] = {
-	MX6_PAD_GPIO_6__GPIO1_IO06 | MUX_PAD_CTRL(GPIO_REVDET_PAD_CTRL),
-};
-
-static void tqma6_detect_enet_workaround(void)
-{
-	int ret;
-	struct gpio_desc desc;
-
-	imx_iomux_v3_setup_multiple_pads(tqma6_revdet_pads,
-					 ARRAY_SIZE(tqma6_revdet_pads));
-
-	ret = dm_gpio_lookup_name("GPIO1_6", &desc);
-	if (ret) {
-		pr_err("error: gpio lookup for enet workaround %d\n", ret);
-	} else {
-		ret = dm_gpio_request(&desc, "rev_det");
-		if (ret) {
-			pr_err("error: gpio request  for enet workaround %d\n", ret);
-		} else {
-			dm_gpio_set_dir_flags(&desc, GPIOD_IS_IN);
-			if (dm_gpio_get_value(&desc) == 0) {
-				has_enet_workaround = 1;
-			} else if (dm_gpio_get_value(&desc) > 0) {
-				has_enet_workaround = 0;
-				dm_gpio_set_dir_flags(&desc, GPIOD_IS_OUT |
-						       GPIOD_IS_OUT_ACTIVE);
-			}
-		}
-	}
-}
-
-int board_early_init_f(void)
-{
-	tqma6_detect_enet_workaround();
-
-	return tq_bb_board_early_init_f();
-}
-
 int board_init(void)
 {
 	/* address of boot parameters */
@@ -306,16 +343,6 @@ static const char *tqma6_get_boardname(void)
 	default:
 		return "??";
 	};
-}
-
-const char *tqma6_get_fdt_configuration(void)
-{
-	if (is_mx6dq())
-		return !tqma6_has_enet_workaround() ? "imx6q-mba6b" : "imx6q-mba6a";
-	if (is_mx6sdl())
-		return !tqma6_has_enet_workaround() ? "imx6dl-mba6b" : "imx6dl-mba6a";
-
-	return NULL;
 }
 
 #if CONFIG_IS_ENABLED(POWER_LEGACY)
@@ -416,3 +443,5 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 	return 0;
 }
 #endif /* defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT) */
+
+#endif

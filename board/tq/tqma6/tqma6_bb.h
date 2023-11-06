@@ -27,4 +27,6 @@ const char *tqma6_bb_get_boardname(void);
 void tqma6_bb_ft_board_setup(void *blob, struct bd_info *bd);
 #endif /* defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT) */
 
+int tqma6_has_enet_workaround(void);
+
 #endif

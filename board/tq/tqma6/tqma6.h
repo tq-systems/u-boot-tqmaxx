@@ -8,7 +8,12 @@
 #ifndef __TQMA6_H
 #define __TQMA6_H
 
+#include <linux/types.h>
+
+extern const u16 tqma6_emmc_dsr;
+
 const char *tqma6_get_fdt_configuration(void);
 int tqma6_has_enet_workaround(void);
+void tqma6_init(void);
 
 #endif /* __TQMA6_H */
