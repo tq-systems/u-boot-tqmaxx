@@ -227,13 +227,40 @@ u32 tqma64xxl_get_boot_device(void)
 		return get_backup_bootmedia(devstat);
 }
 
+/* Imported from k3_has_icss() in arch/arm/mach-k3/am642_fdt.c */
+static int tqma64xxl_has_icss(void)
+{
+	u32 full_devid = readl(CTRLMMR_WKUP_JTAG_DEVICE_ID);
+	u32 feature_code = (full_devid & JTAG_DEV_FEATURES_MASK) >>
+			    JTAG_DEV_FEATURES_SHIFT;
+
+	switch (feature_code) {
+	case JTAG_DEV_FEATURES_D:
+	case JTAG_DEV_FEATURES_E:
+	case JTAG_DEV_FEATURES_F:
+		return true;
+	default:
+		return false;
+	}
+}
+
 static void tqma64xxl_set_macaddrs(u8 *macaddr)
 {
+	/*
+	 * On variants with with ICSS/PRUs, up to 3 dual Ethernet controllers
+	 * can exist, but only 5 of the 6 interfaces can be muxed at the same
+	 * time. We reserve 4 additional MAC addresses, for a total of 5
+	 * including the address assigned by TI.
+	 *
+	 * On TQMa64xxL variants without ICSS/PRUs, one dual Ethernet
+	 * controller exists. We reserve 1 additional address, for a total of 2.
+	 */
+	const int num_addrs = tqma64xxl_has_icss() ? 4 : 1;
 	int i;
 
 	for (i = 1; ; i++) {
 		eth_env_set_enetaddr_by_index("eth", i, macaddr);
-		if (i >= 4)
+		if (i >= num_addrs)
 			break;
 
 		if (++macaddr[5])
