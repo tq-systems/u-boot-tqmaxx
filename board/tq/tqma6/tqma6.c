@@ -32,7 +32,7 @@
 #include <power/pmic.h>
 #include <spi_flash.h>
 
-#include "tqma6_bb.h"
+#include "../common/tq_bb.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -101,7 +101,7 @@ int board_mmc_getcd(struct mmc *mmc)
 		/* eMMC/uSDHC3 is always present */
 		ret = 1;
 	else
-		ret = tqma6_bb_board_mmc_getcd(mmc);
+		ret = tq_bb_board_mmc_getcd(mmc);
 
 	return ret;
 }
@@ -115,7 +115,7 @@ int board_mmc_getwp(struct mmc *mmc)
 		/* eMMC/uSDHC3 is always present */
 		ret = 0;
 	else
-		ret = tqma6_bb_board_mmc_getwp(mmc);
+		ret = tq_bb_board_mmc_getwp(mmc);
 
 	return ret;
 }
@@ -133,7 +133,7 @@ int board_mmc_init(struct bd_info *bis)
 			mmc_set_dsr(mmc, tqma6_emmc_dsr);
 	}
 
-	tqma6_bb_board_mmc_init(bis);
+	tq_bb_board_mmc_init(bis);
 
 	return 0;
 }
@@ -207,7 +207,7 @@ static void tqma6_setup_i2c(void)
 
 int board_early_init_f(void)
 {
-	return tqma6_bb_board_early_init_f();
+	return tq_bb_board_early_init_f();
 }
 
 int board_init(void)
@@ -222,7 +222,7 @@ int board_init(void)
 	tqma6_setup_i2c();
 #endif
 
-	tqma6_bb_board_init();
+	tq_bb_board_init();
 
 	return 0;
 }
@@ -268,7 +268,7 @@ int board_late_init(void)
 {
 	env_set("board_name", tqma6_get_boardname());
 
-	tqma6_bb_board_late_init();
+	tq_bb_board_late_init();
 
 	return 0;
 }
@@ -276,7 +276,7 @@ int board_late_init(void)
 int checkboard(void)
 {
 	printf("Board: %s on a %s\n", tqma6_get_boardname(),
-	       tqma6_bb_get_boardname());
+	       tq_bb_get_boardname());
 	return 0;
 }
 
@@ -297,14 +297,14 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 	char modelstr[MODELSTRLEN];
 
 	snprintf(modelstr, MODELSTRLEN, "TQ %s on %s", tqma6_get_boardname(),
-		 tqma6_bb_get_boardname());
+		 tq_bb_get_boardname());
 	do_fixup_by_path_string(blob, "/", "model", modelstr);
 	fdt_fixup_memory(blob, (u64)PHYS_SDRAM, (u64)gd->ram_size);
 	/* bring in eMMC dsr settings */
 	do_fixup_by_path_u32(blob,
 			     "/soc/aips-bus@02100000/usdhc@02198000",
 			     "dsr", tqma6_emmc_dsr, 2);
-	tqma6_bb_ft_board_setup(blob, bd);
+	tq_bb_ft_board_setup(blob, bd);
 
 	return 0;
 }
