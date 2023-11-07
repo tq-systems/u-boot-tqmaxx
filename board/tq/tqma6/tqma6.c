@@ -308,6 +308,16 @@ static const char *tqma6_get_boardname(void)
 	};
 }
 
+const char *tqma6_get_fdt_configuration(void)
+{
+	if (is_mx6dq())
+		return !tqma6_has_enet_workaround() ? "imx6q-mba6b" : "imx6q-mba6a";
+	if (is_mx6sdl())
+		return !tqma6_has_enet_workaround() ? "imx6dl-mba6b" : "imx6dl-mba6a";
+
+	return NULL;
+}
+
 #if CONFIG_IS_ENABLED(POWER_LEGACY)
 /* setup board specific PMIC */
 int power_init_board(void)
@@ -327,9 +337,22 @@ int power_init_board(void)
 }
 #endif
 
+#define FDTFILE_STRLEN 32u
 int board_late_init(void)
 {
+	char fdtfile[FDTFILE_STRLEN];
+	const char *config = tqma6_get_fdt_configuration();
+
 	env_set("board_name", tqma6_get_boardname());
+
+	if (!env_get("fdtfile")) {
+		if (config) {
+			snprintf(fdtfile, FDTFILE_STRLEN, "%s.dtb", config);
+			env_set("fdtfile", fdtfile);
+		} else {
+			pr_err("ENV: Could not set kernel devicetree, ${fdtfile} remains unset\n");
+		}
+	}
 
 	tq_bb_board_late_init();
 	board_late_mmc_env_init();
