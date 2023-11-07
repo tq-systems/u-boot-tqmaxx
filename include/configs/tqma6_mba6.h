@@ -14,4 +14,7 @@
 #define CFG_MXC_UART_BASE		UART2_BASE
 #define CONSOLE_DEV		"ttymxc1"
 
+#define BB_ENV_SETTINGS \
+	"console=" CONSOLE_DEV "\0" \
+
 #endif /* __CONFIG_TQMA6_MBA6_H */
