@@ -282,6 +282,7 @@ int board_late_init(void)
 	env_set("board_name", tqma6_get_boardname());
 
 	tq_bb_board_late_init();
+	board_late_mmc_env_init();
 
 	return 0;
 }
