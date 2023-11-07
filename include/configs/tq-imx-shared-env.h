@@ -171,7 +171,7 @@
 #define TQ_IMX_SHARED_ENV_SETTINGS                                     \
 	"addip="                                                       \
 		"run check_ipaddr; "                                   \
-		"run setenv bootargs ${bootargs} "                     \
+		"setenv bootargs ${bootargs} "                         \
 		"ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:"    \
 			"${hostname}:${netdev}:off\0"                  \
 	"addnfs="                                                      \
