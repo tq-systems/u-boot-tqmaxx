@@ -33,6 +33,7 @@
 #include <spi_flash.h>
 
 #include "../common/tq_bb.h"
+#include "../common/tq_emmc.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -55,14 +56,26 @@ DECLARE_GLOBAL_DATA_PTR;
 	PAD_CTL_DSE_80ohm | PAD_CTL_HYS |			\
 	PAD_CTL_ODE | PAD_CTL_SRE_FAST)
 
+static const u16 tqma6_emmc_dsr = 0x0100;
+
+/* board-specific MMC card detection / modification */
+void board_mmc_detect_card_type(struct mmc *mmc)
+{
+	struct mmc *emmc = find_mmc_device(0);
+
+	if (emmc != mmc)
+		return;
+
+	if (tq_emmc_need_dsr(mmc) > 0)
+		mmc_set_dsr(mmc, tqma6_emmc_dsr);
+}
+
 int dram_init(void)
 {
 	gd->ram_size = imx_ddr_size();
 
 	return 0;
 }
-
-static const uint16_t tqma6_emmc_dsr = 0x0100;
 
 #ifndef CONFIG_DM_MMC
 /* eMMC on USDHCI3 always present */
@@ -294,17 +307,27 @@ void ldo_mode_set(int ldo_bypass)
 #define MODELSTRLEN 32u
 int ft_board_setup(void *blob, struct bd_info *bd)
 {
+	struct mmc *mmc = find_mmc_device(0);
 	char modelstr[MODELSTRLEN];
+	int err;
 
 	snprintf(modelstr, MODELSTRLEN, "TQ %s on %s", tqma6_get_boardname(),
 		 tq_bb_get_boardname());
 	do_fixup_by_path_string(blob, "/", "model", modelstr);
 	fdt_fixup_memory(blob, (u64)PHYS_SDRAM, (u64)gd->ram_size);
-	/* bring in eMMC dsr settings */
-	do_fixup_by_path_u32(blob,
-			     "/soc/aips-bus@02100000/usdhc@02198000",
-			     "dsr", tqma6_emmc_dsr, 2);
-	tq_bb_ft_board_setup(blob, bd);
+
+	/* bring in eMMC dsr settings if needed */
+	if (mmc && (!mmc_init(mmc))) {
+		if (tq_emmc_need_dsr(mmc) > 0) {
+			err = tq_ft_fixup_emmc_dsr(blob,
+						   "/soc/bus@2100000/mmc@2198000",
+						   (u32)tqma6_emmc_dsr);
+			if (err)
+				puts("ERROR: failed to patch e-MMC DSR in DT\n");
+		}
+	} else {
+		puts("e-MMC: not present?\n");
+	}
 
 	return 0;
 }
