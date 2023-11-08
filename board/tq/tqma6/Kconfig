@@ -99,6 +99,22 @@ config TEXT_BASE
 config SPL_TEXT_BASE
 	default 0x00908000
 
+#
+# environment settings: 64k, offset 1M (SPI Flash sector 64k), redundant env
+# in SPI Flash @ 1M + 64k
+#
+config ENV_SIZE
+	default 0x00010000
+
+config ENV_SECT_SIZE
+	default 0x00010000
+
+config ENV_OFFSET
+	default 0x00100000
+
+config ENV_OFFSET_REDUND
+	default 0x00110000
+
 source "board/tq/common/Kconfig"
 
 endif
