@@ -8,6 +8,8 @@
 #if !defined(__TQ_IMX_SHARED_ENV_H)
 #define __TQ_IMX_SHARED_ENV_H
 
+#ifdef CONFIG_CMD_SF
+
 #ifdef CONFIG_CMD_UBIFS
 
 #define TQ_IMX_SHARED_UBI_ENV_SETTINGS                                 \
@@ -69,6 +71,12 @@
 			"fi; "                                         \
 		"fi; "                                                 \
 		"setenv filesize \0"                                   \
+
+#else
+#define TQ_IMX_SHARED_UBI_ENV_SETTINGS
+#endif
+
+#define TQ_IMX_SHARED_SPI_ENV_SETTINGS                                  \
 	"update_uboot_spi="                                            \
 		"run check_ipaddr; "                                   \
 		"setenv filesize; "                                    \
@@ -83,9 +91,10 @@
 			"fi; "                                         \
 		"fi; fi; "                                             \
 		"setenv filesize \0"                                   \
+	TQ_IMX_SHARED_UBI_ENV_SETTINGS                                 \
 
 #else
-#define TQ_IMX_SHARED_UBI_ENV_SETTINGS
+#define TQ_IMX_SHARED_SPI_ENV_SETTINGS
 #endif
 
 #ifdef CONFIG_CMD_MMC
@@ -215,7 +224,7 @@
 	"rootfsmode=ro\0"                                              \
 	TQ_IMX_SHARED_MMC_ENV_SETTINGS                                 \
 	TQ_IMX_SHARED_NFS_ENV_SETTINGS                                 \
-	TQ_IMX_SHARED_UBI_ENV_SETTINGS                                 \
+	TQ_IMX_SHARED_SPI_ENV_SETTINGS                                 \
 
 #if !defined(CONFIG_SPL_BUILD)
 
