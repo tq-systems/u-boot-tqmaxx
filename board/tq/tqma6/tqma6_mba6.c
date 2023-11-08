@@ -56,21 +56,11 @@
 	PAD_CTL_DSE_80ohm | PAD_CTL_HYS |			\
 	PAD_CTL_ODE | PAD_CTL_SRE_FAST)
 
-#if defined(CONFIG_TQMA6Q)
+#define TQMA6Q_IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII	0x02e0790
+#define TQMA6Q_IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM		0x02e07ac
 
-#define IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII	0x02e0790
-#define IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM	0x02e07ac
-
-#elif defined(CONFIG_TQMA6S) || defined(CONFIG_TQMA6DL)
-
-#define IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII	0x02e0768
-#define IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM	0x02e0788
-
-#else
-
-#error "need to select module"
-
-#endif
+#define TQMA6DL_IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII	0x02e0768
+#define TQMA6DL_IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM	0x02e0788
 
 /* disable on die termination for RGMII */
 #define IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM_DISABLE	0x00000000
@@ -86,10 +76,17 @@ static void mba6_setup_iomuxc_enet(void)
 	/* clear gpr1[ENET_CLK_SEL] for externel clock */
 	clrbits_le32(&iomuxc_regs->gpr[1], IOMUXC_GPR1_ENET_CLK_SEL_MASK);
 
-	__raw_writel(IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM_DISABLE,
-		     (void *)IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM);
-	__raw_writel(IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII_1P5V,
-		     (void *)IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII);
+	if (is_mx6sdl()) {
+		__raw_writel(IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM_DISABLE,
+			     (void *)TQMA6DL_IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM);
+		__raw_writel(IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII_1P5V,
+			     (void *)TQMA6DL_IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII);
+	} else if (is_mx6dq()) {
+		__raw_writel(IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM_DISABLE,
+			     (void *)TQMA6Q_IOMUX_SW_PAD_CTRL_GRP_RGMII_TERM);
+		__raw_writel(IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII_1P5V,
+			     (void *)TQMA6Q_IOMUX_SW_PAD_CTRL_GRP_DDR_TYPE_RGMII);
+	}
 }
 
 static iomux_v3_cfg_t const mba6_uart2_pads[] = {
