@@ -19,6 +19,7 @@ enum env_location env_get_location(enum env_operation op, int prio)
 		return env_loc;
 
 	switch (dev) {
+	case SPI_NOR_BOOT:
 	case QSPI_BOOT:
 	case FLEXSPI_BOOT:
 		if (IS_ENABLED(CONFIG_ENV_IS_IN_SPI_FLASH))
