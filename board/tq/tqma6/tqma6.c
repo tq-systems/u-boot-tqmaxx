@@ -27,6 +27,7 @@
 
 #include "tqma6.h"
 #include "../common/tq_bb.h"
+#include "../common/tq_eeprom.h"
 #include "../common/tq_emmc.h"
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -181,9 +182,12 @@ static const char *tqma6_get_boardname(void)
 int board_late_init(void)
 {
 	char fdtfile[FDTFILE_STRLEN];
+	struct tq_eeprom_data eeprom;
+	const char *bname = tqma6_get_boardname();
 	const char *config = tqma6_get_fdt_configuration();
+	int ret;
 
-	env_set("board_name", tqma6_get_boardname());
+	env_set("board_name", bname);
 
 	if (!env_get("fdtfile")) {
 		if (config) {
@@ -196,6 +200,12 @@ int board_late_init(void)
 
 	tq_bb_board_late_init();
 	board_late_mmc_env_init();
+
+	ret = tq_read_module_eeprom(&eeprom);
+	if (!ret)
+		tq_board_handle_eeprom_data(bname, &eeprom);
+	else
+		pr_err("EEPROM: read error %d\n", ret);
 
 	return 0;
 }

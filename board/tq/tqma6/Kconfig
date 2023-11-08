@@ -63,9 +63,11 @@ choice
 config MBA6
 	bool "TQMa6 on MBa6 Starterkit"
 	select TQ_BB
+	select TQ_EEPROM
 	select TQ_EMMC
 	select TQ_ENVLOC
 	select TQ_SDMMC
+	select MISC
 	select USB
 	select CMD_USB
 	select USB_STORAGE

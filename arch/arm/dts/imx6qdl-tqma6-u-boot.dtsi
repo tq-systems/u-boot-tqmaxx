@@ -9,6 +9,12 @@
 
 #include "imx6qdl-u-boot.dtsi"
 
+/ {
+	aliases {
+		i2c_eeprom0 = &at24c64;
+	};
+};
+
 &i2c1 {
 	u-boot,dm-spl;
 };
