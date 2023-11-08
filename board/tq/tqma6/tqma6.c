@@ -304,16 +304,11 @@ void ldo_mode_set(int ldo_bypass)
  * Device Tree Support
  */
 #if defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT)
-#define MODELSTRLEN 32u
 int ft_board_setup(void *blob, struct bd_info *bd)
 {
 	struct mmc *mmc = find_mmc_device(0);
-	char modelstr[MODELSTRLEN];
 	int err;
 
-	snprintf(modelstr, MODELSTRLEN, "TQ %s on %s", tqma6_get_boardname(),
-		 tq_bb_get_boardname());
-	do_fixup_by_path_string(blob, "/", "model", modelstr);
 	fdt_fixup_memory(blob, (u64)PHYS_SDRAM, (u64)gd->ram_size);
 
 	/* bring in eMMC dsr settings if needed */
