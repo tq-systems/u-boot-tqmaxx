@@ -12,7 +12,7 @@
 
 #if !defined(CONFIG_SPL_BUILD)
 
-__weak struct tq_som_feature_list *tq_board_detect_features(void)
+__weak const struct tq_som_feature_list *tq_board_detect_features(void)
 {
 	return NULL;
 }

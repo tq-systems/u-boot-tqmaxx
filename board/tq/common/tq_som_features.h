@@ -58,7 +58,7 @@ struct tq_som_feature_list {
  * tq_ft_fixup_features. The implementation shall use VARD in the vendor
  * EEPROM to fill the list. See tq_vard_detect_features
  */
-struct tq_som_feature_list *tq_board_detect_features(void);
+const struct tq_som_feature_list *tq_board_detect_features(void);
 
 /**
  * board specific feature fixup in devicetree
