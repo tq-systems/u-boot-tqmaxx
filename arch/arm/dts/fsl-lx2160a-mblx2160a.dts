@@ -115,17 +115,18 @@
 	};
 };
 
+&uart0 {
+	status = "okay";
+};
+
 &uart1 {
 	status = "okay";
-	clock = <175000000>; /* clock is 1/4 of platform */
 };
 
 &uart2 {
 	status = "okay";
-	clock = <175000000>; /* clock is 1/4 of platform */
 };
 
 &uart3 {
 	status = "okay";
-	clock = <175000000>;
 };
