@@ -14,7 +14,6 @@
 #include <netdev.h>
 #include <asm/io.h>
 #include <asm/arch/clock.h>
-#include <dm/platform_data/serial_pl01x.h>
 #include <mtd_node.h>
 #include <jffs2/load_kernel.h>
 #include <fsl-mc/ldpaa_wriop.h>
@@ -24,21 +23,6 @@
 #include "tqmlx2160a_bb.h"
 
 DECLARE_GLOBAL_DATA_PTR;
-
-static struct pl01x_serial_platdata serial0 = {
-	.base = CONFIG_SYS_SERIAL0,
-	.type = TYPE_PL011,
-};
-
-U_BOOT_DEVICE(nxp_serial0) = {
-	.name = "serial_pl01x",
-	.platdata = &serial0,
-};
-
-static void uart_get_clock(void)
-{
-	serial0.clock = get_serial_clock();
-}
 
 unsigned long get_board_sys_clk(void)
 {
@@ -52,7 +36,6 @@ unsigned long get_board_ddr_clk(void)
 
 int board_early_init_f(void)
 {
-	uart_get_clock();
 	fsl_lsch3_early_init_f();
 	return 0;
 }
