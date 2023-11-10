@@ -1,6 +1,7 @@
-// SPDX-License-Identifier: GPL-2.0-only
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 /*
- * Copyright (c) 2014, 2021 - 2022 TQ-Systems GmbH <license@tq-group.com>, D-82229 Seefeld, Germany.
+ * Copyright (c) 2014, 2021-2023 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
  * Author: Gregor Herburger
  *
  * Based on:
@@ -8,13 +9,20 @@
  *
  */
 
+#include <dt-bindings/interrupt-controller/irq.h>
 #include "am33xx.dtsi"
 
-#include "dt-bindings/interrupt-controller/irq.h"
-
 / {
-	model = "TQ-Systems GmbH TQMa335x";
-	compatible = "tq,tqma335x", "ti,am33xx";
+	compatible = "tq,tqma3358", "ti,am33xx";
+
+	aliases {
+		mmc0 = &mmc2;
+		mmc1 = &mmc1;
+		/delete-property/ mmc2;
+		rtc0 = &tps;
+		rtc1 = &ds1339;
+		rtc2 = &rtc;
+	};
 
 	cpus {
 		cpu@0 {
@@ -24,15 +32,29 @@
 
 	memory {
 		device_type = "memory";
-		reg = <0x80000000 0x10000000>;					/* 256 MB */
+		reg = <0x80000000 0x10000000>; /* 256 MB */
 	};
 
-	vbat: fixedregulator@0 {
+	/* SOM input voltage */
+	vcc3v3in: regulator-vcc3v3in {
 		compatible = "regulator-fixed";
-		regulator-name = "vbat";
-		regulator-min-microvolt = <5000000>;
-		regulator-max-microvolt = <5000000>;
+		regulator-name = "VCC3V3IN";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
 		regulator-boot-on;
+	};
+
+	/*
+	 * Regulator is enabled by PMIC power sequence. The supplied voltage
+	 * rail is also usable on baseboard.
+	 */
+	vddshv: regulator-vddshv {
+		compatible = "regulator-fixed";
+		regulator-name = "VDDSHV";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-boot-on;
+		vin-supply = <&vcc3v3in>;
 	};
 };
 
@@ -41,42 +63,52 @@
 };
 
 &am33xx_pinmux {
-	pinctrl-names = "default";
-
 	i2c0_pins: i2c0_pins {
 		pinctrl-single,pins = <
-			0x188 (PIN_INPUT_PULLUP | MUX_MODE0)		/* i2c0_sda.i2c0_sda */
-			0x18c (PIN_INPUT_PULLUP | MUX_MODE0)		/* i2c0_scl.i2c0_scl */
+			/* i2c0_sda.i2c0_sda */
+			AM33XX_PADCONF(AM335X_PIN_I2C0_SDA, PIN_INPUT_PULLUP, MUX_MODE0)
+			/* i2c0_scl.i2c0_scl */
+			AM33XX_PADCONF(AM335X_PIN_I2C0_SCL, PIN_INPUT_PULLUP, MUX_MODE0)
 		>;
 	};
 
 	mmc2_pins: mmc2_pins {
 		pinctrl-single,pins = <
-			0x00 (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad0.mmc1_dat0 */
-			0x04 (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad1.mmc1_dat1 */
-			0x08 (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad2.mmc1_dat2 */
-			0x0c (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad3.mmc1_dat3 */
-			0x10 (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad4.mmc1_dat4 */
-			0x14 (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad5.mmc1_dat5 */
-			0x18 (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad6.mmc1_dat6 */
-			0x1c (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE1)		/* gpmc_ad7.mmc1_dat7 */
-			0x80 (PIN_INPUT_PULLUP | MUX_MODE2)				/* gpmc_csn1.mmc1_clk */
-			0x84 (SLEWCTRL_SLOW | PIN_INPUT_PULLUP | MUX_MODE2)		/* gpmc_csn2.mmc1_cmd */
+			/* gpmc_ad0.mmc1_dat0 */
+			AM33XX_PADCONF(AM335X_PIN_GPMC_AD0, SLEWCTRL_SLOW | PIN_INPUT_PULLUP, MUX_MODE1)
+			/* gpmc_ad1.mmc1_dat1 */
+			AM33XX_PADCONF(AM335X_PIN_GPMC_AD1, SLEWCTRL_SLOW | PIN_INPUT_PULLUP, MUX_MODE1)
+			/* gpmc_ad2.mmc1_dat2 */
+			AM33XX_PADCONF(AM335X_PIN_GPMC_AD2, SLEWCTRL_SLOW | PIN_INPUT_PULLUP, MUX_MODE1)
+			/* gpmc_ad3.mmc1_dat3 */
+			AM33XX_PADCONF(AM335X_PIN_GPMC_AD3, SLEWCTRL_SLOW | PIN_INPUT_PULLUP, MUX_MODE1)
+			/* gpmc_ad4.mmc1_dat4 */
+			AM33XX_PADCONF(AM335X_PIN_GPMC_AD4, SLEWCTRL_SLOW | PIN_INPUT_PULLUP, MUX_MODE1)
+			/* gpmc_ad5.mmc1_dat5 */
+			AM33XX_PADCONF(AM335X_PIN_GPMC_AD5, SLEWCTRL_SLOW | PIN_INPUT_PULLUP, MUX_MODE1)
+			/* gpmc_ad6.mmc1_dat6 */
+			AM33XX_PADCONF(AM335X_PIN_GPMC_AD6, SLEWCTRL_SLOW | PIN_INPUT_PULLUP, MUX_MODE1)
+			/* gpmc_ad7.mmc1_dat7 */
+			AM33XX_PADCONF(AM335X_PIN_GPMC_AD7, SLEWCTRL_SLOW | PIN_INPUT_PULLUP, MUX_MODE1)
+			/* gpmc_csn1.mmc1_clk */
+			AM33XX_PADCONF(AM335X_PIN_GPMC_CSN1, PIN_INPUT_PULLUP, MUX_MODE2)
+			/* gpmc_csn2.mmc1_cmd */
+			AM33XX_PADCONF(AM335X_PIN_GPMC_CSN2, SLEWCTRL_SLOW | PIN_INPUT_PULLUP, MUX_MODE2)
 		>;
 	};
 
 	spi0_pins: pinmux_spi0_pins {
 		pinctrl-single,pins = <
-			0x150 (PIN_INPUT_PULLUP | MUX_MODE0)		/* spi0_clk.spi0_clk */
-			0x154 (PIN_INPUT | MUX_MODE0)		/* spi0_d0.spi0_d0 */
-			0x158 (PIN_OUTPUT_PULLUP | MUX_MODE0)		/* spi0_d1.spi0_d1 */
-			0x15c (PIN_OUTPUT_PULLUP | MUX_MODE0)	/* spi0_cs0.spi0_cs0 */
+			/* spi0_clk.spi0_clk */
+			AM33XX_PADCONF(AM335X_PIN_SPI0_SCLK, PIN_INPUT_PULLUP, MUX_MODE0)
+			/* spi0_d0.spi0_d0 */
+			AM33XX_PADCONF(AM335X_PIN_SPI0_D0, PIN_INPUT, MUX_MODE0)
+			/* spi0_d1.spi0_d1 */
+			AM33XX_PADCONF(AM335X_PIN_SPI0_D1, PIN_OUTPUT_PULLUP, MUX_MODE0)
+			/* spi0_cs0.spi0_cs0 */
+			AM33XX_PADCONF(AM335X_PIN_SPI0_CS0, PIN_OUTPUT_PULLUP, MUX_MODE0)
 		>;
 	};
-};
-
-&aes {
-	status = "okay";
 };
 
 &i2c0 {
@@ -85,7 +117,8 @@
 	clock-frequency = <100000>;
 	status = "okay";
 
-	jc42_1: temp-sensor@1f {
+	/* optional, not on TQMa335xL */
+	jc42_1: temperature-sensor@1f {
 		compatible = "jedec,jc-42.4-temp";
 		reg = <0x1f>;
 	};
@@ -93,60 +126,61 @@
 	tps: pmic@2d {
 		compatible = "ti,tps65910";
 		reg = <0x2d>;
-		interrupt-parent = <&expander2>;
-		interrupts = <4 IRQ_TYPE_EDGE_RISING>;
 		ti,en-ck32k-xtal;
 	};
 
+	/* optional, not on TQMa335xL */
 	eeprom: eeprom@50 {
 		compatible = "atmel,24c64";
 		pagesize = <32>;
 		reg = <0x50>;
 	};
 
+	/* optional, not on TQMa335xL */
 	se97btp: eeprom@57 {
 		compatible = "atmel,24c02";
 		pagesize = <16>;
 		reg = <0x57>;
 	};
 
+	/* optional, not on TQMa335xL */
 	ds1339: rtc@68 {
 		compatible = "dallas,ds1339";
 		reg = <0x68>;
-		interrupts = <43>;
 	};
 };
 
 &mmc2 {
-	status = "okay";
-	vmmc-supply = <&vmmc_reg>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&mmc2_pins>;
+	vmmc-supply = <&vddshv>;
 	bus-width = <8>;
 	ti,non-removable;
+	no-1-8-v;
 	no-sd;
 	no-sdio;
+	status = "okay";
+};
+
+&mmc3 {
+	status = "disabled";
 };
 
 &rtc {
 	status = "disabled";
 };
 
-&sham {
-	status = "okay";
-};
-
 /* include after i2c-device described */
 #include "tps65910.dtsi"
 &tps {
-	vcc1-supply = <&vbat>;
-	vcc2-supply = <&vbat>;
-	vcc3-supply = <&vbat>;
-	vcc4-supply = <&vbat>;
-	vcc5-supply = <&vbat>;
-	vcc6-supply = <&vbat>;
-	vcc7-supply = <&vbat>;
-	vccio-supply = <&vbat>;
+	vcc1-supply = <&vcc3v3in>;
+	vcc2-supply = <&vcc3v3in>;
+	vcc3-supply = <&vcc3v3in>;
+	vcc4-supply = <&vcc3v3in>;
+	vcc5-supply = <&vcc3v3in>;
+	vcc6-supply = <&vcc3v3in>;
+	vcc7-supply = <&vcc3v3in>;
+	vccio-supply = <&vcc3v3in>;
 
 	regulators {
 		vrtc_reg: regulator@0 {
@@ -206,8 +240,6 @@
 		};
 
 		vmmc_reg: regulator@12 {
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
 			regulator-always-on;
 		};
 	};
@@ -223,4 +255,12 @@
 		spi-max-frequency = <24000000>;
 		reg = <0x0>;
 	};
+};
+
+&usb0_phy {
+	vcc-supply = <&vaux1_reg>;
+};
+
+&usb1_phy {
+	vcc-supply = <&vaux1_reg>;
 };
