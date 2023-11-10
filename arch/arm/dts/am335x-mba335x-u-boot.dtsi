@@ -13,28 +13,12 @@
 		u-boot,mmc-env-offset-redundant = <0x280000>;
 		u-boot,spl-payload-offset = <0x20000>;
 	};
-
-	sound {
-		status = "disabled";
-	};
-};
-
-&dcan0 {
-	status = "disabled";
-};
-
-&dcan1 {
-	status = "disabled";
 };
 
 &mac {
 	/delete-property/ pinctrl-names;
 	/delete-property/pinctrl-0;
 	/delete-property/ dual_emac;
-};
-
-&mcasp0 {
-	status = "disabled";
 };
 
 &mmc1_pins {
@@ -47,16 +31,7 @@
 	u-boot,dm-spl;
 };
 
-&tlv320aic32x4 {
-	status = "disabled";
-};
-
 &uart4_pins {
-	u-boot,dm-pre-reloc;
-	u-boot,dm-spl;
-};
-
-&mmc2 {
 	u-boot,dm-pre-reloc;
 	u-boot,dm-spl;
 };
