@@ -48,41 +48,6 @@ struct serial_device *default_serial_console(void)
 }
 #endif
 
-static struct module_pin_mux rgmii1_pin_mux[] = {
-	{OFFSET(mii1_txen), MODE(2)},			/* RGMII1_TCTL */
-	{OFFSET(mii1_rxdv), MODE(2) | RXACTIVE},	/* RGMII1_RCTL */
-	{OFFSET(mii1_txd3), MODE(2)},			/* RGMII1_TD3 */
-	{OFFSET(mii1_txd2), MODE(2)},			/* RGMII1_TD2 */
-	{OFFSET(mii1_txd1), MODE(2)},			/* RGMII1_TD1 */
-	{OFFSET(mii1_txd0), MODE(2)},			/* RGMII1_TD0 */
-	{OFFSET(mii1_txclk), MODE(2)},			/* RGMII1_TCLK */
-	{OFFSET(mii1_rxclk), MODE(2) | RXACTIVE},	/* RGMII1_RCLK */
-	{OFFSET(mii1_rxd3), MODE(2) | RXACTIVE},	/* RGMII1_RD3 */
-	{OFFSET(mii1_rxd2), MODE(2) | RXACTIVE},	/* RGMII1_RD2 */
-	{OFFSET(mii1_rxd1), MODE(2) | RXACTIVE},	/* RGMII1_RD1 */
-	{OFFSET(mii1_rxd0), MODE(2) | RXACTIVE},	/* RGMII1_RD0 */
-	{OFFSET(mdio_data), MODE(0) | RXACTIVE | PULLUP_EN},/* MDIO_DATA */
-	{OFFSET(mdio_clk), MODE(0) | PULLUP_EN},	/* MDIO_CLK */
-	{-1},
-};
-
-static struct module_pin_mux rgmii2_pin_mux[] = {
-	{OFFSET(gpmc_a0),  MODE(2) | PULLDOWN_EN}, /* txctl */
-	{OFFSET(gpmc_a1),  MODE(2) | RXACTIVE | PULLDOWN_EN}, /* rxctl */
-	{OFFSET(gpmc_a2),  MODE(2) | PULLDOWN_EN}, /* txd3 */
-	{OFFSET(gpmc_a3),  MODE(2) | PULLDOWN_EN}, /* txd2 */
-	{OFFSET(gpmc_a4),  MODE(2) | PULLDOWN_EN}, /* txd1 */
-	{OFFSET(gpmc_a5),  MODE(2) | PULLDOWN_EN}, /* txd0 */
-	{OFFSET(gpmc_a6),  MODE(2) | PULLDOWN_EN}, /* txclk */
-	{OFFSET(gpmc_a7),  MODE(2) | RXACTIVE | PULLDOWN_EN}, /* rxclk */
-	{OFFSET(gpmc_a8),  MODE(2) | RXACTIVE | PULLDOWN_EN}, /* rxd3 */
-	{OFFSET(gpmc_a9),  MODE(2) | RXACTIVE | PULLDOWN_EN}, /* rxd2 */
-	{OFFSET(gpmc_a10), MODE(2) | RXACTIVE | PULLDOWN_EN}, /* rxd1 */
-	{OFFSET(gpmc_a11), MODE(2) | RXACTIVE | PULLDOWN_EN}, /* rxd0 */
-	{OFFSET(gpmc_csn0), MODE(7) | RXACTIVE }, /* gpio1_29 */
-	{-1},
-};
-
 void set_uart_mux_conf(void)
 {
 	enable_uart4_pin_mux();
@@ -92,8 +57,6 @@ void enable_board_pin_mux(void)
 {
 	enable_mmc0_pin_mux();
 	enable_uart4_pin_mux();
-	configure_module_pin_mux(rgmii1_pin_mux);
-	configure_module_pin_mux(rgmii2_pin_mux);
 }
 
 #if defined(CONFIG_ENV_IS_IN_MMC)

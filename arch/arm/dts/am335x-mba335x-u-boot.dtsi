@@ -16,8 +16,11 @@
 };
 
 &mac {
-	/delete-property/ pinctrl-names;
-	/delete-property/pinctrl-0;
+	/*
+	 * U-Boot does not have a proper driver for the MDIO bus, so the
+	 * pinctrl must be assigned to the Ethernet controller.
+	 */
+	pinctrl-0 = <&cpsw_default>, <&davinci_mdio_default>;
 	/delete-property/ dual_emac;
 };
 
