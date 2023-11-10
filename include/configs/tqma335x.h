@@ -145,7 +145,8 @@
 		"fi; "                                                         \
 		"echo ... failed\0"                                            \
 	DFUARGS \
-	BOOTENV
+	BOOTENV \
+	"boot_targets=\0"
 #endif
 
 /* NS16550 Configuration */

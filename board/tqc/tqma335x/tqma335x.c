@@ -393,14 +393,17 @@ int board_late_init(void)
 	/* must hold largest field of eeprom data */
 	char safe_string[0x41];
 	struct tqc_eeprom_data eedat;
+	const char *boot_target = NULL;
 
 	puts("BOOT:\t");
 	switch (gd->arch.omap_boot_device) {
 	case BOOT_DEVICE_MMC1:
 		puts("MMC1 (SD)\n");
+		boot_target = "legacy_mmc0";
 		break;
 	case BOOT_DEVICE_MMC2:
 		puts("MMC2 (e-MMC)\n");
+		boot_target = "legacy_mmc1";
 		break;
 	case BOOT_DEVICE_SPI:
 		puts("SPI (SPI-NOR)\n");
@@ -409,6 +412,9 @@ int board_late_init(void)
 		printf("unknown (%u)\n", gd->arch.omap_boot_device);
 		break;
 	}
+
+	if (boot_target && !env_get("boot_targets"))
+		env_set("boot_targets", boot_target);
 
 	ret = tqc_read_eeprom_buf(CONFIG_SYS_EEPROM_BUS_NUM,
 				  CONFIG_SYS_I2C_EEPROM_ADDR,
