@@ -1,6 +1,12 @@
-TQ-SYSTEMS TQMA6 BOARD
-M:	Markus Niebel <Markus.Niebel@tq-group.com>
+TQ-Systems GmbH TQMa6x module and base boards
+L:	linux@ew.tq-group.com
+S:	Supported
+W:	https://www.tq-group.com/en/products/tq-embedded/
 S:	Maintained
+F:	arch/arm/dts/*tqma6*.dtsi
+F:	arch/arm/dts/*mba6*.dtsi
+F:	arch/arm/dts/*mba6*.dts
 F:	board/tq/tqma6/
-F:	include/configs/tqma6.h
 F:	configs/tqma6*_defconfig
+F:	include/configs/tqma6*.h
+F:	include/configs/tq-imx-shared-env.h
