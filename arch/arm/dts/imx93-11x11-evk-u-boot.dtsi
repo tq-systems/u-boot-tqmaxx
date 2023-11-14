@@ -200,12 +200,115 @@
 
 &lpi2c2 {
 	bootph-pre-ram;
+
+#if CONFIG_IS_ENABLED(DM_PMIC_PF0900)
+	/delete-node/ pmic@25;
+	pmic1: pmic@8 {
+		compatible = "nxp,pf0900";
+		reg = <0x08>;
+		interrupt-parent = <&pcal6524>;
+		interrupts = <11 IRQ_TYPE_EDGE_FALLING>;
+		status = "okay";
+
+		regulators {
+			vaon: VAON {
+				regulator-name = "VAON";
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+
+			sw1: SW1 {
+				regulator-name = "SW1";
+				regulator-min-microvolt = <500000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+				regulator-ramp-delay = <1950>;
+			};
+
+			sw2: SW2 {
+				regulator-name = "SW2";
+				regulator-min-microvolt = <300000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+				regulator-ramp-delay = <1950>;
+			};
+
+			sw3: SW3 {
+				regulator-name = "SW3";
+				regulator-min-microvolt = <300000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+				regulator-ramp-delay = <1950>;
+			};
+
+			sw4: SW4{
+				regulator-name = "SW4";
+				regulator-min-microvolt = <300000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+				regulator-ramp-delay = <1950>;
+			};
+
+			sw5: SW5{
+				regulator-name = "SW5";
+				regulator-min-microvolt = <300000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+				regulator-ramp-delay = <1950>;
+			};
+
+			ldo1: LDO1 {
+				regulator-name = "LDO1";
+				regulator-min-microvolt = <750000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+
+			ldo2: LDO2 {
+				regulator-name = "LDO2";
+				regulator-min-microvolt = <650000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+
+			ldo3: LDO3 {
+				regulator-name = "LDO3";
+				regulator-min-microvolt = <650000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+		};
+	};
+
+    adp5585: io-expander@34 {
+		vdd-supply = <&sw2>;
+	};
+#endif
 };
 
 &lpi2c3 {
 	bootph-pre-ram;
 };
 
+#if CONFIG_IS_ENABLED(DM_PMIC_PF0900)
+&{/soc@0/bus@44000000/i2c@44350000/pmic@8} {
+	bootph-pre-ram;
+};
+
+&{/soc@0/bus@44000000/i2c@44350000/pmic@8/regulators} {
+	bootph-pre-ram;
+};
+#else
 &{/soc@0/bus@44000000/i2c@44350000/pmic@25} {
 	bootph-pre-ram;
 };
@@ -213,6 +316,7 @@
 &{/soc@0/bus@44000000/i2c@44350000/pmic@25/regulators} {
 	bootph-pre-ram;
 };
+#endif
 
 &pinctrl_lpi2c1 {
 	bootph-pre-ram;
