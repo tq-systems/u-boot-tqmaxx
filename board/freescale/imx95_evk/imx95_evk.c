@@ -337,3 +337,14 @@ int board_phys_sdram_size(phys_size_t *size)
 
 	return 0;
 }
+
+void board_quiesce_devices(void)
+{
+	int ret;
+
+	ret = imx9_scmi_power_domain_enable(IMX95_PD_NETC, false);
+	if (ret) {
+		printf("%s: Failed for NETC MIX: %d\n", __func__, ret);
+		return;
+	}
+}
