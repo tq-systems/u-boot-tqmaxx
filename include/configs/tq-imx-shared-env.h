@@ -91,10 +91,12 @@
 			"fi; "                                         \
 		"fi; "                                                 \
 		"setenv filesize \0"                                   \
+	TQ_IMX_SHARED_UBI_ENV_SETTINGS                                 \
+
+#define TQ_IMX_SPI_UBOOT_UPDATE                                        \
 	"write_uboot_spi="                                             \
 		"sf update ${loadaddr} ${uboot_spi_start} "            \
 			"${filesize} \0"                               \
-	TQ_IMX_SHARED_UBI_ENV_SETTINGS                                 \
 
 #define TQ_IMX_LEGACY_SPI_UBOOT_UPDATE                                 \
 	"write_uboot_spi="                                             \
@@ -119,11 +121,11 @@
 		"sf write ${loadaddr} ${uboot_spi_start} "             \
 			"${filesize}; "                                \
 		"setenv erase_range; "                                 \
-		"setenv erase_sector_count; "                          \
-	"fi; \0"                                                       \
+		"setenv erase_sector_count; \0"                        \
 
 #else
 #define TQ_IMX_SHARED_SPI_ENV_SETTINGS
+#define TQ_IMX_SPI_UBOOT_UPDATE
 #define TQ_IMX_LEGACY_SPI_UBOOT_UPDATE
 #endif
 

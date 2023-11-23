@@ -88,6 +88,7 @@
 #define CFG_EXTRA_ENV_SETTINGS                                         \
 	CFG_MODULE_ENV_SETTINGS                                        \
 	TQ_IMX_SHARED_ENV_SETTINGS                                     \
+	TQ_IMX_SPI_UBOOT_UPDATE                                        \
 	BB_ENV_SETTINGS                                                \
 	CFG_MFG_ENV_SETTINGS                                           \
 	BOOTENV                                                        \
