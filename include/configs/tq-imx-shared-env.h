@@ -76,33 +76,55 @@
 #define TQ_IMX_SHARED_UBI_ENV_SETTINGS
 #endif
 
-#define TQ_IMX_SHARED_SPI_ENV_SETTINGS                                             \
-	"update_uboot_spi="                                                        \
-		"run check_ipaddr; "                                               \
-		"setenv filesize; "                                                \
-		"if tftp ${uboot}; then "                                          \
-			"echo Write u-boot image to SPI NOR ...; "                 \
-			"setexpr erase_range ${filesize} + ${uboot_spi_start}; "   \
-			"setexpr erase_sector_count ${erase_range} "               \
-				"+ ${uboot_spi_sector_size}; "                     \
-			"setexpr erase_sector_count ${erase_sector_count} "        \
-				"/ ${uboot_spi_sector_size}; "                     \
-			"setexpr erase_bytes ${erase_sector_count} "               \
-				"* ${uboot_spi_sector_size}; "                     \
-			"if sf probe; then "                                       \
-				"sf erase 0 ${erase_bytes}; "                      \
-				"if itest ${filesize} <= ${uboot_spi_size}; then " \
-					"sf write ${loadaddr} "                    \
-						"${uboot_spi_start} "              \
-						"${filesize}; "                    \
-				"fi; "                                             \
-			"fi; "                                                     \
-		"fi; "                                                             \
-		"setenv filesize \0"                                               \
-	TQ_IMX_SHARED_UBI_ENV_SETTINGS                                             \
+#define TQ_IMX_SHARED_SPI_ENV_SETTINGS                                 \
+	"update_uboot_spi="                                            \
+		"run check_ipaddr; "                                   \
+		"setenv filesize; "                                    \
+		"if tftp ${uboot}; then "                              \
+			"if itest ${filesize} >= ${uboot_spi_size}; then "\
+				"echo ERROR: size to large ...; "      \
+				"exit; "                               \
+			"fi; "                                         \
+			"echo Write u-boot image to SPI NOR ...; "     \
+			"if sf probe; then "                           \
+				"run write_uboot_spi; "                \
+			"fi; "                                         \
+		"fi; "                                                 \
+		"setenv filesize \0"                                   \
+	"write_uboot_spi="                                             \
+		"sf update ${loadaddr} ${uboot_spi_start} "            \
+			"${filesize} \0"                               \
+	TQ_IMX_SHARED_UBI_ENV_SETTINGS                                 \
+
+#define TQ_IMX_LEGACY_SPI_UBOOT_UPDATE                                 \
+	"write_uboot_spi="                                             \
+		"if test ${uboot_spi_sector_size} = ''; then "         \
+			"echo ERROR: uboot_spi_sector_size; "          \
+			"exit; "                                       \
+		"fi; "                                                 \
+		"setexpr erase_range "                                 \
+			"${filesize} + ${uboot_spi_start}; "           \
+		"setexpr erase_range "                                 \
+			"${erase_range} + "                            \
+			"${uboot_spi_sector_size}; "                   \
+		"setexpr erase_range "                                 \
+			"${erase_range} - 1; "                         \
+		"setexpr erase_sector_count "                          \
+			"${erase_range} / "                            \
+			"${uboot_spi_sector_size}; "                   \
+		"setexpr erase_range "                                 \
+			"${erase_sector_count} * "                     \
+			"${uboot_spi_sector_size}; "                   \
+		"sf erase 0 ${erase_range}; "                          \
+		"sf write ${loadaddr} ${uboot_spi_start} "             \
+			"${filesize}; "                                \
+		"setenv erase_range; "                                 \
+		"setenv erase_sector_count; "                          \
+	"fi; \0"                                                       \
 
 #else
 #define TQ_IMX_SHARED_SPI_ENV_SETTINGS
+#define TQ_IMX_LEGACY_SPI_UBOOT_UPDATE
 #endif
 
 #ifdef CONFIG_CMD_MMC
