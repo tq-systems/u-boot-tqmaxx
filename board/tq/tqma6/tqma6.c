@@ -202,10 +202,19 @@ int board_late_init(void)
 	board_late_mmc_env_init();
 
 	ret = tq_read_module_eeprom(&eeprom);
-	if (!ret)
-		tq_board_handle_eeprom_data(bname, &eeprom);
-	else
+	if (!ret) {
+		const char *beename = bname;
+
+		/*
+		 * Since the i.MX6DL order codes start with MIMX6U
+		 * the type name string in EEPROM is TQMa6U.<short variant>-<REV>
+		 */
+		if (!strcmp(bname, "TQMa6DL"))
+			beename = "TQMa6U";
+		tq_board_handle_eeprom_data(beename, &eeprom);
+	} else {
 		pr_err("EEPROM: read error %d\n", ret);
+	}
 
 	return 0;
 }
