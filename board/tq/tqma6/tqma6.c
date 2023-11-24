@@ -272,6 +272,13 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 		puts("e-MMC: not present?\n");
 	}
 
+	if (CONFIG_IS_ENABLED(TQ_SPI_NOR)) {
+		const char * const path = "/soc/bus@2000000/spba-bus@2000000/spi@2008000/flash@0";
+		/* Update SPI NOR node this needs the device to be probed. */
+		puts("   Updating SPI NOR status...\n");
+		tq_ft_spi_setup(blob, path, NULL, 0);
+	}
+
 	return 0;
 }
 #endif /* defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT) */
