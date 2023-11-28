@@ -331,9 +331,14 @@ static const char *tqma62xx_cpu_type(void)
 	}
 }
 
-int checkboard(void)
+int show_board_info(void)
 {
+	const char *model = fdt_getprop(gd->fdt_blob, 0, "model", NULL);
+
 	printf("SoC variant: AM%s\n", tqma62xx_cpu_type());
+	if (model)
+		printf("Model: %s\n", model);
+
 	return 0;
 }
 
