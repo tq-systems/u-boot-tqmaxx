@@ -14,6 +14,7 @@ ifdef CONFIG_RISCV
 obj-$(CONFIG_USE_PRIVATE_LIBGCC) += test_clz.o
 obj-$(CONFIG_USE_PRIVATE_LIBGCC) += test_ctz.o
 endif
+obj-y += fs_path_simplify.o
 obj-y += hexdump.o
 obj-$(CONFIG_SANDBOX) += kconfig.o
 obj-$(CONFIG_LMB) += lmb.o
