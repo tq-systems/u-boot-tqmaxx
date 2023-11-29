@@ -2,7 +2,7 @@
 /*
  * Configuration header file for TQ-Systems TQMa62xx
  *
- * Copyright (c) 2020-2023 TQ-Systems GmbH <u-boot@tq-group.com>, D-82229 Seefeld, Germany.
+ * Copyright (c) 2020-2023 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
  */
 
 #ifndef __CONFIG_TQMA62XX_H

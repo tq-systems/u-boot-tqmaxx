@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (C) 2021 Texas Instruments Incorporated - https://www.ti.com/
- * Copyright (c) 2022-2023 TQ-Systems GmbH <u-boot@tq-group.com>, D-82229 Seefeld, Germany.
+ * Copyright (c) 2022-2023 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
  */
 
 / {
