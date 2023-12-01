@@ -78,13 +78,13 @@
 	u-boot,dm-spl;
 };
 
+&usbotg1 {
+	extcon = <&tcpc>;
+};
+
 &usdhc2 {
 	u-boot,dm-spl;
 	fsl,signal-voltage-switch-extra-delay-ms = <8>;
 	sd-uhs-sdr104;
 	sd-uhs-ddr50;
-};
-
-&usbotg1 {
-	extcon = <&tcpc>;
 };
