@@ -6,6 +6,19 @@
 #include "imx95-u-boot.dtsi"
 #include "imx95-19x19-evk-local.dtsi"
 
+&scmi_iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>;
+
+	pinctrl_hog: hoggrp {
+		bootph-pre-ram;
+
+		fsl,pins = <
+			IMX95_PAD_XSPI1_SS1_B__GPIO5_IO_BIT11			0x3fe
+		>;
+	};
+};
+
 &lpuart1 {
 	bootph-pre-ram;
 };
