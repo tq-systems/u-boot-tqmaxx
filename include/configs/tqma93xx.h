@@ -11,15 +11,16 @@
 #include <linux/sizes.h>
 #include <linux/stringify.h>
 #include <asm/arch/imx-regs.h>
-#include "imx_env.h"
 
 #define CFG_SYS_UBOOT_BASE	\
 	(QSPI0_AMBA_BASE + CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR * 512)
 
 #define CFG_MFG_ENV_SETTINGS                                           \
-	CFG_MFG_ENV_SETTINGS_DEFAULT                                   \
-	"initrd_addr=0x83800000\0"                                     \
-	"emmc_dev=0\0"                                                 \
+	"fastboot_partition_alias_all="	                               \
+		__stringify(CONFIG_FASTBOOT_FLASH_MMC_DEV) ".0:0\0"    \
+	"fastboot_partition_alias_bootloader="                         \
+		__stringify(CONFIG_FASTBOOT_FLASH_MMC_DEV) ".1:0\0"    \
+	"emmc_dev=" __stringify(CONFIG_FASTBOOT_FLASH_MMC_DEV) "\0"    \
 	"sd_dev=1\0"
 
 /* Initial environment variables */
