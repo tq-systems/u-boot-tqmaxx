@@ -21,7 +21,9 @@
 #include <thermal.h>
 #include <scmi_agent.h>
 #include <linux/bitops.h>
+#include <linux/bitfield.h>
 #include "../dts/upstream/src/arm64/freescale/imx95-power.h"
+#include <scmi_nxp_protocols.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -503,6 +505,114 @@ err:
 	printf("%s: fuse read err: %d\n", __func__, ret);
 }
 
+static char *rst_string[32] = {
+	"cm33_lockup",
+	"cm33_swreq",
+	"cm7_lockup",
+	"cm7_swreq",
+	"fccu",
+	"jtag_sw",
+	"ele",
+	"tempsense",
+	"wdog1",
+	"wdog2",
+	"wdog3",
+	"wdog4",
+	"wdog5",
+	"jtag",
+	"cm33_exc",
+	"bbm",
+	"sw",
+	"unused", "unused", "unused", "unused", "unused", "unused",
+	"unused", "unused", "unused", "unused", "unused", "unused",
+	"unused", "unused",
+	"por"
+};
+
+int get_reset_reason(bool sys, bool lm)
+{
+	struct scmi_imx_misc_reset_reason_in in = {
+		.flags = MISC_REASON_FLAG_SYSTEM,
+	};
+
+	struct scmi_imx_misc_reset_reason_out out = { 0 };
+	struct scmi_msg msg = {
+		.protocol_id = SCMI_PROTOCOL_ID_IMX_MISC,
+		.message_id = SCMI_IMX_MISC_RESET_REASON,
+		.in_msg = (u8 *)&in,
+		.in_msg_sz = sizeof(in),
+		.out_msg = (u8 *)&out,
+		.out_msg_sz = sizeof(out),
+	};
+	int ret;
+
+	struct udevice *dev;
+
+	ret = uclass_get_device_by_name(UCLASS_CLK, "protocol@14", &dev);
+	if (ret)
+		return ret;
+
+	if (sys) {
+		ret = devm_scmi_process_msg(dev, &msg);
+		if (out.status) {
+			printf("%s:%d for SYS\n", __func__, out.status);
+			return ret;
+		}
+
+		if (out.bootflags & MISC_BOOT_FLAG_VLD) {
+			printf("SYS Boot reason: %s, origin: %ld, errid: %ld\n",
+			       rst_string[out.bootflags & MISC_BOOT_FLAG_REASON],
+			       out.bootflags & MISC_BOOT_FLAG_ORG_VLD ?
+			       FIELD_GET(MISC_BOOT_FLAG_ORIGIN, out.bootflags) : -1,
+			       out.bootflags & MISC_BOOT_FLAG_ERR_VLD ?
+			       FIELD_GET(MISC_BOOT_FLAG_ERR_ID, out.bootflags) : -1
+			       );
+		}
+		if (out.bootflags & MISC_SHUTDOWN_FLAG_VLD) {
+			printf("SYS shutdown reason: %s, origin: %ld, errid: %ld\n",
+			       rst_string[out.bootflags & MISC_SHUTDOWN_FLAG_REASON],
+			       out.bootflags & MISC_SHUTDOWN_FLAG_ORG_VLD ?
+			       FIELD_GET(MISC_SHUTDOWN_FLAG_ORIGIN, out.bootflags) : -1,
+			       out.bootflags & MISC_SHUTDOWN_FLAG_ERR_VLD ?
+			       FIELD_GET(MISC_SHUTDOWN_FLAG_ERR_ID, out.bootflags) : -1
+			       );
+		}
+	}
+
+	if (lm) {
+		in.flags = 0;
+		memset(&out, 0, sizeof(struct scmi_imx_misc_reset_reason_out));
+
+		ret = devm_scmi_process_msg(dev, &msg);
+		if (out.status) {
+			printf("%s:%d for LM\n", __func__, out.status);
+			return ret;
+		}
+
+		if (out.bootflags & MISC_BOOT_FLAG_VLD) {
+			printf("LM Boot reason: %s, origin: %ld, errid: %ld\n",
+			       rst_string[out.bootflags & MISC_BOOT_FLAG_REASON],
+			       out.bootflags & MISC_BOOT_FLAG_ORG_VLD ?
+			       FIELD_GET(MISC_BOOT_FLAG_ORIGIN, out.bootflags) : -1,
+			       out.bootflags & MISC_BOOT_FLAG_ERR_VLD ?
+			       FIELD_GET(MISC_BOOT_FLAG_ERR_ID, out.bootflags) : -1
+			       );
+		}
+
+		if (out.bootflags & MISC_SHUTDOWN_FLAG_VLD) {
+			printf("LM shutdown reason: %s, origin: %ld, errid: %ld\n",
+			       rst_string[out.bootflags & MISC_SHUTDOWN_FLAG_REASON],
+			       out.bootflags & MISC_SHUTDOWN_FLAG_ORG_VLD ?
+			       FIELD_GET(MISC_SHUTDOWN_FLAG_ORIGIN, out.bootflags) : -1,
+			       out.bootflags & MISC_SHUTDOWN_FLAG_ERR_VLD ?
+			       FIELD_GET(MISC_SHUTDOWN_FLAG_ERR_ID, out.bootflags) : -1
+			       );
+		}
+	}
+
+	return 0;
+}
+
 const char *get_imx_type(u32 imxtype)
 {
 	switch (imxtype) {
@@ -572,6 +682,8 @@ int print_cpuinfo(void)
 	}
 #endif
 	puts("\n");
+
+	get_reset_reason(false, true);
 
 	return 0;
 }

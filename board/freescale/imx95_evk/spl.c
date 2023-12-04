@@ -3,6 +3,7 @@
  * Copyright 2025 NXP
  */
 
+#include <asm/arch/sys_proto.h>
 #include <asm/arch/clock.h>
 #include <asm/arch/mu.h>
 #include <asm/mach-imx/boot_mode.h>
@@ -91,6 +92,8 @@ void board_init_f(ulong dummy)
 
 	debug("SOC: 0x%x\n", gd->arch.soc_rev);
 	debug("LC: 0x%x\n", gd->arch.lifecycle);
+
+	get_reset_reason(true, false);
 
 	/* Will set ARM freq to max rate */
 	clock_init_late();
