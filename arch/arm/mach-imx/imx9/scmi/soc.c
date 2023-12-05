@@ -312,7 +312,11 @@ static struct mm_region imx9_mem_map[] = {
 		.phys = PHYS_SDRAM,
 		.size = PHYS_SDRAM_SIZE,
 		.attrs = PTE_BLOCK_MEMTYPE(MT_NORMAL) |
+#ifdef CONFIG_IMX_TRUSTY_OS
+				 PTE_BLOCK_INNER_SHARE
+#else
 				 PTE_BLOCK_OUTER_SHARE
+#endif
 	}, {
 #ifdef PHYS_SDRAM_2_SIZE
 		/* DRAM2 */
