@@ -11,6 +11,7 @@
 #include <hang.h>
 #include <init.h>
 #include <spl.h>
+#include <asm/mach-imx/ele_api.h>
 #include <asm/gpio.h>
 #include <linux/delay.h>
 
@@ -36,7 +37,13 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 
 void spl_board_init(void)
 {
+	int ret;
+
 	puts("Normal Boot\n");
+
+	ret = ele_start_rng();
+	if (ret)
+		printf("Fail to start RNG: %d\n", ret);
 }
 
 static void flexspi_nor_reset(void)
