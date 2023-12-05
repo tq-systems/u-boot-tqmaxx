@@ -67,8 +67,14 @@ memory size
 baseboard:
 * mba8mx for MBa8Mx starterkit mainboard
 
+The ATF load address set in the following must match BL31_BASE of the ATF build:
+
+- TQMa8MxML: 0x920000
+- TQMa8MxNL: 0x960000
+
 $ export CROSS_COMPILE=<compiler path and prefix>
 $ export ARCH=arm
+$ export ATF_LOAD_ADDR=<ATF load address>
 $ make tqma8mx[m,n]l_<mem>_<baseboard>_mmc_defconfig
 $ make flash.bin
 
