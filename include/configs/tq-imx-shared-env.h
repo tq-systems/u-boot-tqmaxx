@@ -296,13 +296,18 @@
 #define BOOT_TARGET_MMC1(func)
 #endif
 
+/*
+ * For every enabled boot device a script 'bootcmd_<device>' will be generated.
+ * The boot device scripts will be executed in this order until boot from a
+ * device is successful
+ */
 #define BOOT_TARGET_DEVICES(func)                                      \
-	BOOT_TARGET_DHCP(func)                                         \
 	BOOT_TARGET_MMC0(func)                                         \
-	BOOT_TARGET_MMC1(func)                                         \
-	BOOT_TARGET_PXE(func)                                          \
 	BOOT_TARGET_UBIFS(func)                                        \
-	BOOT_TARGET_USB(func)
+	BOOT_TARGET_MMC1(func)                                         \
+	BOOT_TARGET_USB(func)                                          \
+	BOOT_TARGET_PXE(func)                                          \
+	BOOT_TARGET_DHCP(func)                                         \
 
 #include <config_distro_bootcmd.h>
 
