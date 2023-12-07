@@ -214,7 +214,7 @@
 	"rootfsmode=ro\0"                                                      \
 	"addtty=setenv bootargs ${bootargs} console=${console},${baudrate}\0"  \
 	"mmcargs=run addtty addmmc\0"                              \
-	"mmcrootpart=1\0"                                                      \
+	"mmcrootpart=2\0"                                                      \
 	"addmmc=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/mmcblk${mmcblkdev}p${mmcrootpart} ${rootfsmode} "   \
 		"rootwait\0"                                                   \
