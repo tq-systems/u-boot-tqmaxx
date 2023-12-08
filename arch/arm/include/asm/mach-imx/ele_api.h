@@ -28,6 +28,7 @@
 #define ELE_START_RNG (0xA3)
 #define ELE_CMD_DERIVE_KEY (0xA9)
 #define ELE_GENERATE_DEK_BLOB (0xAF)
+#define ELE_V2X_GET_STATE_REQ (0xB2)
 #define ELE_ENABLE_PATCH_REQ (0xC3)
 #define ELE_RELEASE_RDC_REQ (0xC4)
 #define ELE_GET_FW_STATUS_REQ (0xC5)
@@ -143,6 +144,12 @@ struct ele_get_info_data {
 	u32 state;
 };
 
+struct v2x_get_state {
+	u8 v2x_state;
+	u8 v2x_power_state;
+	u32 v2x_err_code;
+};
+
 int ele_release_rdc(u8 core_id, u8 xrdc, u32 *response);
 int ele_auth_oem_ctnr(ulong ctnr_addr, u32 *response);
 int ele_release_container(u32 *response);
@@ -165,4 +172,5 @@ int ele_return_lifecycle_update(ulong signed_msg_blk, u32 *response);
 int ele_start_rng(void);
 int ele_write_shadow_fuse(u32 fuse_id, u32 fuse_val, u32 *response);
 int ele_read_shadow_fuse(u32 fuse_id, u32 *fuse_val, u32 *response);
+int ele_v2x_get_state(struct v2x_get_state *state, u32 *response);
 #endif
