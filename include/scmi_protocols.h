@@ -1172,6 +1172,19 @@ struct scmi_sensor_config_get_p2a {
 	uint32_t sensor_config;
 };
 
+struct scmi_sensor_config_set_a2p {
+	u32 id;
+	u32 sensor_config;
+};
+
+struct scmi_sensor_config_set_p2a {
+	u32 status;
+};
+
+#define SCMI_SENS_CFG_ENABLED_MASK	BIT(0)
+#define SCMI_SENS_CFG_ENABLE		1
+#define SCMI_SENS_CFG_DISABLE		0
+
 /*
  * Sensor Reading Get
  */
