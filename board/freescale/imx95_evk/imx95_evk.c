@@ -304,6 +304,13 @@ void netc_init(void)
 }
 int board_init(void)
 {
+	int ret;
+	ret = imx9_scmi_power_domain_enable(IMX95_PD_HSIO_TOP, true);
+	if (ret) {
+		printf("SCMI_POWWER_STATE_SET Failed for USB\n");
+		return ret;
+	}
+
 #if defined(CONFIG_USB_TCPC)
 	setup_typec();
 #endif
@@ -341,6 +348,12 @@ int board_phys_sdram_size(phys_size_t *size)
 void board_quiesce_devices(void)
 {
 	int ret;
+
+	ret = imx9_scmi_power_domain_enable(IMX95_PD_HSIO_TOP, false);
+	if (ret) {
+		printf("%s: Failed for HSIO MIX: %d\n", __func__, ret);
+		return;
+	}
 
 	ret = imx9_scmi_power_domain_enable(IMX95_PD_NETC, false);
 	if (ret) {
