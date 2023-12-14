@@ -173,4 +173,5 @@ int ele_start_rng(void);
 int ele_write_shadow_fuse(u32 fuse_id, u32 fuse_val, u32 *response);
 int ele_read_shadow_fuse(u32 fuse_id, u32 *fuse_val, u32 *response);
 int ele_v2x_get_state(struct v2x_get_state *state, u32 *response);
+int ele_message_call(struct ele_msg *msg);
 #endif
