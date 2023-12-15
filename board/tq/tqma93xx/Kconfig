@@ -19,6 +19,7 @@ config TQMA93XX_DEFAULTS
 	select TQ_RTC
 	select TQ_SDMMC
 	select TQ_VARD
+	imply MISC
 	imply I2C_EEPROM
 
 choice
