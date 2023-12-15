@@ -228,11 +228,6 @@ const char *tq_bb_get_boardname(void)
 	return "Unknown";
 }
 
-int tq_bb_checkboard(void)
-{
-	return 0;
-}
-
 /*
  * SD0 -> mmc0 / mmcblk0
  * SD1 -> mmc1 / mmcblk1
