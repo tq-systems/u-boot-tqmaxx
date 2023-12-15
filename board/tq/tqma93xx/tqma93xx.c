@@ -220,7 +220,7 @@ int board_late_init(void)
 
 	if (CONFIG_IS_ENABLED(ENV_VARS_UBOOT_RUNTIME_CONFIG)) {
 		env_set("board_name", tq_bb_get_boardname());
-		env_set("board_rev", tq_get_boardname());
+		env_set("board_rev", bname);
 
 		if (CONFIG_IS_ENABLED(AHAB_BOOT))
 			env_set("sec_boot", "yes");
