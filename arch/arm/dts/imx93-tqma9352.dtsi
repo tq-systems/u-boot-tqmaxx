@@ -119,6 +119,10 @@
 	vref-supply = <&buck5>;
 };
 
+&ele_mu {
+	memory-region = <&ele_reserved>;
+};
+
 &flexspi1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexspi1>;
