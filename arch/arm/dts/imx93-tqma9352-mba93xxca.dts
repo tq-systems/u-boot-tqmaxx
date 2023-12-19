@@ -301,6 +301,30 @@
 };
 
 &gpio1 {
+	gpio-line-names =
+		/* 00 */ "", "", "USB_C_ALERT#", "PMIC_IRQ#",
+		/* 04 */ "", "", "", "",
+		/* 08 */ "", "", "", "BM2_TEMP_EVENT_MOD#",
+		/* 12 */ "PEX_INT#", "", "RTC_EVENT#", "",
+		/* 16 */ "", "", "", "",
+		/* 20 */ "", "", "", "",
+		/* 24 */ "", "", "", "",
+		/* 28 */ "", "", "", "";
+
+	tcpc-irq-hog {
+		gpio-hog;
+		gpios = <2 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "USB_C_ALERT#";
+	};
+
+	temp-alarm-mod-hog {
+		gpio-hog;
+		gpios = <11 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "BM2_TEMP_EVENT_MOD#";
+	};
+
 	expander-irq-hog {
 		gpio-hog;
 		gpios = <12 GPIO_ACTIVE_LOW>;
@@ -308,11 +332,71 @@
 		line-name = "PEX_INT#";
 	};
 
-	tcpc-irq-hog {
+	rtc-irq-hog {
 		gpio-hog;
-		gpios = <2 GPIO_ACTIVE_LOW>;
+		gpios = <14 GPIO_ACTIVE_LOW>;
 		input;
-		line-name = "USB_C_ALERT#";
+		line-name = "RTC_EVENT#";
+	};
+};
+
+&gpio2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpio2>;
+
+	gpio-line-names =
+		/* 00 */ "SPI6_PCS0#", "", "", "",
+		/* 04 */ "", "", "", "SPI_CS#",
+		/* 08 */ "", "FAN_RPM", "MIPI_CSI_TRIGGER", "MIPI_CSI_SYNC",
+		/* 12 */ "", "", "", "",
+		/* 16 */ "X1_11", "X1_21", "X1_17", "X1_13",
+		/* 20 */ "X1_15", "X1_9", "", "",
+		/* 24 */ "", "", "X1_7", "",
+		/* 28 */ "", "", "", "";
+};
+
+&gpio3 {
+	gpio-line-names =
+		/* 00 */ "SD2_CD#", "", "", "",
+		/* 04 */ "", "", "", "SD2_RST#",
+		/* 08 */ "", "", "", "",
+		/* 12 */ "", "", "", "",
+		/* 16 */ "", "", "", "",
+		/* 20 */ "", "", "", "",
+		/* 24 */ "", "", "ENET1_INT#", "ENET2_INT#",
+		/* 28 */ "", "", "", "";
+
+	ethphy-eqos-irq-hog {
+		gpio-hog;
+		gpios = <26 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "ENET1_INT#";
+	};
+
+	ethphy-fec-irq-hog {
+		gpio-hog;
+		gpios = <27 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "ENET2_INT#";
+	};
+};
+
+&gpio4 {
+	gpio-line-names =
+		/* 00 */ "", "", "", "",
+		/* 04 */ "", "", "", "",
+		/* 08 */ "", "", "", "",
+		/* 12 */ "", "", "", "",
+		/* 16 */ "", "", "", "",
+		/* 20 */ "", "", "", "",
+		/* 24 */ "", "", "", "",
+		/* 28 */ "", "DP_INT", "", "";
+
+	dp-int-hog {
+		gpio-hog;
+		gpios = <29 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "DP_INT";
 	};
 };
 
@@ -667,6 +751,19 @@
 		fsl,pins = <
 			MX93_PAD_GPIO_IO25__CAN2_TX		0x139e
 			MX93_PAD_GPIO_IO27__CAN2_RX		0x139e
+		>;
+	};
+
+	pinctrl_gpio2: gpio2grp {
+		fsl,pins = <
+			/* HYS | PD | FSEL_2 | DSE X4 */
+			MX93_PAD_GPIO_IO16__GPIO2_IO16			0x151e
+			MX93_PAD_GPIO_IO17__GPIO2_IO17			0x151e
+			MX93_PAD_GPIO_IO18__GPIO2_IO18			0x151e
+			MX93_PAD_GPIO_IO19__GPIO2_IO19			0x151e
+			MX93_PAD_GPIO_IO20__GPIO2_IO20			0x151e
+			MX93_PAD_GPIO_IO21__GPIO2_IO21			0x151e
+			MX93_PAD_GPIO_IO26__GPIO2_IO26			0x151e
 		>;
 	};
 
