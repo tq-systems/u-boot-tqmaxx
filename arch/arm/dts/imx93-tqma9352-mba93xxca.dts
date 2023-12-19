@@ -434,12 +434,11 @@
 
 	tcpc: ptn5110@50 {
 		compatible = "nxp,ptn5110";
+		reg = <0x50>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_typec>;
-		reg = <0x50>;
 		interrupt-parent = <&gpio1>;
 		interrupts = <2 IRQ_TYPE_EDGE_FALLING>;
-		status = "okay";
 
 		port {
 			typec_drd_sw: endpoint {
@@ -724,8 +723,17 @@
 
 &usbotg2 {
 	dr_mode = "host";
+	#address-cells = <1>;
+	#size-cells = <0>;
 	disable-over-current;
 	status = "okay";
+
+	hub_2_0: hub@1 {
+		compatible = "usb424,2517";
+		reg = <1>;
+		reset-gpios = <&expander1 2 GPIO_ACTIVE_LOW>;
+		vdd-supply = <&reg_3v3>;
+	};
 };
 
 &usdhc2 {
