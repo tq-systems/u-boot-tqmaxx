@@ -40,6 +40,12 @@
 		status = "disabled";
 	};
 
+	clk_dp: clk-dp {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <26000000>;
+	};
+
 	display: display {
 		/*
 		 * Display is not fixed, so compatible has to be added from
@@ -590,13 +596,54 @@
 	pinctrl-0 = <&pinctrl_lpi2c5>;
 	pinctrl-1 = <&pinctrl_lpi2c5>;
 	status = "okay";
+
+	dp_bridge: dp-bridge@f {
+		compatible = "toshiba,tc9595", "toshiba,tc358767";
+		reg = <0x0f>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_tc9595>;
+		clock-names = "ref";
+		clocks = <&clk_dp>;
+		reset-gpios = <&expander2 3 GPIO_ACTIVE_HIGH>;
+		interrupt-parent = <&gpio4>;
+		interrupts = <29 IRQ_TYPE_EDGE_RISING>;
+		toshiba,hpd-pin = <0>;
+		status = "disabled";
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				dp_dsi_in: endpoint {
+					data-lanes = <1 2 3 4>;
+				};
+			};
+		};
+	};
 };
 
 &lpspi6 {
-	pinctrl-names = "default", "sleep";
-	pinctrl-0 = <&pinctrl_lpspi6>;
-	pinctrl-1 = <&pinctrl_lpspi6>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpspi6>, <&pinctrl_lpspi6_cs>;
+	cs-gpios = <&gpio2 0 GPIO_ACTIVE_LOW>, <&gpio2 7 GPIO_ACTIVE_LOW>;
 	status = "okay";
+
+	spidev6_0: spidev6@0 {
+		compatible = "tq,testdev";
+		reg = <0>;
+		spi-max-frequency = <5000000>;
+		status = "okay";
+	};
+
+	spidev6_1: spidev6@1 {
+		compatible = "tq,testdev";
+		reg = <1>;
+		spi-max-frequency = <5000000>;
+		status = "okay";
+	};
 };
 
 &lpuart1 {
@@ -629,6 +676,22 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart8>;
 	status = "okay";
+};
+
+&pcf85063 {
+	/* RTC_EVENT# from SoM is connected on mainboard */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pcf85063>;
+	interrupt-parent = <&gpio1>;
+	interrupts = <14 IRQ_TYPE_EDGE_FALLING>;
+};
+
+&se97_som {
+	/* TEMP_EVENT# from SoM is connected on mainboard */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_temp_sensor_som>;
+	interrupt-parent = <&gpio1>;
+	interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
 };
 
 &tpm5 {
