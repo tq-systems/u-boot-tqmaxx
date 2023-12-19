@@ -520,6 +520,22 @@
 	};
 };
 
+&lpspi6 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpspi6>, <&pinctrl_lpspi6_cs>;
+	cs-gpios = <&gpio2 0 GPIO_ACTIVE_LOW>;
+	status = "okay";
+
+	afe@0 {
+		compatible = "nxp,nafe13388";
+		reg = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_afe>;
+		spi-max-frequency = <5000000>;
+		status = "okay";
+	};
+};
+
 &lpuart1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart1>;
@@ -553,11 +569,19 @@
 };
 
 &pcf85063 {
-	/* RTC_EVENT# is connected on MBa93xxLA */
+	/* RTC_EVENT# from SoM is connected on mainboard */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pcf85063>;
 	interrupt-parent = <&gpio1>;
 	interrupts = <14 IRQ_TYPE_EDGE_FALLING>;
+};
+
+&se97_som {
+	/* TEMP_EVENT# from SoM is connected on mainboard */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_temp_sensor_som>;
+	interrupt-parent = <&gpio1>;
+	interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
 };
 
 &tpm5 {
@@ -573,8 +597,6 @@
 	adp-disable;
 	usb-role-switch;
 	disable-over-current;
-	samsung,picophy-pre-emp-curr-control = <3>;
-	samsung,picophy-dc-vol-level-adjust = <7>;
 	status = "okay";
 
 	port {
@@ -589,8 +611,6 @@
 	#address-cells = <1>;
 	#size-cells = <0>;
 	disable-over-current;
-	samsung,picophy-pre-emp-curr-control = <3>;
-	samsung,picophy-dc-vol-level-adjust = <7>;
 	status = "okay";
 
 	hub_2_0: hub@1 {
