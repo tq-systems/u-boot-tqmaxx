@@ -9,17 +9,23 @@
 
 #include <common.h>
 #include <dm.h>
+#include <asm/gpio.h>
 #include <dm/device_compat.h>
+#include <linux/delay.h>
 #include <power/regulator.h>
 
 struct onboard_hub {
 	struct udevice *vdd;
+	struct gpio_desc reset_gpio; /* GPIO for reset control */
 };
 
 static int usb_onboard_hub_probe(struct udevice *dev)
 {
 	struct onboard_hub *hub = dev_get_priv(dev);
 	int ret;
+
+	gpio_request_by_name(dev, "reset-gpios", 0,
+			     &hub->reset_gpio, GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
 
 	ret = device_get_supply_regulator(dev, "vdd-supply", &hub->vdd);
 	if (ret) {
@@ -30,6 +36,13 @@ static int usb_onboard_hub_probe(struct udevice *dev)
 	ret = regulator_set_enable_if_allowed(hub->vdd, true);
 	if (ret)
 		dev_err(dev, "can't enable vdd-supply: %d\n", ret);
+
+	if (dm_gpio_is_valid(&hub->reset_gpio)) {
+		dm_gpio_set_value(&hub->reset_gpio, 1);
+		mdelay(1);
+		dm_gpio_set_value(&hub->reset_gpio, 0);
+		mdelay(200);
+	}
 
 	return ret;
 }
@@ -42,6 +55,11 @@ static int usb_onboard_hub_remove(struct udevice *dev)
 	ret = regulator_set_enable_if_allowed(hub->vdd, false);
 	if (ret)
 		dev_err(dev, "can't disable vdd-supply: %d\n", ret);
+
+	if (dm_gpio_is_valid(&hub->reset_gpio)) {
+		dm_gpio_set_value(&hub->reset_gpio, 1);
+		dm_gpio_free(dev, &hub->reset_gpio);
+	}
 
 	return ret;
 }
