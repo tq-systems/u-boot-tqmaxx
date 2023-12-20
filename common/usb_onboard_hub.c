@@ -67,6 +67,7 @@ static int usb_onboard_hub_remove(struct udevice *dev)
 static const struct udevice_id usb_onboard_hub_ids[] = {
 	/* Use generic usbVID,PID dt-bindings (usb-device.yaml) */
 	{ .compatible = "usb424,2514" }, /* USB2514B USB 2.0 */
+	{ .compatible = "usb424,2517" }, /* USB2517B USB 2.0 */
 	{ }
 };
 
