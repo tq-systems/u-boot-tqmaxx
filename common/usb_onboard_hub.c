@@ -232,6 +232,9 @@ static const struct udevice_id usb_onboard_hub_ids[] = {
 	{	.compatible = "usb424,2514",	/* USB2514B USB 2.0 */
 		.data = (ulong)&usb2514_data,
 	}, {
+		.compatible = "usb424,2517",	/* USB2517B USB 2.0 */
+		.data = (ulong)&usb2514_data,
+	}, {
 		.compatible = "usb424,2744",	/* USB2744 USB 2.0 */
 		.data = (ulong)&usb5744_data,
 	}, {
