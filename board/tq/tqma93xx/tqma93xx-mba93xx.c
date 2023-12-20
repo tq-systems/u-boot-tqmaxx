@@ -65,7 +65,9 @@ enum {
 	ENET1_RESET_B,
 	ENET2_RESET_B,
 #endif
+#if !CONFIG_IS_ENABLED(USB_ONBOARD_HUB)
 	USB_RESET_B,
+#endif
 	V12V_EN,
 	/* expander @72 */
 	LCD_RESET_B,
@@ -112,9 +114,11 @@ static struct tq_gpio_init_data mba93xx_gid[] = {
 			     GPIOD_IS_OUT | GPIOD_ACTIVE_LOW |
 			     GPIOD_IS_OUT_ACTIVE),
 #endif
+#if !CONFIG_IS_ENABLED(USB_ONBOARD_HUB)
 	GPIO_INIT_DATA_ENTRY(USB_RESET_B, "gpio@71_2",
 			     GPIOD_IS_OUT | GPIOD_ACTIVE_LOW |
 			     GPIOD_IS_OUT_ACTIVE),
+#endif
 	GPIO_INIT_DATA_ENTRY(V12V_EN, "gpio@71_7", GPIOD_IS_OUT),
 	/* expander 2 */
 	GPIO_INIT_DATA_ENTRY(LCD_RESET_B, "gpio@72_0",
@@ -150,7 +154,9 @@ enum {
 	ENET1_RESET_B,
 	ENET2_RESET_B,
 #endif
+#if !CONFIG_IS_ENABLED(USB_ONBOARD_HUB)
 	USB_RESET_B,
+#endif
 	V12V_EN,
 	/* expander @72 */
 	LCD_RESET_B,
@@ -195,9 +201,11 @@ static struct tq_gpio_init_data mba93xx_gid[] = {
 			     GPIOD_IS_OUT | GPIOD_ACTIVE_LOW |
 			     GPIOD_IS_OUT_ACTIVE),
 #endif
+#if !CONFIG_IS_ENABLED(USB_ONBOARD_HUB)
 	GPIO_INIT_DATA_ENTRY(USB_RESET_B, "gpio@71_2",
 			     GPIOD_IS_OUT | GPIOD_ACTIVE_LOW |
 			     GPIOD_IS_OUT_ACTIVE),
+#endif
 	GPIO_INIT_DATA_ENTRY(V12V_EN, "gpio@71_7", GPIOD_IS_OUT),
 	/* expander 2 */
 	GPIO_INIT_DATA_ENTRY(LCD_RESET_B, "gpio@72_0",
@@ -314,7 +322,6 @@ int board_ehci_usb_phy_mode(struct udevice *dev)
 int board_usb_init(int index, enum usb_init_type init)
 {
 	int ret = 0;
-	struct gpio_desc *usb_reset_gpio = &mba93xx_gid[USB_RESET_B].desc;
 
 	switch (index) {
 #if CONFIG_IS_ENABLED(USB_TCPC)
@@ -333,17 +340,19 @@ int board_usb_init(int index, enum usb_init_type init)
 #endif
 	case 1:
 		debug("USB2/HUB\n");
+#if !CONFIG_IS_ENABLED(USB_ONBOARD_HUB)
 		switch (init) {
 		case USB_INIT_DEVICE:
 			ret = -ENODEV;
 			break;
 		case USB_INIT_HOST:
-			dm_gpio_set_value(usb_reset_gpio, 0);
+			dm_gpio_set_value(&mba93xx_gid[USB_RESET_B].desc, 0);
 			break;
 		default:
 			printf("USB2: unknown init type\n");
 			ret = -EINVAL;
 		}
+#endif
 		break;
 	default:
 		printf("invalid USB port %d\n", index);
@@ -356,7 +365,6 @@ int board_usb_init(int index, enum usb_init_type init)
 int board_usb_cleanup(int index, enum usb_init_type init)
 {
 	int ret = 0;
-	struct gpio_desc *usb_reset_gpio = &mba93xx_gid[USB_RESET_B].desc;
 
 	switch (index) {
 #if CONFIG_IS_ENABLED(USB_TCPC)
@@ -368,7 +376,9 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 #endif
 	case 1:
 		debug("USB2/HUB\n");
-		dm_gpio_set_value(usb_reset_gpio, 1);
+#if !CONFIG_IS_ENABLED(USB_ONBOARD_HUB)
+		dm_gpio_set_value(&mba93xx_gid[USB_RESET_B].desc, 1);
+#endif
 		break;
 	default:
 		printf("invalid USB port %d\n", index);
