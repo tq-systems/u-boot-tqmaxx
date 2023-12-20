@@ -526,18 +526,6 @@
 				  "WLAN_PERST#", "12V_EN";
 
 		/*
-		 * Controls the on board USB Hub reset which is low
-		 * active as reset signal. The output-low states, the
-		 * signal is inactive, e.g. no reset
-		 */
-		usb-reset-hog {
-			gpio-hog;
-			gpios = <2 GPIO_ACTIVE_LOW>;
-			output-low;
-			line-name = "USB_RESET#";
-		};
-
-		/*
 		 * Controls the WiFi card PD pin which is low active
 		 * as power down signal. The output-low states, the signal
 		 * is inactive, e.g. card is powered on

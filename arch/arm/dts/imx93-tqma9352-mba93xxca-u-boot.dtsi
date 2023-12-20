@@ -29,10 +29,6 @@
 	};
 };
 
-&expander1 {
-	/delete-node/ usb-reset-hog;
-};
-
 &lpi2c3 {
 	u-boot,dm-spl;
 };
@@ -76,6 +72,10 @@
 &reg_usdhc2_vmmc {
 	u-boot,off-on-delay-us = <20000>;
 	u-boot,dm-spl;
+};
+
+&tcpc {
+	status = "disabled";
 };
 
 &usbotg1 {

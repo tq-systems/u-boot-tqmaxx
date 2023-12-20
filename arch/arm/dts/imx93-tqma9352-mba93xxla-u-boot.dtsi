@@ -74,6 +74,10 @@
 	u-boot,dm-spl;
 };
 
+&tcpc {
+	status = "disabled";
+};
+
 &usbotg1 {
 	extcon = <&tcpc>;
 };
