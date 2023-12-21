@@ -26,14 +26,25 @@ static void fdt_fixup_cores_nodes_am642(void *blob, u32 cores)
 
 static void fdt_fixup_cores_r5_nodes_am642(void *blob, int cluster, u32 cores)
 {
-	if (!(cores & BIT(0)))
+	int off;
+
+	if (!(cores & BIT(0))) {
 		fdt_status_disabled_by_pathf(blob,
 					     "/bus@f4000/r5fss@78%x00000",
 					     4 * cluster);
-	else if (!(cores & BIT(1)))
-		fdt_status_disabled_by_pathf(blob,
-					     "/bus@f4000/r5fss@78%x00000/r5f@78%x00000",
-					     4 * cluster, 4 * cluster + 2);
+	} else if (!(cores & BIT(1))) {
+		off = fdt_node_offset_by_pathf(blob,
+					       "/bus@f4000/r5fss@78%x00000/r5f@78%x00000",
+					       4 * cluster, 4 * cluster + 2);
+		fdt_delprop(blob, off, "mboxes");
+		fdt_delprop(blob, off, "memory-region");
+
+		off = fdt_node_offset_by_pathf(blob,
+					       "/bus@f4000/r5fss@78%x00000",
+					       4 * cluster);
+		/* Set to single-CPU mode */
+		fdt_setprop_u32(blob, off, "ti,cluster-mode", 2);
+	}
 }
 
 static void fdt_fixup_adc_node_am642(void *blob, bool has_adc)
