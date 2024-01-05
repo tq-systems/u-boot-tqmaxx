@@ -1,0 +1,94 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2020-2023 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ */
+
+#include "imx8mm-u-boot.dtsi"
+
+/ {
+	wdt-reboot {
+		compatible = "wdt-reboot";
+		wdt = <&wdog1>;
+		u-boot,dm-spl;
+	};
+
+	firmware {
+		optee {
+			compatible = "linaro,optee-tz";
+			method = "smc";
+		};
+	};
+};
+
+&aips4 {
+	u-boot,dm-spl;
+};
+
+&flash0 {
+	spi-tx-bus-width = <1>;
+	spi-rx-bus-width = <1>;
+};
+
+&flexspi {
+	assigned-clock-rates = <100000000>;
+	assigned-clocks = <&clk IMX8MM_CLK_QSPI>;
+	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_100M>;
+};
+
+&i2c1 {
+	u-boot,dm-spl;
+};
+
+&iomuxc {
+	u-boot,dm-pre-proper;
+};
+
+&pca9450 {
+	u-boot,dm-spl;
+
+	regulators {
+		u-boot,dm-spl;
+	};
+};
+
+&pinctrl_usdhc3 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc3_100mhz {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc3_200mhz {
+	u-boot,dm-spl;
+};
+
+&pinctrl_i2c1 {
+	u-boot,dm-spl;
+	u-boot,dm-pre-proper;
+};
+
+&pinctrl_pmic {
+	u-boot,dm-spl;
+};
+
+&usdhc3 {
+	u-boot,dm-spl;
+	mmc-hs400-1_8v;
+	mmc-hs400-enhanced-strobe;
+	/*
+	 * prevents voltage switch warn: driver will switch even at
+	 * fixed voltage
+	 */
+	/delete-property/ vmmc-supply;
+	/delete-property/ vqmmc-supply;
+	assigned-clocks = <&clk IMX8MM_CLK_USDHC3>;
+	assigned-clock-rates = <400000000>;
+	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_400M>;
+};
+
+&wdog1 {
+	u-boot,dm-spl;
+};
+
