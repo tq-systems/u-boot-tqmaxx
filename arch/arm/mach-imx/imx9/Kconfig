@@ -5,11 +5,6 @@ config AHAB_BOOT
     help
     This option enables the support for AHAB secure boot.
 
-config IMX9_LOW_DRIVE_MODE
-    bool "Configure to i.MX9 low drive mode"
-    help
-    This option enables the settings for iMX9 low drive mode.
-
 config IMX9
 	bool
 	select HAS_CAAM
@@ -49,6 +44,15 @@ config TARGET_TQMA93XX
 	  This enables support for TQ-Systems GmbH family of i.MX93
 	  based SOM supporting different i.MX93 variants and different
 	  SOM form factors
+
+config TARGET_IMX91P_11X11_EVK
+	bool "imx91p_11x11_evk"
+	select IMX93
+
+config TARGET_IMX91P_9X9_QSB
+	bool "imx91p_9x9_qsb"
+	select IMX93
+	select IMX9_LPDDR4X
 
 endchoice
 
