@@ -86,7 +86,6 @@ config TARGET_IMX95_19X19_EVK
 	select IMX95
 	imply BOOTSTD_BOOTCOMMAND
 	imply BOOTSTD_FULL
-	imply OF_UPSTREAM
 
 config TARGET_VERDIN_IMX95_19X19
 	bool "imx95_verdin_evk"
