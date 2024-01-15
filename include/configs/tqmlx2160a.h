@@ -359,13 +359,13 @@ unsigned long get_board_ddr_clk(void);
 		"ubi part ${ubirootfspart}; "			\
 		"ubifsmount ubi0:${ubirootfsvol}; "		\
 		"ubifsload ${kernel_addr_r} /boot/${kernel}; "	\
-		"ubifsload ${fdt_addr_r} /boot/${fdt_file}; "	\
+		"ubifsload ${fdt_addr_r} /boot/${fdtfile}; "	\
 		"ubifsumount; ubi detach ;"			\
 		"fsl_mc lazyapply DPL 0x20d00000; "     	\
 		"booti ${kernel_addr_r} - ${fdt_addr_r}\0"	\
 	"sdmmc_bootcmd=setenv bootargs; run mmcargs;"		\
 		"load mmc ${mmcblkdev}:${mmcrootpart} ${kernel_addr_r} /boot/${kernel};" \
-		"load mmc ${mmcblkdev}:${mmcrootpart} ${fdt_addr_r} /boot/${fdt_file};" \
+		"load mmc ${mmcblkdev}:${mmcrootpart} ${fdt_addr_r} /boot/${fdtfile};" \
 		"load mmc ${mmcblkdev}:${bootpart} 0x80d00000 ${dpl_file};" \
 		"fsl_mc lazyappply DPL 0x80d00000;"	        \
 		"booti ${kernel_addr_r} - ${fdt_addr_r};"	\
@@ -399,7 +399,7 @@ unsigned long get_board_ddr_clk(void);
 		"setenv bootargs; "				\
 		"run netargs; "					\
 		"if tftp ${kernel_addr_r} ${kernel}; then "\
-			"if tftp ${fdt_addr_r} ${fdt_file}; then "\
+			"if tftp ${fdt_addr_r} ${fdtfile}; then "\
 				"if tftp 0x80d00000 ${dpl_file}; then "	\
 					"fsl_mc lazyappply DPL 0x80d00000;"     \
 					"booti ${kernel_addr_r} - ${fdt_addr_r}; "    \

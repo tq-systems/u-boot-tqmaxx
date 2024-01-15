@@ -500,7 +500,7 @@ static int tqc_bb_set_fdt_file(u32 srds_s1, u32 srds_s2)
 	char fdt_filename[64];
 	int len = 0;
 
-	if (env_get("fdt_file"))
+	if (env_get("fdtfile"))
 		return 0;
 
 	len = snprintf(fdt_filename, 64, format_string_fdt_file, srds_s1, srds_s2);
@@ -508,7 +508,7 @@ static int tqc_bb_set_fdt_file(u32 srds_s1, u32 srds_s2)
 	if (len < 0)
 		return -EINVAL;
 
-	return env_set("fdt_file", fdt_filename);
+	return env_set("fdtfile", fdt_filename);
 }
 
 int tqc_bb_board_eth_init(int *nr)
@@ -578,7 +578,7 @@ int tqc_bb_board_eth_init(int *nr)
 		printf("No ethernet configuration for Serdes %d_%d_xx found.\n", srds_s1, srds_s2);
 
 	if (tqc_bb_set_fdt_file(srds_s1, srds_s2))
-		puts("WARN: Failed to set fdt_file files\n");
+		puts("WARN: Failed to set fdtfile files\n");
 
 	/* Configure PHY LEDs for all PHYs also if not used */
 	mii_devs = mdio_get_list_head();
