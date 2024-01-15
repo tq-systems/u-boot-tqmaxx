@@ -575,7 +575,7 @@ int tqc_bb_board_eth_init(int *nr)
 	}
 
 	if (!found)
-		printf("No ethernet configuration for Serdes %d_%d_xx found.\n", srds_s1, srds_s2);
+		printf("WARN: No ethernet configuration for Serdes %d_%d_xx found.\n", srds_s1, srds_s2);
 
 	if (tqc_bb_set_fdt_file(srds_s1, srds_s2))
 		puts("WARN: Failed to set fdtfile files\n");
