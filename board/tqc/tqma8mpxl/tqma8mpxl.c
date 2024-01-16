@@ -230,9 +230,6 @@ int ft_board_setup(void *blob, bd_t *bd)
 		const char * const path = "/soc@0/bus@30800000/spi@30bb0000";
 		const struct node_info nodes[] = {
 			{ "jedec,spi-nor",	MTD_DEV_TYPE_NOR, },
-			{ "nxp,imx8mp-fspi",	MTD_DEV_TYPE_NOR, },
-			/* fallback, used by older TQ BSP kernel */
-			{ "nxp,imx8qxp-fspi",	MTD_DEV_TYPE_NOR, },
 		};
 
 		if (tq_vard_valid(&eeprom.tq_hw_data.vard)) {
