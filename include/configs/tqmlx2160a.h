@@ -243,11 +243,9 @@ unsigned long get_board_ddr_clk(void);
 	"mmcdev_sdhc=0\0"			\
 	"mmcdev_emmc=1\0"			\
 	"kernel=Image\0"			\
-	"earlycon=pl011,mmio32,0x21c0000\0"				       \
 	"rootfsmode=ro\0"                                                      \
 	"addtty=setenv bootargs ${bootargs} console=${consoledev},${baudrate}n8\0"\
-	"addearlycon=setenv bootargs ${bootargs} earlycon=${earlycon}\0"       \
-	"mmcargs=run addmmc addtty addearlycon\0"                              \
+	"mmcargs=run addmmc addtty \0"                                         \
 	"mmcblkdev=0\0"                                                        \
 	"mmcrootpart=2\0"                                                      \
 	"addmmc=setenv bootargs ${bootargs} "                                  \
@@ -317,7 +315,7 @@ unsigned long get_board_ddr_clk(void);
 			"fi; "                                                 \
 		"fi; fi; "                                                     \
 		"setenv filesize;\0"					       \
-	"spiargs=run addspi addtty addearlycon\0"                              \
+	"spiargs=run addspi addtty\0"                                          \
 	"addspi=setenv bootargs ${bootargs} root=ubi0_0 rw "		       \
 		"rootfstype=ubifs ubi.mtd=7\0"                                 \
 	BOOTENV								       \
