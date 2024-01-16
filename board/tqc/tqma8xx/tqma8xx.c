@@ -96,7 +96,6 @@ int ft_board_setup(void *blob, bd_t *bd)
 	const char * const path = "/bus@5d000000/spi@5d120000";
 	static const struct node_info nodes[] = {
 		{ "jedec,spi-nor",	MTD_DEV_TYPE_NOR, },
-		{ "nxp,imx8qxp-fspi",	MTD_DEV_TYPE_NOR, },
 	};
 
 	tqc_ft_spi_setup(blob, path, nodes, ARRAY_SIZE(nodes));
