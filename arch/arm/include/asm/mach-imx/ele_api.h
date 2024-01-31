@@ -14,6 +14,8 @@
 #define ELE_PING_REQ (0x01)
 #define ELE_FW_AUTH_REQ (0x02)
 #define ELE_RESTART_RST_TIMER_REQ (0x04)
+#define ELE_VOLT_CHANGE_START_REQ (0x12)
+#define ELE_VOLT_CHANGE_FINISH_REQ (0x13)
 #define ELE_DUMP_DEBUG_BUFFER_REQ (0x21)
 #define ELE_OEM_CNTN_AUTH_REQ (0x87)
 #define ELE_VERIFY_IMAGE_REQ (0x88)
@@ -173,5 +175,7 @@ int ele_start_rng(void);
 int ele_write_shadow_fuse(u32 fuse_id, u32 fuse_val, u32 *response);
 int ele_read_shadow_fuse(u32 fuse_id, u32 *fuse_val, u32 *response);
 int ele_v2x_get_state(struct v2x_get_state *state, u32 *response);
+int ele_volt_change_start_req(void);
+int ele_volt_change_finish_req(void);
 int ele_message_call(struct ele_msg *msg);
 #endif
