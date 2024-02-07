@@ -23,6 +23,22 @@
 	"emmc_dev=" __stringify(CONFIG_FASTBOOT_FLASH_MMC_DEV) "\0"    \
 	"sd_dev=1\0"
 
+#if defined(CONFIG_IMX_BOOTAUX)
+#define CFG_CORTEXM_ENV_SETTINGS                                       \
+	"cortexm_image=demo.bin\0"                                     \
+	"cortexm_load_addr=0x201e0000\0"                               \
+	"cortexm_start_addr=0x1ffe0000\0"                              \
+	"cortexm_boot_mmc=mmc dev ${mmcdev}; mmc rescan; "             \
+		"load mmc ${mmcdev}:${mmcfwpart} ${loadaddr} "         \
+			"${mmcfwpath}${cortexm_image} && "             \
+		"cp.b ${loadaddr} ${cortexm_load_addr} ${filesize} && "\
+		"dcache flush && "                                     \
+		"bootaux ${cortexm_start_addr} 0;\0"
+
+#else
+#define CFG_CORTEXM_ENV_SETTINGS
+#endif
+
 /* Initial environment variables */
 #define CFG_MODULE_ENV_SETTINGS                                        \
 	"scriptaddr=0x83500000\0"                                      \
@@ -88,6 +104,7 @@
 #include "tq-imx-shared-env.h"
 
 #define CFG_EXTRA_ENV_SETTINGS                                         \
+	CFG_CORTEXM_ENV_SETTINGS                                       \
 	CFG_MODULE_ENV_SETTINGS                                        \
 	TQ_IMX_SHARED_ENV_SETTINGS                                     \
 	TQ_IMX_SPI_UBOOT_UPDATE                                        \
