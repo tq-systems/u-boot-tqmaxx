@@ -182,6 +182,29 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 }
 #endif
 
+/* see MAX_CMDLINE_SIZE in boot/bootm.c */
+#define BOARD_CMDLINE_SIZE SZ_4K
+static char board_bootargs[BOARD_CMDLINE_SIZE];
+
+char *board_fdt_chosen_bootargs(void)
+{
+	char *bootargs = env_get("bootargs");
+	static const char *cortexm_args = "clk-imx93.mcore_booted=1";
+
+	if (arch_auxiliary_core_check_up(0)) {
+		size_t len = strlen(bootargs);
+
+		board_bootargs[0] = '\0';
+		strlcat(board_bootargs, bootargs, sizeof(board_bootargs));
+		strlcat(board_bootargs, " ", sizeof(board_bootargs));
+		strlcat(board_bootargs, cortexm_args, sizeof(board_bootargs));
+
+		return board_bootargs;
+	}
+
+	return bootargs;
+}
+
 int board_late_init(void)
 {
 	const char *bname = tq_get_boardname();
