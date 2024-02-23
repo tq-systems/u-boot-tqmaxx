@@ -198,10 +198,10 @@
 #define NETARGS_TQMA57XX \
 	"static_ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}" \
 		"::off\0" \
-	"nfsopts=nolock\0" \
-	"rootpath=/srv/nfs/rootfs\0" \
-	"netloadimage=nfs ${loadaddr} $serverip:$rootpath/$bootfile\0" \
-	"netloadfdt=nfs ${fdtaddr} $serverip:$rootpath/$fdtfile\0" \
+	"nfsopts=v3\0" \
+	"rootpath=/srv/nfs/tqma57xx\0" \
+	"netloadimage=nfs ${loadaddr} ${serverip}:${rootpath}/${bootpath}${bootfile}\0" \
+	"netloadfdt=nfs ${fdtaddr} ${serverip}:${rootpath}/${bootpath}${fdtfile}\0" \
 	"netargs=setenv bootargs console=${console} " \
 		"${optargs} " \
 		"root=/dev/nfs " \
