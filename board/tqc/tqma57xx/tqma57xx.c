@@ -697,30 +697,40 @@ int mmc_get_env_dev(void)
 }
 #endif
 
-#if 0
 enum env_location env_get_location(enum env_operation op, int prio)
 {
 	u32 boot_params = *((u32 *)OMAP_SRAM_SCRATCH_BOOT_PARAMS);
 	struct omap_boot_parameters *omap_boot_params;
+	enum env_location env_loc = ENVL_UNKNOWN;
 	u8 boot_device;
 
 	omap_boot_params = (struct omap_boot_parameters *)boot_params;
 	boot_device = omap_boot_params->boot_device;
 
+	if (prio)
+		return env_loc;
+
 	switch (boot_device) {
+#ifdef CONFIG_ENV_IS_IN_SPI_FLASH
+	case BOOT_DEVICE_SPI:
+		env_loc = ENVL_SPI_FLASH;
+		break;
+#endif
+#ifdef CONFIG_ENV_IS_IN_MMC
 	case BOOT_DEVICE_MMC1:
 	case BOOT_DEVICE_MMC2_2:
-		return ENVL_MMC;
+		env_loc =  ENVL_MMC;
 		break;
-	case BOOT_DEVICE_SPI:
-		return ENVL_SPI_FLASH;
-		break;
+#endif
 	default:
-		return ENVL_MMC;
+#ifdef CONFIG_ENV_IS_NOWHERE
+		env_loc = ENVL_NOWHERE;
+#endif
 		break;
 	}
+
+	return env_loc;
 }
-#endif
 
 int tqma57xx_qspi_present(void)
 {
