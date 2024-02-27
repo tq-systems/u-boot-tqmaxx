@@ -418,8 +418,8 @@ fail:
 #endif
 
 
-/* Return the last byte of of FSL_FASTBOOT_PR_DATA
- * which is managed by PresistDataService
+/* Return the last byte of of FASTBOOT_PARTITION_FBMISC
+ * which is managed by OemLockService
  */
 
 #ifdef CFG_ENABLE_LOCKSTATUS_SUPPORT
@@ -441,7 +441,7 @@ void set_fastboot_lock_disable(void) {
 		return;
 	set_lock_disable_data(bdata);
 	int status;
-	mmc_id = fastboot_flash_find_index(FASTBOOT_PARTITION_PRDATA);
+	mmc_id = fastboot_flash_find_index(FASTBOOT_PARTITION_FBMISC);
 	if (mmc_id < 0) {
 		printf("%s: error in get mmc part\n", __FUNCTION__);
 		goto fail;
@@ -493,7 +493,7 @@ FbLockEnableResult fastboot_lock_enable() {
 	if (bdata == NULL)
 		return FASTBOOT_UL_ERROR;
 	int status;
-	mmc_id = fastboot_flash_find_index(FASTBOOT_PARTITION_PRDATA);
+	mmc_id = fastboot_flash_find_index(FASTBOOT_PARTITION_FBMISC);
 	if (mmc_id < 0) {
 		printf("%s: error in get mmc part\n", __FUNCTION__);
 		ret = FASTBOOT_UL_ERROR;
