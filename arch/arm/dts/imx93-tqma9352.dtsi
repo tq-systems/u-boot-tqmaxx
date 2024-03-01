@@ -11,12 +11,38 @@
 	model = "TQ-Systems i.MX93 TQMa93xxLA/TQMa93xxCA SOM";
 	compatible = "tq,imx93-tqma9352", "fsl,imx93";
 
+	cm33: imx93-cm33 {
+		compatible = "fsl,imx93-cm33";
+		mbox-names = "tx", "rx", "rxdb";
+		mboxes = <&mu1 0 1
+			  &mu1 1 1
+			  &mu1 3 1>;
+		memory-region = <&vdevbuffer>, <&vdev0vring0>, <&vdev0vring1>,
+				<&vdev1vring0>, <&vdev1vring1>, <&rsc_table>;
+		fsl,startup-delay-ms = <500>;
+		status = "disabled";
+	};
+
+	npu: ethosu {
+		compatible = "arm,ethosu";
+		fsl,cm33-proc = <&cm33>;
+		memory-region = <&ethosu_mem>;
+		power-domains = <&mlmix>;
+		status = "disabled";
+	};
+
+	memory@80000000 {
+		device_type = "memory";
+		/* our minimum RAM config will be 1024 MiB */
+		reg = <0x00000000 0x80000000 0 0x40000000>;
+	};
+
 	reserved-memory {
 		#address-cells = <2>;
 		#size-cells = <2>;
 		ranges;
 
-		/* global autoconfigured region for contiguous allocations */
+		/* default CMA, must not exceed assembled memory */
 		linux,cma {
 			compatible = "shared-dma-pool";
 			reusable;
@@ -25,18 +51,10 @@
 			linux,cma-default;
 		};
 
-		/* M33 System TCM (FlexRAM aliased), last page */
-		rsc_table: rsc-table@2021f000 {
-			reg = <0 0x2021f000 0 0x1000>;
+		/* M33 System TCM (FlexRAM aliased), last page is used by ROM */
+		rsc_table: rsc-table@2021e000 {
+			reg = <0 0x2021e000 0 0x1000>;
 			no-map;
-			status = "disabled";
-		};
-
-		/* NPU shared region */
-		ethosu_mem: npu-region@93000000 {
-			compatible = "shared-dma-pool";
-			reusable;
-			reg = <0x0 0x93000000 0x0 0x10000000>;
 			status = "disabled";
 		};
 
@@ -84,6 +102,19 @@
 			compatible = "shared-dma-pool";
 			reg = <0 0xa4120000 0 0x100000>;
 			no-map;
+		};
+
+		/*
+		 * Cortex M33 NPU firmware shared region,
+		 * use NS area as per table 4 in i.MX93 reference manual
+		 * driver and firmware exchanging pointers into this region via
+		 * rpmsg.
+		 */
+		ethosu_mem: npu-region@a6000000 {
+			compatible = "shared-dma-pool";
+			reusable;
+			reg = <0x0 0xa6000000 0x0 0x8000000>;
+			status = "disabled";
 		};
 	};
 
@@ -179,7 +210,7 @@
 		interrupt-parent = <&gpio1>;
 		interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
 
-		pca9451a_regulators: regulators {
+		regulators {
 			/* V_0V8_SOC - hw developer guide: 0.75 .. 0.9 */
 			buck1: BUCK1 {
 				regulator-name = "BUCK1";
@@ -292,6 +323,11 @@
 		vdd-supply = <&buck4>;
 		vddio-supply = <&buck4>;
 	};
+};
+
+&lpm {
+	soc-supply = <&buck1>;
+	status = "okay";
 };
 
 &usbotg1 {
