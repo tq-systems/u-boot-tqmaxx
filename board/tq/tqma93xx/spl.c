@@ -31,8 +31,10 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-extern struct dram_timing_info tqma93xxca_dram_timing;
-extern struct dram_timing_info tqma93xxla_dram_timing;
+extern struct dram_timing_info tqma93xxca_dram_timing_1gb;
+extern struct dram_timing_info tqma93xxla_dram_timing_1gb;
+extern struct dram_timing_info tqma93xxca_dram_timing_2gb;
+extern struct dram_timing_info tqma93xxla_dram_timing_2gb;
 
 struct dram_info {
 	struct dram_timing_info	*table;  /* from NXP RPA */
@@ -41,12 +43,12 @@ struct dram_info {
 };
 
 static const struct dram_info tqma93xx_dram_info[]  = {
-	{ &tqma93xxca_dram_timing, SZ_1G * 1ULL, 'c' },
+	{ &tqma93xxca_dram_timing_1gb, SZ_1G * 1ULL, 'c' },
 	/* reserved for 2 GB variant */
-	{ NULL, SZ_1G * 2ULL, 'c' },
-	{ &tqma93xxla_dram_timing, SZ_1G * 1ULL, 'l' },
+	{ &tqma93xxca_dram_timing_2gb, SZ_1G * 2ULL, 'c' },
+	{ &tqma93xxla_dram_timing_1gb, SZ_1G * 1ULL, 'l' },
 	/* reserved for 2 GB variant */
-	{ NULL, SZ_1G * 2ULL, 'l' },
+	{ &tqma93xxla_dram_timing_2gb, SZ_1G * 2ULL, 'l' },
 };
 
 static int tqma93xx_ram_timing_idx = -1;
