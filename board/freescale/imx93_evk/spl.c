@@ -141,7 +141,7 @@ void board_init_f(ulong dummy)
 
 	ret = imx9_probe_mu();
 	if (ret) {
-		printf("Fail to init Sentinel API\n");
+		printf("Fail to init ELE API\n");
 	} else {
 		debug("SOC: 0x%x\n", gd->arch.soc_rev);
 		debug("LC: 0x%x\n", gd->arch.lifecycle);
