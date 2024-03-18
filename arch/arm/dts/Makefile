@@ -962,6 +962,7 @@ dtb-$(CONFIG_ARCH_IMX8M) += \
 	imx8mq-librem5-r4.dtb
 
 dtb-$(CONFIG_ARCH_IMX9) += \
+	imx95-15x15-evk.dtb \
 	imx95-19x19-verdin.dtb \
 	imx93-var-som-symphony.dtb \
 	imx93-phyboard-segin.dtb
