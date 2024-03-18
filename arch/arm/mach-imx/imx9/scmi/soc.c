@@ -775,13 +775,6 @@ static int disable_m7_node(void *blob)
 	return delete_fdt_nodes(blob, nodes_path_m7, ARRAY_SIZE(nodes_path_m7));
 }
 
-#if defined(CONFIG_OF_BOARD_FIXUP) && !defined(CONFIG_XPL_BUILD)
-int board_fix_fdt(void *fdt)
-{
-	return 0;
-}
-#endif
-
 static bool is_m7_off(void)
 {
 	u32 state = 0;
