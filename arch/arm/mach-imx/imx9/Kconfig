@@ -94,6 +94,12 @@ config TARGET_VERDIN_IMX95_19X19
 	imply BOOTSTD_BOOTCOMMAND
 	imply BOOTSTD_FULL
 
+config TARGET_IMX95_15X15_EVK
+	bool "imx95_15x15_evk"
+	select IMX95
+	imply BOOTSTD_BOOTCOMMAND
+	imply BOOTSTD_FULL
+
 endchoice
 
 source "board/freescale/imx91_evk/Kconfig"
