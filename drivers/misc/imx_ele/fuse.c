@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Copyright 2020 NXP
+ * Copyright 2020-2023 NXP
  */
 
 #include <common.h>
@@ -139,8 +139,7 @@ static s32 map_fsb_fuse_index(u32 bank, u32 word, bool *redundancy)
 	/* map the fuse from ocotp fuse map to FSB*/
 	for (i = 0; i < size; i++) {
 		if (fsb_mapping_table[i].fuse_bank != -1 &&
-		    fsb_mapping_table[i].fuse_bank == bank &&
-		    fsb_mapping_table[i].fuse_words > word) {
+		    fsb_mapping_table[i].fuse_bank == bank) {
 			break;
 		}
 
@@ -151,8 +150,13 @@ static s32 map_fsb_fuse_index(u32 bank, u32 word, bool *redundancy)
 		return -1; /* Failed to find */
 
 	if (fsb_mapping_table[i].redundancy) {
+		if ((fsb_mapping_table[i].fuse_words << 1) <= word)
+			return -2; /* Not valid word */
+
 		*redundancy = true;
 		return (word >> 1) + word_pos;
+	} else if (fsb_mapping_table[i].fuse_words <= word) {
+		return -2; /* Not valid word */
 	}
 
 	*redundancy = false;
@@ -248,7 +252,7 @@ int fuse_sense(u32 bank, u32 word, u32 *val)
 		return -EINVAL;
 
 	word_index = map_fsb_fuse_index(bank, word, &redundancy);
-	if (word_index >= 0) {
+	if (!IS_ENABLED(CONFIG_SCMI_FIRMWARE) && word_index >= 0) {
 		fuse_acc_dis = readl(BLK_CTRL_NS_ANOMIX_BASE_ADDR + 0x28);
 		if (!(fuse_acc_dis & BIT(0))) {
 			*val = readl((ulong)FSB_BASE_ADDR + FSB_OTP_SHADOW + (word_index << 2));

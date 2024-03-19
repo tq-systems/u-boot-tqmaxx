@@ -132,8 +132,8 @@ config USB_XHCI_IMX8
 
 config USB_XHCI_IMX8M
 	bool "XHCI support for imx8M(mscale)"
-	depends on ARCH_IMX8M
-	select MISC if IMX8MP
+	depends on ARCH_IMX8M || IMX95
+	select MISC if IMX8MP || IMX95
 	default y
 	help
 	  Enables support for the on-chip xHCI controller on imx8m(mscale) SoC.
@@ -215,10 +215,10 @@ config USB_EHCI_MX6
 
 config USB_EHCI_MX7
 	bool "Support for i.MX7 on-chip EHCI USB controller"
-	depends on ARCH_MX7 || IMX8M || IMX93
+	depends on ARCH_MX7 || IMX8M || IMX9
 	select EHCI_HCD_INIT_AFTER_RESET if ARCH_MX7
-	select PHY if IMX8M || IMX93
-	select NOP_PHY if IMX8M || IMX93
+	select PHY if IMX8M || IMX9
+	select NOP_PHY if IMX8M || IMX9
 	default y
 	---help---
 	  Enables support for the on-chip EHCI controller on i.MX7 SoCs.

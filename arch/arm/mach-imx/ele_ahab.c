@@ -3,8 +3,10 @@
  * Copyright 2022 NXP
  */
 
+#include "vsprintf.h"
 #include <common.h>
 #include <command.h>
+#include <ctype.h>
 #include <errno.h>
 #include <asm/io.h>
 #include <asm/mach-imx/ele_api.h>
@@ -16,6 +18,7 @@
 #include <cpu_func.h>
 #include <asm/mach-imx/ahab.h>
 #include <asm/global_data.h>
+#include <stdio.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -256,7 +259,7 @@ static void display_ahab_auth_ind(u32 event)
 	printf("%s\n", ele_ind_str[get_idx(ele_ind, resp_ind, ARRAY_SIZE(ele_ind))]);
 }
 
-int ahab_auth_cntr_hdr(struct container_hdr *container, u16 length)
+void *ahab_auth_cntr_hdr(struct container_hdr *container, u16 length)
 {
 	int err;
 	u32 resp;
@@ -272,9 +275,10 @@ int ahab_auth_cntr_hdr(struct container_hdr *container, u16 length)
 		printf("Authenticate container hdr failed, return %d, resp 0x%x\n",
 		       err, resp);
 		display_ahab_auth_ind(resp);
+		return NULL;
 	}
 
-	return err;
+	return (void *)IMG_CONTAINER_BASE; /* Return authenticated container header */
 }
 
 int ahab_auth_release(void)
@@ -328,7 +332,6 @@ int authenticate_os_container(ulong addr)
 {
 	struct container_hdr *phdr;
 	int i, ret = 0;
-	int err;
 	u16 length;
 	struct boot_img_t *img;
 	unsigned long s, e;
@@ -358,8 +361,8 @@ int authenticate_os_container(ulong addr)
 
 	debug("container length %u\n", length);
 
-	err = ahab_auth_cntr_hdr(phdr, length);
-	if (err) {
+	phdr = ahab_auth_cntr_hdr(phdr, length);
+	if (!phdr) {
 		ret = -EIO;
 		goto exit;
 	}
@@ -368,7 +371,7 @@ int authenticate_os_container(ulong addr)
 
 	/* Copy images to dest address */
 	for (i = 0; i < phdr->num_images; i++) {
-		img = (struct boot_img_t *)(addr +
+		img = (struct boot_img_t *)((ulong)phdr +
 					    sizeof(struct container_hdr) +
 					    i * sizeof(struct boot_img_t));
 
@@ -413,6 +416,54 @@ static int do_authenticate(struct cmd_tbl *cmdtp, int flag, int argc,
 	return CMD_RET_SUCCESS;
 }
 
+#ifdef CONFIG_IMX95
+#define FSB_LC_OFFSET 0x414
+#define LC_OEM_OPEN 0x10
+static void display_life_cycle(u32 lc)
+{
+	printf("Lifecycle: 0x%08X, ", lc);
+	switch (lc) {
+	case 0x1:
+		printf("BLANK\n\n");
+		break;
+	case 0x2:
+		printf("FAB Default\n\n");
+		break;
+	case 0x4:
+		printf("FAB\n\n");
+		break;
+	case 0x8:
+		printf("NXP Provisioned\n\n");
+		break;
+	case 0x10:
+		printf("OEM Open\n\n");
+		break;
+	case 0x20:
+		printf("OEM secure world closed\n\n");
+		break;
+	case 0x40:
+		printf("OEM closed\n\n");
+		break;
+	case 0x80:
+		printf("OEM Locked\n\n");
+		break;
+	case 0x100:
+		printf("Field Return OEM\n\n");
+		break;
+	case 0x200:
+		printf("Field Return NXP\n\n");
+		break;
+	case 0x400:
+		printf("BRICKED\n\n");
+		break;
+	default:
+		printf("Unknown\n\n");
+		break;
+	}
+}
+#else
+#define FSB_LC_OFFSET 0x41c
+#define LC_OEM_OPEN 0x8
 static void display_life_cycle(u32 lc)
 {
 	printf("Lifecycle: 0x%08X, ", lc);
@@ -449,6 +500,7 @@ static void display_life_cycle(u32 lc)
 		break;
 	}
 }
+#endif
 
 static int confirm_close(void)
 {
@@ -476,10 +528,10 @@ static int do_ahab_close(struct cmd_tbl *cmdtp, int flag, int argc,
 	if (!confirm_close())
 		return -EACCES;
 
-	lc = readl(FSB_BASE_ADDR + 0x41c);
+	lc = readl(FSB_BASE_ADDR + FSB_LC_OFFSET);
 	lc &= 0x3ff;
 
-	if (lc != 0x8) {
+	if (lc != LC_OEM_OPEN) {
 		puts("Current lifecycle is NOT OEM open, can't move to OEM closed\n");
 		display_life_cycle(lc);
 		return -EPERM;
@@ -542,7 +594,7 @@ static int do_ahab_status(struct cmd_tbl *cmdtp, int flag, int argc, char *const
 	u32 cnt = AHAB_MAX_EVENTS;
 	int ret;
 
-	lc = readl(FSB_BASE_ADDR + 0x41c);
+	lc = readl(FSB_BASE_ADDR + FSB_LC_OFFSET);
 	lc &= 0x3ff;
 
 	display_life_cycle(lc);
@@ -628,6 +680,136 @@ static int do_ahab_return_lifecycle(struct cmd_tbl *cmdtp, int flag, int argc,
 	return CMD_RET_SUCCESS;
 }
 
+static int do_ahab_commit(struct cmd_tbl *cmdtp, int flag, int argc,
+			  char *const argv[])
+{
+	u32 index;
+	u32 resp;
+	u32 info_type;
+
+	if (argc < 2)
+		return CMD_RET_USAGE;
+
+	index = simple_strtoul(argv[1], NULL, 16);
+	printf("Commit index is 0x%x\n", index);
+
+	if (ahab_commit(index, &resp, &info_type)) {
+		printf("Error in AHAB commit\n");
+		return -EIO;
+	}
+
+	printf("Ahab commit succeeded. Information type is 0x%x\n", info_type);
+
+	return 0;
+}
+
+static uint decode_digit(int ch)
+{
+	ch = tolower(ch);
+	bool is_digit = ('0' <= ch && ch <= '9') || ('a' <= ch && ch <= 'f');
+
+  if (!is_digit)
+		return 256;
+
+	return ch <= '9' ? ch - '0' : ch - 'a' + 0xa;
+}
+
+u8 hexstring_to_byte(const char *data)
+{
+	return decode_digit(data[0]) << 4 | decode_digit(data[1]);
+}
+
+u32 hexstring_to_word(const char *data)
+{
+	return hexstring_to_byte(data) 
+	| hexstring_to_byte(data + 2) << 8 
+	| hexstring_to_byte(data + 4) << 16 
+	| hexstring_to_byte(data + 6) << 24;
+} 
+
+int decode_ele_message(struct ele_msg *msg, const char *data)
+{
+	u32 arglen = strlen(data);
+
+	if (arglen < 8) {
+		printf("Message lacks ELE header\n");
+		return 1;
+	}
+
+	// ELE header
+	msg->version = hexstring_to_byte(data + 0);
+	msg->size    = hexstring_to_byte(data + 2);
+	msg->command = hexstring_to_byte(data + 4);
+	msg->tag     = hexstring_to_byte(data + 6);
+
+	// Number of words expected has to match number of received hex characters 
+	if (arglen != msg->size * 8) {
+		printf("Argument size %d bytes does not match the expected size %d bytes \n", 
+         arglen, msg->size * 8);
+		return 1;
+	}
+	
+	// Parse the remaining size - 1 words
+	for (u32 i = 0; i < msg->size - 1; i++)
+		msg->data[i] = hexstring_to_word(data + (i + 1) * 8);
+
+	return 0;
+} 
+
+void print_as_hexstring(char *msg, u32 size)
+{
+	for (u32 i = 0; i < size; i++)
+		printf("%02x", msg[i]);
+}
+
+void print_ele_message(struct ele_msg *msg) 
+{
+	print_as_hexstring((char *) msg, msg->size * sizeof(u32));
+}
+
+static int do_ele_message(struct cmd_tbl *cmdtp, int flag, int argc,
+			   char *const argv[])
+{
+	struct ele_msg msg = { 0 };
+	int ret;
+
+	if (argc < 4)
+		return CMD_RET_USAGE;
+
+	ulong ele_buffer_address = hextoul(argv[1], NULL);
+	ulong ele_buffer_size    = hextoul(argv[2], NULL);
+
+	// We parse the ELE message encoded as hex string 
+	ret = decode_ele_message(&msg, argv[3]);
+	if (ret) {
+		printf("Decode ELE message error\n");
+		return CMD_RET_FAILURE;
+	}
+
+	flush_cache(ele_buffer_address, ele_buffer_size);
+	  
+	// We send the message to ELE and receive back the response
+	ret = ele_message_call(&msg);
+	if (ret) {
+		printf("Call ELE message error %d\n", ret);
+		return CMD_RET_FAILURE;
+	}
+
+	invalidate_dcache_range(ele_buffer_address, ele_buffer_size);
+
+	// ELE reponse is a message too
+	print_ele_message(&msg);
+
+	return CMD_RET_SUCCESS;
+}
+
+U_BOOT_CMD(ele_message, CONFIG_SYS_MAXARGS, 4, do_ele_message, 
+		"Send RAW message to ELE", 
+		"<addr> <size> <msg>\n"
+		"addr - ELE Buffer start address\n"
+		"size - ELE Buffer size in bytes\n"
+		"msg  - RAW message encoded as hexstring\n"
+);
 
 U_BOOT_CMD(auth_cntr, CONFIG_SYS_MAXARGS, 1, do_authenticate,
 	   "autenticate OS container via AHAB",
@@ -660,4 +842,10 @@ U_BOOT_CMD(ahab_return_lifecycle, CONFIG_SYS_MAXARGS, 1, do_ahab_return_lifecycl
 	   "Return lifecycle to OEM field return via signed message block",
 	   "addr\n"
 	   "addr - Return lifecycle message block signed by OEM SRK\n"
+);
+
+U_BOOT_CMD(ahab_commit, CONFIG_SYS_MAXARGS, 1, do_ahab_commit,
+	   "commit into the fuses any new SRK revocation and FW version information\n"
+	   "that have been found into the NXP (ELE FW) and OEM containers",
+	   ""
 );

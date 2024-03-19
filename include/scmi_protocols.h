@@ -24,6 +24,8 @@ enum scmi_std_protocol {
 	SCMI_PROTOCOL_ID_SENSOR = 0x15,
 	SCMI_PROTOCOL_ID_RESET_DOMAIN = 0x16,
 	SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN = 0x17,
+	SCMI_PROTOCOL_ID_PINCTRL = 0x19,
+	SCMI_PROTOCOL_ID_MISC = 0x84,
 };
 
 enum scmi_status_code {
@@ -49,6 +51,11 @@ enum scmi_discovery_id {
 	SCMI_PROTOCOL_MESSAGE_ATTRIBUTES = 0x2,
 };
 
+/* SCMI Base Protocol */
+enum scmi_misc_message_id {
+	SCMI_MISC_ROM_PASSOVER_GET = 0x7
+};
+
 /*
  * SCMI Clock Protocol
  */
@@ -58,6 +65,7 @@ enum scmi_clock_message_id {
 	SCMI_CLOCK_RATE_SET = 0x5,
 	SCMI_CLOCK_RATE_GET = 0x6,
 	SCMI_CLOCK_CONFIG_SET = 0x7,
+	SCMI_CLOCK_PARENT_SET = 0xD
 };
 
 #define SCMI_CLK_PROTO_ATTR_COUNT_MASK	GENMASK(15, 0)
@@ -107,6 +115,7 @@ struct scmi_clk_attribute_out {
 struct scmi_clk_state_in {
 	u32 clock_id;
 	u32 attributes;
+	u32 oem_config_val;
 };
 
 /**
@@ -157,6 +166,24 @@ struct scmi_clk_rate_set_in {
  * @status:	SCMI command status
  */
 struct scmi_clk_rate_set_out {
+	s32 status;
+};
+
+/**
+ * struct scmi_clk_parent_state_in - Message payload for CLOCK_PARENT_SET command
+ * @clock_id:		SCMI clock ID
+ * @parent_clk:		SCMI clock ID
+ */
+struct scmi_clk_parent_set_in {
+	u32 clock_id;
+	u32 parent_clk;
+};
+
+/**
+ * struct scmi_clk_parent_set_out - Response payload for CLOCK_PARENT_SET command
+ * @status:	SCMI command status
+ */
+struct scmi_clk_parent_set_out {
 	s32 status;
 };
 
@@ -430,6 +457,20 @@ struct scmi_sensor_config_get_p2a {
 	uint32_t sensor_config;
 };
 
+struct scmi_sensor_config_set_a2p {
+	u32 id;
+	u32 sensor_config;
+};
+
+struct scmi_sensor_config_set_p2a {
+	void *buf;
+	size_t len;
+};
+
+#define SCMI_SENS_CFG_ENABLED_MASK	BIT(0)
+#define SCMI_SENS_CFG_ENABLE		1
+#define SCMI_SENS_CFG_DISABLE		0
+
 /*
  * Sensor Reading Get
  */
@@ -450,4 +491,48 @@ struct scmi_sensor_reading_get_p2a {
 	struct scmi_sensor_val val;
 };
 
+/* SCMI Pinctrl Protocol */
+enum scmi_pinctrl_message_id {
+	SCMI_MSG_PINCTRL_CONFIG_SET = 0x6
+};
+
+struct scmi_pin_config {
+	u32 type;
+	u32 val;
+};
+
+/**
+ * struct scmi_pad_config_set_in - Message payload for PAD_CONFIG_SET command
+ * @clock_id:	SCMI clock ID
+ * @parent_clk:		SCMI clock ID
+ */
+struct scmi_pinctrl_config_set_in {
+	uint32_t identifier;
+	uint32_t attributes;
+	struct scmi_pin_config configs[4];
+};
+
+
+struct scmi_pinctrl_config_set_out {
+	s32 status;
+};
+
+/* SCMI Perf Protocol */
+enum scmi_perf_message_id {
+	SCMI_PERF_DOMAIN_ATTRIBUTES = 0x3,
+	SCMI_PERF_DESCRIBE_LEVELS = 0x4,
+	SCMI_PERF_LIMITS_SET = 0x5,
+	SCMI_PERF_LIMITS_GET = 0x6,
+	SCMI_PERF_LEVEL_SET = 0x7,
+	SCMI_PERF_LEVEL_GET = 0x8
+};
+
+struct scmi_perf_in {
+	u32 domain_id;
+	u32 perf_level;
+};
+
+struct scmi_perf_out {
+	s32 status;
+};
 #endif /* _SCMI_PROTOCOLS_H */

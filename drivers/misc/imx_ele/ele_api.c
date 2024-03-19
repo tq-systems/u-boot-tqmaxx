@@ -458,6 +458,33 @@ int ahab_release_m33_trout(void)
 	return ret;
 }
 
+int ahab_enable_aux(enum ELE_AUX_ID id)
+{
+	struct udevice *dev = gd->arch.ele_dev;
+	int size = sizeof(struct ele_msg);
+	struct ele_msg msg;
+	int ret;
+
+	if (!dev) {
+		printf("s400 dev is not initialized\n");
+		return -ENODEV;
+	}
+
+	msg.version = AHAB_VERSION;
+	msg.tag = AHAB_CMD_TAG;
+	msg.size = 2;
+	msg.command = ELE_ENABLE_AUX_REQ;
+	msg.data[0] = id;
+
+	ret = misc_call(dev, false, &msg, size, &msg, size);
+	if (ret)
+		printf("Error: %s: ret %d, response 0x%x\n",
+		       __func__, ret, msg.data[0]);
+
+	return ret;
+}
+
+
 int ahab_get_events(u32 *events, u32 *events_cnt, u32 *response)
 {
 	struct udevice *dev = gd->arch.ele_dev;
@@ -524,6 +551,38 @@ int ahab_start_rng(void)
 	if (ret)
 		printf("Error: %s: ret %d, response 0x%x\n",
 		       __func__, ret, msg.data[0]);
+
+	return ret;
+}
+
+int ahab_commit(u16 fuse_id, u32 *response, u32 *info_type)
+{
+	struct udevice *dev = gd->arch.ele_dev;
+	int size = sizeof(struct ele_msg);
+	struct ele_msg msg;
+	int ret = 0;
+
+	if (!dev) {
+		printf("s400 dev is not initialized\n");
+		return -ENODEV;
+	}
+
+	msg.version = AHAB_VERSION;
+	msg.tag = AHAB_CMD_TAG;
+	msg.size = 2;
+	msg.command = ELE_COMMIT_REQ;
+	msg.data[0] = fuse_id;
+
+	ret = misc_call(dev, false, &msg, size, &msg, size);
+	if (ret)
+		printf("Error: %s: ret %d, fuse_id 0x%x, response 0x%x\n",
+		       __func__, ret, fuse_id, msg.data[0]);
+
+	if (response)
+		*response = msg.data[0];
+
+	if (info_type)
+		*info_type = msg.data[1];
 
 	return ret;
 }
@@ -696,6 +755,58 @@ exit:
 		free(ctx_addr);
 	if (key_addr)
 		free(key_addr);
+
+	return ret;
+}
+
+int ahab_v2x_get_state(struct v2x_get_state *state, u32 *response)
+{
+	struct udevice *dev = gd->arch.ele_dev;
+	int size = sizeof(struct ele_msg);
+	struct ele_msg msg;
+	int ret;
+
+	if (!dev) {
+		printf("s400 dev is not initialized\n");
+		return -ENODEV;
+	}
+
+	msg.version = AHAB_VERSION;
+	msg.tag = AHAB_CMD_TAG;
+	msg.size = 1;
+	msg.command = ELE_V2X_GET_STATE_REQ;
+
+	ret = misc_call(dev, false, &msg, size, &msg, size);
+	if (ret)
+		printf("Error: %s: ret %d, response 0x%x\n",
+		       __func__, ret, msg.data[0]);
+
+	if (response)
+		*response = msg.data[0];
+
+	state->v2x_state = msg.data[1] & 0xFF;
+	state->v2x_power_state = (msg.data[1] & 0xFF00) >> 8;
+	state->v2x_err_code = msg.data[2];
+
+	return ret;
+}
+
+int ele_message_call(struct ele_msg *msg)
+{
+	struct udevice *dev = gd->arch.ele_dev;
+	int size = sizeof(struct ele_msg);
+	int ret = -EINVAL;
+
+	if (!dev) {
+		printf("s400 dev is not initialized\n");
+		return -ENODEV;
+	}
+
+	/* Call pre-prepared ELE message. */
+	ret = misc_call(dev, false, msg, size, msg, size);
+	if (ret) 
+		printf("Error: %s: ret 0x%x, response 0x%x\n",
+		       __func__, ret, msg->data[0]);
 
 	return ret;
 }
