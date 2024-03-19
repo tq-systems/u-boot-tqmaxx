@@ -1035,9 +1035,6 @@ int dm_usb_gadget_handle_interrupts(struct udevice *dev)
 		return 0;
 
 	list_for_each_entry(dwc, &dwc3_list, list) {
-		if (dwc->dev != dev)
-			continue;
-
 		dwc3_gadget_uboot_handle_interrupt(dwc);
 		break;
 	}
