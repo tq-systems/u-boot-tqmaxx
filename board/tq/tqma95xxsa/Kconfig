@@ -1,0 +1,68 @@
+if TARGET_TQMA95XXSA
+
+config SYS_BOARD
+	default "tqma95xxsa"
+
+config SYS_VENDOR
+	default "tq"
+
+config SYS_CONFIG_NAME
+	default "tqma95xxsa"
+
+config TQMA95XXSA_DEFAULTS
+	bool
+	select TQ_BB
+	select TQ_EEPROM
+	select TQ_RTC
+	select TQ_SDMMC
+	select TQ_VARD
+	imply MISC
+	imply I2C_EEPROM
+
+choice
+	prompt "TQMa95xxSA mainboard variant"
+	default TQMA95XXSA_BB_MB_SMARC_2
+	help
+	  Select mainboard variant for the SOM. Default is the
+	  starterkit.
+
+config TQMA95XXSA_BB_MB_SMARC_2
+	bool "MB-SMARC-2 starter kit and mainboard"
+	select DM_GPIO
+	select ENV_IS_NOWHERE
+	select TQMA95XXSA_DEFAULTS
+	help
+	  Select the MB-SMARC-2. This mainboard is for SMARC2 SoM.
+
+endchoice
+
+choice
+	prompt "TQMa95xxSA RAM Configuration"
+	default TQMA95XXSA_RAM_2GB_DEFAULT
+	help
+	  Select RAM Configuration. Depending on Board usage and assembled RAM
+	  base address and usable RAM size has to be adjusted
+
+config TQMA95XXSA_RAM_2GB_DEFAULT
+	bool "2 GiB default configuration"
+	help
+	  2GB RAM assembled. The first 256 MiB are reserved. In this reserved region
+	  is the shared memory for RPMSG with M7 is located
+
+config TQMA95XXSA_RAM_4GB_DEFAULT
+	bool "4 GiB default configuration"
+	help
+	  4GB RAM assembled. The first 256 MiB are reserved. In this reserved region
+	  is the shared memory for RPMSG with M7 is located
+
+endchoice
+
+config MTDPARTS_DEFAULT
+	default "mtdparts=425e0000.spi:4m@0k(bootstream),64k@4096k(env0),64k@4160k(env1),-@6m(ubi)"
+
+config MTDIDS_DEFAULT
+	default "nor0=425e0000.spi"
+
+source "board/tq/common/Kconfig"
+
+endif

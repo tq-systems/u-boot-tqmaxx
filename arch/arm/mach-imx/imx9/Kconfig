@@ -69,6 +69,10 @@ config TARGET_TITAN_IMX95_19X19
 	bool "imx95_titan_evk"
 	select IMX95
 
+config TARGET_TQMA95XXSA
+	bool "TQMa95xxSA and mainboards"
+	select IMX95
+
 endchoice
 
 source "board/freescale/imx93_evk/Kconfig"
@@ -77,6 +81,7 @@ source "board/tq/tqma93xx/Kconfig"
 source "board/freescale/imx95_evk/Kconfig"
 source "board/toradex/titan-imx95/Kconfig"
 source "board/tq/tqma93xx/Kconfig"
+source "board/tq/tqma95xxsa/Kconfig"
 
 endif
 
