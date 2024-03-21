@@ -18,6 +18,7 @@
 struct sysinfo_gpio_priv {
 	struct gpio_desc *gpios;
 	int gpio_num, revision;
+	bool no_floating_pins;
 };
 
 static int sysinfo_gpio_detect(struct udevice *dev)
@@ -25,7 +26,11 @@ static int sysinfo_gpio_detect(struct udevice *dev)
 	int ret;
 	struct sysinfo_gpio_priv *priv = dev_get_priv(dev);
 
-	ret = dm_gpio_get_values_as_int_base3(priv->gpios, priv->gpio_num);
+	if (priv->no_floating_pins)
+		ret = dm_gpio_get_values_as_int(priv->gpios, priv->gpio_num);
+	else
+		ret = dm_gpio_get_values_as_int_base3(priv->gpios,
+						      priv->gpio_num);
 	if (ret < 0)
 		return ret;
 
@@ -122,6 +127,8 @@ static int sysinfo_gpio_probe(struct udevice *dev)
 		dev_err(dev, "revisions or names properties missing\n");
 		return -ENOENT;
 	}
+
+	priv->no_floating_pins = dev_read_bool(dev, "no-floating-pins");
 
 	return 0;
 }
