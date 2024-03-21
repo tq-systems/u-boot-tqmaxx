@@ -1,10 +1,11 @@
 GPIO-based Sysinfo device
 
 This binding describes several GPIOs which specify a board revision. Each GPIO
-forms a digit in a ternary revision number. This revision is then mapped to a
-name using the revisions and names properties.
+forms a digit in a binary or ternary revision number. This revision is then
+mapped to a name using the revisions and names properties.
 
-Each GPIO may be floating, pulled-up, or pulled-down, mapping to digits 2, 1,
+By default, the GPIO Sysinfo device uses ternary numbers by distinguishing the
+states floating, pulled-up, or pulled-down for each pin, mapping to digits 2, 1,
 and 0, respectively. The first GPIO forms the least-significant digit of the
 revision. For example, consider the property
 
@@ -20,6 +21,17 @@ then the revision would be
 
 	0t012 = 0*9 + 1*3 + 2*1 = 5
 
+Alternatively, the no-floating-pins flag can be set to make device use binary
+numbers; in this case, only pulled-up and pulled-down pins are distinguished.
+This may be desirable when internal pull-ups/-downs are not configurable at
+runtime to detect floating pins, or external pulls are too weak to result in
+an unambiguous level when countered by an opposing internal pull.
+
+In no-floating-pins mode, if GPIO 0 is pulled-down, GPIO 1 is pulled-up,
+and GPIO 2 is pulled-up, then the revision would be
+
+	0b101 = 1*4 + 1*2 + 0*1 = 6
+
 Required properties:
 - compatible: should be "gpio-sysinfo".
 - gpios: should be a list of gpios forming the revision number,
@@ -27,6 +39,10 @@ Required properties:
 - revisions: a list of known revisions; any revisions not present will have the
   name "unknown"
 - names: the name of each revision in revisions
+
+Optional properties:
+- no-floating-pins: do not consider floating pins, interpret GPIOs as a binary
+  number
 
 Example:
 sysinfo {
