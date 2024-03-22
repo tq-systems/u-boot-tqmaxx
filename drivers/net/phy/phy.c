@@ -18,6 +18,8 @@
 #include <phy.h>
 #include <errno.h>
 #include <asm/global_data.h>
+#include <asm/gpio.h>
+#include <dm/device_compat.h>
 #include <dm/of_extra.h>
 #include <linux/bitops.h>
 #include <linux/delay.h>
@@ -1033,8 +1035,57 @@ struct phy_device *phy_connect(struct mii_dev *bus, int addr,
 		phydev = phy_connect_gmii2rgmii(bus, dev);
 #endif
 
-	if (!phydev)
+	if (!phydev) {
+		if (!IS_ENABLED(CONFIG_DM_ETH_PHY)) {
+			struct ofnode_phandle_args phandle_args;
+			struct gpio_desc gpio;
+			ofnode node;
+			u32 assert, deassert;
+			int ret;
+
+			if (dev_read_phandle_with_args(dev, "phy-handle", NULL, 0, 0,
+						       &phandle_args))
+				return NULL;
+
+			if (!ofnode_valid(phandle_args.node))
+				return NULL;
+
+			node = phandle_args.node;
+
+			if (IS_ENABLED(DM_GPIO)) {
+				ret = gpio_request_by_name_nodev(node, "reset-gpios", 0, &gpio,
+								GPIOD_IS_OUT | GPIOD_ACTIVE_LOW);
+				if (!ret) {
+					assert = ofnode_read_u32_default(node,
+									"reset-assert-us", 0);
+					deassert = ofnode_read_u32_default(node,
+									"reset-deassert-us",
+									0);
+
+					ret = dm_gpio_set_value(&gpio, 1);
+					if (ret) {
+						dev_err(dev,
+							"Failed assert gpio, err: %d\n", ret);
+						return NULL;
+					}
+
+					udelay(assert);
+
+					ret = dm_gpio_set_value(&gpio, 0);
+					if (ret) {
+						dev_err(dev,
+							"Failed deassert gpio, err: %d\n",
+							ret);
+						return NULL;
+					}
+
+					udelay(deassert);
+				}
+			}
+		}
+
 		phydev = phy_find_by_mask(bus, mask);
+	}
 
 	if (phydev)
 		phy_connect_dev(phydev, dev, interface);
