@@ -278,7 +278,7 @@ static int mx6_init_after_reset(struct ehci_ctrl *dev)
 		ret = regulator_set_enable_if_allowed(priv->vbus_supply,
 						      (type == USB_INIT_DEVICE) ?
 						      false : true);
-		if (ret && ret != -ENOSYS) {
+		if (ret) {
 			printf("Error enabling VBUS supply (ret=%i)\n", ret);
 			return ret;
 		}
@@ -595,10 +595,10 @@ static int ehci_usb_probe(struct udevice *dev)
 
 #if CONFIG_IS_ENABLED(DM_REGULATOR)
 	if (priv->vbus_supply) {
-		ret = regulator_set_enable(priv->vbus_supply,
+		ret = regulator_set_enable_if_allowed(priv->vbus_supply,
 					   (priv->init_type == USB_INIT_DEVICE) ?
 					   false : true);
-		if (ret && ret != -ENOSYS) {
+		if (ret) {
 			printf("Error enabling VBUS supply (ret=%i)\n", ret);
 			goto err_phy;
 		}
