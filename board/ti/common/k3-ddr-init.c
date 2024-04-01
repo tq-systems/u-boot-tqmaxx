@@ -49,13 +49,16 @@ void fixup_ddr_driver_for_ecc(struct spl_image_info *spl_image)
 	if (ret)
 		printf("Error fixing up ddr node for ECC use! %d\n", ret);
 
+	dram_init_banksize();
+
 	ret = uclass_next_device_err(&dev);
 
-	while (ret && ret != -ENODEV) {
+	while (!ret) {
 		ret = k3_ddrss_ddr_fdt_fixup(dev, spl_image->fdt_addr, gd->bd);
 		if (ret)
 			printf("Error fixing up ddr node %d for ECC use! %d\n", ctr, ret);
 
+		dram_init_banksize();
 		ret = uclass_next_device_err(&dev);
 		ctr++;
 	}
