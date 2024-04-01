@@ -81,8 +81,12 @@ static void __maybe_unused detect_enable_spinand(void *blob)
 void spl_perform_fixups(struct spl_image_info *spl_image)
 {
 	detect_enable_spinand(spl_image->fdt_addr);
-	if (IS_ENABLED(CONFIG_K3_INLINE_ECC))
-		fixup_ddr_driver_for_ecc(spl_image);
+	if (IS_ENABLED(CONFIG_TARGET_J721S2_R5_EVM)) {
+		if (IS_ENABLED(CONFIG_K3_INLINE_ECC))
+			fixup_ddr_driver_for_ecc(spl_image);
+	} else {
+		fixup_memory_node(spl_image);
+	}
 }
 #endif
 
