@@ -27,14 +27,6 @@
 		bootph-all;
 	};
 
-	memory@80000000 {
-		device_type = "memory";
-		/* 32G RAM */
-		reg = <0x00000000 0x80000000 0x00000000 0x80000000>,
-		      <0x00000008 0x80000000 0x00000007 0x80000000>;
-		bootph-pre-ram;
-	};
-
 	a72_0: a72@0 {
 		compatible = "ti,am654-rproc";
 		reg = <0x0 0x00a90000 0x0 0x10>;
