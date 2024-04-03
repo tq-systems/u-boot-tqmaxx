@@ -760,7 +760,7 @@ static int am65_cpsw_port_probe(struct udevice *dev)
 	struct am65_cpsw_priv *priv = dev_get_priv(dev);
 	struct eth_pdata *pdata = dev_get_plat(dev);
 	struct am65_cpsw_common *cpsw_common;
-	char portname[15];
+	char portname[32];
 	int ret;
 
 	priv->dev = dev;
@@ -768,7 +768,7 @@ static int am65_cpsw_port_probe(struct udevice *dev)
 	cpsw_common = dev_get_priv(dev->parent);
 	priv->cpsw_common = cpsw_common;
 
-	sprintf(portname, "%s%s", dev->parent->name, dev->name);
+	snprintf(portname, sizeof(portname), "%s%s", dev->parent->name, dev->name);
 	device_set_name(dev, portname);
 
 	priv->mdio_manual_mode = false;
