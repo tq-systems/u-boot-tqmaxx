@@ -1,0 +1,81 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2024 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
+ */
+
+&{/firmware} {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&{/firmware/scmi} {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&{/firmware/scmi/protocol@11} {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&{/firmware/scmi/protocol@13} {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&{/firmware/scmi/protocol@14} {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&{/firmware/scmi/protocol@15} {
+	u-boot,dm-pre-reloc;
+};
+
+&{/firmware/scmi/protocol@19} {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&{/soc@0} {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&aips1 {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&aips2 {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&aips3 {
+	u-boot,dm-spl;
+};
+
+&elemu1 {
+	status = "okay";
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&elemu3 {
+	status = "okay";
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&mu2 {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&scmi_buf1 {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
