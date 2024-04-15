@@ -67,3 +67,14 @@
 &usb3_dwc3 {
 	compatible = "fsl,imx8mq-dwc3", "snps,dwc3";
 };
+
+&dispmix_csr {
+	/delete-property/ assigned-clocks;
+	/delete-property/ assigned-clock-rates;
+	/delete-property/ assigned-clock-parents;
+};
+
+&mipi_dsi {
+	assigned-clocks = <&scmi_clk IMX95_CLK_MIPIPHYPLLBYPASS>;
+	assigned-clock-parents = <&scmi_clk IMX95_CLK_VIDEOPLL1>;
+};
