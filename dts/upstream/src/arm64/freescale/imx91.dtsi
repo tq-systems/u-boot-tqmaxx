@@ -58,7 +58,13 @@
 };
 
 &tmu {
-	status = "disabled";
+	compatible = "fsl,imx91-tmu";
+	reg = <0x44482000 0x1000>;
+	clocks = <&clk IMX93_CLK_TMC_GATE>;
+
+	/delete-property/ little-endian;
+	/delete-property/ fsl,tmu-range;
+	/delete-property/ fsl,tmu-calibration;
 };
 
 &{/soc@0/ddr-pmu@4e300dc0} {
