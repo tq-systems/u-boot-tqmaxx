@@ -3,6 +3,20 @@
  * Copyright 2024 NXP
  */
 
+&scmi_iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>;
+
+	pinctrl_hog: hoggrp {
+		bootph-pre-ram;
+
+		fsl,pins = <
+			IMX95_PAD_CCM_CLKO1__GPIO3_IO_BIT26			0x3fe
+			IMX95_PAD_CCM_CLKO2__GPIO3_IO_BIT27			0x3fe
+		>;
+	};
+};
+
 &lpuart1 {
 	bootph-pre-ram;
 };
