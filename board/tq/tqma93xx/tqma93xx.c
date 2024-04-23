@@ -134,14 +134,14 @@ static struct tq_som_feature tqma93xx_som_features[] = {
 		.feature = FEATURE_EEPROM,
 		.dt_path = "/soc@0/bus@44000000/i2c@44340000/eeprom@57",
 	}, {
-		.feature = FEATURE_SPINOR,
-		.dt_path = "/soc@0/bus@42000000/spi@425e0000/flash@0",
+		.feature = FEATURE_RTC,
+		.dt_path = "/soc@0/bus@44000000/i2c@44340000/rtc@51",
 	}, {
 		.feature = FEATURE_SECELEM,
 		/* TODO: no driver yet */
 	}, {
-		.feature = FEATURE_RTC,
-		.dt_path = "/soc@0/bus@44000000/i2c@44340000/rtc@51",
+		.feature = FEATURE_SPINOR,
+		.dt_path = "/soc@0/bus@42000000/spi@425e0000/flash@0",
 	},
 };
 
