@@ -194,6 +194,12 @@ bool tq_vard_has_rtc(const struct tq_vard *vard)
 	return (tq_vard_has_feature(vard, 4, 3) > 0);
 }
 
+static inline
+bool tq_vard_has_imu(const struct tq_vard *vard)
+{
+	return (tq_vard_has_feature(vard, 4, 2) > 0);
+}
+
 static inline u32 tq_vard_get_formfactor(const struct tq_vard *vard)
 {
 	return (u32)(vard->formfactor & VARD_FORMFACTOR_MASK_TYPE);

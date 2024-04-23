@@ -15,11 +15,12 @@
  * soldered.
  */
 enum som_feature {
-	FEATURE_EEPROM,	/**< user EEPROM */
+	FEATURE_EEPROM,		/**< user EEPROM */
 	FEATURE_EMMC,		/**< eMMC on SOM */
+	FEATURE_IMU,		/**< Intertial measurement unit */
 	FEATURE_RTC,		/**< discrete RTC */
 	FEATURE_SECELEM,	/**< secure element */
-	FEATURE_SPINOR,	/**< [Q]SPI NOR */
+	FEATURE_SPINOR,		/**< [Q]SPI NOR */
 };
 
 /**

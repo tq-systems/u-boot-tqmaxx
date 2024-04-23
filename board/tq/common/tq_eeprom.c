@@ -139,6 +139,9 @@ int tq_vard_detect_features(const struct tq_vard *vard,
 		case FEATURE_EMMC:
 			features->list[i].present = tq_vard_has_emmc(vard);
 			break;
+		case FEATURE_IMU:
+			features->list[i].present = tq_vard_has_imu(vard);
+			break;
 		case FEATURE_RTC:
 			features->list[i].present = tq_vard_has_rtc(vard);
 			break;
