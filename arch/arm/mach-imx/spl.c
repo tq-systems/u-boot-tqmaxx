@@ -534,15 +534,21 @@ int board_spl_fit_post_load(const void *fit, struct spl_image_info *spl_image)
 	}
 #if defined(CONFIG_IMX8MP) || defined(CONFIG_IMX8MN)
 #define MCU_RDC_MAGIC "mcu_rdc"
-	if (!(spl_image->flags & SPL_FIT_BYPASS_POST_LOAD)) {
-		memcpy((void *)CONFIG_IMX8M_MCU_RDC_START_CONFIG_ADDR, MCU_RDC_MAGIC, ALIGN(strlen(MCU_RDC_MAGIC), 4));
-		memcpy((void *)CONFIG_IMX8M_MCU_RDC_STOP_CONFIG_ADDR, MCU_RDC_MAGIC, ALIGN(strlen(MCU_RDC_MAGIC), 4));
-		board_handle_rdc_config(spl_image->fdt_addr, "start-config",
-					(void *)(CONFIG_IMX8M_MCU_RDC_START_CONFIG_ADDR + ALIGN(strlen(MCU_RDC_MAGIC), 4)));
-		board_handle_rdc_config(spl_image->fdt_addr, "stop-config",
-					(void *)(CONFIG_IMX8M_MCU_RDC_STOP_CONFIG_ADDR + ALIGN(strlen(MCU_RDC_MAGIC), 4)));
+	if (!(spl_image->flags & SPL_FIT_BYPASS_POST_LOAD) &&
+	    CONFIG_IMX8M_MCU_RDC_START_CONFIG_ADDR != 0ull &&
+	    CONFIG_IMX8M_MCU_RDC_STOP_CONFIG_ADDR != 0ull) {
+		if (!board_handle_rdc_config(spl_image->fdt_addr, "start-config",
+					     (void *)(CONFIG_IMX8M_MCU_RDC_START_CONFIG_ADDR +
+					     ALIGN(strlen(MCU_RDC_MAGIC), 4))))
+			memcpy((void *)CONFIG_IMX8M_MCU_RDC_START_CONFIG_ADDR, MCU_RDC_MAGIC,
+			       ALIGN(strlen(MCU_RDC_MAGIC), 4));
+		if (!board_handle_rdc_config(spl_image->fdt_addr, "stop-config",
+					     (void *)(CONFIG_IMX8M_MCU_RDC_STOP_CONFIG_ADDR +
+					     ALIGN(strlen(MCU_RDC_MAGIC), 4))))
+			memcpy((void *)CONFIG_IMX8M_MCU_RDC_STOP_CONFIG_ADDR, MCU_RDC_MAGIC,
+			       ALIGN(strlen(MCU_RDC_MAGIC), 4));
 	}
-#endif
+#endif /* IMX8MP || IMX8MN */
 
 #ifdef CONFIG_IMX_TRUSTY_OS
         if (!(spl_image->flags & SPL_FIT_BYPASS_POST_LOAD)) {
