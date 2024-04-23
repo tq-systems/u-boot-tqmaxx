@@ -133,20 +133,20 @@ int tq_vard_detect_features(const struct tq_vard *vard,
 
 	for (i = 0; i < features->entries; ++i) {
 		switch (features->list[i].feature) {
-		case FEATURE_EMMC:
-			features->list[i].present = tq_vard_has_emmc(vard);
-			break;
 		case FEATURE_EEPROM:
 			features->list[i].present = tq_vard_has_eeprom(vard);
 			break;
-		case FEATURE_SPINOR:
-			features->list[i].present = tq_vard_has_spinor(vard);
+		case FEATURE_EMMC:
+			features->list[i].present = tq_vard_has_emmc(vard);
+			break;
+		case FEATURE_RTC:
+			features->list[i].present = tq_vard_has_rtc(vard);
 			break;
 		case FEATURE_SECELEM:
 			features->list[i].present = tq_vard_has_secelem(vard);
 			break;
-		case FEATURE_RTC:
-			features->list[i].present = tq_vard_has_rtc(vard);
+		case FEATURE_SPINOR:
+			features->list[i].present = tq_vard_has_spinor(vard);
 			break;
 		default:
 			pr_warn("%s: unknown feature %d\n", __func__,
