@@ -134,6 +134,9 @@ static struct tq_som_feature tqma93xx_som_features[] = {
 		.feature = FEATURE_EEPROM,
 		.dt_path = "/soc@0/bus@44000000/i2c@44340000/eeprom@57",
 	}, {
+		.feature = FEATURE_IMU,
+		.dt_path = "/soc@0/bus@44000000/i2c@44340000/imu@6a",
+	}, {
 		.feature = FEATURE_RTC,
 		.dt_path = "/soc@0/bus@44000000/i2c@44340000/rtc@51",
 	}, {
