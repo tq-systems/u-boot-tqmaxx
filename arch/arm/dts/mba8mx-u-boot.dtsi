@@ -1,0 +1,61 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright (c) 2020-2024 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ */
+
+/ {
+	aliases {
+		spi0 = &flexspi;
+		spi1 = &ecspi1;
+		spi2 = &ecspi2;
+		spi3 = &ecspi3;
+		usbgadget0 = &usbg1;
+	};
+
+	usbg1: usbg1 {
+		compatible = "fsl,imx27-usb-gadget";
+		dr_mode = "peripheral";
+		chipidea,usb = <&usbotg1>;
+	};
+};
+
+&ethphy0 {
+	/* LED0: Link, LED2: activity */
+	ti,led-function = <0x0100>;
+	/* active low, LED0/2 driven by phy */
+	ti,led-ctrl = <0x1010>;
+};
+
+&expander0 {
+	/delete-node/ rst-usb-hub-hog;
+};
+
+&pinctrl_uart3 {
+	u-boot,dm-spl;
+	u-boot,dm-pre-proper;
+};
+
+&pinctrl_usdhc2_gpio {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc2 {
+	u-boot,dm-spl;
+};
+
+&reg_usdhc2_vmmc {
+	u-boot,dm-spl;
+};
+
+&usbmisc1 {
+	u-boot,dm-spl;
+};
+
+&usbphynop1 {
+	u-boot,dm-spl;
+};
+
+&wdog1 {
+	status = "disabled";
+};

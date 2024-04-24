@@ -5,38 +5,14 @@
  */
 
 #include "imx8mn-tqma8mqnl-u-boot.dtsi"
+#include "mba8mx-u-boot.dtsi"
 
 / {
-	aliases {
-		spi0 = &flexspi;
-		spi1 = &ecspi1;
-		spi2 = &ecspi2;
-		spi3 = &ecspi3;
-		usbgadget0 = &usbg1;
-	};
-
 	config {
 		/* 32 kiB redundant env */
 		u-boot,mmc-env-offset = <0x400000>;
 		u-boot,mmc-env-offset-redundant = <0x410000>;
 	};
-
-	usbg1: usbg1 {
-		compatible = "fsl,imx27-usb-gadget";
-		dr_mode = "peripheral";
-		chipidea,usb = <&usbotg1>;
-	};
-};
-
-&ethphy0 {
-	/* LED0: Link, LED2: activity */
-	ti,led-function = <0x0100>;
-	/* active low, LED0/2 driven by phy */
-	ti,led-ctrl = <0x1010>;
-};
-
-&expander0 {
-	/delete-node/ rst-usb-hub-hog;
 };
 
 &gpio2 {
@@ -57,31 +33,6 @@
 	pinctrl_usb0_connector: usb0connectorgrp {
 		fsl,pins = <MX8MN_IOMUXC_GPIO1_IO10_USB1_OTG_ID	0x1c0>;
 	};
-};
-
-&pinctrl_uart3 {
-	u-boot,dm-spl;
-	u-boot,dm-pre-proper;
-};
-
-&pinctrl_usdhc2_gpio {
-	u-boot,dm-spl;
-};
-
-&pinctrl_usdhc2 {
-	u-boot,dm-spl;
-};
-
-&reg_usdhc2_vmmc {
-	u-boot,dm-spl;
-};
-
-&usbmisc1 {
-	u-boot,dm-spl;
-};
-
-&usbphynop1 {
-	u-boot,dm-spl;
 };
 
 &usbotg1 {
@@ -112,6 +63,3 @@
 	assigned-clock-parents = <&clk IMX8MN_SYS_PLL1_400M>;
 };
 
-&wdog1 {
-	status = "disabled";
-};
