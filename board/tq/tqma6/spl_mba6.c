@@ -19,7 +19,6 @@
 #include <asm/arch/sys_proto.h>
 #include <asm/mach-imx/boot_mode.h>
 #include <asm/mach-imx/iomux-v3.h>
-#include <spl.h>
 
 #include "tqma6.h"
 #include "../common/tq_bb.h"

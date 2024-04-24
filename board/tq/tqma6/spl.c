@@ -20,7 +20,6 @@
 #include <asm/mach-imx/boot_mode.h>
 #include <asm/mach-imx/iomux-v3.h>
 #include <asm/mach-imx/spi.h>
-#include <spl.h>
 
 #include "tqma6.h"
 #include "../common/tq_bb.h"
