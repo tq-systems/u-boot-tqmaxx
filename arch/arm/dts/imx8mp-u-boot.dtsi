@@ -40,14 +40,17 @@
 
 &aips2 {
 	u-boot,dm-spl;
+	u-boot,dm-pre-reloc;
 };
 
 &aips3 {
 	u-boot,dm-spl;
+	u-boot,dm-pre-reloc;
 };
 
 &iomuxc {
 	u-boot,dm-spl;
+	u-boot,dm-pre-reloc;
 };
 
 &binman {
