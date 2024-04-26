@@ -1,0 +1,6 @@
+TQMa8MPxL
+M:	Markus Niebel <markus.niebel@ew.tq-group.com>
+M:	Alexander Stein <alexander.stein@ew.tq-group.com>
+S:	Maintained
+F:	arch/arm/dts/imx8mp-tqma8mpql-mba8mp*-u-boot.dtsi
+F:	configs/tqma8mpxl*config
