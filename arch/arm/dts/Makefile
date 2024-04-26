@@ -1183,6 +1183,10 @@ dtb-$(CONFIG_ARCH_IMX8M) += \
 	imx8mq-kontron-pitx-imx8m.dtb \
 	imx8mq-librem5-r4.dtb
 
+dtb-$(CONFIG_ARCH_IMX8M) += \
+	imx8mp-tqma8mpql-mba8mpxl.dtb \
+	imx8mp-tqma8mpql-mba8mp-ras314.dtb
+
 dtb-$(CONFIG_ARCH_IMX9) += \
 	imx95-15x15-evk.dtb \
 	imx95-19x19-evk.dtb \
