@@ -427,6 +427,16 @@ config TARGET_LIBREM5
 	select SUPPORT_SPL
 	select IMX8M_LPDDR4
 
+config TARGET_TQMA8MPXL
+	bool "TQ-Systems GmbH TQMa8MPxL SOM family"
+	select IMX8MP
+	select IMX8M_LPDDR4
+	select SUPPORT_SPL
+	select FSL_CAAM
+	select FSL_BLOB
+	select ARCH_MISC_INIT
+	select SPL_CRYPTO if SPL
+
 endchoice
 
 source "board/advantech/imx8mp_rsb3720a1/Kconfig"
@@ -465,5 +475,6 @@ source "board/variscite/imx8mn_var_som/Kconfig"
 source "board/toradex/smarc-imx8mp/Kconfig"
 source "board/toradex/verdin-imx8mm/Kconfig"
 source "board/toradex/verdin-imx8mp/Kconfig"
+source "board/tq/tqma8mpxl/Kconfig"
 
 endif

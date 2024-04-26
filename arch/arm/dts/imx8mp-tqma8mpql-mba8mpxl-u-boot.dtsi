@@ -1,0 +1,248 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright (c) 2021-2026 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
+ */
+
+/* SOM shared settings for U-Boot */
+#include "imx8mp-tqma8mpql-u-boot.dtsi"
+
+/ {
+	config {
+		/* 64 kiB redundant env */
+		u-boot,mmc-env-offset = <0x400000>;
+		u-boot,mmc-env-offset-redundant = <0x410000>;
+	};
+};
+
+&gpio1 {
+	gpout1-hog {
+		gpio-hog;
+		gpios = <0 0>;
+		output-low;
+		line-name = "GPOUT_1";
+	};
+
+	gpout0-hog {
+		gpio-hog;
+		gpios = <1 0>;
+		output-low;
+		line-name = "GPOUT_0";
+	};
+
+	gpout3-hog {
+		gpio-hog;
+		gpios = <3 0>;
+		output-low;
+		line-name = "GPOUT_3";
+	};
+
+	gpout2-hog {
+		gpio-hog;
+		gpios = <6 0>;
+		output-low;
+		line-name = "GPOUT_2";
+	};
+
+	gpin0-hog {
+		gpio-hog;
+		gpios = <7 0>;
+		input;
+		line-name = "GPIN_0";
+	};
+
+	pmic-irq-hog {
+		gpio-hog;
+		gpios = <8 0>;
+		input;
+		line-name = "PMIC_IRQ";
+	};
+
+	gpin1-hog {
+		gpio-hog;
+		gpios = <9 0>;
+		input;
+		line-name = "GPIN_1";
+	};
+
+	usb-otg-id-hog {
+		gpio-hog;
+		gpios = <10 0>;
+		input;
+		line-name = "USB_OTG_ID";
+	};
+
+	gpin2-hog {
+		gpio-hog;
+		gpios = <14 0>;
+		input;
+		line-name = "GPIN_2";
+	};
+
+	gpin3-hog {
+		gpio-hog;
+		gpios = <15 0>;
+		input;
+		line-name = "GPIN_3";
+	};
+};
+
+&gpio2 {
+	vcc12v-en-hog {
+		gpio-hog;
+		gpios = <6 0>;
+		output-low;
+		line-name = "VCC12V_EN";
+	};
+};
+
+&gpio3 {
+	lvds-reset-hog {
+		gpio-hog;
+		gpios = <14 GPIO_ACTIVE_LOW>;
+		output-high;
+		line-name = "LVDS_RESET_B";
+	};
+
+	lvds-blt-en-hog {
+		gpio-hog;
+		gpios = <19 0>;
+		output-low;
+		line-name = "LVDS_BLT_EN";
+	};
+
+	lvds-pwr-en-hog {
+		gpio-hog;
+		gpios = <20 0>;
+		output-low;
+		line-name = "LVDS_PWR_EN";
+	};
+};
+
+&gpio4 {
+	enet0-int-hog {
+		gpio-hog;
+		gpios = <1 0>;
+		input;
+		line-name = "ENET0_INT";
+	};
+
+	enet1-int-hog {
+		gpio-hog;
+		gpios = <3 0>;
+		input;
+		line-name = "ENET1_INT";
+	};
+
+	dp-irq-hog {
+		gpio-hog;
+		gpios = <18 0>;
+		input;
+		line-name = "DP_IRQ";
+	};
+
+	dp-en-hog {
+		gpio-hog;
+		gpios = <19 0>;
+		output-low;
+		line-name = "DP_EN";
+	};
+
+	hdmi-oc-hog {
+		gpio-hog;
+		gpios = <20 0>;
+		input;
+		line-name = "HDMI_OC";
+	};
+
+	temp-event-hog {
+		gpio-hog;
+		gpios = <21 0>;
+		input;
+		line-name = "TEMP_EVENT";
+	};
+
+	fan-pwr-hog {
+		gpio-hog;
+		gpios = <27 0>;
+		output-low;
+		line-name = "FAN_PWR";
+	};
+
+	rtc-event-hog {
+		gpio-hog;
+		gpios = <28 0>;
+		input;
+		line-name = "RTC_EVENT";
+	};
+
+	codec-rst-hog {
+		gpio-hog;
+		gpios = <29 GPIO_ACTIVE_LOW>;
+		output-high;
+		line-name = "CODEC_RST";
+	};
+};
+
+&gpio5 {
+	csi0-reset-hog {
+		gpio-hog;
+		gpios = <6 GPIO_ACTIVE_LOW>;
+		output-high;
+		line-name = "CSI0_RESET";
+	};
+
+	csi0-sync-hog {
+		gpio-hog;
+		gpios = <7 0>;
+		input;
+		line-name = "CSI0_SYNC";
+	};
+
+	csi0-trigger-hog {
+		gpio-hog;
+		gpios = <8 0>;
+		input;
+		line-name = "CSI0_TRIGGER";
+	};
+
+	csi0-enable-hog {
+		gpio-hog;
+		gpios = <9 0>;
+		output-low;
+		line-name = "CSI0_ENABLE";
+	};
+};
+
+&pcie {
+	status = "disabled";
+};
+
+&pcie_phy {
+	status = "disabled";
+};
+
+&pinctrl_gpio1 {
+	bootph-pre-ram;
+};
+
+&pinctrl_uart4 {
+	bootph-pre-ram;
+};
+
+&uart4 {
+	bootph-pre-ram;
+};
+
+&usdhc2 {
+	sd-uhs-sdr104;
+	sd-uhs-ddr50;
+	assigned-clocks = <&clk IMX8MP_CLK_USDHC2>;
+	assigned-clock-rates = <400000000>;
+};
+
+&wdog1 {
+	u-boot,noautostart;
+	timeout-sec = <60>;
+};

@@ -1,0 +1,84 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright (c) 2020-2026 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
+ */
+
+#include "imx8mp-u-boot.dtsi"
+
+/ {
+	aliases {
+		i2c_eeprom0 = &at24c02;
+	};
+
+	wdt-reboot {
+		compatible = "wdt-reboot";
+		wdt = <&wdog1>;
+		bootph-pre-ram;
+	};
+};
+
+&at24c02 {
+	bootph-pre-ram;
+	bootph-all;
+};
+
+/* TODO: can be removed when upstream DT supports 4 lane rx/tx */
+&flash0 {
+	spi-tx-bus-width = <4>;
+	spi-rx-bus-width = <4>;
+};
+
+&flexspi {
+	assigned-clock-rates = <100000000>;
+	assigned-clocks = <&clk IMX8MP_CLK_QSPI>;
+	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_100M>;
+};
+
+&gpio1 {
+	bootph-pre-ram;
+};
+
+&gpio5 {
+	bootph-pre-ram;
+};
+
+&i2c1 {
+	bootph-pre-ram;
+};
+
+&pinctrl_i2c1 {
+	bootph-pre-ram;
+};
+
+&pinctrl_i2c1_gpio {
+	bootph-pre-ram;
+};
+
+&pinctrl_pmic {
+	bootph-pre-ram;
+};
+
+&pinctrl_wdog {
+	bootph-pre-ram;
+};
+
+&pmic {
+	bootph-pre-ram;
+
+	regulators {
+		bootph-pre-ram;
+	};
+};
+
+&usdhc3 {
+	mmc-hs400-1_8v;
+	mmc-hs400-enhanced-strobe;
+	assigned-clocks = <&clk IMX8MP_CLK_USDHC3>;
+	assigned-clock-rates = <400000000>;
+};
+
+&wdog1 {
+	bootph-pre-ram;
+};
