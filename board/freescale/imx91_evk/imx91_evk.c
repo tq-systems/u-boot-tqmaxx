@@ -268,6 +268,29 @@ static void board_gpio_init(void)
 
 	dm_gpio_set_dir_flags(&desc, GPIOD_IS_OUT);
 	dm_gpio_set_value(&desc, 1);
+
+	/* Enable EXT_PWREN for vRPi 5V */
+	ret = dm_gpio_lookup_name("gpio@22_8", &desc);
+	if (ret)
+		return;
+
+	ret = dm_gpio_request(&desc, "EXT_PWREN");
+	if (ret)
+		return;
+
+	dm_gpio_set_dir_flags(&desc, GPIOD_IS_OUT);
+	dm_gpio_set_value(&desc, 1);
+
+	ret = dm_gpio_lookup_name("adp5585-gpio4", &desc);
+	if (ret)
+		return;
+
+	ret = dm_gpio_request(&desc, "EXP_SEL");
+	if (ret)
+		return;
+
+	dm_gpio_set_dir_flags(&desc, GPIOD_IS_OUT);
+	dm_gpio_set_value(&desc, 1);
 }
 
 int board_init(void)
