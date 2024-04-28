@@ -4,7 +4,7 @@
  */
 
 #include "imx91-u-boot.dtsi"
-#include "imx91-11x11-evk-ontat-wvga-panel.dtsi"
+#include "imx91-11x11-evk-tianma-wvga-panel.dtsi"
 
 / {
 	wdt-reboot {
