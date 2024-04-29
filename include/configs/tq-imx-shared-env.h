@@ -218,7 +218,7 @@
 	"addnfs="                                                      \
 		"setenv bootargs ${bootargs} "                         \
 		"root=/dev/nfs rw "                                    \
-		"nfsroot=${serverip}:${rootpath},v3,tcp;\0"            \
+		"nfsroot=${serverip}:${rootpath},v3,tcp\0"            \
 	"addtty="                                                      \
 		"setenv bootargs ${bootargs} "                         \
 		"console=${console},${baudrate}\0"                     \
