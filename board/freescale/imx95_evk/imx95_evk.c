@@ -15,9 +15,9 @@
 #include <linux/delay.h>
 #include <asm/gpio.h>
 #include <power/regulator.h>
-#include <asm/mach-imx/sys_proto.h>
 #include <scmi_agent.h>
 #include "../dts/upstream/src/arm64/freescale/imx95-power.h"
+#include <asm/arch/sys_proto.h>
 #include <i2c.h>
 
 int board_early_init_f(void)
@@ -374,6 +374,9 @@ int board_init(void)
 #endif
 
 	netc_init();
+
+	power_on_m7("mx95alt");
+
 	return 0;
 }
 
