@@ -23,6 +23,13 @@ Base boards / configurations
 
 The following combinations of base board and SOM are supported:
 
+* TQ-Systems TQMa93xxLA (REV.010x) with adaptor on MBa91xxCA (REV.010x) and TQ-Systems TQMa93xxCA (REV.010x) on
+  MBa91xxCA (REV.010x)
+
+  * `tqma93xx_mba91xxca_defconfig`
+
+  * `tqma93xx_mba91xxca_uuu_defconfig`
+
 * TQ-Systems TQMa93xxLA (REV.010x) with adaptor on MBa93xxCA (REV.020x) and TQ-Systems TQMa93xxCA (REV.010x) on
   MBa93xxCA (REV.020x)
 

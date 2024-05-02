@@ -7,6 +7,7 @@
 
 obj-y += tqma93xx.o
 
+obj-$(CONFIG_TQMA93XX_BB_MBA91XXCA) += tqma93xx-mba91xx.o
 obj-$(CONFIG_TQMA93XX_BB_MBA93XXCA) += tqma93xx-mba93xx.o
 obj-$(CONFIG_TQMA93XX_BB_MBA93XXLA) += tqma93xx-mba93xx.o
 
