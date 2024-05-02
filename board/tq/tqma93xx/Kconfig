@@ -29,6 +29,17 @@ choice
 	  Select mainboard variant for the SOM. Default is the
 	  starterkit.
 
+config TQMA93XX_BB_MBA91XXCA
+	bool "MBa91xxCA starterkit"
+	select DM_GPIO
+	select ENV_IS_NOWHERE
+	select TQMA93XX_DEFAULTS
+	select USB_TCPC if USB
+	help
+	  Select the MBa91xxCA starterkit. The evaluation board can
+	  demonstrate most of the features of the SOM and CPU and can be
+	  used for LGA and connector SOM variants
+
 config TQMA93XX_BB_MBA93XXCA
 	bool "MBa93xxCA starterkit"
 	select DM_GPIO
