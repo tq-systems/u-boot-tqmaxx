@@ -1,0 +1,33 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2024 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Max Merchel
+ */
+
+/ {
+	config {
+		u-boot,mmc-env-offset = <0x100000>;
+		u-boot,mmc-env-offset-redundant = <0x110000>;
+	};
+};
+
+&uart1 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_uart1 {
+	u-boot,dm-spl;
+};
+
+&usdhc1 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc1 {
+	u-boot,dm-spl;
+};
+
+&reg_mba6ul_3v3 {
+	u-boot,dm-spl;
+};
