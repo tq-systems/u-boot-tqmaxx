@@ -1099,6 +1099,7 @@ dtb-$(CONFIG_ARCH_IMX9) += \
 	imx91p-9x9-qsb-spinand.dtb
 
 dtb-$(CONFIG_ARCH_IMX9) += \
+	imx93-tqma9352-mba91xxca.dtb \
 	imx93-tqma9352-mba93xxca.dtb \
 	imx93-tqma9352-mba93xxla.dtb
 
