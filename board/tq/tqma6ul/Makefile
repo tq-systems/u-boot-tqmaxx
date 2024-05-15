@@ -12,6 +12,8 @@ obj-y += spl.o
 obj-y += spl_tqma6ul_256m.o
 obj-y += spl_tqma6ul_512m.o
 obj-$(CONFIG_MBA6UL) += spl_mba6ul.o
+obj-$(CONFIG_MBA6ULXL) += spl_mba6ulxl.o
 else
 obj-$(CONFIG_MBA6UL) += tqma6ul_mba6ul.o
+obj-$(CONFIG_MBA6ULXL) += tqma6ul_mba6ulxl.o
 endif

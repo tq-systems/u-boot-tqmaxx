@@ -15,6 +15,7 @@ config SYS_VENDOR
 
 config SYS_CONFIG_NAME
 	default "tqma6ul_mba6ul" if MBA6UL
+	default "tqma6ul_mba6ulxl" if MBA6ULXL
 
 choice
 	prompt "TQMa6UL module variant"
@@ -55,6 +56,24 @@ config MBA6UL
 	imply DM_ETH
 	help
 	  Select the MBa6ULx starterkit
+
+config MBA6ULXL
+	bool "TQMa6UL on MBa6ULxL Starterkit"
+	select TQ_BB
+	select TQ_ENVLOC
+	select USB
+	select CMD_USB
+	select USB_STORAGE
+	select PHYLIB
+	select PHY_SMSC
+	select MXC_UART
+	select DM_MMC
+	select DM_SPI
+	select DM_GPIO
+	imply DM_SERIAL
+	imply DM_ETH
+	help
+	  Select the MBa6ULxL starterkit
 
 endchoice
 
