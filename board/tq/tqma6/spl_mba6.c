@@ -184,13 +184,6 @@ void tq_bb_board_init_f(ulong dummy)
 	preloader_console_init();
 }
 
-#if IS_ENABLED(CONFIG_SPL_SPI_SUPPORT)
-u32 spl_spi_get_uboot_offset(void)
-{
-	return TQMA6_SPI_FLASH_SECTOR_SIZE;
-}
-#endif
-
 #if IS_ENABLED(CONFIG_SPL_MMC_SUPPORT)
 u32 spl_mmc_get_uboot_sector(void)
 {
