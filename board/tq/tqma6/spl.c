@@ -192,9 +192,3 @@ void board_init_f(ulong dummy)
 	board_init_r(NULL, 0);
 }
 
-#if IS_ENABLED(CONFIG_SPL_MMC_SUPPORT)
-u32 spl_mmc_get_uboot_sector(void)
-{
-	return CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR;
-}
-#endif
