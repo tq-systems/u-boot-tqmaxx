@@ -29,7 +29,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 int dram_init(void)
 {
-	return fdtdec_setup_mem_size_base();
+	return fdtdec_setup_mem_size_base_lowest();
 }
 
 int dram_init_banksize(void)
@@ -106,13 +106,6 @@ int fdtdec_board_setup(const void *fdt_blob)
 #define CTRLMMR_USB1_PHY_CTRL	(WKUP_CTRL_MMR0_BASE + 0x4018)
 #define CORE_VOLTAGE		0x80000000
 
-#define WKUP_CTRLMMR_DBOUNCE_CFG1 0x04504084
-#define WKUP_CTRLMMR_DBOUNCE_CFG2 0x04504088
-#define WKUP_CTRLMMR_DBOUNCE_CFG3 0x0450408c
-#define WKUP_CTRLMMR_DBOUNCE_CFG4 0x04504090
-#define WKUP_CTRLMMR_DBOUNCE_CFG5 0x04504094
-#define WKUP_CTRLMMR_DBOUNCE_CFG6 0x04504098
-
 void spl_board_init(void)
 {
 	u32 val;
@@ -135,23 +128,8 @@ void spl_board_init(void)
 	/* Make sure to mux up to take the SoC 32k from the crystal */
 	writel(MCU_CTRL_DEVICE_CLKOUT_LFOSC_SELECT_VAL,
 	       MCU_CTRL_DEVICE_CLKOUT_32K_CTRL);
-
-	/* Setup debounce conf registers - arbitrary values. Times are approx */
-	/* 1.9ms debounce @ 32k */
-	writel(WKUP_CTRLMMR_DBOUNCE_CFG1, 0x1);
-	/* 5ms debounce @ 32k */
-	writel(WKUP_CTRLMMR_DBOUNCE_CFG2, 0x5);
-	/* 20ms debounce @ 32k */
-	writel(WKUP_CTRLMMR_DBOUNCE_CFG3, 0x14);
-	/* 46ms debounce @ 32k */
-	writel(WKUP_CTRLMMR_DBOUNCE_CFG4, 0x18);
-	/* 100ms debounce @ 32k */
-	writel(WKUP_CTRLMMR_DBOUNCE_CFG5, 0x1c);
-	/* 156ms debounce @ 32k */
-	writel(WKUP_CTRLMMR_DBOUNCE_CFG6, 0x1f);
 }
 
-#if defined(CONFIG_K3_AM64_DDRSS)
 static void fixup_ddr_driver_for_ecc(struct spl_image_info *spl_image)
 {
 	struct udevice *dev;
@@ -167,7 +145,7 @@ static void fixup_ddr_driver_for_ecc(struct spl_image_info *spl_image)
 	if (ret)
 		printf("Error fixing up ddr node for ECC use! %d\n", ret);
 }
-#else
+
 static void fixup_memory_node(struct spl_image_info *spl_image)
 {
 	u64 start[CONFIG_NR_DRAM_BANKS];
@@ -179,25 +157,23 @@ static void fixup_memory_node(struct spl_image_info *spl_image)
 	dram_init_banksize();
 
 	for (bank = 0; bank < CONFIG_NR_DRAM_BANKS; bank++) {
-		start[bank] =  gd->bd->bi_dram[bank].start;
+		start[bank] = gd->bd->bi_dram[bank].start;
 		size[bank] = gd->bd->bi_dram[bank].size;
 	}
 
-	/* dram_init functions use SPL fdt, and we must fixup u-boot fdt */
 	ret = fdt_fixup_memory_banks(spl_image->fdt_addr, start, size,
 				     CONFIG_NR_DRAM_BANKS);
+
 	if (ret)
 		printf("Error fixing up memory node! %d\n", ret);
 }
-#endif
 
 void spl_perform_fixups(struct spl_image_info *spl_image)
 {
-#if defined(CONFIG_K3_AM64_DDRSS)
-	fixup_ddr_driver_for_ecc(spl_image);
-#else
-	fixup_memory_node(spl_image);
-#endif
+	if (IS_ENABLED(CONFIG_K3_INLINE_ECC))
+		fixup_ddr_driver_for_ecc(spl_image);
+	else
+		fixup_memory_node(spl_image);
 
 	if (CONFIG_IS_ENABLED(USB_STORAGE))
 		fixup_usb_boot(spl_image->fdt_addr);
