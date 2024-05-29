@@ -1259,7 +1259,9 @@ dtb-$(CONFIG_SOC_K3_AM654) += \
 	k3-am6528-iot2050-basic.dtb \
 	k3-am6528-iot2050-basic-pg2.dtb \
 	k3-am6548-iot2050-advanced.dtb \
-	k3-am6548-iot2050-advanced-pg2.dtb
+	k3-am6548-iot2050-advanced-pg2.dtb \
+	k3-am654-icssg2.dtbo
+
 dtb-$(CONFIG_SOC_K3_J721E) += k3-j721e-common-proc-board.dtb \
 			      k3-j721e-r5-common-proc-board.dtb \
 			      k3-j7200-common-proc-board.dtb \
@@ -1273,6 +1275,10 @@ dtb-$(CONFIG_SOC_K3_J721S2) += k3-am68-sk-base-board.dtb\
 			       k3-am68-sk-r5-base-board.dtb\
 			       k3-j721s2-common-proc-board.dtb\
 			       k3-j721s2-r5-common-proc-board.dtb
+
+dtb-$(CONFIG_SOC_K3_J722S) +=	k3-j722s-evm.dtb \
+				k3-j722s-r5-evm.dtb
+
 dtb-$(CONFIG_SOC_K3_J784S4) +=	k3-am69-sk.dtb \
 				k3-am69-r5-sk.dtb \
 				k3-j784s4-evm.dtb \
@@ -1281,6 +1287,7 @@ dtb-$(CONFIG_SOC_K3_AM642) += k3-am642-evm.dtb \
 			      k3-am642-r5-evm.dtb \
 			      k3-am642-sk.dtb \
 			      k3-am642-r5-sk.dtb \
+			      k3-am642-evm-nand.dtbo \
 			      k3-am642-tqma64xxl-mbax4xxl.dtb \
 			      k3-am642-r5-tqma64xxl-mbax4xxl.dtb
 
@@ -1295,8 +1302,11 @@ dtb-$(CONFIG_SOC_K3_AM625) += k3-am625-sk.dtb \
 			      k3-am625-r5-tqma62xx-mba62xx.dtb
 
 
-dtb-$(CONFIG_SOC_K3_AM625) += k3-am62a7-sk.dtb \
+dtb-$(CONFIG_SOC_K3_AM62A7) += k3-am62a7-sk.dtb \
 			      k3-am62a7-r5-sk.dtb
+
+dtb-$(CONFIG_SOC_K3_AM62P5) += k3-am62p5-sk.dtb \
+			      k3-am62p5-r5-sk.dtb
 
 dtb-$(CONFIG_ARCH_MEDIATEK) += \
 	mt7622-rfb.dtb \

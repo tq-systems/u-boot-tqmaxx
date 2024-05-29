@@ -19,6 +19,7 @@
 				<&combined_dm_cfg>, <&sysfw_inner_cert>;
 			combined;
 			dm-data;
+			core-opts = <2>;
 			sysfw-inner-cert;
 			keyfile = "custMpk.pem";
 			sw-rev = <1>;
@@ -64,6 +65,7 @@
 				<&combined_dm_cfg_fs>, <&sysfw_inner_cert_fs>;
 			combined;
 			dm-data;
+			core-opts = <2>;
 			sysfw-inner-cert;
 			keyfile = "custMpk.pem";
 			sw-rev = <1>;
@@ -110,6 +112,7 @@
 				<&combined_tifs_cfg_gp>, <&combined_dm_cfg_gp>;
 			combined;
 			dm-data;
+			core-opts = <2>;
 			content-sbl = <&u_boot_spl_unsigned>;
 			load = <0x41c00000>;
 			content-sysfw = <&ti_fs_gp>;
@@ -157,6 +160,7 @@
 		filename = "ti-dm.bin";
 		blob-ext {
 			filename = "ti-dm/j784s4/ipc_echo_testb_mcu1_0_release_strip.xer5f";
+			optional;
 		};
 	};
 	ti-spl {
@@ -213,7 +217,7 @@
 						content = <&dm>;
 						keyfile = "custMpk.pem";
 					};
-					dm: blob-ext {
+					dm: ti-dm {
 						filename = "ti-dm.bin";
 					};
 				};
@@ -416,7 +420,7 @@
 					os = "DM";
 					load = <0x89000000>;
 					entry = <0x89000000>;
-					blob-ext {
+					ti-dm {
 						filename = "ti-dm.bin";
 					};
 				};

@@ -48,7 +48,7 @@ static int splash_sf_read_raw(u32 bmp_load_addr, int offset, size_t read_size)
 }
 #endif
 
-#ifdef CONFIG_CMD_NAND
+#if  defined(CONFIG_CMD_NAND) && !defined(CONFIG_SPL_BUILD)
 static int splash_nand_read_raw(u32 bmp_load_addr, int offset, size_t read_size)
 {
 	struct mtd_info *mtd = get_nand_dev_by_index(nand_curr_device);
@@ -216,7 +216,7 @@ static int splash_init_virtio(void)
 	}
 }
 
-#ifdef CONFIG_CMD_UBIFS
+#if defined(CONFIG_CMD_UBIFS) && !defined(CONFIG_SPL_BUILD)
 static int splash_mount_ubifs(struct splash_location *location)
 {
 	int res;

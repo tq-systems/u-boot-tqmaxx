@@ -392,6 +392,7 @@
 		ti,itap-del-sel-sd-hs = <0x0>;
 		ti,itap-del-sel-sdr12 = <0x0>;
 		ti,itap-del-sel-sdr25 = <0x0>;
+		ti,itap-del-sel-ddr50 = <0x2>;
 		ti,clkbuf-sel = <0x7>;
 		ti,trm-icp = <0x8>;
 		dma-coherent;
@@ -1183,5 +1184,12 @@
 		ti,sci-proc-ids = <0x31 0xff>;
 		resets = <&k3_reset 11 1>;
 		firmware-name = "j721s2-c71_1-fw";
+	};
+
+	main_esm: esm@700000 {
+		compatible = "ti,j721e-esm";
+		reg = <0x00 0x700000 0x00 0x1000>;
+		ti,esm-pins = <688>, <689>;
+		bootph-pre-ram;
 	};
 };

@@ -27,6 +27,9 @@
 #include <env.h>
 #include <elf.h>
 #include <soc.h>
+#include <wait_bit.h>
+
+#define CLKSTOP_TRANSITION_TIMEOUT_MS	10
 
 #if IS_ENABLED(CONFIG_SYS_K3_SPL_ATF)
 enum {
@@ -46,9 +49,9 @@ static const char *image_os_match[IMAGE_AMT] = {
 	"tee",
 	"U-Boot",
 	"DM",
-	"fsstub-hs",
-	"fsstub-fs",
-	"fsstub-gp",
+	"tifsstub-hs",
+	"tifsstub-fs",
+	"tifsstub-gp",
 };
 #endif
 
@@ -98,6 +101,59 @@ void mmr_unlock(uintptr_t base, u32 partition)
 	/* Unlock the requested partition if locked using two-step sequence */
 	writel(CTRLMMR_LOCK_KICK0_UNLOCK_VAL, part_base + CTRLMMR_LOCK_KICK0);
 	writel(CTRLMMR_LOCK_KICK1_UNLOCK_VAL, part_base + CTRLMMR_LOCK_KICK1);
+}
+
+static void wkup_ctrl_remove_can_io_isolation(void)
+{
+	const void *wait_reg = (const void *)(WKUP_CTRL_MMR0_BASE +
+					      WKUP_CTRL_MMR_CANUART_WAKE_STAT1);
+	int ret;
+	u32 reg = 0;
+
+	/* Program magic word */
+	reg = readl(WKUP_CTRL_MMR0_BASE + WKUP_CTRL_MMR_CANUART_WAKE_CTRL);
+	reg |= WKUP_CTRL_MMR_CANUART_WAKE_CTRL_MW << WKUP_CTRL_MMR_CANUART_WAKE_CTRL_MW_SHIFT;
+	writel(reg, WKUP_CTRL_MMR0_BASE + WKUP_CTRL_MMR_CANUART_WAKE_CTRL);
+
+	/* Set enable bit. */
+	reg |= WKUP_CTRL_MMR_CANUART_WAKE_CTRL_MW_LOAD_EN;
+	writel(reg, WKUP_CTRL_MMR0_BASE + WKUP_CTRL_MMR_CANUART_WAKE_CTRL);
+
+       /* Clear enable bit. */
+	reg &= ~WKUP_CTRL_MMR_CANUART_WAKE_CTRL_MW_LOAD_EN;
+	writel(reg, WKUP_CTRL_MMR0_BASE + WKUP_CTRL_MMR_CANUART_WAKE_CTRL);
+
+	/* wait for CAN_ONLY_IO signal to be 0 */
+	ret = wait_for_bit_32(wait_reg,
+			      WKUP_CTRL_MMR_CANUART_WAKE_STAT1_CANUART_IO_MODE,
+			      false,
+			      CLKSTOP_TRANSITION_TIMEOUT_MS,
+			      false);
+	if (ret < 0)
+		return;
+
+	/* Reset magic word */
+	writel(0, WKUP_CTRL_MMR0_BASE + WKUP_CTRL_MMR_CANUART_WAKE_CTRL);
+
+	/* Remove WKUP IO isolation */
+	reg = readl(WKUP_CTRL_MMR0_BASE + WKUP_CTRL_MMR_PMCTRL_IO_0);
+	reg = reg & WKUP_CTRL_MMR_PMCTRL_IO_0_WRITE_MASK & ~WKUP_CTRL_MMR_PMCTRL_IO_0_GLOBAL_WUEN_0;
+	writel(reg, WKUP_CTRL_MMR0_BASE + WKUP_CTRL_MMR_PMCTRL_IO_0);
+
+	/* clear global IO isolation */
+	reg = readl(WKUP_CTRL_MMR0_BASE + WKUP_CTRL_MMR_PMCTRL_IO_0);
+	reg = reg & WKUP_CTRL_MMR_PMCTRL_IO_0_WRITE_MASK & ~WKUP_CTRL_MMR_PMCTRL_IO_0_IO_ISO_CTRL_0;
+	writel(reg, WKUP_CTRL_MMR0_BASE + WKUP_CTRL_MMR_PMCTRL_IO_0);
+
+	writel(0, WKUP_CTRL_MMR0_BASE + WKUP_CTRL_MMR_DEEPSLEEP_CTRL);
+	writel(0, WKUP_CTRL_MMR0_BASE + WKUP_CTRL_MMR_PMCTRL_IO_GLB);
+}
+
+void wkup_ctrl_remove_can_io_isolation_if_set(void)
+{
+	if (readl(WKUP_CTRL_MMR0_BASE + WKUP_CTRL_MMR_CANUART_WAKE_STAT1) &
+	    WKUP_CTRL_MMR_CANUART_WAKE_STAT1_CANUART_IO_MODE)
+		wkup_ctrl_remove_can_io_isolation();
 }
 
 bool is_rom_loaded_sysfw(struct rom_extended_boot_data *data)
@@ -169,7 +225,7 @@ int load_firmware(char *name_fw, char *name_loadaddr, u32 *loadaddr)
 	char *name = NULL;
 	int size = 0;
 
-	if (!IS_ENABLED(CONFIG_FS_LOADER))
+	if (!CONFIG_IS_ENABLED(FS_LOADER))
 		return 0;
 
 	*loadaddr = 0;
@@ -234,6 +290,31 @@ void __noreturn jump_to_image_no_args(struct spl_image_info *spl_image)
 	ret = rproc_load(1, fit_image_info[IMAGE_ID_ATF].image_start, 0x200);
 	if (ret)
 		panic("%s: ATF failed to load on rproc (%d)\n", __func__, ret);
+
+#if (CONFIG_IS_ENABLED(FIT_IMAGE_POST_PROCESS) && IS_ENABLED(CONFIG_SYS_K3_SPL_ATF))
+	/* Authenticate ATF */
+	void *image_addr = (void *)fit_image_info[IMAGE_ID_ATF].image_start;
+
+	debug("%s: Authenticating image: addr=%lx, size=%ld, os=%s\n", __func__,
+	      fit_image_info[IMAGE_ID_ATF].image_start,
+	      fit_image_info[IMAGE_ID_ATF].image_len,
+	      image_os_match[IMAGE_ID_ATF]);
+
+	ti_secure_image_post_process(&image_addr,
+				     (size_t *)&fit_image_info[IMAGE_ID_ATF].image_len);
+
+	/* Authenticate OPTEE */
+	image_addr = (void *)fit_image_info[IMAGE_ID_OPTEE].image_start;
+
+	debug("%s: Authenticating image: addr=%lx, size=%ld, os=%s\n", __func__,
+	      fit_image_info[IMAGE_ID_OPTEE].image_start,
+	      fit_image_info[IMAGE_ID_OPTEE].image_len,
+	      image_os_match[IMAGE_ID_OPTEE]);
+
+	ti_secure_image_post_process(&image_addr,
+				     (size_t *)&fit_image_info[IMAGE_ID_OPTEE].image_len);
+
+#endif
 
 	if (!fit_image_info[IMAGE_ID_DM_FW].image_len &&
 	    !(size > 0 && valid_elf_image(loadaddr))) {
@@ -301,20 +382,32 @@ void board_fit_image_post_process(const void *fit, int node, void **p_image,
 		int device_type = get_device_type();
 
 		if ((device_type == K3_DEVICE_TYPE_HS_SE &&
-		     strcmp(os, "fsstub-hs")) ||
+		     strcmp(os, "tifsstub-hs")) ||
 		   (device_type == K3_DEVICE_TYPE_HS_FS &&
-		     strcmp(os, "fsstub-fs")) ||
+		     strcmp(os, "tifsstub-fs")) ||
 		   (device_type == K3_DEVICE_TYPE_GP &&
-		     strcmp(os, "fsstub-gp"))) {
+		     strcmp(os, "tifsstub-gp"))) {
 			*p_size = 0;
 		} else {
-			debug("fsstub-type: %s\n", os);
+			debug("tifsstub-type: %s\n", os);
 		}
 
 		return;
 	}
+	/*
+	 * Only DM and the DTBs are being authenticated here,
+	 * rest will be authenticated when A72 cluster is up
+	 */
+	if (i != IMAGE_ID_ATF && i != IMAGE_ID_OPTEE)
 #endif
-	ti_secure_image_post_process(p_image, p_size);
+	{
+		ti_secure_image_check_binary(p_image, p_size);
+		ti_secure_image_post_process(p_image, p_size);
+	}
+#if IS_ENABLED(CONFIG_SYS_K3_SPL_ATF)
+	else
+		ti_secure_image_check_binary(p_image, p_size);
+#endif
 }
 #endif
 

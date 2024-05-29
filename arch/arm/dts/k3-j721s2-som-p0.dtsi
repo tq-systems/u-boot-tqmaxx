@@ -12,8 +12,9 @@
 	memory@80000000 {
 		device_type = "memory";
 		/* 16 GB RAM */
-		reg = <0x00 0x80000000 0x00 0x80000000>,
-		      <0x08 0x80000000 0x03 0x80000000>;
+		reg = <0x00000000 0x80000000 0x00000000 0x80000000>,
+		      <0x00000008 0x80000000 0x00000003 0x80000000>;
+		bootph-pre-ram;
 	};
 
 	reserved_memory: reserved-memory {
@@ -395,8 +396,8 @@
 	ospi0_nand: nand@0 {
 		compatible = "spi-nand";
 		reg = <0x0>;
-		spi-tx-bus-width = <1>;
-		spi-rx-bus-width = <1>;
+		spi-tx-bus-width = <8>;
+		spi-rx-bus-width = <8>;
 		spi-max-frequency = <25000000>;
 		cdns,tshsl-ns = <60>;
 		cdns,tsd2d-ns = <60>;

@@ -207,6 +207,7 @@ void k3_spl_init(void)
 
 	/* Output System Firmware version info */
 	k3_sysfw_print_ver();
+
 }
 
 bool check_rom_loaded_sysfw(void)
@@ -229,7 +230,7 @@ void k3_mem_init(void)
 			panic("DRAM 0 init failed: %d\n", ret);
 
 		ret = uclass_next_device_err(&dev);
-		if (ret)
+		if (ret && ret != -ENODEV)
 			panic("DRAM 1 init failed: %d\n", ret);
 	}
 	spl_enable_dcache();

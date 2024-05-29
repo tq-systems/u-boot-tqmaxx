@@ -20,8 +20,10 @@
 #include <env.h>
 
 #include "../common/board_detect.h"
+#include "../common/k3-ddr-init.h"
 
 #define board_is_am64x_gpevm() (board_ti_k3_is("AM64-GPEVM") || \
+				board_ti_k3_is("AM64-EVM") || \
 				board_ti_k3_is("AM64-HSEVM"))
 
 #define board_is_am64x_skevm() (board_ti_k3_is("AM64-SKEVM") || \
@@ -35,6 +37,10 @@ enum {
 	AM64X_EVM_BRD_DET_COUNT,
 };
 
+#define AM642_NAND_DTBO		"k3-am642-evm-nand.dtbo"
+
+static struct gpio_desc board_det_gpios[AM64X_EVM_BRD_DET_COUNT];
+
 /* Max number of MAC addresses that are parsed/processed per daughter card */
 #define DAUGHTER_CARD_NO_OF_MAC_ADDR	8
 
@@ -45,36 +51,20 @@ int board_init(void)
 	return 0;
 }
 
-int dram_init(void)
-{
-	s32 ret;
-
-	ret = fdtdec_setup_mem_size_base();
-	if (ret)
-		printf("Error setting up mem size and base. %d\n", ret);
-
-	return ret;
-}
-
-int dram_init_banksize(void)
-{
-	s32 ret;
-
-	ret = fdtdec_setup_memory_banksize();
-	if (ret)
-		printf("Error setting up memory banksize. %d\n", ret);
-
-	return ret;
-}
-
+static bool is_nand;
 #if defined(CONFIG_SPL_LOAD_FIT)
 int board_fit_config_name_match(const char *name)
 {
 	bool eeprom_read = board_ti_was_eeprom_read();
 
 	if (!eeprom_read || board_is_am64x_gpevm()) {
-		if (!strcmp(name, "k3-am642-r5-evm") || !strcmp(name, "k3-am642-evm"))
-			return 0;
+		if (is_nand) {
+			if (!strcmp(name, "k3-am642-r5-evm") || !strcmp(name, "k3-am642-evm-nand"))
+				return 0;
+		} else {
+			if (!strcmp(name, "k3-am642-r5-evm") || !strcmp(name, "k3-am642-evm"))
+				return 0;
+		}
 	} else if (board_is_am64x_skevm()) {
 		if (!strcmp(name, "k3-am642-r5-sk") || !strcmp(name, "k3-am642-sk"))
 			return 0;
@@ -111,52 +101,12 @@ static int fixup_usb_boot(const void *fdt_blob)
 }
 #endif
 
-#if defined(CONFIG_K3_AM64_DDRSS)
-static void fixup_ddr_driver_for_ecc(struct spl_image_info *spl_image)
-{
-	struct udevice *dev;
-	int ret;
-
-	dram_init_banksize();
-
-	ret = uclass_get_device(UCLASS_RAM, 0, &dev);
-	if (ret)
-		panic("Cannot get RAM device for ddr size fixup: %d\n", ret);
-
-	ret = k3_ddrss_ddr_fdt_fixup(dev, spl_image->fdt_addr, gd->bd);
-	if (ret)
-		printf("Error fixing up ddr node for ECC use! %d\n", ret);
-}
-#else
-static void fixup_memory_node(struct spl_image_info *spl_image)
-{
-	u64 start[CONFIG_NR_DRAM_BANKS];
-	u64 size[CONFIG_NR_DRAM_BANKS];
-	int bank;
-	int ret;
-
-	dram_init();
-	dram_init_banksize();
-
-	for (bank = 0; bank < CONFIG_NR_DRAM_BANKS; bank++) {
-		start[bank] =  gd->bd->bi_dram[bank].start;
-		size[bank] = gd->bd->bi_dram[bank].size;
-	}
-
-	/* dram_init functions use SPL fdt, and we must fixup u-boot fdt */
-	ret = fdt_fixup_memory_banks(spl_image->fdt_addr, start, size, CONFIG_NR_DRAM_BANKS);
-	if (ret)
-		printf("Error fixing up memory node! %d\n", ret);
-}
-#endif
-
 void spl_perform_fixups(struct spl_image_info *spl_image)
 {
-#if defined(CONFIG_K3_AM64_DDRSS)
-	fixup_ddr_driver_for_ecc(spl_image);
-#else
-	fixup_memory_node(spl_image);
-#endif
+	if (IS_ENABLED(CONFIG_K3_INLINE_ECC))
+		fixup_ddr_driver_for_ecc(spl_image);
+	else
+		fixup_memory_node(spl_image);
 
 #if CONFIG_IS_ENABLED(USB_STORAGE)
 	fixup_usb_boot(spl_image->fdt_addr);
@@ -236,7 +186,6 @@ static void setup_serial(void)
 #endif
 #endif
 
-#ifdef CONFIG_BOARD_LATE_INIT
 static const char *k3_dtbo_list[AM64X_MAX_DAUGHTER_CARDS] = {NULL};
 
 static int init_daughtercard_det_gpio(char *gpio_name, struct gpio_desc *desc)
@@ -264,7 +213,6 @@ static int init_daughtercard_det_gpio(char *gpio_name, struct gpio_desc *desc)
 static int probe_daughtercards(void)
 {
 	struct ti_am6_eeprom ep;
-	struct gpio_desc board_det_gpios[AM64X_EVM_BRD_DET_COUNT];
 	char mac_addr[DAUGHTER_CARD_NO_OF_MAC_ADDR][TI_EEPROM_HDR_ETH_ALEN];
 	u8 mac_addr_cnt;
 	char name_overlays[1024] = { 0 };
@@ -292,7 +240,7 @@ static int probe_daughtercards(void)
 		{
 			AM64X_EVM_HSE_BRD_DET,
 			"TMDS64DC02EVM",
-			"k3-am642-evm-nand.dtbo",
+			AM642_NAND_DTBO,
 			0,
 		},
 	};
@@ -373,6 +321,9 @@ static int probe_daughtercards(void)
 		dtboname = cards[i].dtbo_name;
 		k3_dtbo_list[nb_dtbos++] = dtboname;
 
+		if (!strcmp(dtboname, AM642_NAND_DTBO))
+			is_nand = true;
+
 		/*
 		 * Make sure we are not running out of buffer space by checking
 		 * if we can fit the new overlay, a trailing space to be used
@@ -396,6 +347,7 @@ static int probe_daughtercards(void)
 	return 0;
 }
 
+#ifdef CONFIG_BOARD_LATE_INIT
 int board_late_init(void)
 {
 	if (IS_ENABLED(CONFIG_TI_I2C_BOARD_DETECT)) {
@@ -434,5 +386,9 @@ void spl_board_init(void)
 
 	/* Init DRAM size for R5/A53 SPL */
 	dram_init_banksize();
+
+	/* Check for and probe any plugged-in daughtercards */
+	if (board_is_am64x_gpevm())
+		probe_daughtercards();
 }
 #endif

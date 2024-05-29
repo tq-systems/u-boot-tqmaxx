@@ -137,10 +137,12 @@ static void store_boot_info_from_rom(void)
 	       sizeof(struct rom_extended_boot_data));
 }
 
+#define J784S4_MAX_CONTROLLERS	4
+
 void board_init_f(ulong dummy)
 {
 	struct udevice *dev;
-	int ret;
+	int ret, ctr = 1;
 
 	/*
 	 * Cannot delay this further as there is a chance that
@@ -213,6 +215,13 @@ void board_init_f(ulong dummy)
 	/* Output System Firmware version info */
 	k3_sysfw_print_ver();
 
+	if (IS_ENABLED(CONFIG_K3_AVS0)) {
+		ret = uclass_get_device_by_driver(UCLASS_MISC, DM_DRIVER_GET(k3_avs),
+						  &dev);
+		if (ret)
+			pr_err("AVS init failed: %d\n", ret);
+	}
+
 	if (IS_ENABLED(CONFIG_TARGET_J784S4_R5_EVM)) {
 		ret = uclass_get_device_by_name(UCLASS_MISC, "msmc", &dev);
 		if (ret)
@@ -222,17 +231,13 @@ void board_init_f(ulong dummy)
 		if (ret)
 			panic("DRAM 0 init failed: %d\n", ret);
 
-		ret = uclass_next_device_err(&dev);
-		if (ret)
-			panic("DRAM 1 init failed: %d\n", ret);
+		while (ctr < J784S4_MAX_CONTROLLERS) {
+			ret = uclass_next_device_err(&dev);
 
-		ret = uclass_next_device_err(&dev);
-		if (ret)
-			panic("DRAM 2 init failed: %d\n", ret);
-
-		ret = uclass_next_device_err(&dev);
-		if (ret)
-			panic("DRAM 3 init failed: %d\n", ret);
+			if (ret && ret != -ENODEV)
+				panic("DRAM %d init failed: %d\n", ctr, ret);
+			ctr++;
+		}
 	}
 
 	spl_enable_dcache();

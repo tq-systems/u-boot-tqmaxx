@@ -1701,6 +1701,20 @@ the included board config binaries. Example::
 
 
 
+.. _etype_ti_dm:
+
+Entry: ti-dm: TI Device Manager (DM) blob
+-----------------------------------------
+
+Properties / Entry arguments:
+    - ti-dm-path: Filename of file to read into the entry, typically ti-dm.bin
+
+This entry holds the device manager responsible for resource and power management
+in K3 devices. See https://software-dl.ti.com/tisci/esd/latest/ for more information
+about TI DM.
+
+
+
 .. _etype_ti_secure:
 
 Entry: ti-secure: Entry containing a TI x509 certificate binary
@@ -1739,6 +1753,7 @@ Properties / Entry arguments:
     - core: core on which bootloader runs, valid cores are 'secure' and 'public'
     - content: phandle of SPL in case of legacy bootflow or phandles of component binaries
       in case of combined bootflow
+    - core-opts (optional): split-mode (0) or lockstep mode (1) set to 0 by default
 
 The following properties are only for generating a combined bootflow binary:
     - sysfw-inner-cert: boolean if binary contains sysfw inner certificate

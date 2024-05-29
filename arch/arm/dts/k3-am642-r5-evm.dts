@@ -226,6 +226,13 @@
 			AM64X_IOPAD(0x0008, PIN_INPUT, 0) /* (N19) OSPI0_DQS */
 		>;
 	};
+
+	main_i2c0_pins_default: main-i2c0-pins-default {
+		pinctrl-single,pins = <
+			AM64X_IOPAD(0x0260, PIN_INPUT_PULLUP, 0) /* (A18) I2C0_SCL */
+			AM64X_IOPAD(0x0264, PIN_INPUT_PULLUP, 0) /* (B18) I2C0_SDA */
+		>;
+	};
 };
 
 &dmsc {
@@ -271,7 +278,6 @@
 	/delete-property/ power-domains;
 	clocks = <&clk_200mhz>;
 	clock-names = "clk_xin";
-	ti,driver-strength-ohm = <50>;
 	disable-wp;
 	pinctrl-0 = <&main_mmc1_pins_default>;
 };
@@ -284,6 +290,18 @@
 /* EEPROM might be read before SYSFW is available */
 &main_i2c0 {
 	/delete-property/ power-domains;
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&main_i2c0_pins_default>;
+	clock-frequency = <400000>;
+
+	tca9554: gpio@38 {
+		 /* TCA9554 */
+		 compatible = "nxp,pca9554";
+		 reg = <0x38>;
+		 gpio-controller;
+		 #gpio-cells = <2>;
+	};
 };
 
 &usbss0 {
@@ -361,6 +379,24 @@
 			};
 		};
 	};
+};
+
+#include "k3-am642-evm-nand.dtsi"
+
+&gpmc0_pins_default {
+	bootph-all;
+};
+
+&gpmc0 {
+	bootph-all;
+};
+
+&main_gpio0 {
+	bootph-all;
+};
+
+&nand0_0 {
+	bootph-all;
 };
 
 #include "k3-am642-evm-u-boot.dtsi"

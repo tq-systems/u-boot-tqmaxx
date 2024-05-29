@@ -26,22 +26,12 @@
 #include <dm/root.h>
 
 #include "../common/board_detect.h"
+#include "../common/k3-ddr-init.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
 int board_init(void)
 {
-	return 0;
-}
-
-int dram_init(void)
-{
-#ifdef CONFIG_PHYS_64BIT
-	gd->ram_size = 0x100000000;
-#else
-	gd->ram_size = 0x80000000;
-#endif
-
 	return 0;
 }
 
@@ -56,73 +46,65 @@ phys_size_t board_get_usable_ram_top(phys_size_t total_size)
 	return gd->ram_top;
 }
 
-int dram_init_banksize(void)
-{
-	/* Bank 0 declares the memory available in the DDR low region */
-	gd->bd->bi_dram[0].start = CFG_SYS_SDRAM_BASE;
-	gd->bd->bi_dram[0].size = 0x7fffffff;
-	gd->ram_size = 0x80000000;
-
-#ifdef CONFIG_PHYS_64BIT
-	/* Bank 1 declares the memory available in the DDR high region */
-	gd->bd->bi_dram[1].start = CFG_SYS_SDRAM_BASE1;
-	gd->bd->bi_dram[1].size = 0x37fffffff;
-	gd->ram_size = 0x400000000;
-#endif
-
-	return 0;
-}
-
-#if CONFIG_IS_ENABLED(DM_GPIO) && CONFIG_IS_ENABLED(OF_LIBFDT)
 /* Enables the spi-nand dts node, if onboard mux is set to spinand */
 static void __maybe_unused detect_enable_spinand(void *blob)
 {
-	struct gpio_desc desc = {0};
-	char *ospi_mux_sel_gpio = "6";
-	int offset;
+	if (IS_ENABLED(CONFIG_DM_GPIO) && IS_ENABLED(CONFIG_OF_LIBFDT)) {
+		struct gpio_desc desc = {0};
+		char *ospi_mux_sel_gpio = "6";
+		int nand_offset, nor_offset;
 
-	if (dm_gpio_lookup_name(ospi_mux_sel_gpio, &desc))
-		return;
+		if (dm_gpio_lookup_name(ospi_mux_sel_gpio, &desc))
+			return;
 
-	if (dm_gpio_request(&desc, ospi_mux_sel_gpio))
-		return;
+		if (dm_gpio_request(&desc, ospi_mux_sel_gpio))
+			return;
 
-	if (dm_gpio_set_dir_flags(&desc, GPIOD_IS_IN))
-		return;
+		if (dm_gpio_set_dir_flags(&desc, GPIOD_IS_IN))
+			return;
 
-	if (dm_gpio_get_value(&desc)) {
-		offset = fdt_node_offset_by_compatible(blob, -1, "spi-nand");
-		fdt_status_okay(blob, offset);
+		nand_offset = fdt_node_offset_by_compatible(blob, -1, "spi-nand");
+		nor_offset = fdt_node_offset_by_compatible(blob,
+							   fdt_parent_offset(blob, nand_offset),
+							   "jedec,spi-nor");
 
-		offset = fdt_first_subnode(blob,
-					   fdt_parent_offset(blob, offset));
-		while (offset > 0) {
-			if (!fdt_node_check_compatible(blob, offset,
-						       "jedec,spi-nor"))
-				fdt_status_disabled(blob, offset);
-
-			offset = fdt_next_subnode(blob, offset);
+		if (dm_gpio_get_value(&desc)) {
+			fdt_status_okay(blob, nand_offset);
+			fdt_del_node(blob, nor_offset);
+		} else {
+			fdt_del_node(blob, nand_offset);
 		}
 	}
 }
-#endif
 
-#if defined(CONFIG_SPL_BUILD) && (defined(CONFIG_TARGET_J721S2_A72_EVM) || \
-				  defined(CONFIG_TARGET_J721S2_R5_EVM))
+#if defined(CONFIG_SPL_BUILD)
 void spl_perform_fixups(struct spl_image_info *spl_image)
 {
-	if (IS_ENABLED(CONFIG_DM_GPIO) && IS_ENABLED(CONFIG_OF_LIBFDT))
-		detect_enable_spinand(spl_image->fdt_addr);
+	detect_enable_spinand(spl_image->fdt_addr);
+	if (IS_ENABLED(CONFIG_TARGET_J721S2_R5_EVM)) {
+		if (IS_ENABLED(CONFIG_K3_INLINE_ECC))
+			fixup_ddr_driver_for_ecc(spl_image);
+	} else {
+		fixup_memory_node(spl_image);
+	}
 }
 #endif
 
 #if defined(CONFIG_OF_LIBFDT) && defined(CONFIG_OF_BOARD_SETUP)
 int ft_board_setup(void *blob, struct bd_info *bd)
 {
-	if (IS_ENABLED(CONFIG_DM_GPIO) && IS_ENABLED(CONFIG_OF_LIBFDT))
-		detect_enable_spinand(blob);
+	int ret;
 
-	return 0;
+	ret = fdt_fixup_msmc_ram(blob, "/bus@100000", "sram@70000000");
+	if (ret < 0)
+		ret = fdt_fixup_msmc_ram(blob, "/interconnect@100000",
+					 "sram@70000000");
+	if (ret)
+		printf("%s: fixing up msmc ram failed %d\n", __func__, ret);
+
+	detect_enable_spinand(blob);
+
+	return ret;
 }
 #endif
 
@@ -372,8 +354,46 @@ int board_late_init(void)
 	return 0;
 }
 
+ofnode cadence_qspi_get_subnode(struct udevice *dev)
+{
+	if (IS_ENABLED(CONFIG_SPL_BUILD) &&
+	    IS_ENABLED(CONFIG_TARGET_J721S2_R5_EVM)) {
+		if (spl_boot_device() == BOOT_DEVICE_SPINAND)
+			return ofnode_by_compatible(dev_ofnode(dev), "spi-nand");
+	}
+
+	return dev_read_first_subnode(dev);
+}
+
 void spl_board_init(void)
 {
+	struct udevice *dev;
+	int ret;
+
+	if (IS_ENABLED(CONFIG_ESM_K3)) {
+		ret = uclass_get_device_by_name(UCLASS_MISC, "esm@700000",
+						&dev);
+		if (ret)
+			printf("MISC init for esm@700000 failed: %d\n", ret);
+
+		ret = uclass_get_device_by_name(UCLASS_MISC, "esm@40800000",
+						&dev);
+		if (ret)
+			printf("MISC init for esm@40800000 failed: %d\n", ret);
+
+		ret = uclass_get_device_by_name(UCLASS_MISC, "esm@42080000",
+						&dev);
+		if (ret)
+			printf("MISC init for esm@42080000 failed: %d\n", ret);
+	}
+
+	if (IS_ENABLED(CONFIG_ESM_PMIC) && !board_is_am68_sk_som()) {
+		ret = uclass_get_device_by_driver(UCLASS_MISC,
+						  DM_DRIVER_GET(pmic_esm),
+						  &dev);
+		if (ret)
+			printf("ESM PMIC init failed: %d\n", ret);
+	}
 }
 
 /* Support for the various EVM / SK families */
@@ -431,10 +451,19 @@ void do_dt_magic(void)
 #ifdef CONFIG_SPL_BUILD
 void board_init_f(ulong dummy)
 {
+	struct udevice *dev;
+	int ret;
 	k3_spl_init();
 #if defined(CONFIG_SPL_OF_LIST) && defined(CONFIG_TI_I2C_BOARD_DETECT)
 	do_dt_magic();
 #endif
 	k3_mem_init();
+
+	if (IS_ENABLED(CONFIG_K3_AVS0) && board_is_j721s2_som()) {
+		ret = uclass_get_device_by_driver(UCLASS_MISC, DM_DRIVER_GET(k3_avs),
+						  &dev);
+			if (ret)
+				printf("AVS init failed: %d\n", ret);
+	}
 }
 #endif
