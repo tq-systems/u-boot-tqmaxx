@@ -11,6 +11,8 @@
 #include "k3-am62x-tqma62xx-1g-lp4-1600MTs.dtsi"
 #include "k3-am62-ddr.dtsi"
 
+#include <config.h>
+
 / {
 	memory@80000000 {
 		/* 512M RAM (initial configuration - fixed up by board code) */
@@ -19,12 +21,21 @@
 };
 
 &memorycontroller {
+#ifdef CONFIG_K3_INLINE_ECC
+	ti,ecc-enable;
+#endif
+
 	ram-variants {
 		base-variant = "tqma62xx-1g";
 		bootph-pre-ram;
 
 		variant-2g {
 			variant-name = "tqma62xx-2g";
+
+#ifdef CONFIG_K3_INLINE_ECC
+			ti,ecc-enable;
+#endif
+
 			#include "k3-am62x-tqma62xx-2g-lp4-1600MTs-patch.dtsi"
 		};
 	};
