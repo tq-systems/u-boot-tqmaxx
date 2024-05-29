@@ -99,6 +99,14 @@ config K3_AM62A_DDRSS
 
 endchoice
 
+config K3_DDRSS_BOARD_DRAM_INIT
+	bool "Initialize RAM banksizes using dram_init() and dram_init_banksize()"
+	depends on K3_DDRSS && PHYS_64BIT
+	help
+	  Instead of reading RAM sizes from the Device Tree, use the board's
+	  provided dram_init() and dram_init_banksize(), allowing to override
+	  the settings dynamically.
+
 config K3_DDRSS_VARIANTS
 	bool "Enable K3 DDRSS RAM configuration variant support"
 	depends on K3_DDRSS && SPL_SYSINFO
