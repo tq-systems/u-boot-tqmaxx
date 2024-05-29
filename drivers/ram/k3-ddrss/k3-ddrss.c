@@ -14,6 +14,7 @@
 #include <fdt_support.h>
 #include <ram.h>
 #include <hang.h>
+#include <init.h>
 #include <log.h>
 #include <asm/io.h>
 #include <power-domain.h>
@@ -939,38 +940,49 @@ static void k3_ddrss_ddr_bank_base_size_calc(struct k3_ddrss_desc *ddrss)
 	int bank, na, ns, len, parent;
 	const fdt32_t *ptr, *end;
 
-	for (bank = 0; bank < CONFIG_NR_DRAM_BANKS; bank++) {
-		ddrss->ddr_bank_base[bank] = 0;
-		ddrss->ddr_bank_size[bank] = 0;
-	}
+	if (IS_ENABLED(CONFIG_K3_DDRSS_BOARD_DRAM_INIT)) {
+		memset(gd->bd->bi_dram, 0, sizeof(gd->bd->bi_dram));
+		dram_init_banksize();
 
-	ofnode mem = ofnode_null();
-
-	do {
-		mem = ofnode_by_prop_value(mem, "device_type", "memory", 7);
-	} while (!ofnode_is_enabled(mem));
-
-	const void *fdt = ofnode_to_fdt(mem);
-	int node = ofnode_to_offset(mem);
-	const char *property = "reg";
-
-	parent = fdt_parent_offset(fdt, node);
-	na = fdt_address_cells(fdt, parent);
-	ns = fdt_size_cells(fdt, parent);
-	ptr = fdt_getprop(fdt, node, property, &len);
-	end = ptr + len / sizeof(*ptr);
-
-	for (bank = 0; bank < CONFIG_NR_DRAM_BANKS; bank++) {
-		if (ptr + na + ns <= end) {
-			if (CONFIG_IS_ENABLED(OF_TRANSLATE))
-				ddrss->ddr_bank_base[bank] = fdt_translate_address(fdt, node, ptr);
-			else
-				ddrss->ddr_bank_base[bank] = fdtdec_get_number(ptr, na);
-
-			ddrss->ddr_bank_size[bank] = fdtdec_get_number(&ptr[na], ns);
+		for (bank = 0; bank < CONFIG_NR_DRAM_BANKS; bank++) {
+			ddrss->ddr_bank_base[bank] = gd->bd->bi_dram[bank].start;
+			ddrss->ddr_bank_size[bank] = gd->bd->bi_dram[bank].size;
+		}
+	} else {
+		for (bank = 0; bank < CONFIG_NR_DRAM_BANKS; bank++) {
+			ddrss->ddr_bank_base[bank] = 0;
+			ddrss->ddr_bank_size[bank] = 0;
 		}
 
-		ptr += na + ns;
+		ofnode mem = ofnode_null();
+
+		do {
+			mem = ofnode_by_prop_value(mem, "device_type", "memory", 7);
+		} while (!ofnode_is_enabled(mem));
+
+		const void *fdt = ofnode_to_fdt(mem);
+		int node = ofnode_to_offset(mem);
+		const char *property = "reg";
+
+		parent = fdt_parent_offset(fdt, node);
+		na = fdt_address_cells(fdt, parent);
+		ns = fdt_size_cells(fdt, parent);
+		ptr = fdt_getprop(fdt, node, property, &len);
+		end = ptr + len / sizeof(*ptr);
+
+		for (bank = 0; bank < CONFIG_NR_DRAM_BANKS; bank++) {
+			if (ptr + na + ns <= end) {
+				if (CONFIG_IS_ENABLED(OF_TRANSLATE))
+					ddrss->ddr_bank_base[bank] =
+						fdt_translate_address(fdt, node, ptr);
+				else
+					ddrss->ddr_bank_base[bank] = fdtdec_get_number(ptr, na);
+
+				ddrss->ddr_bank_size[bank] = fdtdec_get_number(&ptr[na], ns);
+			}
+
+			ptr += na + ns;
+		}
 	}
 
 	for (bank = 0; bank < CONFIG_NR_DRAM_BANKS; bank++)
@@ -1032,7 +1044,10 @@ static void k3_ddrss_ddr_inline_ecc_base_size_calc(struct k3_ddrss_ecc_region *r
 
 static void k3_ddrss_lpddr4_ecc_calc_reserved_mem(struct k3_ddrss_desc *ddrss)
 {
-	fdtdec_setup_mem_size_base_lowest();
+	if (IS_ENABLED(CONFIG_K3_DDRSS_BOARD_DRAM_INIT))
+		dram_init();
+	else
+		fdtdec_setup_mem_size_base_lowest();
 
 	/*
 	 * For every 512-byte data block, 64 bytes are used to store inline ECC
