@@ -679,10 +679,6 @@ int arch_initr_trap(void)
 	return 0;
 }
 
-#ifndef CONFIG_SYS_MMC_ENV_DEV
-#define CONFIG_SYS_MMC_ENV_DEV -1
-#endif
-
 __weak int board_mmc_get_env_dev(int devno)
 {
 	return devno;

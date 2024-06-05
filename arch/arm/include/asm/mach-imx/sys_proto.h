@@ -302,6 +302,14 @@ void board_mem_get_layout(u64 *phys_sdram_1_start,
 int arch_auxiliary_core_up(u32 core_id, ulong boot_private_data);
 int arch_auxiliary_core_check_up(u32 core_id);
 
+/*
+ * This causes a checkpath error but needed to be built without ENV_IS_IN_MMC
+ * since unrelated NXP code depends on this define
+ */
+#ifndef CONFIG_SYS_MMC_ENV_DEV
+#define CONFIG_SYS_MMC_ENV_DEV -1
+#endif
+
 int board_mmc_get_env_dev(int devno);
 
 int nxp_board_rev(void);
