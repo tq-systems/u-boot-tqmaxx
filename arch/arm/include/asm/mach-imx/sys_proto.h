@@ -341,6 +341,14 @@ void board_mem_get_layout(u64 *phys_sdram_1_start,
 int arch_auxiliary_core_up(u32 core_id, ulong boot_private_data);
 int arch_auxiliary_core_check_up(u32 core_id);
 
+/*
+ * This causes a checkpatch error but needed to be built without ENV_IS_IN_MMC
+ * since NXP i.MX fastboot code depends on this define and mmc_get_env_dev
+ */
+#ifndef CONFIG_ENV_MMC_DEVICE_INDEX
+#define CONFIG_ENV_MMC_DEVICE_INDEX -1
+#endif
+
 int board_mmc_get_env_dev(int devno);
 
 int nxp_board_rev(void);
