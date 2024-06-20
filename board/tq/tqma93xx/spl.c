@@ -33,8 +33,15 @@ DECLARE_GLOBAL_DATA_PTR;
 
 extern struct dram_timing_info tqma93xxca_dram_timing_1gb;
 extern struct dram_timing_info tqma93xxla_dram_timing_1gb;
+extern struct dram_timing_info tqma93xxla_dram_timing_1gb5;
 extern struct dram_timing_info tqma93xxca_dram_timing_2gb;
 extern struct dram_timing_info tqma93xxla_dram_timing_2gb;
+
+enum tqma93xxxa_ram_size {
+	TQMA93XXXA_RAM_SIZE_1G = 1,
+	TQMA93XXXA_RAM_SIZE_1G5,
+	TQMA93XXXA_RAM_SIZE_2G,
+};
 
 struct dram_info {
 	struct dram_timing_info	*table;  /* from NXP RPA */
@@ -46,6 +53,7 @@ static const struct dram_info tqma93xx_dram_info[]  = {
 	{ &tqma93xxca_dram_timing_1gb, SZ_1G * 1ULL, 'c' },
 	{ &tqma93xxca_dram_timing_2gb, SZ_1G * 2ULL, 'c' },
 	{ &tqma93xxla_dram_timing_1gb, SZ_1G * 1ULL, 'l' },
+	{ &tqma93xxla_dram_timing_1gb5, SZ_512M * 3ULL, 'l' },
 	{ &tqma93xxla_dram_timing_2gb, SZ_1G * 2ULL, 'l' },
 };
 
@@ -79,13 +87,15 @@ static int tqma93xx_query_ddr_timing(void)
 {
 	char sel = '-';
 	char var = '-';
-	unsigned int ramsize_gb;
+	enum tqma93xxxa_ram_size ramsize_choice;
 	phys_size_t ramsize;
 	int idx;
 
 	puts("Warning: no valid EEPROM!\n"
-		"Please enter LPDDR size in GByte to proceed.\n"
-		"Valid sizes are 1 and 2.\n");
+		"Please choose LPDDR size to proceed.\n"
+		"1 -   1 GiB\n"
+		"2 - 1.5 GiB\n"
+		"3 -   2 GiB\n");
 
 	for (;;) {
 		/* Flush input */
@@ -95,7 +105,7 @@ static int tqma93xx_query_ddr_timing(void)
 		sel = serial_getc();
 		putc('\n');
 
-		if ((sel == '1') || (sel == '2'))
+		if ((sel == '1') || (sel == '2') || (sel == '3'))
 			break;
 
 		puts("Please enter a valid size.\n");
@@ -103,11 +113,24 @@ static int tqma93xx_query_ddr_timing(void)
 
 	/*
 	 * We expect ASCII codes from the terminal. So we can easily subtract
-	 * to get the assembled size of DRAM in GB.
-	 * Our lookup has the size in bytes, hence we have to multiply.
+	 * to get the choice.
 	 */
-	ramsize_gb = (unsigned int)sel - (unsigned int)'0';
-	ramsize = (phys_size_t)(ramsize_gb) * SZ_1G;
+	ramsize_choice = (unsigned int)sel - (unsigned int)'0';
+
+	switch (ramsize_choice) {
+	case TQMA93XXXA_RAM_SIZE_1G:
+		ramsize = (phys_size_t)1 * SZ_1G;
+		break;
+	case TQMA93XXXA_RAM_SIZE_1G5:
+		ramsize = (phys_size_t)3 * SZ_512M;
+		break;
+	case TQMA93XXXA_RAM_SIZE_2G:
+		ramsize = (phys_size_t)2 * SZ_1G;
+		break;
+	default:
+		puts("ERROR: no valid RAM size given, stop\n");
+		hang();
+	}
 
 	puts("Warning: no valid EEPROM!\n"
 		"Please enter form factor to proceed.\n"

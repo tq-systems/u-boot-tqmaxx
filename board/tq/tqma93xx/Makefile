@@ -15,6 +15,7 @@ ifdef CONFIG_SPL_BUILD
 obj-y += spl.o
 obj-y += lpddr4x_tqma93xxca_timing_1gb.o
 obj-y += lpddr4x_tqma93xxla_timing_1gb.o
+obj-y += lpddr4x_tqma93xxla_timing_1gb5.o
 obj-y += lpddr4x_tqma93xxca_timing_2gb.o
 obj-y += lpddr4x_tqma93xxla_timing_2gb.o
 endif
