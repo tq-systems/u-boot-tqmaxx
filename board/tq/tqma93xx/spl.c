@@ -44,10 +44,8 @@ struct dram_info {
 
 static const struct dram_info tqma93xx_dram_info[]  = {
 	{ &tqma93xxca_dram_timing_1gb, SZ_1G * 1ULL, 'c' },
-	/* reserved for 2 GB variant */
 	{ &tqma93xxca_dram_timing_2gb, SZ_1G * 2ULL, 'c' },
 	{ &tqma93xxla_dram_timing_1gb, SZ_1G * 1ULL, 'l' },
-	/* reserved for 2 GB variant */
 	{ &tqma93xxla_dram_timing_2gb, SZ_1G * 2ULL, 'l' },
 };
 
