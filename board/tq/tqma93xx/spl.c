@@ -38,8 +38,8 @@ extern struct dram_timing_info tqma93xxla_dram_timing_2gb;
 
 struct dram_info {
 	struct dram_timing_info	*table;  /* from NXP RPA */
-	phys_size_t			size;    /* size of RAM */
-	char				variant; /* char to help user query */
+	phys_size_t		size;    /* size of RAM */
+	char			variant; /* char to help user query */
 };
 
 static const struct dram_info tqma93xx_dram_info[]  = {
