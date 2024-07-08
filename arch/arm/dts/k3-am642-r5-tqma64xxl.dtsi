@@ -14,6 +14,21 @@
 #ifdef CONFIG_K3_INLINE_ECC
 	ti,ecc-enable;
 #endif
+
+	ram-variants {
+		base-variant = "tqma64xxl-1g";
+		bootph-pre-ram;
+
+		variant-2g {
+			variant-name = "tqma64xxl-2g";
+
+#ifdef CONFIG_K3_INLINE_ECC
+			ti,ecc-enable;
+#endif
+
+			#include "k3-am64-tqma64xxl-2g-lp4-1600MTs-patch.dtsi"
+		};
+	};
 };
 
 &sysinfo {
@@ -23,6 +38,13 @@
 		tqma64xxl-1g {
 			variant-name = "tqma64xxl-1g";
 			ram-size = /bits/ 64 <0x040000000>;
+			ram-type = <1>;
+			bootph-pre-ram;
+		};
+
+		tqma64xxl-2g {
+			variant-name = "tqma64xxl-2g";
+			ram-size = /bits/ 64 <0x080000000>;
 			ram-type = <1>;
 			bootph-pre-ram;
 		};
