@@ -34,7 +34,34 @@ int dram_init(void)
 
 int dram_init_banksize(void)
 {
-	return fdtdec_setup_memory_banksize();
+	u64 bank0_size;
+	struct udevice *sysinfo;
+	int ret;
+
+	if (!IS_ENABLED(CONFIG_CPU_V7R))
+		return fdtdec_setup_memory_banksize();
+
+	ret = sysinfo_get_and_detect(&sysinfo);
+	if (ret) {
+		printf("Failed to get sysinfo data: %d\n", ret);
+		return ret;
+	}
+
+	ret = sysinfo_get_uint64(sysinfo, SYSINFO_ID_RAM_SIZE, &bank0_size);
+	if (ret) {
+		printf("Failed to get RAM size: %d\n", ret);
+		return ret;
+	}
+
+	if (bank0_size > SZ_2G) {
+		printf("VARD error: AM64x does not support more than 2GiB of RAM.\n");
+		bank0_size = SZ_2G;
+	}
+
+	gd->bd->bi_dram[0].start = CFG_SYS_SDRAM_BASE;
+	gd->bd->bi_dram[0].size = bank0_size;
+
+	return 0;
 }
 
 #ifdef CONFIG_SPL_BUILD
