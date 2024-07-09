@@ -908,6 +908,7 @@ static void k3_ddrss_ddr_bank_base_size_calc(struct k3_ddrss_desc *ddrss)
 	const fdt32_t *ptr, *end;
 
 	if (IS_ENABLED(CONFIG_K3_DDRSS_BOARD_DRAM_INIT)) {
+		memset(gd->bd->bi_dram, 0, sizeof(gd->bd->bi_dram));
 		dram_init_banksize();
 
 		for (bank = 0; bank < CONFIG_NR_DRAM_BANKS; bank++) {
