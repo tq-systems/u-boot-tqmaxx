@@ -72,7 +72,7 @@
 				  <&clk IMX93_CLK_MEDIA_APB>;
 		assigned-clock-parents = <&clk IMX93_CLK_24M>,
 					 <&clk IMX93_CLK_VIDEO_PLL>,
-					 <&clk IMX93_CLK_SYS_PLL_PFD1>,
+					 <&clk IMX93_CLK_SYS_PLL_PFD0>,
 					 <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
 		power-domains = <&media_blk_ctrl IMX93_MEDIABLK_PD_LCDIF>;
 		status = "disabled";
