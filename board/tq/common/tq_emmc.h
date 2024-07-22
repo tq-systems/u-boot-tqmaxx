@@ -8,6 +8,8 @@
 #ifndef __TQ_EMMC_H__
 #define __TQ_EMMC_H__
 
+struct mmc;
+
 int tq_emmc_need_dsr(const struct mmc *mmc);
 int tq_ft_fixup_emmc_dsr(void *blob, const char *path, u32 value);
 
