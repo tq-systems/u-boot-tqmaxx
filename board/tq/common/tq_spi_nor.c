@@ -16,21 +16,21 @@
 #include "tq_bb.h"
 
 /* All this code must be called from ft_board_setup */
-#if defined(CONFIG_OF_BOARD_SETUP) && !defined(CONFIG_SPL_BUILD)
+#if IS_ENABLED(CONFIG_OF_BOARD_SETUP) && !IS_ENABLED(CONFIG_SPL_BUILD)
 
 static void tq_ft_fixup_spi_mtdparts(void *blob,
 				     const struct node_info *nodes,
 				     size_t node_count)
 {
 /* fdt_fixup_mtdparts is only present with CONFIG_FDT_FIXUP_PARTITIONS set */
-#if defined(CONFIG_FDT_FIXUP_PARTITIONS)
+#if IS_ENABLED(CONFIG_FDT_FIXUP_PARTITIONS)
 	/*
 	 * Update MTD partition nodes using info from mtdparts env var
 	 * for [Q]SPI this needs the device probed.
 	 */
 	puts("   Updating MTD partitions...\n");
 	fdt_fixup_mtdparts(blob, nodes, node_count);
-#endif
+#endif /* IS_ENABLED(CONFIG_FDT_FIXUP_PARTITIONS) */
 }
 
 void tq_ft_spi_setup(void *blob, const char *path,
@@ -60,5 +60,4 @@ void tq_ft_spi_setup(void *blob, const char *path,
 		}
 	}
 }
-
-#endif
+#endif /* IS_ENABLED(CONFIG_OF_BOARD_SETUP) && !IS_ENABLED(CONFIG_SPL_BUILD) */

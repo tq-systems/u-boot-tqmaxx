@@ -20,7 +20,7 @@
 /**
  * Reads buffer from EEPROM given by seq nr starting at offset
  */
-int tq_read_eeprom_buffer(int seq, uint offset, int buf_size, u_int8_t *buf)
+int tq_read_eeprom_buffer(int seq, uint offset, int buf_size, u8 *buf)
 {
 	struct udevice *dev;
 	int ret;
@@ -34,12 +34,11 @@ int tq_read_eeprom_buffer(int seq, uint offset, int buf_size, u_int8_t *buf)
 	return i2c_eeprom_read(dev, offset, (u8 *)buf, buf_size);
 };
 
-#if defined(CONFIG_TQ_VARD)
-
+#if IS_ENABLED(CONFIG_TQ_VARD)
 /*
  * checksum is calculated over whole structure but the CRC field
  */
-static uint16_t tq_vard_chksum(const struct tq_vard *vard)
+static u16 tq_vard_chksum(const struct tq_vard *vard)
 {
 	const unsigned char *start = (const unsigned char *)(vard) +
 		sizeof(vard->crc);
@@ -159,10 +158,9 @@ int tq_vard_detect_features(const struct tq_vard *vard,
 
 	return 0;
 }
+#endif /* IS_ENABLED(CONFIG_TQ_VARD) */
 
-#endif
-
-#if !defined(CONFIG_SPL_BUILD)
+#if (!IS_ENABLED(CONFIG_SPL_BUILD))
 
 /**
  * Reads struct tq_eeprom_data from EEPROM given by seq nr
@@ -171,7 +169,7 @@ int tq_vard_detect_features(const struct tq_vard *vard,
 int tq_read_eeprom_at(int seq, uint offset, struct tq_eeprom_data *eeprom)
 {
 	return tq_read_eeprom_buffer(seq, offset, sizeof(*eeprom),
-				      (u_int8_t *)eeprom);
+				     (u8 *)eeprom);
 }
 
 int tq_parse_eeprom_mac(struct tq_eeprom_data * const eeprom, char *buf,
@@ -195,7 +193,7 @@ int tq_parse_eeprom_mac(struct tq_eeprom_data * const eeprom, char *buf,
 }
 
 static int tq_parse_eeprom_serial_new(struct tq_eeprom_data * const eeprom,
-				        char *buf)
+				      char *buf)
 {
 	unsigned int i;
 
@@ -210,7 +208,7 @@ static int tq_parse_eeprom_serial_new(struct tq_eeprom_data * const eeprom,
 }
 
 static int tq_parse_eeprom_serial_old(struct tq_eeprom_data * const eeprom,
-				        char *buf)
+				      char *buf)
 {
 	unsigned int i;
 
@@ -225,7 +223,7 @@ static int tq_parse_eeprom_serial_old(struct tq_eeprom_data * const eeprom,
 }
 
 int tq_parse_eeprom_serial(struct tq_eeprom_data * const eeprom,
-			    char *buf, size_t len)
+			   char *buf, size_t len)
 {
 	if (!buf || !eeprom)
 		return -EINVAL;
@@ -292,7 +290,7 @@ int tq_show_eeprom(struct tq_eeprom_data * const eeprom, const char *id)
 }
 
 int tq_board_handle_eeprom_data(const char *board_name,
-				 struct tq_eeprom_data * const eeprom)
+				struct tq_eeprom_data * const eeprom)
 {
 	char sstring[(TQ_EE_BDID_BYTES) + 1];
 
@@ -311,4 +309,4 @@ int tq_board_handle_eeprom_data(const char *board_name,
 	return tq_show_eeprom(eeprom, board_name);
 }
 
-#endif
+#endif /* !IS_ENABLED(CONFIG_SPL_BUILD) */

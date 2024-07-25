@@ -12,7 +12,7 @@
 
 struct tq_eeprom_data;
 
-#if defined(CONFIG_I2C_EEPROM)
+#if IS_ENABLED(CONFIG_I2C_EEPROM)
 
 /**
  * Reads buffer from EEPROM given by seq nr starting at offset
@@ -46,9 +46,9 @@ static inline int tq_read_module_eeprom(struct tq_eeprom_data *eeprom)
 
 #error "need CONFIG_I2C_EEPROM"
 
-#endif
+#endif /* IS_ENABLED(CONFIG_I2C_EEPROM) */
 
-#if defined(CONFIG_TQ_VARD)
+#if IS_ENABLED(CONFIG_TQ_VARD)
 
 #define VARD_FEATURE_BYTES	8
 
@@ -240,11 +240,11 @@ struct tq_som_feature_list;
  * for each entry depending on the flags in vard.
  */
 int tq_vard_detect_features(const struct tq_vard *vard,
-			     struct tq_som_feature_list *features);
+			    struct tq_som_feature_list *features);
 
-#endif
+#endif /* IS_ENABLED(CONFIG_TQ_VARD) */
 
-#if !defined(CONFIG_SPL_BUILD)
+#if (!IS_ENABLED(CONFIG_SPL_BUILD))
 
 /*
  * static EEPROM layout
@@ -258,11 +258,13 @@ int tq_vard_detect_features(const struct tq_vard *vard,
 
 struct __packed tq_eeprom_data {
 	union {
-#if defined(CONFIG_TQ_VARD)
+#if IS_ENABLED(CONFIG_TQ_VARD)
 		struct tq_vard vard;
-		_Static_assert(sizeof(struct tq_vard) == TQ_EE_HRCW_BYTES, \
-			"struct tq_vard has incorrect size");
-#endif
+
+		_Static_assert(sizeof(struct tq_vard) == TQ_EE_HRCW_BYTES,
+			       "struct tq_vard has incorrect size");
+
+#endif /* IS_ENABLED(CONFIG_TQ_VARD) */
 		u8 hrcw_primary[TQ_EE_HRCW_BYTES];
 	} tq_hw_data;
 	u8 mac[TQ_EE_MAC_BYTES];		/* 0x20 ... 0x25 */
@@ -308,6 +310,6 @@ int tq_show_eeprom(struct tq_eeprom_data *const eeprom, const char *id);
 int tq_board_handle_eeprom_data(const char *board_name,
 				struct tq_eeprom_data * const eeprom);
 
-#endif /* CONFIG_SPL_BUILD */
+#endif /* !IS_ENABLED(CONFIG_SPL_BUILD) */
 
 #endif

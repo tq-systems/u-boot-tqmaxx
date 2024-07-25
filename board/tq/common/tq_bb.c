@@ -59,21 +59,20 @@ const char * __weak tq_bb_get_boardname(void)
 	return "INVALID";
 }
 
-#if defined(CONFIG_SPL_BUILD)
+#if IS_ENABLED(CONFIG_SPL_BUILD)
 void __weak tq_bb_spl_board_init(void)
 {
 	;
 }
-
-#endif
+#endif /* IS_ENABLED(CONFIG_SPL_BUILD) */
 
 /*
  * Device Tree Support
  */
-#if defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT)
+#if IS_ENABLED(CONFIG_OF_BOARD_SETUP) && IS_ENABLED(CONFIG_OF_LIBFDT)
 int __weak tq_bb_ft_board_setup(void *blob, struct bd_info *bis)
 {
 	return 0;
 }
 
-#endif /* defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT) */
+#endif /* IS_ENABLED(CONFIG_OF_BOARD_SETUP) && IS_ENABLED(CONFIG_OF_LIBFDT) */

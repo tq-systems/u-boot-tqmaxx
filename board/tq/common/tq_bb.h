@@ -24,14 +24,14 @@ void tq_bb_board_quiesce_devices(void);
 
 const char *tq_bb_get_boardname(void);
 
-#if defined(CONFIG_SPL_BUILD)
+#if IS_ENABLED(CONFIG_SPL_BUILD)
 void tq_bb_spl_board_init(void);
 #endif
 
 /*
  * Device Tree Support
  */
-#if defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT)
+#if IS_ENABLED(CONFIG_OF_BOARD_SETUP) && IS_ENABLED(CONFIG_OF_LIBFDT)
 
 struct node_info;
 
@@ -54,15 +54,15 @@ int tq_bb_ft_board_setup(void *blob, struct bd_info *bis);
 void tq_ft_spi_setup(void *blob, const char *path,
 		     const struct node_info *nodes,
 		     size_t node_count);
-#endif /* defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT) */
+#endif /* IS_ENABLED(CONFIG_OF_BOARD_SETUP) && IS_ENABLED(CONFIG_OF_LIBFDT) */
 
-#if defined(CONFIG_TQ_RTC) && defined(CONFIG_DM_I2C)
+#if IS_ENABLED(CONFIG_TQ_RTC) && IS_ENABLED(CONFIG_DM_I2C)
 
 #define TQ_PCF85063_CLKOUT_OFF 0x07
 
 int tq_pcf85063_adjust_capacity(int bus, int address, int quartz_load);
-int tq_pcf85063_set_clkout(int bus, int address, uint8_t clkout);
+int tq_pcf85063_set_clkout(int bus, int address, u8 clkout);
 int tq_pcf85063_set_offset(int bus, int address, bool mode, int offset);
-#endif /* CONFIG_TQC_RTC */
+#endif /* IS_ENABLED(CONFIG_TQ_RTC) && IS_ENABLED(CONFIG_DM_I2C) */
 
 #endif /* __TQ_BB_H */

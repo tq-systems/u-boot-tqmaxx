@@ -17,7 +17,7 @@ struct tq_gpio_init_data {
 	struct gpio_desc desc;
 };
 
-#if defined(CONFIG_DM_GPIO)
+#if IS_ENABLED(CONFIG_DM_GPIO)
 
 #define GPIO_INIT_DATA_ENTRY(IDX, NAME, FLAGS) \
 	[IDX] = { \
@@ -34,6 +34,6 @@ static inline int tq_board_gpio_init(struct tq_gpio_init_data *data,
 {
 	return 0;
 }
-#endif
+#endif /* IS_ENABLED(CONFIG_DM_GPIO) */
 
-#endif
+#endif /* __TQ_BOARD_GPIO_H__ */

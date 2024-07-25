@@ -49,7 +49,7 @@ int tq_pcf85063_adjust_capacity(int bus, int address, int quartz_load)
 	return ret;
 }
 
-int tq_pcf85063_set_clkout(int bus, int address, uint8_t clkout)
+int tq_pcf85063_set_clkout(int bus, int address, u8 clkout)
 {
 	struct udevice *dev;
 	int ret;
@@ -83,7 +83,7 @@ int tq_pcf85063_set_offset(int bus, int address, bool mode, int offset)
 	if (ret)
 		return ret;
 
-	val = ((uint8_t)offset) & PCF85063_REG_OFFSET_OFFSET_MASK;
+	val = ((u8)offset) & PCF85063_REG_OFFSET_OFFSET_MASK;
 	if (mode)
 		val |= PCF85063_REG_OFFSET_MODE;
 	ret = dm_i2c_reg_write(dev, PCF85063_REG_OFFSET, val);
