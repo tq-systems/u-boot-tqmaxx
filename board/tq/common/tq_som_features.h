@@ -67,7 +67,7 @@ const struct tq_som_feature_list *tq_board_detect_features(void);
  * @param[in] blob pointer to in memory devicetree
  * @param[in] list of features
  *
- * The function can be used to enable / disable features in the feature
+ * The function can be used to disable features in the feature
  * list based on its present flag and should be called from mainboard
  * specific part of ft_board_setup.
  * If a feature has no given dt_path in its tq_som_feature entry
