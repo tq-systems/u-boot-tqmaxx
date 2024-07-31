@@ -30,14 +30,11 @@ void tq_ft_fixup_features(void *blob, const struct tq_som_feature_list *features
 		bool present = features->list[i].present;
 		const char *path = features->list[i].dt_path;
 
-		if (path) {
+		if (!present && path) {
 			off = fdt_path_offset(blob, path);
 			if (off >= 0) {
-				pr_info("%s %s\n",
-					(present) ? "enable" : "disable",
-					path);
-				fdt_set_node_status(blob, off, present ?
-						    FDT_STATUS_OKAY : FDT_STATUS_DISABLED);
+				pr_info("disable %s\n", path);
+				fdt_set_node_status(blob, off, FDT_STATUS_DISABLED);
 			}
 		}
 	}
