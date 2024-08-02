@@ -946,7 +946,8 @@ int disable_gpu_nodes(void *blob)
 int disable_npu_nodes(void *blob)
 {
 	const char *nodes_path_8mp[] = {
-		"/vipsi@38500000"
+		"/vipsi@38500000",
+		"/soc@0/npu@38500000",
 	};
 
 	return disable_fdt_nodes(blob, nodes_path_8mp, ARRAY_SIZE(nodes_path_8mp));
@@ -965,7 +966,8 @@ int disable_isp_nodes(void *blob)
 int disable_dsp_nodes(void *blob)
 {
 	const char *nodes_path_8mp[] = {
-		"/dsp@3b6e8000"
+		"/dsp@3b6e8000",
+		"/soc@0/dsp@3b6e8000",
 	};
 
 	return disable_fdt_nodes(blob, nodes_path_8mp, ARRAY_SIZE(nodes_path_8mp));
