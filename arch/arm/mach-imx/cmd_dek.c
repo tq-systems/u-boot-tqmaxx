@@ -409,9 +409,9 @@ int generate_dek_blob(char *data, uint32_t *data_size)
 		goto exit;
 	}
 
-#if CONFIG_DEK_BLOB_BUFFER
-	input_buf = (uint8_t *)(u64)CONFIG_DEK_BLOB_BUFFER;
-	output_buf = (uint8_t *)(u64)(CONFIG_DEK_BLOB_BUFFER + *data_size);
+#if CONFIG_ELE_SHARED_BUFFER
+	input_buf = (uint8_t *)(u64)CONFIG_ELE_SHARED_BUFFER;
+	output_buf = (uint8_t *)(u64)(CONFIG_ELE_SHARED_BUFFER + *data_size);
 	memcpy(input_buf, data, *data_size);
 #else
 	input_buf = data;
@@ -434,7 +434,7 @@ int generate_dek_blob(char *data, uint32_t *data_size)
 	*data_size = out_data_size;
 
 exit:
-#if !CONFIG_DEK_BLOB_BUFFER
+#if !CONFIG_ELE_SHARED_BUFFER
 	if(output_buf)
 		free(output_buf);
 #endif
