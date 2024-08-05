@@ -133,4 +133,11 @@ config RNG_EXYNOS
 	  case the LDFW (Loadable Firmware) has to be loaded first, as it
 	  actually implements TRNG SMC calls.
 
+config IMX_ELE_RNG
+	bool "Enable RNG driver for EdgeLock Enclave"
+	depends on IMX_ELE && DM_RNG
+	default n
+	help
+	  Say y to enable the RNG driver based on EdgeLock Enclave.
+
 endif
