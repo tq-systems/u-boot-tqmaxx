@@ -104,6 +104,15 @@ config TARGET_COLIBRI_IMX7
 	select MX7D
 	imply CMD_DM
 
+config TARGET_TQMA7
+	bool "TQ-Systems TQMa7 SoM"
+	select BOARD_LATE_INIT
+	select DM
+	select DM_SERIAL
+	select DM_THERMAL
+	select MX7D
+	imply CMD_DM
+
 endchoice
 
 config SYS_SOC
@@ -116,6 +125,7 @@ source "board/novtech/meerkat96/Kconfig"
 source "board/storopack/smegw01/Kconfig"
 source "board/technexion/pico-imx7d/Kconfig"
 source "board/toradex/colibri_imx7/Kconfig"
+source "board/tq/tqma7/Kconfig"
 source "board/warp7/Kconfig"
 
 endif

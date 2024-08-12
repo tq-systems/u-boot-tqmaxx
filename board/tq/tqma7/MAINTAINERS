@@ -1,0 +1,10 @@
+TQ SYSTEMS TQMA7 BOARD
+M:	Markus Niebel <u-boot@ew.tq-group.com>
+S:	Maintained
+F:	board/tq/tqma7/*
+F:	include/configs/tqma7.h
+F:	include/configs/tqma7_*.h
+F:	configs/tqma7*_defconfig
+F:	arch/arm/dts/*mba7*.dts
+F:	arch/arm/dts/*mba7*.dtsi
+F:	arch/arm/dts/*tqma7*.dtsi

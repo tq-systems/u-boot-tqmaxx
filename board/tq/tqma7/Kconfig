@@ -1,0 +1,107 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Copyright (c) 2016-2024 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+# D-82229 Seefeld, Germany.
+# Author: Markus Niebel, Steffen Doster
+#
+
+if TARGET_TQMA7
+
+config SYS_BOARD
+	default "tqma7"
+
+config SYS_VENDOR
+	default "tq"
+
+config SYS_CONFIG_NAME
+	default "tqma7"
+
+choice
+	prompt "TQMa7 boot configuration"
+	default TQMA7_MMC_BOOT
+	help
+	  Configure boot device. This is also used to implement environment
+	  location.
+
+config TQMA7_MMC_BOOT
+	bool "MMC / SD Boot"
+	help
+	  Boot from eMMC / SD Card
+
+config TQMA7_QSPI_BOOT
+	bool "QSPI NOR Boot"
+	help
+	  Boot from on board QSPI NOR flash
+
+endchoice
+
+choice
+	prompt "TQMa7 DRAM configuration"
+	default TQMA7_512MB
+	help
+	  Configure DRAM size
+
+config TQMA7_512MB
+	bool "512 MB DRAM"
+	help
+	  configure for variant with 512 MB DRAM
+
+config TQMA7_1GB
+	bool "1 GB DRAM"
+	help
+	  configure for variant with 1 GB DRAM
+
+config TQMA7_2GB
+	bool "2 GB DRAM"
+	help
+	  configure for variant with 2 GB DRAM
+
+endchoice
+
+choice
+	prompt "TQMa7 base board variant"
+	default MBA7
+	help
+	  Select base board for TQMa7
+
+config MBA7
+	bool "TQMa7 on MBa7x Starterkit"
+	help
+	  Select the MBa7x starterkit.
+
+endchoice
+
+config IMX_CONFIG
+	default "board/tq/tqma7/tqma7.cfg"
+
+config MTDPARTS_DEFAULT
+	default "mtdparts=30bb0000.qspi:4m@0k(bootstream),64k@4096k(env0),64k@4160k(env1),-@6m(ubi)"
+
+config MTDIDS_DEFAULT
+	default "nor0=30bb0000.qspi"
+
+config TQ_EEPROM
+	default y
+
+#
+# environment settings: 64k, offset 1M (SPI Flash sector 64k), redundant env
+# in SPI Flash @ 1M + 64k
+#
+config ENV_SIZE
+	default 0x00010000
+
+config ENV_SECT_SIZE
+	default 0x00010000
+
+config ENV_OFFSET
+	default 0x00100000
+
+config ENV_OFFSET_REDUND
+	default 0x00110000
+
+config SF_DEFAULT_BUS
+	default 4
+
+source "board/tq/common/Kconfig"
+
+endif

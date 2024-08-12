@@ -1,0 +1,45 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Device Tree Source for TQ-Systems TQMa7 board on MBa7 carrier board.
+ *
+ * Copyright (C) 2024 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany
+ * Author: Steffen Doster
+ */
+
+/ {
+	config {
+		u-boot,mmc-env-offset = <0x100000>;
+		u-boot,mmc-env-offset-redundant = <0x110000>;
+	};
+};
+
+&fec1 {
+	mdio {
+		device-name = "mdio1";
+	};
+};
+
+&soc {
+	u-boot,dm-pre-reloc;
+};
+
+&aips1 {
+	u-boot,dm-pre-reloc;
+};
+
+&aips3 {
+	u-boot,dm-pre-reloc;
+};
+
+&iomuxc {
+	u-boot,dm-pre-reloc;
+};
+
+&pinctrl_uart6 {
+	u-boot,dm-pre-reloc;
+};
+
+&uart6 {
+	u-boot,dm-pre-reloc;
+};
