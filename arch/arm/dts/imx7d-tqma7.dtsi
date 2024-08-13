@@ -1,0 +1,17 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Device Tree Include file for TQ-Systems TQMa7D board with NXP i.MX7Dual SoC.
+ *
+ * Copyright (c) 2016 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
+ *
+ * Copyright (C) 2019 Bruno Thomsen <bruno.thomsen@gmail.com>
+ */
+
+#include "imx7d.dtsi"
+#include "imx7-tqma7.dtsi"
+
+&cpu1 {
+	cpu-supply = <&sw1a_reg>;
+};
