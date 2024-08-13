@@ -26,6 +26,7 @@
 #include <linux/bitops.h>
 #include <linux/bitfield.h>
 #include "common.h"
+#include <fdt_support.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -1270,6 +1271,7 @@ static int disable_smmu_node(void *blob)
 int ft_system_setup(void *blob, struct bd_info *bd)
 {
 	u32 val = 0;
+	int ret = 0;
 	int num_a55_cores_disabled = 0;
 	int gpu_disabled = 0;
 
@@ -1335,6 +1337,13 @@ int ft_system_setup(void *blob, struct bd_info *bd)
 			disable_enet10g_node(blob);
 
 		disable_smmu_node(blob);
+	}
+
+	if (IS_ENABLED(CONFIG_DM_RNG)) {
+		ret = fdt_kaslrseed(blob, true);
+		if (ret)
+			printf("Unable to set property %s, err=%s\n",
+				"kaslr-seed", fdt_strerror(ret));
 	}
 
 	return ft_add_optee_node(blob, bd);
