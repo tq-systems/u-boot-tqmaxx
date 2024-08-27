@@ -10,4 +10,5 @@ tq
 .. toctree::
    :maxdepth: 2
 
+   tqma6ul
    tqma7
