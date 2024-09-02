@@ -44,7 +44,7 @@ int tq_bb_ft_board_setup(void *blob, struct bd_info *bis);
  * @param nodes		list of compatibles to scan
  * @param node_count	path to spi controller for the SPI NOR device
  *
- * Test if optional SPI NOR is present and enable / disable it in device tree
+ * Test if optional SPI NOR is present and disable it in device tree if not found.
  * If present, use U-Boot standard env variables to add partition info to the
  * SPI NOR device node. This is needed by kernel to use UBIFS in MTD partition
  * as rootfs.
