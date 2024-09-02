@@ -40,7 +40,7 @@ void tq_ft_spi_setup(void *blob, const char *path,
 	/* This code is specific for compiled in SPI FLASH support */
 	if (CONFIG_IS_ENABLED(DM_SPI_FLASH)) {
 		int off;
-		bool enable_flash = false;
+		bool disable_flash = true;
 		unsigned int bus = CONFIG_SF_DEFAULT_BUS;
 		unsigned int cs = CONFIG_SF_DEFAULT_CS;
 
@@ -50,15 +50,13 @@ void tq_ft_spi_setup(void *blob, const char *path,
 		ret = spi_flash_probe_bus_cs(bus, cs, &new);
 		if (!ret) {
 			tq_ft_fixup_spi_mtdparts(blob, nodes, node_count);
-			enable_flash = true;
+			disable_flash = false;
 		}
 
-		off = fdt_path_offset(blob, path);
-		if (off >= 0) {
-			printf("%s %s\n", (enable_flash) ? "enable" : "disable",
-			       path);
-			fdt_set_node_status(blob, off, (enable_flash) ?
-					    FDT_STATUS_OKAY : FDT_STATUS_DISABLED);
+		if (disable_flash) {
+			off = fdt_path_offset(blob, path);
+			if (off >= 0)
+				fdt_set_node_status(blob, off, FDT_STATUS_DISABLED);
 		}
 	}
 }
