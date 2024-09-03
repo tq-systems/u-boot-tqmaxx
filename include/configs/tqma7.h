@@ -99,6 +99,7 @@
 
 #define CFG_EXTRA_ENV_SETTINGS                                                 \
 	TQ_IMX_SHARED_ENV_SETTINGS                                             \
+	TQ_QSPIHDR_IMX_SPI_UBOOT_UPDATE                                        \
 	TQMA7_M4_ENV                                                           \
 	TQMA7_MODULE_ENV_SETTINGS                                              \
 	BB_ENV_SETTINGS                                                        \
