@@ -12,6 +12,11 @@
 		u-boot,mmc-env-offset = <0x100000>;
 		u-boot,mmc-env-offset-redundant = <0x110000>;
 	};
+
+	wdt-reboot {
+		compatible = "wdt-reboot";
+		wdt = <&wdog1>;
+	};
 };
 
 &fec1 {
