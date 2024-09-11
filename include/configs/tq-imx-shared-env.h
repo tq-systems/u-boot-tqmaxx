@@ -123,10 +123,15 @@
 		"setenv erase_range; "                                 \
 		"setenv erase_sector_count; \0"                        \
 
+#define TQ_QSPIHDR_IMX_SPI_UBOOT_UPDATE                                \
+	"write_uboot_spi="                                             \
+		"qspihdr init ${loadaddr} ${filesize} safe;\0"         \
+
 #else
 #define TQ_IMX_SHARED_SPI_ENV_SETTINGS
 #define TQ_IMX_SPI_UBOOT_UPDATE
 #define TQ_IMX_LEGACY_SPI_UBOOT_UPDATE
+#define TQ_QSPIHDR_IMX_SPI_UBOOT_UPDATE
 #endif
 
 #ifdef CONFIG_CMD_MMC
