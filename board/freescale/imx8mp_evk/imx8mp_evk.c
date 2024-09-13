@@ -28,6 +28,7 @@
 #include <dwc3-uboot.h>
 #include <dm/uclass-internal.h>
 #include <dm/pinctrl.h>
+#include <fuse.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -456,8 +457,39 @@ int board_typec_get_mode(int index)
 #endif
 #endif
 
+
+#if IS_ENABLED(CONFIG_IMX8MP_GP5_LOCK_UPDATE)
+#define GP5_LOCK_WPOP 0x300
+
+static void lock_gp5_fuse(void)
+{
+	u32 val = 0;
+	int ret;
+
+	ret = fuse_sense(0, 1, &val);
+	if (ret) {
+		printf("Sense GP5_LOCK fuse failed\n");
+		return;
+	}
+
+	if ((val & GP5_LOCK_WPOP) != GP5_LOCK_WPOP) {
+		printf("Locking GP5 ");
+		ret = fuse_prog(0, 1, GP5_LOCK_WPOP);
+		if (!ret)
+			printf("done\n");
+		else
+			printf("failed %d\n", ret);
+
+	}
+}
+#endif
+
 int board_init(void)
 {
+#if IS_ENABLED(CONFIG_IMX8MP_GP5_LOCK_UPDATE)
+	lock_gp5_fuse();
+#endif
+
 #ifdef CONFIG_USB_TCPC
 	setup_typec();
 #endif
