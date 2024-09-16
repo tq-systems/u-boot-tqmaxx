@@ -1,0 +1,17 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2024-2025 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
+ */
+
+#include "imx95-tqma9596sa-u-boot.dtsi"
+
+/* X4 */
+&usb2 {
+	status = "disabled";
+};
+
+&wdog3 {
+	u-boot,noautostart;
+};

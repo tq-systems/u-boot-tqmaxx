@@ -1,0 +1,80 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2024-2025 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
+ */
+
+&flash0 {
+	bootph-pre-ram;
+};
+
+&flexspi1 {
+	bootph-pre-ram;
+};
+
+&lpuart7 {
+	bootph-pre-ram;
+};
+
+&pinctrl_flexspi1 {
+	bootph-pre-ram;
+};
+
+&pinctrl_lpuart7 {
+	bootph-pre-ram;
+};
+
+&pinctrl_sdvmmc {
+	bootph-pre-ram;
+};
+
+&pinctrl_usdhc1 {
+	bootph-pre-ram;
+};
+
+&pinctrl_usdhc1_100mhz {
+	bootph-pre-ram;
+};
+
+&pinctrl_usdhc1_200mhz {
+	bootph-pre-ram;
+};
+
+&pinctrl_usdhc2 {
+	bootph-pre-ram;
+};
+
+&pinctrl_usdhc2_100mhz {
+	bootph-pre-ram;
+};
+
+&pinctrl_usdhc2_200mhz {
+	bootph-pre-ram;
+};
+
+&reg_sdvmmc {
+	bootph-pre-ram;
+};
+
+&usb2 {
+	compatible = "fsl,imx8mm-usb", "fsl,imx7d-usb";
+	/delete-property/ power-domains;
+};
+
+&usb3 {
+	/delete-property/ power-domains;
+};
+
+&usb3_dwc3 {
+	dr_mode = "peripheral";
+	compatible = "fsl,imx8mq-dwc3", "snps,dwc3";
+};
+
+&usdhc1 {
+	bootph-pre-ram;
+};
+
+&usdhc2 {
+	bootph-pre-ram;
+};

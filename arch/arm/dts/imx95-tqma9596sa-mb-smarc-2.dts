@@ -44,7 +44,6 @@
 	};
 
 	chosen {
-		bootargs = "console=ttyLP6,115200";
 		stdout-path = &lpuart7;
 	};
 
