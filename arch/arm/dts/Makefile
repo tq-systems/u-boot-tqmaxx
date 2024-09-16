@@ -1106,6 +1106,8 @@ dtb-$(CONFIG_ARCH_IMX9) += \
 	imx93-tqma9352-mba93xxca.dtb \
 	imx93-tqma9352-mba93xxla.dtb
 
+dtb-$(CONFIG_ARCH_IMX9) += imx95-tqma9596sa-mb-smarc-2.dtb
+
 dtb-$(CONFIG_ARCH_IMXRT) += imxrt1050-evk.dtb \
 	imxrt1020-evk.dtb \
 	imxrt1170-evk.dtb \

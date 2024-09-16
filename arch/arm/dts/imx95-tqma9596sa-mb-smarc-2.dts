@@ -1,0 +1,330 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2024 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Alexander Stein
+ */
+
+/dts-v1/;
+
+#include <dt-bindings/phy/phy-imx8-pcie.h>
+#include "imx95-tqma9596sa.dtsi"
+
+/ {
+	model = "TQ-Systems i.MX95 TQMa95xxSA on MB-SMARC-2";
+	compatible = "tq,imx95-tqma9596sa-mb-smarc-2", "tq,imx95-tqma9596sa", "fsl,imx95";
+
+	aliases {
+		rtc0 = &pcf85063;
+		rtc1 = &scmi_bbm;
+	};
+
+	chosen {
+		bootargs = "console=ttyLP6,115200 earlycon";
+		stdout-path = &lpuart7;
+	};
+
+
+	backlight_lvds0: backlight-lvds0 {
+		compatible = "pwm-backlight";
+		pwms = <&tpm3 0 100000 0>;
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <7>;
+		enable-gpios = <&expander2 1 GPIO_ACTIVE_HIGH>;
+		power-supply = <&reg_12v0>;
+		status = "disabled";
+	};
+
+	backlight_lvds1: backlight-lvds1 {
+		compatible = "pwm-backlight";
+		pwms = <&tpm4 0 100000 0>;
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <7>;
+		enable-gpios = <&expander2 3 GPIO_ACTIVE_HIGH>;
+		power-supply = <&reg_12v0>;
+		status = "disabled";
+	};
+
+	panel_lvds0: panel-lvds0 {
+		/*
+		 * Display is not fixed, so compatible has to be added from
+		 * DT
+		 */
+		backlight = <&backlight_lvds0>;
+		power-supply = <&reg_lvds0>;
+		status = "disabled";
+
+		port {
+			panel_in_lvds0: endpoint {
+			};
+		};
+	};
+
+	panel_lvds1: panel-lvds1 {
+		/*
+		 * Display is not fixed, so compatible has to be added from
+		 * DT
+		 */
+		backlight = <&backlight_lvds1>;
+		power-supply = <&reg_lvds1>;
+		status = "disabled";
+
+		port {
+			panel_in_lvds1: endpoint {
+			};
+		};
+	};
+
+	reg_1v8: regulator-1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "1V8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-always-on;
+	};
+
+	reg_3v3: regulator-3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+	};
+
+	reg_12v0: regulator-12v0 {
+		compatible = "regulator-fixed";
+		regulator-name = "12V0";
+		regulator-min-microvolt = <12000000>;
+		regulator-max-microvolt = <12000000>;
+		regulator-always-on;
+	};
+
+	reg_lvds0: regulator-lvds0 {
+		compatible = "regulator-fixed";
+		regulator-name = "LCD0_VDD_EN";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&expander2 2 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+
+	reg_lvds1: regulator-lvds1 {
+		compatible = "regulator-fixed";
+		regulator-name = "LCD1_VDD_EN";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&expander2 4 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+};
+
+&enetc_port0 {
+	status = "okay";
+};
+
+&enetc_port1 {
+	status = "okay";
+};
+
+&ethphy0 {
+	/* LED1: 1Gbit/s, LED2: link+activity */
+	ti,led-function = <0x0b50>;
+	/* LED1/2: active high, driven by PHY function */
+	ti,led-ctrl = <0x1441>;
+};
+
+&ethphy3 {
+	/* LED1: 1Gbit/s, LED2: link+activity */
+	ti,led-function = <0x0b50>;
+	/* LED1/2: active high, driven by PHY function */
+	ti,led-ctrl = <0x1441>;
+};
+
+&expander2 {
+	pcie1-clk-en-hog {
+		gpio-hog;
+		gpios = <14 GPIO_ACTIVE_HIGH>;
+		output-high;
+		line-name = "PCIE1_CLK_EN";
+	};
+
+	pcie2-clk-en-hog {
+		gpio-hog;
+		gpios = <15 GPIO_ACTIVE_HIGH>;
+		output-high;
+		line-name = "PCIE2_CLK_EN";
+	};
+};
+
+&flexcan1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan1>;
+	xceiver-supply = <&reg_3v3>;
+	status = "okay";
+};
+
+&flexcan3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan3>;
+	xceiver-supply = <&reg_3v3>;
+	status = "okay";
+};
+
+&gpio1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpio1>;
+	gpio-line-names = "", "", "", "",
+			  "", "", "", "",
+			  "", "", "GPIO7", "GPIO8",
+			  "", "GPIO9", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "";
+};
+
+&gpio2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpio2>;
+	gpio-line-names = "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "GPIO5",
+			  "", "", "GPIO6", "",
+			  "", "", "", "",
+			  "", "", "", "";
+};
+
+&lpi2c1 {
+	tlv320aic3x04: audio-codec@18 {
+		compatible = "ti,tlv320aic32x4";
+		reg = <0x18>;
+		// TODO: Fix audio clock
+		// clocks = <&mclkout0_lpcg 0>;
+		clock-names = "mclk";
+		iov-supply = <&reg_1v8>;
+		ldoin-supply = <&reg_3v3>;
+	};
+
+	eeprom2: eeprom@57 {
+		compatible = "atmel,24c32";
+		reg = <0x57>;
+		pagesize = <32>;
+		vcc-supply = <&reg_3v3>;
+	};
+};
+
+&lpi2c3 {
+	status = "okay";
+};
+
+&lpi2c4 {
+	status = "okay";
+};
+
+&lpi2c6 {
+	status = "okay";
+};
+
+&lpspi3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lpspi3>;
+	cs-gpios = <&gpio2 8 GPIO_ACTIVE_HIGH>, <&gpio2 7 GPIO_ACTIVE_HIGH>;
+	status = "okay";
+
+	spidev0_0: spidev0@0 {
+		compatible = "tq,testdev";
+		reg = <0>;
+		spi-max-frequency = <5000000>;
+	};
+
+	spidev0_1: spidev0@1 {
+		compatible = "tq,testdev";
+		reg = <1>;
+		spi-max-frequency = <5000000>;
+	};
+};
+
+/* SER0 */
+&lpuart1 {
+	status = "reserved";
+};
+
+/* SER3 */
+&lpuart5 {
+	status = "okay";
+};
+
+/* SER1 */
+&lpuart7 {
+	status = "okay";
+};
+
+/* SER2 */
+&lpuart8 {
+	status = "okay";
+};
+
+&tlv320aic3x04 {
+	/* TODO: audio_blk_ctrl is missing */
+	/* clocks = <&audio_blk_ctrl IMX95_CLK_AUDIOMIX_SAI3_MCLK1>; */
+	clock-names = "mclk";
+	status = "disabled";
+};
+
+&tpm3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_tpm3>;
+};
+
+&tpm4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_tpm4>;
+};
+
+/* X4 */
+&usb2 {
+	dr_mode = "host";
+	vbus-supply = <&reg_usb_vbus>;
+	hnp-disable;
+	srp-disable;
+	adp-disable;
+	disable-over-current;
+	status = "okay";
+};
+
+&usb3 {
+	status = "okay";
+};
+
+&usb3_phy {
+	status = "okay";
+};
+
+&usb3_dwc3 {
+	dr_mode = "otg";
+	hnp-disable;
+	srp-disable;
+	adp-disable;
+	usb-role-switch;
+	role-switch-default-mode = "none";
+	snps,dis-u1-entry-quirk;
+	snps,dis-u2-entry-quirk;
+	status = "okay";
+
+	port {
+		usb3_drd_sw: endpoint {
+		};
+	};
+};
+
+/* X16 */
+&usdhc2 {
+	cd-gpios = <&gpio3 0 GPIO_ACTIVE_LOW>;
+	vmmc-supply = <&reg_sdvmmc>;
+	no-1-8-v;
+	no-sdio;
+	disable-wp;
+	status = "okay";
+};
