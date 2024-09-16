@@ -1,0 +1,112 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2024 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
+ */
+
+#include "imx95-u-boot.dtsi"
+
+&clk_ext1 {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&dummy {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&flash0 {
+	u-boot,dm-spl;
+};
+
+&flexspi1 {
+	u-boot,dm-spl;
+};
+
+&gpio1 {
+	reg = <0 0x47400000 0 0x1000>, <0 0x47400040 0 0x40>;
+};
+
+&gpio2 {
+	reg = <0 0x43810000 0 0x1000>, <0 0x43810040 0 0x40>;
+	u-boot,dm-spl;
+};
+
+&gpio3 {
+	reg = <0 0x43820000 0 0x1000>, <0 0x43820040 0 0x40>;
+	u-boot,dm-spl;
+};
+
+&gpio4 {
+	reg = <0 0x43840000 0 0x1000>, <0 0x43840040 0 0x40>;
+	u-boot,dm-spl;
+};
+
+&gpio5 {
+	reg = <0 0x43850000 0 0x1000>, <0 0x43850040 0 0x40>;
+	u-boot,dm-spl;
+};
+
+&osc_24m {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&lpuart7 {
+	clocks = <&scmi_clk IMX95_CLK_LPUART7>, <&scmi_clk IMX95_CLK_LPUART7>;
+	clock-names = "ipg", "per";
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&pinctrl_flexspi1 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_lpuart7 {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&pinctrl_reg_sdvmmc {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc1 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc2 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc2_gpio {
+	u-boot,dm-spl;
+};
+
+&reg_sdvmmc {
+	u-boot,dm-spl;
+};
+
+&usb2 {
+	compatible = "fsl,imx8mm-usb", "fsl,imx7d-usb";
+	/delete-property/ power-domains;
+};
+
+&usb3 {
+	/delete-property/ power-domains;
+};
+
+&usb3_dwc3 {
+	compatible = "fsl,imx8mq-dwc3", "snps,dwc3";
+};
+
+&usdhc1 {
+	u-boot,dm-spl;
+};
+
+&usdhc2 {
+	u-boot,dm-spl;
+};
