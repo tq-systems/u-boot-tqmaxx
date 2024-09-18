@@ -51,7 +51,7 @@
 		"if run load_spi; then "                               \
 			"run boot_os; "                                \
 		"else "                                                \
-			"echo ERR: loading kernel; "                   \
+			"echo ERROR: loading kernel; "                 \
 		"fi;\0"                                                \
 	"ubimtdidx=3\0"                                                \
 	"ubirootfs=rootfs.ubifs\0"                                     \
@@ -157,7 +157,7 @@
 		"if run load_mmc; then "                               \
 			"run boot_os; "                                \
 		"else "                                                \
-			"echo ERR: loading from mmc; "                 \
+			"echo ERROR: loading from mmc; "               \
 		"fi;\0"                                                \
 	"mmcpath=/boot/\0"                                             \
 	"mmcpart=2\0"                                                  \
@@ -204,7 +204,7 @@
 		"if run load_nfs; then "                               \
 			"run boot_os; "                                \
 		"else "                                                \
-			"echo ERR: loading from nfs; "                 \
+			"echo ERROR: loading from nfs; "               \
 		"fi;\0"                                                \
 
 #else
@@ -251,7 +251,7 @@
 		"if run load_net; then "                               \
 			"run boot_os; "                                \
 		"else "                                                \
-			"echo ERR: loading from TFTP; "                \
+			"echo ERROR: loading from TFTP; "              \
 		"fi;\0"                                                \
 	"netargs=run addnfs addip addtty\0"                            \
 	"rootpath=/srv/nfs\0"                                          \
