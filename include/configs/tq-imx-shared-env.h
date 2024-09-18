@@ -170,10 +170,12 @@
 			"mmc dev ${mmcdev}; mmc rescan; "              \
 			"setexpr blkc ${filesize} + 0x1ff; "           \
 			"setexpr blkc ${blkc} / 0x200; "               \
-			"if itest ${blkc} <= ${uboot_mmc_size}; then " \
-				"mmc write ${loadaddr} "               \
-					"${uboot_mmc_start} ${blkc}; " \
+			"if itest ${blkc} >= ${uboot_mmc_size}; then " \
+				"echo ERROR: size to large ...; "      \
+				"exit; "                               \
 			"fi; "                                         \
+			"mmc write ${loadaddr} "                       \
+				"${uboot_mmc_start} ${blkc}; "         \
 		"fi; "                                                 \
 		"setenv filesize; setenv blkc \0"                      \
 
