@@ -11,8 +11,8 @@
 #include "imx95-tqma9596sa.dtsi"
 
 / {
-	model = "TQ-Systems i.MX95 TQMa95xxSA on MB-SMARC-2";
-	compatible = "tq,imx95-tqma9596sa-mb-smarc-2", "tq,imx95-tqma9596sa", "fsl,imx95";
+        model = "TQ-Systems i.MX95 TQMa95xxSA on MB-SMARC-2";
+        compatible = "tq,imx95-tqma9596sa-mb-smarc-2", "tq,imx95-tqma9596sa", "fsl,imx95";
 
 	aliases {
 		rtc0 = &pcf85063;
@@ -20,10 +20,23 @@
 	};
 
 	chosen {
-		bootargs = "console=ttyLP6,115200 earlycon";
 		stdout-path = &lpuart7;
 	};
 
+	connector {
+		compatible = "gpio-usb-b-connector", "usb-b-connector";
+		type = "micro";
+		label = "X4";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_usbcon0>;
+		id-gpios = <&gpio4 2 GPIO_ACTIVE_HIGH>;
+
+		port {
+			usb_dr_connector: endpoint {
+				remote-endpoint = <&usb2_dr>;
+			};
+		};
+	};
 
 	backlight_lvds0: backlight-lvds0 {
 		compatible = "pwm-backlight";
@@ -56,6 +69,7 @@
 
 		port {
 			panel_in_lvds0: endpoint {
+				remote-endpoint = <&lvds0_out>;
 			};
 		};
 	};
@@ -71,6 +85,7 @@
 
 		port {
 			panel_in_lvds1: endpoint {
+				remote-endpoint = <&lvds1_out>;
 			};
 		};
 	};
@@ -115,6 +130,13 @@
 		regulator-max-microvolt = <3300000>;
 		gpio = <&expander2 4 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
+	};
+
+	sound {
+		compatible = "fsl,imx-audio-tlv320aic32x4";
+		model = "tqm-tlv320aic32";
+		audio-codec = <&tlv320aic3x04>;
+		audio-cpu = <&sai3>;
 	};
 };
 
@@ -170,32 +192,6 @@
 	status = "okay";
 };
 
-&gpio1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_gpio1>;
-	gpio-line-names = "", "", "", "",
-			  "", "", "", "",
-			  "", "", "GPIO7", "GPIO8",
-			  "", "GPIO9", "", "",
-			  "", "", "", "",
-			  "", "", "", "",
-			  "", "", "", "",
-			  "", "", "", "";
-};
-
-&gpio2 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_gpio2>;
-	gpio-line-names = "", "", "", "",
-			  "", "", "", "",
-			  "", "", "", "",
-			  "", "", "", "",
-			  "", "", "", "GPIO5",
-			  "", "", "GPIO6", "",
-			  "", "", "", "",
-			  "", "", "", "";
-};
-
 &lpi2c1 {
 	tlv320aic3x04: audio-codec@18 {
 		compatible = "ti,tlv320aic32x4";
@@ -215,22 +211,10 @@
 	};
 };
 
-&lpi2c3 {
-	status = "okay";
-};
-
-&lpi2c4 {
-	status = "okay";
-};
-
-&lpi2c6 {
-	status = "okay";
-};
-
 &lpspi3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpspi3>;
-	cs-gpios = <&gpio2 8 GPIO_ACTIVE_HIGH>, <&gpio2 7 GPIO_ACTIVE_HIGH>;
+	cs-gpios = <&gpio2 8 GPIO_ACTIVE_LOW>, <&gpio2 7 GPIO_ACTIVE_LOW>;
 	status = "okay";
 
 	spidev0_0: spidev0@0 {
@@ -248,7 +232,7 @@
 
 /* SER0 */
 &lpuart1 {
-	status = "reserved";
+	status = "disabled";
 };
 
 /* SER3 */
@@ -266,6 +250,10 @@
 	status = "okay";
 };
 
+&reg_sdvmmc {
+	status = "okay";
+};
+
 &tlv320aic3x04 {
 	/* TODO: audio_blk_ctrl is missing */
 	/* clocks = <&audio_blk_ctrl IMX95_CLK_AUDIOMIX_SAI3_MCLK1>; */
@@ -273,58 +261,38 @@
 	status = "disabled";
 };
 
-&tpm3 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_tpm3>;
-};
-
-&tpm4 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_tpm4>;
-};
-
 /* X4 */
 &usb2 {
-	dr_mode = "host";
-	vbus-supply = <&reg_usb_vbus>;
-	hnp-disable;
 	srp-disable;
-	adp-disable;
-	disable-over-current;
-	status = "okay";
-};
-
-&usb3 {
-	status = "okay";
-};
-
-&usb3_phy {
-	status = "okay";
-};
-
-&usb3_dwc3 {
-	dr_mode = "otg";
 	hnp-disable;
-	srp-disable;
 	adp-disable;
+	/* DR not yet supported */
+	dr_mode = "peripheral";
 	usb-role-switch;
-	role-switch-default-mode = "none";
-	snps,dis-u1-entry-quirk;
-	snps,dis-u2-entry-quirk;
+	role-switch-default-mode = "peripheral";
+	disable-over-current;
 	status = "okay";
 
 	port {
-		usb3_drd_sw: endpoint {
+		usb2_dr: endpoint {
+			remote-endpoint = <&usb_dr_connector>;
 		};
 	};
 };
 
 /* X16 */
 &usdhc2 {
-	cd-gpios = <&gpio3 0 GPIO_ACTIVE_LOW>;
+	pinctrl-names = "default", "state_100mhz", "state_200mhz", "sleep";
+	pinctrl-0 = <&pinctrl_usdhc2>;
+	pinctrl-1 = <&pinctrl_usdhc2_100mhz>;
+	pinctrl-2 = <&pinctrl_usdhc2_200mhz>;
+	pinctrl-3 = <&pinctrl_usdhc2>;
 	vmmc-supply = <&reg_sdvmmc>;
+	cd-gpios = <&gpio3 0 GPIO_ACTIVE_LOW>;
 	no-1-8-v;
+	no-mmc;
 	no-sdio;
 	disable-wp;
+	bus-width = <4>;
 	status = "okay";
 };

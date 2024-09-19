@@ -16,13 +16,18 @@
 	model = "TQ Systems TQMa95xxSA SoM";
 	compatible = "fsl,imx95-tqma95xxsa", "fsl,imx95";
 
+	aliases {
+		ethernet0 = &enetc_port0;
+		ethernet1 = &enetc_port1;
+	};
+
 	memory@80000000 {
 		device_type = "memory";
 		/*
 		 * DRAM base addr, size : 2048 MiB DRAM
 		 * should be corrected by bootloader
 		 */
-		reg = <0x00000000 0x80000000 0 0x80000000>;
+		reg = <0 0x80000000 0 0x80000000>;
 	};
 
 	reserved-memory {
@@ -38,13 +43,8 @@
 			linux,cma-default;
 		};
 
-		mali_protected: mali-protected@a0000000 {
-			compatible = "mali-reserved";
-			reg = <0x0 0xa0000000 0x0 0x1000000>;
-		};
-
-		vpu_boot: vpu_boot@a1000000 {
-			reg = <0 0xa1000000 0 0x100000>;
+		vpu_boot: vpu_boot@a0000000 {
+			reg = <0 0xa0000000 0 0x100000>;
 			no-map;
 		};
 	};
@@ -81,21 +81,13 @@
 	reg_sdvmmc: regulator-sdvmmc {
 		compatible = "regulator-fixed";
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_reg_sdvmmc>;
+		pinctrl-0 = <&pinctrl_sdvmmc>;
 		regulator-name = "SDIO_PWR_EN";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		gpio = <&gpio3 7 GPIO_ACTIVE_HIGH>;
-		off-on-delay-us = <12000>;
 		enable-active-high;
-	};
-
-	reg_usb_vbus: regulator-vbus {
-		compatible = "regulator-fixed";
-		regulator-name = "USB_VBUS";
-		regulator-min-microvolt = <5000000>;
-		regulator-max-microvolt = <5000000>;
-		regulator-always-on;
+		status = "disabled";
 	};
 };
 
@@ -134,9 +126,33 @@
 	};
 };
 
+&gpio1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpio1>;
+	gpio-line-names = "", "", "", "",
+			  "", "", "", "",
+			  "", "", "GPIO7", "GPIO8",
+			  "", "GPIO9", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "";
+};
+
+&gpio2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpio2>;
+	gpio-line-names = "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "", "",
+			  "", "", "SLEEP", "GPIO5",
+			  "", "", "GPIO6", "",
+			  "", "", "", "",
+			  "", "", "", "";
+};
+
 &lpi2c1 {
-	#address-cells = <1>;
-	#size-cells = <0>;
 	clock-frequency = <400000>;
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&pinctrl_lpi2c1>;
@@ -234,13 +250,13 @@
 	};
 };
 
+/* I2C_CAM0 */
 &lpi2c3 {
-	#address-cells = <1>;
-	#size-cells = <0>;
 	clock-frequency = <400000>;
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&pinctrl_lpi2c3>;
 	pinctrl-1 = <&pinctrl_lpi2c3>;
+	status = "okay";
 
 	dp_bridge: dp-bridge@f {
 		compatible = "toshiba,tc9595", "toshiba,tc358767";
@@ -262,6 +278,7 @@
 				reg = <0>;
 
 				dp_dsi_in: endpoint {
+					remote-endpoint = <&dsi_out>;
 					data-lanes = <1 2 3 4>;
 				};
 			};
@@ -269,18 +286,22 @@
 	};
 };
 
+/* I2C_CAM1 */
 &lpi2c4 {
 	clock-frequency = <400000>;
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&pinctrl_lpi2c4>;
 	pinctrl-1 = <&pinctrl_lpi2c4>;
+	status = "okay";
 };
 
+/* I2C_LCD */
 &lpi2c6 {
 	clock-frequency = <400000>;
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&pinctrl_lpi2c6>;
 	pinctrl-1 = <&pinctrl_lpi2c6>;
+	status = "okay";
 };
 
 /* SER0 */
@@ -307,7 +328,17 @@
 	pinctrl-0 = <&pinctrl_lpuart8>;
 };
 
+/*
+&netc_prb_ierb {
+	netc-interfaces = <NXP_NETC_RGMII
+			   NXP_NETC_RGMII
+			   NXP_NETC_RGMII>;
+};
+*/
+
 &netc_emdio {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_mdio>;
 	status = "okay";
 
 	ethphy0: ethernet-phy@0 {
@@ -315,15 +346,16 @@
 		reg = <0>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_ethphy0>;
+		reset-gpios = <&expander2 5 GPIO_ACTIVE_LOW>;
+		reset-assert-us = <500000>;
+		reset-deassert-us = <50000>;
+		interrupt-parent = <&gpio5>;
+		interrupts = <13 IRQ_TYPE_EDGE_FALLING>;
 		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
 		ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
 		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
 		ti,dp83867-rxctrl-strap-quirk;
 		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
-		reset-gpios = <&expander2 5 GPIO_ACTIVE_LOW>;
-		reset-assert-us = <500000>;
-		reset-deassert-us = <50000>;
-		interrupt-parent = <&gpio5>;
 	};
 
 	ethphy3: ethernet-phy@3 {
@@ -331,17 +363,36 @@
 		reg = <3>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_ethphy3>;
-		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
-		ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
-		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
-		ti,dp83867-rxctrl-strap-quirk;
-		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
 		reset-gpios = <&expander2 6 GPIO_ACTIVE_LOW>;
 		reset-assert-us = <500000>;
 		reset-deassert-us = <50000>;
 		interrupt-parent = <&gpio5>;
 		interrupts = <14 IRQ_TYPE_EDGE_FALLING>;
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+		ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_50_NS>;
+		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+		ti,dp83867-rxctrl-strap-quirk;
+		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
 	};
+};
+
+&scmi_bbm {
+	linux,code = <KEY_POWER>;
+};
+
+&tpm3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_tpm3>;
+};
+
+&tpm4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_tpm4>;
+};
+
+&tpm5 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_tpm5>;
 };
 
 &usb3 {
@@ -388,181 +439,176 @@
 	status = "okay";
 };
 
-&usdhc2 {
-	pinctrl-names = "default", "state_100mhz", "state_200mhz";
-	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-1 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-2 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
-	bus-width = <4>;
-	no-mmc;
-	/* NOTE: CD / WP and VMMC support depends on mainboard */
-};
-
 &wdog3 {
 	status = "okay";
 };
 
 &scmi_iomuxc {
 	pinctrl_ethphy0: ethphy0grp {
-		fsl,pins = <IMX95_PAD_GPIO_IO33__GPIO5_IO_BIT13				0x1000>;
+		fsl,pins = <IMX95_PAD_GPIO_IO33__GPIO5_IO_BIT13				0x1100>;
 	};
 
 	pinctrl_ethphy3: ethphy3grp {
-		fsl,pins = <IMX95_PAD_GPIO_IO34__GPIO5_IO_BIT14				0x1000>;
+		fsl,pins = <IMX95_PAD_GPIO_IO34__GPIO5_IO_BIT14				0x1100>;
 	};
 
 	pinctrl_enetc0: enetc0grp {
-		fsl,pins = <IMX95_PAD_ENET1_MDC__NETCMIX_TOP_NETC_MDC			0x57e>,
-			   <IMX95_PAD_ENET1_MDIO__NETCMIX_TOP_NETC_MDIO			0x57e>,
-			   <IMX95_PAD_ENET1_TD0__NETCMIX_TOP_ETH0_RGMII_TD0		0x57e>,
-			   <IMX95_PAD_ENET1_TD1__NETCMIX_TOP_ETH0_RGMII_TD1		0x57e>,
-			   <IMX95_PAD_ENET1_TD2__NETCMIX_TOP_ETH0_RGMII_TD2		0x57e>,
-			   <IMX95_PAD_ENET1_TD3__NETCMIX_TOP_ETH0_RGMII_TD3		0x57e>,
-			   <IMX95_PAD_ENET1_TX_CTL__NETCMIX_TOP_ETH0_RGMII_TX_CTL	0x57e>,
-			   <IMX95_PAD_ENET1_TXC__NETCMIX_TOP_ETH0_RGMII_TX_CLK		0x5fe>,
-			   <IMX95_PAD_ENET1_RX_CTL__NETCMIX_TOP_ETH0_RGMII_RX_CTL	0x57e>,
-			   <IMX95_PAD_ENET1_RXC__NETCMIX_TOP_ETH0_RGMII_RX_CLK		0x5fe>,
-			   <IMX95_PAD_ENET1_RD0__NETCMIX_TOP_ETH0_RGMII_RD0		0x57e>,
-			   <IMX95_PAD_ENET1_RD1__NETCMIX_TOP_ETH0_RGMII_RD1		0x57e>,
-			   <IMX95_PAD_ENET1_RD2__NETCMIX_TOP_ETH0_RGMII_RD2		0x57e>,
-			   <IMX95_PAD_ENET1_RD3__NETCMIX_TOP_ETH0_RGMII_RD3		0x57e>;
+		fsl,pins = <IMX95_PAD_ENET1_RD0__NETCMIX_TOP_ETH0_RGMII_RD0		0x1100>,
+			   <IMX95_PAD_ENET1_RD1__NETCMIX_TOP_ETH0_RGMII_RD1		0x1100>,
+			   <IMX95_PAD_ENET1_RD2__NETCMIX_TOP_ETH0_RGMII_RD2		0x1100>,
+			   <IMX95_PAD_ENET1_RD3__NETCMIX_TOP_ETH0_RGMII_RD3		0x1100>,
+			   <IMX95_PAD_ENET1_RXC__NETCMIX_TOP_ETH0_RGMII_RX_CLK		0x1100>,
+			   <IMX95_PAD_ENET1_RX_CTL__NETCMIX_TOP_ETH0_RGMII_RX_CTL	0x1100>,
+			   <IMX95_PAD_ENET1_TD0__NETCMIX_TOP_ETH0_RGMII_TD0		0x11e>,
+			   <IMX95_PAD_ENET1_TD1__NETCMIX_TOP_ETH0_RGMII_TD1		0x11e>,
+			   <IMX95_PAD_ENET1_TD2__NETCMIX_TOP_ETH0_RGMII_TD2		0x11e>,
+			   <IMX95_PAD_ENET1_TD3__NETCMIX_TOP_ETH0_RGMII_TD3		0x11e>,
+			   <IMX95_PAD_ENET1_TXC__NETCMIX_TOP_ETH0_RGMII_TX_CLK		0x11e>,
+			   <IMX95_PAD_ENET1_TX_CTL__NETCMIX_TOP_ETH0_RGMII_TX_CTL	0x11e>,
+			   <IMX95_PAD_GPIO_IO23__GPIO2_IO_BIT23				0x51e>;
 	};
 
 	pinctrl_enetc1: enetc1grp {
-		fsl,pins = <IMX95_PAD_ENET2_TD0__NETCMIX_TOP_ETH1_RGMII_TD0		0x57e>,
-			   <IMX95_PAD_ENET2_TD1__NETCMIX_TOP_ETH1_RGMII_TD1		0x57e>,
-			   <IMX95_PAD_ENET2_TD2__NETCMIX_TOP_ETH1_RGMII_TD2		0x57e>,
-			   <IMX95_PAD_ENET2_TD3__NETCMIX_TOP_ETH1_RGMII_TD3		0x57e>,
-			   <IMX95_PAD_ENET2_TX_CTL__NETCMIX_TOP_ETH1_RGMII_TX_CTL	0x57e>,
-			   <IMX95_PAD_ENET2_TXC__NETCMIX_TOP_ETH1_RGMII_TX_CLK		0x5fe>,
-			   <IMX95_PAD_ENET2_RX_CTL__NETCMIX_TOP_ETH1_RGMII_RX_CTL	0x57e>,
-			   <IMX95_PAD_ENET2_RXC__NETCMIX_TOP_ETH1_RGMII_RX_CLK		0x5fe>,
-			   <IMX95_PAD_ENET2_RD0__NETCMIX_TOP_ETH1_RGMII_RD0		0x57e>,
-			   <IMX95_PAD_ENET2_RD1__NETCMIX_TOP_ETH1_RGMII_RD1		0x57e>,
-			   <IMX95_PAD_ENET2_RD2__NETCMIX_TOP_ETH1_RGMII_RD2		0x57e>,
-			   <IMX95_PAD_ENET2_RD3__NETCMIX_TOP_ETH1_RGMII_RD3		0x57e>;
+		fsl,pins = <IMX95_PAD_ENET2_RD0__NETCMIX_TOP_ETH1_RGMII_RD0		0x1100>,
+			   <IMX95_PAD_ENET2_RD1__NETCMIX_TOP_ETH1_RGMII_RD1		0x1100>,
+			   <IMX95_PAD_ENET2_RD2__NETCMIX_TOP_ETH1_RGMII_RD2		0x1100>,
+			   <IMX95_PAD_ENET2_RD3__NETCMIX_TOP_ETH1_RGMII_RD3		0x1100>,
+			   <IMX95_PAD_ENET2_RXC__NETCMIX_TOP_ETH1_RGMII_RX_CLK		0x1100>,
+			   <IMX95_PAD_ENET2_RX_CTL__NETCMIX_TOP_ETH1_RGMII_RX_CTL	0x1100>,
+			   <IMX95_PAD_ENET2_TD0__NETCMIX_TOP_ETH1_RGMII_TD0		0x11e>,
+			   <IMX95_PAD_ENET2_TD1__NETCMIX_TOP_ETH1_RGMII_TD1		0x11e>,
+			   <IMX95_PAD_ENET2_TD2__NETCMIX_TOP_ETH1_RGMII_TD2		0x11e>,
+			   <IMX95_PAD_ENET2_TD3__NETCMIX_TOP_ETH1_RGMII_TD3		0x11e>,
+			   <IMX95_PAD_ENET2_TXC__NETCMIX_TOP_ETH1_RGMII_TX_CLK		0x11e>,
+			   <IMX95_PAD_ENET2_TX_CTL__NETCMIX_TOP_ETH1_RGMII_TX_CTL	0x11e>,
+			   <IMX95_PAD_GPIO_IO24__GPIO2_IO_BIT24				0x51e>;
 	};
 
 	pinctrl_expander1: expander1grp {
-		fsl,pins = <IMX95_PAD_CCM_CLKO2__GPIO3_IO_BIT27				0x00000040>;
+		fsl,pins = <IMX95_PAD_CCM_CLKO2__GPIO3_IO_BIT27				0x1100>;
 	};
 
 	pinctrl_flexcan1: flexcan1grp {
-		fsl,pins = <IMX95_PAD_PDM_CLK__AONMIX_TOP_CAN1_TX		0x39e>,
-			   <IMX95_PAD_PDM_BIT_STREAM0__AONMIX_TOP_CAN1_RX	0x39e>;
+		fsl,pins = <IMX95_PAD_PDM_BIT_STREAM0__AONMIX_TOP_CAN1_RX	0x1300>,
+			   <IMX95_PAD_PDM_CLK__AONMIX_TOP_CAN1_TX		0x31e>;
 	};
 
 	pinctrl_flexcan3: flexcan3grp {
-		fsl,pins = <IMX95_PAD_CCM_CLKO3__CAN3_TX		0x39e>,
-			   <IMX95_PAD_CCM_CLKO4__CAN3_RX		0x39e>;
+		fsl,pins = <IMX95_PAD_CCM_CLKO3__CAN3_TX		0x31e>,
+			   <IMX95_PAD_CCM_CLKO4__CAN3_RX		0x1300>;
 	};
 
 	pinctrl_flexspi1: flexspi1grp {
-		fsl,pins = <IMX95_PAD_SD3_CMD__FLEXSPI1_A_SS0_B		0x3fe>,
-			   <IMX95_PAD_SD3_CLK__FLEXSPI1_A_SCLK		0x3fe>,
-			   <IMX95_PAD_SD3_DATA0__FLEXSPI1_A_DATA_BIT0	0x3fe>,
-			   <IMX95_PAD_SD3_DATA1__FLEXSPI1_A_DATA_BIT1	0x3fe>,
-			   <IMX95_PAD_SD3_DATA2__FLEXSPI1_A_DATA_BIT2	0x3fe>,
-			   <IMX95_PAD_SD3_DATA3__FLEXSPI1_A_DATA_BIT3	0x3fe>;
+		fsl,pins = <IMX95_PAD_SD3_CLK__FLEXSPI1_A_SCLK		0x11e>,
+			   <IMX95_PAD_SD3_CMD__FLEXSPI1_A_SS0_B		0x11e>,
+			   <IMX95_PAD_SD3_DATA0__FLEXSPI1_A_DATA_BIT0	0x11e>,
+			   <IMX95_PAD_SD3_DATA1__FLEXSPI1_A_DATA_BIT1	0x11e>,
+			   <IMX95_PAD_SD3_DATA2__FLEXSPI1_A_DATA_BIT2	0x11e>,
+			   <IMX95_PAD_SD3_DATA3__FLEXSPI1_A_DATA_BIT3	0x11e>;
 	};
 
 	pinctrl_gpio1: gpio1grp {
-		fsl,pins = <IMX95_PAD_PDM_BIT_STREAM1__AONMIX_TOP_GPIO1_IO_BIT10	0x21>,
-			   <IMX95_PAD_SAI1_TXFS__AONMIX_TOP_SAI1_TX_SYNC		0x21>,
-			   <IMX95_PAD_SAI1_TXD0__AONMIX_TOP_SAI1_TX_DATA_BIT0		0x21>;
+		fsl,pins = <IMX95_PAD_PDM_BIT_STREAM1__AONMIX_TOP_GPIO1_IO_BIT10	0x111e>,
+			   <IMX95_PAD_SAI1_TXD0__AONMIX_TOP_GPIO1_IO_BIT13		0x111e>,
+			   <IMX95_PAD_SAI1_TXFS__AONMIX_TOP_GPIO1_IO_BIT11		0x111e>;
 	};
 
 	pinctrl_gpio2: gpio2grp {
-		fsl,pins = <IMX95_PAD_GPIO_IO19__GPIO2_IO_BIT19		0x21>,
-			   <IMX95_PAD_GPIO_IO22__GPIO2_IO_BIT22		0x21>;
+		fsl,pins = <IMX95_PAD_GPIO_IO18__GPIO2_IO_BIT18		0x1100>,
+			   <IMX95_PAD_GPIO_IO19__GPIO2_IO_BIT19		0x111e>,
+			   <IMX95_PAD_GPIO_IO22__GPIO2_IO_BIT22		0x111e>;
 	};
 
 	pinctrl_lpi2c1: lpi2c1grp {
-		fsl,pins = <IMX95_PAD_I2C1_SCL__AONMIX_TOP_LPI2C1_SCL		0x40000b9e>,
-			   <IMX95_PAD_I2C1_SDA__AONMIX_TOP_LPI2C1_SDA		0x40000b9e>;
+		fsl,pins = <IMX95_PAD_I2C1_SCL__AONMIX_TOP_LPI2C1_SCL		0x4000191e>,
+			   <IMX95_PAD_I2C1_SDA__AONMIX_TOP_LPI2C1_SDA		0x4000191e>;
 	};
 
 	pinctrl_lpi2c3: lpi2c3grp {
-		fsl,pins = <IMX95_PAD_GPIO_IO28__LPI2C3_SDA			0x40000b9e>,
-			   <IMX95_PAD_GPIO_IO29__LPI2C3_SCL			0x40000b9e>;
+		fsl,pins = <IMX95_PAD_GPIO_IO28__LPI2C3_SDA			0x4000191e>,
+			   <IMX95_PAD_GPIO_IO29__LPI2C3_SCL			0x4000191e>;
 	};
 
-	pinctrl_lpi2c4: lpi2c4grp {
-		fsl,pins = <IMX95_PAD_GPIO_IO30__LPI2C4_SDA			0x40000b9e>,
-			   <IMX95_PAD_GPIO_IO31__LPI2C4_SCL			0x40000b9e>;
-	};
+        pinctrl_lpi2c4: lpi2c4grp {
+            fsl,pins = <IMX95_PAD_GPIO_IO30__LPI2C4_SDA             0x4000191e>,
+                       <IMX95_PAD_GPIO_IO31__LPI2C4_SCL             0x4000191e>;
+        };
 
-	pinctrl_lpi2c6: lpi2c6grp {
-		fsl,pins = <IMX95_PAD_GPIO_IO02__LPI2C6_SDA			0x40000b9e>,
-			   <IMX95_PAD_GPIO_IO03__LPI2C6_SCL			0x40000b9e>;
-	};
+        pinctrl_lpi2c6: lpi2c6grp {
+            fsl,pins = <IMX95_PAD_GPIO_IO02__LPI2C6_SDA             0x4000191e>,
+                       <IMX95_PAD_GPIO_IO03__LPI2C6_SCL             0x4000191e>;
+        };
 
 	pinctrl_lpspi3: lpspi3grp {
-		fsl,pins = <IMX95_PAD_GPIO_IO07__GPIO2_IO_BIT7		0x3fe>,
-			   <IMX95_PAD_GPIO_IO08__GPIO2_IO_BIT8		0x3fe>,
-			   <IMX95_PAD_GPIO_IO09__LPSPI3_SIN		0x3fe>,
-			   <IMX95_PAD_GPIO_IO10__LPSPI3_SOUT		0x3fe>,
-			   <IMX95_PAD_GPIO_IO11__LPSPI3_SCK		0x3fe>;
+		fsl,pins = <IMX95_PAD_GPIO_IO07__GPIO2_IO_BIT7		0x51e>,
+			   <IMX95_PAD_GPIO_IO08__GPIO2_IO_BIT8		0x51e>,
+			   <IMX95_PAD_GPIO_IO09__LPSPI3_SIN		0x51e>,
+			   <IMX95_PAD_GPIO_IO10__LPSPI3_SOUT		0x51e>,
+			   <IMX95_PAD_GPIO_IO11__LPSPI3_SCK		0x51e>;
 	};
 
 	pinctrl_lpuart1: lpuart1grp {
-		fsl,pins = <IMX95_PAD_UART1_RXD__AONMIX_TOP_LPUART1_RX		0x31e>,
+		fsl,pins = <IMX95_PAD_UART1_RXD__AONMIX_TOP_LPUART1_RX		0x1300>,
 			   <IMX95_PAD_UART1_TXD__AONMIX_TOP_LPUART1_TX		0x31e>,
-			   <IMX95_PAD_UART2_TXD__AONMIX_TOP_LPUART1_RTS_B	0x31e>,
+			   <IMX95_PAD_UART2_TXD__AONMIX_TOP_LPUART1_RTS_B	0x1300>,
 			   <IMX95_PAD_UART2_RXD__AONMIX_TOP_LPUART1_CTS_B	0x31e>;
 	};
 
 	pinctrl_lpuart5: lpuart5grp {
-		fsl,pins = <IMX95_PAD_GPIO_IO01__LPUART5_RX			0x31e>,
-			   <IMX95_PAD_GPIO_IO00__LPUART5_TX			0x31e>;
+		fsl,pins = <IMX95_PAD_GPIO_IO00__LPUART5_TX			0x31e>,
+			   <IMX95_PAD_GPIO_IO01__LPUART5_RX			0x1300>;
 	};
 
 	pinctrl_lpuart7: lpuart7grp {
-		fsl,pins = <IMX95_PAD_GPIO_IO37__LPUART7_RX			0x31e>,
-			   <IMX95_PAD_GPIO_IO36__LPUART7_TX			0x31e>;
+		fsl,pins = <IMX95_PAD_GPIO_IO36__LPUART7_TX			0x31e>,
+			   <IMX95_PAD_GPIO_IO37__LPUART7_RX			0x1300>;
 	};
 
 	pinctrl_lpuart8: lpuart8grp {
-		fsl,pins = <IMX95_PAD_GPIO_IO13__LPUART8_RX			0x31e>,
-			   <IMX95_PAD_GPIO_IO12__LPUART8_TX			0x31e>,
+		fsl,pins = <IMX95_PAD_GPIO_IO12__LPUART8_TX			0x31e>,
+			   <IMX95_PAD_GPIO_IO13__LPUART8_RX			0x1300>,
 			   <IMX95_PAD_GPIO_IO14__LPUART8_CTS_B			0x31e>,
-			   <IMX95_PAD_GPIO_IO15__LPUART8_RTS_B			0x31e>;
+			   <IMX95_PAD_GPIO_IO15__LPUART8_RTS_B			0x1300>;
 	};
 
+        pinctrl_mdio: mdiogrp {
+            fsl,pins = <IMX95_PAD_ENET1_MDC__NETCMIX_TOP_NETC_MDC		0x51e>,
+                       <IMX95_PAD_ENET1_MDIO__NETCMIX_TOP_NETC_MDIO		0x51e>;
+        };
+
 	pinctrl_pcf85063: pcf85063grp {
-		fsl,pins = <IMX95_PAD_GPIO_IO27__GPIO2_IO_BIT27				0x80>;
+		fsl,pins = <IMX95_PAD_GPIO_IO27__GPIO2_IO_BIT27			0x1100>;
 	};
 
 	pinctrl_pcie0: pcie0grp {
-		fsl,pins = <
-			IMX95_PAD_GPIO_IO32__HSIOMIX_TOP_PCIE1_CLKREQ_B		0x40000b1e
-		>;
+		fsl,pins = <IMX95_PAD_GPIO_IO32__HSIOMIX_TOP_PCIE1_CLKREQ_B	0x111e>;
 	};
 
 	pinctrl_pcie1: pcie1grp {
-		fsl,pins = <
-			IMX95_PAD_GPIO_IO35__HSIOMIX_TOP_PCIE2_CLKREQ_B		0x40000b1e
-		>;
-	};
-
-	pinctrl_reg_sdvmmc: regsdvmmcgrp {
-		fsl,pins = <
-			IMX95_PAD_SD2_RESET_B__GPIO3_IO_BIT7			0x31e
-		>;
+		fsl,pins = <IMX95_PAD_GPIO_IO35__HSIOMIX_TOP_PCIE2_CLKREQ_B	0x111e>;
 	};
 
 	pinctrl_sai3: sai3grp {
-		fsl,pins = <
-			IMX95_PAD_GPIO_IO17__SAI3_MCLK				0x31e
-			IMX95_PAD_GPIO_IO16__SAI3_TX_BCLK			0x31e
-			IMX95_PAD_GPIO_IO26__SAI3_TX_SYNC			0x31e
-			IMX95_PAD_GPIO_IO20__SAI3_RX_DATA_BIT0			0x31e
-			IMX95_PAD_GPIO_IO21__SAI3_TX_DATA_BIT0			0x31e
-		>;
+		fsl,pins = <IMX95_PAD_GPIO_IO16__SAI3_TX_BCLK			0x51e>,
+			   <IMX95_PAD_GPIO_IO17__SAI3_MCLK			0x51e>,
+			   <IMX95_PAD_GPIO_IO20__SAI3_RX_DATA_BIT0		0x1300>,
+			   <IMX95_PAD_GPIO_IO21__SAI3_TX_DATA_BIT0		0x51e>,
+			   <IMX95_PAD_GPIO_IO26__SAI3_TX_SYNC			0x51e>;
+	};
+
+        pinctrl_sai5: sai5grp {
+            fsl,pins = <IMX95_PAD_XSPI1_DATA4__SAI5_TX_DATA_BIT0	0x51e>,
+                       <IMX95_PAD_XSPI1_DATA5__SAI5_TX_SYNC		0x51e>,
+                       <IMX95_PAD_XSPI1_DATA6__SAI5_TX_BCLK		0x51e>,
+                       <IMX95_PAD_XSPI1_DATA7__SAI5_RX_DATA_BIT0	0x1300>;
+        };
+
+	pinctrl_sdvmmc: sdvmmcgrp {
+		fsl,pins = <IMX95_PAD_SD2_RESET_B__GPIO3_IO_BIT7		0x11e>;
 	};
 
 	pinctrl_tc9595: tc9595grp {
-		fsl,pins = <IMX95_PAD_GPIO_IO25__GPIO2_IO_BIT25				0x00000040>;
+		fsl,pins = <IMX95_PAD_GPIO_IO25__GPIO2_IO_BIT25			0x1500>;
 	};
 
 	pinctrl_tpm3: tpm3grp {
@@ -573,8 +619,13 @@
 		fsl,pins = <IMX95_PAD_GPIO_IO05__TPM4_CH0			0x51e>;
 	};
 
+	pinctrl_tpm5: tpm4grp {
+		fsl,pins = <IMX95_PAD_GPIO_IO06__TPM5_CH0			0x51e>;
+	};
+
 	pinctrl_usbcon0: usbotg1grp {
-		fsl,pins = <IMX95_PAD_ENET1_TD3__GPIO4_IO_BIT2		0x00000021>;
+		// FIXME: Wrong GPIO
+		// fsl,pins = <IMX95_PAD_ENET1_TD3__GPIO4_IO_BIT2		0x00000021>;
 	};
 
 	pinctrl_usdhc1: usdhc1grp {
@@ -619,22 +670,20 @@
 			   <IMX95_PAD_SD1_STROBE__USDHC1_STROBE	0x15fe>;
 	};
 
-	pinctrl_usdhc2_gpio: usdhc2gpiogrp {
-		fsl,pins = <IMX95_PAD_SD2_CD_B__GPIO3_IO_BIT0		0x00000021>;
-	};
-
 	pinctrl_usdhc2: usdhc2grp {
-		fsl,pins = <IMX95_PAD_SD2_CLK__USDHC2_CLK			0x158e>,
-			   <IMX95_PAD_SD2_CMD__USDHC2_CMD			0x138e>,
-			   <IMX95_PAD_SD2_DATA0__USDHC2_DATA0			0x138e>,
-			   <IMX95_PAD_SD2_DATA1__USDHC2_DATA1			0x138e>,
-			   <IMX95_PAD_SD2_DATA2__USDHC2_DATA2			0x138e>,
-			   <IMX95_PAD_SD2_DATA3__USDHC2_DATA3			0x138e>,
+		fsl,pins = <IMX95_PAD_SD2_CD_B__GPIO3_IO_BIT0			0x1100>,
+			   <IMX95_PAD_SD2_CLK__USDHC2_CLK			0x51e>,
+			   <IMX95_PAD_SD2_CMD__USDHC2_CMD			0x31e>,
+			   <IMX95_PAD_SD2_DATA0__USDHC2_DATA0			0x131e>,
+			   <IMX95_PAD_SD2_DATA1__USDHC2_DATA1			0x131e>,
+			   <IMX95_PAD_SD2_DATA2__USDHC2_DATA2			0x131e>,
+			   <IMX95_PAD_SD2_DATA3__USDHC2_DATA3			0x131e>,
 			   <IMX95_PAD_SD2_VSELECT__USDHC2_VSELECT		0x51e>;
 	};
 
 	pinctrl_usdhc2_100mhz: usdhc2-100mhzgrp {
-		fsl,pins = <IMX95_PAD_SD2_CLK__USDHC2_CLK			0x158e>,
+		fsl,pins = <IMX95_PAD_SD2_CD_B__GPIO3_IO_BIT0			0x1100>,
+			   <IMX95_PAD_SD2_CLK__USDHC2_CLK			0x158e>,
 			   <IMX95_PAD_SD2_CMD__USDHC2_CMD			0x138e>,
 			   <IMX95_PAD_SD2_DATA0__USDHC2_DATA0			0x138e>,
 			   <IMX95_PAD_SD2_DATA1__USDHC2_DATA1			0x138e>,
@@ -644,7 +693,8 @@
 	};
 
 	pinctrl_usdhc2_200mhz: usdhc2-200mhzgrp {
-		fsl,pins = <IMX95_PAD_SD2_CLK__USDHC2_CLK			0x15fe>,
+		fsl,pins = <IMX95_PAD_SD2_CD_B__GPIO3_IO_BIT0			0x1100>,
+			   <IMX95_PAD_SD2_CLK__USDHC2_CLK			0x15fe>,
 			   <IMX95_PAD_SD2_CMD__USDHC2_CMD			0x13fe>,
 			   <IMX95_PAD_SD2_DATA0__USDHC2_DATA0			0x13fe>,
 			   <IMX95_PAD_SD2_DATA1__USDHC2_DATA1			0x13fe>,
