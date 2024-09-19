@@ -12,4 +12,16 @@
 		ethernet0 = &enetc_port0;
 		ethernet1 = &enetc_port1;
 	};
+
+	sound {
+		/delete-property/ audio-cpu;
+	};
+};
+
+&panel_in_lvds0 {
+	/delete-property/ remote-endpoint;
+};
+
+&panel_in_lvds1 {
+	/delete-property/ remote-endpoint;
 };

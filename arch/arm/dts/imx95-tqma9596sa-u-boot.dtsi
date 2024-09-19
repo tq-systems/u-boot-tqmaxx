@@ -12,6 +12,10 @@
 	u-boot,dm-spl;
 };
 
+&dp_dsi_in {
+	/delete-property/ remote-endpoint;
+};
+
 &dummy {
 	u-boot,dm-pre-reloc;
 	u-boot,dm-spl;
@@ -70,7 +74,7 @@
 	u-boot,dm-spl;
 };
 
-&pinctrl_reg_sdvmmc {
+&pinctrl_sdvmmc {
 	u-boot,dm-spl;
 };
 
@@ -78,11 +82,23 @@
 	u-boot,dm-spl;
 };
 
+&pinctrl_usdhc1_100mhz {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc1_200mhz {
+	u-boot,dm-spl;
+};
+
 &pinctrl_usdhc2 {
 	u-boot,dm-spl;
 };
 
-&pinctrl_usdhc2_gpio {
+&pinctrl_usdhc2_100mhz {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc2_200mhz {
 	u-boot,dm-spl;
 };
 
