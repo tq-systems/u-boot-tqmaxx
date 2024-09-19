@@ -195,8 +195,6 @@ char *board_fdt_chosen_bootargs(void)
 	static const char *cortexm_args = "clk-imx93.mcore_booted=1";
 
 	if (arch_auxiliary_core_check_up(0)) {
-		size_t len = strlen(bootargs);
-
 		board_bootargs[0] = '\0';
 		strlcat(board_bootargs, bootargs, sizeof(board_bootargs));
 		strlcat(board_bootargs, " ", sizeof(board_bootargs));
