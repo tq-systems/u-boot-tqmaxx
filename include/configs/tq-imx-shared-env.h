@@ -174,8 +174,19 @@
 				"echo ERROR: size to large ...; "      \
 				"exit; "                               \
 			"fi; "                                         \
-			"mmc write ${loadaddr} "                       \
-				"${uboot_mmc_start} ${blkc}; "         \
+			"setenv update_start_blk ${uboot_mmc_start}; " \
+			"setenv update_part 0; "                       \
+			"if itest ${mmcdev} == ${emmc_dev}; then "\
+				"mmc partconf ${mmcdev} update_part; " \
+				"if itest ${update_part} > 0 ; then "  \
+					"setenv update_start_blk 0; "  \
+				"fi; "                                 \
+				"mmc dev ${mmcdev} ${update_part}; "   \
+			"fi; "                                         \
+			"mmc write ${loadaddr} ${update_start_blk} ${blkc}; " \
+			"mmc dev ${mmcdev} 0; "                        \
+			"setenv update_part; "                         \
+			"setenv update_start_blk; "                    \
 		"fi; "                                                 \
 		"setenv filesize; setenv blkc \0"                      \
 
