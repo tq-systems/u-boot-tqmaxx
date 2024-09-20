@@ -15,6 +15,12 @@
 #define CFG_SYS_UBOOT_BASE	\
 	(QSPI0_AMBA_BASE + CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR * 512)
 
+#if defined(CONFIG_FASTBOOT) && !defined(CONFIG_FSL_FASTBOOT)
+
+#if !defined(CONFIG_FASTBOOT_FLASH_MMC_DEV)
+#error "FASTBOOT_FLASH_MMC_DEV must be set to device index of eMMC device"
+#endif
+
 #define CFG_MFG_ENV_SETTINGS                                           \
 	"fastboot_partition_alias_all="	                               \
 		__stringify(CONFIG_FASTBOOT_FLASH_MMC_DEV) ".0:0\0"    \
@@ -22,6 +28,14 @@
 		__stringify(CONFIG_FASTBOOT_FLASH_MMC_DEV) ".1:0\0"    \
 	"emmc_dev=" __stringify(CONFIG_FASTBOOT_FLASH_MMC_DEV) "\0"    \
 	"sd_dev=1\0"
+
+#else
+
+#define CFG_MFG_ENV_SETTINGS                                           \
+	"emmc_dev=0\0"                                                 \
+	"sd_dev=1\0"
+
+#endif
 
 #if defined(CONFIG_IMX_BOOTAUX)
 #define CFG_CORTEXM_ENV_SETTINGS                                       \
