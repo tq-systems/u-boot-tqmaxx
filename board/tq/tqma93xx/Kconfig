@@ -12,8 +12,6 @@ config SYS_CONFIG_NAME
 config TQMA93XX_DEFAULTS
 	bool
 	select BLOBLIST
-	select IMX93
-	select IMX9_LPDDR4X
 	select TQ_BB
 	select TQ_EEPROM
 	select TQ_RTC
