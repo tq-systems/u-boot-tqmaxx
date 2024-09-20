@@ -174,8 +174,21 @@
 				"echo ERROR: size to large ...; "      \
 				"exit; "                               \
 			"fi; "                                         \
-			"mmc write ${loadaddr} "                       \
-				"${uboot_mmc_start} ${blkc}; "         \
+			"if itest ${mmcdev} == ${sd_dev} ; then "      \
+				"mmc write ${loadaddr} "               \
+					"${uboot_mmc_start} ${blkc}; " \
+			"else if itest ${mmcdev} == ${emmc_dev}; then "\
+				"mmc partconf ${mmcdev} updp; "        \
+				"if itest ${updp} == 0 ; then "         \
+					"setenv usb ${uboot_mmc_start}; "\
+				"else "                                \
+					"setenv usb 0; "\
+				"fi; " \
+				"mmc dev ${mmcdev} ${updp}; " \
+				"mmc write ${loadaddr} ${usb} ${blkc}; " \
+				"mmc dev ${mmcdev} 0; " \
+				"setenv updp; setenv usb; "             \
+			"fi; fi; "                                         \
 		"fi; "                                                 \
 		"setenv filesize; setenv blkc \0"                      \
 
