@@ -13,8 +13,6 @@
 #include <linux/kconfig.h>
 #include <linux/stringify.h>
 
-/* place code in last 4 MiB of RAM */
-
 #include "mx6_common.h"
 
 /* I2C Configs */
@@ -84,7 +82,5 @@
 	CFG_MODULE_ENV_SETTINGS		\
 	TQ_IMX_LEGACY_SPI_UBOOT_UPDATE	\
 	BB_ENV_SETTINGS			\
-
-/* Support at least the sensor on TQMa6 SOM */
 
 #endif /* __CONFIG_H */
