@@ -50,7 +50,6 @@
 	"loadm4image=load mmc ${mmcdev}:${firmwarepart} ${m4loadaddr} ${m4image}\0" \
 	"m4boot=run loadm4image; bootaux ${m4loadaddr}\0"                      \
 	"m4netboot=tftp ${m4image}; bootaux ${m4loadaddr}\0"                   \
-	""
 
 #else
 #define TQMA7_M4_ENV
@@ -60,7 +59,7 @@
 	"emmc_dev=0\0"                                                         \
 	"sd_dev=1\0"                                                           \
 	"board=tqma7\0"                                                        \
-	"boot_os=bootz ${loadaddr} - ${fdt_addr_r}\0"                          \
+	"boot_os=bootz ${kernel_addr_r} - ${fdt_addr_r}\0"                     \
 	"fdt_addr_r=" __stringify(TQMA7_FDT_ADDRESS) "\0"                      \
 	"fdtoverlay_addr_r=" __stringify(FDT_OVERLAY_ADDR)"\0"                 \
 	"image=zImage\0"                                                       \
@@ -74,7 +73,6 @@
 	"uboot_spi_sector_size=" __stringify(TQMA7_SPI_FLASH_SECTOR_SIZE) "\0" \
 	"uboot_spi_start=" __stringify(TQMA7_SPI_UBOOT_START) "\0"             \
 	"uboot_spi_size=" __stringify(TQMA7_SPI_UBOOT_SIZE) "\0"               \
-	""
 
 /* Physical Memory Map */
 #define PHYS_SDRAM			MMDC0_ARB_BASE_ADDR
