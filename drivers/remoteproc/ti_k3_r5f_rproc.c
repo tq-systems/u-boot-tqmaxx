@@ -858,9 +858,15 @@ static int k3_r5f_probe(struct udevice *dev)
 			 */
 			if (core->ipdata->is_dm_core && !is_primary_core(core) &&
 			    core->cluster->mode == CLUSTER_MODE_SPLIT) {
-				dev_dbg(dev, "Core %d is in WFI mode, resetting core to use in split-mode.\n",
-					 core->tsp.proc_id);
-				k3_r5f_stop(core->dev);
+				if (!strstr(core->tsp.sci->version.firmware_description,
+					    "v09.02.04"))
+					dev_warn(dev, "IPC on MCU R5F Core 1 requires SYSFW version: v09.02.04, detected version: %s\n",
+						 core->tsp.sci->version.firmware_description);
+				else {
+					dev_dbg(dev, "Core %d is in WFI mode, resetting core to use in split-mode.\n",
+						core->tsp.proc_id);
+					k3_r5f_stop(core->dev);
+				}
 			} else {
 				dev_info(dev, "Core %d is already in use. No rproc commands work\n",
 					 core->tsp.proc_id);
