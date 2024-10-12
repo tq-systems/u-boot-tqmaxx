@@ -4,7 +4,7 @@
  */
 
 #include "imx93-u-boot.dtsi"
-#include "imx93-9x9-qsb-ontat-wvga-panel.dtsi"
+#include "imx93-9x9-qsb-tianma-wvga-panel.dtsi"
 
 / {
 	wdt-reboot {
