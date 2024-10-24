@@ -78,7 +78,7 @@ static struct pf9453_vrange pf9453_ldo2_vranges[] = {
 };
 
 static struct pf9453_vrange pf9453_ldosnvs_vranges[] = {
-	PCA_RANGE(800000, 25000, 0x0, 0x58),
+	PCA_RANGE(1200000, 25000, 0x0, 0x58),
 };
 
 static struct pf9453_plat pf9453_reg_data[] = {
