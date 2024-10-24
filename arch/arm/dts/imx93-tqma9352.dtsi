@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
 /*
- * Copyright (c) 2022-2023 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * Copyright (c) 2022-2024 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
  * D-82229 Seefeld, Germany.
  * Author: Markus Niebel
  */
@@ -118,20 +118,6 @@
 		};
 	};
 
-	reg_v1v8: regulator-v1v8 {
-		compatible = "regulator-fixed";
-		regulator-name = "V_1V8";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-	};
-
-	reg_v3v3: regulator-v3v3 {
-		compatible = "regulator-fixed";
-		regulator-name = "V_3V3";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-	};
-
 	/* SD2 RST# via PMIC SW_EN */
 	reg_usdhc2_vmmc: regulator-usdhc2 {
 		compatible = "regulator-fixed";
@@ -148,6 +134,16 @@
 
 &adc1 {
 	vref-supply = <&buck5>;
+};
+
+&cm33 {
+	mbox-names = "tx", "rx", "rxdb";
+	mboxes = <&mu1 0 1
+		  &mu1 1 1
+		  &mu1 3 1>;
+	memory-region = <&vdevbuffer>, <&vdev0vring0>, <&vdev0vring1>,
+			<&vdev1vring0>, <&vdev1vring1>, <&rsc_table>;
+	fsl,startup-delay-ms = <500>;
 };
 
 &ele_mu {
@@ -225,7 +221,7 @@
 			buck2: BUCK2 {
 				regulator-name = "BUCK2";
 				regulator-min-microvolt = <600000>;
-				regulator-max-microvolt = <600000>;
+				regulator-max-microvolt = <1100000>;
 				regulator-boot-on;
 				regulator-always-on;
 				regulator-ramp-delay = <3125>;
@@ -330,21 +326,13 @@
 	status = "okay";
 };
 
-&usbotg1 {
-	samsung,picophy-pre-emp-curr-control = <3>;
-	samsung,picophy-dc-vol-level-adjust = <7>;
-};
-
-&usbotg2 {
-	samsung,picophy-pre-emp-curr-control = <3>;
-	samsung,picophy-dc-vol-level-adjust = <7>;
-};
-
 &usdhc1 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
 	pinctrl-0 = <&pinctrl_usdhc1>;
 	pinctrl-1 = <&pinctrl_usdhc1>;
 	pinctrl-2 = <&pinctrl_usdhc1>;
+	vmmc-supply = <&buck4>;
+	vqmmc-supply = <&buck5>;
 	bus-width = <8>;
 	non-removable;
 	no-sdio;
