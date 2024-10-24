@@ -26,6 +26,8 @@
 #include "../common/tcpc.h"
 #include <usb.h>
 #include <dwc3-uboot.h>
+#include <dm/uclass-internal.h>
+#include <dm/pinctrl.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -484,3 +486,15 @@ int board_late_init(void)
 
 	return 0;
 }
+
+#ifndef CONFIG_XPL_BUILD
+void board_prep_linux(struct bootm_headers *images)
+{
+	int ret;
+	struct udevice *dwc3_usb;
+
+	ret = uclass_find_device_by_seq(UCLASS_USB, 1, &dwc3_usb);
+	if (!ret)
+		pinctrl_select_state(dwc3_usb, "gpio");
+}
+#endif
