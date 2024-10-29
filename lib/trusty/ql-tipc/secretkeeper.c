@@ -17,6 +17,8 @@
 #include <trusty/secretkeeper.h>
 #include <trusty/trusty_ipc.h>
 #include <trusty/util.h>
+#include <linux/libfdt.h>
+#include <fdt_support.h>
 
 static struct trusty_ipc_chan secretkeeper_chan;
 static bool initialized;
@@ -51,6 +53,12 @@ void secretkeeper_tipc_shutdown(void) {
 static int send_header_only_request(struct secretkeeper_req_hdr* hdr,
                                     size_t hdr_size) {
     int num_iovec = 1;
+
+    if (!initialized) {
+        trusty_error("%s: SecretKeeper client not initialized\n", __func__);
+        return TRUSTY_ERR_GENERIC;
+    }
+
     struct trusty_ipc_iovec req_iov = {.base = hdr, .len = hdr_size};
     return trusty_ipc_send(&secretkeeper_chan, &req_iov, num_iovec, true);
 }
@@ -111,7 +119,7 @@ int secretkeeper_get_identity(size_t identity_buf_size,
 
     if (rc < 0) {
         trusty_error(
-                "In secretkeeper_get_identity: failed (%d) to send request to Secretkeeper.",
+                "In secretkeeper_get_identity: failed (%d) to send request to Secretkeeper.\n",
                 rc);
         return rc;
     }
@@ -121,10 +129,45 @@ int secretkeeper_get_identity(size_t identity_buf_size,
 
     if (rc < 0) {
         trusty_error(
-                "In secretkeeper_get_identity: failed (%d) to read the response.",
+                "In secretkeeper_get_identity: failed (%d) to read the response.\n",
                 rc);
         return rc;
     }
 
     return TRUSTY_ERR_NONE;
+}
+
+#define SK_KEY_SIZE (128)
+int trusty_populate_sk_key(void *fdt_addr) {
+    uint8_t sk_key[SK_KEY_SIZE] = {0};
+    size_t out_key_size = 0;
+    int node_offset = 0;
+    int ret = 0;
+
+    /* Retrive the key from secure os */
+    ret = secretkeeper_get_identity(sizeof(sk_key), sk_key, &out_key_size);
+    if (ret != TRUSTY_ERR_NONE || out_key_size > sizeof(sk_key)) {
+        trusty_error("Failed to get secretkeeper key (err = %d)!\n", ret);
+        return ret;
+    }
+
+    /* Now populate the key to device-tree */
+    ret = fdt_increase_size(fdt_addr, SK_KEY_SIZE);
+    if (ret != 0) {
+        trusty_error("Failed to increase the fdt size! ret: %d\n", ret);
+        return ret;
+    }
+
+    node_offset = fdt_path_offset(fdt_addr, "/avf/reference/avf");
+    if (node_offset < 0) {
+        trusty_error("Failed to find avf fdt path!\n");
+        return node_offset;
+    }
+
+    ret = fdt_setprop(fdt_addr, node_offset, "secretkeeper_public_key", sk_key, out_key_size);
+    if (ret != 0) {
+        trusty_error("Failed to set avf property!, err: %d\n", ret);
+    }
+
+    return ret;
 }

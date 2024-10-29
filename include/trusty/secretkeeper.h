@@ -44,3 +44,9 @@ void secretkeeper_tipc_shutdown(void);
 int secretkeeper_get_identity(size_t identity_buf_size,
                               uint8_t identity_buf[],
                               size_t* identity_size);
+
+/**
+ * Retrive the secretkeeper from the secure os and populate it to the host DT.
+ * @ fdt_addr: point to the start of Host DT.
+ */
+int trusty_populate_sk_key(void *fdt_addr);
