@@ -407,6 +407,29 @@ static void flexspi_nor_steup(void)
 	dm_gpio_set_value(&desc, 1);
 }
 
+void lvds_backlight_on(void)
+{
+	struct udevice *dev;
+	int ret;
+	u8 reg;
+
+	if (!IS_ENABLED(CONFIG_TARGET_IMX95_15X15_EVK))
+		return;
+
+	ret = i2c_get_chip_for_busnum(2, 0x62, 1, &dev);
+	if (ret) {
+		printf("%s: Cannot find pca9632 led dev\n",
+		       __func__);
+		return;
+	}
+
+	reg = 1;
+	dm_i2c_write(dev, 0x1, &reg, 1);
+
+	reg = 5;
+	dm_i2c_write(dev, 0x8, &reg, 1);
+}
+
 int board_init(void)
 {
 	int ret;
@@ -428,6 +451,8 @@ int board_init(void)
 	flexspi_nor_steup();
 
 	power_on_m7("mx95alt");
+
+	lvds_backlight_on();
 
 	return 0;
 }
