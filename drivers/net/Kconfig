@@ -373,6 +373,7 @@ config ETHOC
 config FEC_MXC_SHARE_MDIO
 	bool "Share the MDIO bus for FEC controller"
 	depends on FEC_MXC
+	depends on !DM_ETH_PHY
 
 config FEC_MXC_MDIO_BASE
 	hex "MDIO base address for the FEC controller"
