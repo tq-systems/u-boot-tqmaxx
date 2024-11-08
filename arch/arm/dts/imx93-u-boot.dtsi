@@ -86,3 +86,85 @@
 		};
 	};
 };
+
+&A55_0 {
+	clocks = <&clk IMX93_CLK_A55_SEL>;
+};
+
+&A55_1 {
+	clocks = <&clk IMX93_CLK_A55_SEL>;
+};
+
+&{/soc@0} {
+	bootph-all;
+	bootph-pre-ram;
+};
+
+&aips1 {
+	bootph-pre-ram;
+	bootph-all;
+};
+
+&aips2 {
+	bootph-pre-ram;
+	bootph-some-ram;
+};
+
+&aips3 {
+	bootph-pre-ram;
+	bootph-some-ram;
+};
+
+&clk {
+	bootph-all;
+	bootph-pre-ram;
+	/delete-property/ assigned-clocks;
+	/delete-property/ assigned-clock-rates;
+	/delete-property/ assigned-clock-parents;
+};
+
+&clk_ext1 {
+	bootph-all;
+	bootph-pre-ram;
+};
+
+&gpio1 {
+	bootph-pre-ram;
+	bootph-some-ram;
+};
+
+&gpio2 {
+	bootph-pre-ram;
+	bootph-some-ram;
+};
+
+&gpio3 {
+	bootph-pre-ram;
+	bootph-some-ram;
+};
+
+&gpio4 {
+	bootph-pre-ram;
+	bootph-some-ram;
+};
+
+&iomuxc {
+	bootph-pre-ram;
+	bootph-some-ram;
+};
+
+&osc_24m {
+	bootph-all;
+	bootph-pre-ram;
+};
+
+&osc_32k {
+	bootph-all;
+	bootph-pre-ram;
+};
+
+&s4muap {
+	bootph-pre-ram;
+	bootph-some-ram;
+	status = "okay";
+};
