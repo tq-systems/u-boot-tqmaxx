@@ -446,9 +446,9 @@ config AUTO_SET_RPMB_KEY
 
 config VPU_SECURE_HEAP
 	bool "Memory need by WIDEVINE_L1"
-	depends on IMX_TRUSTY_OS && (IMX8QM)
+	depends on IMX_TRUSTY_OS && (IMX8QM || IMX8QXP)
 	help
-	  if enable widevine L1 on imx8qm, need to pass secure memory and vpu memory
+	  if enable widevine L1 on imx8q, need to pass secure memory and vpu memory
 	  to linux. It is only used by imx8qm.
 	default n
 
