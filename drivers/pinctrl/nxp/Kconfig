@@ -115,13 +115,13 @@ config PINCTRL_IMX8M
 	  registers.
 
 config PINCTRL_IMX93
-	bool "IMX8M pinctrl driver"
+	bool "IMX93 pinctrl driver"
 	depends on ARCH_IMX9 && PINCTRL_FULL
 	select PINCTRL_IMX
 	help
-	  Say Y here to enable the imx8m pinctrl driver
+	  Say Y here to enable the imx93 pinctrl driver
 
-	  This provides a simple pinctrl driver for i.MX8M SoC familiy.
+	  This provides a simple pinctrl driver for i.MX93 and iMX91 SoC families.
 	  This feature depends on device tree configuration. This driver
 	  is different from the linux one, this is a simple implementation,
 	  only parses the 'fsl,pins' property and configure related
