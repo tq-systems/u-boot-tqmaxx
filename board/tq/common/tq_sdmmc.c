@@ -5,23 +5,28 @@
  * D-82229 Seefeld, Germany.
  */
 
-#include <asm/arch/sys_proto.h>
-#include <linux/errno.h>
-#include <asm/io.h>
+#include <command.h>
 #include <env.h>
 #include <mmc.h>
 #include <stdbool.h>
+#include <vsprintf.h>
+#include <asm/io.h>
+#include <asm/arch/sys_proto.h>
+#include <linux/errno.h>
 
 #include "tq_bb.h"
 
 static int check_mmc_autodetect(void)
 {
-	char *autodetect_str = env_get("mmcautodetect");
+	int ret;
 
-	if (autodetect_str && (strcmp(autodetect_str, "yes") == 0))
-		return 1;
+	ret = env_get_yesno("mmcautodetect");
 
-	return 0;
+	/* no or not set */
+	if (ret <= 0)
+		return 0;
+
+	return 1;
 }
 
 /* This should be defined for each board */
@@ -32,11 +37,17 @@ __weak int mmc_map_to_kernel_blk(int dev_no)
 
 void board_late_mmc_env_init(void)
 {
-	u32 dev_no = mmc_get_env_dev();
+	char cmd[32];
+	u32 dev_no;
+
+	dev_no = mmc_get_env_dev();
 
 	if (!check_mmc_autodetect())
 		return;
 
 	env_set_ulong("mmcdev", dev_no);
 	env_set_ulong("mmcblkdev", mmc_map_to_kernel_blk(dev_no));
+
+	snprintf(cmd, ARRAY_SIZE(cmd), "mmc dev %d", dev_no);
+	run_command(cmd, 0);
 }
