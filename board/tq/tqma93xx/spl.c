@@ -238,6 +238,7 @@ void spl_board_init(void)
 static int power_init_board(void)
 {
 	if (CONFIG_IS_ENABLED(DM_PMIC_PCA9450)) {
+		unsigned int trim_val, buck_val;
 		struct udevice *dev;
 		int ret;
 
@@ -253,22 +254,62 @@ static int power_init_board(void)
 
 		/* BUCKxOUT_DVS0/1 control BUCK123 output */
 		pmic_reg_write(dev, PCA9450_BUCK123_DVS, 0x29);
-
-		/* TODO: LOW_DRIVE_MODE / OVERDRIVE + PWRCTRL_TOFF_DEB -> imx93-evk */
-
 		/* enable DVS control through PMIC_STBY_REQ */
 		pmic_reg_write(dev, PCA9450_BUCK1CTRL, 0x59);
-		/* 0.9 V */
-		pmic_reg_write(dev, PCA9450_BUCK1OUT_DVS0, 0x18);
-		pmic_reg_write(dev, PCA9450_BUCK3OUT_DVS0, 0x18);
+
+		/*
+		 * HACK:
+		 * Newer PMIC versions defaults to PCA9450_REG_PWRCTRL_TOFF_DEB == 1b
+		 * while older versions had PCA9450_REG_PWRCTRL_TOFF_DEB == 0b as
+		 * power on default.
+		 * This is the only way to handle differences for BUCK1/3 regulator range.
+		 * regulator step equals to 12.5 mV, new versions start at 650 mV while
+		 * older versions start at 600 mV, hence 0x4 equals to 50 mV.
+		 * Attention: When setting PCA9450_REG_PWRCTRL_TOFF_DEB at runtime and using
+		 * WDOG warm reset this will not work.
+		 */
+		ret = pmic_reg_read(dev, PCA9450_PWR_CTRL);
+		if (ret < 0) {
+			pr_err("ERROR: access pca9450@25 %d\n", ret);
+			return ret;
+		}
+
+		trim_val = ((unsigned int)ret & PCA9450_REG_PWRCTRL_TOFF_DEB) ? 0x0 : 0x4;
+		puts("PMIC: ");
+		if (is_voltage_mode(VOLT_LOW_DRIVE)) {
+			/* 0.8v for Low drive mode */
+			buck_val = 0x0c + trim_val;
+			puts("Low Drive ");
+		} else if (is_voltage_mode(VOLT_NOMINAL_DRIVE)) {
+			/* 0.85v for Nominal drive mode */
+			buck_val = 0x10 + trim_val;
+			puts("Nominal ");
+		} else {
+			/* 0.9v for Over drive mode */
+			buck_val = 0x14 + trim_val;
+			puts("Over Drive ");
+		}
+		puts("Voltage Mode\n");
+
+		pmic_reg_write(dev, PCA9450_BUCK1OUT_DVS0, buck_val);
+		pmic_reg_write(dev, PCA9450_BUCK3OUT_DVS0, buck_val);
 		/* set standby voltage to 0.65v */
-		pmic_reg_write(dev, PCA9450_BUCK1OUT_DVS1, 0x4);
+		pmic_reg_write(dev, PCA9450_BUCK1OUT_DVS1, trim_val);
 
-		/* I2C_LT_EN*/
-		pmic_reg_write(dev, 0xa, 0x3);
-
-		/* set WDOG_B_CFG to cold reset */
-		pmic_reg_write(dev, PCA9450_RESET_CTRL, 0xA1);
+		/*
+		 * I2C_LT_EN: I2C level translator Forcedly Disable (POR default)
+		 * usage is dicouraged by TQ Systems according to in house testing
+		 */
+		pmic_reg_write(dev, PCA9450_CONFIG2, 0x00);
+		/*
+		 * T_PMIC_RST_DEB: 001b (50 ms, default)
+		 * PMIC_RST_CFG: 10b Cold Reset except LDO1 (V_1V8_BBSM), default
+		 * WDOG_B_CFG: 10b  Cold Reset except LDO1 (V_1V8_BBSM)
+		 * This follows the recommendations from NXP hardware design guide
+		 */
+		pmic_clrsetbits(dev, PCA9450_RESET_CTRL,
+				PCA9450_PMIC_RESET_WDOG_B_CFG_MASK,
+				PCA9450_PMIC_RESET_WDOG_B_CFG_COLD_LDO12);
 	}
 
 	return 0;
@@ -300,9 +341,11 @@ void board_init_f(ulong dummy)
 		printf("lifecycle: 0x%x\n", gd->arch.lifecycle);
 	}
 
+	clock_init_late();
+
 	power_init_board();
 
-	if (!IS_ENABLED(CONFIG_IMX9_LOW_DRIVE_MODE))
+	if (!is_voltage_mode(VOLT_LOW_DRIVE))
 		set_arm_core_max_clk();
 
 	/* Init power of mix */
