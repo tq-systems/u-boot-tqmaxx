@@ -16,6 +16,7 @@
 
 #define DAISY_OFFSET_IMX93	0x360
 #define DAISY_OFFSET_IMX95	0x408
+#define DAISY_OFFSET_IMX94	0x608
 
 /* SCMI pin control types */
 #define PINCTRL_TYPE_MUX        192
@@ -129,17 +130,21 @@ static int imx_scmi_pinctrl_probe(struct udevice *dev)
 {
 	struct imx_scmi_pinctrl_priv *priv = dev_get_priv(dev);
 
-	priv->daisy_offset = is_imx93() ? DAISY_OFFSET_IMX93 : DAISY_OFFSET_IMX95;
+	if (IS_ENABLED(CONFIG_IMX93))
+		priv->daisy_offset = DAISY_OFFSET_IMX93;
+	else if (IS_ENABLED(CONFIG_IMX95))
+		priv->daisy_offset = DAISY_OFFSET_IMX95;
+	else if (IS_ENABLED(CONFIG_IMX94))
+		priv->daisy_offset = DAISY_OFFSET_IMX94;
+	else
+		return -EINVAL;
 
 	return devm_scmi_of_get_channel(dev);
 }
 
 static int imx_scmi_pinctrl_bind(struct udevice *dev)
 {
-	if (IS_ENABLED(CONFIG_IMX95))
-		return 0;
-
-	return -ENODEV;
+	return 0;
 }
 
 U_BOOT_DRIVER(scmi_pinctrl_imx) = {
