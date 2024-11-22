@@ -9,7 +9,9 @@
 #include <init.h>
 #include <mtd_node.h>
 #include <spl.h>
+#include <asm/bootm.h>
 #include <asm/global_data.h>
+#include <asm/setup.h>
 #include <asm/arch/clock.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/arch-imx9/ccm_regs.h>
@@ -216,6 +218,16 @@ int board_late_init(void)
 	const char *bname = tq_get_boardname();
 	bool features_detected = false;
 	int ret;
+
+	if (IS_ENABLED(CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG)) {
+		struct tag_serialnr serialnr;
+
+		/*
+		 * CPU UID Query - get_board_serial returns only part of the
+		 * UID but prints complete UID data for i.MX9 SOC
+		 */
+		get_board_serial(&serialnr);
+	}
 
 	ret = tq_read_module_eeprom(&eeprom);
 
