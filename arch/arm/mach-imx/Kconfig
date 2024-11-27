@@ -452,6 +452,12 @@ config VPU_SECURE_HEAP
 	  to linux. It is only used by imx8qm.
 	default n
 
+config IMX_SUPPORT_SRM
+	bool "Support SRM feature"
+	help
+	  Let trusty to load srm before loading kernel.
+	default n
+
 endmenu
 
 config APPEND_BOOTARGS

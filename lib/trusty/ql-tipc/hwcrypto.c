@@ -541,6 +541,12 @@ int hwcrypto_provision_srm(const char *data, uint32_t data_size)
     return rc;
 }
 
+int hwcrypto_load_srm(void)
+{
+    int rc = hwcrypto_do_tipc(HWCRYPTO_LOAD_SRM, NULL, 0, NULL, 0);
+    return rc;
+}
+
 int hwcrypto_get_dek_blob(char *data, uint32_t *data_size, enum dek_blob_part part)
 {
     uint32_t dek_blob_size = 0, tmp = 0;
