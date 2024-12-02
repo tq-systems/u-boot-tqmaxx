@@ -32,16 +32,16 @@ static int tcpc_log(struct tcpc_port *port, const char *fmt, ...)
 
 int tcpc_set_cc_to_source(struct tcpc_port *port)
 {
-	uint8_t valb;
+	u8 valb;
 	int err;
 
-	if (port == NULL || port->i2c_dev == NULL)
+	if (!port || !port->i2c_dev)
 		return -EINVAL;
 
 	valb = (TCPC_ROLE_CTRL_CC_RP << TCPC_ROLE_CTRL_CC1_SHIFT) |
-			(TCPC_ROLE_CTRL_CC_RP << TCPC_ROLE_CTRL_CC2_SHIFT) |
-			(TCPC_ROLE_CTRL_RP_VAL_DEF <<
-			 TCPC_ROLE_CTRL_RP_VAL_SHIFT) | TCPC_ROLE_CTRL_DRP;
+		(TCPC_ROLE_CTRL_CC_RP << TCPC_ROLE_CTRL_CC2_SHIFT) |
+		(TCPC_ROLE_CTRL_RP_VAL_DEF <<
+		 TCPC_ROLE_CTRL_RP_VAL_SHIFT) | TCPC_ROLE_CTRL_DRP;
 
 	err = dm_i2c_write(port->i2c_dev, TCPC_ROLE_CTRL, &valb, 1);
 	if (err)
@@ -51,14 +51,15 @@ int tcpc_set_cc_to_source(struct tcpc_port *port)
 
 int tcpc_set_cc_to_sink(struct tcpc_port *port)
 {
-	uint8_t valb;
+	u8 valb;
 	int err;
 
-	if (port == NULL || port->i2c_dev == NULL)
+	if (!port || !port->i2c_dev)
 		return -EINVAL;
 
 	valb = (TCPC_ROLE_CTRL_CC_RD << TCPC_ROLE_CTRL_CC1_SHIFT) |
-			(TCPC_ROLE_CTRL_CC_RD << TCPC_ROLE_CTRL_CC2_SHIFT) | TCPC_ROLE_CTRL_DRP;
+		(TCPC_ROLE_CTRL_CC_RD << TCPC_ROLE_CTRL_CC2_SHIFT) |
+		TCPC_ROLE_CTRL_DRP;
 
 	err = dm_i2c_write(port->i2c_dev, TCPC_ROLE_CTRL, &valb, 1);
 	if (err)
@@ -66,13 +67,12 @@ int tcpc_set_cc_to_sink(struct tcpc_port *port)
 	return err;
 }
 
-
 int tcpc_set_plug_orientation(struct tcpc_port *port, enum typec_cc_polarity polarity)
 {
-	uint8_t valb;
+	u8 valb;
 	int err;
 
-	if (port == NULL || port->i2c_dev == NULL)
+	if (!port || !port->i2c_dev)
 		return -EINVAL;
 
 	err = dm_i2c_read(port->i2c_dev, TCPC_TCPC_CTRL, &valb, 1);
@@ -95,16 +95,16 @@ int tcpc_set_plug_orientation(struct tcpc_port *port, enum typec_cc_polarity pol
 	return 0;
 }
 
-int tcpc_get_cc_status(struct tcpc_port *port, enum typec_cc_polarity *polarity, enum typec_cc_state *state)
+int tcpc_get_cc_status(struct tcpc_port *port, enum typec_cc_polarity *polarity,
+		       enum typec_cc_state *state)
 {
-
-	uint8_t valb_cc, cc2, cc1;
+	u8 valb_cc, cc2, cc1;
 	int err;
 
-	if (port == NULL || port->i2c_dev == NULL || polarity == NULL || state == NULL)
+	if (!port || !port->i2c_dev || !polarity || !state)
 		return -EINVAL;
 
-	err = dm_i2c_read(port->i2c_dev, TCPC_CC_STATUS, (uint8_t *)&valb_cc, 1);
+	err = dm_i2c_read(port->i2c_dev, TCPC_CC_STATUS, (u8 *)&valb_cc, 1);
 	if (err) {
 		tcpc_log(port, "%s dm_i2c_read failed, err %d\n", __func__, err);
 		return -EIO;
@@ -175,8 +175,9 @@ int tcpc_get_cc_status(struct tcpc_port *port, enum typec_cc_polarity *polarity,
 				} else if (cc1 == 0x0) {
 					tcpc_log(port, "SRC.Ra only on CC2\n");
 					return -EFAULT;
-				} else
+				} else {
 					return -EFAULT;
+				}
 				break;
 			case 0x2:
 				if (cc1 == 0x1) {
@@ -185,8 +186,9 @@ int tcpc_get_cc_status(struct tcpc_port *port, enum typec_cc_polarity *polarity,
 				} else if (cc1 == 0x0) {
 					*state = TYPEC_STATE_SRC_RD;
 					tcpc_log(port, "SRC.Rd on CC2\n");
-				} else
+				} else {
 					return -EFAULT;
+				}
 				break;
 			case 0x3:
 				*state = TYPEC_STATE_SRC_RESERVED;
@@ -216,28 +218,28 @@ int tcpc_get_cc_status(struct tcpc_port *port, enum typec_cc_polarity *polarity,
 	return 0;
 }
 
-int tcpc_alert_mask(struct tcpc_port *port, uint16_t alert_mask)
+int tcpc_alert_mask(struct tcpc_port *port, u16 alert_mask)
 {
 	int err = 0;
 
-	if (!port || port->i2c_dev == NULL)
+	if (!port || !port->i2c_dev)
 		return -EINVAL;
 
-	err = dm_i2c_write(port->i2c_dev, TCPC_ALERT_MASK, (const uint8_t *)&alert_mask, 2);
+	err = dm_i2c_write(port->i2c_dev, TCPC_ALERT_MASK, (const u8 *)&alert_mask, 2);
 	if (err)
 		tcpc_log(port, "%s dm_i2c_write failed, err %d\n", __func__, err);
 
 	return err;
 }
 
-int tcpc_clear_alert(struct tcpc_port *port, uint16_t clear_mask)
+int tcpc_clear_alert(struct tcpc_port *port, u16 clear_mask)
 {
 	int err;
 
-	if (port == NULL || port->i2c_dev == NULL)
+	if (!port || !port->i2c_dev)
 		return -EINVAL;
 
-	err = dm_i2c_write(port->i2c_dev, TCPC_ALERT, (const uint8_t *)&clear_mask, 2);
+	err = dm_i2c_write(port->i2c_dev, TCPC_ALERT, (const u8 *)&clear_mask, 2);
 	if (err) {
 		tcpc_log(port, "%s dm_i2c_write failed, err %d\n", __func__, err);
 		return -EIO;
@@ -246,11 +248,11 @@ int tcpc_clear_alert(struct tcpc_port *port, uint16_t clear_mask)
 	return 0;
 }
 
-int tcpc_fault_status_mask(struct tcpc_port *port, uint8_t fault_mask)
+int tcpc_fault_status_mask(struct tcpc_port *port, u8 fault_mask)
 {
 	int err = 0;
 
-	if (!port || port->i2c_dev == NULL)
+	if (!port || !port->i2c_dev)
 		return -EINVAL;
 
 	err = dm_i2c_write(port->i2c_dev, TCPC_FAULT_STATUS_MASK, &fault_mask, 1);
@@ -260,14 +262,14 @@ int tcpc_fault_status_mask(struct tcpc_port *port, uint8_t fault_mask)
 	return err;
 }
 
-int tcpc_send_command(struct tcpc_port *port, uint8_t command)
+int tcpc_send_command(struct tcpc_port *port, u8 command)
 {
 	int err;
 
-	if (port == NULL || port->i2c_dev == NULL)
+	if (!port || !port->i2c_dev)
 		return -EINVAL;
 
-	err = dm_i2c_write(port->i2c_dev, TCPC_COMMAND, (const uint8_t *)&command, 1);
+	err = dm_i2c_write(port->i2c_dev, TCPC_COMMAND, (const u8 *)&command, 1);
 	if (err) {
 		tcpc_log(port, "%s dm_i2c_write failed, err %d\n", __func__, err);
 		return -EIO;
@@ -276,14 +278,14 @@ int tcpc_send_command(struct tcpc_port *port, uint8_t command)
 	return 0;
 }
 
-int tcpc_polling_reg(struct tcpc_port *port, uint8_t reg,
-	uint8_t reg_width, uint16_t mask, uint16_t value, ulong timeout_ms)
+int tcpc_polling_reg(struct tcpc_port *port, u8 reg, u8 reg_width, u16 mask,
+		     u16 value, ulong timeout_ms)
 {
-	uint16_t val = 0;
+	u16 val = 0;
 	int err;
 	ulong start;
 
-	if (port == NULL || port->i2c_dev == NULL)
+	if (!port || !port->i2c_dev)
 		return -EINVAL;
 
 	tcpc_debug_log(port, "%s reg 0x%x, mask 0x%x, value 0x%x\n", __func__, reg, mask, value);
@@ -294,7 +296,7 @@ int tcpc_polling_reg(struct tcpc_port *port, uint8_t reg,
 
 	start = get_timer(0);	/* Get current timestamp */
 	do {
-		err = dm_i2c_read(port->i2c_dev, reg, (uint8_t *)&val, reg_width);
+		err = dm_i2c_read(port->i2c_dev, reg, (u8 *)&val, reg_width);
 		if (err)
 			return -EIO;
 
@@ -307,7 +309,7 @@ int tcpc_polling_reg(struct tcpc_port *port, uint8_t reg,
 
 void tcpc_print_log(struct tcpc_port *port)
 {
-	if (port == NULL)
+	if (!port)
 		return;
 
 	if (port->log_print == port->log_p) /*nothing to output*/
@@ -324,12 +326,12 @@ int tcpc_setup_dfp_mode(struct tcpc_port *port)
 	enum typec_cc_state state;
 	int ret;
 
-	if (port == NULL)
+	if (!port)
 		return -EINVAL;
 
 	if (tcpc_pd_sink_check_charging(port)) {
 		tcpc_log(port, "%s: Can't apply DFP mode when PD is charging\n",
-			__func__);
+			 __func__);
 		return -EPERM;
 	}
 
@@ -339,16 +341,20 @@ int tcpc_setup_dfp_mode(struct tcpc_port *port)
 	if (ret)
 		return ret;
 
-	/* At least wait tCcStatusDelay + tTCPCFilter + tCcTCPCSampleRate (max) = 200us + 500us + ?ms
-	 * PTN5110 datasheet does not contain the sample rate value, according other productions,
-	 * the sample rate is at ms level, about 2 ms -10ms. So wait 100ms should be enough.
+	/* At least wait
+	 * tCcStatusDelay + tTCPCFilter + tCcTCPCSampleRate (max) =
+	 * 200us + 500us + ?ms
+	 * PTN5110 datasheet does not contain the sample rate value,
+	 * according other productions, the sample rate is at ms level,
+	 * about 2 ms -10ms. So wait 100ms should be enough.
 	 */
 	mdelay(100);
 
-	ret = tcpc_polling_reg(port, TCPC_ALERT, 2, TCPC_ALERT_CC_STATUS, TCPC_ALERT_CC_STATUS, 100);
+	ret = tcpc_polling_reg(port, TCPC_ALERT, 2, TCPC_ALERT_CC_STATUS,
+			       TCPC_ALERT_CC_STATUS, 100);
 	if (ret) {
 		tcpc_log(port, "%s: Polling ALERT register, TCPC_ALERT_CC_STATUS bit failed, ret = %d\n",
-			__func__, ret);
+			 __func__, ret);
 		return ret;
 	}
 
@@ -379,7 +385,6 @@ int tcpc_setup_dfp_mode(struct tcpc_port *port)
 
 		/* The max vbus on time is 200ms, we add margin 100ms */
 		mdelay(300);
-
 	}
 
 	return 0;
@@ -391,12 +396,13 @@ int tcpc_setup_ufp_mode(struct tcpc_port *port)
 	enum typec_cc_state state;
 	int ret;
 
-	if (port == NULL)
+	if (!port)
 		return -EINVAL;
 
-	/* Check if the PD charge is working. If not, need to configure CC role for UFP */
+	/* Check if the PD charge is working.
+	 * If not, need to configure CC role for UFP
+	 */
 	if (!tcpc_pd_sink_check_charging(port)) {
-
 		/* Disable the source vbus once it is enabled by DFP mode */
 		tcpc_disable_src_vbus(port);
 
@@ -406,16 +412,20 @@ int tcpc_setup_ufp_mode(struct tcpc_port *port)
 		if (ret)
 			return ret;
 
-		/* At least wait tCcStatusDelay + tTCPCFilter + tCcTCPCSampleRate (max) = 200us + 500us + ?ms
-		 * PTN5110 datasheet does not contain the sample rate value, according other productions,
-		 * the sample rate is at ms level, about 2 ms -10ms. So wait 100ms should be enough.
+		/* At least wait
+		 * tCcStatusDelay + tTCPCFilter + tCcTCPCSampleRate (max) =
+		 * 200us + 500us + ?ms
+		 * PTN5110 datasheet does not contain the sample rate value,
+		 * according other productions, the sample rate is at ms level,
+		 * about 2 ms -10ms. So wait 100ms should be enough.
 		 */
 		mdelay(100);
 
-		ret = tcpc_polling_reg(port, TCPC_ALERT, 2, TCPC_ALERT_CC_STATUS, TCPC_ALERT_CC_STATUS, 100);
+		ret = tcpc_polling_reg(port, TCPC_ALERT, 2, TCPC_ALERT_CC_STATUS,
+				       TCPC_ALERT_CC_STATUS, 100);
 		if (ret) {
 			tcpc_log(port, "%s: Polling ALERT register, TCPC_ALERT_CC_STATUS bit failed, ret = %d\n",
-				__func__, ret);
+				 __func__, ret);
 			return ret;
 		}
 
@@ -428,8 +438,9 @@ int tcpc_setup_ufp_mode(struct tcpc_port *port)
 
 	if (!ret) {
 		/* If presenting not as sink, then return */
-		if (state != TYPEC_STATE_SNK_DEFAULT && state != TYPEC_STATE_SNK_POWER15 &&
-			state != TYPEC_STATE_SNK_POWER30)
+		if (state != TYPEC_STATE_SNK_DEFAULT &&
+		    state != TYPEC_STATE_SNK_POWER15 &&
+		    state != TYPEC_STATE_SNK_POWER30)
 			return -EPERM;
 
 		if (pol == TYPEC_POLARITY_CC1)
@@ -452,7 +463,7 @@ int tcpc_disable_src_vbus(struct tcpc_port *port)
 {
 	int ret;
 
-	if (port == NULL)
+	if (!port)
 		return -EINVAL;
 
 	/* Disable VBUS*/
@@ -470,7 +481,7 @@ int tcpc_disable_sink_vbus(struct tcpc_port *port)
 {
 	int ret;
 
-	if (port == NULL)
+	if (!port)
 		return -EINVAL;
 
 	/* Disable SINK VBUS*/
@@ -484,37 +495,37 @@ int tcpc_disable_sink_vbus(struct tcpc_port *port)
 	return 0;
 }
 
-
 static int tcpc_pd_receive_message(struct tcpc_port *port, struct pd_message *msg)
 {
 	int ret;
-	uint8_t cnt;
-	uint16_t val;
+	u8 cnt;
+	u16 val;
 
-	if (port == NULL || port->i2c_dev == NULL)
+	if (!port || !port->i2c_dev)
 		return -EINVAL;
 
 	/* Generally the max tSenderResponse is 30ms, max tTypeCSendSourceCap is 200ms, we set the timeout to 500ms */
-	ret = tcpc_polling_reg(port, TCPC_ALERT, 2, TCPC_ALERT_RX_STATUS, TCPC_ALERT_RX_STATUS, 500);
+	ret = tcpc_polling_reg(port, TCPC_ALERT, 2, TCPC_ALERT_RX_STATUS,
+			       TCPC_ALERT_RX_STATUS, 500);
 	if (ret) {
 		tcpc_log(port, "%s: Polling ALERT register, TCPC_ALERT_RX_STATUS bit failed, ret = %d\n",
-			__func__, ret);
+			 __func__, ret);
 		return ret;
 	}
 
 	cnt = 0;
-	ret = dm_i2c_read(port->i2c_dev, TCPC_RX_BYTE_CNT, (uint8_t *)&cnt, 1);
+	ret = dm_i2c_read(port->i2c_dev, TCPC_RX_BYTE_CNT, (u8 *)&cnt, 1);
 	if (ret)
 		return -EIO;
 
 	if (cnt > 0) {
-		ret = dm_i2c_read(port->i2c_dev, TCPC_RX_BUF_FRAME_TYPE, (uint8_t *)msg, cnt);
+		ret = dm_i2c_read(port->i2c_dev, TCPC_RX_BUF_FRAME_TYPE, (u8 *)msg, cnt);
 		if (ret)
 			return -EIO;
 
 		/* Clear RX status alert bit */
 		val = TCPC_ALERT_RX_STATUS;
-		ret = dm_i2c_write(port->i2c_dev, TCPC_ALERT, (const uint8_t *)&val, 2);
+		ret = dm_i2c_write(port->i2c_dev, TCPC_ALERT, (const u8 *)&val, 2);
 		if (ret)
 			return -EIO;
 	}
@@ -522,48 +533,54 @@ static int tcpc_pd_receive_message(struct tcpc_port *port, struct pd_message *ms
 	return cnt;
 }
 
-static int tcpc_pd_transmit_message(struct tcpc_port *port, struct pd_message *msg_p, uint8_t bytes)
+static int tcpc_pd_transmit_message(struct tcpc_port *port,
+				    struct pd_message *msg_p, u8 bytes)
 {
 	int ret;
-	uint8_t valb;
-	uint16_t val = 0;
+	u8 valb;
+	u16 val = 0;
 
-	if (port == NULL || port->i2c_dev == NULL)
+	if (!port || !port->i2c_dev)
 		return -EINVAL;
 
-	if (msg_p == NULL || bytes <= 0)
+	if (!msg_p || bytes <= 0)
 		return -EINVAL;
 
-	ret = dm_i2c_write(port->i2c_dev, TCPC_TX_BYTE_CNT, (const uint8_t *)&bytes, 1);
+	ret = dm_i2c_write(port->i2c_dev, TCPC_TX_BYTE_CNT, (const u8 *)&bytes, 1);
 	if (ret)
 		return -EIO;
 
-	ret = dm_i2c_write(port->i2c_dev, TCPC_TX_HDR, (const uint8_t *)&(msg_p->header), bytes);
+	ret = dm_i2c_write(port->i2c_dev, TCPC_TX_HDR,
+			   (const u8 *)&msg_p->header,
+			   bytes);
 	if (ret)
 		return -EIO;
 
 	valb = (3 << TCPC_TRANSMIT_RETRY_SHIFT) | (TCPC_TX_SOP << TCPC_TRANSMIT_TYPE_SHIFT);
-	ret = dm_i2c_write(port->i2c_dev, TCPC_TRANSMIT, (const uint8_t *)&valb, 1);
+	ret = dm_i2c_write(port->i2c_dev, TCPC_TRANSMIT, (const u8 *)&valb, 1);
 	if (ret)
 		return -EIO;
 
 	/* Max tReceive is 1.1ms, we set to 5ms timeout */
-	ret = tcpc_polling_reg(port, TCPC_ALERT, 2, TCPC_ALERT_TX_SUCCESS, TCPC_ALERT_TX_SUCCESS, 5);
+	ret = tcpc_polling_reg(port, TCPC_ALERT, 2, TCPC_ALERT_TX_SUCCESS,
+			       TCPC_ALERT_TX_SUCCESS, 5);
 	if (ret) {
 		if (ret == -ETIME) {
-			ret = dm_i2c_read(port->i2c_dev, TCPC_ALERT, (uint8_t *)&val, 2);
+			ret = dm_i2c_read(port->i2c_dev, TCPC_ALERT, (u8 *)&val, 2);
 			if (ret)
 				return -EIO;
 
 			if (val & TCPC_ALERT_TX_FAILED)
-				tcpc_log(port, "%s: PD TX FAILED, ALERT = 0x%x\n", __func__, val);
+				tcpc_log(port, "%s: PD TX FAILED, ALERT = 0x%x\n",
+					 __func__, val);
 
 			if (val & TCPC_ALERT_TX_DISCARDED)
-				tcpc_log(port, "%s: PD TX DISCARDED, ALERT = 0x%x\n", __func__, val);
+				tcpc_log(port, "%s: PD TX DISCARDED, ALERT = 0x%x\n",
+					 __func__, val);
 
 		} else {
 			tcpc_log(port, "%s: Polling ALERT register, TCPC_ALERT_TX_SUCCESS bit failed, ret = %d\n",
-				__func__, ret);
+				 __func__, ret);
 		}
 	} else {
 		port->tx_msg_id = (port->tx_msg_id + 1) & PD_HEADER_ID_MASK;
@@ -571,14 +588,15 @@ static int tcpc_pd_transmit_message(struct tcpc_port *port, struct pd_message *m
 
 	/* Clear ALERT status */
 	val &= (TCPC_ALERT_TX_FAILED | TCPC_ALERT_TX_DISCARDED | TCPC_ALERT_TX_SUCCESS);
-	ret = dm_i2c_write(port->i2c_dev, TCPC_ALERT, (const uint8_t *)&val, 2);
+	ret = dm_i2c_write(port->i2c_dev, TCPC_ALERT, (const u8 *)&val, 2);
 	if (ret)
 		return -EIO;
 
 	return ret;
 }
 
-static void tcpc_log_source_caps(struct tcpc_port *port, struct pd_message *msg, unsigned int capcount)
+static void tcpc_log_source_caps(struct tcpc_port *port, struct pd_message *msg,
+				 unsigned int capcount)
 {
 	int i;
 
@@ -592,32 +610,26 @@ static void tcpc_log_source_caps(struct tcpc_port *port, struct pd_message *msg,
 		switch (type) {
 		case PDO_TYPE_FIXED:
 			tcpc_log(port, "%u mV, %u mA [%s%s%s%s%s%s]\n",
-				  pdo_fixed_voltage(pdo),
-				  pdo_max_current(pdo),
-				  (pdo & PDO_FIXED_DUAL_ROLE) ?
-							"R" : "",
-				  (pdo & PDO_FIXED_SUSPEND) ?
-							"S" : "",
-				  (pdo & PDO_FIXED_HIGHER_CAP) ?
-							"H" : "",
-				  (pdo & PDO_FIXED_USB_COMM) ?
-							"U" : "",
-				  (pdo & PDO_FIXED_DATA_SWAP) ?
-							"D" : "",
-				  (pdo & PDO_FIXED_EXTPOWER) ?
-							"E" : "");
+				 pdo_fixed_voltage(pdo),
+				 pdo_max_current(pdo),
+				 (pdo & PDO_FIXED_DUAL_ROLE) ? "R" : "",
+				 (pdo & PDO_FIXED_SUSPEND) ? "S" : "",
+				 (pdo & PDO_FIXED_HIGHER_CAP) ? "H" : "",
+				 (pdo & PDO_FIXED_USB_COMM) ? "U" : "",
+				 (pdo & PDO_FIXED_DATA_SWAP) ? "D" : "",
+				 (pdo & PDO_FIXED_EXTPOWER) ? "E" : "");
 			break;
 		case PDO_TYPE_VAR:
 			tcpc_log(port, "%u-%u mV, %u mA\n",
-				  pdo_min_voltage(pdo),
-				  pdo_max_voltage(pdo),
-				  pdo_max_current(pdo));
+				 pdo_min_voltage(pdo),
+				 pdo_max_voltage(pdo),
+				 pdo_max_current(pdo));
 			break;
 		case PDO_TYPE_BATT:
 			tcpc_log(port, "%u-%u mV, %u mW\n",
-				  pdo_min_voltage(pdo),
-				  pdo_max_voltage(pdo),
-				  pdo_max_power(pdo));
+				 pdo_min_voltage(pdo),
+				 pdo_max_voltage(pdo),
+				 pdo_max_power(pdo));
 			break;
 		default:
 			tcpc_log(port, "undefined\n");
@@ -626,7 +638,7 @@ static void tcpc_log_source_caps(struct tcpc_port *port, struct pd_message *msg,
 	}
 }
 
-static int tcpc_pd_select_pdo(struct pd_message *msg, uint32_t capcount, uint32_t max_snk_mv, uint32_t max_snk_ma)
+static int tcpc_pd_select_pdo(struct pd_message *msg, u32 capcount, u32 max_snk_mv, u32 max_snk_ma)
 {
 	unsigned int i, max_mw = 0, max_mv = 0;
 	int ret = -EINVAL;
@@ -665,14 +677,10 @@ static int tcpc_pd_select_pdo(struct pd_message *msg, uint32_t capcount, uint32_
 	return ret;
 }
 
-static int tcpc_pd_build_request(struct tcpc_port *port,
-										struct pd_message *msg,
-										uint32_t capcount,
-										uint32_t max_snk_mv,
-										uint32_t max_snk_ma,
-										uint32_t max_snk_mw,
-										uint32_t operating_snk_mw,
-										uint32_t *rdo)
+static int tcpc_pd_build_request(struct tcpc_port *port, struct pd_message *msg,
+				 u32 capcount, u32 max_snk_mv,
+				 u32 max_snk_ma, u32 max_snk_mw,
+				 u32 operating_snk_mw, u32 *rdo)
 {
 	unsigned int mv, ma, mw, flags;
 	unsigned int max_ma, max_mw;
@@ -735,13 +743,12 @@ static int tcpc_pd_build_request(struct tcpc_port *port,
 static void tcpc_pd_sink_process(struct tcpc_port *port)
 {
 	int ret;
-	uint8_t msgtype;
-	uint32_t objcnt;
+	u8 msgtype;
+	u32 objcnt;
 	struct pd_message msg;
 	enum pd_sink_state pd_state = WAIT_SOURCE_CAP;
 
 	while (tcpc_pd_receive_message(port, &msg) > 0) {
-
 		msgtype = pd_header_type(msg.header);
 		objcnt = pd_header_cnt_le(msg.header);
 
@@ -753,17 +760,19 @@ static void tcpc_pd_sink_process(struct tcpc_port *port)
 			if (msgtype != PD_DATA_SOURCE_CAP)
 				continue;
 
-			uint32_t rdo = 0;
+			u32 rdo = 0;
 
 			tcpc_log_source_caps(port, &msg, objcnt);
 
 			tcpc_pd_build_request(port, &msg, objcnt,
-				port->cfg.max_snk_mv, port->cfg.max_snk_ma,
-				port->cfg.max_snk_mw, port->cfg.op_snk_mv,
-				&rdo);
+					      port->cfg.max_snk_mv,
+					      port->cfg.max_snk_ma,
+					      port->cfg.max_snk_mw,
+					      port->cfg.op_snk_mv, &rdo);
 
 			memset(&msg, 0, sizeof(msg));
-			msg.header = PD_HEADER(PD_DATA_REQUEST, 0, 0, port->tx_msg_id, 1);  /* power sink, data device, id 0, len 1 */
+			/* power sink, data device, id 0, len 1 */
+			msg.header = PD_HEADER(PD_DATA_REQUEST, 0, 0, port->tx_msg_id, 1);
 			msg.payload[0] = rdo;
 
 			ret = tcpc_pd_transmit_message(port, &msg, 6);
@@ -805,21 +814,21 @@ static void tcpc_pd_sink_process(struct tcpc_port *port)
 
 bool tcpc_pd_sink_check_charging(struct tcpc_port *port)
 {
-	uint8_t valb;
+	u8 valb;
 	int err;
 	enum typec_cc_polarity pol;
 	enum typec_cc_state state;
 
-	if (port == NULL || port->i2c_dev == NULL)
+	if (!port || !port->i2c_dev)
 		return false;
 
 	/* Check the CC status, must be sink */
 	err = tcpc_get_cc_status(port, &pol, &state);
-	if (err || (state != TYPEC_STATE_SNK_POWER15
-		&& state != TYPEC_STATE_SNK_POWER30
-		&& state != TYPEC_STATE_SNK_DEFAULT)) {
+	if (err || (state != TYPEC_STATE_SNK_POWER15 &&
+		    state != TYPEC_STATE_SNK_POWER30 &&
+		    state != TYPEC_STATE_SNK_DEFAULT)) {
 		tcpc_debug_log(port, "TCPC wrong state for PD charging, err = %d, CC = 0x%x\n",
-			err, state);
+			       err, state);
 		return false;
 	}
 
@@ -831,7 +840,7 @@ bool tcpc_pd_sink_check_charging(struct tcpc_port *port)
 	}
 
 	if (!(valb & TCPC_POWER_STATUS_VBUS_PRES)) {
-		tcpc_debug_log(port, "VBUS NOT PRES \n");
+		tcpc_debug_log(port, "VBUS NOT PRES\n");
 		return false;
 	}
 
@@ -845,10 +854,10 @@ bool tcpc_pd_sink_check_charging(struct tcpc_port *port)
 
 static int tcpc_pd_sink_disable(struct tcpc_port *port)
 {
-	uint8_t valb;
+	u8 valb;
 	int err;
 
-	if (port == NULL || port->i2c_dev == NULL)
+	if (!port || !port->i2c_dev)
 		return -EINVAL;
 
 	port->pd_state = UNATTACH;
@@ -861,14 +870,14 @@ static int tcpc_pd_sink_disable(struct tcpc_port *port)
 	}
 
 	if ((valb & TCPC_POWER_STATUS_VBUS_PRES) && (valb & TCPC_POWER_STATUS_SINKING_VBUS)) {
-		err = dm_i2c_read(port->i2c_dev, TCPC_POWER_CTRL, (uint8_t *)&valb, 1);
+		err = dm_i2c_read(port->i2c_dev, TCPC_POWER_CTRL, (u8 *)&valb, 1);
 		if (err) {
 			tcpc_log(port, "%s dm_i2c_read failed, err %d\n", __func__, err);
 			return -EIO;
 		}
 
 		valb &= ~TCPC_POWER_CTRL_AUTO_DISCH_DISCO; /* disable AutoDischargeDisconnect */
-		err = dm_i2c_write(port->i2c_dev, TCPC_POWER_CTRL, (const uint8_t *)&valb, 1);
+		err = dm_i2c_write(port->i2c_dev, TCPC_POWER_CTRL, (const u8 *)&valb, 1);
 		if (err) {
 			tcpc_log(port, "%s dm_i2c_write failed, err %d\n", __func__, err);
 			return -EIO;
@@ -885,13 +894,13 @@ static int tcpc_pd_sink_disable(struct tcpc_port *port)
 
 static int tcpc_pd_sink_init(struct tcpc_port *port)
 {
-	uint8_t valb;
-	uint16_t val;
+	u8 valb;
+	u16 val;
 	int err;
 	enum typec_cc_polarity pol;
 	enum typec_cc_state state;
 
-	if (port == NULL || port->i2c_dev == NULL)
+	if (!port || !port->i2c_dev)
 		return -EINVAL;
 
 	port->pd_state = UNATTACH;
@@ -904,7 +913,7 @@ static int tcpc_pd_sink_init(struct tcpc_port *port)
 	}
 
 	if (!(valb & TCPC_POWER_STATUS_VBUS_PRES)) {
-		tcpc_debug_log(port, "VBUS NOT PRES \n");
+		tcpc_debug_log(port, "VBUS NOT PRES\n");
 		return -EPERM;
 	}
 
@@ -913,7 +922,7 @@ static int tcpc_pd_sink_init(struct tcpc_port *port)
 		return -EPERM;
 	}
 
-	err = dm_i2c_read(port->i2c_dev, TCPC_ALERT, (uint8_t *)&val, 2);
+	err = dm_i2c_read(port->i2c_dev, TCPC_ALERT, (u8 *)&val, 2);
 	if (err) {
 		tcpc_log(port, "%s dm_i2c_read failed, err %d\n", __func__, err);
 		return -EIO;
@@ -925,11 +934,11 @@ static int tcpc_pd_sink_init(struct tcpc_port *port)
 	}
 
 	err = tcpc_get_cc_status(port, &pol, &state);
-	if (err || (state != TYPEC_STATE_SNK_POWER15
-		&& state != TYPEC_STATE_SNK_POWER30
-		&& state != TYPEC_STATE_SNK_DEFAULT)) {
+	if (err || (state != TYPEC_STATE_SNK_POWER15 &&
+		    state != TYPEC_STATE_SNK_POWER30 &&
+		    state != TYPEC_STATE_SNK_DEFAULT)) {
 		tcpc_log(port, "TCPC wrong state for dead battery, err = %d, CC = 0x%x\n",
-			err, state);
+			 err, state);
 		return -EPERM;
 	} else {
 		err = tcpc_set_plug_orientation(port, pol);
@@ -940,14 +949,14 @@ static int tcpc_pd_sink_init(struct tcpc_port *port)
 		port->pd_state = ATTACHED;
 	}
 
-	err = dm_i2c_read(port->i2c_dev, TCPC_POWER_CTRL, (uint8_t *)&valb, 1);
+	err = dm_i2c_read(port->i2c_dev, TCPC_POWER_CTRL, (u8 *)&valb, 1);
 	if (err) {
 		tcpc_log(port, "%s dm_i2c_read failed, err %d\n", __func__, err);
 		return -EIO;
 	}
 
 	valb &= ~TCPC_POWER_CTRL_AUTO_DISCH_DISCO; /* disable AutoDischargeDisconnect */
-	err = dm_i2c_write(port->i2c_dev, TCPC_POWER_CTRL, (const uint8_t *)&valb, 1);
+	err = dm_i2c_write(port->i2c_dev, TCPC_POWER_CTRL, (const u8 *)&valb, 1);
 	if (err) {
 		tcpc_log(port, "%s dm_i2c_write failed, err %d\n", __func__, err);
 		return -EIO;
@@ -958,7 +967,7 @@ static int tcpc_pd_sink_init(struct tcpc_port *port)
 
 	/* As sink role */
 	valb = 0x00;
-	err = dm_i2c_write(port->i2c_dev, TCPC_MSG_HDR_INFO, (const uint8_t *)&valb, 1);
+	err = dm_i2c_write(port->i2c_dev, TCPC_MSG_HDR_INFO, (const u8 *)&valb, 1);
 	if (err) {
 		tcpc_log(port, "%s dm_i2c_read failed, err %d\n", __func__, err);
 		return -EIO;
@@ -966,7 +975,7 @@ static int tcpc_pd_sink_init(struct tcpc_port *port)
 
 	/* Enable rx */
 	valb = TCPC_RX_DETECT_SOP | TCPC_RX_DETECT_HARD_RESET;
-	err = dm_i2c_write(port->i2c_dev, TCPC_RX_DETECT, (const uint8_t *)&valb, 1);
+	err = dm_i2c_write(port->i2c_dev, TCPC_RX_DETECT, (const u8 *)&valb, 1);
 	if (err) {
 		tcpc_log(port, "%s dm_i2c_read failed, err %d\n", __func__, err);
 		return -EIO;
@@ -980,23 +989,23 @@ static int tcpc_pd_sink_init(struct tcpc_port *port)
 int tcpc_init(struct tcpc_port *port, struct tcpc_port_config config, ss_mux_sel ss_sel_func)
 {
 	int ret;
-	uint8_t valb;
-	uint16_t vid, pid;
+	u8 valb;
+	u16 vid, pid;
 	struct udevice *bus;
 	struct udevice *i2c_dev = NULL;
 
 	memset(port, 0, sizeof(struct tcpc_port));
 
-	if (port == NULL)
+	if (!port)
 		return -EINVAL;
 
 	port->cfg = config;
 	port->tx_msg_id = 0;
 	port->ss_sel_func = ss_sel_func;
-	port->log_p = (char *)&(port->logbuffer);
+	port->log_p = (char *)&port->logbuffer;
 	port->log_size = TCPC_LOG_BUFFER_SIZE;
 	port->log_print = port->log_p;
-	memset(&(port->logbuffer), 0, TCPC_LOG_BUFFER_SIZE);
+	memset(&port->logbuffer, 0, TCPC_LOG_BUFFER_SIZE);
 
 	ret = uclass_get_device_by_seq(UCLASS_I2C, port->cfg.i2c_bus, &bus);
 	if (ret) {
@@ -1007,7 +1016,7 @@ int tcpc_init(struct tcpc_port *port, struct tcpc_port_config config, ss_mux_sel
 	ret = dm_i2c_probe(bus, port->cfg.addr, 0, &i2c_dev);
 	if (ret) {
 		printf("%s: Can't find device id=0x%x\n",
-			__func__, config.addr);
+		       __func__, config.addr);
 		return -ENODEV;
 	}
 
@@ -1017,7 +1026,7 @@ int tcpc_init(struct tcpc_port *port, struct tcpc_port_config config, ss_mux_sel
 	ret = tcpc_polling_reg(port, TCPC_POWER_STATUS, 1, TCPC_POWER_STATUS_UNINIT, 0, 1000);
 	if (ret) {
 		tcpc_log(port, "%s: Polling TCPC POWER STATUS Initialization Status bit failed, ret = %d\n",
-			__func__, ret);
+			 __func__, ret);
 		return ret;
 	}
 
@@ -1026,31 +1035,31 @@ int tcpc_init(struct tcpc_port *port, struct tcpc_port_config config, ss_mux_sel
 
 	/* Clear AllRegistersResetToDefault */
 	valb = 0x80;
-	ret = dm_i2c_write(port->i2c_dev, TCPC_FAULT_STATUS, (const uint8_t *)&valb, 1);
+	ret = dm_i2c_write(port->i2c_dev, TCPC_FAULT_STATUS, (const u8 *)&valb, 1);
 	if (ret) {
 		tcpc_log(port, "%s dm_i2c_read failed, err %d\n", __func__, ret);
 		return -EIO;
 	}
 
 	/* Read Vendor ID and Product ID */
-	ret = dm_i2c_read(port->i2c_dev, TCPC_VENDOR_ID, (uint8_t *)&vid, 2);
+	ret = dm_i2c_read(port->i2c_dev, TCPC_VENDOR_ID, (u8 *)&vid, 2);
 	if (ret) {
 		tcpc_log(port, "%s dm_i2c_read failed, err %d\n", __func__, ret);
 		return -EIO;
 	}
 
-	ret = dm_i2c_read(port->i2c_dev, TCPC_PRODUCT_ID, (uint8_t *)&pid, 2);
+	ret = dm_i2c_read(port->i2c_dev, TCPC_PRODUCT_ID, (u8 *)&pid, 2);
 	if (ret) {
 		tcpc_log(port, "%s dm_i2c_read failed, err %d\n", __func__, ret);
 		return -EIO;
 	}
 
 	tcpc_log(port, "TCPC:  Vendor ID [0x%x], Product ID [0x%x], Addr [I2C%u 0x%x]\n",
-		vid, pid, port->cfg.i2c_bus, port->cfg.addr);
+		 vid, pid, port->cfg.i2c_bus, port->cfg.addr);
 
 	if (!port->cfg.disable_pd) {
-		if  (port->cfg.port_type == TYPEC_PORT_UFP
-			|| port->cfg.port_type == TYPEC_PORT_DRP)
+		if (port->cfg.port_type == TYPEC_PORT_UFP ||
+		    port->cfg.port_type == TYPEC_PORT_DRP)
 			tcpc_pd_sink_init(port);
 	} else {
 		tcpc_pd_sink_disable(port);
