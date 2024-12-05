@@ -329,7 +329,7 @@ ulong board_spl_fit_size_align(ulong size)
 	 */
 
 	size = ALIGN(size, 0x1000);
-	size += CONFIG_CSF_SIZE;
+	size += 2 * CONFIG_CSF_SIZE;
 
 	return size;
 }
