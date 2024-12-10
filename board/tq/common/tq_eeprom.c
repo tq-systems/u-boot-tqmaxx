@@ -76,12 +76,13 @@ void tq_vard_show(const struct tq_vard *vard)
 	       (unsigned int)(vard->memtype & VARD_MEMTYPE_MASK_TYPE),
 	       (unsigned long)(tq_vard_ramsize(vard) / (SZ_1M)),
 	       (tq_vard_has_ramecc(vard) ? "ECC" : "no ECC"));
-	printf("RTC\t%c\nSPINOR\t%c\ne-MMC\t%c\nSE\t%c\nEEPROM\t%c\n",
-	       (tq_vard_has_rtc(vard) ? 'y' : 'n'),
-	       (tq_vard_has_spinor(vard) ? 'y' : 'n'),
+	printf("EEPROM\t%c\neMMC\t%c\nIMU\t%c\nRTC\t%c\nSE\t%c\nSPINOR\t%c\n",
+	       (tq_vard_has_eeprom(vard) ? 'y' : 'n'),
 	       (tq_vard_has_emmc(vard) ? 'y' : 'n'),
+	       (tq_vard_has_imu(vard) ? 'y' : 'n'),
+	       (tq_vard_has_rtc(vard) ? 'y' : 'n'),
 	       (tq_vard_has_secelem(vard) ? 'y' : 'n'),
-	       (tq_vard_has_eeprom(vard) ? 'y' : 'n'));
+	       (tq_vard_has_spinor(vard) ? 'y' : 'n'));
 	if (tq_vard_has_eeprom(vard))
 		printf("EEPROM\ttype %u, %lu KiB, page %lu\n",
 		       (unsigned int)(vard->eepromtype & VARD_EETYPE_MASK_MFR) >> 4,
