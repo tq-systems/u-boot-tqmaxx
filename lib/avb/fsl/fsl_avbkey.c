@@ -69,12 +69,12 @@ int spl_get_mmc_dev(void)
 }
 #endif
 
-#ifdef AVB_RPMB
-static u8 __attribute__((unused)) skeymod[] = {
+u8 skeymod[16] = {
 	0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08,
 	0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00
 };
 
+#ifdef AVB_RPMB
 struct mmc *get_mmc(void) {
 	int mmc_dev_no;
 	struct mmc *mmc;
@@ -592,26 +592,78 @@ int rpmb_init(void) {
 	if (!memcmp(hdr.magic, AVB_KBLB_MAGIC, AVB_KBLB_MAGIC_LEN))
 		return 0;
 	else
+#ifdef CONFIG_IMX_ROLLBACK_BLOB
+#ifdef CONFIG_RPMB_INIT_ALLOW
+		printf("RPMB magic not match, still bootup\n");
+#else
+	{
+		printf("RPMB magic not match\n");
+		return -1;
+	}
+#endif
+#endif
 		printf("initialize rollback index...\n");
 	/* init rollback index */
 #if defined(CONFIG_SPL_BUILD) && defined(CONFIG_IMX_TRUSTY_OS)
 	offset = BOOTLOADER_RBIDX_START;
-	rbidx_len = BOOTLOADER_RBIDX_LEN;
-	rbidx = malloc(rbidx_len);
+	rbidx = (uint8_t *)memalign(ARCH_DMA_MINALIGN, BOOTLOADER_RBIDX_LEN);
 	if (rbidx == NULL) {
 		ERR("failed to allocate memory!\n");
 		return -1;
 	}
-	memset(rbidx, 0, rbidx_len);
+
+	memset(rbidx, 0, BOOTLOADER_RBIDX_LEN);
 	*(uint64_t *)rbidx = BOOTLOADER_RBIDX_INITVAL;
+
 	tag = &hdr.bootloader_rbk_tags;
 	tag->offset = offset;
-	tag->len = rbidx_len;
-	if (rpmb_write(mmc_dev, rbidx, tag->len, tag->offset) != 0) {
-		ERR("write RBKIDX RPMB error\n");
+
+#if defined(CONFIG_IMX_ROLLBACK_BLOB)
+	rbidx_len = BLOB_SIZE(BOOTLOADER_RBIDX_LEN);
+
+	uint8_t *rbidx_blob;
+	rbidx_blob = (uint8_t *)memalign(ARCH_DMA_MINALIGN, rbidx_len);
+	uint8_t *keymod = (uint8_t *)memalign(ARCH_DMA_MINALIGN, sizeof(skeymod));
+
+	if (!rbidx_blob || !keymod) {
+		ERR("Memory malloc failed because not enough memory\n");
 		free(rbidx);
+		free(rbidx_blob);
+		free(keymod);
 		return -1;
 	}
+	memset(rbidx_blob, 0, rbidx_len);
+	memcpy(keymod, skeymod, sizeof(skeymod));
+
+	if (blob_encap(keymod, rbidx, rbidx_blob, BOOTLOADER_RBIDX_LEN, 0)) {
+		ERR("gen rollback index blob error\n");
+		free(rbidx);
+		free(rbidx_blob);
+		free(keymod);
+		return -1;
+	}
+
+	free(keymod);
+
+	tag->len = BLOB_SIZE(BOOTLOADER_RBIDX_LEN);
+	if (rpmb_write(mmc_dev, rbidx_blob, tag->len, tag->offset) != 0) {
+		free(rbidx_blob);
+		free(rbidx);
+		ERR("write RBKIDX RPMB error\n");
+		return -1;
+	}
+	if (rbidx_blob != NULL)
+		free(rbidx_blob);
+#else
+	rbidx_len = BOOTLOADER_RBIDX_LEN;
+
+	tag->len = rbidx_len;
+	if (rpmb_write(mmc_dev, rbidx, tag->len, tag->offset) != 0) {
+		free(rbidx);
+		ERR("write RBKIDX RPMB error\n");
+		return -1;
+	}
+#endif
 	if (rbidx != NULL)
 		free(rbidx);
 #else /* CONFIG_SPL_BUILD && CONFIG_IMX_TRUSTY_OS */
