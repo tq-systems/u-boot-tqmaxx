@@ -1351,13 +1351,6 @@ int do_rpmb_key_set(uint8_t *key, uint32_t key_size)
 		desc->hwpart = MMC_PART_RPMB;
 	}
 
-	if (mmc_rpmb_set_key(mmc, rpmb_key)) {
-		printf("ERROR - Key already programmed ?\n");
-		ret = -1;
-		goto fail;
-	} else
-		printf("RPMB key programed successfully!\n");
-
 	/* Generate keyblob with CAAM. */
 	memset((void *)&kp, 0, sizeof(struct keyslot_package));
 	kp.rpmb_keyblob_len = RPMBKEY_LENGTH + CAAM_PAD;
@@ -1371,6 +1364,13 @@ int do_rpmb_key_set(uint8_t *key, uint32_t key_size)
 		printf("RPMB key blob generated!\n");
 
 	memcpy(kp.rpmb_keyblob, blob, kp.rpmb_keyblob_len);
+
+	if (mmc_rpmb_set_key(mmc, rpmb_key)) {
+		printf("ERROR - Key already programmed ?\n");
+		ret = -1;
+		goto fail;
+	} else
+		printf("RPMB key programed successfully!\n");
 
 	/* Reset key after use */
 	memset(rpmb_key, 0, RPMBKEY_LENGTH);
