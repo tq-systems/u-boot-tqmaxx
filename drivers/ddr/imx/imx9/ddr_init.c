@@ -403,8 +403,6 @@ int ddr_init(struct dram_timing_info *dram_timing)
 	ddrphy_qb_save();
 #endif
 #endif
-	/* save the ddr PHY trained CSR in memory for low power use */
-	ddrphy_trained_csr_save(ddrphy_trained_csr, ddrphy_trained_csr_num);
 
 	debug("DDRINFO: ddrphy config done\n");
 

@@ -91,5 +91,9 @@ int ddr_cfg_phy(struct dram_timing_info *dram_timing)
 		dram_cfg++;
 	}
 
+	/* save the ddr PHY trained CSR in memory for low power use */
+	ddrphy_trained_csr_save(dram_timing->ddrphy_trained_csr,
+				dram_timing->ddrphy_trained_csr_num);
+
 	return 0;
 }
