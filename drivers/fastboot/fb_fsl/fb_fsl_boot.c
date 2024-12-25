@@ -1118,7 +1118,10 @@ int do_boota(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[]) {
 	trusty_populate_sk_key((void *)(ulong)fdt_addr);
 
 #ifdef CONFIG_IMX_SUPPORT_SRM
-	hwcrypto_load_srm();
+	char *keystore = env_get("keystore");
+	if ((keystore != NULL) && (!strcmp(keystore, "trusty"))) {
+		hwcrypto_load_srm();
+	}
 #endif
 #endif
 
