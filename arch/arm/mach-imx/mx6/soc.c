@@ -598,10 +598,30 @@ const struct boot_mode soc_boot_modes[] = {
 enum boot_device get_boot_device(void)
 {
 	enum boot_device boot_dev = UNKNOWN_BOOT;
-	uint soc_sbmr = readl(SRC_BASE_ADDR + 0x4);
+	uint bmode = readl(&src_base->sbmr2);
+	uint soc_sbmr = readl(&src_base->sbmr1);
 	uint bt_mem_ctl = (soc_sbmr & 0x000000FF) >> 4;
 	uint bt_mem_type = (soc_sbmr & 0x00000008) >> 3;
 	uint bt_dev_port = (soc_sbmr & 0x00001800) >> 11;
+
+	/*
+	 * Check for BMODE if serial downloader is enabled
+	 * BOOT_MODE - see IMX6DQRM Table 8-1
+	 */
+	if (((bmode >> 24) & 0x03) == 0x01) /* Serial Downloader */
+		return USB_BOOT;
+
+	/*
+	 * The above method does not detect that the boot ROM used
+	 * serial downloader in case the boot ROM decided to use the
+	 * serial downloader as a fall back (primary boot source failed).
+	 *
+	 * Infer that the boot ROM used the USB serial downloader by
+	 * checking whether the USB PHY is currently active... This
+	 * assumes that SPL did not (yet) initialize the USB PHY...
+	 */
+	if (is_usbotg_phy_active())
+		return USB_BOOT;
 
 	switch (bt_mem_ctl) {
 	case 0x0:
