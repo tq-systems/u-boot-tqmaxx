@@ -51,6 +51,7 @@
 #define ELE_ATTEST_REQ (0xDB)
 #define ELE_RELEASE_PATCH_REQ (0xDC)
 #define ELE_OTP_SEQ_SWITH_REQ (0xDD)
+#define ELE_SET_GMID_REQ (0xE4)
 #define ELE_WRITE_SHADOW_REQ (0xF2)
 #define ELE_READ_SHADOW_REQ (0xF3)
 
@@ -180,4 +181,5 @@ int ele_v2x_get_state(struct v2x_get_state *state, u32 *response);
 int ele_volt_change_start_req(void);
 int ele_volt_change_finish_req(void);
 int ele_message_call(struct ele_msg *msg);
+int ele_set_gmid(u32 *response);
 #endif
