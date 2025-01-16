@@ -293,6 +293,12 @@ config SF_DEFAULT_SPEED
 config SF_DEFAULT_MODE
 	default 0
 
+config MTDPARTS_DEFAULT
+	default "mtdparts=30bb0000.spi:4m@0k(bootstream),64k@4096k(env0),64k@4160k(env1),-@6m(ubi)"
+
+config MTDIDS_DEFAULT
+	default "nor0=30bb0000.spi"
+
 #
 # environment settings: 32k, offset 4M (SPI NOR sector 64k), redundant env
 # in SPI NOR @ 4M + 64k
