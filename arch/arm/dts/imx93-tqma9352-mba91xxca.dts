@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
 /*
- * Copyright (c) 2022-2023 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * Copyright (c) 2022-2024 TQ-Systems GmbH <linux@ew.tq-group.com>,
  * D-82229 Seefeld, Germany.
  * Author: Markus Niebel
  * Author: Alexander Stein
@@ -53,7 +53,7 @@
 		status = "disabled";
 
 		port {
-			panel_in_dpi: endpoint {
+			panel_in: endpoint {
 			};
 		};
 	};
@@ -354,19 +354,6 @@
 		reg = <0x1c>;
 	};
 
-	polytouch: touchscreen@38 {
-		compatible = "edt,edt-ft5406";
-		reg = <0x38>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_touch>;
-		interrupt-parent = <&gpio1>;
-		interrupts = <11 IRQ_TYPE_EDGE_FALLING>;
-		reset-gpios = <&expander2 0 GPIO_ACTIVE_LOW>;
-		iovcc-supply = <&reg_3v3>;
-		vcc-supply = <&reg_3v3>;
-		status = "disabled";
-	};
-
 	ptn5110: usb-typec@50 {
 		compatible = "nxp,ptn5110", "tcpci";
 		reg = <0x50>;
@@ -416,6 +403,13 @@
 				  "MPCIE_1V5_EN", "MPCIE_3V3_EN",
 				  "MPCIE_PERST#", "MPCIE_WDISABLE#",
 				  "BUTTON_A#", "BUTTON_B#";
+
+		temp-event-mod-hog {
+			gpio-hog;
+			gpios = <0 GPIO_ACTIVE_LOW>;
+			input;
+			line-name = "TEMP_EVENT_MOD#";
+		};
 
 		mpcie-wake-hog {
 			gpio-hog;
@@ -570,7 +564,7 @@
 	samsung,picophy-dc-vol-level-adjust = <7>;
 	status = "okay";
 
-	hub_2_0: usb-hub@1 {
+	hub_2_0: hub@1 {
 		compatible = "usb424,2517";
 		reg = <1>;
 		reset-gpios = <&expander1 2 GPIO_ACTIVE_LOW>;

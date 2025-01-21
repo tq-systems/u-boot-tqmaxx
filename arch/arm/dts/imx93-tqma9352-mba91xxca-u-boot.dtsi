@@ -28,6 +28,52 @@
 	};
 };
 
+&gpio1 {
+	tcpc-irq-hog {
+		gpio-hog;
+		gpios = <10 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "USB_C_ALERT#";
+	};
+
+	lcd-int-hog {
+		gpio-hog;
+		gpios = <11 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "BM2_LCD_INT#";
+	};
+
+	expander-irq-hog {
+		gpio-hog;
+		gpios = <12 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "PEX_INT#";
+	};
+
+	rtc-irq-hog {
+		gpio-hog;
+		gpios = <14 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "RTC_EVENT#";
+	};
+};
+
+&gpio3 {
+	ethphy-eqos-irq-hog {
+		gpio-hog;
+		gpios = <26 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "ENET1_INT#";
+	};
+
+	ethphy-fec-irq-hog {
+		gpio-hog;
+		gpios = <27 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "ENET2_INT#";
+	};
+};
+
 &lpuart1 {
 	bootph-pre-ram;
 	bootph-some-ram;
