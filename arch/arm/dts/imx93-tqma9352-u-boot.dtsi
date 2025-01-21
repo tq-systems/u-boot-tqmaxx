@@ -37,6 +37,15 @@
 	/delete-property/ vcc-supply;
 };
 
+&gpio1 {
+	pmic-irq-hog {
+		gpio-hog;
+		gpios = <3 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "PMIC_IRQ#";
+	};
+};
+
 &lpi2c1 {
 	bootph-all;
 	bootph-pre-ram;
