@@ -20,10 +20,10 @@
 #include <imx_thermal.h>
 #include <thermal.h>
 #include <scmi_agent.h>
+#include <scmi_nxp_protocols.h>
 #include <linux/bitops.h>
 #include <linux/bitfield.h>
-#include "../dts/upstream/src/arm64/freescale/imx95-power.h"
-#include <scmi_nxp_protocols.h>
+#include "common.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -212,7 +212,7 @@ u32 get_cpu_rev(void)
 {
 	u32 rev = (gd->arch.soc_rev >> 24) - 0xa0;
 
-	return (MXC_CPU_IMX95 << 12) | (CHIP_REV_1_0 + rev);
+	return (SCMI_CPU << 12) | (CHIP_REV_1_0 + rev);
 }
 
 #define UNLOCK_WORD 0xD928C520 /* unlock word */
@@ -471,12 +471,16 @@ void imx_get_mac_from_fuse(int dev_id, unsigned char *mac)
 {
 	u32 val[2] = {};
 	int ret, num_of_macs;
+	u32 bank = 40;
 
-	ret = fuse_read(40, 5, &val[0]);
+	if (is_imx94())
+		bank = 66;
+
+	ret = fuse_read(bank, 5, &val[0]);
 	if (ret)
 		goto err;
 
-	ret = fuse_read(40, 6, &val[1]);
+	ret = fuse_read(bank, 6, &val[1]);
 	if (ret)
 		goto err;
 
@@ -492,10 +496,32 @@ void imx_get_mac_from_fuse(int dev_id, unsigned char *mac)
 	mac[3] = (val[0] >> 24) & 0xff;
 	mac[4] = val[1] & 0xff;
 	mac[5] = (val[1] >> 8) & 0xff;
-	if (dev_id == 1)
-		mac[5] = mac[5] + 3;
-	if (dev_id == 2)
-		mac[5] = mac[5] + 6;
+
+	if (is_imx94()) {
+		/*
+		 * i.MX94 uses the following mac address offset list:
+		 * | No.    | Module      | Mac address user          |
+		 * |--------|-------------|---------------------------|
+		 * | 0 ~ 1  | ethercat    | port0/port1               |
+		 * | 2      | netc switch | internal enetc3 mac/swp0  |
+		 * | 3 ~ 6  |             | enetc3 vf1~3/swp1         |
+		 * | 7      | enetc mac   | enetc0 pf                 |
+		 * | 8      |             | enetc1 pf                 |
+		 * | 9      |             | enetc2 pf                 |
+		 * | 10     | netc switch | swp2                      |
+		*/
+		if (dev_id == 0)
+			mac[5] = mac[5] + 2; /* enetc3 mac/swp0 */
+		if (dev_id == 1)
+			mac[5] = mac[5] + 8; /* enetc1 */
+		if (dev_id == 2)
+			mac[5] = mac[5] + 9; /* enetc2 */
+	} else {
+		if (dev_id == 1)
+			mac[5] = mac[5] + 3;
+		if (dev_id == 2)
+			mac[5] = mac[5] + 6;
+	}
 
 	debug("%s: MAC%d: %02x.%02x.%02x.%02x.%02x.%02x\n",
 	      __func__, dev_id, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
@@ -644,7 +670,7 @@ int power_on_m7(char *name)
 	}
 
 	/* Power up M7MIX */
-	ret = scmi_pwd_state_set(dev, 0, IMX95_PD_M7, 0);
+	ret = scmi_pwd_state_set(dev, 0, SCMI_PD(M70), 0);
 	if (ret) {
 		printf("Power M7 failed\n");
 		return -EIO;
@@ -660,8 +686,8 @@ int power_on_m7(char *name)
 const char *get_imx_type(u32 imxtype)
 {
 	switch (imxtype) {
-	case MXC_CPU_IMX95:
-		return "95";/* iMX95 FULL */
+	case SCMI_CPU:
+		return IMX_PLAT_STR;
 	default:
 		return "??";
 	}
@@ -1111,7 +1137,7 @@ static bool is_m7_off(void)
 	if (ret)
 		return ret;
 
-	ret = scmi_pwd_state_get(dev, IMX95_PD_M7, &state);
+	ret = scmi_pwd_state_get(dev, SCMI_PD(M70), &state);
 	if (ret)
 		printf("scmi_pwd_state_get Failed %d for M7\n", ret);
 
@@ -1288,6 +1314,10 @@ int arch_cpu_init(void)
 		gpio_reset(GPIO3_BASE_ADDR);
 		gpio_reset(GPIO4_BASE_ADDR);
 		gpio_reset(GPIO5_BASE_ADDR);
+#if IS_ENABLED(CONFIG_IMX94)
+		gpio_reset(GPIO6_BASE_ADDR);
+		gpio_reset(GPIO7_BASE_ADDR);
+#endif
 	}
 
 	return 0;
