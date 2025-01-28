@@ -116,23 +116,32 @@ int tq_bb_board_mmc_init(struct bd_info *bis)
 void board_boot_order(u32 *spl_boot_list)
 {
 	u32 bmode = imx6_src_get_boot_mode();
-	u8 boot_dev = BOOT_DEVICE_MMC1;
 	u8 imx6_bmode = (bmode & IMX6_BMODE_MASK) >> IMX6_BMODE_SHIFT;
+
+	/* USB boot */
+	if (spl_boot_device() == BOOT_DEVICE_BOARD) {
+		puts("USB\n");
+		spl_boot_list[0] = BOOT_DEVICE_BOARD;
+		return;
+	}
 
 	switch (imx6_bmode) {
 	case IMX6_BMODE_SD:
 	case IMX6_BMODE_ESD:
 		/* SD/eSD - BOOT_DEVICE_MMC2 */
 		puts("SD\n");
-		boot_dev = BOOT_DEVICE_MMC2;
+		spl_boot_list[0] = BOOT_DEVICE_MMC2;
 		break;
 	case IMX6_BMODE_MMC:
 	case IMX6_BMODE_EMMC:
 		/* MMC/eMMC - BOOT_DEVICE_MMC1 */
 		puts("eMMC\n");
-		boot_dev = BOOT_DEVICE_MMC1;
+		spl_boot_list[0] = BOOT_DEVICE_MMC1;
 		break;
 	case IMX6_BMODE_SERIAL_ROM:
+		/* SERIAL_ROM - BOOT_DEVICE_BOARD */
+		puts("Serial ROM\n");
+		spl_boot_list[0] = BOOT_DEVICE_BOARD;
 		switch ((imx6_bmode & IMX6_BMODE_SERIAL_ROM_MASK) >>
 			IMX6_BMODE_SERIAL_ROM_SHIFT) {
 		case IMX6_BMODE_ECSPI1:
@@ -140,7 +149,7 @@ void board_boot_order(u32 *spl_boot_list)
 		case IMX6_BMODE_ECSPI3:
 		case IMX6_BMODE_ECSPI4:
 		case IMX6_BMODE_ECSPI5:
-			boot_dev = BOOT_DEVICE_SPI;
+			spl_boot_list[0] = BOOT_DEVICE_SPI;
 			break;
 		default:
 			/* Default - BOOT_DEVICE_MMC1 */
@@ -151,10 +160,9 @@ void board_boot_order(u32 *spl_boot_list)
 	default:
 		/* Default - BOOT_DEVICE_MMC1 */
 		puts("Wrong board boot order\n");
+		spl_boot_list[0] = BOOT_DEVICE_MMC1;
 		break;
 	}
-
-	spl_boot_list[0] = boot_dev;
 }
 
 int board_fit_config_name_match(const char *name)
