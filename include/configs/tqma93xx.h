@@ -44,6 +44,7 @@
 	"kernel_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0"        \
 	"pxefile_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0"       \
 	"fdt_addr_r=0x83000000\0"                                      \
+	"fdtoverlay_addr_r=0x83040000\0"                               \
 	"initrd_addr=0x83800000\0"                                     \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0"             \
 	"mmcfwpart=1\0"                                                \
