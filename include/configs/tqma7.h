@@ -22,11 +22,15 @@
 #define PHYS_SDRAM_SIZE			SZ_2G
 #endif
 
+/* 128 MiB offset as in ARM related docs for Linux suggested */
+#define TQMA7_FDT_ADDRESS		0x88000000
+#define FDT_OVERLAY_ADDR		(TQMA7_FDT_ADDRESS + SZ_256K)
 /*
  * above 128 MiB offset as in ARM related docu for linux suggested
  * DTB is loaded at 128 MiB, so use just 16 MiB more
  */
-#define TQMA7_INITRD_ADDRESS		0x89000000
+#define TQMA7_INITRD_ADDRESS		(TQMA67_FDT_ADDRESS + SZ_16M)
+
 
 #define TQMA7_UBOOT_OFFSET		SZ_1K
 #define TQMA7_MMC_UBOOT_SECTOR_START	0x2
@@ -52,15 +56,15 @@
 #define TQMA7_M4_ENV
 #endif
 
-/* 128 MiB offset as in ARM related docs for Linux suggested */
-#define TQMA7_FDT_ADDRESS		0x88000000
-
 #define TQMA7_MODULE_ENV_SETTINGS \
 	"board=tqma7\0"                                                        \
 	"boot_os=bootz ${loadaddr} - ${fdt_addr_r}\0"                          \
 	"fdt_addr_r=" __stringify(TQMA7_FDT_ADDRESS) "\0"                      \
+	"fdtoverlay_addr_r=" __stringify(FDT_OVERLAY_ADDR)"\0"                 \
 	"image=zImage\0"                                                       \
-	"kernel_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0"                \
+	"kernel_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR)"\0"                 \
+	"pxefile_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0"               \
+	"ramdisk_addr_r=" __stringify(TQMA7_INITRD_ADDRESS) "\0"               \
 	"netdev=eth0\0"                                                        \
 	"ipmode=static\0"                                                      \
 	"uboot=u-boot-dtb.imx\0"                                               \
