@@ -68,7 +68,6 @@
 	"pxefile_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0"               \
 	"ramdisk_addr_r=" __stringify(TQMA7_INITRD_ADDRESS) "\0"               \
 	"netdev=eth0\0"                                                        \
-	"ipmode=static\0"                                                      \
 	"uboot=u-boot-dtb.imx\0"                                               \
 	"uboot_mmc_start=" __stringify(TQMA7_MMC_UBOOT_SECTOR_START) "\0"      \
 	"uboot_mmc_size=" __stringify(TQMA7_MMC_UBOOT_SECTOR_COUNT) "\0"       \
