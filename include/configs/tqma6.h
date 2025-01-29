@@ -28,6 +28,10 @@
 
 /* 128 MiB offset as in ARM related docu for linux suggested */
 #define TQMA6_FDT_ADDRESS	0x18000000
+#define FDT_OVERLAY_ADDR	(TQMA6_FDT_ADDRESS + SZ_256K)
+
+/* 16MiB above TQMA6_FDT_ADDRESS */
+#define TQMA6_INITRD_ADDRESS	(TQMA6_FDT_ADDRESS + SZ_16M)
 
 #define TQMA6_SPI_FLASH_SECTOR_SIZE SZ_64K
 
@@ -35,8 +39,11 @@
 	"board=tqma6\0"                                                        \
 	"boot_os=bootz ${kernel_addr_r} - ${fdt_addr_r}\0"                     \
 	"fdt_addr_r=" __stringify(TQMA6_FDT_ADDRESS)"\0"                       \
+	"fdtoverlay_addr_r=" __stringify(FDT_OVERLAY_ADDR)"\0"                 \
 	"image=zImage\0"                                                       \
 	"kernel_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0"                \
+	"pxefile_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0"               \
+	"ramdisk_addr_r=" __stringify(TQMA6UL_INITRD_ADDRESS) "\0"             \
 	"mmcautodetect=yes\0"                                                  \
 	"mmcblkdev=0\0"                                                        \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV)"\0"                      \
