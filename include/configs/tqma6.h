@@ -36,6 +36,8 @@
 #define TQMA6_SPI_FLASH_SECTOR_SIZE SZ_64K
 
 #define CFG_MODULE_ENV_SETTINGS                                                \
+	"emmc_dev=0\0"                                                         \
+	"sd_dev=1\0"                                                           \
 	"board=tqma6\0"                                                        \
 	"boot_os=bootz ${kernel_addr_r} - ${fdt_addr_r}\0"                     \
 	"fdt_addr_r=" __stringify(TQMA6_FDT_ADDRESS)"\0"                       \
