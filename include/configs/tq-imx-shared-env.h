@@ -28,9 +28,9 @@
 					"fdt address ${fdt_addr_r}; "  \
 					"fdt resize 0x100000; "        \
 					"for overlay in ${fdt_overlays}; do "\
-						"ubifsload ${overlay_addr_r} "\
+						"ubifsload ${fdtoverlay_addr_r} "\
 						"/boot/${overlay} && " \
-						"fdt apply ${overlay_addr_r}; "\
+						"fdt apply ${fdtoverlay_addr_r}; "\
 					"done; "                       \
 				"fi; "                                 \
 				"ubifsumount; "                        \
@@ -151,9 +151,9 @@
 		"fdt resize 0x100000;"                                 \
 		"for overlay in ${fdt_overlays}; do "                  \
 			"load mmc ${mmcdev}:${mmcpart} "               \
-				"${overlay_addr_r} "                   \
+				"${fdtoverlay_addr_r} "                \
 				"${mmcpath}/${overlay} && "            \
-			"fdt apply ${overlay_addr_r}; "                \
+			"fdt apply ${fdtoverlay_addr_r}; "             \
 		"done;\0"                                              \
 	"mmcargs=run addtty addmmc\0"                                  \
 	"mmcboot=echo Booting from mmc ...; "                          \
@@ -196,9 +196,9 @@
 		"fdt address ${fdt_addr_r};"                           \
 		"fdt resize 0x100000;"                                 \
 		"for overlay in ${fdt_overlays}; do "                  \
-			"nfs ${overlay_addr_r} "                       \
+			"nfs ${fdtoverlay_addr_r} "                       \
 				"${serverip}:${rootpath}/boot/${overlay} && "\
-			"fdt apply ${overlay_addr_r}; "                \
+			"fdt apply ${fdtoverlay_addr_r}; "                \
 		"done;\0"                                              \
 	"nfsboot="                                                     \
 		"echo Booting from nfs ...; "                          \
@@ -240,8 +240,8 @@
 		"fdt address ${fdt_addr_r}; "                          \
 		"fdt resize 0x100000;"                                 \
 		"for overlay in ${fdt_overlays}; do "                  \
-			"if tftp ${overlay_addr_r} ${overlay}; then "  \
-				"fdt apply ${overlay_addr_r}; "        \
+			"if tftp ${fdtoverlay_addr_r} ${overlay}; then "  \
+				"fdt apply ${fdtoverlay_addr_r}; "        \
 			"else "                                        \
 				"exit; "                               \
 			"fi; "                                         \
