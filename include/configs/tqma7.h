@@ -57,6 +57,8 @@
 #endif
 
 #define TQMA7_MODULE_ENV_SETTINGS \
+	"emmc_dev=0\0"                                                         \
+	"sd_dev=1\0"                                                           \
 	"board=tqma7\0"                                                        \
 	"boot_os=bootz ${loadaddr} - ${fdt_addr_r}\0"                          \
 	"fdt_addr_r=" __stringify(TQMA7_FDT_ADDRESS) "\0"                      \
