@@ -14,9 +14,10 @@
 
 /* 128 MiB offset as suggested in ARM related Linux docs */
 #define TQMA6UL_FDT_ADDRESS		0x88000000
+#define FDT_OVERLAY_ADDR		(TQMA6UL_FDT_ADDRESS + SZ_256K)
 
 /* 16MiB above TQMA6UL_FDT_ADDRESS */
-#define TQMA6UL_INITRD_ADDRESS		0x89000000
+#define TQMA6UL_INITRD_ADDRESS		(TQMA6UL_FDT_ADDRESS + SZ_16M)
 
 /* Physical Memory Map */
 #define PHYS_SDRAM			MMDC0_ARB_BASE_ADDR
@@ -44,12 +45,13 @@
 	"emmc_dev=0\0"                                                           \
 	"sd_dev=1\0"                                                             \
 	"board=tqma6ul\0"                                                        \
-	"boot_type=bootz\0"                                                      \
-	"boot_os=${boot_type} ${kernel_addr_r} - ${fdt_addr_r}\0"                \
+	"boot_os=bootz ${kernel_addr_r} - ${fdt_addr_r}\0"                       \
 	"fdt_addr_r=" __stringify(TQMA6UL_FDT_ADDRESS)"\0"                       \
+	"fdtoverlay_addr_r=" __stringify(FDT_OVERLAY_ADDR)"\0"                   \
 	"image=zImage\0"                                                         \
 	"kernel_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR)"\0"                   \
 	"pxefile_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0"                 \
+	"ramdisk_addr_r=" __stringify(TQMA6UL_INITRD_ADDRESS) "\0"               \
 	"mmcautodetect=yes\0"                                                    \
 	"mmcblkdev=0\0"                                                          \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV)"\0"                        \
