@@ -37,6 +37,9 @@ extern struct dram_timing_info tqma93xxla_dram_timing_1gb5;
 extern struct dram_timing_info tqma93xxca_dram_timing_2gb;
 extern struct dram_timing_info tqma93xxla_dram_timing_2gb;
 
+extern struct dram_timing_info tqma91xxca_dram_timing_1gb;
+extern struct dram_timing_info tqma91xxla_dram_timing_1gb;
+
 enum tqma93xxxa_ram_size {
 	TQMA93XXXA_RAM_SIZE_1G = 1,
 	TQMA93XXXA_RAM_SIZE_1G5,
@@ -50,11 +53,16 @@ struct dram_info {
 };
 
 static const struct dram_info tqma93xx_dram_info[]  = {
+#if IS_ENABLED(CONFIG_IMX91)
+	{ &tqma91xxca_dram_timing_1gb, SZ_1G * 1ULL, 'c' },
+	{ &tqma91xxla_dram_timing_1gb, SZ_1G * 1ULL, 'l' },
+#elif IS_ENABLED(CONFIG_IMX93)
 	{ &tqma93xxca_dram_timing_1gb, SZ_1G * 1ULL, 'c' },
 	{ &tqma93xxca_dram_timing_2gb, SZ_1G * 2ULL, 'c' },
 	{ &tqma93xxla_dram_timing_1gb, SZ_1G * 1ULL, 'l' },
 	{ &tqma93xxla_dram_timing_1gb5, SZ_512M * 3ULL, 'l' },
 	{ &tqma93xxla_dram_timing_2gb, SZ_1G * 2ULL, 'l' },
+#endif
 };
 
 static int tqma93xx_ram_timing_idx = -1;
@@ -296,6 +304,16 @@ static int power_init_board(void)
 		/* set standby voltage to 0.65v */
 		pmic_reg_write(dev, PCA9450_BUCK1OUT_DVS1, trim_val);
 
+		if (IS_ENABLED(CONFIG_IMX91)) {
+			puts("TQMa91xx: LPDDR4\n");
+			/* Set VDDQ to 1.1V from buck2 (LPDDR4): 600 mV + 40 * 12.5 mV */
+			pmic_reg_write(dev, PCA9450_BUCK2OUT_DVS0, 40);
+
+		} else if (IS_ENABLED(CONFIG_IMX93)) {
+			puts("TQMa93xx: LPDDR4x\n");
+			/* Set VDDQ to 0.6V from buck2 (LPDDR4x): 600 mV + 0 * 12.5 mV */
+			pmic_reg_write(dev, PCA9450_BUCK2OUT_DVS0, 0);
+		}
 		/*
 		 * I2C_LT_EN: I2C level translator Forcedly Disable (POR default)
 		 * usage is dicouraged by TQ Systems according to in house testing
@@ -359,10 +377,12 @@ void board_init_f(ulong dummy)
 	tq_vard_show(&vard);
 	spl_dram_init(ramtype);
 
-	/* Put M33 into CPUWAIT for following kick */
-	ret = m33_prepare();
-	if (ret)
-		printf("ERROR: M33 prepare %d\n", ret);
+	if (CONFIG_IS_ENABLED(IMX93)) {
+		/* Put M33 into CPUWAIT for following kick */
+		ret = m33_prepare();
+		if (ret)
+			printf("ERROR: M33 prepare %d\n", ret);
+	}
 
 	board_init_r(NULL, 0);
 }

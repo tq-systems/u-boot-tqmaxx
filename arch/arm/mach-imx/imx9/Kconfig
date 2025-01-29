@@ -44,6 +44,15 @@ config TARGET_IMX91_9X9_QSB
 	select IMX91
 	select IMX9_LPDDR4X
 
+config TARGET_TQMA91XX
+	bool "TQMa91xx family of SOM"
+	select IMX91
+	select IMX9_LPDDR4X
+	help
+	  This enables support for TQ-Systems GmbH family of i.MX91
+	  based SOM supporting different i.MX91 variants and different
+	  SOM form factors
+
 config TARGET_IMX93_14X14_EVK
 	bool "imx93_14x14_evk"
 	select IMX93

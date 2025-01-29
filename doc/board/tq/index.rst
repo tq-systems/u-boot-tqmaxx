@@ -6,4 +6,5 @@ TQ-Systems GmbH
 .. toctree::
    :maxdepth: 2
 
+   tqma91xx
    tqma93xx

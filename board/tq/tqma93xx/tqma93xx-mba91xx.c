@@ -12,7 +12,11 @@
 #include <asm/arch/clock.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/arch-imx9/ccm_regs.h>
+#if CONFIG_IS_ENABLED(IMX91)
+#include <asm/arch-imx9/imx91_pins.h>
+#elif CONFIG_IS_ENABLED(IMX93)
 #include <asm/arch-imx9/imx93_pins.h>
+#endif
 #include <asm/mach-imx/iomux-v3.h>
 #include <asm-generic/gpio.h>
 
@@ -26,8 +30,13 @@ DECLARE_GLOBAL_DATA_PTR;
 #define UART_PAD_CTRL	(PAD_CTL_DSE(6) | PAD_CTL_FSEL2)
 
 static const iomux_v3_cfg_t uart_pads[] = {
+#if CONFIG_IS_ENABLED(MX91)
+	MX91_PAD_UART1_RXD__LPUART1_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
+	MX91_PAD_UART1_TXD__LPUART1_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
+#elif CONFIG_IS_ENABLED(MX93)
 	MX93_PAD_UART1_RXD__LPUART1_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
 	MX93_PAD_UART1_TXD__LPUART1_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
+#endif
 };
 
 /*

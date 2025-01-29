@@ -1,4 +1,4 @@
-if TARGET_TQMA93XX
+if TARGET_TQMA91XX || TARGET_TQMA93XX
 
 config SYS_BOARD
 	default "tqma93xx"

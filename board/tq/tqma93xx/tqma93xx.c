@@ -48,6 +48,11 @@ static struct tq_eeprom_data eeprom;
 static const char *tq_get_boardname(void)
 {
 	switch (get_cpu_type()) {
+	case MXC_CPU_IMX91:
+		return "TQMa9131"; /* iMX91 11x11 full */
+	case MXC_CPU_IMX9121:
+		return "TQMa9121"; /* iMX91 11x11 reduced */
+	/* IMX9111 / IMX9101 not assambled, 9x9mm package */
 	case MXC_CPU_IMX93:
 		return "TQMa9352"; /* iMX93 Dual core with NPU */
 	case MXC_CPU_IMX9351:
@@ -190,6 +195,7 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 }
 #endif
 
+#if CONFIG_IS_ENABLED(IMX93)
 /* see MAX_CMDLINE_SIZE in boot/bootm.c */
 #define BOARD_CMDLINE_SIZE SZ_4K
 static char board_bootargs[BOARD_CMDLINE_SIZE];
@@ -210,6 +216,7 @@ char *board_fdt_chosen_bootargs(void)
 
 	return bootargs;
 }
+#endif
 
 int board_late_init(void)
 {
