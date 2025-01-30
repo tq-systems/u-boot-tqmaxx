@@ -33,27 +33,6 @@
 
 #define TQMA6_SPI_FLASH_SECTOR_SIZE SZ_64K
 
-#define CFG_MODULE_ENV_SETTINGS                                                \
-	"emmc_dev=0\0"                                                         \
-	"sd_dev=1\0"                                                           \
-	"board=tqma6\0"                                                        \
-	"boot_os=bootz ${kernel_addr_r} - ${fdt_addr_r}\0"                     \
-	"fdt_addr_r=" __stringify(TQMA6_FDT_ADDRESS)"\0"                       \
-	"fdtoverlay_addr_r=" __stringify(FDT_OVERLAY_ADDR)"\0"                 \
-	"image=zImage\0"                                                       \
-	"kernel_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0"                \
-	"pxefile_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0"               \
-	"ramdisk_addr_r=" __stringify(TQMA6UL_INITRD_ADDRESS) "\0"             \
-	"mmcautodetect=yes\0"                                                  \
-	"mmcblkdev=0\0"                                                        \
-	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV)"\0"                      \
-	"netdev=eth0\0"                                                        \
-	"uboot=u-boot.imx\0"                                                   \
-	"uboot_mmc_size=0x7fe\0"                                               \
-	"uboot_mmc_start=0x2\0"                                                \
-	"uboot_spi_sector_size=" __stringify(TQMA6_SPI_FLASH_SECTOR_SIZE) "\0" \
-	"uboot_spi_size=0xa0000\0"                                             \
-	"uboot_spi_start=0x400\0"                                              \
 
 /* Physical Memory Map */
 #define PHYS_SDRAM		MMDC0_ARB_BASE_ADDR
@@ -75,12 +54,41 @@
 #error "No baseboard for the TQMa6 defined!"
 #endif
 
+#define TQMA6_MMC_UBOOT_SECTOR_START	0x2
+#define TQMA6_MMC_UBOOT_SECTOR_COUNT	0x7fe
+
+#define TQMA6_SPI_FLASH_SECTOR_SIZE	SZ_64K
+#define TQMA6_SPI_UBOOT_START		0x400
+#define TQMA6_SPI_UBOOT_SIZE		0xa0000
+
+#define CFG_MODULE_ENV_SETTINGS                                                \
+	"emmc_dev=0\0"                                                         \
+	"sd_dev=1\0"                                                           \
+	"board=tqma6\0"                                                        \
+	"boot_os=bootz ${kernel_addr_r} - ${fdt_addr_r}\0"                     \
+	"fdt_addr_r=" __stringify(TQMA6_FDT_ADDRESS)"\0"                       \
+	"fdtoverlay_addr_r=" __stringify(FDT_OVERLAY_ADDR)"\0"                 \
+	"image=zImage\0"                                                       \
+	"kernel_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0"                \
+	"pxefile_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0"               \
+	"ramdisk_addr_r=" __stringify(TQMA6UL_INITRD_ADDRESS) "\0"             \
+	"mmcautodetect=yes\0"                                                  \
+	"mmcblkdev=0\0"                                                        \
+	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV)"\0"                      \
+	"netdev=eth0\0"                                                        \
+	"uboot=u-boot.imx\0"                                                   \
+	"uboot_mmc_start=" __stringify(TQMA6_MMC_UBOOT_SECTOR_START)"\0"       \
+	"uboot_mmc_size=" __stringify(TQMA6_MMC_UBOOT_SECTOR_COUNT) "\0"       \
+	"uboot_spi_sector_size=" __stringify(TQMA6_SPI_FLASH_SECTOR_SIZE) "\0" \
+	"uboot_spi_start=" __stringify(TQMA6_SPI_UBOOT_START) "\0"             \
+	"uboot_spi_size=" __stringify(TQMA6_SPI_UBOOT_SIZE) "\0"               \
+
 #include "tq-imx-shared-env.h"
 
 #define CFG_EXTRA_ENV_SETTINGS		\
 	TQ_IMX_SHARED_ENV_SETTINGS	\
 	CFG_MODULE_ENV_SETTINGS		\
-	TQ_IMX_LEGACY_SPI_UBOOT_UPDATE	\
 	BB_ENV_SETTINGS			\
+	TQ_IMX_LEGACY_SPI_UBOOT_UPDATE	\
 
 #endif /* __CONFIG_H */
