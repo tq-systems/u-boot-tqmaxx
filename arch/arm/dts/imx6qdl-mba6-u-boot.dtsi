@@ -41,7 +41,7 @@
 };
 
 &usbotg {
-	status = "disabled";
+	status = "okay";
 };
 
 &usdhc2 {
