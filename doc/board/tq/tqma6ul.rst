@@ -72,6 +72,7 @@ The following boot sources are supported:
 
 - SD/eMMC
 - QSPI-NOR
+- USB / SDP
 
 ********
 Building
@@ -111,22 +112,25 @@ To build U-Boot for the TQ-Systems TQMa6UL[L]x[L] modules:
 +------+----------+
 | qspi | QSPI-NOR |
 +------+----------+
+| mfg  | USB/SDP  |
++------+----------+
 
 The default build artifact is named ``u-boot-with-spl.imx``.
 The QSPI header is added during updating qspi image with prepared update script
 ``run update_uboot_spi``
 
-***********************************
-Serial Download Protocol (with uuu)
-***********************************
+*****************************************
+Serial Download Protocol (SDP) / USB boot
+*****************************************
 
 The complete system image can be programmed with ``uuu``
 (https://github.com/NXPmicro/mfgtools.git) to eMMC.
 
-Serial Download Protocol is used on the Micro-B USB port (X9).
+Serial Download Protocol is supported on the Micro-B USB port (X9) on MBa6ulx[L].
+The command ``fastboot usb 0`` is used to enable the fastboot gadget.
 
-Build UUU U-Boot image
-======================
+Build SDP enabled U-Boot image
+==============================
 
 .. code-block:: bash
 
@@ -140,23 +144,16 @@ With mfgtools
 
 .. code-block:: bash
 
-	<path to MFG Tool/>uuu/uuu SDP: boot -f <UUU U-Boot image>
-	<path to MFG Tool/>uuu/uuu SDPV: write -f <UUU U-Boot image> -addr 0x877eefc0
-	<path to MFG Tool/>uuu/uuu SDPV: jump -addr 0x8fbfffc0
+	<path to MFG Tool/>uuu/uuu -b spl <UUU U-Boot image>
 
-Please note that the address above is calculated based on TEXT_BASE address:
+Please note that the ``CONFIG_SDP_LOADADDR`` is calculated based on
+``CONFIG_TEXT_BASE`` address:
 
 0x8fbfffc0 = 0x8fc00000 (TEXT_BASE) - 0x40 (U-Boot proper Header size)
 
-Fastboot gadget
-===============
+************
+Support Wiki
+************
 
-The command `fastboot usb 0` is used to enable the fastboot gadget on the
-Micro-B USB port (X9). The `fastboot` and `uuu` utilities can be used to erase
-and flash SD/eMMC partitions, for example:
-
-With mfgtools
-
-.. code-block:: bash
-
-	<path to MFG Tool/>uuu/uuu FB: flash -raw2sparse all <SD / eMMC system images>
+See `TQ Embedded Wiki for TQMa6ULx and TQMa6ULLx <https://support.tq-group.com/en/arm/tqma6ulx>`_.
+See `TQ Embedded Wiki for TQMa6ULxL and TQMa6ULLxL <https://support.tq-group.com/en/arm/tqma6ulxl>`_.
