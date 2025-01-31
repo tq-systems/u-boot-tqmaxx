@@ -60,6 +60,7 @@
 	"sd_dev=1\0"                                                           \
 	"board=tqma7\0"                                                        \
 	"boot_os=bootz ${kernel_addr_r} - ${fdt_addr_r}\0"                     \
+	"emmc_bootp_start=" __stringify(TQMA7_MMC_UBOOT_SECTOR_START)"\0"      \
 	"fdt_addr_r=" __stringify(TQMA7_FDT_ADDRESS) "\0"                      \
 	"fdtoverlay_addr_r=" __stringify(FDT_OVERLAY_ADDR)"\0"                 \
 	"image=zImage\0"                                                       \
