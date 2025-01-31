@@ -65,6 +65,7 @@
 	"emmc_dev=0\0"                                                         \
 	"sd_dev=1\0"                                                           \
 	"board=tqma6\0"                                                        \
+	"emmc_bootp_start=" __stringify(TQMA6_MMC_UBOOT_SECTOR_START)"\0"      \
 	"boot_os=bootz ${kernel_addr_r} - ${fdt_addr_r}\0"                     \
 	"fdt_addr_r=" __stringify(TQMA6_FDT_ADDRESS)"\0"                       \
 	"fdtoverlay_addr_r=" __stringify(FDT_OVERLAY_ADDR)"\0"                 \
