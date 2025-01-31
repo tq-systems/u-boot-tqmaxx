@@ -192,7 +192,12 @@
 			"if itest ${mmcdev} == ${emmc_dev}; then "     \
 				"run mmc_switch_part; "                \
 				"if itest ${update_part} > 0 ; then "  \
-					"setenv update_start_blk 0; "  \
+					"if env exists emmc_bootp_start; then " \
+						"setenv update_start_blk ${emmc_bootp_start}; " \
+					"else "                        \
+						"echo ERROR: eMMC boot partition block unset; " \
+						"exit; "               \
+					"fi; "                         \
 				"fi; "                                 \
 			"fi; "                                         \
 			"run mmc_finish_update_uboot; "                \
