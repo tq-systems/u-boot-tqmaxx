@@ -142,6 +142,9 @@
 		"root=/dev/mmcblk${mmcblkdev}p${mmcrootpart} "         \
 			"${rootfsmode} "                               \
 		"rootwait\0"                                           \
+	"get_blockcount="                                              \
+		"setexpr blkc ${filesize} + 0x1ff; "                   \
+		"setexpr blkc ${blkc} / 0x200; \0"                     \
 	"load_mmc=mmc dev ${mmcdev}; mmc rescan; "                     \
 		"load mmc ${mmcdev}:${mmcpart} ${kernel_addr_r} "      \
 			"${mmcpath}${image}; "                         \
@@ -166,34 +169,40 @@
 		"fi;\0"                                                \
 	"mmcpath=/boot/\0"                                             \
 	"mmcpart=2\0"                                                  \
+	"mmc_finish_update_uboot="                                     \
+		"mmc write ${loadaddr} ${update_start_blk} ${blkc}; "  \
+		"mmc dev ${mmcdev} 0; "                                \
+		"setenv update_part; "                                 \
+		"setenv update_start_blk; "                            \
+		"setenv blkc; \0"                                      \
+	"mmc_prepare_update_uboot="                                    \
+		"echo Write U-Boot to mmc ${mmcdev} ...; "             \
+		"mmc dev ${mmcdev}; mmc rescan; "                      \
+		"run get_blockcount; "                                 \
+		"setenv update_start_blk ${uboot_mmc_start}; "         \
+		"setenv update_part 0; \0"                             \
+	"mmc_switch_part="                                             \
+		"mmc partconf ${mmcdev} update_part; "                 \
+		"mmc dev ${mmcdev} ${update_part};  \0"                \
 	"mmcrootpart=2\0"                                              \
 	"update_uboot_mmc="                                            \
 		"run check_ipaddr; "                                   \
 		"setenv filesize; "                                    \
-		"if tftp ${uboot} ; then "                             \
-			"echo Write U-Boot to mmc ${mmcdev} ...; "     \
-			"mmc dev ${mmcdev}; mmc rescan; "              \
-			"setexpr blkc ${filesize} + 0x1ff; "           \
-			"setexpr blkc ${blkc} / 0x200; "               \
+		"if tftp ${uboot}; then "                              \
+			"run mmc_prepare_update_uboot; "               \
 			"if itest ${blkc} >= ${uboot_mmc_size}; then " \
 				"echo ERROR: size to large ...; "      \
 				"exit; "                               \
 			"fi; "                                         \
-			"setenv update_start_blk ${uboot_mmc_start}; " \
-			"setenv update_part 0; "                       \
-			"if itest ${mmcdev} == ${emmc_dev}; then "\
-				"mmc partconf ${mmcdev} update_part; " \
+			"if itest ${mmcdev} == ${emmc_dev}; then "     \
+				"run mmc_switch_part; "                \
 				"if itest ${update_part} > 0 ; then "  \
 					"setenv update_start_blk 0; "  \
 				"fi; "                                 \
-				"mmc dev ${mmcdev} ${update_part}; "   \
 			"fi; "                                         \
-			"mmc write ${loadaddr} ${update_start_blk} ${blkc}; " \
-			"mmc dev ${mmcdev} 0; "                        \
-			"setenv update_part; "                         \
-			"setenv update_start_blk; "                    \
+			"run mmc_finish_update_uboot; "                \
 		"fi; "                                                 \
-		"setenv filesize; setenv blkc \0"                      \
+		"setenv filesize; \0"                                  \
 
 #else
 #define TQ_IMX_SHARED_MMC_ENV_SETTINGS
