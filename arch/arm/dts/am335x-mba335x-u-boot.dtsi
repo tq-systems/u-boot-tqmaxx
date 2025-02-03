@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Copyright (c) 2022-2023 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
- * D-82229 Seefeld, Germany.
+ * Copyright (c) 2022-2025 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
  * Author: Markus Niebel
  */
 
@@ -20,8 +19,7 @@
 	 * U-Boot does not have a proper driver for the MDIO bus, so the
 	 * pinctrl must be assigned to the Ethernet controller.
 	 */
-	pinctrl-0 = <&cpsw_default>, <&davinci_mdio_default>;
-	/delete-property/ dual_emac;
+	pinctrl-0 = <&cpsw_default_pins>, <&davinci_mdio_default_pins>;
 };
 
 &mmc1_pins {
