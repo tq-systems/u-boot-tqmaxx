@@ -10,7 +10,7 @@ config SYS_SOC
 	default "am33xx"
 
 config SYS_CONFIG_NAME
-	default "tqma335x"
+	default "tqma335x_mba335x" if MBA335X
 
 config TQMA335X
 	bool

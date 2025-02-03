@@ -1,14 +1,14 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Copyright (c) 2021 - 2022 TQ-Systems GmbH <license@tq-group.com>, D-82229 Seefeld, Germany.
- * Author: Gregor Herburger
+ * Copyright (c) 2021-2025 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Authors: Gregor Herburger, Matthias Schiffer
  *
  * Based on:
  * Copyright (C) 2011, Texas Instruments, Incorporated - http://www.ti.com/
  */
 
-#ifndef __CONFIG_AM335X_MBA335X_H
-#define __CONFIG_AM335X_MBA335X_H
+#ifndef __CONFIG_AM335X_TQMA335X_H
+#define __CONFIG_AM335X_TQMA335X_H
 
 #include <configs/ti_am335x_common.h>
 #include <linux/sizes.h>
@@ -43,17 +43,10 @@
 #define BOOTENV_DEV_NAME_LEGACY_MMC(devtypeu, devtypel, instance) \
 	#devtypel #instance " "
 
-#define BOOT_TARGET_DEVICES(func) \
-	func(LEGACY_MMC, legacy_mmc, 0) \
-	func(LEGACY_MMC, legacy_mmc, 1)
-
-#include <config_distro_bootcmd.h>
-
 #ifndef CONFIG_SPL_BUILD
-#include <environment/ti/dfu.h>
 #include <environment/ti/mmc.h>
 
-#define CONFIG_EXTRA_ENV_SETTINGS \
+#define TQMA335X_ENV_SETTINGS \
 	DEFAULT_LINUX_BOOT_ENV \
 	DEFAULT_MMC_TI_ARGS \
 	"boot_fit=0\0" \
@@ -62,18 +55,11 @@
 	"bootdir=/boot\0" \
 	"bootfile=zImage\0" \
 	"fdtfile=" CONFIG_DEFAULT_FDT_FILE "\0" \
-	"console=ttyS4,115200n8\0" \
-	"partitions=" \
-		"uuid_disk=${uuid_gpt_disk};" \
-		"name=bootloader,start=384K,size=1792K," \
-			"uuid=${uuid_gpt_bootloader};" \
-		"name=rootfs,start=2688K,size=-,uuid=${uuid_gpt_rootfs}\0" \
 	"optargs=\0" \
 	"uboot=u-boot.img\0" \
 	"mlo=MLO\0" \
 	"uboot_spi=u-boot.img\0" \
 	"mlo_spi=MLO.byteswap\0" \
-	"init_console=setenv console ttyS4,115200n8\0" \
 	"update_uboot_mmc=if mmc dev ${mmcdev} && mmc rescan; then " \
 			"run set_getcmd; " \
 			"setenv mlo_load_addr $loadaddr; " \
@@ -115,8 +101,6 @@
 		"setenv ${filesize}; setenv getcmd; setenv mlo_load_addr; " \
 		"setenv mlo_size; setenv uboot_load_addr \0" \
 	"upd_uboot_spi_net=run update_uboot_spi\0" \
-	"upd_uboot_sd_net=setenv mmcdev 0 && run update_uboot_mmc\0" \
-	"upd_uboot_emmc_net=setenv mmcdev 1 && run update_uboot_mmc\0" \
 	"addtty=setenv bootargs ${bootargs} console=${console}\0"              \
 	"netdev=eth0\0"                                                        \
 	"rootpath=/srv/nfs/exports\0"                                          \
@@ -144,9 +128,7 @@
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"echo ... failed\0"                                            \
-	DFUARGS \
-	BOOTENV \
-	"boot_targets=legacy_mmc0\0"
+	""
 #endif
 
 /* NS16550 Configuration */
@@ -163,14 +145,6 @@
 
 /* PMIC support */
 #define CONFIG_POWER_TPS65910
-
-/* USB Device Firmware Update support */
-#ifndef CONFIG_SPL_BUILD
-#define DFUARGS \
-	DFU_ALT_INFO_EMMC \
-	DFU_ALT_INFO_MMC \
-	DFU_ALT_INFO_RAM
-#endif
 
 /* SPL related */
 #define CONFIG_SYS_SPI_U_BOOT_OFFS	0x20000
@@ -204,4 +178,4 @@
 
 #define CONFIG_SYS_MMC_MAX_DEVICE	2
 
-#endif	/* ! __CONFIG_AM335X_MBA335X_H */
+#endif	/* ! __CONFIG_AM335X_TQMA335X_H */
