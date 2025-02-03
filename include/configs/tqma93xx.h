@@ -56,6 +56,7 @@
 	"bootscript=echo Running bootscript from mmc ...; "            \
 		"source\0"                                             \
 	"boot_os=booti ${kernel_addr_r} - ${fdt_addr_r};\0"            \
+	"emmc_bootp_start=0x0\0"                                       \
 	"uboot_mmc_start=0x40\0"                                       \
 	"uboot_mmc_size=0xfc0\0"                                       \
 	"uboot_spi_start=0x0\0"                                        \
