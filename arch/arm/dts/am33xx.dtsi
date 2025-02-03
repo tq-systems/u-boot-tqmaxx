@@ -849,7 +849,7 @@
 			};
 		};
 
-		mac: ethernet@4a100000 {
+		mac: mac_sw: ethernet@4a100000 {
 			compatible = "ti,am335x-cpsw","ti,cpsw";
 			ti,hwmods = "cpgmac0";
 			clocks = <&cpsw_125mhz_gclk>, <&cpsw_cpts_rft_clk>;
@@ -877,7 +877,7 @@
 			syscon = <&scm_conf>;
 			status = "disabled";
 
-			davinci_mdio: mdio@4a101000 {
+			davinci_mdio: davinci_mdio_sw: mdio@4a101000 {
 				compatible = "ti,cpsw-mdio","ti,davinci_mdio";
 				#address-cells = <1>;
 				#size-cells = <0>;
@@ -887,12 +887,12 @@
 				status = "disabled";
 			};
 
-			cpsw_emac0: slave@4a100200 {
+			cpsw_emac0: cpsw_port1: slave@4a100200 {
 				/* Filled in by U-Boot */
 				mac-address = [ 00 00 00 00 00 00 ];
 			};
 
-			cpsw_emac1: slave@4a100300 {
+			cpsw_emac1: cpsw_port2: slave@4a100300 {
 				/* Filled in by U-Boot */
 				mac-address = [ 00 00 00 00 00 00 ];
 			};
