@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (c) 2021 - 2022 TQ-Systems GmbH <license@tq-group.com>, D-82229 Seefeld, Germany.
- * Author: Gregor Herburger
+ * Copyright (c) 2021-2025 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Authors: Gregor Herburger, Matthias Schiffer
  *
  * Based on:
  * Copyright (C) 2011, Texas Instruments, Incorporated - http://www.ti.com/
@@ -38,6 +38,7 @@
 #include <watchdog.h>
 
 #include "tqma335x.h"
+#include "../common/tqc_sdmmc.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -100,6 +101,33 @@ enum env_location board_get_envl(enum env_location loc, enum env_operation op,
 
 	return loc;
 }
+
+#if defined(CONFIG_BOARD_LATE_INIT) && !defined(CONFIG_SPL_BUILD)
+int board_late_init(void)
+{
+	puts("BOOT:\t");
+	switch (gd->arch.omap_boot_device) {
+	case BOOT_DEVICE_MMC1:
+		puts("MMC1 (SD)\n");
+		break;
+	case BOOT_DEVICE_MMC2:
+		puts("MMC2 (e-MMC)\n");
+		break;
+	case BOOT_DEVICE_SPI:
+		puts("SPI (SPI-NOR)\n");
+		break;
+	default:
+		printf("unknown (%u)\n", gd->arch.omap_boot_device);
+		break;
+	}
+
+	tqma335x_read_eeprom();
+
+	board_late_mmc_env_init();
+
+	return 0;
+}
+#endif
 
 #if defined(CONFIG_OF_BOARD_SETUP)
 int tqc_bb_ft_board_setup(void *fdt, bd_t *bd)

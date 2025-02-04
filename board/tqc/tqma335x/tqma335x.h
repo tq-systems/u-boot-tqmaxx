@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Copyright (C) 2021 - 2022, TQ-Systems GmbH
+ * Copyright (c) 2021-2025 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Authors: Gregor Herburger, Matthias Schiffer
  *
  * Copyright (C) 2011, Texas Instruments, Incorporated - http://www.ti.com/
  */
@@ -23,6 +24,8 @@ void enable_i2c0_pin_mux(void);
 void enable_mmc0_pin_mux(void);
 /* can be overwritten */
 void enable_board_pin_mux(void);
+
+void tqma335x_read_eeprom(void);
 
 /* DDR3L 2GB / 256MB */
 /* Setting-File: TQMa335x.DDR3.0207.xlsx */

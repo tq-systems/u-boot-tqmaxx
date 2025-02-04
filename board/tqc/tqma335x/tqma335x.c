@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (c) 2021 - 2022 TQ-Systems GmbH <license@tq-group.com>, D-82229 Seefeld, Germany.
- * Author: Gregor Herburger
+ * Copyright (c) 2021-2025 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Authors: Gregor Herburger, Matthias Schiffer
  *
  * Based on:
  * Copyright (C) 2011, Texas Instruments, Incorporated - http://www.ti.com/
@@ -40,7 +40,6 @@
 
 #include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
-#include "../common/tqc_sdmmc.h"
 #include "tqma335x.h"
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -386,61 +385,41 @@ int board_init(void)
 	return 0;
 }
 
-#if defined(CONFIG_BOARD_LATE_INIT) && !defined(CONFIG_SPL_BUILD)
-int board_late_init(void)
+#if !defined(CONFIG_SPL_BUILD)
+void tqma335x_read_eeprom(void)
 {
 	int ret;
 	/* must hold largest field of eeprom data */
 	char safe_string[0x41];
 	struct tqc_eeprom_data eedat;
 
-	puts("BOOT:\t");
-	switch (gd->arch.omap_boot_device) {
-	case BOOT_DEVICE_MMC1:
-		puts("MMC1 (SD)\n");
-		break;
-	case BOOT_DEVICE_MMC2:
-		puts("MMC2 (e-MMC)\n");
-		break;
-	case BOOT_DEVICE_SPI:
-		puts("SPI (SPI-NOR)\n");
-		break;
-	default:
-		printf("unknown (%u)\n", gd->arch.omap_boot_device);
-		break;
-	}
-
 	ret = tqc_read_eeprom_buf(CONFIG_SYS_EEPROM_BUS_NUM,
 				  CONFIG_SYS_I2C_EEPROM_ADDR,
 				  CONFIG_SYS_I2C_EEPROM_ADDR_LEN, 0,
 				  sizeof(eedat), (void *)&eedat);
-	if (!ret) {
-		/* ID */
-		tqc_parse_eeprom_id(&eedat, safe_string,
-				    ARRAY_SIZE(safe_string));
-		if (IS_ENABLED(CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG)) {
-			if (!strncmp(safe_string, "TQMA335", 3))
-				env_set("boardtype", safe_string);
-			if (!tqc_parse_eeprom_serial(&eedat, safe_string,
-						     ARRAY_SIZE(safe_string)))
-				env_set("serial#", safe_string);
-			else
-				env_set("serial#", "???");
-		}
-
-		/*
-		 * Do not set MAC addresses from EEPROM;
-		 * the CPSW driver will set the correct ethaddrs from efuses
-		 */
-
-		tqc_show_eeprom(&eedat, "TQMA335");
-	} else {
+	if (ret) {
 		printf("EEPROM: err %d\n", ret);
+		return;
 	}
 
-	board_late_mmc_env_init();
+	/* ID */
+	tqc_parse_eeprom_id(&eedat, safe_string, ARRAY_SIZE(safe_string));
+	if (IS_ENABLED(CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG)) {
+		if (!strncmp(safe_string, "TQMA335", 3))
+			env_set("boardtype", safe_string);
+		if (!tqc_parse_eeprom_serial(&eedat, safe_string,
+					     ARRAY_SIZE(safe_string)))
+			env_set("serial#", safe_string);
+		else
+			env_set("serial#", "???");
+	}
 
-	return 0;
+	/*
+	 * Do not set MAC addresses from EEPROM;
+	 * the CPSW driver will set the correct ethaddrs from efuses
+	 */
+
+	tqc_show_eeprom(&eedat, "TQMA335");
 }
 #endif
 
