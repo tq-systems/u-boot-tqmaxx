@@ -8,32 +8,14 @@
  */
 
 #include <common.h>
-#include <cpsw.h>
-#include <dm.h>
-#include <errno.h>
-#include <environment.h>
-#include <i2c.h>
-#include <miiphy.h>
-#include <serial.h>
-#include <spl.h>
-#include <watchdog.h>
-#include <asm/io.h>
 #include <asm/emif.h>
-#include <asm/gpio.h>
-#include <asm/arch/clk_synthesizer.h>
 #include <asm/arch/clock.h>
-#include <asm/arch/cpu.h>
 #include <asm/arch/ddr_defs.h>
-#include <asm/arch/hardware.h>
-#include <asm/arch/gpio.h>
-#include <asm/arch/mem.h>
 #include <asm/arch/mmc_host_def.h>
 #include <asm/arch/mux.h>
-#include <asm/arch/omap.h>
 #include <asm/arch/sys_proto.h>
-#include <asm/omap_common.h>
-#include <asm/omap_sec_common.h>
-#include <asm/omap_mmc.h>
+#include <dm.h>
+#include <i2c.h>
 #include <jffs2/load_kernel.h>
 #include <mtd_node.h>
 #include <power/tps65910.h>
