@@ -8,13 +8,6 @@
 
 #include "am33xx-u-boot.dtsi"
 
-/ {
-	aliases {
-		mmc0 = &mmc1;
-		mmc1 = &mmc2;
-	};
-};
-
 &am33xx_pinmux {
 	u-boot,dm-pre-reloc;
 	u-boot,dm-spl;
