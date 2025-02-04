@@ -27,6 +27,7 @@
 #include <errno.h>
 #include <fdt_support.h>
 #include <imx_thermal.h>
+#include <kaslr.h>
 #include <linux/bitops.h>
 #include <linux/bitfield.h>
 #include <linux/delay.h>
@@ -844,6 +845,14 @@ int ft_system_setup(void *blob, struct bd_info *bd)
 	if (is_voltage_mode(VOLT_LOW_DRIVE)) {
 		low_drive_freq_update(blob);
 		disable_lpm(blob);
+	}
+
+	if (IS_ENABLED(CONFIG_KASLR)) {
+		int ret = do_generate_kaslr(blob);
+
+		if (ret)
+			printf("Unable to set property 'kaslr-seed', err=%s\n",
+			       fdt_strerror(ret));
 	}
 
 	return ft_add_optee_node(blob, bd);
