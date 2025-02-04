@@ -27,6 +27,7 @@
 #include <errno.h>
 #include <fdt_support.h>
 #include <imx_thermal.h>
+#include <kaslr.h>
 #include <linux/bitops.h>
 #include <linux/bitfield.h>
 #include <linux/delay.h>
@@ -848,6 +849,14 @@ int ft_system_setup(void *blob, struct bd_info *bd)
 	if (is_voltage_mode(VOLT_LOW_DRIVE)) {
 		low_drive_freq_update(blob);
 		disable_lpm(blob);
+	}
+
+	if (IS_ENABLED(CONFIG_DM_RNG) && !IS_ENABLED(CONFIG_IMX_ANDROID_GBL)) {
+		int ret = fdt_kaslrseed(blob, true);
+
+		if (ret)
+			printf("Unable to set property %s, err=%s\n",
+			       "kaslr-seed", fdt_strerror(ret));
 	}
 
 	return ft_add_optee_node(blob, bd);
