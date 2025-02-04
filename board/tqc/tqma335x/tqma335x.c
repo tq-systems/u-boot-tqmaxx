@@ -361,7 +361,8 @@ void sdram_init(void)
  */
 int board_init(void)
 {
-	save_omap_boot_params();
+	if (!gd->arch.omap_boot_device)
+		save_omap_boot_params();
 	gd->bd->bi_boot_params = CONFIG_SYS_SDRAM_BASE + 0x100;
 
 	return 0;

@@ -9,6 +9,7 @@
 
 #include <common.h>
 #include <asm/arch/mmc_host_def.h>
+#include <asm/arch/sys_proto.h>
 #include <dm.h>
 #include <environment.h>
 #include <spl.h>
@@ -50,33 +51,34 @@ int mmc_get_env_dev(void)
 }
 #endif
 
-enum env_location board_get_envl(enum env_location loc, enum env_operation op,
-				 int prio)
+#if !defined(CONFIG_SPL_BUILD)
+enum env_location env_get_location(enum env_operation op, int prio)
 {
-#if !defined(CONFIG_SPL_BUILD) && defined(CONFIG_TARGET_TQMA335X)
+	if (prio != 0)
+		return ENVL_UNKNOWN;
+
+	if (!gd->arch.omap_boot_device)
+		save_omap_boot_params();
+
 	switch (gd->arch.omap_boot_device) {
+#if IS_ENABLED(CONFIG_ENV_IS_IN_MMC)
 	case BOOT_DEVICE_MMC1:
 	case BOOT_DEVICE_MMC2:
-		if (IS_ENABLED(CONFIG_ENV_IS_IN_MMC)) {
-			debug("env + boot SD/e-MMC\n");
-			loc = ENVL_MMC;
-		}
-		break;
+		debug("env + boot SD/e-MMC\n");
+		return ENVL_MMC;
+#endif
+#if IS_ENABLED(CONFIG_ENV_IS_IN_SPI_FLASH)
 	case BOOT_DEVICE_SPI:
-		if (IS_ENABLED(CONFIG_ENV_IS_IN_SPI_FLASH)) {
-			debug("env + boot SPI NOR\n");
-			loc = ENVL_SPI_FLASH;
-		}
-		break;
+		debug("env + boot SPI NOR\n");
+		return ENVL_SPI_FLASH;
+#endif
 	default:
 		if (IS_ENABLED(CONFIG_ENV_IS_NOWHERE))
-			loc = ENVL_NOWHERE;
-		break;
+			return ENVL_NOWHERE;
+		return ENVL_UNKNOWN;
 	}
-#endif
-
-	return loc;
 }
+#endif
 
 #if defined(CONFIG_BOARD_LATE_INIT) && !defined(CONFIG_SPL_BUILD)
 int board_late_init(void)
