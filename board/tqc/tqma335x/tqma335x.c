@@ -424,11 +424,13 @@ U_BOOT_DEVICE(am335x_mmc1) = {
 #if defined(CONFIG_OF_BOARD_SETUP)
 int ft_board_setup(void *fdt, bd_t *bd)
 {
+#if IS_ENABLED(CONFIG_TQC_SPI_NOR)
 	static const struct node_info nodes[] = {
 		{ "jedec,spi-nor",	MTD_DEV_TYPE_NOR, },
 	};
 
 	tqc_ft_setup_spinor_by_alias(fdt, "spi0", nodes, ARRAY_SIZE(nodes));
+#endif
 
 	return tqc_bb_ft_board_setup(fdt, bd);
 }
