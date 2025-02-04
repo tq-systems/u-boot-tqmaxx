@@ -4,7 +4,9 @@
 
 #include <dm.h>
 #include <rng.h>
+#include <stdlib.h>
 #include <linux/kernel.h>
+#include <asm/cache.h>
 #include <asm/mach-imx/ele_api.h>
 
 U_BOOT_DRVINFO(ele_rng) = {
