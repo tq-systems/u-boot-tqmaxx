@@ -25,19 +25,20 @@ config IMX9_DRAM_INLINE_ECC
 
 config SAVED_DRAM_TIMING_BASE
 	hex "Define the base address for saved dram timing"
+	depends on !SCMI_FIRMWARE
+	default 0x2051C000 if IMX93
+	default 0x2049C000 if IMX91
 	help
 	  after DRAM is trained, need to save the dram related timming
 	  info into memory for low power use. This value needs to be the
 	  same as used in TF-A
-	default 0x2051C000 if IMX93
-	default 0x2049C000 if IMX91
 
 config SAVED_QB_STATE_BASE
 	hex "Define the base address for saved QuickBoot state"
 	depends on IMX_SNPS_DDR_PHY_QB_GEN
+	default 0x83100000
 	help
 	  Once DRAM is trained, need to save the dram related timing
 	  info into memory in order to be reachable from U-Boot.
-	default 0x83100000
 
 endmenu
