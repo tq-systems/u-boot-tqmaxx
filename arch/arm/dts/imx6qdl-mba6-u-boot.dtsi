@@ -40,10 +40,6 @@
 	u-boot,dm-spl;
 };
 
-&usbotg {
-	status = "okay";
-};
-
 &usdhc2 {
 	u-boot,dm-spl;
 };
