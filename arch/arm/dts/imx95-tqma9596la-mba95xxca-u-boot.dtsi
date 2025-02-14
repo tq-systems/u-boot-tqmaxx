@@ -1,0 +1,81 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2026 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
+ */
+
+#include "imx95-tqma9596la-u-boot.dtsi"
+
+&lpuart1 {
+	bootph-pre-ram;
+};
+
+&lpuart2 {
+	bootph-pre-ram;
+};
+
+&pinctrl_lpuart1 {
+	bootph-pre-ram;
+};
+
+&pinctrl_lpuart2 {
+	bootph-pre-ram;
+};
+
+&pinctrl_sdvmmc {
+	bootph-pre-ram;
+};
+
+&pinctrl_usdhc2 {
+	bootph-pre-ram;
+};
+
+&pinctrl_usdhc2_100mhz {
+	bootph-pre-ram;
+};
+
+&pinctrl_usdhc2_200mhz {
+	bootph-pre-ram;
+};
+
+&ptn5110 {
+	status = "disabled";
+	/delete-node/ connector;
+};
+
+&reg_sdvmmc {
+	bootph-pre-ram;
+};
+
+&usdhc2 {
+	bootph-pre-ram;
+};
+
+&usb2 {
+	/delete-node/ port;
+};
+
+&usb2 {
+	/delete-property/ power-domains;
+	compatible = "fsl,imx8mm-usb", "fsl,imx7d-usb";
+	status = "disabled";
+};
+
+&usb3 {
+	/delete-property/ power-domains;
+};
+
+&usb3_dwc3 {
+	dr_mode = "peripheral";
+	compatible = "fsl,imx8mq-dwc3", "snps,dwc3";
+};
+
+&usb3_phy {
+	/delete-property/ vbus-supply;
+};
+
+&wdog3 {
+	u-boot,noautostart;
+	timeout-sec = <60>;
+};

@@ -1,0 +1,42 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2026 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
+ */
+
+&flash0 {
+	bootph-pre-ram;
+};
+
+&flexspi1 {
+	bootph-pre-ram;
+};
+
+&lpi2c2 {
+	bootph-pre-ram;
+};
+
+&pinctrl_flexspi1 {
+	bootph-pre-ram;
+};
+
+&pinctrl_sdvmmc {
+	bootph-pre-ram;
+};
+
+&pinctrl_usdhc1 {
+	bootph-pre-ram;
+};
+
+&pinctrl_usdhc1_100mhz {
+	bootph-pre-ram;
+};
+
+&pinctrl_usdhc1_200mhz {
+	bootph-pre-ram;
+};
+
+&usdhc1 {
+	bootph-pre-ram;
+};
