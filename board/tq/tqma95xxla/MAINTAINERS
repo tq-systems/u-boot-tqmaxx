@@ -1,0 +1,8 @@
+TQ-Systems GmbH TQMa95xxSA SOM / MB-SMARC-2 board
+L:	u-boot@ew.tq-group.com
+W:	https://www.tq-group.com/en/products/tq-embedded/
+S:	Maintained
+F:	arch/arm/dts/imx95*-tqma95*-mb*.dts*
+F:	board/tq/tqma95xxsa/
+F:	configs/tqma95*_mb*_defconfig
+F:	include/configs/tqma95*.h
