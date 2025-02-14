@@ -1,0 +1,2 @@
+#include "configs/tqma95xxla.config"
+CONFIG_TQMA95XXLA_RAM_4GB_DEFAULT=y
