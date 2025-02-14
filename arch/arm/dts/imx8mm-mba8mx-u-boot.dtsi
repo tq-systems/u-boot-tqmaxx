@@ -155,10 +155,6 @@
 	u-boot,dm-pre-proper;
 };
 
-&fec1 {
-	phy-reset-gpios = <&gpio4 22 GPIO_ACTIVE_LOW>;
-};
-
 &flexspi {
 	assigned-clock-rates = <100000000>;
 	assigned-clocks = <&clk IMX8MM_CLK_QSPI>;
