@@ -169,10 +169,10 @@ int board_fit_config_name_match(const char *name)
 {
 	const char *config = tqma6_get_fdt_configuration();
 
-	printf("%s: config %s\n", __func__, name);
-
-	if (config && name && !strcmp(config, name))
+	if (config && name && !strcmp(config, name)) {
+		printf("Device tree: %s\n", name);
 		return 0;
+	}
 
 	return -EINVAL;
 }
