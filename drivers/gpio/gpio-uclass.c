@@ -1505,7 +1505,8 @@ static int gpio_post_bind(struct udevice *dev)
 		ofnode node;
 
 		dev_for_each_subnode(node, dev) {
-			if (ofnode_read_bool(node, "gpio-hog")) {
+			if (ofnode_read_bool(node, "gpio-hog") &&
+			    ofnode_is_enabled(node)) {
 				const char *name = ofnode_get_name(node);
 				int ret;
 
