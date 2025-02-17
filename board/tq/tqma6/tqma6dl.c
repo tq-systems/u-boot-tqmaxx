@@ -12,6 +12,7 @@
 #include <asm/arch/mx6dl-ddr.h>
 #include <asm/arch/iomux.h>
 #include <asm/arch/crm_regs.h>
+#include <asm/arch/sys_proto.h>
 #include <linux/delay.h>
 
 #include <common.h>
@@ -261,5 +262,9 @@ static void tqma6dl_init_ddr_controller(void)
 
 void tqma6_init(void)
 {
+	if (!is_mx6dl()) {
+		printf("Not running on TQMa6DL\n");
+		hang();
+	}
 	tqma6dl_init_ddr_controller();
 }
