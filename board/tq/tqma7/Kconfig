@@ -66,6 +66,20 @@ choice
 
 config MBA7
 	bool "TQMa7 on MBa7x Starterkit"
+	select TQ_BB
+	select TQ_EEPROM
+	select TQ_ENVLOC
+	select USB
+	select CMD_USB
+	select USB_STORAGE
+	select PHYLIB
+	select CONFIG_PHY_TI_DP83867
+	select MXC_UART
+	select DM_MMC
+	select DM_SPI
+	select DM_GPIO
+	imply DM_SERIAL
+	imply DM_ETH
 	help
 	  Select the MBa7x starterkit.
 
@@ -73,34 +87,6 @@ endchoice
 
 config IMX_CONFIG
 	default "board/tq/tqma7/tqma7.cfg"
-
-config MTDPARTS_DEFAULT
-	default "mtdparts=30bb0000.qspi:4m@0k(bootstream),64k@4096k(env0),64k@4160k(env1),-@6m(ubi)"
-
-config MTDIDS_DEFAULT
-	default "nor0=30bb0000.qspi"
-
-config TQ_EEPROM
-	default y
-
-#
-# environment settings: 64k, offset 1M (SPI Flash sector 64k), redundant env
-# in SPI Flash @ 1M + 64k
-#
-config ENV_SIZE
-	default 0x00010000
-
-config ENV_SECT_SIZE
-	default 0x00010000
-
-config ENV_OFFSET
-	default 0x00100000
-
-config ENV_OFFSET_REDUND
-	default 0x00110000
-
-config SF_DEFAULT_BUS
-	default 4
 
 source "board/tq/common/Kconfig"
 
