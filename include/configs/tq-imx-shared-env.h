@@ -53,7 +53,7 @@
 		"else "                                                \
 			"echo ERROR: loading kernel; "                 \
 		"fi;\0"                                                \
-	"ubimtdidx=3\0"                                                \
+	"ubimtdidx=ubi\0"                                                \
 	"ubirootfs=rootfs.ubifs\0"                                     \
 	"ubirootfspart=ubi\0"                                          \
 	"ubirootfsvol=rootfs\0"                                        \
