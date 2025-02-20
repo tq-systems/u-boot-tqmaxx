@@ -186,7 +186,8 @@ static int parse_container(void *addr, u32 *qb_data_off)
 
 static int get_dev_qbdata_offset(void *dev, int dev_type, unsigned long offset, u32 *qbdata_offset)
 {
-	void *buf = malloc(CONTAINER_HDR_ALIGNMENT);
+	u16 ctnr_hdr_align = container_hdr_alignment();
+	void *buf = malloc(ctnr_hdr_align);
 	int ret = 0;
 	char cmd[128];
 	unsigned long count = 0;
@@ -203,7 +204,7 @@ static int get_dev_qbdata_offset(void *dev, int dev_type, unsigned long offset, 
 
 		count = blk_dread(mmc_get_blk_desc(mmc),
 				  offset / mmc->read_bl_len,
-				  CONTAINER_HDR_ALIGNMENT / mmc->read_bl_len,
+				  ctnr_hdr_align / mmc->read_bl_len,
 				  buf);
 		if (count == 0) {
 			printf("Read container image from MMC/SD failed\n");
@@ -212,7 +213,7 @@ static int get_dev_qbdata_offset(void *dev, int dev_type, unsigned long offset, 
 		break;
 	case QSPI_DEV:
 		sprintf(cmd, "sf read 0x%x 0x%lx 0x%x", (unsigned int)(uintptr_t)buf,
-			offset, CONTAINER_HDR_ALIGNMENT);
+			offset, ctnr_hdr_align);
 		/** Read data */
 		ret = run_command(cmd, 0);
 		if (ret) {
@@ -222,7 +223,7 @@ static int get_dev_qbdata_offset(void *dev, int dev_type, unsigned long offset, 
 		break;
 	case QSPI_NOR_DEV:
 	case RAM_DEV:
-		memcpy(buf, (const void *)offset, CONTAINER_HDR_ALIGNMENT);
+		memcpy(buf, (const void *)offset, ctnr_hdr_align);
 		break;
 	}
 
@@ -236,12 +237,13 @@ static int get_dev_qbdata_offset(void *dev, int dev_type, unsigned long offset, 
 static int get_qbdata_offset(void *dev, int dev_type, u32 *qbdata_offset)
 {
 	u32 offset = get_boot_device_offset(dev, dev_type);
+	u16 ctnr_hdr_align = container_hdr_alignment();
 	u32 contOffset;
 	int ret, i;
 
 	for (i = 0; i < 3; i++)
 	{
-		contOffset = offset + i * CONTAINER_HDR_ALIGNMENT;
+		contOffset = offset + i * ctnr_hdr_align;
 		ret = get_dev_qbdata_offset(dev, dev_type, contOffset, qbdata_offset);
 		if (ret == 0)
 		{

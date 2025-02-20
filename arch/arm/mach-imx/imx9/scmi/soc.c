@@ -1562,3 +1562,10 @@ void *arch_get_container_trampoline(void)
 {
 	return (void *)((ulong)CFG_SYS_SDRAM_BASE + PHYS_SDRAM_SIZE - SZ_16M);
 }
+
+#ifdef CONFIG_IMX95
+u32 container_hdr_alignment(void)
+{
+	return is_imx95_a0() ? 0x400: 0x4000;
+}
+#endif
