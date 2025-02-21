@@ -615,6 +615,7 @@ config TARGET_TQMA6UL
 	depends on MX6UL || MX6ULL
 	select BOARD_EARLY_INIT_F
 	select BOARD_LATE_INIT
+	select OF_SYSTEM_SETUP
 	select SPI
 	select DM
 	select DM_I2C
