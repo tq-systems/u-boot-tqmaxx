@@ -55,6 +55,40 @@ int arch_auxiliary_core_up(u32 core_id, ulong addr)
 	return 0;
 }
 
+#ifdef CONFIG_SCMI_FIRMWARE
+int arch_auxiliary_core_prepare(u32 core_id)
+{
+	struct arm_smccc_res res;
+
+	printf("## Preparing auxiliary core: %d\n", core_id);
+
+	arm_smccc_smc(IMX_SIP_SRC, IMX_SIP_SRC_MCU_PREP, 0, core_id,
+		      0, 0, 0, 0, &res);
+
+	return res.a0;
+}
+
+int arch_auxiliary_core_prepared(u32 core_id)
+{
+	struct arm_smccc_res res;
+
+	arm_smccc_smc(IMX_SIP_SRC, IMX_SIP_SRC_MCU_PREPED, 0, core_id,
+		      0, 0, 0, 0, &res);
+
+	return res.a0;
+}
+#else
+int arch_auxiliary_core_prepare(u32 core_id)
+{
+	return 0;
+}
+
+bool arch_auxiliary_core_prepared(u32 core_id)
+{
+	return true;
+}
+#endif
+
 static inline bool check_in_ddr(ulong addr)
 {
 	int i;
@@ -222,6 +256,12 @@ static int do_bootaux_cntr(struct cmd_tbl *cmdtp, int flag, int argc,
 		return CMD_RET_SUCCESS;
 	}
 
+	up = arch_auxiliary_core_prepared(core);
+	if (!up) {
+		printf("## Not prepared, run 'prepaux [coreid]' first\n");
+		return CMD_RET_FAILURE;
+	}
+
 	addr = simple_strtoul(argv[1], NULL, 16);
 
 	if (!addr)
@@ -279,6 +319,12 @@ static int do_bootaux(struct cmd_tbl *cmdtp, int flag, int argc,
 		return CMD_RET_SUCCESS;
 	}
 
+	up = arch_auxiliary_core_prepared(core);
+	if (!up) {
+		printf("## Not prepared, run 'prepaux [coreid]' first\n");
+		return CMD_RET_FAILURE;
+	}
+
 	addr = simple_strtoul(argv[1], NULL, 16);
 
 	if ((core != CORE_CM7 && core != CORE_CM71) && !addr) {
@@ -332,6 +378,32 @@ U_BOOT_CMD(
 	"<address> [<core>]\n"
 	"   - start auxiliary core [<core>] (default 0),\n"
 	"     at address <address>\n"
+);
+
+static int do_prepaux(struct cmd_tbl *cmdtp, int flag, int argc,
+		      char *const argv[])
+{
+	int ret;
+	u32 core = 0;
+
+	if (argc < 2)
+		return CMD_RET_USAGE;
+
+	if (argc > 2)
+		core = simple_strtoul(argv[2], NULL, 10);
+
+	ret = arch_auxiliary_core_prepare(core);
+	if (ret)
+		return CMD_RET_FAILURE;
+
+	return CMD_RET_SUCCESS;
+}
+
+U_BOOT_CMD(
+	prepaux, CONFIG_SYS_MAXARGS, 1,	do_prepaux,
+	"prepare auxiliary core",
+	"[<core>]\n"
+	"   - prep auxiliary core [<core>] (default 0),\n"
 );
 
 #if IS_ENABLED(CONFIG_AHAB_BOOT)
