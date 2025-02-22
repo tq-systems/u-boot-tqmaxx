@@ -23,6 +23,7 @@
 #define PINCTRL_TYPE_CONFIG     193
 #define PINCTRL_TYPE_DAISY_ID   194
 #define PINCTRL_TYPE_DAISY_CFG  195
+#define PINCTRL_TYPE_EXT        196
 #define PINCTRL_NUM_CFGS_SHIFT  2
 
 struct imx_scmi_pinctrl_priv {
@@ -46,8 +47,13 @@ static int imx_pinconf_scmi_set(struct udevice *dev, u32 mux_ofs, u32 mux, u32 c
 
 	if (mux_ofs) {
 		in.configs[num_cfgs].type = PINCTRL_TYPE_MUX;
-		in.configs[num_cfgs].val = mux;
+		in.configs[num_cfgs].val = mux & 0xFF;
 		num_cfgs++;
+		if (mux & 0xFF00) {
+			in.configs[num_cfgs].type = PINCTRL_TYPE_EXT;
+			in.configs[num_cfgs].val = (mux & 0xFF00) >> 8;
+			num_cfgs++;
+		}
 	}
 
 	if (config_val) {
