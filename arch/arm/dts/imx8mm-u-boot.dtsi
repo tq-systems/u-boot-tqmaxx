@@ -4,6 +4,11 @@
  */
 
 / {
+	aliases {
+		usb0 = &usbotg1;
+		usb1 = &usbotg2;
+	};
+
 	binman: binman {
 	};
 

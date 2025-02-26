@@ -105,6 +105,10 @@
 };
 
 &i2c1 {
+	pinctrl-names = "default", "gpio";
+	pinctrl-1 = <&pinctrl_i2c1_gpio>;
+	scl-gpios = <&gpio5 14 GPIO_ACTIVE_HIGH>;
+	sda-gpios = <&gpio5 15 GPIO_ACTIVE_HIGH>;
 	bootph-pre-ram;
 
 	pmic_nxp: pca9450@25 {
@@ -213,6 +217,21 @@
 	};
 };
 
+&i2c2 {
+	pinctrl-names = "default", "gpio";
+	pinctrl-1 = <&pinctrl_i2c2_gpio>;
+	scl-gpios = <&gpio5 16 GPIO_ACTIVE_HIGH>;
+	sda-gpios = <&gpio5 17 GPIO_ACTIVE_HIGH>;
+};
+
+&i2c3 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default", "gpio";
+	pinctrl-1 = <&pinctrl_i2c3_gpio>;
+	scl-gpios = <&gpio5 18 GPIO_ACTIVE_HIGH>;
+	sda-gpios = <&gpio5 19 GPIO_ACTIVE_HIGH>;
+};
+
 /delete-node/ &{/soc@0/bus@30800000/i2c@30a20000/pmic@4b};
 
 &pinctrl_i2c1 {
@@ -227,11 +246,9 @@
 	bootph-pre-ram;
 };
 
-&fec1 {
-	phy-reset-gpios = <&gpio4 22 GPIO_ACTIVE_LOW>;
-};
-
 &ethphy0 {
+	reset-deassert-us = <80000>;
+
 	vddio0: vddio-regulator {
 		regulator-name = "VDDIO";
 		regulator-min-microvolt = <1800000>;
@@ -246,4 +263,27 @@
 &usbotg1 {
 	status = "okay";
 	extcon = <&ptn5110>;
+};
+
+&iomuxc {
+	pinctrl_i2c1_gpio: i2c1-gpiogrp {
+		fsl,pins = <
+			MX8MM_IOMUXC_I2C1_SCL_GPIO5_IO14        		0x1c3
+			MX8MM_IOMUXC_I2C1_SDA_GPIO5_IO15        	0x1c3
+		>;
+	};
+
+	pinctrl_i2c2_gpio: i2c2-gpiogrp {
+		fsl,pins = <
+			MX8MM_IOMUXC_I2C2_SCL_GPIO5_IO16        		0x1c3
+			MX8MM_IOMUXC_I2C2_SDA_GPIO5_IO17        	0x1c3
+		>;
+	};
+
+	pinctrl_i2c3_gpio: i2c3-gpiogrp {
+		fsl,pins = <
+			MX8MM_IOMUXC_I2C3_SCL_GPIO5_IO18        		0x1c3
+			MX8MM_IOMUXC_I2C3_SDA_GPIO5_IO19        	0x1c3
+		>;
+	};
 };
