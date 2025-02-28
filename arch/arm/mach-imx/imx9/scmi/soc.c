@@ -700,36 +700,42 @@ int power_on_m7(char *name)
 		return -EINVAL;
 	}
 
-	/* Power up M7MIX */
-	ret = scmi_pwd_state_set(dev, 0, SCMI_PD(M70), 0);
-	if (ret) {
-		printf("Power M7 failed\n");
-		return -EIO;
-	}
+	if (!arch_auxiliary_core_check_up(1)) {
+		/* Power up M7MIX */
+		ret = scmi_pwd_state_set(dev, 0, SCMI_PD(M70), 0);
+		if (ret) {
+			printf("Power M7 failed\n");
+			return -EIO;
+		}
 
-	/* In case OEI not init ECC, do it here */
-	memset_io((void *)0x203c0000, 0, 0x40000);
-	memset_io((void *)0x20400000, 0, 0x40000);
+		/* In case OEI not init ECC, do it here */
+		memset_io((void *)0x203c0000, 0, 0x40000);
+		memset_io((void *)0x20400000, 0, 0x40000);
+	}
 
 #ifdef CONFIG_IMX94
-	ret = scmi_pwd_state_set(dev, 0, SCMI_PD(M71), 0);
-	if (ret) {
-		printf("Power M71 failed\n");
-		return -EIO;
+	if (!arch_auxiliary_core_check_up(7)) {
+		ret = scmi_pwd_state_set(dev, 0, SCMI_PD(M71), 0);
+		if (ret) {
+			printf("Power M71 failed\n");
+			return -EIO;
+		}
+
+		memset_io((void *)0x202c0000, 0, 0x40000);
+		memset_io((void *)0x20300000, 0, 0x40000);
 	}
 
-	memset_io((void *)0x202c0000, 0, 0x40000);
-	memset_io((void *)0x20300000, 0, 0x40000);
+	if (!arch_auxiliary_core_check_up(8)) {
+		ret = scmi_pwd_state_set(dev, 0, SCMI_PD(NETC), 0);
+		if (ret) {
+			printf("Power M33S failed\n");
+			return -EIO;
+		}
 
-	ret = scmi_pwd_state_set(dev, 0, SCMI_PD(NETC), 0);
-	if (ret) {
-		printf("Power M33S failed\n");
-		return -EIO;
+		memset_io((void *)0x209c0000, 0, 0x40000);
+		memset_io((void *)0x20A00000, 0, 0x40000);
+		memset_io((void *)0x20800000, 0, 0xa1000);
 	}
-
-	memset_io((void *)0x209c0000, 0, 0x40000);
-	memset_io((void *)0x20A00000, 0, 0x40000);
-	memset_io((void *)0x20800000, 0, 0xa1000);
 #endif
 
 	return 0;
