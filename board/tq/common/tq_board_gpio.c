@@ -5,7 +5,8 @@
  * Author: Markus Niebel
  */
 
-#include <asm/gpio.h>
+#include <asm-generic/gpio.h>
+
 #include "tq_board_gpio.h"
 
 int tq_board_gpio_init(struct tq_gpio_init_data *data, int count)
