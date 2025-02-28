@@ -534,8 +534,7 @@ int board_spl_fit_post_load(const void *fit, struct spl_image_info *spl_image)
 	}
 #if defined(CONFIG_IMX8MP) || defined(CONFIG_IMX8MN)
 #define MCU_RDC_MAGIC "mcu_rdc"
-	if (!(spl_image->flags & SPL_FIT_BYPASS_POST_LOAD) &&
-	    CONFIG_IMX8M_MCU_RDC_START_CONFIG_ADDR != 0ull &&
+	if (CONFIG_IMX8M_MCU_RDC_START_CONFIG_ADDR != 0ull &&
 	    CONFIG_IMX8M_MCU_RDC_STOP_CONFIG_ADDR != 0ull) {
 		if (!board_handle_rdc_config(spl_image->fdt_addr, "start-config",
 					     (void *)(CONFIG_IMX8M_MCU_RDC_START_CONFIG_ADDR +
