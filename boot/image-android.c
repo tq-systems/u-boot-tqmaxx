@@ -39,6 +39,11 @@
 				BOOTCONFIG_SIZE_SIZE + \
 				BOOTCONFIG_CHECKSUM_SIZE
 
+/* Reserve space to insert 'rng-seed' node */
+#define RNG_SEED_DTB_RESERVE (64)
+/* Generate 24 bytes (out of 32 bytes) rng seed */
+#define RNG_SEED_LENGTH (24)
+
 static char andr_tmp_str[ANDR_BOOT_ARGS_SIZE + 1];
 
 static ulong checksum(const unsigned char *buffer, ulong size)
@@ -435,40 +440,75 @@ static int append_androidboot_args(char *args, uint32_t *len, void *fdt_addr)
 			return -1;
 		}
 
+#ifdef CONFIG_DM_RNG
 #if defined(CONFIG_ANDROID_SUPPORT) || defined(CONFIG_ANDROID_AUTO_SUPPORT)
-#if defined(CONFIG_IMX8ULP) || defined(CONFIG_IMX95)
 		/* set the value of the /chosen/rng-seed property */
 		offset = fdt_path_offset(fdt_addr, "/chosen");
 		if (offset > 0) {
 			int prop_len = 0, ret = 0;
-			struct fdt_property *prop;
+			void *rand_buf = NULL;
+			struct udevice *dev = NULL;
 
-			prop = fdt_get_property_w(fdt_addr, offset, "rng-seed", &prop_len);
-			if (prop) {
-				void *rand_buf = memalign(ARCH_DMA_MINALIGN, prop_len);
-				struct udevice *dev;
+			do {
+				/*
+				 * Delete the hardcode node which exists on some legacy
+				 * kernel dts, bootloader can handle the node without
+				 * inserting placeholder.
+				 */
+				if (fdt_get_property(fdt_addr, offset, "rng-seed", &prop_len) != NULL) {
+					printf("'rng-seed' node already exist, delete it\n");
+					fdt_delprop(fdt_addr, offset, "rng-seed");
+				}
 
-				ret =  uclass_get_device(UCLASS_RNG, 0, &dev);
+				/*
+				 * Don't pass bootloader randomness if no reliable
+				 * RNG driver found.
+				 */
+				ret = uclass_get_device(UCLASS_RNG, 0, &dev);
+				if (ret != 0 || !dev) {
+					printf("no RNG driver found! ret: %d\n", ret);
+					ret = 0;
+					break;
+				}
 
-				if (!rand_buf || ret || !dev || dm_rng_read(dev, rand_buf, prop_len) || \
-					fdt_setprop(fdt_addr, offset, "rng-seed", rand_buf, prop_len)) {
-					printf("failed to generate random, delete the 'rng-seed' node.\n");
-					ret = fdt_delprop(fdt_addr, offset, "rng-seed");
+				ret = fdt_increase_size(fdt_addr, RNG_SEED_DTB_RESERVE);
+				if (ret != 0) {
+					printf("failed to increase the fdt size! ret: %d", ret);
+					break;
 				}
-				if (rand_buf) {
-					memset(rand_buf, 0, prop_len);
-					free(rand_buf);
+
+				rand_buf = memalign(ARCH_DMA_MINALIGN, RNG_SEED_LENGTH);
+				if (!rand_buf) {
+					printf("failed to allocate memory!\n");
+					ret = -1;
+					break;
 				}
-				if (ret) {
-					printf("fail to delete the /chosen/rng-seed property, the kernel crng may be compromised\n");
-					return -1;
+
+				ret = dm_rng_read(dev, rand_buf, RNG_SEED_LENGTH);
+				if (ret != 0) {
+					printf("failed to generate random! ret: %d\n", ret);
+					break;
 				}
+
+				ret = fdt_setprop(fdt_addr, offset, "rng-seed", rand_buf, RNG_SEED_LENGTH);
+				if (ret != 0) {
+					printf("failed to set 'rng-seed' node in device tree! ret: %d\n", ret);
+					break;
+				}
+			} while(0);
+
+			if (rand_buf) {
+				memset(rand_buf, 0, RNG_SEED_LENGTH);
+				free(rand_buf);
+			}
+			if (ret) {
+				return -1;
 			}
 		} else {
 			printf("the device tree may not have the /chosen node\n");
 		}
-#endif
-#endif
+#endif /* CONFIG_ANDROID_SUPPORT || CONFIG_ANDROID_AUTO_SUPPORT */
+#endif /* CONFIG_DM_RNG */
 	}
 
 	/* boot metric variables */
