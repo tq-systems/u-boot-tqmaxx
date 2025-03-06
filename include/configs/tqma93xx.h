@@ -47,14 +47,7 @@
 	"fdtoverlay_addr_r=0x83080000\0"                               \
 	"initrd_addr=0x83800000\0"                                     \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0"             \
-	"mmcfwpart=1\0"                                                \
-	"mmcfwpath=/\0"                                                \
 	"mmcautodetect=yes\0"                                          \
-	"loadbootscript=mmc dev ${mmcdev}; mmc rescan;"                \
-		"load mmc ${mmcdev}:${mmcfwpart} ${loadaddr} "         \
-		"${mmcfwpath}${script};\0"                             \
-	"bootscript=echo Running bootscript from mmc ...; "            \
-		"source\0"                                             \
 	"boot_os=booti ${kernel_addr_r} - ${fdt_addr_r};\0"            \
 	"emmc_bootp_start=0x0\0"                                       \
 	"uboot_mmc_start=0x40\0"                                       \
