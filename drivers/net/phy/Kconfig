@@ -21,7 +21,7 @@ config PHY_ADDR_ENABLE
 
 config PHY_ANEG_TIMEOUT
 	int "PHY auto-negotiation timeout"
-	default 4000
+	default 20000
 	help
 	  Default PHY auto-negotiation timeout.
 
