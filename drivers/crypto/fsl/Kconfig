@@ -115,6 +115,13 @@ config RNG_SELF_TEST
 
 endif
 
+config FSL_ELE_BLOB
+	bool "Enable Blob Encap/Decap support using ELE"
+        depends on IMX_ELE
+        help
+          Enable support for Blob Encap/Decap using ELE. It is
+	  used to wrap or unwrap data using EdgeLock Secure Enclave.
+
 config FSL_DCP_RNG
 	bool "Enable DCP Random Number Generator support"
 	depends on DM_RNG

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Copyright 2020, 2023 NXP
+ * Copyright 2020, 2023, 2025 NXP
  * Copyright 2024 Mathieu Othacehe <othacehe@gnu.org>
  *
  */
@@ -819,6 +819,44 @@ int ele_generate_dek_blob(u32 key_id, u32 src_paddr, u32 dst_paddr, u32 max_outp
 		printf("Error: %s: ret 0x%x, response 0x%x\n",
 		       __func__, ret, msg.data[0]);
 
+	return ret;
+}
+
+int ele_blob(u32 key_id, u32 src, u32 in_size, u32 dst, u32 out_size, int wrap_blob)
+{
+	struct udevice *dev = gd->arch.ele_dev;
+	int size = sizeof(struct ele_msg);
+	struct ele_msg msg = {0};
+	int ret = 0;
+
+	if (!dev) {
+		printf("ele dev is not initialized\n");
+		return -ENODEV;
+	}
+
+	msg.version = ELE_VERSION;
+	msg.tag = ELE_CMD_TAG;
+	msg.size = ELE_BLOB_MSG_SIZE;
+	msg.command = ELE_BLOB;
+	msg.data[0] = upper_32_bits(src);
+	msg.data[1] = lower_32_bits(src);
+	msg.data[2] = upper_32_bits(dst);
+	msg.data[3] = lower_32_bits(dst);
+	msg.data[4] = 0;
+	msg.data[5] = 0;
+	msg.data[6] = in_size;
+	msg.data[7] = out_size;
+	msg.data[8] = 0;
+	if (wrap_blob)
+		msg.data[9] = (ELE_BLOB_ENCAP_MODE << ELE_BLOB_SHIFT);
+	else
+		msg.data[9] = (ELE_BLOB_DECAP_MODE << ELE_BLOB_SHIFT);
+	msg.data[10] = compute_crc(&msg);
+
+	ret = misc_call(dev, false, &msg, size, &msg, size);
+	if (ret)
+		printf("Error: %s: ret 0x%x, response 0x%x\n",
+		       __func__, ret, msg.data[0]);
 	return ret;
 }
 
