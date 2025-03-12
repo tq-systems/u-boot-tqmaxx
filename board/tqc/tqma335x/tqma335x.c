@@ -66,13 +66,13 @@ static struct module_pin_mux i2c0_pin_mux[] = {
 
 static struct module_pin_mux spi0_pin_mux[] = {
 	/* SPI0_SCLK (needs RXACTIVE to work) */
-	{OFFSET(spi0_sclk), (MODE(0) | RXACTIVE | PULLUDEN | PULLUP_EN)},
+	{OFFSET(spi0_sclk), (MODE(0) | RXACTIVE | PULLUDDIS)},
 	/* SPI0_D0 */
-	{OFFSET(spi0_d0), (MODE(0) | RXACTIVE | PULLUDDIS)},
+	{OFFSET(spi0_d0), (MODE(0) | RXACTIVE | PULLUDEN | PULLDOWN_EN)},
 	/* SPI0_D1 */
-	{OFFSET(spi0_d1), (MODE(0) | PULLUDEN | PULLUP_EN)},
+	{OFFSET(spi0_d1), (MODE(0) | PULLUDDIS)},
 	/* SPI0_CS0 */
-	{OFFSET(spi0_cs0), (MODE(0) | PULLUDEN | PULLUP_EN)},
+	{OFFSET(spi0_cs0), (MODE(0) | PULLUDDIS)},
 	{-1},
 };
 
