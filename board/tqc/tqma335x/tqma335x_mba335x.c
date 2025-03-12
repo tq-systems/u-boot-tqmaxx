@@ -9,6 +9,7 @@
 
 #include <common.h>
 #include <asm/arch/mmc_host_def.h>
+#include <asm/arch/mux.h>
 #include <asm/arch/sys_proto.h>
 #include <dm.h>
 #include <environment.h>
@@ -26,15 +27,30 @@ struct serial_device *default_serial_console(void)
 }
 #endif
 
+static struct module_pin_mux uart4_pin_mux[] = {
+	{OFFSET(gpmc_wait0), (MODE(6) | PULLUP_EN | RXACTIVE)},	/* UART4_RXD */
+	{OFFSET(gpmc_wpn), (MODE(6) | PULLUDEN)},		/* UART4_TXD */
+	{-1},
+};
+
+static struct module_pin_mux mmc0_pin_mux[] = {
+	{OFFSET(mmc0_dat3), (MODE(0) | RXACTIVE | PULLUP_EN)},	/* MMC0_DAT3 */
+	{OFFSET(mmc0_dat2), (MODE(0) | RXACTIVE | PULLUP_EN)},	/* MMC0_DAT2 */
+	{OFFSET(mmc0_dat1), (MODE(0) | RXACTIVE | PULLUP_EN)},	/* MMC0_DAT1 */
+	{OFFSET(mmc0_dat0), (MODE(0) | RXACTIVE | PULLUP_EN)},	/* MMC0_DAT0 */
+	{OFFSET(mmc0_clk), (MODE(0) | RXACTIVE | PULLUP_EN)},	/* MMC0_CLK */
+	{OFFSET(mmc0_cmd), (MODE(0) | RXACTIVE | PULLUP_EN)},	/* MMC0_CMD */
+	{-1},
+};
+
 void set_uart_mux_conf(void)
 {
-	enable_uart4_pin_mux();
+	configure_module_pin_mux(uart4_pin_mux);
 }
 
 void enable_board_pin_mux(void)
 {
-	enable_mmc0_pin_mux();
-	set_uart_mux_conf();
+	configure_module_pin_mux(mmc0_pin_mux);
 }
 
 #if defined(CONFIG_ENV_IS_IN_MMC)

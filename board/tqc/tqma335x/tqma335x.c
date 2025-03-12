@@ -26,36 +26,6 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-static struct module_pin_mux uart0_pin_mux[] = {
-	{OFFSET(uart0_rxd), (MODE(0) | PULLUP_EN | RXACTIVE)},	/* UART0_RXD */
-	{OFFSET(uart0_txd), (MODE(0) | PULLUDEN)},		/* UART0_TXD */
-	{-1},
-};
-
-static struct module_pin_mux uart3_pin_mux[] = {
-	{OFFSET(spi0_cs1), (MODE(1) | PULLUP_EN | RXACTIVE)},	/* UART3_RXD */
-	{OFFSET(ecap0_in_pwm0_out), (MODE(1) | PULLUDEN)},	/* UART3_TXD */
-	{-1},
-};
-
-static struct module_pin_mux uart4_pin_mux[] = {
-	{OFFSET(gpmc_wait0), (MODE(6) | PULLUP_EN | RXACTIVE)},	/* UART4_RXD */
-	{OFFSET(gpmc_wpn), (MODE(6) | PULLUDEN)},		/* UART4_TXD */
-	{-1},
-};
-
-static struct module_pin_mux mmc0_pin_mux[] = {
-	{OFFSET(mmc0_dat3), (MODE(0) | RXACTIVE | PULLUP_EN)},	/* MMC0_DAT3 */
-	{OFFSET(mmc0_dat2), (MODE(0) | RXACTIVE | PULLUP_EN)},	/* MMC0_DAT2 */
-	{OFFSET(mmc0_dat1), (MODE(0) | RXACTIVE | PULLUP_EN)},	/* MMC0_DAT1 */
-	{OFFSET(mmc0_dat0), (MODE(0) | RXACTIVE | PULLUP_EN)},	/* MMC0_DAT0 */
-	{OFFSET(mmc0_clk), (MODE(0) | RXACTIVE | PULLUP_EN)},	/* MMC0_CLK */
-	{OFFSET(mmc0_cmd), (MODE(0) | RXACTIVE | PULLUP_EN)},	/* MMC0_CMD */
-	{OFFSET(mcasp0_aclkr), (MODE(4) | RXACTIVE)},		/* MMC0_WP */
-	{OFFSET(spi0_cs1), (MODE(7) | RXACTIVE | PULLUP_EN)},	/* GPIO0_6 */
-	{-1},
-};
-
 static struct module_pin_mux i2c0_pin_mux[] = {
 	{OFFSET(i2c0_sda), (MODE(0) | RXACTIVE |
 			PULLUDEN | SLEWCTRL)}, /* I2C_DATA */
@@ -76,35 +46,15 @@ static struct module_pin_mux spi0_pin_mux[] = {
 	{-1},
 };
 
-void enable_uart0_pin_mux(void)
-{
-	configure_module_pin_mux(uart0_pin_mux);
-}
-
-void enable_uart3_pin_mux(void)
-{
-	configure_module_pin_mux(uart3_pin_mux);
-}
-
-void enable_uart4_pin_mux(void)
-{
-	configure_module_pin_mux(uart4_pin_mux);
-}
-
-void enable_i2c0_pin_mux(void)
+static void enable_i2c0_pin_mux(void)
 {
 	configure_module_pin_mux(i2c0_pin_mux);
-}
-
-void enable_mmc0_pin_mux(void)
-{
-	configure_module_pin_mux(mmc0_pin_mux);
 }
 
 void set_mux_conf_regs(void)
 {
+	enable_i2c0_pin_mux();
 	configure_module_pin_mux(spi0_pin_mux);
-	configure_module_pin_mux(i2c0_pin_mux);
 	enable_board_pin_mux();
 }
 
@@ -297,7 +247,6 @@ static void scale_vcores_generic(int freq)
 		puts("WARN: CORE voltage update failed\n");
 		return;
 	}
-
 }
 
 void gpi2c_init(void)

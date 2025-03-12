@@ -9,19 +9,6 @@
 #ifndef _TQMA335X_H_
 #define _TQMA335X_H_
 
-/*
- * We have some pin mux functions that must exist:
- * - We must be able to enable uart<n> for initial output
- * - and i2c0 to access the module EEPROM and PMIC.
- * We then have a main pinmux function that can be overridden to enable all
- * other pinmux that is required on the baseboard.
- * For convinience we have some standard muxing functions for common interfaces.
- */
-void enable_uart0_pin_mux(void);
-void enable_uart3_pin_mux(void);
-void enable_uart4_pin_mux(void);
-void enable_i2c0_pin_mux(void);
-void enable_mmc0_pin_mux(void);
 /* can be overwritten */
 void enable_board_pin_mux(void);
 
