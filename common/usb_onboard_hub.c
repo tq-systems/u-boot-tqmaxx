@@ -227,6 +227,10 @@ static const struct onboard_hub_data usb5744_data = {
 	.reset_us = 5,
 };
 
+static const struct onboard_hub_data usb8041_data = {
+	.reset_us = 30000,
+};
+
 static const struct udevice_id usb_onboard_hub_ids[] = {
 	/* Use generic usbVID,PID dt-bindings (usb-device.yaml) */
 	{	.compatible = "usb424,2514",	/* USB2514B USB 2.0 */
@@ -240,6 +244,12 @@ static const struct udevice_id usb_onboard_hub_ids[] = {
 	}, {
 		.compatible = "usb424,5744",	/* USB5744 USB 3.0 */
 		.data = (ulong)&usb5744_data,
+	}, {
+		.compatible = "usb451,8140",	/* TUSB8041 USB 3.0 */
+		.data = (ulong)&usb8041_data,
+	}, {
+		.compatible = "usb451,8142",	/* TUSB8041 USB 2.0 */
+		.data = (ulong)&usb8041_data,
 	}
 };
 
