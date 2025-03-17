@@ -33,29 +33,15 @@
 /* Custom script for NOR */
 #define CONFIG_SYS_LDSCRIPT		"board/tqc/tqma335x/u-boot.lds"
 
-#define BOOTENV_DEV_LEGACY_MMC(devtypeu, devtypel, instance) \
-	"bootcmd_" #devtypel #instance "=" \
-	"setexpr bootdev ${mmcdev} ^ " #instance "; " \
-	"setenv mmcdev ${bootdev}; "\
-	"setenv bootpart ${bootdev}:2; "\
-	"run mmcboot\0"
-
-#define BOOTENV_DEV_NAME_LEGACY_MMC(devtypeu, devtypel, instance) \
-	#devtypel #instance " "
-
 #ifndef CONFIG_SPL_BUILD
-#include <environment/ti/mmc.h>
 
 #define TQMA335X_ENV_SETTINGS \
 	DEFAULT_LINUX_BOOT_ENV \
-	DEFAULT_MMC_TI_ARGS \
-	"boot_fit=0\0" \
 	"mmcautodetect=yes\0" \
-	"bootpart=0:2\0" \
+	"mmcrootpart=2\0" \
 	"bootdir=/boot\0" \
 	"bootfile=zImage\0" \
 	"fdtfile=" CONFIG_DEFAULT_FDT_FILE "\0" \
-	"optargs=\0" \
 	"uboot=u-boot.img\0" \
 	"mlo=MLO\0" \
 	"uboot_spi=u-boot.img\0" \
@@ -101,11 +87,16 @@
 		"setenv ${filesize}; setenv getcmd; setenv mlo_load_addr; " \
 		"setenv mlo_size; setenv uboot_load_addr \0" \
 	"upd_uboot_spi_net=run update_uboot_spi\0" \
+	"mmcrootfstype=ext4 rootwait\0" \
+	"addmmc=setenv bootargs ${bootargs} " \
+		"root=/dev/mmcblk${mmcblkdev}p${mmcrootpart} " \
+		"rw rootfstype=${mmcrootfstype}\0" \
 	"addtty=setenv bootargs ${bootargs} console=${console}\0"              \
 	"netdev=eth0\0"                                                        \
 	"rootpath=/srv/nfs/exports\0"                                          \
 	"ipmode=static\0"                                                      \
 	"netargs=run addnfs addip addtty\0"                                    \
+	"mmcargs=run addmmc addtty\0"                                          \
 	"addnfs=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/nfs rw "                                            \
 		"nfsroot=${serverip}:${rootpath},v3,tcp;\0"                    \
@@ -128,6 +119,20 @@
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"echo ... failed\0"                                            \
+	"loadimage=load ${devtype} ${devnum}:${mmcrootpart} ${loadaddr} ${bootdir}/${bootfile}\0" \
+	"loadfdt=load ${devtype} ${devnum}:${mmcrootpart} ${fdtaddr} ${bootdir}/${fdtfile}\0" \
+	"mmcboot=mmc dev ${mmcdev}; " \
+		"setenv devnum ${mmcdev}; " \
+		"setenv devtype mmc; " \
+		"if mmc rescan; then " \
+			"echo SD/MMC found on device ${mmcdev};" \
+			"run mmcargs; " \
+			"if run loadimage && run loadfdt; then " \
+				"bootz ${loadaddr} - ${fdtaddr}; " \
+			"else " \
+				"echo WARN: Loading OS image or FDT failed; " \
+			"fi;" \
+		"fi;\0" \
 	""
 #endif
 

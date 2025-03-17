@@ -12,12 +12,6 @@
 
 #include "tqma335x.h"
 
-#define BOOT_TARGET_DEVICES(func) \
-	func(LEGACY_MMC, legacy_mmc, 0) \
-	func(LEGACY_MMC, legacy_mmc, 1)
-
-#include <config_distro_bootcmd.h>
-
 #ifndef CONFIG_SPL_BUILD
 
 /* USB Device Firmware Update support */
@@ -31,15 +25,8 @@
 	TQMA335X_ENV_SETTINGS \
 	"console=ttyS4,115200n8\0" \
 	DFUARGS \
-	BOOTENV \
-	"boot_targets=legacy_mmc0\0" \
 	"upd_uboot_emmc_net=setenv mmcdev 0 && run update_uboot_mmc\0" \
 	"upd_uboot_sd_net=setenv mmcdev 1 && run update_uboot_mmc\0" \
-	"partitions=" \
-		"uuid_disk=${uuid_gpt_disk};" \
-		"name=bootloader,start=384K,size=1792K," \
-			"uuid=${uuid_gpt_bootloader};" \
-		"name=rootfs,start=2688K,size=-,uuid=${uuid_gpt_rootfs}\0" \
 	""
 
 #endif
