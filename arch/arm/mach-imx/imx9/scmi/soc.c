@@ -10,6 +10,7 @@
 #include <asm/arch/sys_proto.h>
 #include <asm/armv8/mmu.h>
 #include <asm/mach-imx/boot_mode.h>
+#include <asm/mach-imx/optee.h>
 #include <asm/mach-imx/ele_api.h>
 #include <asm/setup.h>
 #include <dm/uclass.h>
@@ -17,6 +18,7 @@
 #include <env_internal.h>
 #include <fuse.h>
 #include <imx_thermal.h>
+#include <thermal.h>
 #include <scmi_agent.h>
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -52,6 +54,24 @@ uint32_t scmi_get_rom_data(rom_passover_t *rom_data)
 	}
 
 	return 0;
+}
+
+bool is_usb_boot(void)
+{
+	enum boot_device bt_dev = get_boot_device();
+	return (bt_dev == USB_BOOT || bt_dev == USB2_BOOT);
+}
+
+void disconnect_from_pc(void)
+{
+	enum boot_device bt_dev = get_boot_device();
+
+	if (bt_dev == USB_BOOT)
+		clrbits_le32(USB1_BASE_ADDR + 0xc704, (1 << 31));
+	else if (bt_dev == USB2_BOOT)
+		writel(0x0, USB2_BASE_ADDR + 0x140);
+
+	return;
 }
 
 #if IS_ENABLED(CONFIG_ENV_IS_IN_MMC)
@@ -97,6 +117,21 @@ int mmc_get_env_dev(void)
 		return env_get_ulong("mmcdev", 10, CONFIG_SYS_MMC_ENV_DEV);
 
 	return board_mmc_get_env_dev(boot_instance);
+}
+#endif
+
+#ifdef CONFIG_USB_PORT_AUTO
+int board_usb_gadget_port_auto(void)
+{
+    enum boot_device bt_dev = get_boot_device();
+	int usb_boot_index = 0;
+
+	if (bt_dev == USB2_BOOT)
+		usb_boot_index = 1;
+
+	printf("auto usb %d\n", usb_boot_index);
+
+	return usb_boot_index;
 }
 #endif
 
@@ -204,16 +239,9 @@ static void disable_wdog(void __iomem *wdog_base)
 
 static struct mm_region imx9_mem_map[] = {
 	{
-		/* ROM */
-		.virt = 0x0UL,
-		.phys = 0x0UL,
-		.size = 0x100000UL,
-		.attrs = PTE_BLOCK_MEMTYPE(MT_NORMAL) |
-			 PTE_BLOCK_OUTER_SHARE
-	}, {
-		/* TCM */
-		.virt = 0x201c0000UL,
-		.phys = 0x201c0000UL,
+		/* M7 TCM */
+		.virt = 0x203c0000UL,
+		.phys = 0x203c0000UL,
 		.size = 0x80000UL,
 		.attrs = PTE_BLOCK_MEMTYPE(MT_DEVICE_NGNRNE) |
 			 PTE_BLOCK_NON_SHARE |
@@ -345,7 +373,7 @@ int dram_init(void)
 		return ret;
 
 	/* rom_pointer[1] contains the size of TEE occupies */
-	if (rom_pointer[1])
+	if (rom_pointer[1] && (PHYS_SDRAM < (phys_addr_t)rom_pointer[0]))
 		gd->ram_size = sdram_size - rom_pointer[1];
 	else
 		gd->ram_size = sdram_size;
@@ -374,7 +402,7 @@ int dram_init_banksize(void)
 	}
 
 	gd->bd->bi_dram[bank].start = PHYS_SDRAM;
-	if (rom_pointer[1]) {
+	if (rom_pointer[1] && (PHYS_SDRAM < (phys_addr_t)rom_pointer[0])) {
 		phys_addr_t optee_start = (phys_addr_t)rom_pointer[0];
 		phys_size_t optee_size = (size_t)rom_pointer[1];
 
@@ -420,9 +448,10 @@ phys_size_t get_effective_memsize(void)
 			sdram_b1_size = sdram_size;
 
 		if (rom_pointer[1]) {
-			/* We will relocate u-boot to Top of dram1. Tee position has two cases:
+			/* We will relocate u-boot to Top of dram1. Tee position has three cases:
 			 * 1. At the top of dram1,  Then return the size removed optee size.
 			 * 2. In the middle of dram1, return the size of dram1.
+			 * 3. Not in the scope of dram1, return the size of dram1.
 			 */
 			if ((rom_pointer[0] + rom_pointer[1]) == (PHYS_SDRAM + sdram_b1_size))
 				return ((phys_addr_t)rom_pointer[0] - PHYS_SDRAM);
@@ -437,49 +466,32 @@ phys_size_t get_effective_memsize(void)
 void imx_get_mac_from_fuse(int dev_id, unsigned char *mac)
 {
 	u32 val[2] = {};
-	int ret;
+	int ret, num_of_macs;
 
-	if (dev_id == 0) {
-		ret = fuse_read(39, 3, &val[0]);
-		if (ret)
-			goto err;
+	ret = fuse_read(40, 5, &val[0]);
+	if (ret)
+		goto err;
 
-		ret = fuse_read(39, 4, &val[1]);
-		if (ret)
-			goto err;
+	ret = fuse_read(40, 6, &val[1]);
+	if (ret)
+		goto err;
 
-		mac[0] = val[1] >> 8;
-		mac[1] = val[1];
-		mac[2] = val[0] >> 24;
-		mac[3] = val[0] >> 16;
-		mac[4] = val[0] >> 8;
-		mac[5] = val[0];
-
-	} else {
-		ret = fuse_read(39, 5, &val[0]);
-		if (ret)
-			goto err;
-
-		ret = fuse_read(39, 4, &val[1]);
-		if (ret)
-			goto err;
-
-		if (is_soc_rev(CHIP_REV_1_0)) {
-			mac[0] = val[1] >> 24;
-			mac[1] = val[1] >> 16;
-			mac[2] = val[0] >> 24;
-			mac[3] = val[0] >> 16;
-			mac[4] = val[0] >> 8;
-			mac[5] = val[0];
-		} else {
-			mac[0] = val[0] >> 24;
-			mac[1] = val[0] >> 16;
-			mac[2] = val[0] >> 8;
-			mac[3] = val[0];
-			mac[4] = val[1] >> 24;
-			mac[5] = val[1] >> 16;
-		}
+	num_of_macs = (val[1] >> 24) & 0xff;
+	if (num_of_macs <= (dev_id * 3)) {
+		printf("WARNING: no MAC address assigned for MAC%d\n", dev_id);
+		goto err;
 	}
+
+	mac[0] = val[0] & 0xff;
+	mac[1] = (val[0] >> 8) & 0xff;
+	mac[2] = (val[0] >> 16) & 0xff;
+	mac[3] = (val[0] >> 24) & 0xff;
+	mac[4] = val[1] & 0xff;
+	mac[5] = (val[1] >> 8) & 0xff;
+	if (dev_id == 1)
+		mac[5] = mac[5] + 3;
+	if (dev_id == 2)
+		mac[5] = mac[5] + 6;
 
 	debug("%s: MAC%d: %02x.%02x.%02x.%02x.%02x.%02x\n",
 	      __func__, dev_id, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
@@ -538,6 +550,25 @@ int print_cpuinfo(void)
 	}
 	printf("(%dC to %dC)", minc, maxc);
 
+#if defined(CONFIG_DM_THERMAL)
+	struct udevice *udev;
+	int ret, temp;
+
+	if (IS_ENABLED(CONFIG_IMX_TMU))
+		ret = uclass_get_device_by_name(UCLASS_THERMAL, "cpu-thermal", &udev);
+	else
+		ret = uclass_get_device(UCLASS_THERMAL, 0, &udev);
+	if (!ret) {
+		ret = thermal_get_temp(udev, &temp);
+
+		if (!ret)
+			printf(" at %dC", temp / 100);
+		else
+			debug(" - invalid sensor data\n");
+	} else {
+		debug(" - invalid sensor device\n");
+	}
+#endif
 	puts("\n");
 
 	return 0;
@@ -545,7 +576,7 @@ int print_cpuinfo(void)
 
 void build_info(void)
 {
-	u32 fw_version, sha1, res, status;
+	u32 fw_version, sha1, res = 0, status;
 	int ret;
 
 	printf("\nBuildInfo:\n");
@@ -560,8 +591,8 @@ void build_info(void)
 		} else {
 			printf("  - ELE firmware version %u.%u.%u-%x",
 			       (fw_version & (0x00ff0000)) >> 16,
-			       (fw_version & (0x0000ff00)) >> 8,
-			       (fw_version & (0x000000ff)), sha1);
+			       (fw_version & (0x0000fff0)) >> 4,
+			       (fw_version & (0x0000000f)), sha1);
 			((fw_version & (0x80000000)) >> 31) == 1 ? puts("-dirty\n") : puts("\n");
 		}
 	} else {
@@ -576,7 +607,7 @@ int arch_misc_init(void)
 	return 0;
 }
 
-#if defined(CONFIG_OF_BOARD_FIXUP) && !defined(CONFIG_SPL_BUILD)
+#if defined(CONFIG_OF_BOARD_FIXUP) && !defined(CONFIG_XPL_BUILD)
 int board_fix_fdt(void *fdt)
 {
 	return 0;
@@ -585,17 +616,18 @@ int board_fix_fdt(void *fdt)
 
 int ft_system_setup(void *blob, struct bd_info *bd)
 {
-	return 0;
+	return ft_add_optee_node(blob, bd);
 }
 
 #if IS_ENABLED(CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG)
 void get_board_serial(struct tag_serialnr *serialnr)
 {
-	printf("UID: 0x%x 0x%x 0x%x 0x%x\n",
-	       gd->arch.uid[0], gd->arch.uid[1], gd->arch.uid[2], gd->arch.uid[3]);
+	printf("UID: %08x%08x%08x%08x\n", __be32_to_cpu(gd->arch.uid[0]),
+	       __be32_to_cpu(gd->arch.uid[1]), __be32_to_cpu(gd->arch.uid[2]),
+	       __be32_to_cpu(gd->arch.uid[3]));
 
-	serialnr->low = gd->arch.uid[0];
-	serialnr->high = gd->arch.uid[3];
+	serialnr->low = __be32_to_cpu(gd->arch.uid[1]);
+	serialnr->high = __be32_to_cpu(gd->arch.uid[0]);
 }
 #endif
 
@@ -609,7 +641,7 @@ static void gpio_reset(ulong gpio_base)
 
 int arch_cpu_init(void)
 {
-	if (IS_ENABLED(CONFIG_SPL_BUILD)) {
+	if (IS_ENABLED(CONFIG_XPL_BUILD)) {
 		disable_wdog((void __iomem *)WDG3_BASE_ADDR);
 		disable_wdog((void __iomem *)WDG4_BASE_ADDR);
 
@@ -627,7 +659,7 @@ int arch_cpu_init(void)
 int imx9_probe_mu(void)
 {
 	struct udevice *dev;
-	int node, ret;
+	int ret;
 	u32 res;
 	struct ele_get_info_data info;
 
@@ -647,9 +679,11 @@ int imx9_probe_mu(void)
 	if (ret)
 		return ret;
 
-	node = fdt_node_offset_by_compatible(gd->fdt_blob, -1, "fsl,imx93-mu-s4");
-
-	ret = uclass_get_device_by_of_offset(UCLASS_MISC, node, &dev);
+#if defined(CONFIG_XPL_BUILD)
+	ret = uclass_get_device_by_name(UCLASS_MISC, "mailbox@47530000", &dev);
+#else
+	ret = uclass_get_device_by_name(UCLASS_MISC, "mailbox@47550000", &dev);
+#endif
 	if (ret)
 		return ret;
 
@@ -673,7 +707,7 @@ int timer_init(void)
 	gd->arch.tbl = 0;
 	gd->arch.tbu = 0;
 
-	if (IS_ENABLED(CONFIG_SPL_BUILD)) {
+	if (IS_ENABLED(CONFIG_XPL_BUILD)) {
 		unsigned long freq = 24000000;
 
 		asm volatile("msr cntfrq_el0, %0" : : "r" (freq) : "memory");
@@ -739,7 +773,7 @@ enum boot_device get_boot_device(void)
 	enum boot_device boot_dev = 0;
 	rom_passover_t *rdata;
 
-#if IS_ENABLED(CONFIG_SPL_BUILD)
+#if IS_ENABLED(CONFIG_XPL_BUILD)
 	rdata = &rom_passover_data;
 #else
 	rom_passover_t rom_data = {0};
