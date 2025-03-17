@@ -58,9 +58,9 @@ int mmc_get_env_dev(void)
 {
 	switch (gd->arch.omap_boot_device) {
 	case BOOT_DEVICE_MMC1:
-		return 0;
-	case BOOT_DEVICE_MMC2:
 		return 1;
+	case BOOT_DEVICE_MMC2:
+		return 0;
 	default:
 		return -ENODEV;
 	}

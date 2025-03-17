@@ -33,8 +33,8 @@
 	DFUARGS \
 	BOOTENV \
 	"boot_targets=legacy_mmc0\0" \
-	"upd_uboot_sd_net=setenv mmcdev 0 && run update_uboot_mmc\0" \
-	"upd_uboot_emmc_net=setenv mmcdev 1 && run update_uboot_mmc\0" \
+	"upd_uboot_emmc_net=setenv mmcdev 0 && run update_uboot_mmc\0" \
+	"upd_uboot_sd_net=setenv mmcdev 1 && run update_uboot_mmc\0" \
 	"partitions=" \
 		"uuid_disk=${uuid_gpt_disk};" \
 		"name=bootloader,start=384K,size=1792K," \

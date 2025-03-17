@@ -7,11 +7,6 @@
 #include "am335x-tqma335x-u-boot.dtsi"
 
 / {
-	aliases {
-		mmc0 = &mmc1;
-		mmc1 = &mmc2;
-	};
-
 	config {
 		u-boot,mmc-env-offset = <0x260000>;
 		u-boot,mmc-env-offset-redundant = <0x280000>;
