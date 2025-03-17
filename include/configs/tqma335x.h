@@ -35,6 +35,8 @@
 
 #ifndef CONFIG_SPL_BUILD
 
+#define CONFIG_SYS_AUTOLOAD "no"
+
 #define TQMA335X_ENV_SETTINGS \
 	DEFAULT_LINUX_BOOT_ENV \
 	"mmcautodetect=yes\0" \
@@ -47,30 +49,30 @@
 	"uboot_spi=u-boot.img\0" \
 	"mlo_spi=MLO.byteswap\0" \
 	"update_uboot_mmc=if mmc dev ${mmcdev} && mmc rescan; then " \
-			"run set_getcmd; " \
+			"run check_ipaddr; " \
 			"setenv mlo_load_addr $loadaddr; " \
 			"setexpr uboot_load_addr ${loadaddr} + " __stringify(SZ_256K) "; " \
-			"if ${getcmd} ${mlo_load_addr} ${mlo}; then " \
+			"if tftp ${mlo_load_addr} ${mlo}; then " \
 				"setenv mlo_size $filesize; " \
-				"if ${getcmd} ${uboot_load_addr} ${uboot}; then " \
+				"if tftp ${uboot_load_addr} ${uboot}; then " \
 					"fatwrite mmc ${mmcdev}:1 ${mlo_load_addr} ${mlo} ${mlo_size} && " \
 					"fatwrite mmc ${mmcdev}:1 ${uboot_load_addr} ${uboot} ${filesize}; " \
 				"else " \
-					"echo ERROR: {getcmd} ${uboot} failed; " \
+					"echo ERROR: tftp ${uboot} failed; " \
 				"fi; " \
 			"else " \
-				"echo ERROR: {getcmd} ${mlo} failed; " \
+				"echo ERROR: tftp ${mlo} failed; " \
 			"fi; " \
 		"fi; " \
-		"setenv ${filesize}; setenv getcmd; setenv mlo_load_addr; " \
+		"setenv ${filesize}; setenv mlo_load_addr; " \
 		"setenv mlo_size; setenv uboot_load_addr \0" \
 	"update_uboot_spi=if sf probe; then " \
-			"run set_getcmd; " \
+			"run check_ipaddr; " \
 			"setenv mlo_load_addr $loadaddr; " \
 			"setexpr uboot_load_addr $loadaddr + " __stringify(CONFIG_SYS_SPI_U_BOOT_OFFS) "; " \
-			"if ${getcmd} ${mlo_load_addr} ${mlo_spi}; then " \
+			"if tftp ${mlo_load_addr} ${mlo_spi}; then " \
 				"setenv mlo_size $filesize; " \
-				"if ${getcmd} ${uboot_load_addr} ${uboot_spi}; then " \
+				"if tftp ${uboot_load_addr} ${uboot_spi}; then " \
 					"if itest ${mlo_size} <= " __stringify(CONFIG_SYS_SPI_U_BOOT_OFFS) "; then " \
 						"sf update ${mlo_load_addr} 0x0 ${mlo_size} && " \
 						"sf update ${uboot_load_addr} " __stringify(CONFIG_SYS_SPI_U_BOOT_OFFS) " ${filesize}; " \
@@ -78,47 +80,48 @@
 						"echo ERROR: ${mlo_spi} to large; " \
 					"fi; " \
 				"else " \
-					"echo ERROR: {getcmd} ${uboot_spi} failed; " \
+					"echo ERROR: tftp ${uboot_spi} failed; " \
 				"fi; " \
 			"else " \
-				"echo ERROR: {getcmd} ${mlo_spi} failed; " \
+				"echo ERROR: tftp ${mlo_spi} failed; " \
 			"fi; " \
 		"fi; " \
-		"setenv ${filesize}; setenv getcmd; setenv mlo_load_addr; " \
+		"setenv ${filesize}; setenv mlo_load_addr; " \
 		"setenv mlo_size; setenv uboot_load_addr \0" \
 	"upd_uboot_spi_net=run update_uboot_spi\0" \
-	"mmcrootfstype=ext4 rootwait\0" \
 	"addmmc=setenv bootargs ${bootargs} " \
 		"root=/dev/mmcblk${mmcblkdev}p${mmcrootpart} " \
-		"rw rootfstype=${mmcrootfstype}\0" \
+		"${rootfsmode} rootwait\0" \
+	"rootfsmode=ro\0" \
 	"addtty=setenv bootargs ${bootargs} console=${console}\0"              \
 	"netdev=eth0\0"                                                        \
-	"rootpath=/srv/nfs/exports\0"                                          \
-	"ipmode=static\0"                                                      \
+	"rootpath=/srv/nfs/tqma335x\0"                                         \
 	"netargs=run addnfs addip addtty\0"                                    \
 	"mmcargs=run addmmc addtty\0"                                          \
 	"addnfs=setenv bootargs ${bootargs} "                                  \
 		"root=/dev/nfs rw "                                            \
 		"nfsroot=${serverip}:${rootpath},v3,tcp;\0"                    \
-	"addip_static=setenv bootargs ${bootargs} "                            \
-		"ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:"            \
-		"${hostname}:${netdev}:off\0"                                  \
-	"addip_dynamic=setenv bootargs ${bootargs} ip=dhcp\0"                  \
-	"addip=if test \"${ipmode}\" != static; then "                         \
-		"run addip_dynamic; else run addip_static; fi\0"               \
-	"set_getcmd=if test \"${ipmode}\" != static; then "                    \
-		"setenv getcmd dhcp; setenv autoload yes; "                    \
-		"else setenv getcmd tftp; setenv autoload no; fi\0"            \
-	"netboot=echo Booting from net ...; "                                  \
-		"run set_getcmd; "                                             \
-		"setenv bootargs; "                                            \
-		"run netargs; "                                                \
-		"if ${getcmd} ${bootfile}; then "                              \
-			"if ${getcmd} ${fdtaddr} ${fdtfile}; then "            \
-				"bootz ${loadaddr} - ${fdtaddr}; "             \
-			"fi; "                                                 \
-		"fi; "                                                         \
-		"echo ... failed\0"                                            \
+	"check_ipaddr=" \
+		"if test -n \"${ipaddr}\" && test -n \"${serverip}\"; then " \
+			"exit; " \
+		"fi; " \
+		"echo 'ipaddr or serverip unset, falling back to DHCP...'; " \
+		"dhcp\0" \
+	"addip=" \
+		"run check_ipaddr; " \
+		"setenv bootargs ${bootargs} " \
+			"ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:" \
+				"${hostname}:${netdev}:off\0" \
+	"netboot=echo Booting from net ...; " \
+		"run check_ipaddr; " \
+		"setenv bootargs; " \
+		"run netargs; " \
+		"if tftp ${bootfile} && tftp ${fdtaddr} ${fdtfile}; then " \
+			"bootz ${loadaddr} - ${fdtaddr}; " \
+		"else " \
+			"echo WARN: Loading OS image or FDT failed; " \
+		"fi; " \
+		"echo ... failed\0" \
 	"loadimage=load ${devtype} ${devnum}:${mmcrootpart} ${loadaddr} ${bootdir}/${bootfile}\0" \
 	"loadfdt=load ${devtype} ${devnum}:${mmcrootpart} ${fdtaddr} ${bootdir}/${fdtfile}\0" \
 	"mmcboot=mmc dev ${mmcdev}; " \
