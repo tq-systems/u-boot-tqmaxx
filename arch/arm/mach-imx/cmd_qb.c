@@ -38,7 +38,6 @@ extern rom_passover_t rom_passover_data;
 
 #define IMG_TYPE_DDR_TDATA_DUMMY  (0x0Du)   /* dummy DDR training data image */
 
-#if defined(CONFIG_IMX95)
 /** Polynomial: 0xEDB88320 */
 static u32 const p_table[] =
 {
@@ -72,36 +71,29 @@ static u32 qb_crc32(const void* addr, u32 len)
 static bool qb_check(void)
 {
 	struct ddrphy_qb_state *qb_state;
-	bool valid = true;
-	u32 size, crc;
-
-	/** check crc here, or validate it using ELE */
-	qb_state = (struct ddrphy_qb_state *)CONFIG_SAVED_QB_STATE_BASE;
-	size = sizeof(struct ddrphy_qb_state) - sizeof(u32);
-	crc = qb_crc32(&qb_state->TrainedVREFCA_A0, size);
-	valid = (crc == qb_state->crc);
-
-	return valid;
-}
-#else
-static bool qb_check(void)
-{
-	struct ddrphy_qb_state *qb_state;
-	u32 i;
+	u32 i, size, crc;
 
 	/**
 	 * Ensure MAC is not empty, the reason is that
 	 * the data is invalidated after first save run
 	 */
 	qb_state = (struct ddrphy_qb_state *)CONFIG_SAVED_QB_STATE_BASE;
-	for (i = 0; i < MAC_LENGTH; i++)
-		if (qb_state->mac[i] == 0)
-			return false;
+
+	if (is_imx95_a0()) {
+		/** For iMX95 A0/1 check the CRC32 value */
+		size = sizeof(struct ddrphy_qb_state) - MAC_LENGTH * sizeof(u32);
+		crc = qb_crc32(&qb_state->TrainedVREFCA_A0, size);
+
+		return (crc == qb_state->mac[0]);
+	} else {
+		for (i = 0; i < MAC_LENGTH; i++) {
+			if (qb_state->mac[i] == 0)
+				return false;
+		}
+	}
 
 	return true;
-	/** @todo - check signature using ELE verification function */
 }
-#endif
 
 static int do_qb_check(struct cmd_tbl *cmdtp, int flag,
 		       int argc, char * const argv[])
