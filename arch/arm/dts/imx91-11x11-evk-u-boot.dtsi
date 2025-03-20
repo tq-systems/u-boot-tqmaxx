@@ -259,3 +259,7 @@
 		spi-rx-bus-width = <4>;
 	};
 };
+
+#ifdef CONFIG_MTD_SPI_NAND
+#include "imx91-11x11-evk-spinand.dtsi"
+#endif
