@@ -13,6 +13,9 @@
 
 #include "imx_env.h"
 
+/* FIT support */
+#define CONFIG_SYS_BOOTM_LEN	SZ_64M
+
 /* Display configs */
 /* activate only HDP_LOAD because display port needs firmware,
  * but setting this Option in Kconfig need CONFIG_VIDEO.

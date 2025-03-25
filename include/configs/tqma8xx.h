@@ -13,6 +13,9 @@
 
 #include "imx_env.h"
 
+/* FIT support */
+#define CONFIG_SYS_BOOTM_LEN	SZ_64M
+
 #ifdef CONFIG_SPL_BUILD
 #define CONFIG_PARSE_CONTAINER
 #define CONFIG_SPL_MAX_SIZE				(192 * 1024)
