@@ -296,7 +296,7 @@ int board_init(void)
 
 	xspi_nor_setup();
 
-	power_on_m7("mx94alt");
+	power_on_m7("mx94evkrpmsg");
 
 	return 0;
 }
