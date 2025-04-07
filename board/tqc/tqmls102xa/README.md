@@ -5,7 +5,7 @@ U-Boot to the TQ Systems TQMLS102xA modules.
 
 ## Boot source
 
-The following boot source is supported:
+The following boot sources are supported:
 
 - e-MMC/SD
 - QSPI NOR
@@ -29,6 +29,8 @@ make
 - `ecc`		- ECC enabled
 - -not given-	- ECC disabled
 
+Note: `ecc` requires a module with additionally installed ECC RAM!
+
 `<boot>` is a placeholder for the boot device
 - `mmcsd`		- build to boot from device on esDHC (eMMC or SD card)
 - `qspi`		- build to boot from flash on QSPI interface
@@ -42,7 +44,7 @@ This gives the following configurations:
 - `tqmls1021a-ae_mbls102xa_ecc_qspi_defconfig`
 
 Note: RCW is not part of u-boot. It has to be configured and created
-externally and put to gether with u-boot accordingly.
+externally and put together with u-boot accordingly.
 
 RCW repository: https://github.com/tq-systems/rcw
 
