@@ -43,3 +43,26 @@ This gives the following configurations:
 
 Note: RCW is not part of u-boot. It has to be configured and created
 externally and put to gether with u-boot accordingly.
+
+RCW repository: https://github.com/tq-systems/rcw
+
+## Merging U-Boot and RCW
+
+Depending on the boot media the bootstream has to be created differently. Below are example
+commands for creating the bootstream manually
+
+### SD card
+```
+mkimage -n rcw.bin -T pblimage -A arm -C none -a 0x10000000 -e 0 -d spl/u-boot-spl.bin spl/${spl_file}
+objcopy --gap-fill=0xff -I binary -O binary --pad-to=0x1c000 --gap-fill=0xff spl/${spl_file} u-boot-rcw.bin
+cat u-boot.bin >> u-boot-rcw.bin
+```
+
+### QSPI
+`bytesawp.tcl` can be found at https://github.com/tq-systems/meta-tq/tree/scarthgap/meta-tq/recipes-bsp/swap-file-endianess
+```
+objcopy --gap-fill=0xff -I binary -O binary --pad-to=0x10000 --gap-fill=0xff rcw.bin rcw.temp.bin
+cat rcw.temp.bin u-boot.bin > rcw_uboot.bin
+objcopy --gap-fill=0xff -I binary -O binary --pad-to=0x40000 --gap-fill=0xff rcw_uboot.bin u-boot-rcw.bin.temp
+tclsh byteswap.tcl u-boot-rcw.bin.temp u-boot-rcw.bin 8
+```
