@@ -17,6 +17,10 @@
 		usb_gadget0 = &usbg1;
 	};
 
+	chosen {
+		bootargs = "console=ttyLP0,115200";
+	};
+
 	usbg1: usbg1 {
 		compatible = "fsl,imx27-usb-gadget";
 		dr_mode = "peripheral";

@@ -36,4 +36,8 @@
 
 #define CFG_SYS_NAND_BASE           0x20000000
 
+#ifdef CONFIG_ANDROID_SUPPORT
+#include "imx8mp_evk_android.h"
+#endif
+
 #endif

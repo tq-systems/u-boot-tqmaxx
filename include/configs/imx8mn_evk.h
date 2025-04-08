@@ -28,4 +28,8 @@
 #define PHYS_SDRAM_SIZE			0x80000000 /* 2GB DDR */
 #endif
 
+#ifdef CONFIG_ANDROID_SUPPORT
+#include "imx8mn_evk_android.h"
+#endif
+
 #endif
