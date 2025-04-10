@@ -22,29 +22,72 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+extern struct dram_timing_info dram_micron_8gb_timing;
+
 int spl_board_boot_device(enum boot_device boot_dev_spl)
 {
 	return BOOT_DEVICE_BOOTROM;
 }
 
+#define DDR_BASE 0x40000000ULL
+#define MIRROR   0xC0000000ULL
+
 void spl_dram_init(void)
 {
-	ddr_init(&dram_timing);
+	int ret;
+	volatile unsigned int *ptr;
+
+	ret = ddr_init(&dram_micron_8gb_timing);
+
+	if(ret == 0)
+	{
+		ptr = (volatile unsigned int *)DDR_BASE;
+		ptr[0] = 0xCAFEBABE;
+
+		ptr = (volatile unsigned int *)MIRROR;
+		ptr[0] = 0xBEAFBEAF;
+
+		invalidate_dcache_range((ulong)DDR_BASE,
+					(ulong)DDR_BASE + 4);
+		invalidate_dcache_range((ulong)MIRROR,
+					(ulong)MIRROR + 4);
+
+		ptr = (volatile unsigned int *)DDR_BASE;
+
+		if (ptr[0] == 0xBEAFBEAF) {
+			printf("4GB\n");
+			printf ("Re-training for 4GByte Kingston memory\n");
+			ddr_init(&dram_timing);
+			/* Indicate 4GB chip to board_phys_sdram_size */
+			ptr[0] = 0xBEAFBEAF;
+		}
+	} else {
+		printf("8GB training failed\n");
+		printf ("Re-training for 4GByte Kingston memory\n");
+		ddr_init(&dram_timing);
+		/* Indicate 4GB chip to board_phys_sdram_size */
+		ptr = (volatile unsigned int *)DDR_BASE;
+		ptr[0] = 0xBEAFBEAF;
+	}
 }
 
 void spl_board_init(void)
 {
+	arch_misc_init();
+
 	/*
 	 * Set GIC clock to 500Mhz for OD VDD_SOC. Kernel driver does
 	 * not allow to change it. Should set the clock after PMIC
 	 * setting done. Default is 400Mhz (system_pll1_800m with div = 2)
 	 * set by ROM for ND VDD_SOC
 	 */
+#if !defined(CONFIG_IMX8M_VDD_SOC_850MV)
 	clock_enable(CCGR_GIC, 0);
 	clock_set_target_val(GIC_CLK_ROOT, CLK_ROOT_ON | CLK_ROOT_SOURCE_SEL(5));
 	clock_enable(CCGR_GIC, 1);
 
 	puts("Normal Boot\n");
+#endif
 }
 
 int power_init_board(void)
@@ -104,18 +147,29 @@ int board_fit_config_name_match(const char *name)
 
 void board_init_f(ulong dummy)
 {
+	struct udevice *dev;
 	int ret;
-
-	arch_cpu_init();
-
-	init_uart_clk(1);
 
 	/* Clear the BSS. */
 	memset(__bss_start, 0, __bss_end - __bss_start);
 
-	ret = spl_init();
+	arch_cpu_init();
+
+	board_early_init_f();
+
+	timer_init();
+
+	ret = spl_early_init();
 	if (ret) {
-		debug("spl_init() failed: %d\n", ret);
+		debug("spl_early_init() failed: %d\n", ret);
+		hang();
+	}
+
+	ret = uclass_get_device_by_name(UCLASS_CLK,
+					"clock-controller@30380000",
+					&dev);
+	if (ret < 0) {
+		printf("Failed to find clock node. Check device tree\n");
 		hang();
 	}
 
