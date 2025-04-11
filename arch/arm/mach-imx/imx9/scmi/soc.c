@@ -19,6 +19,7 @@
 #include <fuse.h>
 #include <imx_thermal.h>
 #include <thermal.h>
+#include <fdt_support.h>
 #include <scmi_agent.h>
 #include <scmi_nxp_protocols.h>
 #include <linux/bitops.h>
@@ -1215,8 +1216,10 @@ int disable_lvds_node(void *blob)
 int ft_system_setup(void *blob, struct bd_info *bd)
 {
 	u32 val = 0;
+	int ret = 0, nodeoff;
 	int num_a55_cores_disabled = 0;
 	int gpu_disabled = 0;
+	const char *status = "disabled";
 
 	if (is_imx95()) {
 		fuse_read(2, 2, &val);
@@ -1254,6 +1257,25 @@ int ft_system_setup(void *blob, struct bd_info *bd)
 			disable_pciea_node(blob);
 		if (val & BIT(7)) /* PCIE B */
 			disable_pcieb_node(blob);
+
+		if ((gd->arch.soc_rev >> 28) == 0xa) {
+			puts("disabling SMMU\n");
+
+			ret = fdt_increase_size(blob, 256);
+			if (ret) {
+				printf("Unable to increase fdt size, err=%s\n", fdt_strerror(ret));
+				return ret;
+			}
+			nodeoff = fdt_path_offset(blob, "/soc/bus@49000000/iommu@490d0000");
+			if (nodeoff > 0) {
+				ret = fdt_setprop(blob, nodeoff, "status", status,
+						  strlen(status) + 1);
+				if (ret) {
+					printf("Unable to disable SMMU, err=%s\n", fdt_strerror(ret));
+					return ret;
+				}
+			}
+		}
 
 		if (val & BIT(17)) { /* GPU MIX */
 			disable_gpu_node(blob, num_a55_cores_disabled);
