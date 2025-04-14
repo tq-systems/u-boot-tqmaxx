@@ -33,6 +33,7 @@
 #define MBA6_BOARDNAME "MBa6x"
 
 #include "../common/tq_bb.h"
+#include "../common/tq_eeprom.h"
 
 #define UART_PAD_CTRL  (PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_MED | \
 	PAD_CTL_DSE_80ohm   | PAD_CTL_SRE_FAST  | PAD_CTL_HYS)
@@ -108,6 +109,28 @@ int board_mmc_get_env_dev(int devno)
 int tq_bb_board_init(void)
 {
 	mba6_setup_iomuxc_enet();
+
+	return 0;
+}
+
+int tq_bb_board_late_init(void)
+{
+	struct tq_eeprom_data eeprom;
+	char mac[20];
+	int ret;
+
+	ret = tq_read_eeprom(1, &eeprom);
+	if (ret) {
+		pr_err("%s: failed to read %s EEPROM\n", __func__, MBA6_BOARDNAME);
+		return ret;
+	}
+	/* string parameter is matched with start of of id string in EEPROM data */
+	tq_show_eeprom(&eeprom, "MBA6");
+	ret = tq_parse_eeprom_mac(&eeprom, mac, ARRAY_SIZE(mac));
+	if (ret)
+		return ret;
+
+	env_set("eth1addr", mac);
 
 	return 0;
 }
