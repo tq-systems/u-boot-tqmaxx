@@ -184,17 +184,18 @@ int board_late_init(void)
 	char fdtfile[FDTFILE_STRLEN];
 	struct tq_eeprom_data eeprom;
 	const char *bname = tqma6_get_boardname();
-	const char *config = tqma6_get_fdt_configuration();
 	int ret;
 
-	env_set("board_name", bname);
+	if (IS_ENABLED(CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG)) {
+		const char *config = tqma6_get_fdt_configuration();
 
-	if (!env_get("fdtfile")) {
-		if (config) {
-			snprintf(fdtfile, FDTFILE_STRLEN, "%s.dtb", config);
-			env_set("fdtfile", fdtfile);
-		} else {
-			pr_err("ENV: Could not set kernel devicetree, ${fdtfile} remains unset\n");
+		if (!env_get("fdtfile")) {
+			if (config) {
+				snprintf(fdtfile, FDTFILE_STRLEN, "%s.dtb", config);
+				env_set("fdtfile", fdtfile);
+			} else {
+				pr_err("ENV: Could not set kernel devicetree, ${fdtfile} remains unset\n");
+			}
 		}
 	}
 
