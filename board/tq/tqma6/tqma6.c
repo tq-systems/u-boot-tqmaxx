@@ -15,6 +15,7 @@
 #include <fdt_support.h>
 #include <init.h>
 #include <mmc.h>
+#include <mtd_node.h>
 #include <spi_flash.h>
 
 #include <asm/gpio.h>
@@ -279,9 +280,13 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 
 	if (CONFIG_IS_ENABLED(TQ_SPI_NOR)) {
 		const char * const path = "/soc/bus@2000000/spba-bus@2000000/spi@2008000/flash@0";
+		static const struct node_info nodes[] = {
+			{ "jedec,spi-nor",	MTD_DEV_TYPE_NOR, },
+		};
+
 		/* Update SPI NOR node this needs the device to be probed. */
 		puts("   Updating SPI NOR status...\n");
-		tq_ft_spi_setup(blob, path, NULL, 0);
+		tq_ft_spi_setup(blob, path, nodes, ARRAY_SIZE(nodes));
 	}
 
 	return 0;
