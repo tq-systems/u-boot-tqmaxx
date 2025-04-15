@@ -9,21 +9,25 @@
  * Author: Markus Niebel
  */
 
+#include <common.h>
+
+#include <env.h>
+#include <fdt_support.h>
 #include <init.h>
+#include <mmc.h>
+#include <spi_flash.h>
+
+#include <asm/gpio.h>
+#include <asm/io.h>
 #include <asm/arch/clock.h>
 #include <asm/arch/mx6-pins.h>
 #include <asm/arch/imx-regs.h>
 #include <asm/arch/iomux.h>
 #include <asm/arch/sys_proto.h>
-#include <env.h>
-#include <fdt_support.h>
+#include <asm/mach-imx/boot_mode.h>
 #include <asm/global_data.h>
 #include <linux/errno.h>
-#include <asm/gpio.h>
-#include <asm/io.h>
-#include <common.h>
 #include <linux/libfdt.h>
-#include <mmc.h>
 
 #include "tqma6.h"
 #include "../common/tq_bb.h"
