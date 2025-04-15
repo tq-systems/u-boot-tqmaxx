@@ -55,6 +55,8 @@
 
 #define BM_GPC_PGC_CORE_PUPSCR			0x7fff80
 
+DECLARE_GLOBAL_DATA_PTR;
+
 #if defined(CONFIG_IMX_THERMAL)
 static const struct imx_thermal_plat imx7_thermal_plat = {
 	.regs = (void *)ANATOP_BASE_ADDR,
@@ -313,6 +315,9 @@ static void imx_gpcv2_init(void)
 
 int arch_cpu_init(void)
 {
+	if (is_usbphy_power_on())
+		gd->flags |= GD_FLG_ARCH_IMX_USB_BOOT;
+
 	init_aips();
 
 	init_csu();

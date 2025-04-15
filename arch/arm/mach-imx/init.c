@@ -3,12 +3,15 @@
  * Copyright 2015 Freescale Semiconductor, Inc.
  */
 
+#include <asm/global_data.h>
 #include <asm/io.h>
 #include <asm/arch/imx-regs.h>
 #include <asm/arch/clock.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/mach-imx/boot_mode.h>
 #include <asm/arch/crm_regs.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 void init_aips(void)
 {
@@ -136,5 +139,16 @@ u32 imx6_src_get_boot_mode(void)
 		return readl(&src_base->gpr9);
 	else
 		return readl(&src_base->sbmr1);
+}
+#endif
+
+#if defined(CONFIG_MX6) || defined(CONFIG_MX7)
+
+bool is_usb_boot(void)
+{
+	if (gd->flags & GD_FLG_ARCH_IMX_USB_BOOT)
+		return true;
+
+	return false;
 }
 #endif

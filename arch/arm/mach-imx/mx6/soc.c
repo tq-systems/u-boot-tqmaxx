@@ -27,6 +27,8 @@
 #include <imx_thermal.h>
 #include <mmc.h>
 
+DECLARE_GLOBAL_DATA_PTR;
+
 #define has_err007805() \
 	(is_mx6sl() || is_mx6dl() || is_mx6solo() || is_mx6ull())
 
@@ -412,6 +414,9 @@ int arch_cpu_init(void)
 {
 	struct mxc_ccm_reg *ccm = (struct mxc_ccm_reg *)CCM_BASE_ADDR;
 
+	if (is_usbotg_phy_active())
+		gd->flags |= GD_FLG_ARCH_IMX_USB_BOOT;
+
 	init_aips();
 
 	/* Need to clear MMDC_CHx_MASK to make warm reset work. */
@@ -620,7 +625,7 @@ enum boot_device get_boot_device(void)
 	 * checking whether the USB PHY is currently active... This
 	 * assumes that SPL did not (yet) initialize the USB PHY...
 	 */
-	if (is_usbotg_phy_active())
+	if (is_usb_boot())
 		return USB_BOOT;
 
 	switch (bt_mem_ctl) {

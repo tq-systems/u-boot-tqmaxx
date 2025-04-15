@@ -87,7 +87,7 @@ u32 spl_boot_device(void)
 	 * checking whether the USB PHY is currently active... This
 	 * assumes that SPL did not (yet) initialize the USB PHY...
 	 */
-	if (is_usbotg_phy_active())
+	if (is_usb_boot())
 		return BOOT_DEVICE_BOARD;
 
 	/* BOOT_CFG1[7:4] - see IMX6DQRM Table 8-8 */
