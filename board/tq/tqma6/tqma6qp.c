@@ -6,6 +6,7 @@
  */
 
 #include <config.h>
+#include <hang.h>
 
 #include <asm/io.h>
 #include <asm/arch/mx6-ddr.h>
