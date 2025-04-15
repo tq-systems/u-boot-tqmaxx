@@ -414,8 +414,7 @@ int arch_cpu_init(void)
 {
 	struct mxc_ccm_reg *ccm = (struct mxc_ccm_reg *)CCM_BASE_ADDR;
 
-	if (is_usbotg_phy_active())
-		gd->flags |= GD_FLG_ARCH_IMX_USB_BOOT;
+	mark_usb_boot(is_usbotg_phy_active());
 
 	init_aips();
 

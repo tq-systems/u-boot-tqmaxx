@@ -90,6 +90,10 @@ struct arch_global_data {
 	struct udevice *scu_dev;
 #endif
 
+#if defined(CONFIG_MX6) || defined(CONFIG_MX7)
+	u32 usb_boot_mode;
+#endif
+
 #ifdef CONFIG_IMX_SENTINEL
 	struct udevice *s400_dev;
 	u32 soc_rev;

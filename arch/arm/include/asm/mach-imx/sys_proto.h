@@ -88,16 +88,9 @@ struct bd_info;
 #define is_imxrt1050() (is_cpu_type(MXC_CPU_IMXRT1050))
 
 #if defined(CONFIG_MX6) || defined(CONFIG_MX7)
-/*
- * gd->flags reserves high 16 bits for arch-specific flags
- * Only used for MX6/7, If set, the u-boot is booting from
- * USB serial download
- * b830a549fc7cc02141b0e2a320703fb2be4e51c6
- * cd9b728903462fbaf21750fb6a12ef25e3f3541b
- */
-#define GD_FLG_ARCH_IMX_USB_BOOT		0x80000000
 #include <stdbool.h>
 bool is_usb_boot(void);
+void mark_usb_boot(bool on);
 /* backward compatible */
 #define	is_boot_from_usb is_usb_boot
 #endif

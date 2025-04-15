@@ -315,8 +315,7 @@ static void imx_gpcv2_init(void)
 
 int arch_cpu_init(void)
 {
-	if (is_usbphy_power_on())
-		gd->flags |= GD_FLG_ARCH_IMX_USB_BOOT;
+	mark_usb_boot(is_usbphy_power_on());
 
 	init_aips();
 

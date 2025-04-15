@@ -143,12 +143,13 @@ u32 imx6_src_get_boot_mode(void)
 #endif
 
 #if defined(CONFIG_MX6) || defined(CONFIG_MX7)
+void mark_usb_boot(bool on)
+{
+	gd->arch.usb_boot_mode = on ? 1 : 0;
+}
 
 bool is_usb_boot(void)
 {
-	if (gd->flags & GD_FLG_ARCH_IMX_USB_BOOT)
-		return true;
-
-	return false;
+	return gd->arch.usb_boot_mode != 0;
 }
 #endif
