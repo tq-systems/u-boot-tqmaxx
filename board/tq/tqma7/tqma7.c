@@ -53,13 +53,14 @@ static const char *tqma7_get_boardname(void)
 int board_late_init(void)
 {
 	int ret;
+	const char *bname = tqma7_get_boardname();
 	struct tq_eeprom_data eeprom;
 
-	env_set_runtime("board_name", tqma7_get_boardname());
+	env_set_runtime("board_name", bname);
 
 	ret = tq_read_module_eeprom(&eeprom);
 	if (!ret)
-		tq_board_handle_eeprom_data(tqma7_get_boardname(), &eeprom);
+		tq_board_handle_eeprom_data(bname, &eeprom);
 	else
 		printf("EEPROM: err %d\n", ret);
 
