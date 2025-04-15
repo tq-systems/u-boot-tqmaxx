@@ -249,12 +249,12 @@ int tq_vard_detect_features(const struct tq_vard *vard,
 /*
  * static EEPROM layout
  */
-#define TQ_EE_HRCW_BYTES		0x20
+#define TQ_EE_HRCW_BYTES	0x20
 #define TQ_EE_MAC_BYTES		6
-#define TQ_EE_RSV1_BYTES		10
-#define TQ_EE_SERIAL_BYTES		8
-#define TQ_EE_RSV2_BYTES		8
-#define TQ_EE_BDID_BYTES		0x40
+#define TQ_EE_RSV1_BYTES	10
+#define TQ_EE_SERIAL_BYTES	8
+#define TQ_EE_RSV2_BYTES	8
+#define TQ_EE_BDID_BYTES	0x40
 
 struct __packed tq_eeprom_data {
 	union {
