@@ -56,7 +56,8 @@ void tqc_ft_spi_setup(void *blob, const char *path,
 	 * U-Boot, we support DM and non DM case at least in theory.
 	 * when upstreaming, non DM code should be deleted
 	 */
-	if (CONFIG_IS_ENABLED(DM_SPI_FLASH)) {
+#ifdef CONFIG_DM_SPI_FLASH
+	{
 		struct udevice *new;
 		int ret;
 
@@ -65,7 +66,9 @@ void tqc_ft_spi_setup(void *blob, const char *path,
 			tqc_ft_fixup_spi_mtdparts(blob, nodes, node_count);
 			enable_flash = 1;
 		}
-	} else {
+	}
+#else
+	{
 		struct spi_flash *new;
 
 		new = spi_flash_probe(bus, cs, speed, mode);
@@ -75,6 +78,7 @@ void tqc_ft_spi_setup(void *blob, const char *path,
 			enable_flash = 1;
 		}
 	}
+#endif
 
 	off = fdt_path_offset(blob, path);
 	if (off >= 0)
