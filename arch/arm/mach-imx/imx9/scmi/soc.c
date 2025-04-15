@@ -16,6 +16,7 @@
 #include <dm/uclass.h>
 #include <dm/device.h>
 #include <env_internal.h>
+#include <linux/iopoll.h>
 #include <fuse.h>
 #include <imx_thermal.h>
 #include <thermal.h>
@@ -1415,6 +1416,53 @@ int imx9_probe_mu(void)
 
 EVENT_SPY_SIMPLE(EVT_DM_POST_INIT_F, imx9_probe_mu);
 EVENT_SPY_SIMPLE(EVT_DM_POST_INIT_R, imx9_probe_mu);
+
+#ifdef CONFIG_XPL_BUILD
+int disable_smmuv3(void)
+{
+	/*
+	 * Disable SMMU in case kernel force reset, not check whether SMMU
+	 * is already disabled, because there is chance that when SMMU
+	 * is being dsiable in linux, while linux got reset. So disable SMMU
+	 * no matter SMMU is disabled or enabled.
+	 */
+	if (IS_ENABLED(CONFIG_IMX95)) {
+		int ret;
+		u32 reg, val, __iomem *gbpa = (void __iomem *)SMMU_BASE_ADDR + SMMU_GBPA;
+
+		ret = readl_relaxed_poll_timeout(gbpa, reg, !(reg & GBPA_UPDATE),
+						 ARM_SMMU_POLL_TIMEOUT_US);
+
+		if (ret) {
+			printf("GBPA updating waiting timeout\n");
+			return ret;
+		}
+
+		/* Use incoming SHCFG attributes */
+		reg = BIT(12);
+
+		writel_relaxed(reg | GBPA_UPDATE, gbpa);
+		ret = readl_relaxed_poll_timeout(gbpa, reg, !(reg & GBPA_UPDATE),
+						 ARM_SMMU_POLL_TIMEOUT_US);
+
+		if (ret) {
+			printf("GBPA not responding to update\n");
+			return ret;
+		}
+
+		val = 0;
+		writel_relaxed(val, SMMU_BASE_ADDR + SMMU_CR0);
+		ret = readl_relaxed_poll_timeout(SMMU_BASE_ADDR + SMMU_CR0_ACK, reg, reg == val,
+						 ARM_SMMU_POLL_TIMEOUT_US);
+		if (ret) {
+			printf("CR0 not updated\n");
+			return ret;
+		}
+	}
+
+	return 0;
+}
+#endif
 
 int timer_init(void)
 {

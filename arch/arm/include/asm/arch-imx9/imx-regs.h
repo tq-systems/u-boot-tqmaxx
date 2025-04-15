@@ -36,6 +36,15 @@
 #define GPIO7_BASE_ADDR	    0x43870000UL
 #endif
 
+/* i.MX95 */
+#define SMMU_BASE_ADDR      0x490d0000UL
+#define SMMU_CR0            0x20
+#define SMMU_CR0_ACK        0x24
+#define SMMU_GBPA           0x44
+#define GBPA_UPDATE	    (1 << 31)
+#define GBPA_ABORT          (1 << 20)
+#define ARM_SMMU_POLL_TIMEOUT_US 1000000
+
 #define FSB_BASE_ADDR       0x47510000UL
 
 #define ANATOP_BASE_ADDR    0x44480000UL
