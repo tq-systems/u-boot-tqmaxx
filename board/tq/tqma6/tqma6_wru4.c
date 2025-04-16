@@ -32,7 +32,6 @@
 #include <mmc.h>
 #include <netdev.h>
 
-#include "tqma6_bb.h"
 #include "../common/tq_bb.h"
 
 /* UART */
