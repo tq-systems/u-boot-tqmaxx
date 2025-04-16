@@ -369,6 +369,11 @@ static int ksz9031_config(struct phy_device *phydev)
 	unsigned int features = phydev->drv->features;
 	int ret;
 
+	/* Restart the PHY.  */
+	ret = phy_reset(phydev);
+	if (ret < 0)
+		pr_err("KSZ9031: Error resetting PHY ...\n");
+
 	ret = ksz9031_of_config(phydev);
 	if (ret)
 		return ret;
