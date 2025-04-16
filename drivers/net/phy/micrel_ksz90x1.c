@@ -330,6 +330,7 @@ static int ksz9031_phy_extwrite(struct phy_device *phydev, int addr,
 
 static int ksz9031_config(struct phy_device *phydev)
 {
+	unsigned int features = phydev->drv->features;
 	int ret;
 
 	ret = ksz9031_of_config(phydev);
@@ -365,7 +366,22 @@ static int ksz9031_config(struct phy_device *phydev)
 		return 0;
 	}
 
-	return genphy_config(phydev);
+	/* Silicon Errata Sheet (DS80000691D or DS80000692D):
+	 * Whenever the device's Asymmetric Pause capability is set to 1,
+	 * link-up may fail after a link-up to link-down transition.
+	 *
+	 * Workaround:
+	 * Do not enable the Asymmetric Pause capability bit.
+	 */
+	features &= ~ADVERTISE_PAUSE_ASYM;
+	/* update feature support and forward to advertised features */
+	phydev->supported = features;
+	phydev->advertising = phydev->supported;
+
+	/* genphy_restart_aneg called from genphy_config_aneg */
+	return genphy_config_aneg(phydev);
+
+	return 0;
 }
 
 static struct phy_driver ksz9031_driver = {
