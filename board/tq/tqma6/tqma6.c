@@ -289,6 +289,8 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 		tq_ft_spi_setup(blob, path, nodes, ARRAY_SIZE(nodes));
 	}
 
+	tq_bb_ft_board_setup(blob, bd);
+
 	return 0;
 }
 #endif /* defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT) */

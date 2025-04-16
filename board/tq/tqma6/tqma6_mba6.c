@@ -124,7 +124,7 @@ int tq_bb_board_late_init(void)
 		pr_err("%s: failed to read %s EEPROM\n", __func__, MBA6_BOARDNAME);
 		return ret;
 	}
-	/* string parameter is matched with start of of id string in EEPROM data */
+	/* string parameter is matched with start of id string in EEPROM data */
 	tq_show_eeprom(&eeprom, "MBA6");
 	ret = tq_parse_eeprom_mac(&eeprom, mac, ARRAY_SIZE(mac));
 	if (ret)
