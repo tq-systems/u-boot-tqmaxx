@@ -30,6 +30,8 @@
 #include <netdev.h>
 #include <spl.h>
 
+#define MBA6_BOARDNAME "MBa6x"
+
 #include "../common/tq_bb.h"
 
 #define UART_PAD_CTRL  (PAD_CTL_PUS_100K_UP | PAD_CTL_SPEED_MED | \
@@ -112,7 +114,7 @@ int tq_bb_board_init(void)
 
 const char *tq_bb_get_boardname(void)
 {
-	return "MBa6x";
+	return MBA6_BOARDNAME;
 }
 
 #endif
