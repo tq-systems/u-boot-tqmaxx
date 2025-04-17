@@ -70,7 +70,7 @@ void sdhci_prepare_adma_table(struct sdhci_host *host,
 
 	__sdhci_adma_write_desc(host, &next_desc, addr, trans_bytes, true);
 
-	flush_cache((phys_addr_t)table,
+	flush_cache((unsigned long)table,
 		    ROUND(next_desc - (void *)table,
 			  ARCH_DMA_MINALIGN));
 }
