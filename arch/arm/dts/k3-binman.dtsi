@@ -254,6 +254,9 @@
 #else
 
 &binman {
+
+#if IS_ENABLED(CONFIG_SPL)
+
 	ti_spl_template: template-1 {
 		filename = "tispl.bin";
 		pad-byte = <0xff>;
@@ -390,6 +393,9 @@
 			};
 		};
 	};
+
+#endif
+
 	u_boot_template: template-3 {
 		filename = "u-boot.img";
 		pad-byte = <0xff>;
@@ -398,6 +404,51 @@
 			description = "FIT image with multiple configurations";
 
 			images {
+#if !IS_ENABLED(CONFIG_SPL)
+				atf {
+					description = "ARM Trusted Firmware";
+					type = "firmware";
+					arch = "arm64";
+					compression = "none";
+					os = "arm-trusted-firmware";
+					load = <CONFIG_K3_ATF_LOAD_ADDR>;
+					entry = <CONFIG_K3_ATF_LOAD_ADDR>;
+					ti-secure {
+						content = <&atf>;
+						keyfile = "custMpk.pem";
+					};
+					atf: atf-bl31 {
+					};
+				};
+
+				tee {
+					description = "OP-TEE";
+					type = "tee";
+					arch = "arm64";
+					compression = "none";
+					os = "tee";
+					load = <CONFIG_K3_OPTEE_LOAD_ADDR>;
+					entry = <CONFIG_K3_OPTEE_LOAD_ADDR>;
+					ti-secure {
+						content = <&tee>;
+						keyfile = "custMpk.pem";
+					};
+					tee: tee-os {
+						optional;
+					};
+				};
+
+				dm {
+					description = "DM binary";
+					type = "firmware";
+					arch = "arm32";
+					compression = "none";
+					os = "DM";
+					load = <0x89000000>;
+					entry = <0x89000000>;
+				};
+#endif
+
 				uboot {
 					type = "firmware";
 					os = "u-boot";
@@ -425,6 +476,45 @@
 			description = "FIT image with multiple configurations";
 
 			images {
+#if !IS_ENABLED(CONFIG_SPL)
+				atf {
+					description = "ARM Trusted Firmware";
+					type = "firmware";
+					arch = "arm64";
+					compression = "none";
+					os = "arm-trusted-firmware";
+					load = <CONFIG_K3_ATF_LOAD_ADDR>;
+					entry = <CONFIG_K3_ATF_LOAD_ADDR>;
+					atf-bl31 {
+						filename = "bl31.bin";
+					};
+				};
+
+				tee {
+					description = "OP-TEE";
+					type = "tee";
+					arch = "arm64";
+					compression = "none";
+					os = "tee";
+					load = <CONFIG_K3_OPTEE_LOAD_ADDR>;
+					entry = <CONFIG_K3_OPTEE_LOAD_ADDR>;
+					tee-os {
+						filename = "tee-raw.bin";
+						optional;
+					};
+				};
+
+				dm {
+					description = "DM binary";
+					type = "firmware";
+					arch = "arm32";
+					compression = "none";
+					os = "DM";
+					load = <0x89000000>;
+					entry = <0x89000000>;
+				};
+#endif
+
 				uboot {
 					type = "firmware";
 					os = "u-boot";
