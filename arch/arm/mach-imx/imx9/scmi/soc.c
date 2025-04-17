@@ -1577,7 +1577,7 @@ enum boot_device get_boot_device(void)
 		break;
 	case BT_DEV_TYPE_USB:
 		boot_dev = boot_instance + USB_BOOT;
-		if (IS_ENABLED(CONFIG_IMX95))
+		if (IS_ENABLED(CONFIG_IMX95) && is_imx95_a0())
 			boot_dev -= 3; //iMX95 usb instance start at 3
 		break;
 	default:
