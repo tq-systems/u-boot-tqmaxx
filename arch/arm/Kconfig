@@ -815,11 +815,11 @@ config ARCH_KEYSTONE
 
 config ARCH_K3
 	bool "Texas Instruments' K3 Architecture"
-	select SPL
 	select SUPPORT_SPL
 	select FIT
 	select REGEX
 	select FIT_SIGNATURE if ARM64
+	imply SPL
 	imply TI_SECURE_DEVICE
 
 config ARCH_OMAP2PLUS
