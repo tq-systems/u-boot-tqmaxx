@@ -179,14 +179,14 @@ static int parse_container(void *addr, u32 *qb_data_off)
 static int get_dev_qbdata_offset(void *dev, int dev_type, unsigned long offset, u32 *qbdata_offset)
 {
 	u16 ctnr_hdr_align = container_hdr_alignment();
-	void *buf = malloc(ctnr_hdr_align);
+	void *buf = (void *)env_get_hex("loadaddr", 0);;
 	int ret = 0;
 	char cmd[128];
 	unsigned long count = 0;
 	struct mmc *mmc;
 
 	if (!buf) {
-		printf("Malloc buffer failed\n");
+		printf("loadaddr env is not defined, please set it\n");
 		return -ENOMEM;
 	}
 
@@ -220,8 +220,6 @@ static int get_dev_qbdata_offset(void *dev, int dev_type, unsigned long offset, 
 	}
 
 	ret = parse_container(buf, qbdata_offset);
-
-	free(buf);
 
 	return ret;
 }
