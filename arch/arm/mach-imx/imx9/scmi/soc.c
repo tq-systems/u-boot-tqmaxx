@@ -1200,7 +1200,6 @@ int disable_mipidsi_node(void *blob)
 	return delete_fdt_nodes(blob, nodes_path_mipidsi, ARRAY_SIZE(nodes_path_mipidsi));
 }
 
-
 int disable_lvds_node(void *blob)
 {
 	static const char * const nodes_path_lvds[] = {
@@ -1213,14 +1212,62 @@ int disable_lvds_node(void *blob)
 	return delete_fdt_nodes(blob, nodes_path_lvds, ARRAY_SIZE(nodes_path_lvds));
 }
 
+static int disable_smmu_node(void *blob)
+{
+	struct scmi_imx_misc_cfg_info_out out = { 0 };
+	struct scmi_msg msg = SCMI_MSG(SCMI_IMX_PROTOCOL_ID_MISC,
+				       SCMI_IMX_MISC_CFG_INFO, out);
+	int ret, nodeoff;
+	bool disable_smmu_node = false;
+	const char *status = "disabled";
+	struct udevice *dev;
+
+	ret = uclass_get_device_by_name(UCLASS_CLK, "protocol@14", &dev);
+	if (ret) {
+		printf("%s:%d fail to get protocol@14\n", __func__, ret);
+		return ret;
+	}
+
+	ret = devm_scmi_process_msg(dev, &msg);
+	if (out.status) {
+		printf("%s:%d fail\n", __func__, out.status);
+		return ret;
+	}
+
+	if (!strncmp(out.cfgname, "mx95alt", MISC_MAX_CFGNAME))
+		disable_smmu_node = true;
+
+	if ((gd->arch.soc_rev >> 28) == 0xa)
+		disable_smmu_node = true;
+
+	if (!disable_smmu_node)
+		return 0;
+
+	puts("disabling SMMU\n");
+
+	ret = fdt_increase_size(blob, 256);
+	if (ret) {
+		printf("Unable to increase fdt size, err=%s\n", fdt_strerror(ret));
+		return ret;
+	}
+	nodeoff = fdt_path_offset(blob, "/soc/bus@49000000/iommu@490d0000");
+	if (nodeoff > 0) {
+		ret = fdt_setprop(blob, nodeoff, "status", status,
+				  strlen(status) + 1);
+		if (ret) {
+			printf("Unable to disable SMMU, err=%s\n", fdt_strerror(ret));
+			return ret;
+		}
+	}
+
+	return 0;
+}
 
 int ft_system_setup(void *blob, struct bd_info *bd)
 {
 	u32 val = 0;
-	int ret = 0, nodeoff;
 	int num_a55_cores_disabled = 0;
 	int gpu_disabled = 0;
-	const char *status = "disabled";
 
 	if (is_imx95()) {
 		fuse_read(2, 2, &val);
@@ -1259,25 +1306,6 @@ int ft_system_setup(void *blob, struct bd_info *bd)
 		if (val & BIT(7)) /* PCIE B */
 			disable_pcieb_node(blob);
 
-		if ((gd->arch.soc_rev >> 28) == 0xa) {
-			puts("disabling SMMU\n");
-
-			ret = fdt_increase_size(blob, 256);
-			if (ret) {
-				printf("Unable to increase fdt size, err=%s\n", fdt_strerror(ret));
-				return ret;
-			}
-			nodeoff = fdt_path_offset(blob, "/soc/bus@49000000/iommu@490d0000");
-			if (nodeoff > 0) {
-				ret = fdt_setprop(blob, nodeoff, "status", status,
-						  strlen(status) + 1);
-				if (ret) {
-					printf("Unable to disable SMMU, err=%s\n", fdt_strerror(ret));
-					return ret;
-				}
-			}
-		}
-
 		if (val & BIT(17)) { /* GPU MIX */
 			disable_gpu_node(blob, num_a55_cores_disabled);
 			gpu_disabled = 1;
@@ -1301,6 +1329,8 @@ int ft_system_setup(void *blob, struct bd_info *bd)
 
 		if (val & BIT(12)) /* Disable 10G */
 			disable_enet10g_node(blob);
+
+		disable_smmu_node(blob);
 	}
 
 	return ft_add_optee_node(blob, bd);
