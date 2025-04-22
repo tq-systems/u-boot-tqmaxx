@@ -1083,7 +1083,7 @@ struct scmi_pinctrl_config_set_in {
 	u32 identifier;
 	u32 function_id;
 	u32 attributes;
-	struct scmi_pin_config configs[4];
+	struct scmi_pin_config configs[5];
 };
 
 struct scmi_pinctrl_config_set_out {
