@@ -48,6 +48,7 @@
 #define TQMLS1012_SPI_PBL_FILE_NAME	"bl2_qspi.pbl"
 #define TQMLS1012_UBOOT_FILE_NAME	"fip_uboot.bin"
 #define TQMLS1012_MMC_KERNEL_FILE_NAME	"Image.gz"
+#define TQMLS1012_PFE_FILE_NAME		"pfe_fw_sbl.itb"
 #define MAX_PBL_SIZE 0x100000
 #define MAX_UBOOT_SIZE 0x400000
 
@@ -58,6 +59,7 @@
 	"uboot_max_size=" __stringify(MAX_UBOOT_SIZE) "\0"                       \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0"                               \
 	"kernel_file=" TQMLS1012_MMC_KERNEL_FILE_NAME "\0"                       \
+	"pfe_file=" TQMLS1012_PFE_FILE_NAME "\0"                               \
 	"update_pbl=run set_getcmd; "                                          \
 		"if ${getcmd} ${pbl_spi_file}; then "                          \
 			"if itest ${filesize} > 0; then "                      \
@@ -107,6 +109,13 @@
 		"if ${getcmd} ${kernel_file}; then "                           \
 			"if itest ${filesize} > 0; then "                      \
 				"sf probe; sf update ${loadaddr} Linux ${filesize};"\
+			"fi; "                                                 \
+		"fi; "                                                         \
+		"setenv filesize; setenv blkc; setenv getcmd\0"                \
+	"update_pfe=run set_getcmd; "                                      \
+		"if ${getcmd} ${pfe_file}; then "                              \
+			"if itest ${filesize} > 0; then "                      \
+				"sf probe; sf update ${loadaddr} PFE ${filesize};"\
 			"fi; "                                                 \
 		"fi; "                                                         \
 		"setenv filesize; setenv blkc; setenv getcmd\0"                \
