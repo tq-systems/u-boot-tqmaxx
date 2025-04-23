@@ -29,8 +29,8 @@ int tq_parse_eeprom_mac(struct tq_eeprom_data const *eeprom, char *buf,
 int tq_parse_eeprom_mac_additional(struct tq_eeprom_data const *eeprom,
 				   char *buf, size_t len,
 				   size_t additional);
-int tq_parse_eeprom_serial(struct tq_eeprom_data *eeprom, char *buf,
-			   size_t len);
+int tq_parse_eeprom_serial(const struct tq_eeprom_data *eeprom,
+			   char *buf, size_t len);
 int tq_parse_eeprom_id(struct tq_eeprom_data *eeprom, char *buf,
 		       size_t len);
 int tq_show_eeprom(struct tq_eeprom_data *eeprom, const char *id);
