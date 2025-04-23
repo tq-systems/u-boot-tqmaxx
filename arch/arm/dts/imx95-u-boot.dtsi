@@ -737,7 +737,7 @@
 				compatible = "fsl,imx95-enetc";
 				reg = <0x000000 0 0 0 0>;
 				clocks = <&scmi_clk IMX95_CLK_ENETREF>;
-				clock-names = "enet_ref_clk";
+				clock-names = "ref";
 				status = "disabled";
 			};
 
@@ -745,7 +745,7 @@
 				compatible = "fsl,imx95-enetc";
 				reg = <0x004000 0 0 0 0>;
 				clocks = <&scmi_clk IMX95_CLK_ENETREF>;
-				clock-names = "enet_ref_clk";
+				clock-names = "ref";
 				status = "disabled";
 			};
 
