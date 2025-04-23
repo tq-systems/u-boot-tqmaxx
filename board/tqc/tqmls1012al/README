@@ -87,6 +87,10 @@ setenv kernel <filename>		# Kernel file name
 run update_kernel_mmc			# update kernel on SD card
 run update_kernel_spi			# update kernel in SPI-NOR flash
 
+PFE
+---
+setenv pfe_file <filename>		# PFE firmware file name
+run update_pfe				# update PFE in SPI-NOR flash
 
 # Start Linux from U-Boot
 
