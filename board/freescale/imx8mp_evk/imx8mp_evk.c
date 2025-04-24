@@ -29,6 +29,7 @@
 #include <dm/uclass-internal.h>
 #include <dm/pinctrl.h>
 #include <fuse.h>
+#include <mmc.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -530,3 +531,32 @@ void board_prep_linux(struct bootm_headers *images)
 		pinctrl_select_state(dwc3_usb, "gpio");
 }
 #endif
+
+#ifdef CONFIG_ANDROID_SUPPORT
+bool is_power_key_pressed(void) {
+	return (bool)(!!(readl(SNVS_HPSR) & (0x1 << 6)));
+}
+#endif
+
+#ifdef CONFIG_SPL_MMC
+#define UBOOT_RAW_SECTOR_OFFSET 0x40
+unsigned long spl_mmc_get_uboot_raw_sector(struct mmc *mmc, unsigned long raw_sect)
+{
+	u32 boot_dev = spl_boot_device();
+	switch (boot_dev) {
+		case BOOT_DEVICE_MMC2:
+			return CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR - UBOOT_RAW_SECTOR_OFFSET;
+		default:
+			return CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR;
+	}
+}
+#endif
+
+#ifdef CONFIG_FSL_FASTBOOT
+#ifdef CONFIG_ANDROID_RECOVERY
+int is_recovery_key_pressing(void)
+{
+	return 0; /* TODO */
+}
+#endif /* CONFIG_ANDROID_RECOVERY */
+#endif /* CONFIG_FSL_FASTBOOT */

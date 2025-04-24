@@ -66,7 +66,7 @@ struct kblb_hdr {
 	/* Rollback index for bootloader is managed by SPL and
 	 * will be stored in RPMB.
 	 */
-#if defined(CONFIG_DUAL_BOOTLOADER) && defined(CONFIG_SPL_BUILD)
+#if defined(CONFIG_IMX_TRUSTY_OS) && defined(CONFIG_SPL_BUILD)
 	kblb_tag_t bootloader_rbk_tags;
 #endif
 	/* public key keyblb tag */
@@ -82,12 +82,15 @@ typedef struct kblb_hdr kblb_hdr_t;
 
 #define RPMBKEY_LEN (32 + CAAM_PAD)
 #define KEYPACK_MAGIC "!KS"
+#define KEYPACK_PAD_LENGTH (512 - 4 * sizeof(char) - sizeof(unsigned int) - RPMBKEY_LEN * sizeof(unsigned char))
 
 struct keyslot_package
 {
     char magic[4];
     unsigned int rpmb_keyblob_len;
     unsigned char rpmb_keyblob[RPMBKEY_LEN];
+    // padding keyslot_package to 1 block size
+    unsigned char pad[KEYPACK_PAD_LENGTH];
 };
 
 int gen_rpmb_key(struct keyslot_package *kp);

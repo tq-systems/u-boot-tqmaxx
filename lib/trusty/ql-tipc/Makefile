@@ -41,9 +41,16 @@ obj-y += \
     $(QL_TIPC)/libtipc.o \
     $(QL_TIPC)/rpmb_proxy.o \
     $(QL_TIPC)/util.o \
+    $(QL_TIPC)/imx_snvs.o \
+    $(QL_TIPC)/secretkeeper.o \
     sysdeps/sysdeps_uboot.o \
     sysdeps/storage_ops_uboot.o
+
+obj-$(CONFIG_IMX_MATTER_TRUSTY) += $(QL_TIPC)/matter.o
 
 obj-$(CONFIG_ARM) += \
     $(QL_TIPC)/arch/arm/trusty_mem.o \
     $(QL_TIPC)/arch/arm/trusty_dev.o
+
+obj-$(CONFIG_DM_RNG) += \
+    $(QL_TIPC)/rng.o

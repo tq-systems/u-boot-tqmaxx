@@ -5,6 +5,7 @@
 #include <config.h>
 #include <mapmem.h>
 #include <linux/types.h>
+#include <linux/delay.h>
 #include <part.h>
 #include <mmc.h>
 #include <ext_common.h>
@@ -20,6 +21,8 @@
 #include <asm/mach-imx/hab.h>
 #endif
 
+#include <fsl_avb.h>
+
 #ifdef FASTBOOT_ENCRYPT_LOCK
 
 #include <hash.h>
@@ -28,6 +31,17 @@
 //Encrypted data is 80bytes length.
 #define ENDATA_LEN 80
 
+#endif
+
+#ifdef CONFIG_AVB_WARNING_LOGO
+#include "mxc_epdc_fb.h"
+#include "video.h"
+#include "dm/uclass.h"
+#include "fsl_avb_logo.h"
+#include "video_link.h"
+#include "video_console.h"
+#include "video_font_data.h"
+#include <dm.h>
 #endif
 
 int fastboot_flash_find_index(const char *name);
@@ -145,7 +159,7 @@ static int generate_salt(unsigned char* salt) {
 
 }
 
-static FbLockState decrypt_lock_store(unsigned char *bdata) {
+static __maybe_unused FbLockState decrypt_lock_store(unsigned char *bdata) {
 	int p = 0, ret;
 	ALLOC_CACHE_ALIGN_BUFFER(uint8_t, plain_data, ENDATA_LEN);
 	ALLOC_CACHE_ALIGN_BUFFER(uint8_t, keymod, 16);
@@ -404,8 +418,8 @@ fail:
 #endif
 
 
-/* Return the last byte of of FSL_FASTBOOT_PR_DATA
- * which is managed by PresistDataService
+/* Return the last byte of of FASTBOOT_PARTITION_FBMISC
+ * which is managed by OemLockService
  */
 
 #ifdef CFG_ENABLE_LOCKSTATUS_SUPPORT
@@ -427,7 +441,7 @@ void set_fastboot_lock_disable(void) {
 		return;
 	set_lock_disable_data(bdata);
 	int status;
-	mmc_id = fastboot_flash_find_index(FASTBOOT_PARTITION_PRDATA);
+	mmc_id = fastboot_flash_find_index(FASTBOOT_PARTITION_FBMISC);
 	if (mmc_id < 0) {
 		printf("%s: error in get mmc part\n", __FUNCTION__);
 		goto fail;
@@ -453,17 +467,33 @@ fail:
 
 }
 FbLockEnableResult fastboot_lock_enable() {
+#ifdef CONFIG_DUAL_BOOTLOADER
+	/* Always allow unlock device in spl recovery mode. */
+	if (is_spl_recovery())
+		return FASTBOOT_UL_ENABLE;
+#endif
+
+#if defined(CONFIG_IMX_TRUSTY_OS) || defined(CONFIG_TRUSTY_UNLOCK_PERMISSION)
+	int ret;
+	uint8_t oem_device_unlock;
+
+	ret = trusty_read_oem_unlock_device_permission(&oem_device_unlock);
+	if (ret < 0)
+		return FASTBOOT_UL_ERROR;
+	else
+		return oem_device_unlock;
+#else /* CONFIG_IMX_TRUSTY_OS */
+	FbLockEnableResult ret;
 	struct blk_desc *fs_dev_desc;
 	struct disk_partition fs_partition;
 	unsigned char *bdata;
 	int mmc_id;
-	FbLockEnableResult ret;
 
 	bdata = (unsigned char *)memalign(ALIGN_BYTES, SECTOR_SIZE);
 	if (bdata == NULL)
 		return FASTBOOT_UL_ERROR;
 	int status;
-	mmc_id = fastboot_flash_find_index(FASTBOOT_PARTITION_PRDATA);
+	mmc_id = fastboot_flash_find_index(FASTBOOT_PARTITION_FBMISC);
 	if (mmc_id < 0) {
 		printf("%s: error in get mmc part\n", __FUNCTION__);
 		ret = FASTBOOT_UL_ERROR;
@@ -498,6 +528,7 @@ FbLockEnableResult fastboot_lock_enable() {
 fail:
 	free(bdata);
 	return ret;
+#endif /* CONFIG_IMX_TRUSTY_OS */
 
 }
 #endif
@@ -534,6 +565,69 @@ int display_lock(FbLockState lock, int verify) {
 	return -1;
 
 }
+
+#ifdef CONFIG_AVB_WARNING_LOGO
+int display_unlock_warning(void) {
+	int ret;
+	struct udevice *dev;
+	struct vidconsole_priv *priv;
+	int video_font_width, video_font_height;
+
+	ret = uclass_first_device_err(UCLASS_VIDEO, &dev);
+	if (!ret) {
+		/* clear screen first */
+		video_clear(dev);
+		/* Draw the orange warning bmp logo */
+		ret = bmp_display((ulong)orange_warning_bmp_bitmap,
+					CONFIG_AVB_WARNING_LOGO_COLS, CONFIG_AVB_WARNING_LOGO_ROWS);
+
+		/* Show warning text. */
+		if (uclass_first_device_err(UCLASS_VIDEO_CONSOLE, &dev)) {
+			printf("no text console device found!\n");
+			return -1;
+		}
+
+		priv = dev_get_uclass_priv(dev);
+		video_font_width = priv->x_charsize;
+		video_font_height = priv->y_charsize;
+
+		/* Adjust the cursor postion, the (x, y) are hard-coded here. */
+		vidconsole_position_cursor(dev, CONFIG_AVB_WARNING_LOGO_COLS/video_font_width,
+						CONFIG_AVB_WARNING_LOGO_ROWS/video_font_height + 6);
+		vidconsole_put_string(dev, "The bootloader is unlocked and software");
+		vidconsole_position_cursor(dev, CONFIG_AVB_WARNING_LOGO_COLS/video_font_width,
+						CONFIG_AVB_WARNING_LOGO_ROWS/video_font_height + 7);
+		vidconsole_put_string(dev, "integrity cannot be guaranteed. Any data");
+		vidconsole_position_cursor(dev, CONFIG_AVB_WARNING_LOGO_COLS/video_font_width,
+						CONFIG_AVB_WARNING_LOGO_ROWS/video_font_height + 8);
+		vidconsole_put_string(dev, "stored on the device may be available to");
+		vidconsole_position_cursor(dev, CONFIG_AVB_WARNING_LOGO_COLS/video_font_width,
+						CONFIG_AVB_WARNING_LOGO_ROWS/video_font_height + 9);
+		vidconsole_put_string(dev, "attackers. Do not store any sensitive data");
+		vidconsole_position_cursor(dev, CONFIG_AVB_WARNING_LOGO_COLS/video_font_width,
+						CONFIG_AVB_WARNING_LOGO_ROWS/video_font_height + 10);
+		vidconsole_put_string(dev, "on the device.");
+		/* Jump one line to show the link */
+		vidconsole_position_cursor(dev, CONFIG_AVB_WARNING_LOGO_COLS/video_font_width,
+						CONFIG_AVB_WARNING_LOGO_ROWS/video_font_height + 13);
+		vidconsole_put_string(dev, "Visit this link on another device:");
+		vidconsole_position_cursor(dev, CONFIG_AVB_WARNING_LOGO_COLS/video_font_width,
+						CONFIG_AVB_WARNING_LOGO_ROWS/video_font_height + 14);
+		vidconsole_put_string(dev, "g.co/ABH");
+
+		vidconsole_position_cursor(dev, CONFIG_AVB_WARNING_LOGO_COLS/video_font_width,
+						CONFIG_AVB_WARNING_LOGO_ROWS/video_font_height + 20);
+		vidconsole_put_string(dev, "PRESS POWER BUTTON TO CONTINUE...");
+		/* sync frame buffer */
+		video_sync_all();
+
+		return 0;
+	} else {
+		printf("no video device found!\n");
+		return -1;
+	}
+}
+#endif
 
 int fastboot_wipe_data_partition(void)
 {

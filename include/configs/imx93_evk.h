@@ -31,4 +31,12 @@
 /* Using ULP WDOG for reset */
 #define WDOG_BASE_ADDR          WDG3_BASE_ADDR
 
+#ifdef CONFIG_IMX_MATTER_TRUSTY
+#define NS_ARCH_ARM64 1
+#endif
+
+#ifdef CONFIG_ANDROID_SUPPORT
+#include "imx93_evk_android.h"
+#endif
+
 #endif

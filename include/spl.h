@@ -308,6 +308,9 @@ struct spl_image_info {
 	uint *stack_prot;
 	ulong reloc_offset;
 #endif
+#ifdef CONFIG_IMX_TRUSTY_OS
+	uint64_t rbindex;
+#endif
 };
 
 /* function to jump to an image from SPL */

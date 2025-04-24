@@ -12,6 +12,9 @@
 #include <malloc.h>
 #include <memalign.h>
 #include <misc.h>
+#include <memalign.h>
+#include <linux/delay.h>
+#include <time.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -986,6 +989,176 @@ int ele_set_gmid(u32 *response)
 
 	if (response)
 		*response = msg.data[0];
+
+	return ret;
+}
+
+int ele_get_hw_unique_key(uint8_t *hwkey, size_t key_size, uint8_t *ctx, size_t ctx_size)
+{
+	struct udevice *dev = gd->arch.ele_dev;
+	int size = sizeof(struct ele_msg);
+	struct ele_msg msg;
+	uint8_t *ctx_addr = NULL;
+	uint8_t *key_addr = NULL;
+	int ret = -EINVAL;
+
+	if (!dev) {
+		printf("s400 dev is not initialized\n");
+		return -ENODEV;
+	}
+
+	/* sanity check the key and context */
+	if (ctx_size >= (1U << 16) - 1) {
+		printf("%s: Invalid context size!\n", __func__);
+		return -EINVAL;
+	}
+	if ((key_size != 16) && (key_size != 32)) {
+		printf("%s: Invalid key size!\n", __func__);
+		return -EINVAL;
+	}
+	if (!hwkey || !ctx) {
+		printf("%s: invalid input buffer!\n", __func__);
+		return -EINVAL;
+	}
+
+	/* alloc temp buffer for input context in case it's not cacheline aligned */
+	ctx_addr = memalign(ARCH_DMA_MINALIGN, ctx_size);
+	if (!ctx_addr) {
+		printf("%s: Fail to alloc memory!\n", __func__);
+		return -EINVAL;
+	}
+	memcpy(ctx_addr, ctx, ctx_size);
+
+	/* key buffer */
+	key_addr = memalign(ARCH_DMA_MINALIGN, key_size);
+	if (!key_addr) {
+		printf("%s: Fail to alloc memory!\n", __func__);
+		goto exit;
+	}
+
+	flush_dcache_range((unsigned long)ctx_addr, ALIGN((unsigned long)ctx_addr + ctx_size, ARCH_DMA_MINALIGN));
+	invalidate_dcache_range((unsigned long)key_addr, ALIGN((unsigned long)key_addr + key_size, ARCH_DMA_MINALIGN));
+
+	msg.version = ELE_VERSION;
+	msg.tag = ELE_CMD_TAG;
+	msg.size = 7;
+	msg.command = ELE_CMD_DERIVE_KEY;
+	msg.data[0] = upper_32_bits((ulong)key_addr);
+	msg.data[1] = lower_32_bits((ulong)key_addr);
+	msg.data[2] = upper_32_bits((ulong)ctx_addr);
+	msg.data[3] = lower_32_bits((ulong)ctx_addr);
+	msg.data[4] = ((ctx_size << 16) | key_size);
+	msg.data[5] = compute_crc(&msg);
+
+	ret = misc_call(dev, false, &msg, size, &msg, size);
+	if (ret) {
+		printf("Error: %s: ret 0x%x, response 0x%x\n",
+		       __func__, ret, msg.data[0]);
+		goto exit;
+	}
+
+	invalidate_dcache_range((unsigned long)key_addr, ALIGN((unsigned long)key_addr + key_size, ARCH_DMA_MINALIGN));
+	memcpy(hwkey, key_addr, key_size);
+	ret = 0;
+
+exit:
+	if (ctx_addr)
+		free(ctx_addr);
+	if (key_addr)
+		free(key_addr);
+
+	return ret;
+}
+
+#define IMX_ELE_TRNG_STATUS_READY 0x3
+#define IMX_ELE_CSAL_STATUS_READY 0x2
+int ele_get_trng_state(void)
+{
+	struct udevice *dev = gd->arch.ele_dev;
+	int size = sizeof(struct ele_msg);
+	struct ele_msg msg = {};
+	int ret;
+
+	struct ele_trng_state {
+		uint32_t rsp_code;
+		uint8_t trng_state;
+		uint8_t csal_state;
+		uint16_t rsv;
+	} *rsp = NULL;
+
+	if (!dev) {
+		printf("s400 dev is not initialized\n");
+		return -ENODEV;
+	}
+
+	msg.version = ELE_VERSION;
+	msg.tag = ELE_CMD_TAG;
+	msg.size = 1;
+	msg.command = ELE_GET_TRNG_STATE;
+
+	ret = misc_call(dev, false, &msg, size, &msg, size);
+	if (ret) {
+		printf("Error: %s: ret 0x%x, response 0x%x\n",
+		       __func__, ret, msg.data[0]);
+		return ret;
+	}
+
+	rsp = (void *)msg.data;
+	if (rsp->trng_state != IMX_ELE_TRNG_STATUS_READY ||
+		rsp->csal_state != IMX_ELE_CSAL_STATUS_READY) {
+		return -EBUSY;
+	} else {
+		return 0;
+	}
+}
+
+int ele_get_random(u32 src_paddr, size_t len)
+{
+	struct udevice *dev = gd->arch.ele_dev;
+	int size = sizeof(struct ele_msg);
+	struct ele_msg msg = {};
+	int ret;
+	u32 start = 0;
+
+	if (!dev) {
+		printf("ele dev is not initialized\n");
+		return -ENODEV;
+	}
+
+	if (src_paddr == 0 || len == 0) {
+		printf("Wrong input parameter!\n");
+		return -EINVAL;
+	}
+
+	/* make sure the ELE is ready to produce RNG */
+	start = get_timer(0);
+	while ((ele_get_trng_state() != 0)) {
+		/* timeout in 5ms */
+		if (get_timer(start) >= 5) {
+			printf("get random timeout!\n");
+			return -EBUSY;
+		}
+		udelay(100);
+	}
+
+	flush_dcache_range((ulong)src_paddr,
+				ALIGN((ulong)src_paddr + len, ARCH_DMA_MINALIGN));
+
+	msg.version = ELE_VERSION_FW;
+	msg.tag = ELE_CMD_TAG;
+	msg.size = 4;
+	msg.command = ELE_GET_RNG;
+	msg.data[0] = 0;
+	msg.data[1] = src_paddr;
+	msg.data[2] = len;
+
+	ret = misc_call(dev, false, &msg, size, &msg, size);
+	if (ret)
+		printf("Error: %s: ret 0x%x, response 0x%x\n",
+		       __func__, ret, msg.data[0]);
+	else
+		invalidate_dcache_range((ulong)src_paddr,
+				ALIGN((ulong)src_paddr + len, ARCH_DMA_MINALIGN));
 
 	return ret;
 }

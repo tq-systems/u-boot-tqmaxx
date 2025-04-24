@@ -19,6 +19,10 @@
 #include <asm/mach-imx/ahab.h>
 #endif
 
+#ifdef CONFIG_IMX_MATTER_TRUSTY
+#include <trusty/libtipc.h>
+#endif
+
 DECLARE_GLOBAL_DATA_PTR;
 
 #if defined(CONFIG_AHAB_BOOT) && !defined(CONFIG_ANDROID_SUPPORT)
@@ -125,7 +129,7 @@ static int booti_start(struct bootm_info *bmi)
 	if (ret)
 		return 1;
 
-#ifdef CONFIG_IMX_HAB
+#if defined(CONFIG_IMX_HAB) && !defined(CONFIG_AVB_SUPPORT)
 	extern int authenticate_image(
 		uint32_t ddr_start, uint32_t raw_image_size);
 	if (authenticate_image(ld, image_size) != 0) {

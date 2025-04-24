@@ -290,6 +290,7 @@ static void process_flash_blkdev(const char *cmdbuf, void *download_buffer,
 static void process_erase_blkdev(const char *cmdbuf, char *response)
 {
 	int mmc_no = 0;
+	char blk_dev[128];
 	lbaint_t blks, blks_start, blks_size, grp_size;
 	struct mmc *mmc;
 	struct blk_desc *dev_desc;
@@ -322,6 +323,15 @@ static void process_erase_blkdev(const char *cmdbuf, char *response)
 		printf("Block device MMC %d not supported\n",
 			mmc_no);
 		fastboot_fail("not valid MMC card", response);
+		return;
+	}
+
+	/* Get and switch target flash device. */
+	if (get_fastboot_target_dev(blk_dev, ptn) != 0) {
+		printf("failed to get target dev!\n");
+		return;
+	} else if (run_command(blk_dev, 0)) {
+		printf("Init of BLK device failed\n");
 		return;
 	}
 
@@ -387,7 +397,7 @@ static void process_flash_sf(const char *cmdbuf, void *download_buffer,
 				return;
 			}
 			/* Erase */
-			sprintf(sf_command, "sf erase 0x%x 0x%x", ptn->start * blksz, /*start*/
+			sprintf(sf_command, "sf erase 0x%x 0x%lx", ptn->start * blksz, /*start*/
 			ptn->length * blksz /*size*/);
 			ret = run_command(sf_command, 0);
 			if (ret) {
@@ -413,7 +423,7 @@ static void process_flash_sf(const char *cmdbuf, void *download_buffer,
 	}
 }
 
-#ifdef CONFIG_ARCH_IMX8M
+#if defined(CONFIG_ARCH_IMX8M) || defined(CONFIG_IMX95)
 /* Check if the mcu image is built for running from TCM */
 static bool is_tcm_image(unsigned char *image_addr)
 {
@@ -457,7 +467,7 @@ void fastboot_process_flash(const char *cmdbuf, void *download_buffer,
 			process_flash_sf(cmdbuf, download_buffer,
 				download_bytes, response);
 			break;
-#ifdef CONFIG_ARCH_IMX8M
+#if defined(CONFIG_ARCH_IMX8M) || defined(CONFIG_IMX95)
 		case DEV_MMC:
 			if (is_tcm_image(download_buffer))
 				process_flash_blkdev(cmdbuf, download_buffer,

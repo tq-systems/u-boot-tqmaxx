@@ -153,6 +153,7 @@ EVENT_SPY_SIMPLE(EVT_DM_POST_INIT_R, imx8_init_mu);
 #if defined(CONFIG_ARCH_MISC_INIT)
 int arch_misc_init(void)
 {
+#if !defined(CONFIG_ANDROID_SUPPORT) && !defined(CONFIG_ANDROID_AUTO_SUPPORT)
 	if (IS_ENABLED(CONFIG_FSL_CAAM)) {
 		struct udevice *dev;
 		int ret;
@@ -161,6 +162,7 @@ int arch_misc_init(void)
 		if (ret)
 			printf("Failed to initialize caam_jr: %d\n", ret);
 	}
+#endif
 
 	return 0;
 }
@@ -715,6 +717,19 @@ int dram_init_banksize(void)
 			}
 		}
 	}
+#ifdef CONFIG_VPU_SECURE_HEAP
+	// pass the seucre memory to linux
+	gd->bd->bi_dram[i].start = CONFIG_SECURE_HEAP_BASE;
+	gd->bd->bi_dram[i].size = CONFIG_SECURE_HEAP_SIZE;
+	dram_bank_sort(i);
+	i++;
+
+	gd->bd->bi_dram[i].start = CONFIG_VPU_BOOT_BASE;
+	gd->bd->bi_dram[i].size = CONFIG_VPU_BOOT_SIZE;
+	dram_bank_sort(i);
+	i++;
+#endif
+
 
 	/* If error, set to the default value */
 	if (!i) {

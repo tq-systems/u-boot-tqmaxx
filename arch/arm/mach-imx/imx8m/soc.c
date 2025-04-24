@@ -46,7 +46,7 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#if defined(CONFIG_IMX_HAB) || defined(CONFIG_AVB_ATX)
+#if defined(CONFIG_IMX_HAB) || defined(CONFIG_AVB_ATX) || defined(CONFIG_IMX_TRUSTY_OS)
 struct imx_fuse const imx_sec_config_fuse = {
 	.bank = 1,
 	.word = 3,
@@ -1698,7 +1698,11 @@ usb_modify_speed:
 		               "kaslr-seed", fdt_strerror(ret));
 	}
 
+#if defined(CONFIG_ANDROID_SUPPORT) || defined(CONFIG_ANDROID_AUTO_SUPPORT)
+	return 0;
+#else
 	return ft_add_optee_node(blob, bd);
+#endif
 }
 #endif
 
@@ -1755,6 +1759,7 @@ void reset_cpu(void)
 #if defined(CONFIG_ARCH_MISC_INIT)
 int arch_misc_init(void)
 {
+#if !defined(CONFIG_IMX_TRUSTY_OS) || defined(CONFIG_XPL_BUILD)
 	if (IS_ENABLED(CONFIG_FSL_CAAM)) {
 		struct udevice *dev;
 		int ret;
@@ -1763,6 +1768,7 @@ int arch_misc_init(void)
 		if (ret)
 			printf("Failed to initialize caam_jr: %d\n", ret);
 	}
+#endif
 
 	return 0;
 }

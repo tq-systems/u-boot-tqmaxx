@@ -39,6 +39,22 @@ enum hwcrypto_command {
     HWCRYPTO_HASH            = (1 << HWCRYPTO_REQ_SHIFT),
     HWCRYPTO_ENCAP_BLOB      = (2 << HWCRYPTO_REQ_SHIFT),
     HWCRYPTO_GEN_RNG         = (3 << HWCRYPTO_REQ_SHIFT),
+    HWCRYPTO_GEN_BKEK        = (4 << HWCRYPTO_REQ_SHIFT),
+    HWCRYPTO_LOCK_BOOT_STATE = (5 << HWCRYPTO_REQ_SHIFT),
+    HWCRYPTO_PROVISION_WV_KEY = (6 << HWCRYPTO_REQ_SHIFT),
+    HWCRYPTO_PROVISION_WV_KEY_ENC = (7 << HWCRYPTO_REQ_SHIFT),
+    HWCRYPTO_GEN_DEK_BLOB         = (8 << HWCRYPTO_REQ_SHIFT),
+    HWCRYPTO_SET_EMMC_CID         = (9 << HWCRYPTO_REQ_SHIFT),
+    HWCRYPTO_PROVISION_FIRMWARE_SIGN_KEY = (10 << HWCRYPTO_REQ_SHIFT),
+    HWCRYPTO_PROVISION_FIRMWARE_ENCRYPT_KEY = (11 << HWCRYPTO_REQ_SHIFT),
+    HWCRYPTO_PROVISION_SPL_DEK_BLOB     = (12 << HWCRYPTO_REQ_SHIFT),
+    HWCRYPTO_PROVISION_BOOTLOADER_DEK_BLOB     = (13 << HWCRYPTO_REQ_SHIFT),
+    HWCRYPTO_GET_SPL_DEK_BLOB         = (14 << HWCRYPTO_REQ_SHIFT),
+    HWCRYPTO_GET_SPL_DEK_BLOB_SIZE    = (15 << HWCRYPTO_REQ_SHIFT),
+    HWCRYPTO_GET_BOOTLOADER_DEK_BLOB         = (16 << HWCRYPTO_REQ_SHIFT),
+    HWCRYPTO_GET_BOOTLOADER_DEK_BLOB_SIZE    = (17 << HWCRYPTO_REQ_SHIFT),
+    HWCRYPTO_PROVISION_SRM        = (18 << HWCRYPTO_REQ_SHIFT),
+    HWCRYPTO_LOAD_SRM        = (19 << HWCRYPTO_REQ_SHIFT),
 };
 
 /**
@@ -52,7 +68,15 @@ enum hwcrypto_error {
     HWCRYPTO_ERROR_INVALID  = 1,
     HWCRYPTO_ERROR_INTERNAL = 2,
 };
-
+/**
+ * enum dek_blob_part
+ * @SPL_DEK_BLOB:			dek blob for SPL image
+ * @BOOTLOADER_DEK_BLOB:		dek blob for bootloader image
+ */
+enum dek_blob_part {
+    SPL_DEK_BLOB = 0,
+    BOOTLOADER_DEK_BLOB = 1,
+};
 enum hwcrypto_hash_algo {
     SHA1 = 0,
     SHA256
@@ -101,8 +125,16 @@ typedef struct hwcrypto_blob_msg {
  * @buf:  physical start address of the output rng buf.
  * @len:  size of required rng.
  */
-typedef struct hwcrypto_rng_msg {
+typedef struct hwcrypto_rng_req {
+    uint32_t len;
+}hwcrypto_rng_req;
+
+/**
+ * @buf:  physical start address of the output bkek buf.
+ * @len:  size of required rng.
+ */
+typedef struct hwcrypto_bkek_msg {
     uint32_t buf;
     uint32_t len;
-}hwcrypto_rng_msg;
+}hwcrypto_bkek_msg;
 #endif /* TRUSTY_INTERFACE_HWCRYPTO_H_ */

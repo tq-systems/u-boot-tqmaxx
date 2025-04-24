@@ -67,11 +67,61 @@ int hwcrypto_hash(uint32_t in_addr, uint32_t in_len, uint32_t out_addr,
 int hwcrypto_gen_blob(uint32_t plain_pa,
                       uint32_t plain_size, uint32_t blob_pa);
 
-/* Send request to secure side to generate rng with caam.
+/* Send request to secure side to generate rng.
+ * Returns one of trusty_err.
+ *
+ * @buf: the output rng buf.
+ * @len: size of required rng.
+ * */
+int hwcrypto_gen_rng(uint8_t *buf, uint32_t len);
+
+/* Send request to secure side to generate bkek with caam.
  * Returns one of trusty_err.
  *
  * @buf: physical start address of the output rng buf.
  * @len: size of required rng.
  * */
-int hwcrypto_gen_rng(uint32_t buf, uint32_t len);
+int hwcrypto_gen_bkek(uint32_t buf, uint32_t len);
+
+/* Send request to secure side to lock boot state, so some
+ * hwcrypto commands can't be used outside of bootloader.
+ * Returns one of trusty_err.
+ * */
+int hwcrypto_lock_boot_state(void);
+
+/* Send request to secure side to provision widevine keybox
+ * */
+int hwcrypto_provision_wv_key(const char *data, uint32_t data_size);
+
+/* Send request to secure side to provision encrypted widevine keybox
+ * */
+int hwcrypto_provision_wv_key_enc(const char *data, uint32_t data_size);
+
+/* Send request to secure side to generate dek blob
+ * */
+int hwcrypto_gen_dek_blob(char *data, uint32_t *data_size);
+
+/* pass emmc id to secure side
+ * */
+int hwcrypto_commit_emmc_cid(void);
+
+/* Send request to secure side to provision firmware sign key
+ * */
+int hwcrypto_provision_firmware_sign_key(const char *data, uint32_t data_size);
+
+/* Send request to secure side to provision firmware encrypt key
+ * */
+int hwcrypto_provision_firmware_encrypt_key(const char *data, uint32_t data_size);
+/* Send the bootloader dek blob to secure side then save in rpmb
+ * */
+int hwcrypto_provision_dek_blob(char *data, uint32_t *data_size, enum dek_blob_part);
+/* Get the dek blob which saved in rpmb
+ * */
+int hwcrypto_get_dek_blob(char *data, uint32_t *data_size, enum dek_blob_part);
+/* Send request to secure side to provision srm
+ * */
+int hwcrypto_provision_srm(const char *data, uint32_t data_size);
+/* Send request to secure side to load SRM
+ * */
+int hwcrypto_load_srm(void);
 #endif /* TRUSTY_HWCRYPTO_H_ */

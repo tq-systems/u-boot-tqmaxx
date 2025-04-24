@@ -6,6 +6,10 @@
 #include "imx8ulp-u-boot.dtsi"
 
 / {
+	chosen {
+		bootargs = "console=ttyLP1,115200 earlycon";
+	};
+
 	mu@27020000 {
 		compatible = "fsl,imx8ulp-mu";
 		reg = <0 0x27020000 0 0x10000>;

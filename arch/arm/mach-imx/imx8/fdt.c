@@ -15,6 +15,7 @@
 #include <cpu.h>
 #include <dm.h>
 #include <malloc.h>
+#include <fdt_support.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -495,7 +496,7 @@ static void update_fdt_with_owned_resources_legacy(void *blob)
 	}
 }
 
-static void update_fdt_with_owned_resources(void *blob)
+static __maybe_unused void update_fdt_with_owned_resources(void *blob)
 {
 	/*
 	 * Traverses the fdt nodes, check its power domain and use
@@ -847,6 +848,13 @@ int ft_system_setup(void *blob, struct bd_info *bd)
 		ret = config_smmu_fdt(blob);
 		if (ret)
 			return ret;
+	}
+
+	if (IS_ENABLED(CONFIG_DM_RNG)) {
+		ret = fdt_kaslrseed(blob, true);
+		if (ret)
+			printf("Unable to set property %s, err=%s\n",
+				"kaslr-seed", fdt_strerror(ret));
 	}
 
 	return ft_add_optee_node(blob, bd);

@@ -3,6 +3,12 @@
  * Copyright 2024 NXP
  */
 
+/ {
+	chosen {
+		bootargs = "console=ttyLP0,115200 earlycon";
+	};
+};
+
 &scmi_iomuxc {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_hog>;
