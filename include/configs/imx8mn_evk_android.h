@@ -9,6 +9,8 @@
 
 #define FSL_FASTBOOT_FB_DEV "mmc"
 
+#undef CONFIG_BOOTCOMMAND
+
 #ifdef CONFIG_SPL_BUILD
 #define CFG_MALLOC_F_ADDR 0x970000
 #endif
