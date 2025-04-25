@@ -876,6 +876,24 @@ u64 get_page_table_size(void)
 }
 #endif
 
+#if CONFIG_IS_ENABLED(LMB_ARCH_MEM_MAP)
+void lmb_arch_add_memory(void)
+{
+	int i;
+	phys_addr_t ram_start;
+	phys_size_t ram_size;
+
+	/* Add RAM */
+	for (i = 0; i < CONFIG_NR_DRAM_BANKS; i++) {
+		ram_start = gd->bd->bi_dram[i].start;
+		ram_size = gd->bd->bi_dram[i].size;
+
+		if (ram_size > 0)
+			lmb_add(ram_start, ram_size);
+	}
+}
+#endif
+
 #if defined(CONFIG_IMX8QM)
 #define FUSE_MAC0_WORD0 452
 #define FUSE_MAC0_WORD1 453

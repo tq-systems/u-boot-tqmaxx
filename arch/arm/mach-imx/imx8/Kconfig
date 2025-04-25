@@ -32,18 +32,21 @@ config MU_BASE_SPL
 config IMX8QM
 	select IMX8
 	select SUPPORT_SPL
+	select LMB_ARCH_MEM_MAP
 	select SPL_RECOVER_DATA_SECTION if SPL
 	bool
 
 config IMX8QXP
 	select IMX8
 	select SUPPORT_SPL
+	select LMB_ARCH_MEM_MAP
 	select SPL_RECOVER_DATA_SECTION if SPL
 	bool
 
 config IMX8DXL
 	select IMX8
 	select SUPPORT_SPL
+	select LMB_ARCH_MEM_MAP
 	select SPL_RECOVER_DATA_SECTION if SPL
 	bool
 
