@@ -12,6 +12,7 @@
 #include <asm/global_data.h>
 #include <dm/device.h>
 #include <dm/pinctrl.h>
+#include <dm/devres.h>
 
 #include "pinctrl-imx.h"
 
@@ -79,6 +80,8 @@ int imx_pinctrl_set_state_scu(struct udevice *dev, struct udevice *config)
 			printf("Set pin %d, mux %d, val %d, error\n", pin_id,
 			       mux, config_val);
 	}
+
+	devm_kfree(dev, pin_data);
 
 	return 0;
 }

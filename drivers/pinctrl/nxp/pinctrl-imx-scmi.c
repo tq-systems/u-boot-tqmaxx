@@ -6,6 +6,7 @@
 #include <asm/io.h>
 #include <asm/mach-imx/sys_proto.h>
 #include <dm.h>
+#include <dm/devres.h>
 #include <dm/device_compat.h>
 #include <dm/pinctrl.h>
 #include <scmi_agent.h>
@@ -124,6 +125,8 @@ static int imx_pinctrl_set_state_scmi(struct udevice *dev, struct udevice *confi
 				mux_ofs, mux, config_val);
 		}
 	}
+
+	devm_kfree(dev, pin_data);
 
 	return ret;
 }
