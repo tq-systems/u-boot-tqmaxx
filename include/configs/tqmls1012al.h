@@ -130,7 +130,7 @@
 	"addmmc=setenv bootargs ${bootargs} root=/dev/mmcblk${mmcdev}p2 rootwait\0" \
 	"mmcdev=0\0"                                                           \
 	"firmwarepart=1\0"                                                     \
-	"mmckernelload=load mmc ${mmcdev}:${firmarepart} ${fdtaddr} Image.gz; "\
+	"mmckernelload=load mmc ${mmcdev}:${firmarepart} ${fdtaddr} ${kernel_file}; "\
 		"unzip $fdtaddr $loadaddr\0" \
 	"mmcfdtload=load mmc ${mmcdev}:${firmwarepart} ${fdtaddr} ${fdt_file}; "\
 		"fdt addr ${fdtaddr}\0" \
