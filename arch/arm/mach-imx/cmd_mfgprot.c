@@ -10,15 +10,17 @@
 #include <command.h>
 #include <config.h>
 #include <env.h>
+#include <linux/errno.h>
 #include <mapmem.h>
 #include <memalign.h>
+#include <vsprintf.h>
 #ifdef CONFIG_IMX_CAAM_MFG_PROT
 #include <asm/arch/clock.h>
 #include <fsl_sec.h>
 #endif
 #ifdef CONFIG_IMX_SECO_MFG_PROT
 #include <asm/io.h>
-#include <asm/arch/sci/sci.h>
+#include <firmware/imx/sci/sci.h>
 #endif
 
 /**
