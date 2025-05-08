@@ -6,6 +6,8 @@
 #include "imx8mm-u-boot.dtsi"
 
 / {
+	model = "NXP i.MX8MM DDR4 EVK with CYW43455 WIFI/BT board";
+
 	chosen {
 		bootargs = "console=ttymxc1,115200 earlycon=ec_imx6q,0x30890000,115200";
 	};
