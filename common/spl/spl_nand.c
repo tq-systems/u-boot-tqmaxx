@@ -21,6 +21,13 @@ uint32_t __weak spl_nand_get_uboot_raw_page(void)
 	return CONFIG_SYS_NAND_U_BOOT_OFFS;
 }
 
+#ifdef CONFIG_SYS_NAND_U_BOOT_OFFS_REDUND
+uint32_t __weak spl_nand_get_uboot_redund_raw_page(void)
+{
+	return CONFIG_SYS_NAND_U_BOOT_OFFS_REDUND;
+}
+#endif
+
 #if defined(CONFIG_SPL_NAND_RAW_ONLY)
 static int spl_nand_load_image(struct spl_image_info *spl_image,
 			struct spl_boot_device *bootdev)
@@ -146,7 +153,7 @@ static int spl_nand_load_image(struct spl_image_info *spl_image,
 #if CONFIG_SYS_NAND_U_BOOT_OFFS != CONFIG_SYS_NAND_U_BOOT_OFFS_REDUND
 	if (err)
 		err = spl_nand_load_element(spl_image, bootdev,
-					    CONFIG_SYS_NAND_U_BOOT_OFFS_REDUND);
+					    spl_nand_get_uboot_redund_raw_page());
 #endif
 #endif
 	nand_deselect();

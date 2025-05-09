@@ -43,6 +43,7 @@
 #include <stdlib.h>
 #include <power-domain.h>
 #include <dt-bindings/power/imx8mp-power.h>
+#include <nand.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -1892,6 +1893,16 @@ void do_error(struct pt_regs *pt_regs)
 	panic("Resetting CPU ...\n");
 }
 #endif
+
+#ifdef CONFIG_SYS_NAND_U_BOOT_OFFS_REDUND
+uint32_t spl_nand_get_uboot_redund_raw_page(void)
+{
+	return CONFIG_SYS_NAND_U_BOOT_OFFS +
+		nand_spl_adjust_offset(CONFIG_SYS_NAND_U_BOOT_OFFS,
+			CONFIG_SYS_NAND_U_BOOT_OFFS_REDUND - CONFIG_SYS_NAND_U_BOOT_OFFS);
+}
+#endif
+
 #endif
 
 #if defined(CONFIG_IMX8MN) || defined(CONFIG_IMX8MP)
