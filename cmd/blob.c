@@ -10,7 +10,8 @@
 #include <asm/byteorder.h>
 #include <linux/compiler.h>
 #if defined(CONFIG_ARCH_MX6) || defined(CONFIG_ARCH_MX7) || \
-	defined(CONFIG_ARCH_MX7ULP) || defined(CONFIG_ARCH_IMX8M)
+	defined(CONFIG_ARCH_MX7ULP) || defined(CONFIG_ARCH_IMX8M) || \
+	defined(CONFIG_IMX94) || defined(CONFIG_IMX95)
 #include <fsl_sec.h>
 #include <asm/arch/clock.h>
 #endif
