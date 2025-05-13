@@ -48,7 +48,7 @@
 	"ubirootfs=rootfs.ubifs\0"                                     \
 	"ubirootfspart=ubi\0"                                          \
 	"ubirootfsvol=rootfs\0"                                        \
-	"ubimtdidx=3\0"                                                \
+	"ubimtdidx=ubi\0"                                              \
 	"prepare_ubi_part=if sf probe; then "                          \
 			"mtd erase ubi; "                              \
 			"ubi part ubi; ubi create rootfs; ubi detach; "\
