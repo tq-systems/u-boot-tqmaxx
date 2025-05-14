@@ -452,7 +452,7 @@ int board_init(void)
 
 	flexspi_nor_steup();
 
-	power_on_m7("mx95alt");
+	power_on_m7("mx95evkrpmsg");
 
 	lvds_backlight_on();
 

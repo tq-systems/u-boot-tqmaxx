@@ -319,7 +319,7 @@ int board_init(void)
 
 	netc_init();
 
-	power_on_m7("mx95alt");
+	power_on_m7("mx95evkrpmsg");
 
 	return 0;
 }
