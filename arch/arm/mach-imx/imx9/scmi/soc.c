@@ -999,6 +999,7 @@ static void disable_thermal_cpu_nodes(void *blob, u32 disabled_cores)
 		"/thermal-zones/pf53_arm/cooling-maps/map0",
 		"/thermal-zones/ana/cooling-maps/map0",
 		"/thermal-zones/a55/cooling-maps/map0",
+		"/thermal-zones/a55-thermal/cooling-maps/map0",
 	};
 	u32 cooling_dev[24];
 
@@ -1168,7 +1169,8 @@ static int disable_gpu_node(void *blob, uint32_t num_a55_cores_disabled)
 static int disable_pciea_node(void *blob)
 {
 	static const char * const nodes_path_pciea[] = {
-		"/soc/pcie@4c300000"
+		"/soc/pcie@4c300000",
+		"/soc/pcie-ep@4c300000"
 	};
 
 	return delete_fdt_nodes(blob, nodes_path_pciea, ARRAY_SIZE(nodes_path_pciea));
@@ -1177,7 +1179,8 @@ static int disable_pciea_node(void *blob)
 static int disable_pcieb_node(void *blob)
 {
 	static const char * const nodes_path_pcieb[] = {
-		"/soc/pcie@4c380000"
+		"/soc/pcie@4c380000",
+		"/soc/pcie-ep@4c380000"
 	};
 
 	return delete_fdt_nodes(blob, nodes_path_pcieb, ARRAY_SIZE(nodes_path_pcieb));
@@ -1189,6 +1192,7 @@ int disable_enet10g_node(void *blob)
 		"/pcie@4ca00000/ethernet@10,0",
 		"/soc/pcie@4ca00000/ethernet@10,0",
 		"/soc/syscon@4ca00000/ethernet@10,0",
+		"/soc/netc-blk-ctrl@4cde0000/pcie@4ca00000/ethernet@10,0",
 	};
 
 	return delete_fdt_nodes(blob, nodes_path_enet10g, ARRAY_SIZE(nodes_path_enet10g));
