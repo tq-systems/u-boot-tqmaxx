@@ -631,10 +631,9 @@ static void disable_fdt_resources(void *fdt)
 	int nodeoff, ret;
 	const char *status = "disabled";
 	static const char * const dsi_nodes[] = {
-		"/soc@0/bus@42000000/i2c@426b0000",
-		"/soc@0/bus@42000000/i2c@426d0000",
-		"/pcie@4ca00000",
-		"/pcie@4cb00000"
+		"/soc/bus@42000000/i2c@426b0000",
+		"/soc/bus@42000000/i2c@426d0000",
+		"/soc/netc-blk-ctrl@4cde0000"
 	};
 
 	for (i = 0; i < ARRAY_SIZE(dsi_nodes); i++) {
