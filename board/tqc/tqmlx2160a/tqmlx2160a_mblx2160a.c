@@ -255,17 +255,22 @@ static int mblx2160a_config_i2c_device(struct udevice *dev,
 
 	debug("Configuring i2c device %s on bus: %s\n", dev->name, bus->name);
 	for (int i = 0; i < count; i++) {
-		val = dm_i2c_reg_read(dev, settings[i].reg);
-		if (ret)
-			return ret;
+		if (settings[i].mask == 0xff) {
+			val = 0;
+		} else {
+			val = dm_i2c_reg_read(dev, settings[i].reg);
+			if (ret)
+				return ret;
 
-		debug("Read reg %2x: val: %2x ", settings[i].reg, val);
+			debug("Read reg %02x: val: %02x ", settings[i].reg, val);
 
-		/* Clear bits to write */
-		val &= ~settings[i].mask;
+			/* Clear bits to write */
+			val &= ~settings[i].mask;
+		}
+
 		val |= (settings[i].mask & settings[i].val);
 
-		debug("Writing: %2x\n", val);
+		debug("Writing reg %02x: %02x\n", settings[i].reg, val);
 		ret = dm_i2c_reg_write(dev, settings[i].reg, val);
 
 		if (ret)
