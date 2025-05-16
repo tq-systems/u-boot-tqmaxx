@@ -283,6 +283,7 @@ struct scmi_cfg_info_out {
 	u8 cfgname[SCMI_MISC_MAX_CFGNAME];
 };
 
+uint32_t scmi_get_rom_data(rom_passover_t *rom_data);
 #endif
 
 /* For i.MX ULP */
