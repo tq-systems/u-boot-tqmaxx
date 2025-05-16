@@ -377,7 +377,7 @@ void board_init_f(ulong dummy)
 	tq_vard_show(&vard);
 	spl_dram_init(ramtype);
 
-	if (CONFIG_IS_ENABLED(IMX93)) {
+	if (IS_ENABLED(CONFIG_IMX93)) {
 		/* Put M33 into CPUWAIT for following kick */
 		ret = m33_prepare();
 		if (ret)
