@@ -61,12 +61,6 @@ config TQMA93XX_BB_MBA93XXLA
 
 endchoice
 
-config MTDPARTS_DEFAULT
-	default "mtdparts=425e0000.spi:4m@0k(bootstream),64k@4096k(env0),64k@4160k(env1),-@6m(ubi)"
-
-config MTDIDS_DEFAULT
-	default "nor0=425e0000.spi"
-
 source "board/tq/common/Kconfig"
 
 endif
