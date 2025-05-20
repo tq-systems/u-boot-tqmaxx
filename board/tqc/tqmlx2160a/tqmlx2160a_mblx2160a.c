@@ -210,12 +210,13 @@ int mblx2160a_gpios_init(void)
 static int mblx2160a_set_gpio(const char *name, int val)
 {
 	int i;
-	int ret;
+	int ret = -ENOENT;
 	struct gpio_desc desc;
 
 	i = __gpio_idx_by_name(name);
 
-	ret = dm_gpio_lookup_name(mblx2160a_gpios[i].name, &desc);
+	if (i >= 0)
+		ret = dm_gpio_lookup_name(mblx2160a_gpios[i].name, &desc);
 
 	if (ret) {
 		printf("gpio not found %s: num: %d error: %d\n", name, i, ret);
