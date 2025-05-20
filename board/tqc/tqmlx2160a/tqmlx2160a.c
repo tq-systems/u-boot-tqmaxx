@@ -322,11 +322,6 @@ void fdt_fixup_board_enet(void *fdt)
 		fdt_status_fail(fdt, offset);
 	}
 }
-
-void board_quiesce_devices(void)
-{
-	fsl_mc_ldpaa_exit(gd->bd);
-}
 #endif
 
 #ifdef CONFIG_OF_BOARD_FIXUP

@@ -626,6 +626,13 @@ int mblx2160a_board_init(void)
 	return mblx2160a_set_gpio("RESET_USB_HUB#", 1);
 }
 
+#ifdef CONFIG_FSL_MC_ENET
+void board_quiesce_devices(void)
+{
+	fsl_mc_ldpaa_exit(gd->bd);
+}
+#endif
+
 int board_phy_config(struct phy_device *phydev)
 {
 	int val;
