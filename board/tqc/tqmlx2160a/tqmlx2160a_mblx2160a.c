@@ -49,7 +49,7 @@ enum mblx2160a_phys {
 	CAUI_4,
 };
 
-u8 mac_to_dpmac[] = {
+static const u8 mac_to_dpmac[] = {
 	WRIOP1_DPMAC1,
 	WRIOP1_DPMAC9,
 	WRIOP1_DPMAC10,
@@ -83,7 +83,7 @@ struct phy_info {
 	u8 serdes_lane;
 };
 
-struct phy_info phy_infos[] = {
+static const struct phy_info phy_infos[] = {
 	[ETH_01] = {"RESET_ETH1", 0x1, DEFAULT_WRIOP_MDIO1_NAME, 2, 1 },
 	[ETH_02] = {"RESET_ETH2", 0x2, DEFAULT_WRIOP_MDIO1_NAME, 2, 2 },
 	[ETH_03] = {"RESET_ETH3", 0x3, DEFAULT_WRIOP_MDIO1_NAME, 2, 3 },
@@ -96,7 +96,7 @@ struct phy_info phy_infos[] = {
 	[ETH_10] = {"RESET_ETH10", 0x4, DEFAULT_WRIOP_MDIO2_NAME, 0, 0 },
 };
 
-struct mblx2160a_srds_config srds_configs[] = {
+static const struct mblx2160a_srds_config srds_configs[] = {
 	/* SERDES  , MAC 1,  MAC 9,  MAC 10, MAC 12, MAC 13, MAC 14, MAC 16, MAC 17, MAC 18 */
 	{{0, 0}, {ETH_NO, ETH_NO, ETH_NO, ETH_NO, ETH_NO, ETH_NO, ETH_NO, ETH_09, ETH_10} },
 	{{12, 7}, {ETH_NO, ETH_07, ETH_08, ETH_01, XFI_01, XFI_02, ETH_04, ETH_02, ETH_03} },
@@ -107,7 +107,7 @@ struct mblx2160a_srds_config srds_configs[] = {
 	{{14, 11}, {CAUI_4, ETH_NO, ETH_NO, ETH_01, ETH_05, ETH_06, ETH_04, ETH_02, ETH_03} },
 };
 
-struct mblx2160a_gpio mblx2160a_gpios[] = {
+static const struct mblx2160a_gpio mblx2160a_gpios[] = {
 	{"gpio@20_0",		"QSFP_MODSEL",		GPIOD_IS_OUT, 0 },
 	{"gpio@20_1",		"QSFP_RESET#",		GPIOD_IS_OUT, 1 },
 	{"gpio@20_2",		"QSFP_MODPRS#",		GPIOD_IS_IN, 0 },
