@@ -160,6 +160,8 @@ static const struct mblx2160a_gpio mblx2160a_gpios[] = {
 	{"gpio@22_15",		"X4_2_PRSNT1#",		GPIOD_IS_IN, -1},
 };
 
+static struct gpio_desc reset_usb_hub;
+
 static int __gpio_idx_by_name(const char *name)
 {
 	int i;
@@ -620,18 +622,26 @@ static void fixup_sdhc_gpios(void)
 
 int mblx2160a_board_init(void)
 {
+	int ret;
+
 	if (get_boot_src() == BOOT_SOURCE_SD_MMC)
 		fixup_sdhc_gpios();
 
-	return mblx2160a_set_gpio("RESET_USB_HUB#", 1);
+	ret = mblx2160a_lookup_gpio("RESET_USB_HUB#", &reset_usb_hub);
+	if (ret)
+		return ret;
+
+	return dm_gpio_set_value(&reset_usb_hub, 1);
 }
 
-#ifdef CONFIG_FSL_MC_ENET
 void board_quiesce_devices(void)
 {
+#ifdef CONFIG_FSL_MC_ENET
 	fsl_mc_ldpaa_exit(gd->bd);
-}
 #endif
+
+	dm_gpio_set_value(&reset_usb_hub, 0);
+}
 
 int board_phy_config(struct phy_device *phydev)
 {
