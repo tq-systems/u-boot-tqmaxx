@@ -16,6 +16,7 @@
 #include <asm/arch/clock.h>
 #include <mtd_node.h>
 #include <jffs2/load_kernel.h>
+#include <spi_flash.h>
 #include <fsl-mc/ldpaa_wriop.h>
 #include <fsl-mc/fsl_mc.h>
 
