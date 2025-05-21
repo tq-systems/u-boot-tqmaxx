@@ -22,6 +22,9 @@
 #include <fsl_sec.h>
 #include <netdev.h>
 #include <fdtdec.h>
+#include <mtd_node.h>
+#include <jffs2/load_kernel.h>
+#include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
 #include "tqmls1028a_bb.h"
 
@@ -60,8 +63,30 @@ int board_early_init_f(void)
 #ifdef CONFIG_OF_BOARD_SETUP
 int ft_board_setup(void *blob, bd_t *bd)
 {
+	int ret;
+
 	ft_cpu_setup(blob, bd);
-	return arch_fixup_fdt(blob);
+	ret = arch_fixup_fdt(blob);
+	if (ret)
+		return ret;
+
+	if (IS_ENABLED(CONFIG_FDT_FIXUP_PARTITIONS)) {
+		const char * const path = "/soc/spi@20c0000";
+		static const struct node_info nodes[] = {
+			{ "jedec,spi-nor",	MTD_DEV_TYPE_NOR, },
+		};
+
+		/*
+		 * Update MTD partition nodes using info
+		 * from mtdparts env var
+		 * for QSPI this needs the device probed.
+		 */
+		puts("   Updating MTD partitions...\n");
+		tqc_ft_spi_setup(blob, path, nodes,
+				 ARRAY_SIZE(nodes));
+	}
+
+	return 0;
 }
 #endif
 

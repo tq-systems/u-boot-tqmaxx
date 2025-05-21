@@ -21,6 +21,7 @@ choice
 config MBLS1028A
 	bool "TQMLS1028A on MBLS1028A Starterkit"
 	select DM_GPIO
+	select TQC_SPI_NOR
 	help
 	  Select the MBLS1028A starterkit.
 	  This features a Ethernet, USB, SD-Card, etc.
@@ -28,6 +29,7 @@ config MBLS1028A
 config MBLS1028A_IND
 	bool "TQMLS1028A on MBLS1028A-IND Board"
 	select DM_GPIO
+	select TQC_SPI_NOR
 	help
 	  Select the MBLS1028A industrial starterkit.
 	  This features a Ethernet, USB, SD-Card, etc.
