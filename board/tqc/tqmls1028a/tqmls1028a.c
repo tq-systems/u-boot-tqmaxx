@@ -22,7 +22,7 @@
 #include <fsl_sec.h>
 #include <netdev.h>
 #include <fdtdec.h>
-#include "../common/tqmaxx_eeprom.h"
+#include "../common/tqc_eeprom.h"
 #include "tqmls1028a_bb.h"
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -84,26 +84,26 @@ static const char *tqmls1028a_variant(void)
 int misc_init_r(void)
 {
 	int ret = -1;
-	struct tqmaxx_eeprom_data eepromdata;
+	struct tqc_eeprom_data eepromdata;
 	char safe_string[0x41];
 	char ethaddrstring[9];
 
-	ret = tqmaxx_read_eeprom(0, CONFIG_SYS_I2C_EEPROM_ADDR, &eepromdata);
+	ret = tq_read_module_eeprom(&eepromdata);
 
 	if (ret) {
 		printf("Error reading eeprom.\n");
 		return ret;
 	}
 
-	ret = tqmaxx_parse_eeprom_mac(&eepromdata, safe_string,
-				      ARRAY_SIZE(safe_string));
+	ret = tqc_parse_eeprom_mac(&eepromdata, safe_string,
+				   ARRAY_SIZE(safe_string));
 	if (!ret) {
 		env_set("ethaddr", safe_string);
 		eth_env_set_enetaddr("ethaddr", (uchar *)safe_string);
 
 		int i = 1;
 		for (i = 1; i <= 2; i++) {
-			ret = tqmaxx_parse_eeprom_mac_additional(&eepromdata,
+			ret = tqc_parse_eeprom_mac_additional(&eepromdata,
 					safe_string, ARRAY_SIZE(safe_string),
 					i, "%02x:%02x:%02x:%02x:%02x:%02x");
 			if (!ret) {
@@ -114,7 +114,7 @@ int misc_init_r(void)
 			}
 		}
 
-		tqmaxx_show_eeprom(&eepromdata, tqmls1028a_variant());
+		tqc_show_eeprom(&eepromdata, tqmls1028a_variant());
 	}
 	return 0;
 }

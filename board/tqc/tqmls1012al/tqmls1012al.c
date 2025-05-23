@@ -7,7 +7,7 @@
 #include <common.h>
 
 #include "tqmls1012al_bb.h"
-#include "../common/tqmaxx_eeprom.h"
+#include "../common/tqc_eeprom.h"
 #include "../common/tqmaxx.h"
 
 #include <asm/io.h>
@@ -55,33 +55,33 @@ int board_init(void)
 int misc_init_r(void)
 {
 	int ret = -1;
-	struct tqmaxx_eeprom_data eedat_modul, eedat_board;
+	struct tqc_eeprom_data eedat_modul, eedat_board;
 	/* must hold largest field of eeprom data */
 	char safe_string[0x41];
 
-	ret = tqmaxx_read_eeprom(CONFIG_SYS_I2C_EEPROM_BUS,
-				 TQMLS1012AL_I2C_EEPROM1_ADDR, &eedat_modul);
+	ret = tqc_read_eeprom(CONFIG_SYS_I2C_EEPROM_BUS,
+			      TQMLS1012AL_I2C_EEPROM1_ADDR, &eedat_modul);
 
 	if (ret) {
 		printf("EEPROM: (0x%x) err %d\n", TQMLS1012AL_I2C_EEPROM1_ADDR,
 		       ret);
 	} else {
 		/* Modul ID */
-		tqmaxx_parse_eeprom_id(&eedat_modul, safe_string,
-				       ARRAY_SIZE(safe_string));
+		tqc_parse_eeprom_id(&eedat_modul, safe_string,
+				    ARRAY_SIZE(safe_string));
 		if (strncmp(safe_string, "TQMLS1012AL", 11) == 0)
 			tqmaxx_env_set("modultype", safe_string);
 
 		/* Modul Serial# */
-		if (tqmaxx_parse_eeprom_serial(&eedat_modul, safe_string,
-					       ARRAY_SIZE(safe_string)) == 0)
+		if (tqc_parse_eeprom_serial(&eedat_modul, safe_string,
+					    ARRAY_SIZE(safe_string)) == 0)
 			tqmaxx_env_set("serial#", safe_string);
 		else
 			tqmaxx_env_set("serial#", "???");
 
 		/* Modul MAC */
-		if (tqmaxx_parse_eeprom_mac(&eedat_modul, safe_string,
-					    ARRAY_SIZE(safe_string)) == 0) {
+		if (tqc_parse_eeprom_mac(&eedat_modul, safe_string,
+					 ARRAY_SIZE(safe_string)) == 0) {
 			u32 mac = 0;
 			u8 addr[6];
 			char *ethaddr = env_get("ethaddr");
@@ -111,30 +111,31 @@ int misc_init_r(void)
 		}
 	}
 
-	ret = tqmaxx_read_eeprom_at(CONFIG_SYS_I2C_EEPROM_BUS,
-				    TQMLS1012AL_I2C_EEPROM1_ADDR,
-				    &eedat_board, 0x80);
+	ret = tqc_read_eeprom_at(CONFIG_SYS_I2C_EEPROM_BUS,
+				 TQMLS1012AL_I2C_EEPROM1_ADDR,
+				 CONFIG_SYS_I2C_EEPROM_ADDR_LEN,
+				 0x80, &eedat_board);
 
 	if (ret) {
 		printf("EEPROM: (0x%x) err %d\n", TQMLS1012AL_I2C_EEPROM1_ADDR,
 		       ret);
 	} else {
 		/* Board ID */
-		tqmaxx_parse_eeprom_id(&eedat_board, safe_string,
-				       ARRAY_SIZE(safe_string));
+		tqc_parse_eeprom_id(&eedat_board, safe_string,
+				    ARRAY_SIZE(safe_string));
 		if (strncmp(safe_string, "MBLS1012AL", 10) == 0)
 			tqmaxx_env_set("boardtype", safe_string);
 
 		/* Board Serial# */
-		if (tqmaxx_parse_eeprom_serial(&eedat_board, safe_string,
-					       ARRAY_SIZE(safe_string)) == 0)
+		if (tqc_parse_eeprom_serial(&eedat_board, safe_string,
+					    ARRAY_SIZE(safe_string)) == 0)
 			tqmaxx_env_set("boardserial#", safe_string);
 		else
 			tqmaxx_env_set("boardserial#", "???");
 
 		/* Board MAC */
-		if (tqmaxx_parse_eeprom_mac(&eedat_board, safe_string,
-					    ARRAY_SIZE(safe_string)) == 0) {
+		if (tqc_parse_eeprom_mac(&eedat_board, safe_string,
+					 ARRAY_SIZE(safe_string)) == 0) {
 			u32 mac = 0;
 			u8 addr[6];
 			char *eth2addr = env_get("eth2addr");
@@ -175,8 +176,8 @@ int misc_init_r(void)
 			}
 		}
 
-		tqmaxx_show_eeprom(&eedat_modul, "TQMLS1012AL");
-		tqmaxx_show_eeprom(&eedat_board, "MBLS1012AL");
+		tqc_show_eeprom(&eedat_modul, "TQMLS1012AL");
+		tqc_show_eeprom(&eedat_board, "MBLS1012AL");
 	}
 
 	tqmls1012al_bb_late_init();
