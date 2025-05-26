@@ -125,7 +125,10 @@ struct fsb_map_entry fsb_mapping_table[] = {
 };
 
 struct ele_map_entry ele_api_mapping_table[] = {
-	{ 7, 1, 7, 63 },
+	{ 6, 1, 7 },
+	{ 7, 5, },
+	{ 7, 2, 6, },
+	{ 12, 1, 1, },
 	{ 16, 8, },
 	{ 17, 8, },
 	{ 22, 1, 6 },
