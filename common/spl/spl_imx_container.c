@@ -176,8 +176,10 @@ static int read_auth_container(struct spl_image_info *spl_image,
 
 #ifdef CONFIG_AHAB_BOOT
 	authhdr = ahab_auth_cntr_hdr(authhdr, length);
-	if (!authhdr)
+	if (!authhdr) {
+		ret = -EINVAL;
 		goto end_auth;
+	}
 #endif
 
 	for (i = 0; i < authhdr->num_images; i++) {
