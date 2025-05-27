@@ -138,13 +138,20 @@ static void tqmls10xxa_fixup_partitions(void *blob, struct bd_info *bd)
 int tq_tqmls10xxa_ft_board_setup(void *blob, struct bd_info *bd)
 {
 	struct udevice *dev;
+	size_t idx;
 	u8 bootsrc;
 	int offset;
 	/* Attention: Path may change to /soc/mmc@ in future linux releases. */
 #if defined(CONFIG_FSL_LSCH3)
-	static const char esdhc_node[] = "/soc/esdhc@2140000";
+	static const char * const esdhc_nodes[] = {
+		"/soc/esdhc@2140000",
+		"/soc/mmc@2140000",
+	};
 #elif defined(CONFIG_FSL_LSCH2)
-	static const char esdhc_node[] = "/soc/esdhc@1560000";
+	static const char * const esdhc_nodes[] = {
+		"/soc/esdhc@1560000",
+		"/soc/mmc@1560000",
+	};
 #endif
 
 	ft_cpu_setup(blob, bd);
@@ -154,7 +161,11 @@ int tq_tqmls10xxa_ft_board_setup(void *blob, struct bd_info *bd)
 	bootsrc = dm_i2c_reg_read(dev, SYSC_REG_BOOT_SRC);
 
 	/* get offset of sdhc node */
-	offset = fdt_path_offset(blob, esdhc_node);
+	for (idx = 0; idx < ARRAY_SIZE(esdhc_nodes); ++idx) {
+		offset = fdt_path_offset(blob, esdhc_nodes[idx]);
+		if (offset >= 0)
+			break;
+	}
 	if (offset < 0)
 		return offset;
 
