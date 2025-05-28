@@ -150,8 +150,10 @@ int checkboard(void)
 	print_bootinfo();
 	printf("Board: %s on a %s\n", tq_get_boardname(),
 	       tq_bb_get_boardname());
-	if (CONFIG_IS_ENABLED(IMX8M_DRAM_INLINE_ECC))
-		puts("Inline ECC\n");
+	if (IS_ENABLED(CONFIG_IMX8M_DRAM_INLINE_ECC))
+		puts("ECC: Inline\n");
+	else
+		puts("ECC: None\n");
 
 	return tq_bb_checkboard();
 }
@@ -212,7 +214,7 @@ int fixup_ecc_reserved_mem(void *blob, struct bd_info *bis)
 	 * on top of the available ram space.
 	 */
 	ecc_size = ram_size / 7ULL;
-	ecc_start = CONFIG_SYS_SDRAM_BASE + ram_size;
+	ecc_start = CFG_SYS_SDRAM_BASE + ram_size;
 
 	ret = add_res_mem_dt_node(blob, "ecc", ecc_start, ecc_size);
 	if (ret < 0) {
