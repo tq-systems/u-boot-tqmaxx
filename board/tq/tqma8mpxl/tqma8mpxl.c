@@ -195,43 +195,43 @@ const struct tq_som_feature_list *tq_board_detect_features(void)
 }
 
 #ifdef CONFIG_OF_BOARD_SETUP
-#ifdef CONFIG_IMX8M_DRAM_INLINE_ECC
 int fixup_ecc_reserved_mem(void *blob, struct bd_info *bis)
 {
-	int ret;
-	phys_size_t ram_size = 0x0;
-	phys_addr_t ecc_start = 0x0;
-	phys_size_t ecc_size = 0x0;
+	int ret = 0;
 
-	board_phys_sdram_size(&ram_size);
+	if (IS_ENABLED(CONFIG_IMX8M_DRAM_INLINE_ECC)) {
+		phys_size_t ram_size = 0x0;
+		phys_addr_t ecc_start = 0x0;
+		phys_size_t ecc_size = 0x0;
 
-	/*
-	 * In case of inline ECC, the available ram size has been reduced by
-	 * SPL to 7/8 of total ram size, leaving 1/8 untouched for ECC parity
-	 * data.
-	 * The reserved memory node has therefore a size of 1/7 of the
-	 * available ram size (as returned by board_phys_sdram_size), starting
-	 * on top of the available ram space.
-	 */
-	ecc_size = ram_size / 7ULL;
-	ecc_start = CFG_SYS_SDRAM_BASE + ram_size;
+		board_phys_sdram_size(&ram_size);
 
-	ret = add_res_mem_dt_node(blob, "ecc", ecc_start, ecc_size);
-	if (ret < 0) {
-		printf("Could not create ecc reserved-memory node.\n");
-		return ret;
+		/*
+		 * In case of inline ECC, the available ram size has been reduced by
+		 * SPL to 7/8 of total ram size, leaving 1/8 untouched for ECC parity
+		 * data.
+		 * The reserved memory node has therefore a size of 1/7 of the
+		 * available ram size (as returned by board_phys_sdram_size), starting
+		 * on top of the available ram space.
+		 */
+		ecc_size = ram_size / 7ULL;
+		ecc_start = CFG_SYS_SDRAM_BASE + ram_size;
+
+		ret = add_res_mem_dt_node(blob, "ecc", ecc_start, ecc_size);
+		if (ret < 0) {
+			printf("Could not create ecc reserved-memory node.\n");
+			return ret;
+		}
 	}
 
-	return 0;
+	return ret;
 }
-#endif
+
 int ft_board_setup(void *blob, struct bd_info *bis)
 {
-#ifdef CONFIG_IMX8M_DRAM_INLINE_ECC
 	fixup_ecc_reserved_mem(blob, bis);
-#endif
 
-	if (CONFIG_IS_ENABLED(FDT_FIXUP_PARTITIONS)) {
+	if (IS_ENABLED(CONFIG_FDT_FIXUP_PARTITIONS)) {
 		const char * const path = "/soc@0/bus@30800000/spi@30bb0000";
 		const struct node_info nodes[] = {
 			{ "jedec,spi-nor",	MTD_DEV_TYPE_NOR, },
