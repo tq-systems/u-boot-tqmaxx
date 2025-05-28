@@ -297,10 +297,10 @@ int board_late_init(void)
 		tqma8mpxl_feature_list.entries = 0;
 	}
 
-#ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
-	env_set("board_name", tq_bb_get_boardname());
-	env_set("board_rev", tq_get_boardname());
-#endif
+	if (IS_ENABLED(CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG)) {
+		env_set("board_name", tq_bb_get_boardname());
+		env_set("board_rev", tq_get_boardname());
+	}
 
 	tq_bb_board_late_init();
 
