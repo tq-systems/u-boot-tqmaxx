@@ -114,8 +114,7 @@ static int tqma8mpxl_query_ddr_timing(void)
 void board_dram_ecc_scrub(void)
 {
 	if (tqma8mpxl_ram_timing_idx >= 0) {
-		tqma8mpxl_dram_info[tqma8mpxl_ram_timing_idx]
-			.board_dram_ecc_scrub();
+		tqma8mpxl_dram_info[tqma8mpxl_ram_timing_idx].board_dram_ecc_scrub();
 	} else {
 		printf("ERROR: no valid ram configuration, please reset\n");
 		hang();
