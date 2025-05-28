@@ -261,10 +261,7 @@ int board_late_init(void)
 	int ret;
 	bool features_detected = false;
 
-	if (CONFIG_IS_ENABLED(I2C_EEPROM))
-		ret = tq_read_module_eeprom(&eeprom);
-	else
-		ret = tq_read_eeprom_at(0, 0, &eeprom);
+	ret = tq_read_module_eeprom(&eeprom);
 
 	if (!ret) {
 		tq_board_handle_eeprom_data(bname, &eeprom);
