@@ -8,6 +8,8 @@
 #include <common.h>
 #include <command.h>
 #include <exports.h>
+#include <fdt_support.h>
+#include <fdtdec.h>
 #include <fm_eth.h>
 #include <fsl_mdio.h>
 #include <i2c.h>
@@ -17,6 +19,7 @@
 #include <phy.h>
 #include <asm/gpio.h>
 #include <asm/io.h>
+#include <asm/sections.h>
 #include <asm/arch/fsl_serdes.h>
 #include <fsl-mc/fsl_mc.h>
 #include <fsl-mc/ldpaa_wriop.h>
@@ -178,6 +181,31 @@ static int __gpio_idx_by_name(const char *name)
 
 	return -1;
 }
+
+#if defined(CONFIG_OF_BOARD) || defined(CONFIG_OF_SEPARATE)
+/* Override board_fdt_blob_setup to fixup FDT for SATA support */
+void *board_fdt_blob_setup(void)
+{
+	struct ccsr_gur *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
+	/* FDT is at end of image */
+	void *fdt_blob = &_end;
+	u32 srds_s2;
+
+	srds_s2 = in_le32(&gur->rcwsr[28]) &
+				FSL_CHASSIS3_RCWSR28_SRDS2_PRTCL_MASK;
+	srds_s2 >>= FSL_CHASSIS3_RCWSR28_SRDS2_PRTCL_SHIFT;
+
+	/* Only SerDes 2 config 8 supports SATA on MBLX2160A */
+	if (srds_s2 == 8) {
+		/* Enable sata 0, 1 and 2 */
+		fdt_status_okay(fdt_blob, fdt_path_offset(fdt_blob, "/sata@3200000"));
+		fdt_status_okay(fdt_blob, fdt_path_offset(fdt_blob, "/sata@3210000"));
+		fdt_status_okay(fdt_blob, fdt_path_offset(fdt_blob, "/sata@3220000"));
+	}
+
+	return fdt_blob;
+}
+#endif
 
 int mblx2160a_gpios_init(void)
 {
