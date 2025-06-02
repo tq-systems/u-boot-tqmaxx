@@ -33,6 +33,26 @@
 	status = "disabled";
 };
 
+&pinctrl_gpio1 {
+	bootph-pre-ram;
+};
+
+&pinctrl_gpio5 {
+	bootph-pre-ram;
+};
+
+&pinctrl_gpt1_gpio {
+	bootph-pre-ram;
+};
+
+&pinctrl_gpt2_gpio {
+	bootph-pre-ram;
+};
+
+&pinctrl_gpt3_gpio {
+	bootph-pre-ram;
+};
+
 &pinctrl_uart4 {
 	bootph-pre-ram;
 };
