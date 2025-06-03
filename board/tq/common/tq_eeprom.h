@@ -12,7 +12,7 @@
 
 struct tq_eeprom_data;
 
-#if defined(CONFIG_I2C_EEPROM)
+#if CONFIG_IS_ENABLED(I2C_EEPROM)
 
 /**
  * Reads buffer from EEPROM given by seq nr starting at offset
