@@ -320,7 +320,6 @@ unsigned long get_board_ddr_clk(void);
 		"rootfstype=ubifs ubi.mtd=7\0"                                 \
 	BOOTENV								       \
 	"mcmemsize=0x70000000\0"					       \
-	XSPI_MC_INIT_CMD						       \
 	"scan_dev_for_boot_part="					       \
 		"part list ${devtype} ${devnum} devplist; "	\
 		"env exists devplist || setenv devplist 1; "	\
