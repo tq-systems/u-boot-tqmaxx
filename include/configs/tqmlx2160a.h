@@ -365,7 +365,7 @@ unsigned long get_board_ddr_clk(void);
 		"load mmc ${mmcblkdev}:${mmcrootpart} ${kernel_addr_r} /boot/${kernel};" \
 		"load mmc ${mmcblkdev}:${mmcrootpart} ${fdt_addr_r} /boot/${fdtfile};" \
 		"load mmc ${mmcblkdev}:${bootpart} 0x80d00000 ${dpl_file};" \
-		"fsl_mc lazyappply DPL 0x80d00000;"	        \
+		"fsl_mc lazyapply DPL 0x80d00000;"	        \
 		"booti ${kernel_addr_r} - ${fdt_addr_r};"	\
 		"setenv mmcdev_root\0"                          \
 	"sd_bootcmd=echo Trying load from sd card..;"		\
@@ -399,7 +399,7 @@ unsigned long get_board_ddr_clk(void);
 		"if tftp ${kernel_addr_r} ${kernel}; then "\
 			"if tftp ${fdt_addr_r} ${fdtfile}; then "\
 				"if tftp 0x80d00000 ${dpl_file}; then "	\
-					"fsl_mc lazyappply DPL 0x80d00000;"     \
+					"fsl_mc lazyapply DPL 0x80d00000;"     \
 					"booti ${kernel_addr_r} - ${fdt_addr_r}; "    \
 				"fi; "				\
 			"fi; "					\
