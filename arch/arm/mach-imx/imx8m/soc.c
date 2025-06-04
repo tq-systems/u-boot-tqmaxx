@@ -19,6 +19,7 @@
 #include <asm/mach-imx/boot_mode.h>
 #include <asm/mach-imx/syscounter.h>
 #include <asm/ptrace.h>
+#include <asm/setup.h>
 #include <asm/armv8/mmu.h>
 #include <dm/uclass.h>
 #include <dm/device.h>
@@ -833,6 +834,37 @@ bool is_usb_boot(void)
 {
 	return get_boot_device() == USB_BOOT;
 }
+
+#define OCOTP_UID_LOW			0x410
+#define OCOTP_UID_HIGH			0x420
+
+#define IMX8MP_OCOTP_UID_OFFSET		0x10
+#define IMX8MP_OCOTP_UID_HIGH		0xE00
+
+#ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
+void get_board_serial(struct tag_serialnr *serialnr)
+{
+	void __iomem *base = (void *)OCOTP_BASE_ADDR;
+	u32 uid[4];
+
+	if (is_imx8mp()) {
+		uid[3] = readl_relaxed(base + IMX8MP_OCOTP_UID_HIGH + 0x10);
+		uid[2] = readl_relaxed(base + IMX8MP_OCOTP_UID_HIGH);
+		uid[1] = readl_relaxed(base + OCOTP_UID_HIGH + IMX8MP_OCOTP_UID_OFFSET);
+		uid[0] = readl_relaxed(base + OCOTP_UID_LOW + IMX8MP_OCOTP_UID_OFFSET);
+
+		printf("UID: %08x%08x%08x%08x\n", uid[3], uid[2], uid[1], uid[0]);
+	} else {
+		uid[1] = readl_relaxed(base + OCOTP_UID_HIGH);
+		uid[0] = readl_relaxed(base + OCOTP_UID_LOW);
+
+		printf("UID: %08x%08x\n", uid[0], uid[1]);
+	}
+
+	serialnr->low = uid[0];
+	serialnr->high = uid[1];
+}
+#endif
 
 #if IS_ENABLED(CONFIG_OF_SYSTEM_SETUP)
 bool check_fdt_new_path(void *blob)
