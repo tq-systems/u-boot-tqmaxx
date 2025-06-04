@@ -103,6 +103,8 @@
 #define CONFIG_SYS_LS_MC_DRAM_BLOCK_MIN_SIZE	(256UL * 1024 * 1024)
 #endif
 
+#define CONFIG_SYS_AUTOLOAD "no"
+
 #define CONFIG_VID
 
 /* RTC */
