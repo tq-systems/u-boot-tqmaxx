@@ -7,7 +7,9 @@
 
 #include <env.h>
 #include <errno.h>
+#include <asm/bootm.h>
 #include <asm/io.h>
+#include <asm/setup.h>
 #include <asm/mach-imx/iomux-v3.h>
 #include <asm-generic/gpio.h>
 #include <asm/arch/imx8mp_pins.h>
@@ -295,6 +297,14 @@ int board_late_init(void)
 	}
 
 	if (IS_ENABLED(CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG)) {
+		struct tag_serialnr serialnr;
+
+		/*
+		 * CPU UID Query - get_board_serial returns only part of the
+		 * UID but prints complete UID data for i.MX8MP SOC
+		 */
+		get_board_serial(&serialnr);
+
 		env_set("board_name", tq_bb_get_boardname());
 		env_set("board_rev", tq_get_boardname());
 	}
