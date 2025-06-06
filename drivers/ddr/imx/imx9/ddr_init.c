@@ -269,8 +269,29 @@ u32 ddrc_mrr(u32 chip_select, u32 mode_reg_num, u32 *mode_reg_val)
 	u8 dyn_ref_rate_en = 0;
 
 	dyn_ref_rate_en = !!(readl(REG_DDR_SDRAM_CFG_3) & BIT(7));
-	if (dyn_ref_rate_en)
+
+	/* If DYN_REF is enabled, it must first be disabled before performing
+	 * any SW initiated mode register operations.  In addition, a DYN_REF
+	 * MR4 read may already be in progress when DYN_REF is disabled as
+	 * disabling DYN_REF only prevents future MR4 reads from occurring.
+	 * To prevent an MR4 read collision with a subsequent mode register
+	 * operation, we must first clear and poll (for set)
+	 * DDR_SDRAM_MPR5[MPR_VLD] to ensure the last MR4 read has completed
+	 * and then immdeiately disable DYN_REF to prevent future MR4 reads.
+	 */
+	if (dyn_ref_rate_en) {
+		/* Clear MPR_VLD so that the next MR4 read will set it */
+		writel(0x0, REG_DDR_SDRAM_MPR5);
+		/* Wait till MPR_VLD is set (MR4 read done) then immediately disable DYN_REF */
+		while ((readl(REG_DDR_SDRAM_MPR5) & 0x1) == 0)
+			;
+		/* Disable DYN_REF */
 		clrbits_le32(REG_DDR_SDRAM_CFG_3, BIT(7));
+	}
+
+	/* Ensure DDR_SDRAM_MD_CNTL[MD_EN] is cleared before any MRR/MRS operation */
+	while ((readl(REG_DDR_SDRAM_MD_CNTL) & 0x80000000) == 0x80000000)
+		;
 
 	writel(0x80000000, REG_DDR_SDRAM_MD_CNTL_2);
 	temp = 0x80000000 | (chip_select << 28) | (mode_reg_num << 0);
@@ -298,8 +319,29 @@ void ddrc_mrs(u32 cs_sel, u32 opcode, u32 mr)
 	u8 dyn_ref_rate_en = 0;
 
 	dyn_ref_rate_en = !!(readl(REG_DDR_SDRAM_CFG_3) & BIT(7));
-	if (dyn_ref_rate_en)
+
+	/* If DYN_REF is enabled, it must first be disabled before performing
+	 * any SW initiated mode register operations.  In addition, a DYN_REF
+	 * MR4 read may already be in progress when DYN_REF is disabled as
+	 * disabling DYN_REF only prevents future MR4 reads from occurring.
+	 * To prevent an MR4 read collision with a subsequent mode register
+	 * operation, we must first clear and poll (for set)
+	 * DDR_SDRAM_MPR5[MPR_VLD] to ensure the last MR4 read has completed
+	 * and then immdeiately disable DYN_REF to prevent future MR4 reads.
+	 */
+	if (dyn_ref_rate_en) {
+		/* Clear MPR_VLD so that the next MR4 read will set it */
+		writel(0x0, REG_DDR_SDRAM_MPR5);
+		/* Wait till MPR_VLD is set (MR4 read done) then immediately disable DYN_REF */
+		while ((readl(REG_DDR_SDRAM_MPR5) & 0x1) == 0)
+			;
+		/* Disable DYN_REF */
 		clrbits_le32(REG_DDR_SDRAM_CFG_3, BIT(7));
+	}
+
+	/* Ensure DDR_SDRAM_MD_CNTL[MD_EN] is cleared before any MRR/MRS operation */
+	while ((readl(REG_DDR_SDRAM_MD_CNTL) & 0x80000000) == 0x80000000)
+		;
 
 	regval = (cs_sel << 28) | (opcode << 6) | (mr);
 	writel(regval, REG_DDR_SDRAM_MD_CNTL);
