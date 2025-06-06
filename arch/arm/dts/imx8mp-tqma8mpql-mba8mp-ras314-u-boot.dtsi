@@ -16,15 +16,6 @@
 	};
 };
 
-&iomuxc {
-	pinctrl-names = "default";
-	pinctrl-0 =
-#if !CONFIG_IS_ENABLED(LED_GPIO)
-		<&pinctrl_gpioled>,
-#endif
-		<&pinctrl_wdog>;
-};
-
 &pcie {
 	status = "disabled";
 };
