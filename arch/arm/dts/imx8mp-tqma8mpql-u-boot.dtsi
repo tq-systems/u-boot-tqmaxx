@@ -48,32 +48,26 @@
 
 &gpio1 {
 	bootph-pre-ram;
-	bootph-all;
 };
 
 &gpio5 {
 	bootph-pre-ram;
-	bootph-all;
 };
 
 &i2c1 {
 	bootph-pre-ram;
-	bootph-all;
 };
 
 &pinctrl_i2c1 {
 	bootph-pre-ram;
-	bootph-all;
 };
 
 &pinctrl_i2c1_gpio {
 	bootph-pre-ram;
-	bootph-all;
 };
 
 &pinctrl_pmic {
 	bootph-pre-ram;
-	bootph-all;
 };
 
 &pinctrl_wdog {
@@ -82,11 +76,9 @@
 
 &pmic {
 	bootph-pre-ram;
-	bootph-all;
 
 	regulators {
 		bootph-pre-ram;
-		bootph-all;
 	};
 };
 
