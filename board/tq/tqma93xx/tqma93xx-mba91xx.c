@@ -253,19 +253,6 @@ int board_usb_init(int index, enum usb_init_type init)
 #endif
 	case 1:
 		debug("USB2/HUB\n");
-#if !CONFIG_IS_ENABLED(USB_ONBOARD_HUB)
-		switch (init) {
-		case USB_INIT_DEVICE:
-			ret = -ENODEV;
-			break;
-		case USB_INIT_HOST:
-			dm_gpio_set_value(&mba91xx_gid[USB_RESET_B].desc, 0);
-			break;
-		default:
-			printf("USB2: unknown init type\n");
-			ret = -EINVAL;
-		}
-#endif
 		break;
 	default:
 		printf("invalid USB port %d\n", index);
@@ -289,9 +276,6 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 #endif
 	case 1:
 		debug("USB2/HUB\n");
-#if !CONFIG_IS_ENABLED(USB_ONBOARD_HUB)
-		dm_gpio_set_value(&mba91xx_gid[USB_RESET_B].desc, 1);
-#endif
 		break;
 	default:
 		printf("invalid USB port %d\n", index);
