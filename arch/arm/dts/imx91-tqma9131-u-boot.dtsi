@@ -62,6 +62,11 @@
 	bootph-pre-ram;
 };
 
+&pinctrl_wdog {
+	bootph-pre-ram;
+	bootph-some-ram;
+};
+
 &usdhc1 {
 	mmc-hs400-1_8v;
 	mmc-hs400-enhanced-strobe;
@@ -71,4 +76,9 @@
 	 */
 	/delete-property/ vmmc-supply;
 	/delete-property/ vqmmc-supply;
+};
+
+&wdog3 {
+	bootph-pre-ram;
+	bootph-some-ram;
 };
