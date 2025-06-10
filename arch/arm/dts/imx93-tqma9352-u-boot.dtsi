@@ -38,6 +38,8 @@
 };
 
 &gpio1 {
+	bootph-pre-ram;
+
 	pmic-irq-hog {
 		gpio-hog;
 		gpios = <3 GPIO_ACTIVE_LOW>;
@@ -47,22 +49,22 @@
 };
 
 &lpi2c1 {
-	bootph-all;
 	bootph-pre-ram;
 };
 
 &pca9451a {
-	bootph-all;
 	bootph-pre-ram;
 
 	regulators {
-		bootph-all;
 		bootph-pre-ram;
 	};
 };
 
 &pinctrl_lpi2c1 {
-	bootph-all;
+	bootph-pre-ram;
+};
+
+&pinctrl_pca9451 {
 	bootph-pre-ram;
 };
 
