@@ -25,7 +25,6 @@
 		compatible = "fsl,imx27-usb-gadget";
 		dr_mode = "peripheral";
 		chipidea,usb = <&usbotg1>;
-		status = "okay";
 	};
 };
 
