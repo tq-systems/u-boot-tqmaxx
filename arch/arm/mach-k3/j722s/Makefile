@@ -5,3 +5,4 @@
 
 obj-$(CONFIG_OF_SYSTEM_SETUP) += j722s_fdt.o
 obj-$(CONFIG_XPL_BUILD) += j722s_init.o
+obj-y += boot.o
