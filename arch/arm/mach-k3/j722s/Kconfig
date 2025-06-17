@@ -43,9 +43,28 @@ config TARGET_J722S_R5_BEAGLEY_AI
 	select BINMAN
 	imply SYS_K3_SPL_ATF
 
+config TARGET_J722S_A53_TQMA67XX
+	bool "TI K3 based J722S TQMA67xx running on A53"
+	select ARM64
+	select BINMAN
+	select OF_SYSTEM_SETUP
+	select TQ_COMMON_SYSINFO
+
+config TARGET_J722S_R5_TQMA67XX
+	bool "TI K3 based J722S TQMA67xx running on R5"
+	select CPU_V7R
+	select SYS_THUMB_BUILD
+	select K3_LOAD_SYSFW
+	select RAM
+	select SPL_RAM
+	select K3_DDRSS
+	select BINMAN
+	imply SYS_K3_SPL_ATF
+
 endchoice
 
 source "board/ti/j722s/Kconfig"
 source "board/beagle/beagley-ai/Kconfig"
+source "board/tq/tqma67xx/Kconfig"
 
 endif
