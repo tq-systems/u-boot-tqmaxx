@@ -48,9 +48,31 @@ config TARGET_PHYCORE_AM64X_R5
 	select BINMAN
 	imply SYS_K3_SPL_ATF
 
+config TARGET_AM64_A53_TQMA64XXL
+	bool "TQ-Systems TQMa64xxL running on A53"
+	select ARM64
+	select BOARD_LATE_INIT
+	select BINMAN
+	select TQ_COMMON_SYSINFO
+
+config TARGET_AM64_R5_TQMA64XXL
+	bool "TQ-Systems TQMa64xxL running on R5"
+	select CPU_V7R
+	select SYS_THUMB_BUILD
+	select K3_LOAD_SYSFW
+	select RAM
+	select SPL_RAM
+	select K3_DDRSS
+	select PHYS_64BIT
+	select SPL_BOARD_INIT
+	select BINMAN
+	imply SYS_K3_SPL_ATF
+
+
 endchoice
 
 source "board/phytec/phycore_am64x/Kconfig"
 source "board/ti/am64x/Kconfig"
+source "board/tq/tqma64xxl/Kconfig"
 
 endif
