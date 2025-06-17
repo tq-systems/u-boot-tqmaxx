@@ -125,5 +125,6 @@ struct rom_extended_boot_data {
 };
 
 u32 get_boot_device(void);
+u32 get_mmc_boot_mode(void);
 const char *get_reset_reason(void);
 #endif /* _ASM_ARCH_HARDWARE_H_ */
