@@ -337,6 +337,13 @@ void k3_enable_cache(void)
 #endif
 }
 
+int arch_cpu_init(void)
+{
+	if (!IS_ENABLED(CONFIG_SPL))
+		k3_enable_cache();
+	return 0;
+}
+
 static __maybe_unused void k3_dma_remove(void)
 {
 	struct udevice *dev;
