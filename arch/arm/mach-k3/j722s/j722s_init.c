@@ -199,7 +199,7 @@ static void k3_mem_init(void)
 			panic("DRAM init failed: %d\n", ret);
 	}
 
-	spl_enable_cache();
+	k3_enable_cache();
 }
 
 static __maybe_unused void enable_mcu_esm_reset(void)

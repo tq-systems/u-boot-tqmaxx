@@ -248,7 +248,7 @@ void board_init_f(ulong dummy)
 		enable_mcu_esm_reset();
 	}
 
-	spl_enable_cache();
+	k3_enable_cache();
 
 	setup_qos();
 	debug("am62px_init: %s done\n", __func__);
