@@ -257,7 +257,7 @@ void k3_mem_init(void)
 		if (ret && ret != -ENODEV)
 			panic("DRAM 1 init failed: %d\n", ret);
 	}
-	spl_enable_cache();
+	k3_enable_cache();
 }
 
 /* Support for the various EVM / SK families */

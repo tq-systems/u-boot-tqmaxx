@@ -400,7 +400,7 @@ void board_init_f(ulong dummy)
 	if (ret)
 		panic("DRAM init failed: %d\n", ret);
 #endif
-	spl_enable_cache();
+	k3_enable_cache();
 
 	if (IS_ENABLED(CONFIG_CPU_V7R))
 		setup_navss_nb();

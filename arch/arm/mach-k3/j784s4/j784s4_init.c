@@ -233,7 +233,7 @@ void k3_mem_init(void)
 		printf("Initialized %d DRAM controllers\n", ctrl);
 	}
 
-	spl_enable_cache();
+	k3_enable_cache();
 }
 
 void board_init_f(ulong dummy)

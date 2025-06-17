@@ -263,7 +263,7 @@ void board_init_f(ulong dummy)
 	if (ret)
 		panic("DRAM init failed: %d\n", ret);
 #endif
-	spl_enable_cache();
+	k3_enable_cache();
 
 	if (IS_ENABLED(CONFIG_SPL_ETH) && IS_ENABLED(CONFIG_TI_AM65_CPSW_NUSS) &&
 	    spl_boot_device() == BOOT_DEVICE_ETHERNET) {
