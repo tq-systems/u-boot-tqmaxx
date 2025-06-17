@@ -26,3 +26,10 @@ config TQ_COMMON_SPI_FLASH_PATH
 	  FDT path to set to "disabled" on SOM variants without flash
 
 endif
+
+config TQ_COMMON_AUTO_ENV_LOCATION
+	bool "Store U-Boot environment on boot device"
+	depends on ARCH_K3
+	default y
+	help
+	  Automatically select the environment device based on the boot source.
