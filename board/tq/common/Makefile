@@ -6,3 +6,5 @@
 ifneq ($(CONFIG_XPL_BUILD),y)
 obj-$(CONFIG_TQ_COMMON_SYSINFO) += sysinfo.o
 endif
+
+obj-$(CONFIG_ARCH_K3) += mach-k3.o
