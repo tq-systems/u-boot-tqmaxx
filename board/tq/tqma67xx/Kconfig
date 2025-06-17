@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Copyright (c) 2025 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
+
+if TARGET_J722S_R5_TQMA67XX || TARGET_J722S_A53_TQMA67XX
+
+config SYS_BOARD
+       default "tqma67xx"
+
+config SYS_VENDOR
+       default "tq"
+
+config SYS_CONFIG_NAME
+       default "tq_k3_common"
+
+choice
+	prompt "TQ-Systems TQMa67xx base board"
+
+config TQMA67XX_BOARD_MBA67XX
+	bool "TQ-Systems MBa67xx"
+
+endchoice
+
+source "board/tq/common/Kconfig"
+
+endif
