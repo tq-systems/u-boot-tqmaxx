@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Copyright (c) 2020-2025 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
+
+if TARGET_AM62_A53_TQMA62XX || TARGET_AM62_R5_TQMA62XX
+
+config SYS_BOARD
+	default "tqma62xx"
+
+config SYS_VENDOR
+	default "tq"
+
+config SYS_CONFIG_NAME
+	default "tq_k3_common"
+
+choice
+	prompt "TQ-Systems TQMa62xx base board"
+
+config TQMA62XX_BOARD_MBA62XX
+	bool "TQ-Systems MBa62xx"
+
+endchoice
+
+source "board/tq/common/Kconfig"
+
+endif
