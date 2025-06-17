@@ -1,0 +1,30 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Copyright (C) 2024 Texas Instruments Incorporated - https://www.ti.com/
+ * Copyright (c) 2025 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Nora Schiffer
+ */
+
+#include "k3-am67a-tqma67xx-binman.dtsi"
+
+/ {
+	aliases {
+		sysinfo0 = &sysinfo;
+	};
+
+	chosen {
+		tick-timer = &main_timer0;
+	};
+
+	config {
+		u-boot,mmc-env-offset = <0x3c0000>;
+		u-boot,mmc-env-offset-redundant = <0x3e0000>;
+	};
+
+	sysinfo: sysinfo {
+		compatible = "tq,eeprom-sysinfo";
+		i2c-eeprom = <&eeprom0>;
+		tq,vard;
+		bootph-pre-ram;
+	};
+};

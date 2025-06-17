@@ -1,0 +1,50 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Copyright (C) 2024 Texas Instruments Incorporated - https://www.ti.com/
+ * Copyright (c) 2025 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Nora Schiffer
+ */
+
+#include "k3-am67a-tqma67xx-u-boot.dtsi"
+
+/ {
+	aliases {
+		sysinfo1 = &sysinfo_mba;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+
+	sysinfo_mba: sysinfo-mba {
+		compatible = "gpio-sysinfo";
+		gpios =
+			<&gpio_exp2 5 GPIO_ACTIVE_HIGH>, /* BRD_CFG0 */
+			<&gpio_exp2 6 GPIO_ACTIVE_HIGH>, /* BRD_CFG1 */
+			<&gpio_exp2 7 GPIO_ACTIVE_HIGH>; /* BRD_CFG2 */
+		names = "01xx", "02xx";
+		revisions = <0x0>, <0x1>;
+		no-floating-pins;
+	};
+};
+
+&gpio_exp2 {
+	/delete-node/ line5-hog;
+	/delete-node/ line6-hog;
+	/delete-node/ line7-hog;
+};
+
+&sdhci2 {
+	status = "disabled";
+};
+
+&usb0 {
+	/*
+	 * U-Boot does not support role switching at runtime and will use
+	 * peripheral mode with dr_mode = "otg". Setting it here explicitly
+	 * makes that clearer, but it also allows us to override the setting
+	 * to "host" for boot from USB storage; the override will fail in early
+	 * boot stages otherwise, because "host" is longer than "otg".
+	 */
+	dr_mode = "peripheral";
+};

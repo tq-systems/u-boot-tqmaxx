@@ -1,0 +1,50 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * TQ-Systems TQMa67xx - R5 SPL
+ * Copyright (C) 2024 Texas Instruments Incorporated - https://www.ti.com/
+ * Copyright (c) 2025 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Nora Schiffer
+ */
+
+#include "k3-j722s-r5.dtsi"
+#include "k3-am67a-tqma67xx-2g-lp4-3733MTs.dtsi"
+#include "k3-am62a-ddr.dtsi"
+
+/ {
+	memory@80000000 {
+		/* 512M RAM (initial configuration - fixed up by board code) */
+		reg = <0x00000000 0x80000000 0x00000000 0x20000000>;
+	};
+};
+
+&memorycontroller {
+	ram-variants {
+		bootph-pre-ram;
+		base-variant = "tqma67xx-2g";
+
+		variant-2g {
+			variant-name = "tqma67xx-8g";
+			#include "k3-am67a-tqma67xx-8g-lp4-3733MTs-patch.dtsi"
+		};
+	};
+};
+
+&sysinfo {
+	ram-variants {
+		bootph-pre-ram;
+
+		tqma67xx-2g {
+			bootph-pre-ram;
+			variant-name = "tqma67xx-2g";
+			ram-size = /bits/ 64 <0x080000000>;
+			ram-type = <1>;
+		};
+
+		tqma67xx-8g {
+			bootph-pre-ram;
+			variant-name = "tqma67xx-8g";
+			ram-size = /bits/ 64 <0x200000000>;
+			ram-type = <1>;
+		};
+	};
+};
