@@ -96,6 +96,14 @@ config TARGET_IMX91_11X11_FRDM
 	imply BOOTSTD_FULL
 	imply BOOTSTD_BOOTCOMMAND
 
+config TARGET_IMX91_11X11_FRDM_IMX91S
+	bool "imx91_11x11_frdm_imx91s"
+	select OF_BOARD_FIXUP
+	select IMX91
+	select IMX9_LPDDR4X
+	imply BOOTSTD_FULL
+	imply BOOTSTD_BOOTCOMMAND
+
 config TARGET_IMX91_9X9_QSB
 	bool "imx91_9x9_qsb"
 	select OF_BOARD_FIXUP
@@ -174,6 +182,7 @@ endchoice
 source "board/freescale/imx91_evk/Kconfig"
 source "board/freescale/imx91_qsb/Kconfig"
 source "board/freescale/imx91_frdm/Kconfig"
+source "board/freescale/imx91_frdm_imx91s/Kconfig"
 source "board/freescale/imx93_evk/Kconfig"
 source "board/freescale/imx93_qsb/Kconfig"
 source "board/freescale/imx93_frdm/Kconfig"
