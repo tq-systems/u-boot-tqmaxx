@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Copyright (c) 2025 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
+
+config TQ_COMMON_SYSINFO
+	bool
+
+if TQ_COMMON_SYSINFO
+
+config TQ_COMMON_SYSINFO_MACADDR_OFFSET
+	int "TQ EEPROM MAC address offset"
+	default 1
+	help
+	  Set ethXaddr variables based on EEPROM contents starting with this
+	  offset
+
+config TQ_COMMON_SYSINFO_MACADDR_NUM
+	int "TQ EEPROM MAC address number"
+	default 1
+	help
+	  Number of ethXaddr variables to set based on EEPROM contents
+
+config TQ_COMMON_SPI_FLASH_PATH
+	string "FDT path for SPI flash status fixup"
+	help
+	  FDT path to set to "disabled" on SOM variants without flash
+
+endif
