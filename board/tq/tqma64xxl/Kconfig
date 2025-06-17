@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Copyright (C) 2017-2018 Texas Instruments Incorporated - http://www.ti.com/
+# Copyright (c) 2020-2025 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
+
+if TARGET_AM64_A53_TQMA64XXL || TARGET_AM64_R5_TQMA64XXL
+
+config SYS_BOARD
+	default "tqma64xxl"
+
+config SYS_VENDOR
+	default "tq"
+
+config SYS_CONFIG_NAME
+	default "tq_k3_common"
+
+choice
+	prompt "TQ-Systems TQMa64xxL base board"
+
+config TQMA64XXL_BOARD_MBAX4XXL
+	bool "TQ-Systems MBaX4XxL"
+
+endchoice
+
+source "board/tq/common/Kconfig"
+
+endif
