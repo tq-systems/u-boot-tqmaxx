@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 #include <asm/io.h>
 #include <asm/arch/hardware.h>
-#include <asm/arch/j722s_spl.h>
+#include <spl.h>
 
 static u32 __get_backup_bootmedia(u32 devstat)
 {
@@ -104,4 +104,23 @@ u32 get_boot_device(void)
 	debug("j722s_init: %s: devstat = 0x%x bootmedia = 0x%x bootmode = %d\n",
 	      __func__, devstat, bootmedia, bootmode);
 	return bootmedia;
+}
+
+u32 get_mmc_boot_mode(void)
+{
+	u32 devstat = readl(CTRLMMR_MAIN_DEVSTAT);
+	u32 bootmode = (devstat & MAIN_DEVSTAT_PRIMARY_BOOTMODE_MASK) >>
+				MAIN_DEVSTAT_PRIMARY_BOOTMODE_SHIFT;
+	u32 bootmode_cfg = (devstat & MAIN_DEVSTAT_PRIMARY_BOOTMODE_CFG_MASK) >>
+				MAIN_DEVSTAT_PRIMARY_BOOTMODE_CFG_SHIFT;
+
+	switch (bootmode) {
+	case BOOT_DEVICE_EMMC:
+		return MMCSD_MODE_EMMCBOOT;
+	case BOOT_DEVICE_MMC:
+		if (bootmode_cfg & MAIN_DEVSTAT_PRIMARY_MMC_FS_RAW_MASK)
+			return MMCSD_MODE_RAW;
+	default:
+		return MMCSD_MODE_FS;
+	}
 }
