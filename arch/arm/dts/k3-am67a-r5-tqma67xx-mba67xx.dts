@@ -1,0 +1,16 @@
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * TQ-Systems TQMa67xx on MBa67xx - R5 SPL
+ * Copyright (C) 2024 Texas Instruments Incorporated - https://www.ti.com/
+ * Copyright (c) 2025 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Author: Matthias Schiffer
+ */
+
+#include "k3-am67a-tqma67xx-mba67xx.dts"
+#include "k3-am67a-tqma67xx-mba67xx-u-boot.dtsi"
+#include "k3-am67a-r5-tqma67xx.dtsi"
+
+/* WKUP UART0 is used for DM firmware logs */
+&wkup_uart0 {
+	status = "okay";
+};
