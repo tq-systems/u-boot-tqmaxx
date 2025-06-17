@@ -1,0 +1,7 @@
+TQ-SYSTEMS TQMA67XX SOM / MBA67XX BOARD
+L:      u-boot@ew.tq-group.com
+S:	Maintained
+W:      https://www.tq-group.com/en/products/tq-embedded/
+F:	arch/arm/dts/k3-am67*-tqma67xx*.dts*
+F:	board/tq/tqma67xx/
+F:	configs/tqma67xx_mba67xx_*_defconfig
