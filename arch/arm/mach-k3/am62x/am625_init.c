@@ -82,6 +82,38 @@ static void ctrl_mmr_unlock(void)
 	mmr_unlock(PADCFG_MMR1_BASE, 1);
 }
 
+#if CONFIG_IS_ENABLED(USB_STORAGE)
+static int fixup_usb_boot(const void *fdt_blob)
+{
+	int ret = 0;
+
+	switch (spl_boot_device()) {
+	case BOOT_DEVICE_USB:
+		/*
+		 * If the boot mode is host, fixup the dr_mode to host
+		 * before dwc3 bind takes place
+		 */
+		ret = fdt_find_and_setprop((void *)fdt_blob,
+					   "/bus@f0000/dwc3-usb@f900000/usb@31000000",
+					   "dr_mode", "host", 5, 0);
+		if (ret)
+			printf("%s: fdt_find_and_setprop() failed:%d\n",
+			       __func__, ret);
+		fallthrough;
+	default:
+		break;
+	}
+
+	return ret;
+}
+
+int fdtdec_board_setup(const void *fdt_blob)
+{
+	/* Can use the pointer from the function parameters */
+	return fixup_usb_boot(fdt_blob);
+}
+#endif
+
 static __maybe_unused void enable_mcu_esm_reset(void)
 {
 	/* Set CTRLMMR_MCU_RST_CTRL:MCU_ESM_ERROR_RST_EN_Z  to '0' (low active) */
