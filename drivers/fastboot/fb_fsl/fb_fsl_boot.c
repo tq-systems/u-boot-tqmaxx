@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Copyright 2019 NXP
+ * Copyright 2019,2025 NXP
  */
 
 #include <asm/mach-imx/sys_proto.h>
@@ -1116,6 +1116,10 @@ int do_boota(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[]) {
 
 	/* populate secretkeeper public key */
 	trusty_populate_sk_key((void *)(ulong)fdt_addr);
+
+	/* set deprivilege state to stop NS access */
+	if (hwbcc_ns_deprivilege())
+		goto fail;
 
 #ifdef CONFIG_IMX_SUPPORT_SRM
 	char *keystore = env_get("keystore");
