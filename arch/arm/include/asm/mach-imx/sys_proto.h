@@ -283,7 +283,19 @@ struct scmi_cfg_info_out {
 	u8 cfgname[SCMI_MISC_MAX_CFGNAME];
 };
 
+struct scmi_bbm_gpr_in {
+	u32 index;
+	u32 value;
+};
+
+struct scmi_bbm_gpr_out {
+	s32 status;
+	u32 value;
+};
+
 uint32_t scmi_get_rom_data(rom_passover_t *rom_data);
+int scmi_set_bbnsm_gpr(u32 gpr_id, u32 val);
+int scmi_get_bbnsm_gpr(u32 gpr_id, u32 *val);
 #endif
 
 /* For i.MX ULP */

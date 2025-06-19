@@ -65,6 +65,67 @@ uint32_t scmi_get_rom_data(rom_passover_t *rom_data)
 	return 0;
 }
 
+int scmi_set_bbnsm_gpr(u32 gpr_id, u32 val)
+{
+	struct scmi_bbm_gpr_in in;
+	s32 status;
+	struct scmi_msg msg = {
+		.protocol_id = SCMI_PROTOCOL_ID_IMX_BBM,
+		.message_id = SCMI_BBM_GPR_SET,
+		.in_msg = (u8 *)&in,
+		.in_msg_sz = sizeof(in),
+		.out_msg = (u8 *)&status,
+		.out_msg_sz = sizeof(status),
+	};
+	int ret;
+	struct udevice *dev;
+
+	in.index = gpr_id;
+	in.value = val;
+
+	ret = uclass_get_device_by_name(UCLASS_CLK, "protocol@14", &dev);
+	if (ret)
+		return ret;
+
+	ret = devm_scmi_process_msg(dev, &msg);
+	if (ret != 0 || status != 0) {
+		printf("Failed to set bbnsm GPR, scmi_err = %d\n", status);
+		return -EINVAL;
+	}
+
+	return 0;
+}
+
+int scmi_get_bbnsm_gpr(u32 gpr_id, u32 *val)
+{
+	struct scmi_bbm_gpr_out out;
+	u32 in = gpr_id;
+	struct scmi_msg msg = {
+		.protocol_id = SCMI_PROTOCOL_ID_IMX_BBM,
+		.message_id = SCMI_BBM_GPR_GET,
+		.in_msg = (u8 *)&in,
+		.in_msg_sz = sizeof(in),
+		.out_msg = (u8 *)&out,
+		.out_msg_sz = sizeof(out),
+	};
+	int ret;
+	struct udevice *dev;
+
+	ret = uclass_get_device_by_name(UCLASS_CLK, "protocol@14", &dev);
+	if (ret)
+		return ret;
+
+	ret = devm_scmi_process_msg(dev, &msg);
+	if (ret != 0 || out.status != 0) {
+		printf("Failed to get bbnsm GPR, scmi_err = %d\n", out.status);
+		return -EINVAL;
+	}
+
+	*val = out.value;
+
+	return 0;
+}
+
 bool is_usb_boot(void)
 {
 	enum boot_device bt_dev = get_boot_device();
