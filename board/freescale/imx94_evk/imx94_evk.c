@@ -22,6 +22,7 @@
 #include <i2c.h>
 #include <dm/uclass.h>
 #include <dm/uclass-internal.h>
+#include "crrm.h"
 
 int board_early_init_f(void)
 {
@@ -265,18 +266,6 @@ void netc_init(void)
 	pci_init();
 }
 
-static void xspi_nor_setup(void)
-{
-	/* Set MTO to max */
-	imx_clk_scmi_enable(IMX94_CLK_XSPI1, true);
-	imx_clk_scmi_enable(IMX94_CLK_XSPI2, true);
-
-	writel(0xffffffff, 0x42b90928);
-	writel(0xffffffff, 0x42be0928);
-
-	return;
-}
-
 int board_init(void)
 {
 	int ret;
@@ -294,9 +283,11 @@ int board_init(void)
 
 	netc_init();
 
-	xspi_nor_setup();
-
 	power_on_m7("mx94evkrpmsg");
+
+#if IS_ENABLED(CONFIG_IMX_CRRM)
+	crrm_uboot_init();
+#endif
 
 	return 0;
 }
@@ -310,6 +301,11 @@ int board_late_init(void)
 #ifdef CONFIG_AHAB_BOOT
 	env_set("sec_boot", "yes");
 #endif
+
+#if IS_ENABLED(CONFIG_IMX_CRRM)
+	crrm_uboot_late_init();
+#endif
+
 	return 0;
 }
 
