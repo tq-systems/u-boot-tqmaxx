@@ -601,6 +601,7 @@ struct nxp_xspi {
 	unsigned long support_max_rate;
 	int selected;
 	bool dtr;
+	int ipcmd_seq_id;
 };
 /* xspi data structure end */
 
