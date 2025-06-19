@@ -5,6 +5,28 @@ config AHAB_BOOT
     help
     This option enables the support for AHAB secure boot.
 
+config IMX_CRRM
+    bool "Support i.MX9 cyber resilient recovery module (CRRM)"
+	depends on IMX94
+	select PSCI_BOARD_REBOOT
+    help
+      This option enables the support for IMX CRRM.
+
+config IMX_CRRM_PROTECT_SIZE
+	hex "Specify the size for XSPI protected image"
+	depends on IMX_CRRM
+	default 0x400000
+
+config IMX_CRRM_AWDT_TIMEOUT
+	int "Specify the initialized timeout(ms) for CRRM AWDT timer"
+	depends on IMX_CRRM
+	default 300000
+
+config IMX_CRRM_SELFTEST
+    bool "Enable CRRM self test routing in SPL/u-boot"
+    help
+      This option enables CRRM self test. No CRRM OS is needed in the test.
+
 config IMX9
 	bool
 	select HAS_CAAM
