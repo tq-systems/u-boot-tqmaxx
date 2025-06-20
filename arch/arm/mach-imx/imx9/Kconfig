@@ -157,6 +157,12 @@ config TARGET_IMX95_15X15_EVK
 	imply BOOTSTD_BOOTCOMMAND
 	imply BOOTSTD_FULL
 
+config TARGET_IMX95_15X15_FRDM
+	bool "imx95_15x15_frdm"
+	select IMX95
+	imply BOOTSTD_BOOTCOMMAND
+	imply BOOTSTD_FULL
+
 config TARGET_IMX943_EVK
 	bool "imx943_evk"
 	select IMX94
@@ -174,6 +180,7 @@ source "board/freescale/imx93_frdm/Kconfig"
 source "board/phytec/phycore_imx93/Kconfig"
 source "board/variscite/imx93_var_som/Kconfig"
 source "board/freescale/imx95_evk/Kconfig"
+source "board/freescale/imx95_frdm/Kconfig"
 source "board/toradex/verdin-imx95/Kconfig"
 source "board/freescale/imx94_evk/Kconfig"
 
