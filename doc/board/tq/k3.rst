@@ -1,0 +1,138 @@
+.. SPDX-License-Identifier: GPL-2.0-or-later
+
+Modules with Texas Instruments K3 SoC
+#####################################
+
+See :doc:`../ti/k3` for documentation on the TI K3 SoC families that is not
+specific to the TQ-Systems SoMs.
+
+SoC/SoM family-specific documentation
+-------------------------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   tqma62xx
+   tqma64xxl
+   tqma67xx
+
+Supported variants
+------------------
+
+A single U-Boot build can support multiple SoM variants. A DDR RAM configuration
+is selected based on VARD (Variant and Revision Detection) data read from an
+EEPROM. Other features like the presence of a SPI-NOR flash are detected
+automatically.
+
+Boot sequence
+-------------
+
+The bootloader for the K3 SoC families is loaded in multiple stages. A major
+difference to the boot sequence used by the TI EVMs is that no A53 SPL exists.
+The following stages are provided by this U-Boot repository:
+
+- R5 U-Boot SPL (combined with firmwares to ``tiboot3.bin``)
+- A53 U-Boot (combined with firmwares to ``u-boot.img``)
+
+The R5 bootloader performs the following actions:
+
+- Initialize DDR controller
+- Load ``u-boot.img`` into DDR RAM
+- Boot TF-A
+
+The next stage is handled by the TF-A. It will start the OP-TEE and the A53
+U-Boot, which have already been loaded by the R5 bootloader. The A53 U-Boot can
+then provide a command line interface and boot into the actual OS depending on
+its configuration.
+
+Boot from eMMC boot partitions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The following layout is used by default to store U-Boot and its environment
+in the eMMC boot partition. The layout can be modified by changing
+``CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR`` to a different offset for the next stage
+in the R5 SPL.
+
+Offsets are given in sectors (512B).
+
+.. code-block:: none
+
+    0x0000+------------------------------+
+          | tiboot3.bin (768 KiB)        |
+    0x0600+------------------------------+
+          | u-boot.img (3 MiB)           |
+    0x1E00+------------------------------+
+          | environment (128 KiB)        |
+    0x1F00+------------------------------+
+          | backup environment (128 KiB) |
+    0x2000+------------------------------+
+
+The boot partitions can be enabled or disabled using the following commands:
+
+.. code-block:: none
+
+    mmc bootbus 0 2 0 0
+    mmc partconf 0 1 1 0 # Boot from bootpart 1
+    mmc partconf 0 1 2 0 # Boot from bootpart 2
+    mmc partconf 0 1 7 0 # Boot from user data area
+
+For boot from a boot partition to work after a reset/reboot without power cycle,
+the reset signal of the eMMC must be enabled using the following command:
+
+.. code-block:: none
+
+    mmc rst-function 0 1
+
+.. warning::
+
+    ``mmc rst-function`` is a write-once configuration that cannot be reverted.
+
+U-Boot's environment is stored in the same boot partition that is booted from
+by default, so when switching the boot partition, it may be necessary to copy
+over the environment if it should be preserved.
+
+Build
+-----
+
+R5 SPL
+^^^^^^
+
+The R5 U-Boot SPL is built from the ``r5`` defconfigs and it requires an ARM-v7
+cross compiler (32bit). Only the SPL component of this build is used.
+
+A number of TI firmware files must be available during build, which can be found
+in the ``ti-linux-firmware`` branch of
+https://git.ti.com/git/processor-firmware/ti-linux-firmware.git. A symlink to
+the ``ti-sysfw`` directory of the repository must be created in the R5 U-Boot
+build directory:
+
+.. code-block:: bash
+
+    ln -s /path/to/ti-linux-firmware/ti-sysfw .
+
+Depending on the SoC family, the build will generate R5 SPL binaries in 2 or 3
+variants, which can be recognized by their filenames:
+
+- ``tiboot3-*-gp-*.bin``: General Purpose
+- ``tiboot3-*-hs-fs-*.bin``: High Security - Field Securable
+- ``tiboot3-*-hs-*.bin``: High Security - Security Enforced
+
+A53 U-Boot
+^^^^^^^^^^
+
+The A53 U-Boot is built from the ``a53`` defconfigs. The build requires an
+ARM-v8/AArch64 cross compiler.
+
+TF-A and OP-TEE must be provided to the build to produce a working bootloader.
+Use the ``BL31`` and ``TEE`` variables to pass the paths of these files (usually
+called ``bl31.bin`` and ``bl32.bin``) when calling ``make``.
+
+In addition, a number of TI firmware files must be available during build,
+from the same repository as used for the R5 build. Symlinks to the ``ti-dm`` and
+``ti-sysfw`` directories of the repository must be created in the A53 U-Boot
+build directory:
+
+.. code-block:: bash
+
+    ln -s /path/to/ti-linux-firmware/ti-dm .
+    ln -s /path/to/ti-linux-firmware/ti-sysfw .
