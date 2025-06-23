@@ -69,6 +69,7 @@ Board-specific doc
    theobroma-systems/index
    ti/index
    toradex/index
+   tq/index
    variscite/index
    wexler/index
    xen/index
