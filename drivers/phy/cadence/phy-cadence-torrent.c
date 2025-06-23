@@ -240,7 +240,7 @@ struct cdns_torrent_inst {
 
 struct cdns_torrent_phy {
 	void __iomem *sd_base;	/* SD0801 register base  */
-	size_t size;
+	fdt_size_t size;
 	struct reset_control *phy_rst;
 	struct udevice *dev;
 	struct cdns_torrent_inst phys[MAX_NUM_LANES];
@@ -597,7 +597,7 @@ static int cdns_torrent_phy_probe(struct udevice *dev)
 	cdns_phy->sd_base = devfdt_remap_addr_index(dev, 0);
 	if (IS_ERR(cdns_phy->sd_base))
 		return PTR_ERR(cdns_phy->sd_base);
-	devfdt_get_addr_size_index(dev, 0, (fdt_size_t *)&cdns_phy->size);
+	devfdt_get_addr_size_index(dev, 0, &cdns_phy->size);
 
 	dev_for_each_subnode(child, dev)
 		subnodes++;
