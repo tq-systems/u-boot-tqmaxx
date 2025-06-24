@@ -1,0 +1,68 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Copyright 2025 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Paul Gerber
+ */
+
+/* SOM shared settings for U-Boot */
+#include "imx8mp-tqma8mpqs-u-boot.dtsi"
+
+/ {
+	config {
+		/* 64 kiB redundant env */
+		u-boot,mmc-env-offset = <0x400000>;
+		u-boot,mmc-env-offset-redundant = <0x410000>;
+	};
+
+	usb-connector {
+		status = "disabled";
+
+		/delete-node/ port;
+	};
+};
+
+&gpio1	{
+	/* USB dual role ID */
+	usb_id_hog: usb-id-hog {
+		gpio-hog;
+		gpios = <10 0>;
+		input;
+		line-name = "USB_ID";
+	};
+};
+
+&pcie {
+	status = "disabled";
+};
+
+&pcie_phy {
+	status = "disabled";
+};
+
+&pinctrl_gpio1 {
+	bootph-pre-ram;
+};
+
+&pinctrl_uart3 {
+	bootph-pre-ram;
+};
+
+&uart3 {
+	bootph-pre-ram;
+};
+
+&usb_dwc3_0 {
+	dr_mode = "peripheral";
+	/delete-property/ usb-role-switch;
+	/delete-property/ role-switch-default-mode;
+	/delete-node/ port;
+};
+
+&usdhc2 {
+	sd-uhs-sdr104;
+	sd-uhs-ddr50;
+	assigned-clocks = <&clk IMX8MP_CLK_USDHC2>;
+	assigned-clock-rates = <400000000>;
+	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_400M>;
+};
