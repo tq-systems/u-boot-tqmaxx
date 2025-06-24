@@ -1185,7 +1185,8 @@ dtb-$(CONFIG_ARCH_IMX8M) += \
 
 dtb-$(CONFIG_ARCH_IMX8M) += \
 	imx8mp-tqma8mpql-mba8mpxl.dtb \
-	imx8mp-tqma8mpql-mba8mp-ras314.dtb
+	imx8mp-tqma8mpql-mba8mp-ras314.dtb \
+	imx8mp-tqma8mpqs-mb-smarc-2.dtb \
 
 dtb-$(CONFIG_ARCH_IMX9) += \
 	imx95-15x15-evk.dtb \
