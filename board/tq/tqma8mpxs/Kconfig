@@ -1,0 +1,85 @@
+if TARGET_TQMA8MPXS
+
+config SYS_BOARD
+	default "tqma8mpxs"
+
+config SYS_VENDOR
+	default "tq"
+
+config SYS_CONFIG_NAME
+	default "tqma8mpxs"
+
+config IMX_CONFIG
+	default "board/freescale/imx8mp_evk/imximage-8mp-lpddr4.cfg"
+
+config TQMA8MPXS_DEFAULTS
+	bool
+	default y
+	select TQ_BB
+	select TQ_EEPROM
+	select TQ_RTC
+	select TQ_SDMMC
+	select TQ_SPI_NOR
+	select TQ_VARD
+	imply FSL_CAAM
+	imply SPL_CRYPTO if SPL
+	select I2C_EEPROM
+	select SPL_I2C_EEPROM if SPL
+	imply MISC
+	imply ENV_IS_NOWHERE
+	imply SYS_REDUNDAND_ENVIRONMENT
+	imply ENV_OVERWRITE
+
+choice
+	prompt "TQMa8MPxS RAM configuration"
+	default TQMA8MPXS_RAM_MULTI
+	help
+	  Select RAM configuration. Normally use default here but for
+	  specific setup it is possible to use a single RAM size.
+
+config TQMA8MPXS_RAM_MULTI
+	bool "TQMa8MPxS with 1/2/4/8 GB RAM - Single image"
+	select TQMA8MPXS_RAM_1024MB
+	select TQMA8MPXS_RAM_2048MB
+	select TQMA8MPXS_RAM_4096MB
+	select TQMA8MPXS_RAM_8192MB
+	help
+	  Build a single U-Boot for variants with 1/2/4/8 GB RAM. Select whether to use
+	  the inline ECC capability or not using config item IMX8M_DRAM_INLINE_ECC
+
+#
+# When compiling for a single product using only one SoM variant, an alternate config
+# supporting only a single RAM configuration may be added.
+#
+
+endchoice
+
+config TQMA8MPXS_RAM_1024MB
+	bool
+
+config TQMA8MPXS_RAM_2048MB
+	bool
+
+config TQMA8MPXS_RAM_4096MB
+	bool
+
+config TQMA8MPXS_RAM_8192MB
+	bool
+
+choice
+	prompt "TQMa8MPxS base board variant"
+	default TQMA8MPXS_BB_MB_SMARC_2
+	help
+	  Select base board for TQMa8MPxS
+
+config TQMA8MPXS_BB_MB_SMARC_2
+	bool "TQMa8MPxS on MB_SMARC_2 Board"
+	help
+	  Select the MB_SMARC_2 board for TQMa8MPxS board.
+	  This features most interfaces the CPU can provide.
+
+endchoice
+
+source "board/tq/common/Kconfig"
+
+endif

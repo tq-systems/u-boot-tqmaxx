@@ -7,5 +7,6 @@ TQ-Systems GmbH
    :maxdepth: 2
 
    tqma8mpxl
+   tqma8mpxs
    tqma91xx
    tqma93xx

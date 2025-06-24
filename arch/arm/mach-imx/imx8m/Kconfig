@@ -458,6 +458,16 @@ config TARGET_TQMA8MPXL
 	select ARCH_MISC_INIT
 	select SPL_CRYPTO if SPL
 
+config TARGET_TQMA8MPXS
+	bool "TQ-Systems GmbH TQMa8MPxS SOM family"
+	select IMX8MP
+	select IMX8M_LPDDR4
+	select SUPPORT_SPL
+	select FSL_CAAM
+	select FSL_BLOB
+	select ARCH_MISC_INIT
+	select SPL_CRYPTO if SPL
+
 endchoice
 
 source "board/advantech/imx8mp_rsb3720a1/Kconfig"
@@ -495,5 +505,6 @@ source "board/toradex/verdin-imx8mm/Kconfig"
 source "board/toradex/verdin-imx8mp/Kconfig"
 source "board/voxelbotics/navqp/Kconfig"
 source "board/tq/tqma8mpxl/Kconfig"
+source "board/tq/tqma8mpxs/Kconfig"
 
 endif
