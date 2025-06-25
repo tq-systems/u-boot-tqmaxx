@@ -10,3 +10,5 @@ ifeq ($(CONFIG_PARTITIONS),y)
 obj-y += efi_block_device.o
 endif
 obj-$(CONFIG_SYSRESET_SBI) += efi_reset_riscv.o
+
+obj-$(CONFIG_EFI_GBL_IMAGE_LOADING) += efi_gbl_image_loading_protocol.o

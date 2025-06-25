@@ -12,6 +12,8 @@
 #include <log.h>
 #include <asm-generic/unaligned.h>
 
+#include <efi_gbl_image_loading_protocol.h>
+
 #define OBJ_LIST_NOT_INITIALIZED 1
 
 efi_status_t efi_obj_list_initialized = OBJ_LIST_NOT_INITIALIZED;
@@ -349,6 +351,14 @@ efi_status_t efi_init_obj_list(void)
 	if (IS_ENABLED(CONFIG_EFI_CAPSULE_ON_DISK) &&
 	    !IS_ENABLED(CONFIG_EFI_CAPSULE_ON_DISK_EARLY))
 		ret = efi_launch_capsules();
+
+	/* Register GBL Image Loading protocol */
+	if (IS_ENABLED(CONFIG_EFI_GBL_IMAGE_LOADING)) {
+		ret = efi_gbl_image_loading_register();
+		if (ret != EFI_SUCCESS)
+			goto out;
+	}
+
 out:
 	efi_obj_list_initialized = ret;
 	return ret;
