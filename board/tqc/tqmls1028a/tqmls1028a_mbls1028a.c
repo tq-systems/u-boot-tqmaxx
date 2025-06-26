@@ -18,8 +18,8 @@ static int clockgen_init(void)
 	struct udevice *dev;
 	int ret;
 
-        ret = i2c_get_chip_for_busnum(CLOCKGEN_I2C_BUS_NUM,
-                                      CLOCKGEN_I2C_ADDR, 1, &dev);
+	ret = i2c_get_chip_for_busnum(CLOCKGEN_I2C_BUS_NUM,
+				      CLOCKGEN_I2C_ADDR, 1, &dev);
 	if (ret)
 		return ret;
 
