@@ -14,7 +14,6 @@
 
 / {
 	aliases {
-		i2c1 = &i2c4;
 		serial0 = &serial0;
 		serial1 = &serial1;
 	};

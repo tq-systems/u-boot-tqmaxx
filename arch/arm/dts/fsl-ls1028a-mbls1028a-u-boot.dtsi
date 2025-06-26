@@ -1,0 +1,23 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2025 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
+ */
+
+/*
+ * include SOM specific part of U-Boot modifications
+ * for device tree
+ */
+#include "fsl-ls1028a-tqmls1028a-u-boot.dtsi"
+
+/ {
+	aliases {
+		i2c1 = &i2c4;
+	};
+
+	config {
+		u-boot,mmc-env-offset = <0x800000>;
+		u-boot,mmc-env-offset-redundant = <0x840000>;
+	};
+};
