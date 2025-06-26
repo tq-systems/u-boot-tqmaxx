@@ -46,8 +46,6 @@
 	status = "okay";
 
 	flash@0 {
-		#address-cells = <1>;
-		#size-cells = <1>;
 		compatible = "jedec,spi-nor";  /* 64MB */
 		reg = <0>;
 		spi-max-frequency = <100000000>;
@@ -108,38 +106,34 @@
 &i2c0 {
 	status = "okay";
 
-	js42_18: eeprom-temperature-sensor@18 {
-		compatible = "nxp,se97", "jedec,jc-42.4-temp";
+	js42_18: temperature-sensor@18 {
+		compatible = "nxp,se97b", "jedec,jc-42.4-temp";
 		reg = <0x18>;
-		status = "okay";
 	};
 
 	sa56004_4c: temperature-sensor@4c {
 		compatible = "nxp,sa56004";
 		reg = <0x4c>;
+		#thermal-sensor-cells = <1>;
 		vcc-supply = <&reg_3p3v_som>;
-		status = "okay";
 	};
 
 	se97_50: eeprom@50 {
-		compatible = "nxp,spd", "atmel,24c02";
+		compatible = "nxp,se97b", "atmel,24c02";
 		reg = <0x50>;
 		pagesize = <16>;
-		status = "okay";
 	};
 
 	rtc1: rtc@51 {
-		compatible = "nxp,pcf85063";
+		compatible = "nxp,pcf85063a";
 		reg = <0x51>;
 		quartz-load-femtofarads = <12500>;
-		status = "okay";
 	};
 
 	m24c256_57: eeprom@57 {
 		compatible = "atmel,24c256";
-		pagesize = <32>;
 		reg = <0x57>;
-		status = "okay";
+		pagesize = <32>;
 	};
 };
 

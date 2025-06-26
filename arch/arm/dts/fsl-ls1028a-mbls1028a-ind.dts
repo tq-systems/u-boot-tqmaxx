@@ -23,7 +23,6 @@
 		reg = <0x72>;
 		gpio-controller;
 		#gpio-cells = <2>;
-		status = "okay";
 
 		clk_intn {
 			gpio-hog;

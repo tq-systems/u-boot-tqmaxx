@@ -81,7 +81,6 @@
 		reg = <0x70>;
 		gpio-controller;
 		#gpio-cells = <2>;
-		status = "okay";
 
 		ec1_intn {
 			gpio-hog;
