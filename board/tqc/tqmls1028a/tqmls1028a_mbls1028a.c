@@ -153,6 +153,14 @@ int board_bb_init(void)
 				 GPIOD_ACTIVE_LOW, 10000);
 	mbls1028a_reset_one_gpio("USB_RST", GPIO_USB_RST,
 				 GPIOD_ACTIVE_LOW, 3000);
+	mbls1028a_reset_one_gpio("SATA_RST", GPIO_SATA_RST,
+				 GPIOD_ACTIVE_LOW, 3000);
+	mbls1028a_reset_one_gpio("PCIE_RST", GPIO_PCIE_RST,
+				 GPIOD_ACTIVE_LOW, 3000);
+	mbls1028a_reset_one_gpio("PCIE_DIS", GPIO_PCIE_DIS,
+				 GPIOD_ACTIVE_LOW, 3000);
+
+	printf("Initialized GPIO RESET pins\n");
 
 	/* Ensure that everything has time to come out of reset again */
 	mdelay(10);

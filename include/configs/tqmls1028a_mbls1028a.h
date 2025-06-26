@@ -17,6 +17,9 @@
 #define GPIO_QSGMII_RESET		"gpio@70_5"
 
 #define GPIO_USB_RST			"gpio@25_1"
+#define GPIO_PCIE_DIS			"gpio@25_3"
+#define GPIO_PCIE_RST			"gpio@25_4"
+#define GPIO_SATA_RST			"gpio@25_6"
 
 #define BOOT_ENV_BOARD                                                         \
 	"console=ttyS0,115200\0"                                               \
