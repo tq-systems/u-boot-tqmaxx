@@ -21,3 +21,14 @@
 		u-boot,mmc-env-offset-redundant = <0x840000>;
 	};
 };
+
+&gpio_exp_1v8 {
+	/delete-node/ qsgmii_rstn;
+};
+
+&gpio_exp_3v3 {
+	/delete-node/ usb_rstn;
+	/delete-node/ mpcie_disn;
+	/delete-node/ mpcie_rstn;
+	/delete-node/ sata_perstn;
+};
