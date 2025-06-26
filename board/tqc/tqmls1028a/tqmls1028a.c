@@ -115,32 +115,37 @@ int misc_init_r(void)
 
 	ret = tq_read_module_eeprom(&eepromdata);
 
-	if (ret) {
-		printf("Error reading eeprom.\n");
-		return ret;
-	}
-
-	ret = tqc_parse_eeprom_mac(&eepromdata, safe_string,
-				   ARRAY_SIZE(safe_string));
 	if (!ret) {
-		env_set("ethaddr", safe_string);
-		eth_env_set_enetaddr("ethaddr", (uchar *)safe_string);
+		ret = tqc_parse_eeprom_mac(&eepromdata, safe_string,
+					   ARRAY_SIZE(safe_string));
+		if (!ret) {
+			int i;
 
-		int i = 1;
-		for (i = 1; i <= 2; i++) {
-			ret = tqc_parse_eeprom_mac_additional(&eepromdata,
-					safe_string, ARRAY_SIZE(safe_string),
-					i, "%02x:%02x:%02x:%02x:%02x:%02x");
-			if (!ret) {
-				snprintf(ethaddrstring, 9, "eth%daddr", i);
-				env_set(ethaddrstring, safe_string);
-				eth_env_set_enetaddr(ethaddrstring,
-						    (uchar *)safe_string);
+			env_set("ethaddr", safe_string);
+			eth_env_set_enetaddr("ethaddr", (uchar *)safe_string);
+
+			for (i = 1; i <= 2; i++) {
+				ret = tqc_parse_eeprom_mac_additional(&eepromdata,
+								      safe_string,
+								      ARRAY_SIZE(safe_string),
+								      i,
+								      "%02x:%02x:%02x:%02x:%02x:%02x");
+				if (!ret) {
+					snprintf(ethaddrstring, 9, "eth%daddr", i);
+					env_set(ethaddrstring, safe_string);
+					eth_env_set_enetaddr(ethaddrstring,
+							     (uchar *)safe_string);
+				}
 			}
-		}
 
-		tqc_show_eeprom(&eepromdata, tqmls1028a_variant());
+			tqc_show_eeprom(&eepromdata, tqmls1028a_variant());
+		} else {
+			pr_err("Error parse MAC from EEPROM eeprom.\n");
+		}
+	} else {
+		pr_err("Error reading eeprom.\n");
 	}
+	/* if returning an error, bootflow will be interrupted */
 	return 0;
 }
 #endif
