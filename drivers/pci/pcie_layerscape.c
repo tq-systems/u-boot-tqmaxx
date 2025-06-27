@@ -92,8 +92,10 @@ static int ls_pcie_link_up(struct ls_pcie *pcie)
 	int ltssm;
 
 	ltssm = ls_pcie_ltssm(pcie);
-	if (ltssm < LTSSM_PCIE_L0)
+	if (ltssm < LTSSM_PCIE_L0) {
+		debug("%s: LTSSM %x\n", __func__, ltssm);
 		return 0;
+	}
 
 	return 1;
 }
