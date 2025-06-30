@@ -216,7 +216,7 @@ static int get_dev_container_size(void *dev, int dev_type, unsigned long offset,
 	return ret;
 }
 
-#if IS_ENABLED(CONFIG_SCMI_FIRMWARE)
+#if IS_ENABLED(CONFIG_ARCH_IMX9) && IS_ENABLED(CONFIG_SCMI_FIRMWARE)
 static int scmi_get_boot_device_offset(unsigned long *img_off)
 {
 	int ret;
@@ -303,7 +303,7 @@ static unsigned long get_boot_device_offset(void *dev, int dev_type)
 		return offset;
 	}
 
-#if IS_ENABLED(CONFIG_SCMI_FIRMWARE)
+#if IS_ENABLED(CONFIG_ARCH_IMX9) && IS_ENABLED(CONFIG_SCMI_FIRMWARE)
 	int ret;
 	ret = scmi_get_boot_device_offset(&offset);
 	if (!ret)
@@ -448,7 +448,7 @@ int spl_mmc_emmc_boot_partition(struct mmc *mmc)
 	part = EXT_CSD_EXTRACT_BOOT_PART(mmc->part_config);
 	if (part == EMMC_BOOT_PART_BOOT1 || part == EMMC_BOOT_PART_BOOT2) {
 		bool sec_boot = false;
-#if IS_ENABLED(CONFIG_SCMI_FIRMWARE)
+#if IS_ENABLED(CONFIG_ARCH_IMX9) && IS_ENABLED(CONFIG_SCMI_FIRMWARE)
 		u8 stage;
 		int ret;
 		ret = scmi_get_boot_stage(&stage);
