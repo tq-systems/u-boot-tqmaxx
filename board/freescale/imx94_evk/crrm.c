@@ -19,6 +19,7 @@
 #include <spl.h>
 #include <stdlib.h>
 #include <display_options.h>
+#include <env_internal.h>
 #include "crrm.h"
 
 struct crrm_info_struct crrm_info = {};
@@ -678,6 +679,23 @@ set_mode:
 	}
 
 	return 0;
+}
+
+enum env_location env_get_location(enum env_operation op, int prio)
+{
+	int ret;
+	u32 bm;
+
+	if (prio)
+		return ENVL_UNKNOWN;
+
+	ret = scmi_get_bbnsm_gpr(4, &bm);
+	if (!ret) {
+		if (bm == CRRM_RECOVERY_DOWNLOAD || bm == CRRM_RECOVERY_INSTALL)
+			return ENVL_NOWHERE;
+	}
+
+	return arch_env_get_location(op, prio);
 }
 
 static int do_crrm_status(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
