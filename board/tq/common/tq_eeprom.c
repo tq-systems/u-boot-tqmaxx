@@ -76,7 +76,8 @@ void tq_vard_show(const struct tq_vard *vard)
 	       (unsigned int)(vard->memtype & VARD_MEMTYPE_MASK_TYPE),
 	       (unsigned long)(tq_vard_ramsize(vard) / (SZ_1M)),
 	       (tq_vard_has_ramecc(vard) ? "ECC" : "no ECC"));
-	printf("EEPROM\t%c\neMMC\t%c\nIMU\t%c\nRTC\t%c\nSE\t%c\nSPINOR\t%c\n",
+	printf("TEMP\t%c\nEEPROM\t%c\neMMC\t%c\nIMU\t%c\nRTC\t%c\nSE\t%c\nSPINOR\t%c\n",
+	       (tq_vard_has_discrete_tempsensor(vard) ? 'y' : 'n'),
 	       (tq_vard_has_eeprom(vard) ? 'y' : 'n'),
 	       (tq_vard_has_emmc(vard) ? 'y' : 'n'),
 	       (tq_vard_has_imu(vard) ? 'y' : 'n'),
@@ -150,6 +151,9 @@ int tq_vard_detect_features(const struct tq_vard *vard,
 			break;
 		case FEATURE_SPINOR:
 			features->list[i].present = tq_vard_has_spinor(vard);
+			break;
+		case FEATURE_TEMP_DISCRETE:
+			features->list[i].present = tq_vard_has_discrete_tempsensor(vard);
 			break;
 		default:
 			pr_warn("%s: unknown feature %d\n", __func__,
