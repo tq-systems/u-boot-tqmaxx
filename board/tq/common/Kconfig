@@ -11,6 +11,14 @@ config TQ_EEPROM
 	select DM_I2C
 	select I2C_EEPROM
 
+if TQ_EEPROM
+
+config TQ_EEPROM_OFFSET
+	hex
+	default 0x1000 if TARGET_TQMA8MPXS
+	default 0x0
+
+endif
 #
 # This is only needed for boards with hardware revisions with/without serial
 # termination in eMMC signal lines. The code allows to decide upon the eMMC type
