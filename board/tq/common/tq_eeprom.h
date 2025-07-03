@@ -28,11 +28,11 @@ int tq_read_eeprom_at(int seq, uint offset, struct tq_eeprom_data *eeprom);
 
 /**
  * Reads struct tq_eeprom_data from EEPROM given by seq nr
- * starting at offset zero in EEPROM array.
+ * starting at offset CONFIG_TQ_EEPROM_OFFSET in EEPROM array.
  */
 static inline int tq_read_eeprom(int seq, struct tq_eeprom_data *eeprom)
 {
-	return tq_read_eeprom_at(seq, 0, eeprom);
+	return tq_read_eeprom_at(seq, CONFIG_TQ_EEPROM_OFFSET, eeprom);
 }
 
 /**
@@ -43,6 +43,7 @@ static inline int tq_read_module_eeprom(struct tq_eeprom_data *eeprom)
 {
 	return tq_read_eeprom(0, eeprom);
 }
+
 #else
 
 #error "need CONFIG_I2C_EEPROM"
@@ -98,18 +99,19 @@ struct __packed tq_vard {
 #define VARD_FORMFACTOR_TYPE_LGA	0x10 /* LGA SOM, no board standard */
 #define VARD_FORMFACTOR_TYPE_SMARC2	0x20 /* SOM conforms to SMARC-2 standard */
 #define VARD_FORMFACTOR_TYPE_NONE	0xf0 /* unspecified SOM type */
+
 /*
  * read module configuration data from eeprom
- * bus: I2C bus number
- * bus: I2C address of EEPROM
- * This function is intended for SPL usage without DT support
- * All supported modules have an JC42 type EEPROM with one byte offset
- * addressing
+ * This function is intended for SPL usage with DT/DM support and I2C_EEPROM
+ * SOM with JC42 or other EEPROM types used for VARD and TQ SOM EEPROM data
+ * store VARD at offset CONFIG_TQ_EEPROM_OFFSET. The EEPROM should have an alias
+ * index of 0
  */
 static inline
 int tq_vard_read(struct tq_vard *vard)
 {
-	return tq_read_eeprom_buffer(0, 0, sizeof(*vard), (u_int8_t *)vard);
+	return tq_read_eeprom_buffer(0, CONFIG_TQ_EEPROM_OFFSET, sizeof(*vard),
+				     (u_int8_t *)vard);
 }
 
 /*
