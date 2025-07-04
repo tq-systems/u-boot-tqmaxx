@@ -287,6 +287,7 @@ static struct mm_region imx9_mem_map[] = {
 			 PTE_BLOCK_PXN | PTE_BLOCK_UXN
 	},
 #endif
+#if IS_ENABLED(CONFIG_XPL_BUILD)
 	{
 		/* OCRAM */
 		.virt = 0x20480000UL,
@@ -294,7 +295,9 @@ static struct mm_region imx9_mem_map[] = {
 		.size = 0xA0000UL,
 		.attrs = PTE_BLOCK_MEMTYPE(MT_NORMAL) |
 			 PTE_BLOCK_OUTER_SHARE
-	}, {
+	},
+#endif
+	{
 		/* AIPS */
 		.virt = 0x40000000UL,
 		.phys = 0x40000000UL,
@@ -331,7 +334,7 @@ static struct mm_region imx9_mem_map[] = {
 			 PTE_BLOCK_OUTER_SHARE
 	}, {
 #endif
-#if defined(CFG_SYS_SECURE_SDRAM_SIZE) || IS_ENABLED(CONFIG_XPL_BUILD)
+#if defined(CFG_SYS_SECURE_SDRAM_SIZE) && IS_ENABLED(CONFIG_XPL_BUILD)
 		/* DRAM2 */
 		.virt = CFG_SYS_SECURE_SDRAM_BASE,
 		.phys = CFG_SYS_SECURE_SDRAM_BASE,
