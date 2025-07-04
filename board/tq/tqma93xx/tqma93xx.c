@@ -45,7 +45,7 @@ static struct tq_eeprom_data eeprom;
  *
  * return: string consisting of the name or string indicating unknown variant
  */
-static const char *tq_get_boardname(void)
+const char *tq_get_boardname(void)
 {
 	switch (get_cpu_type()) {
 	case MXC_CPU_IMX91:

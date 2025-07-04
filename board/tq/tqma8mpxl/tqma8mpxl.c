@@ -86,7 +86,7 @@ int board_phys_sdram_size(phys_size_t *size)
  *
  * return: string consisting of the name or string indicating unknown variant
  */
-static const char *tq_get_boardname(void)
+const char *tq_get_boardname(void)
 {
 	switch (get_cpu_type()) {
 	/* all normal quad core variants */
