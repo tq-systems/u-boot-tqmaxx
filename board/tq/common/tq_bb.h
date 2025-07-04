@@ -24,6 +24,7 @@ int tq_bb_board_late_init(void);
 int tq_bb_checkboard(void);
 void tq_bb_board_quiesce_devices(void);
 
+const char *tq_get_boardname(void);
 const char *tq_bb_get_boardname(void);
 
 #if IS_ENABLED(CONFIG_XPL_BUILD)

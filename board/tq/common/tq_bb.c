@@ -52,6 +52,11 @@ void __weak tq_bb_board_quiesce_devices(void)
 	;
 }
 
+const char *tq_get_boardname(void)
+{
+	return "INVALID";
+}
+
 const char * __weak tq_bb_get_boardname(void)
 {
 	return "INVALID";
