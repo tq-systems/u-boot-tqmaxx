@@ -50,7 +50,7 @@ static inline int tq_read_module_eeprom(struct tq_eeprom_data *eeprom)
 
 #endif
 
-#if defined(CONFIG_TQ_VARD)
+#if IS_ENABLED(CONFIG_TQ_VARD)
 
 #define VARD_FEATURE_BYTES	8
 

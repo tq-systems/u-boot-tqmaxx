@@ -14,6 +14,13 @@ config TQ_EEPROM_OFFSET
 	default 0x1000 if TARGET_TQMA8MPXS
 	default 0x0
 
+config CMD_TQ_EEPROM
+	bool "Simple command to read EEPROM data to RAM address"
+	help
+	  SOM by TQ-Systems GmbH store specific information in EEPROM on SOM:
+	  exact SOM type and hardware revision, serial number and primary MAC.
+	  Enable this to support CLI for SOM EEPROM access.
+
 endif
 #
 # This is only needed for boards with hardware revisions with/without serial

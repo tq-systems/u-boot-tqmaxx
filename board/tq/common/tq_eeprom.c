@@ -5,14 +5,17 @@
  * Author: Markus Niebel
  */
 
+#include <command.h>
 #include <dm/uclass.h>
-#include <i2c_eeprom.h>
 #include <i2c.h>
+#include <i2c_eeprom.h>
 #include <linux/ctype.h>
 #include <malloc.h>
+#include <mapmem.h>
 #include <net.h>
 #include <u-boot/crc.h>
 
+#include "tq_bb.h"
 #include "tq_eeprom.h"
 #include "tq_som_features.h"
 
@@ -314,5 +317,75 @@ int tq_board_handle_eeprom_data(const char *board_name,
 
 	return tq_show_eeprom(eeprom, board_name);
 }
+
+static int handle_vard(struct tq_vard *vd)
+{
+	int ret;
+
+	if (IS_ENABLED(CONFIG_TQ_VARD)) {
+		ret = tq_vard_read(vd);
+		if (!ret)
+			tq_vard_show(vd);
+	} else {
+		ret = -EOPNOTSUPP;
+	}
+
+	return ret;
+}
+
+static int handle_som_data(struct tq_eeprom_data *eeprom)
+{
+	int ret;
+
+	ret = tq_read_module_eeprom(eeprom);
+	if (!ret)
+		ret = tq_show_eeprom(eeprom, tq_get_boardname());
+
+	return ret;
+}
+
+static int do_eeprom(struct cmd_tbl *cmdtp, int flag, int argc,
+		     char *const argv[])
+{
+	bool do_vard;
+	const void *buf;
+	ulong addr;
+	int ret;
+
+	if (argc != 4)
+		return CMD_RET_USAGE;
+
+	addr = hextoul(argv[3], NULL);
+
+	if (strcmp(argv[1], "reload"))
+		return CMD_RET_USAGE;
+
+	if (!strcmp(argv[2], "som_data")) {
+		do_vard = false;
+		buf = map_sysmem(addr, sizeof(struct tq_eeprom_data));
+	} else if (IS_ENABLED(CONFIG_TQ_VARD) && !strcmp(argv[2], "vard")) {
+		do_vard = true;
+		buf = map_sysmem(addr, sizeof(struct tq_vard));
+	} else {
+		return CMD_RET_USAGE;
+	}
+
+	if (do_vard)
+		ret = handle_vard((struct tq_vard *)buf);
+	else
+		ret = handle_som_data((struct tq_eeprom_data *)buf);
+
+	unmap_sysmem(buf);
+
+	return ret;
+}
+
+U_BOOT_CMD(tq_eeprom, 4, 0, do_eeprom,
+	   "TQ Systems SOM EEPROM handling command",
+	   "reload som_data <addr>\n"
+#if IS_ENABLED(CONFIG_TQ_VARD)
+	   "tq_eeprom reload vard <addr>\n"
+#endif
+);
 
 #endif /* !IS_ENABLED(CONFIG_XPL_BUILD) */
