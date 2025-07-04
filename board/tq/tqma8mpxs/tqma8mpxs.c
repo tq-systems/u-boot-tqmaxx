@@ -28,6 +28,7 @@
 
 #include "../common/tq_bb.h"
 #include "../common/tq_blob.h"
+#include "../common/tq_board_gpio.h"
 #include "../common/tq_eeprom.h"
 #include "../common/tq_som_features.h"
 
@@ -58,6 +59,39 @@ int board_early_init_f(void)
  * Data is read during board_late_init
  */
 static struct tq_eeprom_data eeprom;
+
+#if IS_ENABLED(CONFIG_CMD_TQ_EEPROM_WRITE)
+
+enum {
+	EEPROM_WREN,
+};
+
+static struct tq_gpio_init_data gpio_init_data[] = {
+	GPIO_INIT_DATA_ENTRY(EEPROM_WREN, "GPIO4_5",
+			     GPIOD_IS_OUT | GPIOD_ACTIVE_LOW),
+};
+
+void tq_bb_eeprom_wren(void)
+{
+	dm_gpio_set_value(&gpio_init_data[EEPROM_WREN].desc, 1);
+}
+
+void tq_bb_eeprom_wrdi(void)
+{
+	dm_gpio_set_value(&gpio_init_data[EEPROM_WREN].desc, 0);
+}
+
+static void tqma8mpxs_init_eeprom(void)
+{
+	tq_board_gpio_init(gpio_init_data, ARRAY_SIZE(gpio_init_data));
+	tq_bb_eeprom_wrdi();
+}
+
+#else
+
+static void tqma8mpxs_init_eeprom(void) {}
+
+#endif
 
 #if CONFIG_IS_ENABLED(BLOBLIST)
 
@@ -162,6 +196,8 @@ int checkboard(void)
 
 int board_init(void)
 {
+	tqma8mpxs_init_eeprom();
+
 	tq_bb_board_init();
 
 	return 0;
