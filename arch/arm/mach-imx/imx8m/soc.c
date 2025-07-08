@@ -937,7 +937,7 @@ int disable_gpu_nodes(void *blob)
 {
 	const char *nodes_path_8mn[] = {
 		"/gpu@38000000",
-		"/soc@/gpu@38000000"
+		"/soc@0/gpu@38000000"
 	};
 
 	return disable_fdt_nodes(blob, nodes_path_8mn, ARRAY_SIZE(nodes_path_8mn));
