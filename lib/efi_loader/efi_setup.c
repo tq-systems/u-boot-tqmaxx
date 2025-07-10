@@ -13,6 +13,7 @@
 #include <asm-generic/unaligned.h>
 
 #include <efi_gbl_image_loading_protocol.h>
+#include <efi_gbl_avb_protocol.h>
 
 #define OBJ_LIST_NOT_INITIALIZED 1
 
@@ -355,6 +356,13 @@ efi_status_t efi_init_obj_list(void)
 	/* Register GBL Image Loading protocol */
 	if (IS_ENABLED(CONFIG_EFI_GBL_IMAGE_LOADING)) {
 		ret = efi_gbl_image_loading_register();
+		if (ret != EFI_SUCCESS)
+			goto out;
+	}
+
+	/* Register GBL AVB protocol */
+	if (IS_ENABLED(CONFIG_EFI_GBL_AVB)) {
+		ret = efi_gbl_avb_register();
 		if (ret != EFI_SUCCESS)
 			goto out;
 	}
