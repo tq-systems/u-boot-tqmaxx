@@ -616,7 +616,8 @@ static void nxp_xspi_select_mem(struct nxp_xspi *xspi,
 {
 	unsigned long rate = slave->max_hz;
 
-	if (xspi->dtr == op->cmd.dtr)
+	if (xspi->selected == spi_chip_select(slave->dev) &&
+		xspi->dtr == op->cmd.dtr)
 		return;
 
 	if (!op->cmd.dtr) {
@@ -643,6 +644,8 @@ static void nxp_xspi_select_mem(struct nxp_xspi *xspi,
 	if (ret)
 		return;
 #endif
+
+	xspi->selected = spi_chip_select(slave->dev);
 
 	if (!op->cmd.dtr || rate < MHZ(60))
 		nxp_xspi_dll_bypass(xspi);
@@ -900,6 +903,8 @@ static int nxp_xspi_default_setup(struct nxp_xspi *x)
 	xspi_set_reg_field(x, 0, 0, MCR, MDIS);
 
 	xspi_swreset(x);
+
+	x->selected = -1;
 
 	return ret;
 };
