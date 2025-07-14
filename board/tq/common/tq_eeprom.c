@@ -318,28 +318,85 @@ int tq_board_handle_eeprom_data(const char *board_name,
 	return tq_show_eeprom(eeprom, board_name);
 }
 
-static int handle_vard(struct tq_vard *vd)
+#if IS_ENABLED(CONFIG_CMD_TQ_EEPROM_WRITE)
+
+void __weak tq_bb_eeprom_wren(void)
 {
+	;
+}
+
+void __weak tq_bb_eeprom_wrdi(void)
+{
+	;
+}
+
+/**
+ * Write buffer from RAM address to EEPROM given by seq nr starting at offset
+ */
+int tq_write_eeprom_buffer(int seq, uint offset, int buf_size, u_int8_t *buf)
+{
+	struct udevice *dev;
 	int ret;
 
+	ret = uclass_get_device_by_seq(UCLASS_I2C_EEPROM, seq, &dev);
+	if (ret) {
+		pr_err("%s: Cannot find i2c_eeprom%d\n", __func__, seq);
+		return ret;
+	}
+
+	tq_bb_eeprom_wren();
+	ret = i2c_eeprom_write(dev, offset, (u8 *)buf, buf_size);
+	if (ret)
+		pr_err("Failed to write: %d\n", ret);
+	tq_bb_eeprom_wrdi();
+
+	return ret;
+};
+
+int tq_vard_write(const struct tq_vard * const vard)
+{
+	return tq_write_eeprom_buffer(0, CONFIG_TQ_EEPROM_OFFSET, sizeof(*vard), (u_int8_t *)vard);
+};
+
+int tq_write_module_eeprom(const struct tq_eeprom_data * const eeprom)
+{
+	return tq_write_eeprom_buffer(0, CONFIG_TQ_EEPROM_OFFSET + TQ_EE_HRCW_BYTES,
+				      sizeof(*eeprom) - TQ_EE_HRCW_BYTES,
+				      (u_int8_t *)eeprom + TQ_EE_HRCW_BYTES);
+};
+
+#endif /* IS_ENABLED(CONFIG_TQ_EEPROM_WRITE) */
+
+#if IS_ENABLED(CONFIG_CMD_TQ_EEPROM)
+
+static int handle_vard(struct tq_vard *vd, bool do_write)
+{
+	int ret = -EOPNOTSUPP;
+
 	if (IS_ENABLED(CONFIG_TQ_VARD)) {
-		ret = tq_vard_read(vd);
-		if (!ret)
-			tq_vard_show(vd);
-	} else {
-		ret = -EOPNOTSUPP;
+		if (IS_ENABLED(CONFIG_CMD_TQ_EEPROM_WRITE) && do_write) {
+			ret = tq_vard_write(vd);
+		} else {
+			ret = tq_vard_read(vd);
+			if (!ret)
+				tq_vard_show(vd);
+		}
 	}
 
 	return ret;
 }
 
-static int handle_som_data(struct tq_eeprom_data *eeprom)
+static int handle_som_data(struct tq_eeprom_data *eeprom, bool do_write)
 {
-	int ret;
+	int ret = -EOPNOTSUPP;
 
-	ret = tq_read_module_eeprom(eeprom);
-	if (!ret)
-		ret = tq_show_eeprom(eeprom, tq_get_boardname());
+	if (IS_ENABLED(CONFIG_CMD_TQ_EEPROM_WRITE) && do_write) {
+		ret = tq_write_module_eeprom(eeprom);
+	} else {
+		ret = tq_read_module_eeprom(eeprom);
+		if (!ret)
+			ret = tq_show_eeprom(eeprom, tq_get_boardname());
+	}
 
 	return ret;
 }
@@ -347,7 +404,7 @@ static int handle_som_data(struct tq_eeprom_data *eeprom)
 static int do_eeprom(struct cmd_tbl *cmdtp, int flag, int argc,
 		     char *const argv[])
 {
-	bool do_vard;
+	bool do_vard, do_write;
 	const void *buf;
 	ulong addr;
 	int ret;
@@ -357,23 +414,27 @@ static int do_eeprom(struct cmd_tbl *cmdtp, int flag, int argc,
 
 	addr = hextoul(argv[3], NULL);
 
-	if (strcmp(argv[1], "reload"))
+	if (IS_ENABLED(CONFIG_CMD_TQ_EEPROM_WRITE) && !strcmp(argv[1], "write"))
+		do_write = true;
+	else if (!strcmp(argv[1], "reload"))
+		do_write = false;
+	else
 		return CMD_RET_USAGE;
 
-	if (!strcmp(argv[2], "som_data")) {
-		do_vard = false;
-		buf = map_sysmem(addr, sizeof(struct tq_eeprom_data));
-	} else if (IS_ENABLED(CONFIG_TQ_VARD) && !strcmp(argv[2], "vard")) {
+	if (IS_ENABLED(CONFIG_TQ_VARD) && !strcmp(argv[2], "vard")) {
 		do_vard = true;
 		buf = map_sysmem(addr, sizeof(struct tq_vard));
+	} else if (!strcmp(argv[2], "som_data")) {
+		do_vard = false;
+		buf = map_sysmem(addr, sizeof(struct tq_eeprom_data));
 	} else {
 		return CMD_RET_USAGE;
 	}
 
 	if (do_vard)
-		ret = handle_vard((struct tq_vard *)buf);
+		ret = handle_vard((struct tq_vard *)buf, do_write);
 	else
-		ret = handle_som_data((struct tq_eeprom_data *)buf);
+		ret = handle_som_data((struct tq_eeprom_data *)buf, do_write);
 
 	unmap_sysmem(buf);
 
@@ -385,7 +446,15 @@ U_BOOT_CMD(tq_eeprom, 4, 0, do_eeprom,
 	   "reload som_data <addr>\n"
 #if IS_ENABLED(CONFIG_TQ_VARD)
 	   "tq_eeprom reload vard <addr>\n"
-#endif
+#endif /* IS_ENABLED(CONFIG_TQ_VARD) */
+#if IS_ENABLED(CONFIG_CMD_TQ_EEPROM_WRITE)
+	   "tq_eeprom write som_data <addr>\n"
+#if IS_ENABLED(CONFIG_TQ_VARD)
+	   "tq_eeprom write vard <addr>\n"
+#endif /* IS_ENABLED(CONFIG_TQ_VARD) */
+#endif /* IS_ENABLED(CONFIG_CMD_TQ_EEPROM_WRITE) */
 );
+
+#endif
 
 #endif /* !IS_ENABLED(CONFIG_XPL_BUILD) */

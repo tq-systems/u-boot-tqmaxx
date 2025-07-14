@@ -21,6 +21,13 @@ config CMD_TQ_EEPROM
 	  exact SOM type and hardware revision, serial number and primary MAC.
 	  Enable this to support CLI for SOM EEPROM access.
 
+config CMD_TQ_EEPROM_WRITE
+	bool "SOM EEPROM write support"
+	depends on CMD_TQ_EEPROM
+	help
+	  Enable to support write access to SOM EEPROM
+	  Note that this is potentially unsafe.
+
 endif
 #
 # This is only needed for boards with hardware revisions with/without serial
