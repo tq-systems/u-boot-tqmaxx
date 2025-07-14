@@ -43,6 +43,13 @@ static inline int tq_read_module_eeprom(struct tq_eeprom_data *eeprom)
 	return tq_read_eeprom(0, eeprom);
 }
 
+#if IS_ENABLED(CONFIG_CMD_TQ_EEPROM_WRITE)
+
+void tq_bb_eeprom_wren(void);
+void tq_bb_eeprom_wrdi(void);
+
+#endif
+
 #else
 
 #error "need CONFIG_I2C_EEPROM"
