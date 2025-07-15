@@ -4,6 +4,7 @@
  */
 
 #include <env.h>
+#include <efi_loader.h>
 #include <init.h>
 #include <fdt_support.h>
 #include <asm/arch/clock.h>
@@ -23,6 +24,26 @@
 #include <dm/uclass-internal.h>
 
 extern int board_fix_fdt_fuse(void *fdt);
+
+#if CONFIG_IS_ENABLED(EFI_HAVE_CAPSULE_SUPPORT)
+#define IMX_BOOT_IMAGE_GUID \
+	EFI_GUID(0x2c4db6b3, 0x0b15, 0x4a36, 0xbe, 0xae, \
+		 0x1e, 0xa1, 0x35, 0x46, 0x4f, 0x5b)
+
+struct efi_fw_image fw_images[] = {
+	{
+		.image_type_id = IMX_BOOT_IMAGE_GUID,
+		.fw_name = u"IMX95-EVK-RAW",
+		.image_index = 1,
+	},
+};
+
+struct efi_capsule_update_info update_info = {
+	.dfu_string = "mmc 0=flash-bin raw 0 0x2000 mmcpart 1",
+	.num_images = ARRAY_SIZE(fw_images),
+	.images = fw_images,
+};
+#endif /* EFI_HAVE_CAPSULE_SUPPORT */
 
 int board_early_init_f(void)
 {
