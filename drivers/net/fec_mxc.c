@@ -1070,6 +1070,7 @@ static int dm_fec_bind_mdio(struct udevice *dev)
 	const char *name;
 	ofnode mdio;
 	int ret = -ENODEV;
+	struct fec_priv *fec = dev_get_priv(dev);
 
 	/* for a UCLASS_MDIO driver we need to bind and probe manually
 	 * for an internal MDIO bus that has no dt compatible of its own
@@ -1080,8 +1081,9 @@ static int dm_fec_bind_mdio(struct udevice *dev)
 		if (strcmp(name, "mdio"))
 			continue;
 
+		fec_set_dev_name(fec->mdio_name, dev_seq(dev));
 		ret = device_bind_driver_to_node(dev, "fec_mdio",
-						 name, mdio, &mdiodev);
+						 fec->mdio_name, mdio, &mdiodev);
 		if (ret) {
 			printf("%s bind %s failed: %d\n", __func__, name, ret);
 			break;
@@ -1317,7 +1319,7 @@ static int fecmxc_probe(struct udevice *dev)
 	 */
 	ret = dm_fec_bind_mdio(dev);
 	if (!ret)
-		bus = miiphy_get_dev_by_name("mdio");
+		bus = miiphy_get_dev_by_name(priv->mdio_name);
 	else if (ret != -ENODEV)
 		return ret;
 #endif
