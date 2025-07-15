@@ -13,3 +13,4 @@ obj-$(CONFIG_SYSRESET_SBI) += efi_reset_riscv.o
 
 obj-$(CONFIG_EFI_GBL_IMAGE_LOADING) += efi_gbl_image_loading_protocol.o
 obj-$(CONFIG_EFI_GBL_AVB) += efi_gbl_avb_protocol.o
+obj-$(CONFIG_EFI_GBL_OS_CONFIGURATION) += efi_gbl_os_configuration_protocol.o
