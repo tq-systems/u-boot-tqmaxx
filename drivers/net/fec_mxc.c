@@ -1050,6 +1050,7 @@ static int dm_fec_mdio_probe(struct udevice *dev)
 	struct dm_fec_mdio_priv *priv = dev_get_priv(dev);
 
 	priv->regs = (struct ethernet_regs *)ofnode_get_addr(dev_ofnode(dev->parent));
+	fec_mii_setspeed(priv->regs);
 
 	return 0;
 }
