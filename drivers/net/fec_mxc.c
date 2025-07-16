@@ -1311,16 +1311,26 @@ static int fecmxc_probe(struct udevice *dev)
 	priv->dev_id = dev_seq(dev);
 
 #ifdef CONFIG_DM_MDIO
+	/* If our instance manages the mdio bus, dm_fec_bind_mdio will bind, probe
+	 * and register the MDIO bus driver. To get access to the mii_dev structure
+	 *query it from the global mii_devs list.
+	 */
 	ret = dm_fec_bind_mdio(dev);
-	if (ret && ret != -ENODEV)
+	if (!ret)
+		bus = miiphy_get_dev_by_name("mdio");
+	else if (ret != -ENODEV)
 		return ret;
 #endif
 
 #ifdef CONFIG_DM_ETH_PHY
-	bus = eth_phy_get_mdio_bus(dev);
+	/* if our PHY is not on our mdio bus, this call queries the bus in case
+	 * we using the DM abstraction for shared MDIO busses.
+	 */
 	if (!bus)
-		bus = fec_get_miibus((ulong)priv->eth, dev_seq(dev));
-#else
+		bus = eth_phy_get_mdio_bus(dev);
+#endif
+
+#ifndef CONFIG_DM_MDIO
 	if (!bus) {
 		ulong regs = (ulong)priv->eth;
 
@@ -1332,8 +1342,8 @@ static int fecmxc_probe(struct udevice *dev)
 
 		bus = fec_get_miibus(regs, dev_seq(dev));
 	}
+#endif /* !CONFIG_DM_MDIO */
 
-#endif /* CONFIG_DM_ETH_PHY */
 	if (!bus) {
 		ret = -ENOMEM;
 		goto err_mii;
