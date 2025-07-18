@@ -2,10 +2,9 @@
 /*
  * Device Tree file for MBLS1028A starterkit
  *
- * Copyright 2019-2020 TQ-Systems GmbH
- *
- * Authors: Michael Krummsdorf <michael.krummsdorf@tq-group.com>
- *          Matthias Schiffer <matthias.schiffer@tq-group.com>
+ * Copyright (c) 2019-2020 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
+ * Authors: Michael Krummsdorf
+ *          Matthias Schiffer
  */
 
 /dts-v1/;
