@@ -126,6 +126,37 @@ int scmi_get_bbnsm_gpr(u32 gpr_id, u32 *val)
 	return 0;
 }
 
+int scmi_misc_cfginfo(u32 *msel, char *cfgname)
+{
+	struct scmi_cfg_info_out out;
+	struct scmi_msg msg = {
+		.protocol_id = SCMI_PROTOCOL_ID_IMX_MISC,
+		.message_id = SCMI_MISC_CFG_INFO,
+		.in_msg = (u8 *)NULL,
+		.in_msg_sz = 0,
+		.out_msg = (u8 *)&out,
+		.out_msg_sz = sizeof(out),
+	};
+	int ret;
+	struct udevice *dev;
+
+	ret = uclass_get_device_by_name(UCLASS_CLK, "protocol@14", &dev);
+	if (ret)
+		return ret;
+
+	ret = devm_scmi_process_msg(dev, &msg);
+	if(ret == 0 && out.status == 0) {
+		strcpy(cfgname, (const char *)out.cfgname);
+	} else {
+		printf("Failed to get cfg name, scmi_err = %d\n",
+		       out.status);
+		return -EINVAL;
+	}
+
+	return 0;
+}
+
+
 bool is_usb_boot(void)
 {
 	enum boot_device bt_dev = get_boot_device();

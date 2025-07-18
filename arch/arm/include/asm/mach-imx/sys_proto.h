@@ -296,6 +296,7 @@ struct scmi_bbm_gpr_out {
 uint32_t scmi_get_rom_data(rom_passover_t *rom_data);
 int scmi_set_bbnsm_gpr(u32 gpr_id, u32 val);
 int scmi_get_bbnsm_gpr(u32 gpr_id, u32 *val);
+int scmi_misc_cfginfo(u32 *msel, char *cfgname);
 #endif
 
 /* For i.MX ULP */

@@ -615,37 +615,6 @@ static int board_fix_15x15_evk(void *fdt)
 }
 
 #else
-
-static int imx9_scmi_misc_cfginfo(u32 *msel, char *cfgname)
-{
-	struct scmi_cfg_info_out out;
-	struct scmi_msg msg = {
-		.protocol_id = SCMI_PROTOCOL_ID_IMX_MISC,
-		.message_id = SCMI_MISC_CFG_INFO,
-		.in_msg = (u8 *)NULL,
-		.in_msg_sz = 0,
-		.out_msg = (u8 *)&out,
-		.out_msg_sz = sizeof(out),
-	};
-	int ret;
-	struct udevice *dev;
-
-	ret = uclass_get_device_by_name(UCLASS_CLK, "protocol@14", &dev);
-	if (ret)
-		return ret;
-
-	ret = devm_scmi_process_msg(dev, &msg);
-	if(ret == 0 && out.status == 0) {
-		strcpy(cfgname, (const char *)out.cfgname);
-	} else {
-		printf("Failed to get cfg name, scmi_err = %d\n",
-		       out.status);
-		return -EINVAL;
-	}
-
-	return 0;
-}
-
 static void disable_fdt_resources(void *fdt)
 {
 	int i = 0;
@@ -679,7 +648,7 @@ static int board_fix_19x19_evk(void *fdt)
 	int ret;
 	const char *netcfg = "mx95netc";
 
-	ret = imx9_scmi_misc_cfginfo(&msel, cfgname);
+	ret = scmi_misc_cfginfo(&msel, cfgname);
 	if (!ret) {
 		debug("SM: %s\n", cfgname);
 		if (!strcmp(netcfg, cfgname))
@@ -694,7 +663,7 @@ int board_fix_fdt(void *fdt)
 {
 	/* Remove nodes based on fuses. */
 	board_fix_fdt_fuse(fdt);
-	
+
 #if IS_ENABLED(CONFIG_TARGET_IMX95_15X15_EVK)
 	return board_fix_15x15_evk(fdt);
 #else
