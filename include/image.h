@@ -2144,4 +2144,9 @@ struct fit_loadable_tbl {
  */
 int fit_update(const void *fit);
 
+/**
+ * Fixup the imx android fdt.
+ */
+int imx_android_dt_fixup(void *fdt_addr);
+
 #endif	/* __IMAGE_H__ */

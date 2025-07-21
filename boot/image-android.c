@@ -27,6 +27,10 @@
 #include <fsl_sec.h>
 #include <asm/cache.h>
 #include <rng.h>
+#ifdef CONFIG_IMX_TRUSTY_OS
+#include <trusty/libtipc.h>
+#include <trusty/hwcrypto.h>
+#endif
 
 #define ANDROID_IMAGE_DEFAULT_KERNEL_ADDR	0x10008000
 #define ANDROID_IMAGE_DEFAULT_RAMDISK_ADDR	0x11000000
@@ -439,76 +443,6 @@ static int append_androidboot_args(char *args, uint32_t *len, void *fdt_addr)
 			printf("failed to get boot device from device tree!\n");
 			return -1;
 		}
-
-#ifdef CONFIG_DM_RNG
-#if defined(CONFIG_ANDROID_SUPPORT) || defined(CONFIG_ANDROID_AUTO_SUPPORT)
-		/* set the value of the /chosen/rng-seed property */
-		offset = fdt_path_offset(fdt_addr, "/chosen");
-		if (offset > 0) {
-			int prop_len = 0, ret = 0;
-			void *rand_buf = NULL;
-			struct udevice *dev = NULL;
-
-			do {
-				/*
-				 * Delete the hardcode node which exists on some legacy
-				 * kernel dts, bootloader can handle the node without
-				 * inserting placeholder.
-				 */
-				if (fdt_get_property(fdt_addr, offset, "rng-seed", &prop_len) != NULL) {
-					printf("'rng-seed' node already exist, delete it\n");
-					fdt_delprop(fdt_addr, offset, "rng-seed");
-				}
-
-				/*
-				 * Don't pass bootloader randomness if no reliable
-				 * RNG driver found.
-				 */
-				ret = uclass_get_device(UCLASS_RNG, 0, &dev);
-				if (ret != 0 || !dev) {
-					printf("no RNG driver found! ret: %d\n", ret);
-					ret = 0;
-					break;
-				}
-
-				ret = fdt_increase_size(fdt_addr, RNG_SEED_DTB_RESERVE);
-				if (ret != 0) {
-					printf("failed to increase the fdt size! ret: %d", ret);
-					break;
-				}
-
-				rand_buf = memalign(ARCH_DMA_MINALIGN, RNG_SEED_LENGTH);
-				if (!rand_buf) {
-					printf("failed to allocate memory!\n");
-					ret = -1;
-					break;
-				}
-
-				ret = dm_rng_read(dev, rand_buf, RNG_SEED_LENGTH);
-				if (ret != 0) {
-					printf("failed to generate random! ret: %d\n", ret);
-					break;
-				}
-
-				ret = fdt_setprop(fdt_addr, offset, "rng-seed", rand_buf, RNG_SEED_LENGTH);
-				if (ret != 0) {
-					printf("failed to set 'rng-seed' node in device tree! ret: %d\n", ret);
-					break;
-				}
-			} while(0);
-
-			if (rand_buf) {
-				memset(rand_buf, 0, RNG_SEED_LENGTH);
-				free(rand_buf);
-			}
-			if (ret) {
-				return -1;
-			}
-		} else {
-			printf("the device tree may not have the /chosen node\n");
-		}
-#endif /* CONFIG_ANDROID_SUPPORT || CONFIG_ANDROID_AUTO_SUPPORT */
-#endif /* CONFIG_DM_RNG */
 	}
 
 	/* boot metric variables */
@@ -837,6 +771,159 @@ int android_image_get_kernel_v3(const struct boot_img_hdr_v3 *hdr,
 
 	return 0;
 }
+
+#if defined(CONFIG_ANDROID_SUPPORT) || defined(CONFIG_ANDROID_AUTO_SUPPORT)
+int append_rng_seed(void *fdt_addr) {
+#ifdef CONFIG_DM_RNG
+	int offset = -1;
+	int ret = 0;
+
+	/* set the value of the /chosen/rng-seed property */
+	offset = fdt_path_offset(fdt_addr, "/chosen");
+	if (offset > 0) {
+		int prop_len = 0, ret = 0;
+		void *rand_buf = NULL;
+		struct udevice *dev = NULL;
+
+		do {
+			/*
+			 * Delete the hardcode node which exists on some legacy
+			 * kernel dts, bootloader can handle the node without
+			 * inserting placeholder.
+			 */
+			if (fdt_get_property(fdt_addr, offset, "rng-seed", &prop_len) != NULL) {
+				printf("'rng-seed' node already exist, delete it\n");
+				fdt_delprop(fdt_addr, offset, "rng-seed");
+			}
+
+			/*
+			 * Don't pass bootloader randomness if no reliable
+			 * RNG driver found.
+			 */
+			ret = uclass_get_device(UCLASS_RNG, 0, &dev);
+			if (ret != 0 || !dev) {
+				printf("no RNG driver found! ret: %d\n", ret);
+				ret = 0;
+				break;
+			}
+
+			ret = fdt_increase_size(fdt_addr, RNG_SEED_DTB_RESERVE);
+			if (ret != 0) {
+				printf("failed to increase the fdt size! ret: %d", ret);
+				break;
+			}
+
+			rand_buf = memalign(ARCH_DMA_MINALIGN, RNG_SEED_LENGTH);
+			if (!rand_buf) {
+				printf("failed to allocate memory!\n");
+				ret = -1;
+				break;
+			}
+
+			ret = dm_rng_read(dev, rand_buf, RNG_SEED_LENGTH);
+			if (ret != 0) {
+				printf("failed to generate random! ret: %d\n", ret);
+				break;
+			}
+
+			ret = fdt_setprop(fdt_addr, offset, "rng-seed", rand_buf, RNG_SEED_LENGTH);
+			if (ret != 0) {
+				printf("failed to set 'rng-seed' node in device tree! ret: %d\n", ret);
+				break;
+			}
+		} while(0);
+
+		if (rand_buf) {
+			memset(rand_buf, 0, RNG_SEED_LENGTH);
+			free(rand_buf);
+		}
+	} else {
+		printf("the device tree may not have the /chosen node\n");
+		ret = -1;
+	}
+
+	return ret;
+#else
+	return 0;
+#endif /* CONFIG_DM_RNG */
+}
+
+int fixup_gbl_bootargs(void *fdt_addr) {
+	char commandline[COMMANDLINE_LENGTH] = {0};
+	int offset;
+	char *bootargs = NULL;
+
+	/* First check the bootargs env */
+	bootargs = env_get("bootargs");
+	if (bootargs) {
+		if (strlen(bootargs) + 1 > sizeof(commandline)) {
+			printf("bootargs is too long!\n");
+			return -1;
+		}
+		else
+			strncpy(commandline, bootargs, sizeof(commandline) - 1);
+	} else {
+		/* fallback to the u-boot dts */
+		offset = fdt_path_offset(gd->fdt_blob, "/chosen");
+		if (offset > 0) {
+			bootargs = (char *)fdt_getprop(gd->fdt_blob, offset,
+							"bootargs", NULL);
+			if (bootargs)
+				sprintf(commandline, "%s", bootargs);
+		}
+	}
+
+	/* Append some runtime commandline */
+	append_kernel_cmdline(commandline);
+
+	/* Get bootargs from kernel dtb and concatenate
+	 * it with runtime commandline
+	 */
+	offset = fdt_path_offset(fdt_addr, "/chosen");
+	if (offset < 0) {
+		printf("no /chosen node found in kernel fdt!\n");
+		return -1;
+	} else {
+		bootargs = (char *)fdt_getprop(fdt_addr, offset,
+						"bootargs", NULL);
+		strncat(commandline, " ", COMMANDLINE_LENGTH - strlen(commandline));
+		strncat(commandline, bootargs, COMMANDLINE_LENGTH - strlen(commandline));
+
+		if (fdt_setprop(fdt_addr, offset,
+				"bootargs", commandline,
+				strlen(commandline) + 1) != 0) {
+			printf("Failed to set bootargs in kernel fdt!\n");
+			return -1;
+		}
+	}
+
+	return 0;
+}
+
+int imx_android_dt_fixup(void *fdt_addr) {
+	/* set rng seed to speed up the boot */
+	if (append_rng_seed(fdt_addr))
+		return -1;
+
+	/* Append runtime boot commandline */
+#ifdef CONFIG_IMX_ANDROID_GBL
+	if (fixup_gbl_bootargs(fdt_addr))
+		return -1;
+#endif
+
+	/* Below functions will return error if RPMB key
+	 * is not programed, we want continue booting in
+	 * this case.
+	 */
+#ifdef CONFIG_IMX_TRUSTY_OS
+	/* populate secretkeeper public key */
+	trusty_populate_sk_key(fdt_addr);
+#endif
+
+	return 0;
+
+}
+#endif /* CONFIG_ANDROID_SUPPORT || CONFIG_ANDROID_AUTO_SUPPORT */
 
 bool is_android_vendor_boot_image_header(const void *vendor_boot_img)
 {

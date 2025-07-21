@@ -1208,9 +1208,6 @@ int do_boota(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[]) {
 	/* lock the boot status and rollback_idx preventing Linux modify it */
 	trusty_lock_boot_state();
 
-	/* populate secretkeeper public key */
-	trusty_populate_sk_key((void *)(ulong)fdt_addr);
-
 	/* set deprivilege state to stop NS access */
 	if (hwbcc_ns_deprivilege())
 		goto fail;
