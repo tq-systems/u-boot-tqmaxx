@@ -11,6 +11,7 @@
 #include <mapmem.h>
 #include <spl.h>
 #include <u-boot/lz4.h>
+#include <cpu_func.h>
 #ifdef CONFIG_AHAB_BOOT
 #include <asm/mach-imx/ahab.h>
 #endif
@@ -93,9 +94,7 @@ static struct boot_img_t *read_auth_image(struct spl_image_info *spl_image,
 
 		memcpy(buf, trampoline, images[image_index].size);
 	} else {
-		if (info->read(info, offset, size,
-			       map_sysmem(images[image_index].dst,
-					  images[image_index].size)) <
+		if (info->read(info, offset, size, buf) <
 		    images[image_index].size) {
 			printf("%s wrong\n", __func__);
 			return NULL;
@@ -103,6 +102,7 @@ static struct boot_img_t *read_auth_image(struct spl_image_info *spl_image,
 	}
 
 #ifdef CONFIG_AHAB_BOOT
+	flush_dcache_range((ulong)buf, (ulong)(buf + images[image_index].size - 1));
 	if (ahab_verify_cntr_image(&images[image_index], image_index))
 		return NULL;
 #endif
