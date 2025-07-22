@@ -582,8 +582,9 @@ static int fecmxc_init(struct udevice *dev)
 
 	fec_reg_setup(fec);
 
-	if (fec->xcv_type != SEVENWIRE)
+	if ((fec->xcv_type != SEVENWIRE) && !IS_ENABLED(CONFIG_DM_MDIO)) {
 		fec_mii_setspeed(fec->bus->priv);
+	}
 
 	/* Set Opcode/Pause Duration Register */
 	writel(0x00010020, &fec->eth->op_pause);	/* FIXME 0xffff0020; */
