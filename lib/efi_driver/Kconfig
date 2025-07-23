@@ -21,3 +21,12 @@ config EFI_GBL_OS_CONFIGURATION
 	  Include the driver for the custom GBL os configuration protocol.
 	  This protocol is used to select base device trees and overlays
 	  and apply runtime fix-ups to the bootconfig.
+
+config EFI_GBL_BOOT_CONTROL
+	bool "Include GBL boot control protocol"
+	depends on EFI_LOADER
+	help
+	  Include the driver for the custom GBL boot control protocol.
+	  This protocol provides interfaces for platform specific boot operations,
+	  such as determining the number of slots, determining the current target slot,
+	  and changing the target boot slot.

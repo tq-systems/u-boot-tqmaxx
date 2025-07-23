@@ -15,6 +15,7 @@
 #include <efi_gbl_image_loading_protocol.h>
 #include <efi_gbl_avb_protocol.h>
 #include <efi_gbl_os_configuration_protocol.h>
+#include <efi_gbl_boot_control_protocol.h>
 
 #define OBJ_LIST_NOT_INITIALIZED 1
 
@@ -371,6 +372,14 @@ efi_status_t efi_init_obj_list(void)
 	/* Register GBL OS configuration protocol */
 	if (IS_ENABLED(CONFIG_EFI_GBL_OS_CONFIGURATION)) {
 		ret = efi_gbl_os_config_register();
+		if (ret != EFI_SUCCESS) {
+			goto out;
+		}
+	}
+
+	/* Register GBL boot control protocol */
+	if (IS_ENABLED(CONFIG_EFI_GBL_BOOT_CONTROL)) {
+		ret = efi_gbl_boot_control_register();
 		if (ret != EFI_SUCCESS) {
 			goto out;
 		}
