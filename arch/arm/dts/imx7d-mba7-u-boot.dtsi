@@ -8,9 +8,3 @@
  */
 
 #include "imx7-mba7-u-boot.dtsi"
-
-&fec2 {
-	mdio {
-		device-name = "mdio2";
-	};
-};

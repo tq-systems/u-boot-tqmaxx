@@ -19,12 +19,6 @@
 	};
 };
 
-&fec1 {
-	mdio {
-		device-name = "mdio1";
-	};
-};
-
 &soc {
 	u-boot,dm-pre-reloc;
 };
