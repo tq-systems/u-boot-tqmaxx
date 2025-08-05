@@ -283,6 +283,16 @@ struct scmi_cfg_info_out {
 	u8 cfgname[SCMI_MISC_MAX_CFGNAME];
 };
 
+struct scmi_ddr_info_out {
+	s32 status;
+	u32 attributes;
+	u32 mts;
+	u32 startlow;
+	u32 starthigh;
+	u32 endlow;
+	u32 endhigh;
+};
+
 struct scmi_bbm_gpr_in {
 	u32 index;
 	u32 value;
