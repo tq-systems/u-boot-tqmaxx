@@ -18,6 +18,7 @@
 #include <usb.h>
 #include <dwc3-uboot.h>
 #include <asm/gpio.h>
+#include <adc.h>
 
 #define UART_PAD_CTRL	(PAD_CTL_DSE(6) | PAD_CTL_FSEL2)
 #define LCDIF_GPIO_PAD_CTRL	(PAD_CTL_DSE(0xf) | PAD_CTL_FSEL2 | PAD_CTL_PUE)
@@ -277,8 +278,54 @@ static void board_gpio_init(void)
 	dm_gpio_set_value(&ext_pwren_desc, 1);
 }
 
+static int print_board_version(void)
+{
+	int i, ret;
+	struct udevice *dev;
+	unsigned int rev[2];
+	unsigned int data[2];
+
+	ret = uclass_first_device_check(UCLASS_ADC, &dev);
+
+	if (dev) {
+		ret = adc_channel_single_shot(dev->name, 2, &data[0]);
+		if (ret) {
+			printf("BOARD: unknown\n");
+			return 0;
+		}
+		ret = adc_channel_single_shot(dev->name, 3, &data[1]);
+		if (ret) {
+			printf("BOARD: unknown\n");
+			return 0;
+		}
+
+		for (i = 0; i < 2; i++) {
+			if (data[i] < 500)
+				rev[i] = 0;
+			else if (data[i] < 700)
+				rev[i] = 1;
+			else if (data[i] < 1500)
+				rev[i] = 2;
+			else if (data[i] < 2300)
+				rev[i] = 3;
+			else if (data[i] < 3000)
+				rev[i] = 4;
+			else if (data[i] < 3600)
+				rev[i] = 5;
+			else
+				rev[i] = 6;
+		}
+		printf("BOARD: V%d.%d(ADC2:%d,ADC3:%d)\n", rev[0], rev[1], data[0], data[1]);
+	} else {
+		printf("BOARD: unknown\n");
+	}
+
+	return 0;
+}
+
 int board_init(void)
 {
+	print_board_version();
 #ifdef CONFIG_USB_TCPC
 	setup_typec();
 #endif
