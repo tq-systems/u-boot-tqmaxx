@@ -37,7 +37,7 @@ static rom_passover_t rom_passover_data = {0};
 uint32_t scmi_get_rom_data(rom_passover_t *rom_data)
 {
 	/* Read ROM passover data */
-	struct scmi_rom_passover_get_out out;
+	struct scmi_rom_passover_get_out out = {};
 	struct scmi_msg msg = {
 		.protocol_id = SCMI_PROTOCOL_ID_IMX_MISC,
 		.message_id = SCMI_MISC_ROM_PASSOVER_GET,
@@ -68,7 +68,7 @@ uint32_t scmi_get_rom_data(rom_passover_t *rom_data)
 int scmi_set_bbnsm_gpr(u32 gpr_id, u32 val)
 {
 	struct scmi_bbm_gpr_in in;
-	s32 status;
+	s32 status = 0;
 	struct scmi_msg msg = {
 		.protocol_id = SCMI_PROTOCOL_ID_IMX_BBM,
 		.message_id = SCMI_BBM_GPR_SET,
@@ -98,7 +98,7 @@ int scmi_set_bbnsm_gpr(u32 gpr_id, u32 val)
 
 int scmi_get_bbnsm_gpr(u32 gpr_id, u32 *val)
 {
-	struct scmi_bbm_gpr_out out;
+	struct scmi_bbm_gpr_out out = {};
 	u32 in = gpr_id;
 	struct scmi_msg msg = {
 		.protocol_id = SCMI_PROTOCOL_ID_IMX_BBM,
@@ -128,7 +128,7 @@ int scmi_get_bbnsm_gpr(u32 gpr_id, u32 *val)
 
 int scmi_misc_cfginfo(u32 *msel, char *cfgname)
 {
-	struct scmi_cfg_info_out out;
+	struct scmi_cfg_info_out out = {};
 	struct scmi_msg msg = {
 		.protocol_id = SCMI_PROTOCOL_ID_IMX_MISC,
 		.message_id = SCMI_MISC_CFG_INFO,
@@ -170,6 +170,7 @@ int scmi_misc_ddrinfo(u32 ddrc_id, struct scmi_ddr_info_out *out)
 	int ret;
 	struct udevice *dev;
 
+	memset(out, 0, sizeof(*out));
 	ret = uclass_get_device_by_name(UCLASS_CLK, "protocol@14", &dev);
 	if (ret)
 		return ret;
