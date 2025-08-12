@@ -51,6 +51,10 @@
 
 #include "fb_fsl_common.h"
 
+#ifdef CONFIG_IMX_ANDROID_GBL
+#include <../lib/avb/fsl/fsl_gbl.h>
+#endif
+
 /* max kernel image size, used for compressed kernel image */
 #define MAX_KERNEL_LEN (96 * 1024 * 1024)
 
@@ -591,7 +595,7 @@ end:
 const char *requested_partitions_boot[] = {"boot", "dtbo", "vendor_boot", "init_boot", NULL};
 const char *requested_partitions_recovery[] = {"recovery", NULL};
 
-static int get_boot_header_version(void)
+int get_boot_header_version(void)
 {
 	size_t size;
 	struct andr_boot_img_hdr_v0 hdr;
@@ -624,7 +628,7 @@ static int get_boot_header_version(void)
 	return hdr.header_version;
 }
 
-static int find_partition_data_by_name(char* part_name,
+int find_partition_data_by_name(char* part_name,
 		AvbSlotVerifyData* avb_out_data, AvbPartitionData** avb_loadpart)
 {
 	int num = 0;
@@ -651,6 +655,95 @@ bool __weak is_power_key_pressed(void) {
 	return false;
 }
 
+#ifdef CONFIG_IMX_ANDROID_GBL
+static int do_boota(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[]) {
+	gbl_footer footer;
+	gbl_metadata *metadata = NULL;
+	uint8_t *gbl = NULL;
+	size_t num_read = 0;
+	char part_name[8];
+	char command[64];
+	int ret = 0;
+
+	/* Load and verify GBL image */
+#ifdef CONFIG_DUAL_BOOTLOADER
+	int slot = 0;
+	char* slot_suffixes[2] = {"_a", "_b"};
+	slot = current_slot();
+	if (slot == -1) {
+		printf("failed to get current slot!\n");
+		goto fail;
+	}
+
+	snprintf(part_name, sizeof(part_name), "efisp%s", slot_suffixes[slot]);
+#else
+	snprintf(part_name, sizeof(part_name), "efisp");
+#endif
+
+	/* Load the footer to get metadata and signature */
+	ret = read_from_partition_multi(part_name, 0 - sizeof(footer),
+					sizeof(footer), &footer, &num_read);
+	if (ret != 0 || (num_read != sizeof(footer))) {
+		printf("failed to load gbl footer!\n");
+		goto fail;
+	}
+	if(verify_gbl_footer(&footer)) {
+		goto fail;
+	}
+
+	gbl = malloc(footer.image_size);
+	if (gbl == NULL) {
+		printf("failed to allocate memory to load GBL!\n");
+		goto fail;
+	}
+	ret = read_from_partition_multi(part_name, 0,
+					footer.image_size,
+					gbl, &num_read);
+	if (ret != 0 || num_read != footer.image_size) {
+		printf("failed to load GBL image!\n");
+		goto fail;
+	}
+
+	/* Only verify the GBL image when Trusty OS is enabled */
+#ifdef CONFIG_IMX_TRUSTY_OS
+	ret = verify_gbl(gbl, &footer);
+	if (ret != 0) {
+		/* GBL signature verify fail, but we still
+		 * allow boot when the device is unlocked.
+		 */
+		FbLockState lock = fastboot_get_lock_stat();
+		if (lock != FASTBOOT_UNLOCK) {
+			printf("GBL verify fail and device is locked.\n");
+			goto fail;
+		}
+	}
+#endif
+
+	/* Sanity check the GBL image size */
+	metadata = (gbl_metadata *)(gbl + footer.metadata_offset);
+	if (metadata->original_gbl_size == 0 || \
+	    metadata->original_gbl_size != footer.metadata_offset) {
+		printf("Invalid gbl metadata data!\n");
+		goto fail;
+	}
+
+	/* kick GBL image */
+	snprintf(command, sizeof(command), "bootefi 0x%p:%x",
+		 gbl, metadata->original_gbl_size);
+	printf("Booting GBL with command %s\n", command);
+	run_command(command, 0);
+
+fail:
+	if (gbl)
+		free(gbl);
+
+	printf("boota: failed to load GBL!\n");
+	do_reset(NULL, 0, 0, NULL);
+
+	/* We should not get here */
+	return 1;
+}
+#else
 int do_boota(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[]) {
 
 	u32 avb_metric;
@@ -1194,6 +1287,7 @@ fail:
 
 	return run_command("fastboot 0", 0);
 }
+#endif /* CONFIG_IMX_ANDROID_GBL */
 
 U_BOOT_CMD(
 	boota,	2,	1,	do_boota,
