@@ -15,3 +15,4 @@ obj-$(CONFIG_EFI_GBL_IMAGE_LOADING) += efi_gbl_image_loading_protocol.o
 obj-$(CONFIG_EFI_GBL_AVB) += efi_gbl_avb_protocol.o
 obj-$(CONFIG_EFI_GBL_OS_CONFIGURATION) += efi_gbl_os_configuration_protocol.o
 obj-$(CONFIG_EFI_GBL_BOOT_CONTROL) += efi_gbl_boot_control_protocol.o
+obj-$(CONFIG_EFI_GBL_BOOT_MEMORY) += efi_gbl_boot_memory_protocol.o

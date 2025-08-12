@@ -375,6 +375,7 @@ config IMX_ANDROID_GBL
 	select EFI_GBL_AVB
 	select EFI_GBL_OS_CONFIGURATION
 	select EFI_GBL_BOOT_CONTROL
+	select EFI_GBL_BOOT_MEMORY
 	help
 	  Load and boot the Android image by Android Generic Bootloader (GBL),
 	  which is an UEFI application distributed by Google.

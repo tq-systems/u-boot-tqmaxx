@@ -30,3 +30,13 @@ config EFI_GBL_BOOT_CONTROL
 	  This protocol provides interfaces for platform specific boot operations,
 	  such as determining the number of slots, determining the current target slot,
 	  and changing the target boot slot.
+
+config EFI_GBL_BOOT_MEMORY
+	bool "Include GBL boot memory protocol"
+	depends on EFI_LOADER
+	help
+	  Include the driver for the custom GBL boot memory protocol.
+	  The protocol allows UEFI firmware to provide reserved buffers
+	  for sharing preloaded partition image to the GBL, or as destination
+	  buffers for the GBL to load the images to, assemble kernel/ramdisk/fdt images,
+	  and download data in fastboot mode etc.
