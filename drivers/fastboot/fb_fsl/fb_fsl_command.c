@@ -845,6 +845,15 @@ static void flashing(char *cmd, char *response)
 		else
 			strcpy(response, "OKAY");
 	}
+#ifdef CONFIG_IMX_ANDROID_GBL
+	else if (endswith(cmd, FASTBOOT_SET_GBL_PUBLIC_KEY)) {
+		if (avb_set_gbl_public_key(fastboot_buf_addr,
+					fastboot_bytes_received))
+			strcpy(response, "FAILcan't set gbl public key!");
+		else
+			strcpy(response, "OKAY");
+	}
+#endif
 #endif /* !CONFIG_AVB_ATX */
 #endif /* CONFIG_IMX_TRUSTY_OS */
 	else if (endswith(cmd, ERASE_UBOOT_ENV)) {
