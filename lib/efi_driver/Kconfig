@@ -40,3 +40,10 @@ config EFI_GBL_BOOT_MEMORY
 	  for sharing preloaded partition image to the GBL, or as destination
 	  buffers for the GBL to load the images to, assemble kernel/ramdisk/fdt images,
 	  and download data in fastboot mode etc.
+
+config EFI_GBL_FASTBOOT_TRANSPORT
+	bool "Include GBL fastboot transport protocol"
+	depends on EFI_LOADER
+	help
+	  This protocol defines interfaces that abstract platform Fastboot transport
+	  implementation such as USB/TCP or other custom channels.
