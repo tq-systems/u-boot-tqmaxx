@@ -1112,6 +1112,39 @@ static int delete_fdt_nodes(void *blob, const char *const nodes_path[], int size
 	return 0;
 }
 
+static int disable_fdt_nodes(void *blob, const char *const nodes_path[], int size_array)
+{
+	int i = 0;
+	int rc;
+	int nodeoff;
+	const char *status = "disabled";
+
+	for (i = 0; i < size_array; i++) {
+		nodeoff = fdt_path_offset(blob, nodes_path[i]);
+		if (nodeoff < 0)
+			continue; /* Not found, skip it */
+
+		debug("Found %s node\n", nodes_path[i]);
+
+add_status:
+		rc = fdt_setprop(blob, nodeoff, "status", status, strlen(status) + 1);
+		if (rc) {
+			if (rc == -FDT_ERR_NOSPACE) {
+				rc = fdt_increase_size(blob, 512);
+				if (!rc)
+					goto add_status;
+			}
+			printf("Unable to update property %s:%s, err=%s\n",
+			       nodes_path[i], "status", fdt_strerror(rc));
+		} else {
+			debug("Modify %s:%s disabled\n",
+			       nodes_path[i], "status");
+		}
+	}
+
+	return 0;
+}
+
 static int get_cooling_device_list(void * blob, u32 nodeoff, const char *const path, u32* cooling_dev, int max_cnt)
 {
 		int cnt, j;
@@ -1405,9 +1438,8 @@ int disable_enet10g_node(void *blob)
 		"/soc/netc-blk-ctrl@4cde0000/pcie@4ca00000/ethernet@10,0",
 	};
 
-	return delete_fdt_nodes(blob, nodes_path_enet10g, ARRAY_SIZE(nodes_path_enet10g));
+	return disable_fdt_nodes(blob, nodes_path_enet10g, ARRAY_SIZE(nodes_path_enet10g));
 }
-
 
 int disable_mipidsi_node(void *blob)
 {
