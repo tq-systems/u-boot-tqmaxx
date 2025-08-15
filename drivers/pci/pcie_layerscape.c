@@ -51,6 +51,26 @@ static void ctrl_writel(struct ls_pcie *pcie, unsigned int value,
 		out_le32(pcie->ctrl + offset, value);
 }
 
+void ls_pcie_dbi_ro_wr_en(struct ls_pcie *pcie)
+{
+	u32 reg, val;
+
+	reg = PCIE_MISC_CONTROL_1_OFF;
+	val = dbi_readl(pcie, reg);
+	val |= PCIE_DBI_RO_WR_EN;
+	dbi_writel(pcie, val, reg);
+}
+
+void ls_pcie_dbi_ro_wr_dis(struct ls_pcie *pcie)
+{
+	u32 reg, val;
+
+	reg = PCIE_MISC_CONTROL_1_OFF;
+	val = dbi_readl(pcie, reg);
+	val &= ~PCIE_DBI_RO_WR_EN;
+	dbi_writel(pcie, val, reg);
+}
+
 static int ls_pcie_ltssm(struct ls_pcie *pcie)
 {
 	u32 state;
@@ -337,11 +357,11 @@ static void ls_pcie_setup_ctrl(struct ls_pcie *pcie)
 {
 	ls_pcie_setup_atu(pcie);
 
-	dbi_writel(pcie, 1, PCIE_DBI_RO_WR_EN);
+	ls_pcie_dbi_ro_wr_en(pcie);
 	ls_pcie_fix_class(pcie);
 	ls_pcie_clear_multifunction(pcie);
 	ls_pcie_drop_msg_tlp(pcie);
-	dbi_writel(pcie, 0, PCIE_DBI_RO_WR_EN);
+	ls_pcie_dbi_ro_wr_dis(pcie);
 
 	ls_pcie_disable_bars(pcie);
 	pcie->stream_id_cur = 0;

@@ -65,7 +65,8 @@
 /* DBI registers */
 #define PCIE_SRIOV		0x178
 #define PCIE_STRFMR1		0x71c /* Symbol Timer & Filter Mask Register1 */
-#define PCIE_DBI_RO_WR_EN	0x8bc
+#define PCIE_DBI_RO_WR_EN		BIT(0)
+#define PCIE_MISC_CONTROL_1_OFF         0x8BC
 
 #define PCIE_LINK_CAP		0x7c
 #define PCIE_LINK_SPEED_MASK	0xf
@@ -98,7 +99,6 @@
 #define PCIE_BAR4_SIZE		SZ_1M /* 1M */
 
 #define PCIE_SRIOV_VFBAR0	0x19C
-#define PCIE_MISC_CONTROL_1_OFF	0x8BC
 
 #define PCIE_MASK_OFFSET(flag, pf, off) ((flag) ? 0 : (0x1000 + (off) * (pf)))
 
