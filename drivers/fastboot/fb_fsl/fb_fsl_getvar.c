@@ -55,12 +55,14 @@
 
 /* common variables of fastboot getvar command */
 char *fastboot_common_var[] = {
-	"version",
+#ifndef CONFIG_IMX_ANDROID_GBL
+	"max-download-size",
 	"version-bootloader",
+#endif
+	"version",
 	"version-baseband",
 	"product",
 	"secure",
-	"max-download-size",
 	"erase-block-size",
 	"logical-block-size",
 	"unlocked",
@@ -74,6 +76,7 @@ char *fastboot_common_var[] = {
 #endif
 	"tee_enabled",
 	"soc_rev",
+	NULL,
 };
 
 /* at-vboot-state variable list */
@@ -146,7 +149,7 @@ static void uuid_hex2string(uint8_t *uuid, char* buf, uint32_t uuid_len, uint32_
 int get_imx8m_baseboard_id(void);
 #endif
 
-static int get_single_var(char *cmd, char *response)
+int get_single_var(char *cmd, char *response)
 {
 	char *str = cmd;
 	int chars_left;
@@ -483,7 +486,7 @@ void fastboot_getvar(char *cmd, char *response)
 
 
 		/* get common variables */
-		for (n = 0; n < sizeof(fastboot_common_var)/sizeof(char *); n++) {
+		for (n = 0; fastboot_common_var[n] != NULL; n++) {
 			snprintf(response, FASTBOOT_RESPONSE_LEN, "INFO%s:", fastboot_common_var[n]);
 			get_single_var(fastboot_common_var[n], response);
 			fastboot_tx_write_more(response);

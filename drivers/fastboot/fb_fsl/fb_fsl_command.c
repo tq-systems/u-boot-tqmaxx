@@ -62,7 +62,7 @@
 /**
  * fastboot_bytes_received - number of bytes received in the current download
  */
-static u32 fastboot_bytes_received;
+u32 fastboot_bytes_received;
 
 /**
  * fastboot_bytes_expected - number of bytes expected in the current download
@@ -514,7 +514,7 @@ static bool erase_uboot_env(void) {
 		return env_erase() ? false : true;
 }
 
-static void flashing(char *cmd, char *response)
+void flashing(char *cmd, char *response)
 {
 	FbLockState status;
 	FbLockEnableResult result;
@@ -909,12 +909,15 @@ static void flashing(char *cmd, char *response)
 		printf("Unknown flashing command:%s\n", cmd);
 		strcpy(response, "FAILcommand not defined");
 	}
+
+#ifndef CONFIG_IMX_ANDROID_GBL
 	fastboot_tx_write_more(response);
 
 	/* Must call fastboot_none_resp before returning from the dispatch function
 	 *  which uses fastboot_tx_write_more
 	 */
 	fastboot_none_resp(response);
+#endif
 }
 #endif /* CONFIG_FASTBOOT_LOCK */
 
@@ -1097,7 +1100,7 @@ static void flash(char *cmd, char *response)
 #endif
 }
 
-static void erase(char *cmd, char *response)
+void erase(char *cmd, char *response)
 {
 	if (!cmd) {
 		pr_err("missing partition name");

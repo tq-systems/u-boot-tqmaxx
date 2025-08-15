@@ -47,3 +47,11 @@ config EFI_GBL_FASTBOOT_TRANSPORT
 	help
 	  This protocol defines interfaces that abstract platform Fastboot transport
 	  implementation such as USB/TCP or other custom channels.
+
+config EFI_GBL_FASTBOOT
+	bool "Include GBL fastboot protocol"
+	depends on EFI_LOADER
+	help
+	  This protocol provides interfaces for platform-specific operations during Fastboot.
+	  This can include support for vendor defined variables or variables whose query requires
+	  cooperation with vendor firmware, OEM commands.
