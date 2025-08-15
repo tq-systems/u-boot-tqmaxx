@@ -100,6 +100,31 @@ static int ls_pcie_link_up(struct ls_pcie *pcie)
 	return 1;
 }
 
+/* Parameters for the waiting for link up routine */
+#define LINK_WAIT_MAX_RETRIES		1000
+
+static int ls_pcie_wait_for_link(struct ls_pcie *pci)
+{
+	int retries;
+
+	/* Check if the link is up or not */
+	for (retries = 0; retries < LINK_WAIT_MAX_RETRIES; retries++) {
+		if (ls_pcie_link_up(pci))
+			break;
+
+		udelay(1000);
+	}
+
+	if (retries >= LINK_WAIT_MAX_RETRIES) {
+		pr_err("Phy link never came up\n");
+		return -ETIMEDOUT;
+	}
+
+	debug("Phy link up after %d msec\n", retries);
+
+	return 0;
+}
+
 static void ls_pcie_cfg0_set_busdev(struct ls_pcie *pcie, u32 busdev)
 {
 	dbi_writel(pcie, PCIE_ATU_REGION_OUTBOUND | PCIE_ATU_REGION_INDEX0,
@@ -668,7 +693,7 @@ static int ls_pcie_probe(struct udevice *dev)
 		dbi_writel(pcie, ctl2, PCIE_LINK_CTL_2);
 	}
 
-	if (!ls_pcie_link_up(pcie)) {
+	if (ls_pcie_wait_for_link(pcie)) {
 		/* Let the user know there's no PCIe link */
 		printf(": no link\n");
 		return 0;
