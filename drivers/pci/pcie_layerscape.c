@@ -646,8 +646,24 @@ static int ls_pcie_probe(struct udevice *dev)
 		printf("PCIe%u: %s %s", pcie->idx, dev->name, "Endpoint");
 			ls_pcie_setup_ep(pcie);
 	} else {
+		unsigned int link;
+		unsigned int cap;
+		unsigned int ctl2;
+
 		printf("PCIe%u: %s %s", pcie->idx, dev->name, "Root Complex");
 			ls_pcie_setup_ctrl(pcie);
+
+		/* Limit to PCIe Gen2 link, Gen3 link training problems have been observed */
+		ls_pcie_setup_ctrl(pcie);
+		cap = dbi_readl(pcie, PCIE_LINK_CAP);
+		cap &= ~PCIE_LINK_SPEED_MASK;
+		cap |= 0x2;
+		dbi_writel(pcie, cap, PCIE_LINK_CAP);
+
+		ctl2 = dbi_readl(pcie, PCIE_LINK_CTL_2);
+		ctl2 &= ~PCIE_LINK_SPEED_MASK;
+		ctl2 |= 0x2;
+		dbi_writel(pcie, ctl2, PCIE_LINK_CTL_2);
 	}
 
 	if (!ls_pcie_link_up(pcie)) {

@@ -73,6 +73,8 @@
 #define PCIE_LINK_WIDTH_MASK	0x3f0
 #define PCIE_LINK_STA		0x82
 
+#define PCIE_LINK_CTL_2		0xa0
+
 #define LTSSM_STATE_MASK	0x3f
 #define LTSSM_PCIE_L0		0x11 /* L0 state */
 
