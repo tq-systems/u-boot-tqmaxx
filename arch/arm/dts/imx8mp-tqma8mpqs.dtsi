@@ -658,6 +658,7 @@
 	adp-disable;
 	dr_mode = "otg";
 	usb-role-switch;
+	maximum-speed = "high-speed";
 	role-switch-default-mode = "peripheral";
 };
 
