@@ -301,6 +301,8 @@ int board_init(void)
 	setup_typec();
 #endif
 
+	netc_regulator_enable("regulator-m2-pwr");
+
 	netc_init();
 
 	power_on_m7("mx94evkrpmsg");
