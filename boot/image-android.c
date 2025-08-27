@@ -417,6 +417,7 @@ static int append_androidboot_args(char *args, uint32_t *len, void *fdt_addr)
 		strncat(args, args_buf, *len - strlen(args));
 	}
 
+	/* boot_devices */
 	if (!fdt_addr) {
 		sprintf(args_buf,
 			" androidboot.boot_device_root=mmcblk%d", mmc_map_to_kernel_blk(mmc_get_env_dev()));
@@ -424,24 +425,15 @@ static int append_androidboot_args(char *args, uint32_t *len, void *fdt_addr)
 	} else {
 		char mmcblk[30];
 		char *boot_device = NULL;
-		int offset = -1;
 
-		/* The boot device should locates at "/firmware/android/"boot_devices_mmcblkX" */
-		offset = fdt_path_offset(fdt_addr, "/firmware/android");
-		if (offset > 0) {
-			sprintf(mmcblk, "boot_devices_mmcblk%d", mmc_map_to_kernel_blk(mmc_get_env_dev()));
-			boot_device = (char *)fdt_getprop(fdt_addr, offset, mmcblk, NULL);
-			if (boot_device) {
-				sprintf(args_buf,
-					" androidboot.boot_devices=%s", boot_device);
-				strncat(args, args_buf, *len - strlen(args));
-			} else {
-				printf("failed to get boot device from device tree!\n");
-				return -1;
-			}
-		} else {
-			printf("failed to get boot device from device tree!\n");
+		sprintf(mmcblk, "boot_devices_mmcblk%d", mmc_map_to_kernel_blk(mmc_get_env_dev()));
+		boot_device = env_get(mmcblk);
+		if (!boot_device) {
+			log_err("failed to get boot device from env!\n");
 			return -1;
+		} else {
+			sprintf(args_buf, " androidboot.boot_devices=%s", boot_device);
+			strncat(args, args_buf, *len - strlen(args));
 		}
 	}
 
