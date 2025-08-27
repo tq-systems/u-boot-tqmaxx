@@ -18,15 +18,8 @@
 
 static int check_mmc_autodetect(void)
 {
-	int ret;
-
-	ret = env_get_yesno("mmcautodetect");
-
-	/* no or not set */
-	if (ret <= 0)
-		return 0;
-
-	return 1;
+	/* NO or unset: 0 / YES: 1 */
+	return (env_get_yesno("mmcautodetect") > 0);
 }
 
 /* This should be defined for each board */
