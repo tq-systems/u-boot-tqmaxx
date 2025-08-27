@@ -6,7 +6,7 @@
  */
 
 /*
- * start private blobs at BLOBLISTT_VENDOR_AREA
+ * start private blobs at BLOBLISTT_PRIVATE_AREA
  * to not conflict with bloblist_tag_t
  */
 
