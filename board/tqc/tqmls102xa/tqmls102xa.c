@@ -389,6 +389,25 @@ int tqmls102xa_ft_try_fixup_eeprom(void *blob, const char * const *path_list,
 	return (idx < list_len) ? 0 : -ENOENT;
 };
 
+static void tqmls102xa_fixup_esdhc(void *blob)
+{
+	static const char * const esdhc_paths[] = {
+		"/soc/esdhc@1560000",
+		"/soc/mmc@1560000",
+	};
+	size_t i;
+
+	for (i = 0; i < ARRAY_SIZE(esdhc_paths); i++) {
+		const char *path = esdhc_paths[i];
+		int offs;
+
+		offs = fdt_path_offset(blob, path);
+		if (offs >= 0)
+			tqc_ft_fixup_emmc_dsr(blob, path,
+					      tqmls102xa_emmc_dsr);
+	}
+}
+
 int ft_board_setup(void *blob, bd_t *bd)
 {
 	int off;
@@ -400,9 +419,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 	/* bring in eMMC dsr settings if needed */
 	if (mmc && (!mmc_init(mmc))) {
 		if (tqc_emmc_need_dsr(mmc) > 0)
-			tqc_ft_fixup_emmc_dsr(blob,
-					      "/soc/esdhc@1560000",
-					      tqmls102xa_emmc_dsr);
+			tqmls102xa_fixup_esdhc(blob);
 	} else {
 		puts("e-MMC: not present?\n");
 	}
