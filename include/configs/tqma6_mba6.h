@@ -11,7 +11,7 @@
 #ifndef __CONFIG_TQMA6_MBA6_H
 #define __CONFIG_TQMA6_MBA6_H
 
-#define CFG_FEC_MXC_PHYADDR		0x03
+#define PHY_ANEG_TIMEOUT	8000	/* KSZ9031 PHY needs a longer aneg time */
 
 #define CFG_MXC_UART_BASE		UART2_BASE
 #define CONSOLE_DEV		"ttymxc1"
