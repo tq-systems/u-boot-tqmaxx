@@ -1316,7 +1316,7 @@ static int fecmxc_probe(struct udevice *dev)
 #ifdef CONFIG_DM_MDIO
 	/* If our instance manages the mdio bus, dm_fec_bind_mdio will bind, probe
 	 * and register the MDIO bus driver. To get access to the mii_dev structure
-	 *query it from the global mii_devs list.
+	 * query it from the global mii_devs list.
 	 */
 	ret = dm_fec_bind_mdio(dev);
 	if (!ret)
