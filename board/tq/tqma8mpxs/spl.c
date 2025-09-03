@@ -188,7 +188,7 @@ unsigned long spl_mmc_get_uboot_raw_sector(struct mmc *mmc,
 
 void spl_board_init(void)
 {
-	 arch_misc_init();
+	arch_misc_init();
 
 	/*
 	 * Set GIC clock to 500Mhz for OD VDD_SOC. Kernel driver does
