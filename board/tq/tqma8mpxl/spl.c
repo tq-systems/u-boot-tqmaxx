@@ -90,8 +90,8 @@ static int tqma8mpxl_query_ddr_timing(void)
 
 		if ((sel == '1') || (sel == '2') || (sel == '4') || (sel == '8'))
 			break;
-		else
-			puts("Please enter a valid size.\n");
+
+		puts("Please enter a valid size.\n");
 	}
 
 	ramsize = (phys_size_t)((unsigned int)sel - (unsigned int)('0')) * SZ_1G;
@@ -143,7 +143,7 @@ static void spl_dram_init(int memtype)
 			puts("DRAM init: vard invalid?\n");
 		} else {
 			printf("DRAM init: unknown RAM type %u\n",
-				(unsigned int)vard.memtype);
+			       (unsigned int)vard.memtype);
 		}
 
 		if (idx < 0 || idx >= ARRAY_SIZE(tqma8mpxl_dram_info))
@@ -195,7 +195,7 @@ unsigned long spl_mmc_get_uboot_raw_sector(struct mmc *mmc,
 
 void spl_board_init(void)
 {
-	 arch_misc_init();
+	arch_misc_init();
 
 	/*
 	 * Set GIC clock to 500Mhz for OD VDD_SOC. Kernel driver does
