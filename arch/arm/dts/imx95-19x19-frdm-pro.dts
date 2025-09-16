@@ -40,6 +40,7 @@
 		serial7 = &lpuart8;
 		ethernet0 = &enetc_port0;
 		ethernet1 = &enetc_port1;
+		spi0 = &flexspi1;
 	};
 
 	chosen {
@@ -106,6 +107,25 @@
 	phy-handle = <&ethphy1>;
 	phy-mode = "rgmii-id";
 	status = "okay";
+};
+
+&flexspi1 {
+	bootph-pre-ram;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexspi1>;
+	assigned-clock-rates = <133000000>;
+	status = "okay";
+
+	flash0: flash@0 {
+		bootph-pre-ram;
+		reg = <0>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "jedec,spi-nor";
+		spi-max-frequency = <133000000>;
+		spi-tx-bus-width = <4>;
+		spi-rx-bus-width = <4>;
+	};
 };
 
 &netc_emdio {
@@ -491,4 +511,16 @@
 			IMX95_PAD_SD2_VSELECT__USDHC2_VSELECT			0x51e
 		>;
 	};
+
+	pinctrl_flexspi1: flexspi1grp {
+		fsl,pins = <
+			IMX95_PAD_XSPI1_SS0_B__FLEXSPI1_A_SS0_B			0x3fe
+			IMX95_PAD_XSPI1_SCLK__FLEXSPI1_A_SCLK			0x3fe
+			IMX95_PAD_XSPI1_DATA0__FLEXSPI1_A_DATA_BIT0		0x3fe
+			IMX95_PAD_XSPI1_DATA1__FLEXSPI1_A_DATA_BIT1		0x3fe
+			IMX95_PAD_XSPI1_DATA2__FLEXSPI1_A_DATA_BIT2		0x3fe
+			IMX95_PAD_XSPI1_DATA3__FLEXSPI1_A_DATA_BIT3		0x3fe
+		>;
+	};
+
 };

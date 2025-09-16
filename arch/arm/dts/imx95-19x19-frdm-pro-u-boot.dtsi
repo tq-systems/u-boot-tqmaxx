@@ -15,6 +15,14 @@
 	/delete-property/ assigned-clock-parents;
 };
 
+&flexspi1 {
+	bootph-pre-ram;
+
+	flash@0{
+		bootph-pre-ram;
+	};
+};
+
 &lpi2c3 {
 	bootph-some-ram;
 };
@@ -26,6 +34,10 @@
 &mipi_dsi {
 	assigned-clocks = <&scmi_clk IMX95_CLK_MIPIPHYPLLBYPASS>;
 	assigned-clock-parents = <&scmi_clk IMX95_CLK_VIDEOPLL1>;
+};
+
+&pinctrl_flexspi1 {
+	bootph-pre-ram;
 };
 
 &pinctrl_uart1 {
