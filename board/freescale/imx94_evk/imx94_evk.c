@@ -433,8 +433,13 @@ set_status:
 	}
 }
 
+extern int board_fix_fdt_fuse(void *fdt);
+
 int board_fix_fdt(void *fdt)
 {
+	/* Remove nodes based on fuses. */
+	board_fix_fdt_fuse(fdt);
+
 	if (is_netc_cfg())
 		disable_fdt_resources(fdt);
 
