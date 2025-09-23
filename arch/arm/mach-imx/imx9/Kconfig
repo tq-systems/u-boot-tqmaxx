@@ -160,24 +160,40 @@ config TARGET_IMX95_19X19_EVK
 	select IMX95
 	imply BOOTSTD_BOOTCOMMAND
 	imply BOOTSTD_FULL
+	select CMD_REMOTEPROC
+	select REMOTEPROC_IMX
+	select IMX_SM_LMM
+	select IMX_SM_CPU
 
 config TARGET_VERDIN_IMX95_19X19
 	bool "imx95_verdin_evk"
 	select IMX95
 	imply BOOTSTD_BOOTCOMMAND
 	imply BOOTSTD_FULL
+	select CMD_REMOTEPROC
+	select REMOTEPROC_IMX
+	select IMX_SM_LMM
+	select IMX_SM_CPU
 
 config TARGET_IMX95_15X15_EVK
 	bool "imx95_15x15_evk"
 	select IMX95
 	imply BOOTSTD_BOOTCOMMAND
 	imply BOOTSTD_FULL
+	select CMD_REMOTEPROC
+	select REMOTEPROC_IMX
+	select IMX_SM_LMM
+	select IMX_SM_CPU
 
 config TARGET_IMX95_15X15_FRDM
 	bool "imx95_15x15_frdm"
 	select IMX95
 	imply BOOTSTD_BOOTCOMMAND
 	imply BOOTSTD_FULL
+	select CMD_REMOTEPROC
+	select REMOTEPROC_IMX
+	select IMX_SM_LMM
+	select IMX_SM_CPU
 
 config TARGET_IMX943_EVK
 	bool "imx943_evk"
