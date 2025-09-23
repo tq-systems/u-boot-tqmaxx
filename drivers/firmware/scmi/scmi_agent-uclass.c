@@ -108,6 +108,9 @@ struct udevice *scmi_get_protocol(struct udevice *dev,
 	case SCMI_PROTOCOL_ID_VENDOR_80:
 		proto = priv->vendor_80_dev;
 		break;
+	case SCMI_PROTOCOL_ID_VENDOR_82:
+		proto = priv->vendor_82_dev;
+		break;
 	default:
 		dev_err(dev, "Protocol not supported\n");
 		proto = NULL;
@@ -166,6 +169,9 @@ static int scmi_add_protocol(struct udevice *dev,
 		break;
 	case SCMI_PROTOCOL_ID_VENDOR_80:
 		priv->vendor_80_dev = proto;
+		break;
+	case SCMI_PROTOCOL_ID_VENDOR_82:
+		priv->vendor_82_dev = proto;
 		break;
 	default:
 		dev_err(dev, "Protocol not supported\n");
@@ -486,6 +492,11 @@ static int scmi_bind_protocols(struct udevice *dev)
 			if (IS_ENABLED(CONFIG_IMX_SM_LMM) &&
 			    scmi_protocol_is_supported(dev, protocol_id))
 				drv = DM_DRIVER_GET(scmi_imx_lmm);
+			break;
+		case SCMI_PROTOCOL_ID_VENDOR_82:
+			if (IS_ENABLED(CONFIG_IMX_SM_CPU) &&
+			    scmi_protocol_is_supported(dev, protocol_id))
+				drv = DM_DRIVER_GET(scmi_imx_cpu);
 			break;
 		default:
 			break;

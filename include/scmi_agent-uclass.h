@@ -47,6 +47,7 @@ struct scmi_agent_priv {
 	struct udevice *pinctrl_dev;
 	struct udevice *sensor_dev;
 	struct udevice *vendor_80_dev;
+	struct udevice *vendor_82_dev;
 };
 
 static inline u32 scmi_version(struct udevice *dev)
