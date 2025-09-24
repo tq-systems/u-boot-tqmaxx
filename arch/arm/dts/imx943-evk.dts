@@ -125,6 +125,17 @@
 		clock-output-names = "xtal_25MHz";
 	};
 
+	cm70: imx943-cm70 {
+		compatible = "fsl,imx94-cm70";
+	};
+
+	cm71: imx943-cm71 {
+		compatible = "fsl,imx94-cm71";
+	};
+
+	cm33s: imx943-cm33s {
+		compatible = "fsl,imx94-cm33s";
+	};
 };
 
 &lpi2c3 {

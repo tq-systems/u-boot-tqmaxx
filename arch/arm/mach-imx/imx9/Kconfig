@@ -198,6 +198,10 @@ config TARGET_IMX95_15X15_FRDM
 config TARGET_IMX943_EVK
 	bool "imx943_evk"
 	select IMX94
+	select CMD_REMOTEPROC
+	select REMOTEPROC_IMX
+	select IMX_SM_LMM
+	select IMX_SM_CPU
 	imply BOOTSTD_BOOTCOMMAND
 	imply BOOTSTD_FULL
 
