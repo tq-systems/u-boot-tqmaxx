@@ -55,3 +55,9 @@ config EFI_GBL_FASTBOOT
 	  This protocol provides interfaces for platform-specific operations during Fastboot.
 	  This can include support for vendor defined variables or variables whose query requires
 	  cooperation with vendor firmware, OEM commands.
+
+config EFI_GBL_VENDOR_PARTITION
+	bool "Include GBL vendor partisions"
+	depends on EFI_LOADER
+	help
+	  This service will register GBL vendor defined partitions.
