@@ -24,6 +24,8 @@
 #include "../common/tqc_bb.h"
 #include "../common/tqc_board_gpio.h"
 
+#include "tqma8mx-usbg.h"
+
 DECLARE_GLOBAL_DATA_PTR;
 
 #define TQMA8MX_BB_NAME "MBa8Mx"
@@ -248,10 +250,14 @@ int board_usb_init(int index, enum usb_init_type init)
 		gpio = &mba8mx_gid[USB1_OTG_PWR].desc;
 		switch (init) {
 		case USB_INIT_DEVICE:
-			if (otg_id)
+			if (otg_id) {
 				dm_gpio_set_value(gpio, 0);
-			else
+#ifdef CONFIG_USB_DWC3_GADGET
+				ret = tqma8mx_usb_dwc3_gadget_init(USB_SPEED_SUPER);
+#endif
+			} else {
 				ret = -ENODEV;
+			}
 			break;
 		case USB_INIT_HOST:
 			if (!otg_id)
@@ -291,6 +297,7 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 		gpio = &mba8mx_gid[USB1_OTG_PWR].desc;
 		switch (init) {
 		case USB_INIT_DEVICE:
+			dwc3_uboot_exit(index);
 			break;
 		case USB_INIT_HOST:
 			break;

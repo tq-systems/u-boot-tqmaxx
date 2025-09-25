@@ -5,7 +5,7 @@
 ## Author: Markus Niebel
 ##
 
-obj-y += tqma8mx.o
+obj-y += tqma8mx.o tqma8mx-usbg.o
 obj-$(CONFIG_TQMA8MX_BB_MBA8MX) += tqma8mx-mba8mx.o
 
 ifdef CONFIG_SPL_BUILD

@@ -77,7 +77,8 @@ config TQMA8MX_MFG_SUPPORT
 	select USB
 	select DM_USB
 	select USB_GADGET
-	select DM_USB_GADGET
+	select USB_GADGET_DOWNLOAD
+	select USB_DWC3
 	select USB_GADGET_DUALSPEED
 	select USB_XHCI_HCD
 	select USB_XHCI_IMX8M
