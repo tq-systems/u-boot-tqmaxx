@@ -89,6 +89,8 @@ config TARGET_IMX93_9X9_QSB
 	imply BOOTSTD_BOOTCOMMAND
 	select CMD_REMOTEPROC
 	select REMOTEPROC_IMX
+	select REGMAP
+	select SYSCON
 
 config TARGET_IMX91_11X11_FRDM
 	bool "imx91_11x11_frdm"
@@ -123,6 +125,8 @@ config TARGET_IMX93_14X14_EVK
 	imply BOOTSTD_BOOTCOMMAND
 	select CMD_REMOTEPROC
 	select REMOTEPROC_IMX
+	select REGMAP
+	select SYSCON
 
 config TARGET_IMX93_11X11_EVK
 	bool "imx93_11x11_evk"
@@ -133,6 +137,8 @@ config TARGET_IMX93_11X11_EVK
 	imply BOOTSTD_BOOTCOMMAND
 	select CMD_REMOTEPROC
 	select REMOTEPROC_IMX
+	select REGMAP
+	select SYSCON
 
 config TARGET_IMX93_11X11_FRDM
 	bool "imx93_11x11_frdm"
@@ -142,6 +148,8 @@ config TARGET_IMX93_11X11_FRDM
 	imply BOOTSTD_BOOTCOMMAND
 	select CMD_REMOTEPROC
 	select REMOTEPROC_IMX
+	select REGMAP
+	select SYSCON
 
 config TARGET_IMX93_VAR_SOM
 	bool "imx93_var_som"
@@ -162,6 +170,8 @@ config TARGET_IMX95_19X19_EVK
 	imply BOOTSTD_FULL
 	select CMD_REMOTEPROC
 	select REMOTEPROC_IMX
+	select REGMAP
+	select SYSCON
 	select IMX_SM_LMM
 	select IMX_SM_CPU
 
@@ -172,6 +182,8 @@ config TARGET_VERDIN_IMX95_19X19
 	imply BOOTSTD_FULL
 	select CMD_REMOTEPROC
 	select REMOTEPROC_IMX
+	select REGMAP
+	select SYSCON
 	select IMX_SM_LMM
 	select IMX_SM_CPU
 
@@ -182,6 +194,8 @@ config TARGET_IMX95_15X15_EVK
 	imply BOOTSTD_FULL
 	select CMD_REMOTEPROC
 	select REMOTEPROC_IMX
+	select REGMAP
+	select SYSCON
 	select IMX_SM_LMM
 	select IMX_SM_CPU
 
@@ -192,6 +206,8 @@ config TARGET_IMX95_15X15_FRDM
 	imply BOOTSTD_FULL
 	select CMD_REMOTEPROC
 	select REMOTEPROC_IMX
+	select REGMAP
+	select SYSCON
 	select IMX_SM_LMM
 	select IMX_SM_CPU
 
@@ -200,6 +216,8 @@ config TARGET_IMX943_EVK
 	select IMX94
 	select CMD_REMOTEPROC
 	select REMOTEPROC_IMX
+	select REGMAP
+	select SYSCON
 	select IMX_SM_LMM
 	select IMX_SM_CPU
 	imply BOOTSTD_BOOTCOMMAND
