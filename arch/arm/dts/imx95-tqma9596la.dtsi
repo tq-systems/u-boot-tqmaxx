@@ -9,7 +9,8 @@
 /dts-v1/;
 
 #include <dt-bindings/net/ti-dp83867.h>
-#include "imx95.dtsi"
+#include "../dts/upstream/src/arm64/freescale/imx95.dtsi"
+#include "imx95-u-boot.dtsi"
 
 / {
 	memory@80000000 {
