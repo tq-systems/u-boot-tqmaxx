@@ -59,6 +59,15 @@ config TQMA93XX_BB_MBA93XXLA
 	  Select the MBa93xxLA SBC. This mainboard has the LGA SOM
 	  variant assembled.
 
+config TQMA93XX_BB_MBA93XXLA_MINI
+	bool "MBa93xxLA-MINI SBC"
+	select DM_GPIO
+	select ENV_IS_NOWHERE
+	select TQMA93XX_DEFAULTS
+	help
+	  Select the MBa93xxLA-MINI SBC. This mainboard has the LGA SOM
+	  variant assembled.
+
 endchoice
 
 source "board/tq/common/Kconfig"

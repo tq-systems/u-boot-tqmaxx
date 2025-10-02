@@ -1,0 +1,74 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2022-2024 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Martin Schmiedel
+ */
+
+/*
+ * include the generic, SOM specific part of U-Boot modifications
+ * for device tree
+ */
+#include "imx93-tqma9352-u-boot.dtsi"
+
+/ {
+	aliases {
+		usbgadget0 = &usbg1;
+	};
+
+	config {
+		u-boot,mmc-env-offset = <0x400000>;
+		u-boot,mmc-env-offset-redundant = <0x410000>;
+	};
+
+	usbg1: usbg1 {
+		compatible = "fsl,imx27-usb-gadget";
+		dr_mode = "peripheral";
+		chipidea,usb = <&usbotg1>;
+	};
+};
+
+&gpio1 {
+	rtc-irq-hog {
+		gpio-hog;
+		gpios = <14 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "RTC_EVENT#";
+	};
+};
+
+&gpio3 {
+	ethphy-eqos-irq-hog {
+		gpio-hog;
+		gpios = <26 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "ENET1_INT#";
+	};
+
+	ethphy-fec-irq-hog {
+		gpio-hog;
+		gpios = <27 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "ENET2_INT#";
+	};
+};
+
+&lpuart1 {
+	bootph-pre-ram;
+	bootph-some-ram;
+};
+
+&pinctrl_uart1 {
+	bootph-pre-ram;
+	bootph-some-ram;
+};
+
+&reg_usdhc2_vmmc {
+	u-boot,off-on-delay-us = <20000>;
+};
+
+&usdhc2 {
+	fsl,signal-voltage-switch-extra-delay-ms = <8>;
+	sd-uhs-sdr104;
+	sd-uhs-ddr50;
+};

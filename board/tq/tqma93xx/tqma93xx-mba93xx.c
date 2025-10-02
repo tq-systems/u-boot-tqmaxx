@@ -128,6 +128,18 @@ static struct tq_gpio_init_data mba93xx_gid[] = {
 			     GPIOD_IS_OUT_ACTIVE),
 };
 
+#elif CONFIG_IS_ENABLED(TQMA93XX_BB_MBA93XXLA_MINI)
+
+enum {
+	/* expander @70 */
+	V12V_EN,
+};
+
+static struct tq_gpio_init_data mba93xx_gid[] = {
+	/* expander @70 */
+	GPIO_INIT_DATA_ENTRY(V12V_EN, "gpio@70_7", GPIOD_IS_OUT),
+};
+
 #else
 #error "Mainboard not supported"
 #endif
@@ -138,7 +150,8 @@ const char *tq_bb_get_boardname(void)
 		return "MBa93xxCA";
 	else if (CONFIG_IS_ENABLED(TQMA93XX_BB_MBA93XXLA))
 		return "MBa93xxLA";
-
+	else if (CONFIG_IS_ENABLED(TQMA93XX_BB_MBA93XXLA_MINI))
+		return "MBa93xxLA-MINI";
 	return "Unknown";
 }
 
@@ -223,6 +236,58 @@ int board_ehci_usb_phy_mode(struct udevice *dev)
 	return USB_INIT_DEVICE;
 }
 
+static int usbotg1_init(enum usb_init_type init)
+{
+	int ret;
+
+	debug("USB1/Type-C\n");
+	switch (init) {
+	case USB_INIT_DEVICE:
+		ret = tcpc_setup_ufp_mode(&typec_port);
+		break;
+	case USB_INIT_HOST:
+	default:
+		printf("USB1: unsupported init type\n");
+			ret = -EINVAL;
+	}
+
+	return ret;
+}
+
+static int usbotg1_deinit(enum usb_init_type init)
+{
+	int ret = 0;
+
+	debug("USB1/Type-C\n");
+	if (init == USB_INIT_HOST)
+		ret = tcpc_disable_src_vbus(&typec_port);
+
+	return ret;
+}
+
+#else
+
+static int usbotg1_init(enum usb_init_type init)
+{
+	if (init != USB_INIT_DEVICE)
+		return -ENODEV;
+
+	return 0;
+}
+
+static int usbotg1_deinit(enum usb_init_type init)
+{
+	if (init != USB_INIT_DEVICE)
+		return -ENODEV;
+
+	return 0;
+}
+
+static int setup_typec(void)
+{
+	return 0;
+}
+
 #endif
 
 int board_usb_init(int index, enum usb_init_type init)
@@ -230,20 +295,9 @@ int board_usb_init(int index, enum usb_init_type init)
 	int ret = 0;
 
 	switch (index) {
-#if CONFIG_IS_ENABLED(USB_TCPC)
 	case 0:
-		debug("USB1/Type-C\n");
-		switch (init) {
-		case USB_INIT_DEVICE:
-			ret = tcpc_setup_ufp_mode(&typec_port);
-			break;
-		case USB_INIT_HOST:
-		default:
-			printf("USB1: unsupported init type\n");
-			ret = -EINVAL;
-		}
+		ret = usbotg1_init(init);
 		break;
-#endif
 	case 1:
 		debug("USB2/HUB\n");
 		break;
@@ -260,13 +314,9 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 	int ret = 0;
 
 	switch (index) {
-#if CONFIG_IS_ENABLED(USB_TCPC)
 	case 0:
-		debug("USB1/Type-C\n");
-		if (init == USB_INIT_HOST)
-			ret = tcpc_disable_src_vbus(&typec_port);
+		ret = usbotg1_deinit(init);
 		break;
-#endif
 	case 1:
 		debug("USB2/HUB\n");
 		break;

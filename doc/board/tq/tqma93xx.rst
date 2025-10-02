@@ -43,6 +43,12 @@ The following combinations of base board and SOM are supported:
 
   * `tqma93xx_mba93xxla_uuu_defconfig`
 
+* TQ-Systems TQMa93xxLA (REV.010x) soldered on MBa93xxLA-MINI (REV.010x)
+
+  * `tqma93xx_mba93xxla_mini_defconfig`
+
+  * `tqma93xx_mba93xxla_mini_uuu_defconfig`
+
 Boot sequence
 -------------
 
