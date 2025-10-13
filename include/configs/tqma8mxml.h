@@ -75,7 +75,7 @@
 #define CONFIG_REMAKE_ELF
 
 #define CONFIG_MFG_ENV_SETTINGS \
-	CONFIG_MFG_ENV_SETTINGS_DEFAULT \
+	"bootcmd_mfg=" FASTBOOT_CMD "\0" \
 	"initrd_addr=0x43800000\0" \
 	"initrd_high=0xffffffffffffffff\0" \
 	"emmc_dev=0\0"\
