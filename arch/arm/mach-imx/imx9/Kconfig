@@ -5,6 +5,14 @@ config AHAB_BOOT
     help
     This option enables the support for AHAB secure boot.
 
+config SPL_IMX_BBSM
+    bool "Support BBSM Tamper Detection feature"
+	depends on IMX93
+	default n
+    help
+      This option enables the support for BBSM Tamper Detection. This option is
+      only supported on i.MX93.
+
 config IMX_CRRM
     bool "Support i.MX9 cyber resilient recovery module (CRRM)"
 	depends on IMX94
