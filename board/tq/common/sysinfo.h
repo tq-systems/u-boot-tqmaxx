@@ -6,10 +6,14 @@
  * Author: Matthias Schiffer
  */
 
+#ifndef __BOARD_TQ_COMMON_SYSINFO_H
+
 #ifndef CONFIG_XPL_BUILD
 
 size_t tq_common_sysinfo_macaddr_num(void);
 void tq_common_sysinfo_setup(void);
 void tq_common_sysinfo_ft_board_setup(void *fdt);
+
+#endif
 
 #endif

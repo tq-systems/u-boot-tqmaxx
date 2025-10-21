@@ -6,4 +6,12 @@
  * Author: Matthias Schiffer
  */
 
+#ifndef __BOARD_TQ_COMMON_COMMON_H
+
+#ifndef CONFIG_XPL_BUILD
+
 void tq_common_setup_boot_targets(void);
+
+#endif
+
+#endif
