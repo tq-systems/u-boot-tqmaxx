@@ -6,6 +6,21 @@
 if SOC_K3_AM625
 
 choice
+	prompt "AM625 Nominal VDD_CORE voltage"
+	default K3_CORE_VOLTAGE_0V75
+
+config K3_CORE_VOLTAGE_0V75
+	bool "0.75V"
+
+config K3_CORE_VOLTAGE_0V85
+	bool "0.85V"
+
+config K3_CORE_VOLTAGE_BOARD
+	bool "Board-defined"
+
+endchoice
+
+choice
 	prompt "K3 AM62x based boards"
 	optional
 
