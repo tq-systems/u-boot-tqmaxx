@@ -70,6 +70,10 @@ void spl_perform_fixups(struct spl_image_info *spl_image)
 
 	/* Apply USB dr_mode fixup */
 	fdtdec_board_setup(spl_image->fdt_addr);
+
+#if IS_ENABLED(CONFIG_TQ_COMMON_SPL_BOARD_SETUP)
+	tq_common_spl_board_setup(spl_image->fdt_addr);
+#endif
 }
 
 #else /* CONFIG_XPL_BUILD */

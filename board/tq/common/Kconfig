@@ -2,6 +2,10 @@
 #
 # Copyright (c) 2025 TQ-Systems GmbH <u-boot@ew.tq-group.com>, D-82229 Seefeld, Germany.
 
+config TQ_COMMON_SPL_BOARD_SETUP
+	bool
+	depends on SPL
+
 config TQ_COMMON_SYSINFO
 	bool
 
