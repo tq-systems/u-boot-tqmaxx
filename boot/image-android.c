@@ -31,6 +31,9 @@
 #include <trusty/libtipc.h>
 #include <trusty/hwcrypto.h>
 #endif
+#ifdef CONFIG_INCLUDE_DTB_TO_VENDOR_BOOT
+#include <imx_android_dt_mapping.h>
+#endif
 
 #define ANDROID_IMAGE_DEFAULT_KERNEL_ADDR	0x10008000
 #define ANDROID_IMAGE_DEFAULT_RAMDISK_ADDR	0x11000000
@@ -467,8 +470,10 @@ static int append_androidboot_args(char *args, uint32_t *len, void *fdt_addr)
 	 * partition and haven't enabled the dtb overlay.
 	 */
 #if defined(CONFIG_ANDROID_SUPPORT) || defined(CONFIG_ANDROID_AUTO_SUPPORT)
+#ifndef CONFIG_INCLUDE_DTB_TO_VENDOR_BOOT
 	sprintf(args_buf," androidboot.dtbo_idx=0");
 	strncat(args, args_buf, *len - strlen(args));
+#endif
 #endif
 
 	char *keystore = env_get("keystore");
@@ -915,6 +920,51 @@ int imx_android_dt_fixup(void *fdt_addr) {
 	return 0;
 
 }
+
+#ifdef CONFIG_INCLUDE_DTB_TO_VENDOR_BOOT
+int get_imx_android_fdt_id(void) {
+	int i = 0;
+	char *fdt_name = NULL;
+
+	fdt_name = env_get("fdt_name");
+	if (!fdt_name) {
+		printf("Warning: Default fdt_name is not set, falling back to default fdt: %s!\n", imx_android_default_fdt_name);
+		fdt_name = (char *)imx_android_default_fdt_name;
+	}
+
+	if (!strlen(fdt_name)) {
+		printf("Error: Wrong fdt_name!\n");
+		return -1;
+	}
+
+	for (i = 0; imx_android_dt_mapping[i] != NULL; i++) {
+		if (!strncmp(fdt_name, imx_android_dt_mapping[i], strlen(fdt_name))) {
+			printf("Found fdt(%s) with id:%d.\n", fdt_name, i);
+			return i;
+		}
+	}
+
+	//No fdt found, fail.
+	return -1;
+}
+
+int do_show_fdt_list(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[]) {
+	int i = 0;
+
+	printf("Below android dtbs are supported:\n");
+	for (i = 0; imx_android_dt_mapping[i] != NULL; i++) {
+		printf("%s\n", imx_android_dt_mapping[i]);
+	}
+
+	return 0;
+}
+
+U_BOOT_CMD(
+	show_fdt_list,	1,	1,	do_show_fdt_list,
+	"show_fdt_list \n",
+	"show_fdt_list - Show all supported android dtbs \n"
+);
+#endif /* CONFIG_INCLUDE_DTB_TO_VENDOR_BOOT */
 #endif /* CONFIG_ANDROID_SUPPORT || CONFIG_ANDROID_AUTO_SUPPORT */
 
 bool is_android_vendor_boot_image_header(const void *vendor_boot_img)

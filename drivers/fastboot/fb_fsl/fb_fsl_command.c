@@ -211,6 +211,16 @@ bool endswith(char* s, char* subs) {
         return true;
 }
 
+bool is_command(char *s, char *subs) {
+	if (!s || !subs)
+		return false;
+
+	if (strstr(s, subs))
+		return true;
+	else
+		return false;
+}
+
 #ifdef CONFIG_ANDROID_RECOVERY
 /**
  * reboot_fastboot() - Sets reboot fastboot flag.
@@ -905,6 +915,24 @@ void flashing(char *cmd, char *response)
 			printf("flashing get_unlock_ability fail!\n");
 			strcpy(response, "FAILget unlock ability failed.");
 		}
+#ifdef CONFIG_INCLUDE_DTB_TO_VENDOR_BOOT
+	} else if (is_command(cmd, "set-fdt-name")) {
+		char *fdt_name = strstr(cmd, "set-fdt-name") + strlen("set-fdt-name");
+		if (fdt_name[0] != '=' || strlen(fdt_name) == 1) {
+			printf("empty fdt_name provided!\n");
+			strcpy(response, "FAILWrong fdt_name!");
+		} else {
+			/* skip the "=" */
+			fdt_name = fdt_name + 1;
+			if (env_set("fdt_name", fdt_name) || env_save()) {
+				printf("Can't set and save fdt_name!\n");
+				strcpy(response, "FAILCan't set fdt_name!");
+			} else {
+				printf("setting the fdt_name to: %s\n", fdt_name);
+				strcpy(response, "OKAY");
+			}
+		}
+#endif
 	} else {
 		printf("Unknown flashing command:%s\n", cmd);
 		strcpy(response, "FAILcommand not defined");

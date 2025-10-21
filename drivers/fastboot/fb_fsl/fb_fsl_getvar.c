@@ -76,6 +76,9 @@ char *fastboot_common_var[] = {
 #endif
 	"tee_enabled",
 	"soc_rev",
+#ifdef CONFIG_INCLUDE_DTB_TO_VENDOR_BOOT
+	"fdt_name",
+#endif
 	NULL,
 };
 
@@ -449,6 +452,12 @@ int get_single_var(char *cmd, char *response)
 		strncat(response, FASTBOOT_VAR_NO, chars_left);
 #endif
 	}
+#ifdef CONFIG_INCLUDE_DTB_TO_VENDOR_BOOT
+	else if (!strcmp_l1("fdt_name", cmd)) {
+		char *fdt_name = env_get("fdt_name");
+		strncat(response, fdt_name ? fdt_name : "N/A", chars_left);
+	}
+#endif
 	else {
 		char envstr[32];
 

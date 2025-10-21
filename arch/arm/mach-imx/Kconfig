@@ -379,6 +379,7 @@ config IMX_ANDROID_GBL
 	select EFI_GBL_FASTBOOT_TRANSPORT
 	select EFI_GBL_FASTBOOT
 	select EFI_GBL_VENDOR_PARTITION
+	select INCLUDE_DTB_TO_VENDOR_BOOT
 	help
 	  Load and boot the Android image by Android Generic Bootloader (GBL),
 	  which is an UEFI application distributed by Google.
@@ -512,6 +513,10 @@ config ANDROID_DYNAMIC_PARTITION
 config VIRTUAL_AB_SUPPORT
 	bool "Support virtual AB update"
 	select ANDROID_DYNAMIC_PARTITION
+
+config INCLUDE_DTB_TO_VENDOR_BOOT
+	bool "Include the dtb into vendor_boot image"
+	default n
 
 config BOOTLOADER_MENU
 	bool "Enable bootloader menu for android device"

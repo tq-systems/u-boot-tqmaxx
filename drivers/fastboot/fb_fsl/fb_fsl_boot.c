@@ -592,7 +592,11 @@ end:
 
 #if defined(CONFIG_AVB_SUPPORT) && defined(CONFIG_MMC)
 /* we can use avb to verify Trusty if we want */
+#ifdef CONFIG_INCLUDE_DTB_TO_VENDOR_BOOT
+const char *requested_partitions_boot[] = {"boot", "vendor_boot", "init_boot", NULL};
+#else
 const char *requested_partitions_boot[] = {"boot", "dtbo", "vendor_boot", "init_boot", NULL};
+#endif
 const char *requested_partitions_recovery[] = {"recovery", NULL};
 
 int get_boot_header_version(void)
@@ -1036,12 +1040,24 @@ int do_boota(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[]) {
 	}
 
 #ifdef CONFIG_SYSTEM_RAMDISK_SUPPORT
+#ifdef CONFIG_INCLUDE_DTB_TO_VENDOR_BOOT
+	/* The dtb image is included to the vendor_boot partition */
+	if (boot_header_version != 4) {
+		printf("Unsupported boot header version: %d\n", boot_header_version);
+		goto fail;
+	}
+
+	dt_img = (struct dt_table_header *)((void *)(ulong)vendor_boot_hdr_v4 + \
+			ALIGN(sizeof(struct vendor_boot_img_hdr_v4), vendor_boot_hdr_v4->page_size) + \
+			ALIGN(vendor_boot_hdr_v4->vendor_ramdisk_size, vendor_boot_hdr_v4->page_size));
+#else /* CONFIG_INCLUDE_DTB_TO_VENDOR_BOOT */
 	/* It means boot.img(recovery) do not include dtb, it need load dtb from partition */
 	if (find_partition_data_by_name("dtbo",
 				avb_out_data, &avb_loadpart)) {
 		goto fail;
 	} else
 		dt_img = (struct dt_table_header *)avb_loadpart->data;
+#endif /* CONFIG_INCLUDE_DTB_TO_VENDOR_BOOT */
 #else
 	/* recovery.img include dts while boot.img use dtbo */
 	if (is_recovery_mode) {
@@ -1072,8 +1088,25 @@ int do_boota(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[]) {
 	}
 
 	struct dt_table_entry *dt_entry;
+#ifdef CONFIG_INCLUDE_DTB_TO_VENDOR_BOOT
+	int fdt_id = get_imx_android_fdt_id();
+	if (fdt_id < 0) {
+		printf("Failed to select device tree!\n");
+		goto fail;
+	}
+
+	dt_entry = (struct dt_table_entry *)((ulong)dt_img + \
+			be32_to_cpu(dt_img->dt_entries_offset) + \
+			fdt_id * be32_to_cpu(dt_img->dt_entry_size));
+	/* Double check the id */
+	if (fdt_id != be32_to_cpu(dt_entry->id)) {
+		printf("Wrong dtb id found, expect: %d, found: %d\n", fdt_id, be32_to_cpu(dt_entry->id));
+		goto fail;
+	}
+#else /* CONFIG_INCLUDE_DTB_TO_VENDOR_BOOT */
 	dt_entry = (struct dt_table_entry *)((ulong)dt_img +
 			be32_to_cpu(dt_img->dt_entries_offset));
+#endif /* CONFIG_INCLUDE_DTB_TO_VENDOR_BOOT */
 	fdt_size = be32_to_cpu(dt_entry->dt_size);
 	memcpy((void *)(ulong)fdt_addr, (void *)((ulong)dt_img +
 			be32_to_cpu(dt_entry->dt_offset)), fdt_size);
