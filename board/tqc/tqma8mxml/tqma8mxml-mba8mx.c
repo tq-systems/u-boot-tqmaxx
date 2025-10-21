@@ -299,26 +299,20 @@ int board_usb_init(int index, enum usb_init_type init)
 	}
 #endif
 
-#if defined(CONFIG_IMX8MN)
 	if (index == 0) {
-		if (dm_gpio_get_value(&mba8mx_gid[SEL_USB_HUB_B].desc)) {
-			debug("init: USB0/HUB\n");
-			if (init != USB_INIT_HOST) {
-				debug("USB0/HUB: wrong init type\n");
+		if (init == USB_INIT_DEVICE) {
+#if defined(CONFIG_IMX8MN)
+			gpio = &mba8mx_gid[SEL_USB_HUB_B].desc;
+			if (dm_gpio_get_value(gpio)) {
+				puts("USB0/OTG: invalid SEL_USB_HUB\n");
 				ret = -EINVAL;
-			} else {
-				gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
-				dm_gpio_set_value(gpio, 1);
-				udelay(100);
-				dm_gpio_set_value(gpio, 0);
-				udelay(1000);
-				debug("USB0/HUB: hub reset\n");
 			}
+#endif
 		} else {
-			debug("init: USB0/OTG\n");
+			debug("USB0: host not supported\n");
+			ret = -EINVAL;
 		}
 	}
-#endif
 	return ret;
 }
 
@@ -344,13 +338,11 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 
 #if defined(CONFIG_IMX8MM)
 	if (index == 1) {
-#elif defined(CONFIG_IMX8MN)
-	if (index == 0) {
-#endif
 		debug("USB/HUB\n");
 		gpio = &mba8mx_gid[RST_USB_HUB_B].desc;
 		dm_gpio_set_value(gpio, 1);
 	}
+#endif
 
 	return 0;
 }
