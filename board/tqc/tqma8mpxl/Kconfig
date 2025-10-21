@@ -83,7 +83,7 @@ config TQMA8MPXL_MFG_SUPPORT
 	bool "MFG Tool support"
 	select USB_GADGET
 	select USB_GADGET_DOWNLOAD
-	select CONFIG_USB_DWC3
+	select USB_DWC3
 	select USB_FUNCTION_SDP
 	select USB_FUNCTION_FASTBOOT
 	select FASTBOOT_UUU_SUPPORT
