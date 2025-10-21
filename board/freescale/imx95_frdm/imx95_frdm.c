@@ -24,6 +24,7 @@
 #include <dm/uclass-internal.h>
 
 extern int board_fix_fdt_fuse(void *fdt);
+static int get_board_version(int *rev, int *data);
 
 int board_early_init_f(void)
 {
@@ -93,6 +94,8 @@ void tca_mux_select(enum typec_cc_polarity pol)
 static void setup_typec(void)
 {
 	int ret;
+	unsigned int rev[2];
+	unsigned int data[2];
 
 	tca_base = USB1_BASE_ADDR + 0xfc000;
 
@@ -106,10 +109,23 @@ static void setup_typec(void)
 		printf("Power supply on USB PD\n");
 
 		/* Enable EXT PWR */
-		ret = dm_gpio_lookup_name("GPIO5_9", &ext_pwr_desc);
-		if (ret) {
-			printf("%s lookup GPIO5_9 failed ret = %d\n", __func__, ret);
-			return;
+		ret = get_board_version(rev, data);
+		if (ret == 0) {
+			if (rev[0] < 1) {
+				ret = dm_gpio_lookup_name("GPIO5_9", &ext_pwr_desc);
+				if (ret) {
+					printf("%s lookup GPIO5_9 failed ret = %d\n",
+					       __func__, ret);
+					return;
+				}
+			} else {
+				ret = dm_gpio_lookup_name("gpio@22_12", &ext_pwr_desc);
+				if (ret) {
+					printf("%s lookup gpio@22_12 failed ret = %d\n",
+					       __func__, ret);
+					return;
+				}
+			}
 		}
 
 		ret = dm_gpio_request(&ext_pwr_desc, "ext_pwr_en");
