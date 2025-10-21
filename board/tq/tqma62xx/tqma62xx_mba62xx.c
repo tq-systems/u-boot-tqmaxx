@@ -11,6 +11,7 @@
 
 #include "../common/common.h"
 #include "../common/sysinfo.h"
+#include "tqma62xx.h"
 
 int board_late_init(void)
 {
@@ -23,6 +24,7 @@ int board_late_init(void)
 int ft_board_setup(void *blob, struct bd_info *bd)
 {
 	tq_common_sysinfo_ft_board_setup(blob);
+	tqma62xx_ft_board_setup(blob);
 	return 0;
 }
 #endif

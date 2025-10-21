@@ -47,3 +47,7 @@
 	reg-names = "gcfg", "rchanrt", "tchanrt", "ringrt",
 		    "cfg", "tchan", "rchan", "rflow";
 };
+
+&reg_buck1 {
+	bootph-all;
+};
