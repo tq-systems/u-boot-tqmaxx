@@ -152,6 +152,21 @@ static inline int k3_get_max_temp(void)
 	}
 }
 
+#if IS_ENABLED(CONFIG_K3_CORE_VOLTAGE_0V75)
+static inline bool k3_is_core_voltage_0v85(void)
+{
+	return false;
+}
+#elif IS_ENABLED(CONFIG_K3_CORE_VOLTAGE_0V85)
+static inline bool k3_is_core_voltage_0v85(void)
+{
+	return true;
+}
+#else
+/* Provided by board */
+bool k3_is_core_voltage_0v85(void);
+#endif
+
 static inline int k3_get_a53_max_frequency(void)
 {
 	switch (k3_get_speed_grade()) {
@@ -160,6 +175,8 @@ static inline int k3_get_a53_max_frequency(void)
 	case 'S':
 		return 1000000000;
 	case 'T':
+		if (k3_is_core_voltage_0v85())
+			return 1400000000;
 		return 1250000000;
 	case 'G':
 	default:
