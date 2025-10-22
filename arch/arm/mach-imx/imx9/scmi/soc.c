@@ -987,21 +987,24 @@ int power_on_m7(char *name)
 
 static char *get_cpu_variant_type_name(u32 type)
 {
+	u32 val, core_num, part_num;
+	int ret;
+
+	ret = fuse_read(2, 1, &val);
+	if (ret)
+		return NULL;
+
+	/* Get part num */
+	part_num = (val >> 4) & 0xff;
+	if (!part_num)
+		return NULL;
+
 	if (type == MXC_CPU_IMX95) {
-		u32 val = 0, core, segment;
-		int ret;
+		u32 segment;
 		static char *name = "9596";
 
-		ret = fuse_read(2, 1, &val);
-		if (ret)
-			return NULL;
-
-		val = (val >> 4) & 0xff; /* part num */
-		if (!val)
-			return NULL;
-
-		core = val & 0x3;
-		segment = (val >> 2) & 0xf;
+		core_num = part_num & 0x3;
+		segment = (part_num >> 2) & 0xf;
 
 		switch (segment) {
 		case 0xa:
@@ -1027,7 +1030,31 @@ static char *get_cpu_variant_type_name(u32 type)
 			break;
 		}
 
-		name[3] = core * 2 + '0';
+		name[3] = core_num * 2 + '0';
+
+		return name;
+	} else if (type == MXC_CPU_IMX94) {
+		static char *name = "94398";
+		core_num = 8;
+
+		ret = fuse_read(2, 2, &val);
+		if (ret)
+			return NULL;
+
+		if (part_num > 30) { /* 943 */
+			/* A55 2 & 3 disabled */
+			if ((val & 0x18) == 0x18)
+				core_num = 6;
+		} else if (part_num > 20) { /* 942 */
+			core_num = 5;
+
+			/* m7_0 disabled */
+			if ((val & 0x200) == 0x200)
+				core_num = 4;
+		} else if (part_num > 10) { /* 941 */
+			core_num = 5;
+		}
+		sprintf(name, "94%u%u", part_num, core_num);
 
 		return name;
 	}
