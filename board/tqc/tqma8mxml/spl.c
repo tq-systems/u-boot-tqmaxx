@@ -331,7 +331,7 @@ void spl_board_init(void)
 {
 #ifndef CONFIG_SPL_USB_SDP_SUPPORT
 	/* Serial download mode */
-	if (is_usb_boot()) {
+	if (is_usb_boot() && is_imx8mm()) {
 		puts("Back to ROM, SDP\n");
 		restore_boot_params();
 	}
