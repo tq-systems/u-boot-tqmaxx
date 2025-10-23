@@ -49,8 +49,8 @@ struct tcpc_port_config portpd_config = {
 	.addr = 0x52,
 	.port_type = TYPEC_PORT_UFP,
 	.max_snk_mv = 20000,
-	.max_snk_ma = 3000,
-	.max_snk_mw = 15000,
+	.max_snk_ma = 5000,
+	.max_snk_mw = 100000,
 	.op_snk_mv = 9000,
 };
 
