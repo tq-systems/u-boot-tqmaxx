@@ -80,7 +80,7 @@ static inline struct f_fastboot *func_to_fastboot(struct usb_function *f)
 	return container_of(f, struct f_fastboot, usb_function);
 }
 
-static struct f_fastboot *fastboot_func;
+struct f_fastboot *fastboot_func;
 
 static struct usb_endpoint_descriptor fs_ep_in = {
 	.bLength            = USB_DT_ENDPOINT_SIZE,
