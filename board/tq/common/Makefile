@@ -13,6 +13,10 @@ obj-$(CONFIG_TQ_COMMON_SDMMC) += tq_sdmmc.o
 obj-$(CONFIG_TQ_COMMON_SPI_NOR) += tq_spi_nor.o
 obj-$(CONFIG_TQ_COMMON_VARD) += tq_som_features.o
 
+ifdef CONFIG_IMX9
+obj-$(CONFIG_SCMI_FIRMWARE) += imx9-scmi.o
+endif
+
 ifndef CONFIG_XPL_BUILD
 obj-$(CONFIG_TQ_COMMON_TCPC) += tcpc.o
 endif
