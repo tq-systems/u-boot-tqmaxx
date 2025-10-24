@@ -17,32 +17,14 @@
 #include <asm/arch/sys_proto.h>
 #include <asm/arch-imx9/ccm_regs.h>
 #include <asm/mach-imx/boot_mode.h>
-#include <dm/uclass.h>
 #include <jffs2/load_kernel.h>
 #include <linux/bitfield.h>
 #include <linux/bitops.h>
 #include <linux/delay.h>
+#include "../common/imx9-scmi.h"
 #include "../common/tq_bb.h"
 
-#ifdef CONFIG_SCMI_FIRMWARE
-#include <scmi_agent.h>
-#include <scmi_protocols.h>
-#include "../dts/upstream/src/arm64/freescale/imx95-power.h"
-#endif
-
 DECLARE_GLOBAL_DATA_PTR;
-
-static int imx9_scmi_power_domain_enable(u32 domain, bool enable)
-{
-	struct udevice *dev;
-	int ret;
-
-	ret = uclass_get_device_by_name(UCLASS_CLK, "protocol@14", &dev);
-	if (ret)
-		return ret;
-
-	return scmi_pwd_state_set(dev, 0, domain, enable ? 0 : BIT(30));
-}
 
 #ifdef CONFIG_USB_DWC3
 

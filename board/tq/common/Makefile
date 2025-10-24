@@ -16,6 +16,10 @@ obj-$(CONFIG_TQ_SDMMC) += tq_sdmmc.o
 obj-$(CONFIG_TQ_SPI_NOR) += tq_spi_nor.o
 obj-$(CONFIG_TQ_VARD) += tq_som_features.o
 
+ifdef CONFIG_IMX95
+obj-$(CONFIG_SCMI_FIRMWARE) += imx9-scmi.o
+endif
+
 ifndef CONFIG_XPL_BUILD
 obj-$(CONFIG_USB_TCPC) += tcpc.o
 endif
