@@ -18,85 +18,11 @@
 #include <asm/arch-imx9/ccm_regs.h>
 #include <asm/mach-imx/boot_mode.h>
 #include <jffs2/load_kernel.h>
-#include <linux/bitfield.h>
-#include <linux/bitops.h>
-#include <linux/delay.h>
+#include "../common/imx9-dwc3.h"
 #include "../common/imx9-scmi.h"
 #include "../common/tq_bb.h"
 
 DECLARE_GLOBAL_DATA_PTR;
-
-#ifdef CONFIG_USB_DWC3
-
-#define PHY_CTRL0			0xF0040
-#define PHY_CTRL0_REF_SSP_EN		BIT(2)
-#define PHY_CTRL0_FSEL_MASK		GENMASK(10, 5)
-#define PHY_CTRL0_FSEL_24M		0x2a
-#define PHY_CTRL0_FSEL_100M		0x27
-#define PHY_CTRL0_SSC_RANGE_MASK	GENMASK(23, 21)
-#define PHY_CTRL0_SSC_RANGE_4003PPM	(0x2 << 21)
-
-#define PHY_CTRL1			0xF0044
-#define PHY_CTRL1_RESET			BIT(0)
-#define PHY_CTRL1_COMMONONN		BIT(1)
-#define PHY_CTRL1_ATERESET		BIT(3)
-#define PHY_CTRL1_DCDENB		BIT(17)
-#define PHY_CTRL1_CHRGSEL		BIT(18)
-#define PHY_CTRL1_VDATSRCENB0		BIT(19)
-#define PHY_CTRL1_VDATDETENB0		BIT(20)
-
-#define PHY_CTRL2			0xF0048
-#define PHY_CTRL2_TXENABLEN0		BIT(8)
-#define PHY_CTRL2_OTG_DISABLE		BIT(9)
-
-#define PHY_CTRL6			0xF0058
-#define PHY_CTRL6_RXTERM_OVERRIDE_SEL	BIT(29)
-#define PHY_CTRL6_ALT_CLK_EN		BIT(1)
-#define PHY_CTRL6_ALT_CLK_SEL		BIT(0)
-
-static struct dwc3_device dwc3_device_data = {
-	.maximum_speed = USB_SPEED_HIGH,
-	.base = USB1_BASE_ADDR,
-	.dr_mode = USB_DR_MODE_PERIPHERAL,
-	.index = 0,
-	.power_down_scale = 2,
-};
-
-static void dwc3_nxp_usb_phy_init(struct dwc3_device *dwc3)
-{
-	u32 value;
-
-	/* USB3.0 PHY signal fsel for 24M ref */
-	value = readl(dwc3->base + PHY_CTRL0);
-	value &= ~PHY_CTRL0_FSEL_MASK;
-	value |= FIELD_PREP(PHY_CTRL0_FSEL_MASK, PHY_CTRL0_FSEL_24M);
-	writel(value, dwc3->base + PHY_CTRL0);
-
-	/* Disable alt_clk_en and use internal MPLL clocks */
-	value = readl(dwc3->base + PHY_CTRL6);
-	value &= ~(PHY_CTRL6_ALT_CLK_SEL | PHY_CTRL6_ALT_CLK_EN);
-	writel(value, dwc3->base + PHY_CTRL6);
-
-	value = readl(dwc3->base + PHY_CTRL1);
-	value &= ~(PHY_CTRL1_VDATSRCENB0 | PHY_CTRL1_VDATDETENB0);
-	value |= PHY_CTRL1_RESET | PHY_CTRL1_ATERESET;
-	writel(value, dwc3->base + PHY_CTRL1);
-
-	value = readl(dwc3->base + PHY_CTRL0);
-	value |= PHY_CTRL0_REF_SSP_EN;
-	writel(value, dwc3->base + PHY_CTRL0);
-
-	value = readl(dwc3->base + PHY_CTRL2);
-	value |= PHY_CTRL2_TXENABLEN0 | PHY_CTRL2_OTG_DISABLE;
-	writel(value, dwc3->base + PHY_CTRL2);
-
-	udelay(10);
-
-	value = readl(dwc3->base + PHY_CTRL1);
-	value &= ~(PHY_CTRL1_RESET | PHY_CTRL1_ATERESET);
-	writel(value, dwc3->base + PHY_CTRL1);
-}
-#endif
 
 int board_usb_init(int index, enum usb_init_type init)
 {
@@ -114,10 +40,8 @@ int board_usb_init(int index, enum usb_init_type init)
 			return ret;
 		}
 
-		if (IS_ENABLED(CONFIG_USB_DWC3)) {
-			dwc3_nxp_usb_phy_init(&dwc3_device_data);
-			return dwc3_uboot_init(&dwc3_device_data);
-		}
+		if (IS_ENABLED(CONFIG_USB_DWC3))
+			return imx9_dwc3_device_init(index);
 	}
 
 	return 0;
@@ -127,7 +51,7 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 {
 	if (index == 0 && init == USB_INIT_DEVICE) {
 		if (IS_ENABLED(CONFIG_USB_DWC3))
-			dwc3_uboot_exit(index);
+			return imx9_dwc3_device_deinit(index);
 	}
 
 	return 0;

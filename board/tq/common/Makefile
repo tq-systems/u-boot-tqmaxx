@@ -18,6 +18,7 @@ obj-$(CONFIG_TQ_VARD) += tq_som_features.o
 
 ifdef CONFIG_IMX95
 obj-$(CONFIG_SCMI_FIRMWARE) += imx9-scmi.o
+obj-$(CONFIG_USB_DWC3) += imx9-dwc3.o
 endif
 
 ifndef CONFIG_XPL_BUILD
