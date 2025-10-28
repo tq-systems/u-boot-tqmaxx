@@ -670,7 +670,6 @@ static int do_boota(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv
 	int ret = 0;
 
 	/* Load and verify GBL image */
-#ifdef CONFIG_DUAL_BOOTLOADER
 	int slot = 0;
 	char* slot_suffixes[2] = {"_a", "_b"};
 	slot = current_slot();
@@ -678,11 +677,7 @@ static int do_boota(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv
 		printf("failed to get current slot!\n");
 		goto fail;
 	}
-
 	snprintf(part_name, sizeof(part_name), "efisp%s", slot_suffixes[slot]);
-#else
-	snprintf(part_name, sizeof(part_name), "efisp");
-#endif
 
 	/* Load the footer to get metadata and signature */
 	ret = read_from_partition_multi(part_name, 0 - sizeof(footer),
