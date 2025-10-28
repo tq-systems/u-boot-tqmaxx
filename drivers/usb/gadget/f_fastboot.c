@@ -24,6 +24,7 @@
 #include <g_dnl.h>
 #include <serial.h>
 #include <stdio_dev.h>
+#include <asm/arch/sys_proto.h>
 
 #define FASTBOOT_INTERFACE_CLASS	0xff
 #define FASTBOOT_INTERFACE_SUB_CLASS	0x42
@@ -516,10 +517,6 @@ static int fastboot_tx_write_str(const char *buffer)
 {
 	return fastboot_tx_write(buffer, strlen(buffer));
 }
-
-#ifdef CONFIG_PSCI_BOARD_REBOOT
-int do_board_reboot(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[]);
-#endif
 
 static void compl_do_reset(struct usb_ep *ep, struct usb_request *req)
 {
