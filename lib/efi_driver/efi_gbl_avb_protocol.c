@@ -49,17 +49,17 @@ static efi_status_t EFIAPI read_device_status(struct efi_gbl_avb_protocol *this,
 	}
 
 	status = fastboot_get_lock_stat();
-	if (status != FASTBOOT_LOCK_ERROR) {
-		if (status == FASTBOOT_LOCK)
-			*status_flags = 0;
-		else
-			*status_flags = EFI_GBL_AVB_STATUS_UNLOCKED;
-
-		return EFI_EXIT(EFI_SUCCESS);
+	if (status == FASTBOOT_UNLOCK) {
+		*status_flags = EFI_GBL_AVB_STATUS_UNLOCKED;
 	} else {
-		log_err("Failed to get device lock status.\n");
-		return EFI_EXIT(EFI_DEVICE_ERROR);
+		if (status == FASTBOOT_LOCK_ERROR) {
+			log_err("Failed to get device lock status! Setting to locked.\n");
+			fastboot_set_lock_stat(FASTBOOT_LOCK);
+		}
+		*status_flags = 0;
 	}
+
+	return EFI_EXIT(EFI_SUCCESS);
 }
 
 static efi_status_t EFIAPI validate_vbmeta_public_key(struct efi_gbl_avb_protocol *this,
@@ -300,7 +300,7 @@ static efi_status_t EFIAPI handle_verification_result(struct efi_gbl_avb_protoco
 	int ret;
 
 	/* Set KM boot parameters */
-	lock = (fastboot_get_lock_stat() == FASTBOOT_LOCK)? true: false;
+	lock = (fastboot_get_lock_stat() == FASTBOOT_UNLOCK)? false: true;
 	if (result->color == EFI_GBL_AVB_BOOT_COLOR_GREEN && lock) {
 		vbstatus = KM_VERIFIED_BOOT_VERIFIED;
 	} else {

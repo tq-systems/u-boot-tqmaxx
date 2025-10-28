@@ -237,13 +237,14 @@ static efi_status_t EFIAPI get_lock(struct efi_gbl_fastboot_protocol* this,
 	}
 
 	lock_state = fastboot_get_lock_stat();
-	if (lock_state == FASTBOOT_LOCK) {
-		*out_lock = true;
-	} else if (lock_state == FASTBOOT_UNLOCK) {
+	if (lock_state == FASTBOOT_UNLOCK) {
 		*out_lock = false;
 	} else {
-		log_err("Failed to get lock state!\n");
-		return EFI_EXIT(EFI_DEVICE_ERROR);
+		if (lock_state == FASTBOOT_LOCK_ERROR) {
+			log_err("failed to get lock status! Setting to locked.\n");
+			fastboot_set_lock_stat(FASTBOOT_LOCK);
+		}
+		*out_lock = true;
 	}
 
 	return EFI_EXIT(EFI_SUCCESS);

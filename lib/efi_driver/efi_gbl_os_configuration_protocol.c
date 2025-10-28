@@ -50,13 +50,15 @@ int get_runtime_bootconfig(char *bootconfig, int *len) {
 
 	/* check lock state */
 	FbLockState lock_status = fastboot_get_lock_stat();
-	if (lock_status == FASTBOOT_LOCK) {
-		strncat(bootconfig, " androidboot.flash.locked=1", *len - strlen(bootconfig));
-	} else if (lock_status == FASTBOOT_UNLOCK) {
+	if (lock_status == FASTBOOT_UNLOCK) {
 		strncat(bootconfig, " androidboot.flash.locked=0", *len - strlen(bootconfig));
 	} else {
-		log_err("failed to get lock status!\n");
-		return -1;
+		if (lock_status == FASTBOOT_LOCK_ERROR) {
+			log_err("failed to get lock status! Setting to locked.\n");
+			fastboot_set_lock_stat(FASTBOOT_LOCK);
+		}
+
+		strncat(bootconfig, " androidboot.flash.locked=1", *len - strlen(bootconfig));
 	}
 
 	/* append soc type into bootargs */
