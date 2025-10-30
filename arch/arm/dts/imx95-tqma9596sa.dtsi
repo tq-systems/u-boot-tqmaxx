@@ -10,7 +10,9 @@
 #include <dt-bindings/net/ti-dp83867.h>
 #include <dt-bindings/phy/phy-imx8-pcie.h>
 #include <dt-bindings/usb/pd.h>
-#include "imx95.dtsi"
+
+#include "../dts/upstream/src/arm64/freescale/imx95.dtsi"
+#include "imx95-u-boot.dtsi"
 
 / {
 	aliases {
