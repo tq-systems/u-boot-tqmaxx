@@ -1553,6 +1553,29 @@ int disable_mipidsi_node(void *blob)
 	return delete_fdt_nodes(blob, nodes_path_mipidsi, ARRAY_SIZE(nodes_path_mipidsi));
 }
 
+int disable_dpu_node(void *blob)
+{
+	static const char * const nodes_path_dpu[] = {
+		"/soc/bridge@4b0d0000/channel@0/port@0/endpoint",
+		"/soc/bridge@4b0d0000/channel@0/port@1/endpoint",
+		"/soc/bridge@4b0d0000/channel@1/port@0/endpoint",
+		"/soc/bridge@4b0d0000/channel@1/port@1/endpoint",
+		"/soc/display-controller@4b400000/ports/port@0/endpoint",
+		"/soc/display-controller@4b400000/ports/port@1/endpoint",
+		"/soc/display-controller@4b400000",
+		"/soc/syscon@4b010000/bridge@8/ports/port@0/endpoint",
+		"/soc/syscon@4b010000/bridge@8/ports/port@2/endpoint@1",
+		"/soc/syscon@4b010000/bridge@8/ports/port@3/endpoint@0",
+		"/soc/syscon@4b010000/bridge@8/ports/port@3/endpoint@1",
+		"/soc/syscon@4b010000/bridge@8",
+		"/soc/syscon@4b010000",
+		"/soc/interrupt-controller@4b0b0000",
+		"/soc/bridge@4b0d0000"
+	};
+
+	return delete_fdt_nodes(blob, nodes_path_dpu, ARRAY_SIZE(nodes_path_dpu));
+}
+
 int disable_lvds_node(void *blob)
 {
 	static const char * const nodes_path_lvds[] = {
@@ -1560,6 +1583,7 @@ int disable_lvds_node(void *blob)
 		"/soc/syscon@4b0c0000/phy@8",
 		"/soc/syscon@4b0c0000/ldb@4/channel@1",
 		"/soc/syscon@4b0c0000/phy@c",
+		"/soc/syscon@4b0c0000"
 	};
 
 	return delete_fdt_nodes(blob, nodes_path_lvds, ARRAY_SIZE(nodes_path_lvds));
@@ -1685,6 +1709,9 @@ int ft_system_setup(void *blob, struct bd_info *bd)
 			disable_cm71_node(blob);
 	}
 
+	if (val & BIT(22)) /* Display */
+		disable_dpu_node(blob);
+
 	if (val & BIT(27)) /* LVDS */
 		disable_lvds_node(blob);
 
@@ -1749,6 +1776,9 @@ int board_fix_fdt_fuse(void *fdt)
 	u32 val = 0;;
 
 	fuse_read(2, 2, &val);
+
+	if (val & BIT(22)) /* Display */
+		disable_dpu_node(fdt);
 
 	if (val & BIT(27)) /* LVDS */
 		disable_lvds_node(fdt);
