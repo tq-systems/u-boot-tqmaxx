@@ -24,7 +24,9 @@
 #include <g_dnl.h>
 #include <serial.h>
 #include <stdio_dev.h>
+#ifdef CONFIG_PSCI_BOARD_REBOOT
 #include <asm/arch/sys_proto.h>
+#endif
 
 #define FASTBOOT_INTERFACE_CLASS	0xff
 #define FASTBOOT_INTERFACE_SUB_CLASS	0x42

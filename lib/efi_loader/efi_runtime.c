@@ -19,7 +19,9 @@
 #include <asm/global_data.h>
 #include <u-boot/crc.h>
 #include <asm/sections.h>
+#ifdef CONFIG_PSCI_BOARD_REBOOT
 #include <asm/arch/sys_proto.h>
+#endif
 
 /* For manual relocation support */
 DECLARE_GLOBAL_DATA_PTR;
