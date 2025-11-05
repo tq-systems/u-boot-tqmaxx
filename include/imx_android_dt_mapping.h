@@ -37,6 +37,7 @@ static char *imx_android_dt_mapping[] = {
 	"imx95-15x15-mqs",
 	"imx95-15x15-mipi4k",
 	"imx95-15x15-boe-panel-lvds1",
+	"imx95-15x15-frdm",
 #elif defined(CONFIG_IMX94)
 	/* For i.MX 943 */
 	"imx943",
@@ -173,6 +174,8 @@ static char *imx_android_dt_mapping[] = {
 #define IMX_ANDROID_DEFAULT_FDT_NAME "imx95"
 #elif defined(CONFIG_TARGET_IMX95_15X15_EVK)
 #define IMX_ANDROID_DEFAULT_FDT_NAME "imx95-15x15"
+#elif defined(CONFIG_TARGET_IMX95_15X15_FRDM)
+#define IMX_ANDROID_DEFAULT_FDT_NAME "imx95-15x15-frdm"
 #elif defined(CONFIG_TARGET_VERDIN_IMX95_19X19)
 #define IMX_ANDROID_DEFAULT_FDT_NAME "imx95-verdin"
 #elif defined(CONFIG_IMX94)
