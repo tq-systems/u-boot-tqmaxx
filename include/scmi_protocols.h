@@ -9,6 +9,8 @@
 #include <linux/bitops.h>
 #include <asm/types.h>
 
+struct udevice;
+
 /*
  * Subset the SCMI protocols definition
  * based on SCMI specification v2.0 (DEN0056B)
