@@ -276,9 +276,29 @@ static void netc_regulator_enable(const char *devname)
 	}
 }
 
+static bool is_netc_cfg(void)
+{
+	char cfgname[SCMI_MISC_MAX_CFGNAME];
+	u32 msel;
+	int ret;
+	const char *netcfg = "mx94evknetc";
+
+	ret = scmi_misc_cfginfo(&msel, cfgname);
+	if (!ret) {
+		debug("SM: %s\n", cfgname);
+		if (!strcmp(netcfg, cfgname))
+			return true;
+	}
+
+	return false;
+}
+
 void netc_init(void)
 {
 	int ret;
+
+	if (is_netc_cfg())
+		return;
 
 	/* Power up the NETC MIX. */
 	ret = imx9_scmi_power_domain_enable(IMX94_PD_NETC, true);
@@ -326,8 +346,37 @@ int board_late_init(void)
 }
 
 #if IS_ENABLED(CONFIG_OF_BOARD_FIXUP)
+static void disable_fdt_resources(void *fdt)
+{
+	int i = 0;
+	int nodeoff, ret;
+	const char *status = "disabled";
+	static const char * const dsi_nodes[] = {
+		"/soc/bus@42000000/i2c@42530000",
+		"/soc/bus@42000000/i2c@426c0000",
+		"/soc/system-controller@4ceb0000"
+	};
+
+	for (i = 0; i < ARRAY_SIZE(dsi_nodes); i++) {
+		nodeoff = fdt_path_offset(fdt, dsi_nodes[i]);
+		if (nodeoff > 0) {
+set_status:
+			ret = fdt_setprop(fdt, nodeoff, "status", status,
+					  strlen(status) + 1);
+			if (ret == -FDT_ERR_NOSPACE) {
+				ret = fdt_increase_size(fdt, 512);
+				if (!ret)
+					goto set_status;
+			}
+		}
+	}
+}
+
 int board_fix_fdt(void *fdt)
 {
+	if (is_netc_cfg())
+		disable_fdt_resources(fdt);
+
 	return 0;
 }
 #endif
