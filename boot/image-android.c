@@ -899,8 +899,10 @@ int fixup_gbl_bootargs(void *fdt_addr) {
 
 int imx_android_dt_fixup(void *fdt_addr) {
 	/* set rng seed to speed up the boot */
+#ifndef CONFIG_IMX_ANDROID_GBL
 	if (append_rng_seed(fdt_addr))
 		return -1;
+#endif
 
 	/* Append runtime boot commandline */
 #ifdef CONFIG_IMX_ANDROID_GBL
