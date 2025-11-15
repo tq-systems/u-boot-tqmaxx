@@ -1,3 +1,9 @@
+/*
+ * Copyright 2025 NXP
+ *
+ * SPDX-License-Identifier:	GPL-2.0+
+ */
+
 #ifndef __IMX_ANDROID_DT_MAPPING_H__
 #define __IMX_ANDROID_DT_MAPPING_H__
 
@@ -38,6 +44,7 @@ static char *imx_android_dt_mapping[] = {
 	"imx95-15x15-mipi4k",
 	"imx95-15x15-boe-panel-lvds1",
 	"imx95-15x15-frdm",
+	"imx95-15x15-frdm-dual-os08a20",
 #elif defined(CONFIG_IMX94)
 	/* For i.MX 943 */
 	"imx943",
