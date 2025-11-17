@@ -56,6 +56,7 @@ struct imx_rproc {
 	/* For System Manager based system */
 	struct udevice			*lmm_dev;
 	struct udevice			*cpu_dev;
+	ulong				reset_vector;
 };
 
 /* att flags: lower 16 bits specifying core, higher 16 bits for flags  */
@@ -88,7 +89,7 @@ static int imx_rproc_sm_start(struct udevice *dev)
 
 	if (priv->flags & IMX_RPROC_FLAGS_SM_CPU_OP) {
 		ret = scmi_imx_cpu_reset_vector_set(priv->cpu_dev, dcfg->cpuid, 0,
-						    0, true, false, false);
+						    priv->reset_vector, true, false, false);
 		if (ret) {
 			dev_err(dev, "Failed to set reset vector cpuid(%u): %d\n",
 				dcfg->cpuid, ret);
@@ -98,7 +99,8 @@ static int imx_rproc_sm_start(struct udevice *dev)
 		return scmi_imx_cpu_start(priv->cpu_dev, dcfg->cpuid, true);
 	}
 
-	ret = scmi_imx_lmm_reset_vector_set(priv->lmm_dev, dcfg->lmid, dcfg->cpuid, 0, 0);
+	ret = scmi_imx_lmm_reset_vector_set(priv->lmm_dev, dcfg->lmid, dcfg->cpuid, 0,
+					    priv->reset_vector);
 	if (ret) {
 		dev_err(dev, "Failed to set reset vector lmid(%u), cpuid(%u): %d\n",
 			dcfg->lmid, dcfg->cpuid, ret);
@@ -283,6 +285,9 @@ static int imx_rproc_load(struct udevice *dev, ulong addr, ulong size)
 		if (!(priv->flags & (IMX_RPROC_FLAGS_SM_LMM_AVAIL | IMX_RPROC_FLAGS_SM_CPU_OP)))
 			return -EACCES;
 	}
+
+	/* Only used for SM based System */
+	priv->reset_vector = rproc_elf_get_boot_addr(dev, addr) & GENMASK(31, 16);
 
 	return rproc_elf_load_image(dev, addr, size);
 }
