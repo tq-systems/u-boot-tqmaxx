@@ -35,17 +35,13 @@ static void init_pmic(void)
 	reg = pmic_reg_read(dev, TPS65224_REG_FSM_TRIG_MASK_2);
 	if (reg < 0) {
 		printf("Reading PMIC register failed: %d\n", reg);
-		return;
-	}
-
-	/* Mask GPIO6 signal */
-	reg |= TPS65224_REG_FSM_TRIG_MASK_2__GPIO6_FSM_MASK |
-	       TPS65224_REG_FSM_TRIG_MASK_2__GPIO6_FSM_MASK_POL;
-
-	ret = pmic_reg_write(dev, TPS65224_REG_FSM_TRIG_MASK_2, reg);
-	if (ret < 0) {
-		printf("Writing PMIC register failed: %d\n", ret);
-		return;
+	} else {
+		/* Mask GPIO6 signal */
+		reg |= TPS65224_REG_FSM_TRIG_MASK_2__GPIO6_FSM_MASK |
+		       TPS65224_REG_FSM_TRIG_MASK_2__GPIO6_FSM_MASK_POL;
+		ret = pmic_reg_write(dev, TPS65224_REG_FSM_TRIG_MASK_2, reg);
+		if (ret < 0)
+			printf("Writing PMIC register failed: %d\n", ret);
 	}
 
 	printf("PMIC setup done\n");
