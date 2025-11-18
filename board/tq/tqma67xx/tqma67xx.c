@@ -29,6 +29,8 @@ static void init_pmic(void)
 	}
 
 #define TPS65224_REG_FSM_TRIG_MASK_2 0x47
+#define TPS65224_REG_FSM_TRIG_MASK_2__GPIO6_FSM_MASK 0x04
+#define TPS65224_REG_FSM_TRIG_MASK_2__GPIO6_FSM_MASK_POL 0x08
 
 	reg = pmic_reg_read(dev, TPS65224_REG_FSM_TRIG_MASK_2);
 	if (reg < 0) {
@@ -36,8 +38,9 @@ static void init_pmic(void)
 		return;
 	}
 
-	/* Set GPIO6_FSM_MASK and GPIO6_FSM_MASK_POL to mask GPIO6 signal */
-	reg |= 0x0c;
+	/* Mask GPIO6 signal */
+	reg |= TPS65224_REG_FSM_TRIG_MASK_2__GPIO6_FSM_MASK |
+	       TPS65224_REG_FSM_TRIG_MASK_2__GPIO6_FSM_MASK_POL;
 
 	ret = pmic_reg_write(dev, TPS65224_REG_FSM_TRIG_MASK_2, reg);
 	if (ret < 0) {
