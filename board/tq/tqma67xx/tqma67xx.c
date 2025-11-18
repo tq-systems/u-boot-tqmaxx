@@ -23,7 +23,7 @@ static void init_pmic(void)
 	int ret, reg;
 
 	ret = pmic_get("pmic@48", &dev);
-	if (ret == -ENODEV) {
+	if (ret) {
 		printf("PMIC not found\n");
 		return;
 	}
