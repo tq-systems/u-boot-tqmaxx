@@ -117,6 +117,11 @@ static int dwc3_generic_probe(struct udevice *dev,
 	if (device_is_compatible(dev->parent, "rockchip,rk3399-dwc3"))
 		reset_deassert_bulk(&glue->resets);
 
+	if (mode == USB_DR_MODE_HOST)
+		board_usb_init(dev_seq(dev), USB_INIT_HOST);
+	else if (mode == USB_DR_MODE_PERIPHERAL)
+		board_usb_init(dev_seq(dev), USB_INIT_DEVICE);
+
 	priv->base = map_physmem(plat->base, DWC3_OTG_REGS_END, MAP_NOCACHE);
 	dwc3->regs = priv->base + DWC3_GLOBALS_REGS_START;
 
@@ -133,6 +138,7 @@ static int dwc3_generic_remove(struct udevice *dev,
 			       struct dwc3_generic_priv *priv)
 {
 	struct dwc3 *dwc3 = &priv->dwc3;
+	enum usb_dr_mode mode = dwc3->dr_mode;
 
 	if (CONFIG_IS_ENABLED(DM_GPIO) &&
 	    device_is_compatible(dev->parent, "xlnx,zynqmp-dwc3") &&
@@ -145,6 +151,11 @@ static int dwc3_generic_remove(struct udevice *dev,
 	dwc3_remove(dwc3);
 	dwc3_shutdown_phy(dev, &priv->phys);
 	unmap_physmem(dwc3->regs, MAP_NOCACHE);
+
+	if (mode == USB_DR_MODE_HOST)
+		board_usb_cleanup(dev_seq(dev), USB_INIT_HOST);
+	else if (mode == USB_DR_MODE_PERIPHERAL)
+		board_usb_cleanup(dev_seq(dev), USB_INIT_DEVICE);
 
 	return 0;
 }
