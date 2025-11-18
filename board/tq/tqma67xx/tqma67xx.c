@@ -32,16 +32,43 @@ static void init_pmic(void)
 #define TPS65224_REG_FSM_TRIG_MASK_2__GPIO6_FSM_MASK 0x04
 #define TPS65224_REG_FSM_TRIG_MASK_2__GPIO6_FSM_MASK_POL 0x08
 
+#define TPS65224_REG_RECOV_CNT_REG_1 0x83
+#define TPS65224_REG_RECOV_CNT_REG_1__RECOV_CNT 0x0f
+
+#define TPS65224_REG_RECOV_CNT_REG_2 0x84
+#define TPS65224_REG_RECOV_CNT_REG_2__RECOV_CNT_CLR 0x10
+
 	reg = pmic_reg_read(dev, TPS65224_REG_FSM_TRIG_MASK_2);
 	if (reg < 0) {
-		printf("Reading PMIC register failed: %d\n", reg);
+		printf("Reading PMIC register FSM_TRIG_MASK_2 failed: %d\n", reg);
 	} else {
 		/* Mask GPIO6 signal */
 		reg |= TPS65224_REG_FSM_TRIG_MASK_2__GPIO6_FSM_MASK |
 		       TPS65224_REG_FSM_TRIG_MASK_2__GPIO6_FSM_MASK_POL;
 		ret = pmic_reg_write(dev, TPS65224_REG_FSM_TRIG_MASK_2, reg);
 		if (ret < 0)
-			printf("Writing PMIC register failed: %d\n", ret);
+			printf("Writing PMIC register FSM_TRIG_MASK_2 failed: %d\n", ret);
+	}
+
+	reg = pmic_reg_read(dev, TPS65224_REG_RECOV_CNT_REG_1);
+	if (reg < 0) {
+		printf("Reading PMIC register RECOV_CNT_REG_1 failed: %d\n", reg);
+	} else {
+		unsigned int recov_cnt = reg & TPS65224_REG_RECOV_CNT_REG_1__RECOV_CNT;
+
+		if (recov_cnt)
+			printf("PMIC recovery counter: %u\n", recov_cnt);
+	}
+
+	reg = pmic_reg_read(dev, TPS65224_REG_RECOV_CNT_REG_2);
+	if (reg < 0) {
+		printf("Reading PMIC register RECOV_CNT_REG_2 failed: %d\n", reg);
+	} else {
+		/* Clear recovery counter */
+		reg |= TPS65224_REG_RECOV_CNT_REG_2__RECOV_CNT_CLR;
+		ret = pmic_reg_write(dev, TPS65224_REG_RECOV_CNT_REG_2, reg);
+		if (ret < 0)
+			printf("Writing PMIC register RECOV_CNT_REG_2 failed: %d\n", ret);
 	}
 
 	printf("PMIC setup done\n");
