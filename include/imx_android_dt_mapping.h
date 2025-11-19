@@ -21,6 +21,7 @@ static char *imx_android_dt_mapping[] = {
 	"imx95-mipi-lvds1",
 	"imx95-mipi-panel",
 	"imx95-lvds0",
+	"imx95-lvds0-dual-os08a20",
 	"imx95-lvds-dualdisp",
 	"imx95-lvds-panel",
 	"imx95-cs42888",
