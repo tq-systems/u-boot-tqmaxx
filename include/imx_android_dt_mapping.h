@@ -46,6 +46,7 @@ static char *imx_android_dt_mapping[] = {
 	"imx95-15x15-boe-panel-lvds1",
 	"imx95-15x15-frdm",
 	"imx95-15x15-frdm-dual-os08a20",
+	"imx95-15x15-frdm-boe-panel",
 #elif defined(CONFIG_IMX94)
 	/* For i.MX 943 */
 	"imx943",
