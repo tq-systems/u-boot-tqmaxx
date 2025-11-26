@@ -310,6 +310,7 @@ static inline int image_ph_type(int image_ph_type)
 }
 
 #define LZ4F_MAGIC	0x184D2204	/* LZ4 Magic Number		*/
+#define LZ4L_MAGIC	0x184C2102	/* LZ4 Legacy Magic Number	*/
 #define IH_MAGIC	0x27051956	/* Image Magic Number		*/
 #define IH_NMLEN		32	/* Image Name Length		*/
 
