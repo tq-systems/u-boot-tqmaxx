@@ -964,7 +964,7 @@ int do_boota(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[]) {
 				(void *)((ulong)hdr_v4 + 4096), hdr_v4->kernel_size);
 		} else if (IS_ENABLED(CONFIG_LZ4)) {
 			size_t lz4_len = MAX_KERNEL_LEN;
-			if (ulz4fn((void *)((ulong)hdr_v4 + 4096),
+			if (ulz4fn_auto((void *)((ulong)hdr_v4 + 4096),
 				hdr_v4->kernel_size, (void *)kernel_addr, &lz4_len) != 0) {
 				printf("Decompress kernel fail!\n");
 				goto fail;
@@ -980,7 +980,7 @@ int do_boota(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[]) {
 				(void *)((ulong)hdr_v3 + 4096), hdr_v3->kernel_size);
 		} else if (IS_ENABLED(CONFIG_LZ4)) {
 			size_t lz4_len = MAX_KERNEL_LEN;
-			if (ulz4fn((void *)((ulong)hdr_v3 + 4096),
+			if (ulz4fn_auto((void *)((ulong)hdr_v3 + 4096),
 				hdr_v3->kernel_size, (void *)kernel_addr, &lz4_len) != 0) {
 				printf("Decompress kernel fail!\n");
 				goto fail;
@@ -997,7 +997,7 @@ int do_boota(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[]) {
 				(void *)((ulong)hdr + hdr->page_size), hdr->kernel_size);
 		} else if (IS_ENABLED(CONFIG_LZ4)) {
 			size_t lz4_len = MAX_KERNEL_LEN;
-			if (ulz4fn((void *)((ulong)hdr + hdr->page_size),
+			if (ulz4fn_auto((void *)((ulong)hdr + hdr->page_size),
 				hdr->kernel_size, (void *)kernel_addr, &lz4_len) != 0) {
 				printf("Decompress kernel fail!\n");
 				goto fail;
