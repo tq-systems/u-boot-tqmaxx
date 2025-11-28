@@ -789,6 +789,11 @@
 				status = "disabled";
 			};
 		};
+
+		vpuctrl: vpu-ctrl@4c4c0000 {
+			reg = <0x0 0x4c4c0000 0x0 0x10000>;
+			status = "disabled";
+		};
 	};
 };
 
