@@ -8,9 +8,30 @@
 #include "k3-am67a-tqma67xx-u-boot.dtsi"
 
 / {
+	aliases {
+		sysinfo1 = &sysinfo_mba;
+	};
+
 	chosen {
 		stdout-path = "serial0:115200n8";
 	};
+
+	sysinfo_mba: sysinfo-mba {
+		compatible = "gpio-sysinfo";
+		gpios =
+			<&gpio_exp2 5 GPIO_ACTIVE_HIGH>, /* BRD_CFG0 */
+			<&gpio_exp2 6 GPIO_ACTIVE_HIGH>, /* BRD_CFG1 */
+			<&gpio_exp2 7 GPIO_ACTIVE_HIGH>; /* BRD_CFG2 */
+		names = "01xx", "02xx";
+		revisions = <0x0>, <0x1>;
+		no-floating-pins;
+	};
+};
+
+&gpio_exp2 {
+	/delete-node/ line5-hog;
+	/delete-node/ line6-hog;
+	/delete-node/ line7-hog;
 };
 
 &sdhci2 {

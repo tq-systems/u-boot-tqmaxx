@@ -8,6 +8,10 @@
 #include "k3-am67a-tqma67xx-binman.dtsi"
 
 / {
+	aliases {
+		sysinfo0 = &sysinfo;
+	};
+
 	chosen {
 		tick-timer = &main_timer0;
 	};

@@ -6,9 +6,25 @@
 
 #include <fdt_support.h>
 #include <init.h>
+#include <sysinfo.h>
 
 #include "../common/common.h"
 #include "../common/sysinfo.h"
+
+int board_init(void)
+{
+	char revision[16] = "unknown";
+	struct udevice *sysinfo;
+	int ret;
+
+	ret = sysinfo_get_by_seq_and_detect(&sysinfo, 1);
+	if (!ret)
+		sysinfo_get_str(sysinfo, SYSID_BOARD_MODEL, sizeof(revision), revision);
+
+	printf("Board: MBa67xx REV %s\n", revision);
+
+	return 0;
+}
 
 int board_late_init(void)
 {
