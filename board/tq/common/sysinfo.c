@@ -22,12 +22,15 @@ static void tq_common_sysinfo_set_macaddrs(const u8 *macaddr)
 	size_t i, macaddr_num = tq_common_sysinfo_macaddr_num();
 	u8 macaddr_buf[ETH_ALEN];
 
+	if (macaddr_num == 0)
+		return;
+
 	memcpy(macaddr_buf, macaddr, ETH_ALEN);
 
 	for (i = 0; ; i++) {
 		eth_env_set_enetaddr_by_index("eth", CONFIG_TQ_COMMON_SYSINFO_MACADDR_OFFSET + i,
 					      macaddr_buf);
-		if (i > macaddr_num)
+		if (i >= (macaddr_num - 1))
 			break;
 
 		if (++macaddr_buf[5])
