@@ -11,6 +11,7 @@
 #include <dt-bindings/leds/common.h>
 #include <dt-bindings/net/ti-dp83867.h>
 #include <dt-bindings/phy/phy.h>
+#include <dt-bindings/pwm/pwm.h>
 #include "k3-am67a-tqma67xx.dtsi"
 #include "k3-serdes.h"
 
@@ -44,6 +45,25 @@
 		pinctrl-0 = <&backlight_pins>;
 		enable-gpios = <&main_gpio0 22 GPIO_ACTIVE_HIGH>;
 		status = "disabled";
+	};
+
+	dp_refclk: clock-dp-refclk {
+		#clock-cells = <0>;
+		compatible = "fixed-clock";
+		clock-frequency = <26000000>;
+	};
+
+	dp: connector-dp {
+		compatible = "dp-connector";
+		dp-pwr-supply = <&reg_3v3_dp>;
+		label = "DP0";
+		type = "full-size";
+
+		port {
+			dp_connector_in: endpoint {
+				remote-endpoint = <&dp_bridge_out>;
+			};
+		};
 	};
 
 	gpio-keys {
@@ -82,6 +102,30 @@
 		enable-gpios = <&main_gpio0 25 GPIO_ACTIVE_HIGH>;
 		reset-gpios = <&main_gpio0 21 GPIO_ACTIVE_LOW>;
 		status = "disabled";
+	};
+
+	fan0: pwm-fan {
+		compatible = "pwm-fan";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pwm_fan_pins>, <&pwm_fan_mcu_pins>;
+		#cooling-cells = <2>;
+		/* typical 16 kHz -> 62.500 nsec */
+		cooling-levels = <0 32 64 128 196 240>;
+		fan-supply = <&reg_pwm_fan>;
+		interrupt-parent = <&mcu_gpio0>;
+		interrupts = <18 IRQ_TYPE_EDGE_FALLING>;
+		pulses-per-revolution = <2>;
+		pwms = <&epwm1 0 62500 PWM_POLARITY_INVERTED>;
+		status = "disabled";
+	};
+
+	reg_1v2: regulator-1v2 {
+		/* AP7361E-FGE */
+		compatible = "regulator-fixed";
+		regulator-min-microvolt = <1200000>;
+		regulator-max-microvolt = <1200000>;
+		regulator-name = "V_1V2_MBA";
+		vin-supply = <&reg_2v5>;
 	};
 
 	reg_1v5: regulator-1v5 {
@@ -127,6 +171,20 @@
 		regulator-name = "V_3V3_MBA";
 	};
 
+	reg_3v3_dp: regulator-3v3-dp {
+		/* TPS22950YBH */
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&reg_3v3_dp_pins>;
+		enable-active-high;
+		gpio = <&main_gpio0 52 GPIO_ACTIVE_HIGH>;
+		regulator-always-on;
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-name = "V_3V3_DP";
+		vin-supply = <&reg_3v3>;
+	};
+
 	reg_3v3_mpcie: regulator-3v3-mpcie {
 		/* TPS22950YBH */
 		compatible = "regulator-fixed";
@@ -162,6 +220,17 @@
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
 		regulator-name = "V_5V0_MBA";
+	};
+
+	reg_pwm_fan: regulator-pwm-fan {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&reg_pwm_fan_pins>;
+		enable-active-high;
+		gpio = <&mcu_gpio0 17 GPIO_ACTIVE_HIGH>;
+		regulator-name = "FAN_PWR";
+		regulator-min-microvolt = <12000000>;
+		regulator-max-microvolt = <12000000>;
 	};
 
 	reg_wifi_bt: regulator-wifi-bt {
@@ -272,13 +341,19 @@
 	status = "okay";
 };
 
+&dphy_tx0 {
+	status = "okay";
+};
+
 &epwm0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&epwm0_ext_pins>;
 	status = "okay";
 };
 
 &epwm1 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&epwm1_pins>;
+	pinctrl-0 = <&epwm1_ext_pins>;
 	status = "okay";
 };
 
@@ -316,7 +391,6 @@
 		gpios = <26 GPIO_ACTIVE_HIGH>;
 		line-name = "DSI0_EN";
 		output-high;
-		status = "disabled";
 	};
 };
 
@@ -422,11 +496,100 @@
 	};
 };
 
+&dsi0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+
+			dsi0_out: endpoint {
+				remote-endpoint = <&dp_bridge_in>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+
+			dsi0_in: endpoint {
+				remote-endpoint = <&dss1_dpi1_out>;
+			};
+		};
+	};
+};
+
+&dss1 {
+	clocks = <&k3_clks 232 8>,
+		 <&k3_clks 232 0>,
+		 <&k3_clks 232 4>;
+	assigned-clocks = <&k3_clks 241 0>,     /* DSS1-VP0 */
+			  <&k3_clks 240 0>,     /* DSS1-VP1 */
+			  <&k3_clks 245 0>;     /* DPI Output */
+	assigned-clock-parents = <&k3_clks 241 2>,      /* PLL 17 HDMI */
+				 <&k3_clks 240 1>,      /* PLL 18 DSI */
+				 <&k3_clks 245 2>;      /* DSS1-DPI0 */
+	status = "okay";
+};
+
+&dss1_ports {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	/* DSS1-VP1: DSI Output */
+	port@1 {
+		reg = <1>;
+
+		dss1_dpi1_out: endpoint {
+			remote-endpoint = <&dsi0_in>;
+		};
+	};
+};
+
 &main_i2c2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_i2c2_pins>;
 	clock-frequency = <400000>;
 	status = "okay";
+
+	dsi_dp_bridge: dsi-dp-bridge@2c {
+		compatible = "ti,sn65dsi86";
+		reg = <0x2c>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&dsi_dp_bridge_pins>;
+		clock-names = "refclk";
+		clocks = <&dp_refclk>;
+		enable-gpios = <&main_gpio0 13 GPIO_ACTIVE_HIGH>;
+		vpll-supply = <&reg_1v8>;
+		vccio-supply = <&reg_1v8>;
+		vcca-supply = <&reg_1v2>;
+		vcc-supply = <&reg_1v2>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				dp_bridge_in: endpoint {
+					remote-endpoint = <&dsi0_out>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+
+				dp_bridge_out: endpoint {
+					remote-endpoint = <&dp_connector_in>;
+				};
+			};
+		};
+	};
 
 	gpio_exp2: gpio@70 {
 		compatible = "nxp,pca9538";
@@ -732,10 +895,22 @@
 		>;
 	};
 
-	/* On extension header */
-	epwm1_pins: epwm1-pins {
+	dsi_dp_bridge_pins: dsi-dp-bridge-pins {
 		pinctrl-single,pins = <
-			J722S_IOPAD(0x019c, PIN_OUTPUT, 6) /* (B25) MCASP0_AXR1.EHRPWM1_A */
+			J722S_IOPAD(0x0034, PIN_OUTPUT, 7) /* (K22) OSPI0_CSn2.GPIO0_13 */
+		>;
+	};
+
+	/* On extension header */
+	epwm0_ext_pins: epwm0-ext-pins {
+		pinctrl-single,pins = <
+			J722S_IOPAD(0x1b8, PIN_OUTPUT, 2) /* (C20) SPI0_CS1.EHRPWM0_B */
+		>;
+	};
+
+	/* On extension header */
+	epwm1_ext_pins: epwm1-ext-pins {
+		pinctrl-single,pins = <
 			J722S_IOPAD(0x01a0, PIN_OUTPUT, 6) /* (F23) MCASP0_AXR0.EHRPWM1_B */
 		>;
 	};
@@ -788,7 +963,6 @@
 			J722S_IOPAD(0x00c8, PIN_INPUT, 7) /* (W22) VOUT0_DATA4.GPIO0_49 */
 			J722S_IOPAD(0x00cc, PIN_INPUT, 7) /* (W21) VOUT0_DATA5.GPIO0_50 */
 			J722S_IOPAD(0x00d0, PIN_INPUT, 7) /* (Y26) VOUT0_DATA6.GPIO0_51 */
-			J722S_IOPAD(0x00d4, PIN_INPUT, 7) /* (Y27) VOUT0_DATA7.GPIO0_52 */
 		>;
 	};
 
@@ -867,6 +1041,19 @@
 		pinctrl-single,pins = <
 			J722S_IOPAD(0x0160, PIN_OUTPUT, 0) /* (AC24) MDIO0_MDC */
 			J722S_IOPAD(0x015c, PIN_INPUT, 0) /* (AD25) MDIO0_MDIO */
+		>;
+	};
+
+	pwm_fan_pins: pwm-fan-pins {
+		pinctrl-single,pins = <
+			/* (B25) MCASP0_AXR1.EHRPWM1_A - FAN_PWM */
+			J722S_IOPAD(0x019c, PIN_OUTPUT, 6)
+		>;
+	};
+
+	reg_3v3_dp_pins: reg-3v3-dp-pins {
+		pinctrl-single,pins = <
+			J722S_IOPAD(0x00d4, PIN_OUTPUT, 7) /* (Y27) VOUT0_DATA7.GPIO0_52 */
 		>;
 	};
 
@@ -1008,6 +1195,20 @@
 			J722S_MCU_IOPAD(0x0020, PIN_OUTPUT, 0)	/* (C5) MCU_UART0_RTSn */
 			J722S_MCU_IOPAD(0x0014, PIN_INPUT, 0)	/* (B8) MCU_UART0_RXD */
 			J722S_MCU_IOPAD(0x0018, PIN_OUTPUT, 0)	/* (B4) MCU_UART0_TXD */
+		>;
+	};
+
+	pwm_fan_mcu_pins: pwm-fan-mcu-pins {
+		pinctrl-single,pins = <
+			/* (E11) MCU_I2C0_SDA.MCU_GPIO0_18 - FAN_RPM */
+			J722S_MCU_IOPAD(0x0048, PIN_INPUT, 7)
+		>;
+	};
+
+	reg_pwm_fan_pins: reg-pwm-fan-pins {
+		pinctrl-single,pins = <
+			/* (B13) MCU_I2C0_SCL.MCU_GPIO0_17 - FAN_PWR */
+			J722S_MCU_IOPAD(0x0044, PIN_OUTPUT, 7)
 		>;
 	};
 
