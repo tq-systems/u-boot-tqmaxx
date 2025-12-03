@@ -1205,7 +1205,8 @@ dtb-$(CONFIG_ARCH_IMX9) += \
 	imx93-phyboard-segin.dtb
 
 dtb-$(CONFIG_ARCH_IMX9) += \
-	imx91-tqma9131-mba91xxca.dtb
+	imx91-tqma9131-mba91xxca.dtb \
+	imx91-tqma9131-mba93xxca.dtb
 
 dtb-$(CONFIG_ARCH_IMX9) += \
 	imx93-tqma9352-mba91xxca.dtb \
