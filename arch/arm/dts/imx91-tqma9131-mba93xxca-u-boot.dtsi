@@ -1,0 +1,87 @@
+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
+/*
+ * Copyright (c) 2022-2025 TQ-Systems GmbH <u-boot@ew.tq-group.com>,
+ * D-82229 Seefeld, Germany.
+ * Author: Markus Niebel
+ */
+
+/*
+ * include the generic, SOM specific part of U-Boot modifications
+ * for device tree
+ */
+#include "imx91-tqma9131-u-boot.dtsi"
+
+/ {
+	aliases {
+		usbgadget0 = &usbg1;
+	};
+
+	config {
+		u-boot,mmc-env-offset = <0x400000>;
+		u-boot,mmc-env-offset-redundant = <0x410000>;
+	};
+
+	usbg1: usbg1 {
+		compatible = "fsl,imx27-usb-gadget";
+		dr_mode = "peripheral";
+		chipidea,usb = <&usbotg1>;
+	};
+};
+
+&gpio1 {
+	expander-irq-hog {
+		gpio-hog;
+		gpios = <12 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "PEX_INT#";
+	};
+
+	tcpc-irq-hog {
+		gpio-hog;
+		gpios = <2 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "USB_C_ALERT#";
+	};
+};
+
+&gpio4 {
+	dp-int-hog {
+		gpio-hog;
+		gpios = <29 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "DP_INT";
+	};
+};
+
+&lpuart1 {
+	bootph-pre-ram;
+	bootph-some-ram;
+};
+
+&pinctrl_uart1 {
+	bootph-pre-ram;
+	bootph-some-ram;
+};
+
+&reg_usdhc2_vmmc {
+	u-boot,off-on-delay-us = <20000>;
+};
+
+&ptn5110 {
+	status = "disabled";
+};
+
+&usbotg1 {
+	extcon = <&ptn5110>;
+};
+
+&usdhc2 {
+	fsl,signal-voltage-switch-extra-delay-ms = <8>;
+	sd-uhs-sdr104;
+	sd-uhs-ddr50;
+};
+
+&wdog3 {
+	u-boot,noautostart;
+	timeout-sec = <60>;
+};
