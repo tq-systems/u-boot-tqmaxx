@@ -21,10 +21,10 @@ config TQMA93XX_DEFAULTS
 	imply I2C_EEPROM
 
 choice
-	prompt "TQMa93xx mainboard variant"
+	prompt "TQMa91xx/TQMa93xx mainboard variant"
 	default TQMA93XX_BB_MBA93XXCA
 	help
-	  Select mainboard variant for the SOM. Default is the
+	  Select mainboard variant for the SOM. Default is the MBa93xxCA
 	  starterkit.
 
 config TQMA93XX_BB_MBA91XXCA
