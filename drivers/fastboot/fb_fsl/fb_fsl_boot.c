@@ -1084,7 +1084,13 @@ int do_boota(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[]) {
 
 	struct dt_table_entry *dt_entry;
 #ifdef CONFIG_INCLUDE_DTB_TO_VENDOR_BOOT
-	int fdt_id = get_imx_android_fdt_id();
+	/* The first fdt contains the Id<-->Name mapping, parse expected
+	 * dt id from it.
+	 */
+	dt_entry = (struct dt_table_entry *)((ulong)dt_img + \
+			be32_to_cpu(dt_img->dt_entries_offset));
+	int fdt_id = get_imx_android_fdt_id((void *)((ulong)dt_img +
+						be32_to_cpu(dt_entry->dt_offset)));
 	if (fdt_id < 0) {
 		printf("Failed to select device tree!\n");
 		goto fail;
