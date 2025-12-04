@@ -96,3 +96,8 @@
 	sd-uhs-sdr104;
 	sd-uhs-ddr50;
 };
+
+&wdog3 {
+	u-boot,noautostart;
+	timeout-sec = <60>;
+};
