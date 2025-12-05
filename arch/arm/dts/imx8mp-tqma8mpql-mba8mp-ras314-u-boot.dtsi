@@ -59,3 +59,8 @@
 	assigned-clock-rates = <400000000>;
 	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_400M>;
 };
+
+&wdog1 {
+	u-boot,noautostart;
+	timeout-sec = <60>;
+};
