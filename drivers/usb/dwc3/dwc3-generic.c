@@ -506,7 +506,7 @@ static int dwc3_glue_bind_common(struct udevice *parent, ofnode node)
 	const char *name = ofnode_get_name(node);
 	const char *driver;
 	enum usb_dr_mode dr_mode;
-	struct udevice *dev;
+	struct udevice *dev = NULL;
 	int ret;
 
 	debug("%s: subnode name: %s\n", __func__, name);
@@ -520,20 +520,33 @@ static int dwc3_glue_bind_common(struct udevice *parent, ofnode node)
 	    (dr_mode == USB_DR_MODE_PERIPHERAL || dr_mode == USB_DR_MODE_OTG)) {
 		debug("%s: dr_mode: OTG or Peripheral\n", __func__);
 		driver = "dwc3-generic-peripheral";
-	} else if (CONFIG_IS_ENABLED(USB_HOST) && dr_mode == USB_DR_MODE_HOST) {
-		debug("%s: dr_mode: HOST\n", __func__);
-		driver = "dwc3-generic-host";
-	} else {
-		debug("%s: unsupported dr_mode %d\n", __func__, dr_mode);
-		return -ENODEV;
+
+		ret = device_bind_driver_to_node(parent, driver, name,
+					 node, &dev);
+		if (ret) {
+			debug("%s: not able to bind usb device mode\n",
+			      __func__);
+			return ret;
+		}
 	}
 
-	ret = device_bind_driver_to_node(parent, driver, name,
+	if (CONFIG_IS_ENABLED(USB_HOST) &&
+		(dr_mode == USB_DR_MODE_HOST || dr_mode == USB_DR_MODE_OTG)) {
+		debug("%s: dr_mode: HOST\n", __func__);
+		driver = "dwc3-generic-host";
+
+		ret = device_bind_driver_to_node(parent, driver, name,
 					 node, &dev);
-	if (ret) {
-		debug("%s: not able to bind usb device mode\n",
-		      __func__);
-		return ret;
+		if (ret) {
+			debug("%s: not able to bind usb device mode\n",
+			      __func__);
+			return ret;
+		}
+	}
+
+	if (!dev) {
+		debug("%s: unsupported dr_mode %d\n", __func__, dr_mode);
+		return -ENODEV;
 	}
 
 	return 0;
