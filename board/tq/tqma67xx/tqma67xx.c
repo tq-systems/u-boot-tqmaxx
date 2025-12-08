@@ -108,8 +108,20 @@ static const char *tqma67xx_cpu_type(void)
 	u32 device_id = readl(CTRLMMR_WKUP_JTAG_DEVICE_ID);
 
 	switch ((device_id & JTAG_DEV_ID_MASK) >> JTAG_DEV_ID_SHIFT) {
+	case JTAG_DEV_ID_AM6734:
+		return "AM6734";
+	case JTAG_DEV_ID_AM6754:
+		return "AM6754";
+	case JTAG_DEV_ID_AM67A74:
+		return "AM67A74";
 	case JTAG_DEV_ID_AM67A94:
 		return "AM67A94";
+	case JTAG_DEV_ID_TDA4AEN:
+		return "TDA4AEN";
+	case JTAG_DEV_ID_TDA4VEN:
+		return "TDA4VEN";
+	case JTAG_DEV_ID_XJ722S:
+		return "XJ722S";
 	default:
 		return "unknown";
 	}
