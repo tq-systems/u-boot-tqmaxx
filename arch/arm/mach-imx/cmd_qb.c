@@ -356,8 +356,9 @@ static int do_qb_mmc(int dev, bool save)
 {
 	struct mmc *mmc;
 	int ret = 0, mmc_dev;
+	bool has_hw_part;
+	u8 orig_part, part;
 	u32 offset;
-	char blk_cmd[128];
 	void *buf;
 
 	mmc_dev = mmc_get_device_index(dev);
@@ -374,10 +375,12 @@ static int do_qb_mmc(int dev, bool save)
 	if (ret)
 		return ret;
 
-	if (IS_SD(mmc) || mmc->part_config == MMCPART_NOAVAILABLE) {
-		sprintf(blk_cmd, "mmc dev %x", mmc_dev);
-	} else {
-		u8 part = EXT_CSD_EXTRACT_BOOT_PART(mmc->part_config);
+	has_hw_part = !IS_SD(mmc) && mmc->part_config != MMCPART_NOAVAILABLE;
+
+	if (has_hw_part) {
+		orig_part = mmc_get_blk_desc(mmc)->hwpart;
+		part = EXT_CSD_EXTRACT_BOOT_PART(mmc->part_config);
+
 		if (part == 1 || part == 2) {
 #if IS_ENABLED(CONFIG_SCMI_FIRMWARE)
 			u8 stage;
@@ -387,16 +390,13 @@ static int do_qb_mmc(int dev, bool save)
 					part = (part == 1) ? 2 : 1;
 			}
 #endif
-			sprintf(blk_cmd, "mmc dev %x %x", mmc_dev, part);
-		} else {
-			sprintf(blk_cmd, "mmc dev %x", mmc_dev);
 		}
-	}
 
-	/** Select the device and partition */
-	ret = run_command(blk_cmd, 0);
-	if (ret)
-		return ret;
+		/** Select the partition */
+		ret = mmc_switch_part(mmc, part);
+		if (ret)
+			return ret;
+	}
 
 	ret = get_qbdata_offset(mmc, MMC_DEV, &offset);
 	if (ret)
@@ -419,7 +419,13 @@ static int do_qb_mmc(int dev, bool save)
 			 QB_STATE_LOAD_SIZE / mmc->write_bl_len, (const void*)buf);
 	free(buf);
 
-	return (ret > 0 ? 0 : -1);
+	ret = (ret > 0) ? 0 : -1;
+
+	/** Return to original partition */
+	if (has_hw_part)
+		ret |= mmc_switch_part(mmc, orig_part);
+
+	return ret;
 }
 
 static int do_qb_spi(int dev, bool save)
