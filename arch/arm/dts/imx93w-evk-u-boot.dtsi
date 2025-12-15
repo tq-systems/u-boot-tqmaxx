@@ -1,0 +1,18 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Copyright 2025 NXP
+ */
+
+#include "imx93-11x11-evk-u-boot.dtsi"
+
+&pinctrl_lpi2c3_gpio {
+       fsl,pins = <
+               MX93_PAD_GPIO_IO00__GPIO2_IO00                  0x31e
+               MX93_PAD_GPIO_IO01__GPIO2_IO01                  0x31e
+       >;
+};
+
+&lpi2c3 {
+	gpios = <&gpio2 0 GPIO_ACTIVE_LOW>,
+		<&gpio2 1 GPIO_ACTIVE_LOW>;
+};
