@@ -74,23 +74,16 @@ static bool qb_check(void)
 	u32 i, size, crc;
 
 	/**
-	 * Ensure MAC is not empty, the reason is that
+	 * Ensure CRC is not empty, the reason is that
 	 * the data is invalidated after first save run
+	 * or after it is overwritten.
 	 */
 	qb_state = (struct ddrphy_qb_state *)CONFIG_SAVED_QB_STATE_BASE;
+	size = sizeof(struct ddrphy_qb_state) - sizeof(qb_state->crc);
+	crc = qb_crc32(qb_state->mac, size);
 
-	if (is_imx95_a0()) {
-		/** For iMX95 A0/1 check the CRC32 value */
-		size = sizeof(struct ddrphy_qb_state) - MAC_LENGTH * sizeof(u32);
-		crc = qb_crc32(&qb_state->TrainedVREFCA_A0, size);
-
-		return (crc == qb_state->mac[0]);
-	} else {
-		for (i = 0; i < MAC_LENGTH; i++) {
-			if (qb_state->mac[i] == 0)
-				return false;
-		}
-	}
+	if (!qb_state->crc || crc != qb_state->crc)
+		return false;
 
 	return true;
 }
