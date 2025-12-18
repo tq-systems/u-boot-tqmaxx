@@ -49,9 +49,9 @@
 				BOOTCONFIG_CHECKSUM_SIZE
 
 /* Reserve space to insert 'rng-seed' node */
-#define RNG_SEED_DTB_RESERVE (64)
-/* Generate 24 bytes (out of 32 bytes) rng seed */
-#define RNG_SEED_LENGTH (24)
+#define RNG_SEED_DTB_RESERVE (96)
+/* Generate 64 bytes rng seed */
+#define RNG_SEED_LENGTH (64)
 
 static char andr_tmp_str[ANDR_BOOT_ARGS_SIZE + 1];
 
