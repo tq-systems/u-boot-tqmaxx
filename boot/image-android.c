@@ -886,7 +886,10 @@ int fixup_gbl_bootargs(void *fdt_addr) {
 		bootargs = (char *)fdt_getprop(fdt_addr, offset,
 						"bootargs", NULL);
 		strncat(commandline, " ", COMMANDLINE_LENGTH - strlen(commandline));
-		strncat(commandline, bootargs, COMMANDLINE_LENGTH - strlen(commandline));
+
+		if (bootargs) {
+			strncat(commandline, bootargs, COMMANDLINE_LENGTH - strlen(commandline));
+		}
 
 		if (fdt_setprop(fdt_addr, offset,
 				"bootargs", commandline,
