@@ -777,11 +777,6 @@ int gen_rpmb_key(struct keyslot_package *kp) {
 	}
 	original_part = dev_desc->hwpart;
 #endif
-	if (NULL == dev_desc) {
-		printf("** Block device MMC %d not supported\n", mmcc);
-		goto fail;
-	}
-
 	blksz = dev_desc->blksz;
 	fill = (unsigned char *)memalign(ALIGN_BYTES, blksz);
 
