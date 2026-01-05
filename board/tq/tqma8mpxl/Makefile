@@ -10,7 +10,7 @@ obj-$(CONFIG_TQMA8MPXL_BB_MBA8MPXL) += tqma8mpxl-mba8mpxl.o
 obj-$(CONFIG_TQMA8MPXL_BB_MBA8MP_RAS314) += tqma8mpxl-mba8mp-ras314.o
 
 ifdef CONFIG_SPL_BUILD
-obj-y += spl.o
+obj-y += spl.o tqma8mpxl-dram.o
 # the baseboard implementation for SPL is the same
 obj-$(CONFIG_TQMA8MPXL_BB_MBA8MPXL)$(CONFIG_TQMA8MPXL_BB_MBA8MP_RAS314) += spl-mba8mpxl.o
 
@@ -27,4 +27,3 @@ obj-$(CONFIG_TQMA8MPXL_RAM_8192MB) += lpddr4_timing_8gb_no_ecc.o
 endif
 
 endif
-

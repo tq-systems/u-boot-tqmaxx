@@ -5,6 +5,7 @@
  * Author: Paul Gerber
  */
 
+#include <asm/arch/ddr.h>
 #include <linux/types.h>
 
 struct dram_info {
@@ -14,6 +15,9 @@ struct dram_info {
 	void (*board_dram_ecc_scrub)(void);
 #endif
 };
+
+extern struct dram_cfg_param ddr_ddrphy_trained_csr[];
+extern const u32 ddr_ddrphy_trained_csr_num;
 
 #if defined(CONFIG_IMX8M_DRAM_INLINE_ECC)
 

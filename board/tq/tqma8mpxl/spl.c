@@ -165,6 +165,14 @@ static void spl_dram_init(int memtype)
 	}
 
 	/*
+	 * ddr_ddrphy_trained_csr_num can't be set in the timing configuration
+	 * directly, as it is defined in a different compilation unit. Fill it
+	 * in here.
+	 */
+	tqma8mpxl_dram_info[idx].table->ddrphy_trained_csr = ddr_ddrphy_trained_csr;
+	tqma8mpxl_dram_info[idx].table->ddrphy_trained_csr_num = ddr_ddrphy_trained_csr_num;
+
+	/*
 	 * If inline ECC is enabled, ddr_init calls board_dram_ecc_scrub. The
 	 * TQMa8MPxL implementation of board_dram_ecc_scrub uses
 	 * tqma8mpxl_ram_timing_idx to call the appropriate scrubbing function
