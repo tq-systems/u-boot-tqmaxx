@@ -9,7 +9,7 @@ obj-y += tqma8mpxs.o
 obj-$(CONFIG_TQMA8MPXS_BB_MB_SMARC_2) += tqma8mpxs-mb-smarc-2.o
 
 ifdef CONFIG_SPL_BUILD
-obj-y += spl.o
+obj-y += spl.o tqma8mpxs-dram.o
 obj-$(CONFIG_TQMA8MPXS_BB_MB_SMARC_2) += spl-mb-smarc-2.o
 
 ifdef CONFIG_IMX8M_DRAM_INLINE_ECC
@@ -25,4 +25,3 @@ obj-$(CONFIG_TQMA8MPXS_RAM_8192MB) += lpddr4_timing_8gb_no_ecc.o
 endif
 
 endif
-
