@@ -44,6 +44,9 @@
 /* Initial environment variables */
 #define CFG_MODULE_ENV_SETTINGS                                        \
 	"scriptaddr=0x95500000\0"                                      \
+	"script_offset_f=0x5f0000\0"                                   \
+	"script_size_f=0x10000\0"                                      \
+	"rootfs_part_f=ubi\0"                                          \
 	"image=Image\0"                                                \
 	"kernel_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0"        \
 	"pxefile_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0"       \
@@ -95,13 +98,14 @@
 #include "tq-imx-shared-env.h"
 
 #define CFG_EXTRA_ENV_SETTINGS                                         \
+	BOOTENV                                                        \
+	BOOTENV_SF                                                     \
 	CFG_CORTEXM_ENV_SETTINGS                                       \
 	CFG_MODULE_ENV_SETTINGS                                        \
 	TQ_IMX_SHARED_ENV_SETTINGS                                     \
 	TQ_IMX_SPI_UBOOT_UPDATE                                        \
 	BB_ENV_SETTINGS                                                \
 	CFG_MFG_ENV_SETTINGS                                           \
-	BOOTENV                                                        \
 	NETDEV_ENV
 
 #endif /* __TQMA95XXLA_H */
