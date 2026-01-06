@@ -39,10 +39,10 @@
 
 /* Initial environment variables */
 #define CFG_MODULE_ENV_SETTINGS                                        \
-	"scriptaddr=0x83500000\0"                                      \
+	"scriptaddr=0x80200000\0"                                      \
 	"image=Image\0"                                                \
 	"kernel_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0"        \
-	"pxefile_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0"       \
+	"pxefile_addr_r=0x80300000\0"                                  \
 	"fdt_addr_r=0x83000000\0"                                      \
 	"fdtoverlay_addr_r=0x83080000\0"                               \
 	"initrd_addr=0x83800000\0"                                     \
