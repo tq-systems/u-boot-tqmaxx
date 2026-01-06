@@ -111,6 +111,39 @@ int print_bootinfo(void)
 	return 0;
 }
 
+void tq_set_boot_targets(void)
+{
+	enum boot_device bt_dev;
+	const char *target;
+
+	if (env_get("boot_targets"))
+		return;
+
+	bt_dev = get_boot_device();
+
+	switch (bt_dev) {
+	case SD1_BOOT:
+	case MMC1_BOOT:
+		target = "mmc0";
+		break;
+	case SD2_BOOT:
+	case MMC2_BOOT:
+		target = "mmc1";
+		break;
+	case USB_BOOT:
+		target = "usb0";
+		break;
+	case QSPI_BOOT:
+		/* Change to serial_flash0 when migrating from distroboot to stdboot */
+		target = "sf0";
+		break;
+	default:
+		return;
+	}
+
+	env_set("boot_targets", target);
+}
+
 /**
  * print some useful board information
  *

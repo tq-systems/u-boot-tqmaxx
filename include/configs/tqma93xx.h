@@ -58,6 +58,8 @@
 	"uboot_spi_start=0x0\0"                                        \
 	"uboot_spi_size=0x400000\0"                                    \
 	"uboot=bootstream.bin\0"                                       \
+	"boot_targets=\0"                                              \
+	""
 
 #if !defined(CONFIG_BOOTCOMMAND)
 #warn "CONFIG_BOOTCOMMAND missing in configuration"
