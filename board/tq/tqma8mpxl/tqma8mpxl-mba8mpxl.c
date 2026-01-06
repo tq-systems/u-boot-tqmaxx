@@ -16,6 +16,7 @@
 #include <linux/delay.h>
 #include <usb.h>
 
+#include "../common/tq_bb.h"
 #include "../common/tq_board_gpio.h"
 #include "../common/tq_som_features.h"
 
@@ -197,6 +198,7 @@ int tq_bb_board_late_init(void)
 #ifdef CONFIG_ENV_IS_IN_MMC
 	board_late_mmc_env_init();
 #endif
+	tq_set_boot_targets();
 
 	return 0;
 }
