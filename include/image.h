@@ -1341,10 +1341,16 @@ int fit_image_verify_with_data(const void *fit, int image_noffset,
 int fit_image_verify(const void *fit, int noffset);
 #if CONFIG_IS_ENABLED(FIT_SIGNATURE)
 int fit_config_verify(const void *fit, int conf_noffset);
+bool fit_config_is_verify_required(void);
 #else
 static inline int fit_config_verify(const void *fit, int conf_noffset)
 {
 	return 0;
+}
+
+static inline bool fit_config_is_verify_required(void)
+{
+	return false;
 }
 #endif
 int fit_all_image_verify(const void *fit);
