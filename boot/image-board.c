@@ -1031,15 +1031,20 @@ int image_locate_script(void *buf, int size, const char *fit_uname,
 			}
 
 			if (!fit_uname) {
+				bool allow_fallback = !confname && !fit_config_is_verify_required();
+
 				/* If confname is empty, use the default */
 				if (confname && *confname)
 					noffset = fit_conf_get_node(fit_hdr, confname);
 				else
 					noffset = fit_conf_get_node(fit_hdr, NULL);
 				if (noffset < 0) {
-					if (!confname)
+					if (allow_fallback)
 						goto fallback;
-					printf("Could not find config %s\n", confname);
+					if (confname && *confname)
+						printf("Could not find config %s\n", confname);
+					else
+						printf("Could not find default config\n");
 					return 1;
 				}
 
@@ -1051,9 +1056,13 @@ int image_locate_script(void *buf, int size, const char *fit_uname,
 								 FIT_SCRIPT_PROP,
 								 IH_PHASE_NONE);
 				if (noffset < 0) {
-					if (!confname)
+					if (allow_fallback)
 						goto fallback;
-					printf("Could not find script in %s\n", confname);
+					if (confname && *confname)
+						printf("Could not find script in config %s\n",
+						       confname);
+					else
+						printf("Could not find script in default config\n");
 					return 1;
 				}
 			} else {

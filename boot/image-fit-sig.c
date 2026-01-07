@@ -548,3 +548,34 @@ int fit_config_verify(const void *fit, int conf_noffset)
 	return fit_config_verify_required_keys(fit, conf_noffset,
 					       gd_fdt_blob());
 }
+
+/**
+ * fit_config_is_verify_required() - determine if verification of conf sections
+ * is required
+ *
+ * @return true if at least one signature key with required = "conf" exists,
+ *	false otherwise
+ */
+bool fit_config_is_verify_required(void)
+{
+	const void *key_blob = gd_fdt_blob();
+	int key_node, noffset;
+
+	key_node = fdt_subnode_offset(key_blob, 0, FIT_SIG_NODENAME);
+	if (key_node < 0) {
+		debug("%s: No signature node found: %s\n", __func__,
+		      fdt_strerror(key_node));
+		return false;
+	}
+
+	fdt_for_each_subnode(noffset, key_blob, key_node) {
+		const char *required;
+
+		required = fdt_getprop(key_blob, noffset, FIT_KEY_REQUIRED,
+				       NULL);
+		if (required && !strcmp(required, "conf"))
+			return true;
+	}
+
+	return false;
+}
