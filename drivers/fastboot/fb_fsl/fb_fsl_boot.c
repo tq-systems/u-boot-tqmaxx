@@ -1120,7 +1120,8 @@ int do_boota(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[]) {
 	 */
 	/* Check if we have overlap between ramdisk, kernel and dtb */
 	if ((ramdisk_addr >= kernel_addr) && (ramdisk_addr < ALIGN(fdt_addr + fdt_size, 4096))) {
-		ulong ramdisk_addr_relocate = (ulong)ALIGN(fdt_addr + fdt_size, 4096);
+		/* Put ramdisk after the fdt, leave 1MB space for possible fdt runtime adjustment. */
+		ulong ramdisk_addr_relocate = (ulong)ALIGN(fdt_addr + fdt_size + (1024 * 1024), 4096);
 
 		printf("boota: ramdisk overlap detected!!! ");
 		printf("redirecting ramdisk from 0x%08x to 0x%08x\n", (uint32_t)ramdisk_addr, (uint32_t)ramdisk_addr_relocate);
