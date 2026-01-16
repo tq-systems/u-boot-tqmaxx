@@ -28,29 +28,9 @@
 #include "../common/tq_bb.h"
 #include "../common/tq_eeprom.h"
 
+#include "tqma91_93-dram.h"
+
 DECLARE_GLOBAL_DATA_PTR;
-
-/* DDR timing / configurtation generated with NXP DDR Tool */
-extern struct dram_timing_info tqma93xxca_dram_timing_1gb;
-extern struct dram_timing_info tqma93xxla_dram_timing_1gb;
-extern struct dram_timing_info tqma93xxla_dram_timing_1gb5;
-extern struct dram_timing_info tqma93xxca_dram_timing_2gb;
-extern struct dram_timing_info tqma93xxla_dram_timing_2gb;
-
-extern struct dram_timing_info tqma91xxca_dram_timing_1gb;
-extern struct dram_timing_info tqma91xxla_dram_timing_1gb;
-
-enum tqma93xxxa_ram_size {
-	TQMA93XXXA_RAM_SIZE_1G = 1,
-	TQMA93XXXA_RAM_SIZE_1G5,
-	TQMA93XXXA_RAM_SIZE_2G,
-};
-
-struct dram_info {
-	struct dram_timing_info	*table;  /* from NXP RPA */
-	phys_size_t		size;    /* size of RAM */
-	char			variant; /* char to help user query */
-};
 
 static const struct dram_info tqma93xx_dram_info[]  = {
 #if IS_ENABLED(CONFIG_IMX91)
