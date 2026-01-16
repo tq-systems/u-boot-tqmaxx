@@ -35,4 +35,7 @@ struct dram_info {
 	char			variant; /* char to help user query */
 };
 
+extern struct dram_cfg_param ddr_ddrphy_trained_csr[];
+extern const u32 ddr_ddrphy_trained_csr_num;
+
 #endif

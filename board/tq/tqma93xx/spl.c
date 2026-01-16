@@ -194,6 +194,14 @@ static void spl_dram_init(int memtype)
 		hang();
 	}
 
+	/*
+	 * ddr_ddrphy_trained_csr_num can't be set in the timing configuration
+	 * directly, as it is defined in a different compilation unit. Fill it
+	 * in here.
+	 */
+	tqma93xx_dram_info[idx].table->ddrphy_trained_csr = ddr_ddrphy_trained_csr;
+	tqma93xx_dram_info[idx].table->ddrphy_trained_csr_num = ddr_ddrphy_trained_csr_num;
+
 	tqma93xx_ram_timing_idx = idx;
 	if (ddr_init(tqma93xx_dram_info[idx].table))
 		tqma93xx_ram_timing_idx = -1;
