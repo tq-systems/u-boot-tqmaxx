@@ -1988,8 +1988,7 @@ struct dram_timing_info tqma93xxla_dram_timing_1gb = {
 	.ddrphy_trained_csr_num = ARRAY_SIZE(ddr_ddrphy_trained_csr),
 	.ddrphy_pie = ddr_phy_pie,
 	.ddrphy_pie_num = ARRAY_SIZE(ddr_phy_pie),
-	.fsp_table = { 3733, 1866, 625,  },
+	.fsp_table = { 3733, 1866, 625, },
 	.fsp_cfg = ddr_dram_fsp_cfg,
 	.fsp_cfg_num = ARRAY_SIZE(ddr_dram_fsp_cfg),
 };
-

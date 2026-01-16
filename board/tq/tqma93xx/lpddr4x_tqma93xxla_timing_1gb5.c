@@ -1987,4 +1987,3 @@ struct dram_timing_info tqma93xxla_dram_timing_1gb5 = {
 	.fsp_cfg = ddr_dram_fsp_cfg,
 	.fsp_cfg_num = ARRAY_SIZE(ddr_dram_fsp_cfg),
 };
-
