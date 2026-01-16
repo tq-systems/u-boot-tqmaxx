@@ -214,8 +214,9 @@ static void spl_dram_init(int memtype)
 		hang();
 	}
 
-	ddr_init(tqma93xx_dram_info[idx].table);
 	tqma93xx_ram_timing_idx = idx;
+	if (ddr_init(tqma93xx_dram_info[idx].table))
+		tqma93xx_ram_timing_idx = -1;
 }
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
