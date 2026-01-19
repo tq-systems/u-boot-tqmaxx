@@ -249,6 +249,20 @@ int mmc_get_env_dev(void)
 }
 #endif
 
+int power_on_hsio(void)
+{
+	int ret;
+	struct udevice *dev;
+
+	ret = uclass_get_device_by_name(UCLASS_CLK, "protocol@14", &dev);
+	if (ret)
+		return ret;
+
+	ret = scmi_pwd_state_set(dev, 0, SCMI_PD(HSIO_TOP), 0);
+
+	return ret;
+}
+
 #ifdef CONFIG_USB_PORT_AUTO
 int board_usb_gadget_port_auto(void)
 {
