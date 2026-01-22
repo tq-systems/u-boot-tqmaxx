@@ -127,6 +127,18 @@ int get_runtime_bootconfig(char *bootconfig, int *len) {
 	}
 	strncat(bootconfig, bootargs_trusty, *len - strlen(bootconfig));
 
+#ifdef CONFIG_APPEND_BOOTARGS
+	/* Add 'append_bootconfig' environment variable to hold some paramemters
+	 * which need to be appended to bootconfig. Must use ":=" operator when
+	 * doing variable override.
+	 */
+	char *append_bootconfig = env_get("append_bootconfig");
+	if (append_bootconfig) {
+		strncat(bootconfig, " ", *len - strlen(bootconfig));
+		strncat(bootconfig, append_bootconfig, *len - strlen(bootconfig));
+	}
+#endif
+
 	if (*len <= strlen(bootconfig)) {
 		log_err("Bootconfig buffer overflow!\n");
 		return -1;
