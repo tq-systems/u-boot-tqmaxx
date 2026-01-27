@@ -4,8 +4,8 @@
  *
  * Code generated with DDR Tool v3.9.0_8.7-378c9b3d8.
  * DDR PHY FW2022.01
- * Part number: 1,5 GByte x16
- * generated from TQMa93xxLA.DDR-Timing.1.5GB.V25.12.0008.mex
+ * Part number: 1 GByte x16
+ * generated from TQMa93xxCA.DDR-Timing.2GB.V25.12.0008.mex
  */
 
 #include <linux/kernel.h>
@@ -14,12 +14,12 @@
 /* Initialize DDRC registers */
 static struct dram_cfg_param ddr_ddrc_cfg[] = {
 	{ 0x4e300110, 0x44300001 },
-	{ 0x4e300000, 0x8000df },
+	{ 0x4e300000, 0x8000ff },
 	{ 0x4e300008, 0x0 },
 	{ 0x4e300080, 0x80000512 },
 	{ 0x4e300084, 0x0 },
 	{ 0x4e300114, 0x1002 },
-	{ 0x4e300260, 0x4088 },
+	{ 0x4e300260, 0x4080 },
 	{ 0x4e300f04, 0x80 },
 	{ 0x4e300800, 0x43b30002 },
 	{ 0x4e300804, 0x1f1f1f1f },
@@ -122,22 +122,22 @@ static struct dram_fsp_cfg ddr_dram_fsp_cfg[] = {
 
 /* PHY Initialize Configuration */
 static struct dram_cfg_param ddr_ddrphy_cfg[] = {
-	{ 0x100a0, 0x2 },
-	{ 0x100a1, 0x1 },
-	{ 0x100a2, 0x0 },
-	{ 0x100a3, 0x4 },
-	{ 0x100a4, 0x3 },
-	{ 0x100a5, 0x5 },
-	{ 0x100a6, 0x6 },
-	{ 0x100a7, 0x7 },
-	{ 0x110a0, 0x4 },
-	{ 0x110a1, 0x0 },
-	{ 0x110a2, 0x2 },
-	{ 0x110a3, 0x3 },
-	{ 0x110a4, 0x1 },
-	{ 0x110a5, 0x5 },
-	{ 0x110a6, 0x7 },
-	{ 0x110a7, 0x6 },
+	{ 0x100a0, 0x4 },
+	{ 0x100a1, 0x5 },
+	{ 0x100a2, 0x6 },
+	{ 0x100a3, 0x7 },
+	{ 0x100a4, 0x0 },
+	{ 0x100a5, 0x1 },
+	{ 0x100a6, 0x2 },
+	{ 0x100a7, 0x3 },
+	{ 0x110a0, 0x3 },
+	{ 0x110a1, 0x2 },
+	{ 0x110a2, 0x0 },
+	{ 0x110a3, 0x1 },
+	{ 0x110a4, 0x7 },
+	{ 0x110a5, 0x6 },
+	{ 0x110a6, 0x4 },
+	{ 0x110a7, 0x5 },
 	{ 0x1005f, 0x5ff },
 	{ 0x1015f, 0x5ff },
 	{ 0x1105f, 0x5ff },
@@ -999,7 +999,7 @@ static struct dram_fsp_msg ddr_dram_fsp_msg[] = {
 };
 
 /* ddr timing config params */
-struct dram_timing_info tqma93xxla_dram_timing_1gb5 = {
+struct dram_timing_info tqma93xxca_dram_timing_2gb_noecc = {
 	.ddrc_cfg = ddr_ddrc_cfg,
 	.ddrc_cfg_num = ARRAY_SIZE(ddr_ddrc_cfg),
 	.ddrphy_cfg = ddr_ddrphy_cfg,

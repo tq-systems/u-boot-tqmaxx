@@ -13,14 +13,14 @@
 
 /* DDR timing / configuration generated with NXP DDR Tool */
 #if IS_ENABLED(CONFIG_IMX93)
-extern struct dram_timing_info tqma93xxca_dram_timing_1gb;
-extern struct dram_timing_info tqma93xxla_dram_timing_1gb;
-extern struct dram_timing_info tqma93xxla_dram_timing_1gb5;
-extern struct dram_timing_info tqma93xxca_dram_timing_2gb;
-extern struct dram_timing_info tqma93xxla_dram_timing_2gb;
+extern struct dram_timing_info tqma93xxca_dram_timing_1gb_noecc;
+extern struct dram_timing_info tqma93xxla_dram_timing_1gb_noecc;
+extern struct dram_timing_info tqma93xxla_dram_timing_1gb5_noecc;
+extern struct dram_timing_info tqma93xxca_dram_timing_2gb_noecc;
+extern struct dram_timing_info tqma93xxla_dram_timing_2gb_noecc;
 #elif IS_ENABLED(CONFIG_IMX91)
-extern struct dram_timing_info tqma91xxca_dram_timing_1gb;
-extern struct dram_timing_info tqma91xxla_dram_timing_1gb;
+extern struct dram_timing_info tqma91xxca_dram_timing_1gb_noecc;
+extern struct dram_timing_info tqma91xxla_dram_timing_1gb_noecc;
 #endif
 
 enum tqma93xxxa_ram_size {

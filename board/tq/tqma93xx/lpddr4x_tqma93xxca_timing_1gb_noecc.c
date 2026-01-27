@@ -4,8 +4,8 @@
  *
  * Code generated with DDR Tool v3.9.0_8.7-378c9b3d8.
  * DDR PHY FW2022.01
- * Part number: 2 GByte x16
- * generated from TQMa93xxLA.DDR-Timing.2GB.V25.12.0008.mex
+ * Part number: 1 GByte x16
+ * generated from TQMa93xxCA.DDR-Timing.1GB.V25.12.0008.mex
  */
 
 #include <linux/kernel.h>
@@ -14,9 +14,9 @@
 /* Initialize DDRC registers */
 static struct dram_cfg_param ddr_ddrc_cfg[] = {
 	{ 0x4e300110, 0x44300001 },
-	{ 0x4e300000, 0x8000ff },
+	{ 0x4e300000, 0x8000bf },
 	{ 0x4e300008, 0x0 },
-	{ 0x4e300080, 0x80000512 },
+	{ 0x4e300080, 0x80000412 },
 	{ 0x4e300084, 0x0 },
 	{ 0x4e300114, 0x1002 },
 	{ 0x4e300260, 0x4080 },
@@ -38,20 +38,20 @@ static struct dram_cfg_param ddr_ddrc_cfg[] = {
 static struct dram_fsp_cfg ddr_dram_fsp_cfg[] = {
 	{
 		{
-			{ 0x4e300100, 0x24AB421B },
+			{ 0x4e300100, 0x24A0421B },
 			{ 0x4e300104, 0xDAEE001B },
-			{ 0x4e300108, 0x2F26E233 },
+			{ 0x4e300108, 0x2F263233 },
 			{ 0x4e30010C, 0x0005E18B },
 			{ 0x4e300124, 0x1C030000 },
 			{ 0x4e300160, 0x0000B102 },
 			{ 0x4e30016C, 0x35F00000 },
 			{ 0x4e300170, 0x8B0B0608 },
 			{ 0x4e300250, 0x00000028 },
-			{ 0x4e300254, 0x015B015B },
+			{ 0x4e300254, 0x00FE00FE },
 			{ 0x4e300258, 0x00000008 },
 			{ 0x4e30025C, 0x00000400 },
 			{ 0x4e300300, 0x224F2215 },
-			{ 0x4e300304, 0x015B2213 },
+			{ 0x4e300304, 0x00FE2213 },
 			{ 0x4e300308, 0x0A3C0E03 },
 		},
 		{
@@ -67,16 +67,16 @@ static struct dram_fsp_cfg ddr_dram_fsp_cfg[] = {
 	},
 	{
 		{
-			{ 0x4e300100, 0x12552100 },
+			{ 0x4e300100, 0x124F2100 },
 			{ 0x4e300104, 0xDA77000E },
-			{ 0x4e300108, 0x181AB4AA },
+			{ 0x4e300108, 0x181AE4AA },
 			{ 0x4e30010C, 0x005101E6 },
 			{ 0x4e300124, 0x0E030000 },
 			{ 0x4e300160, 0x0000B101 },
 			{ 0x4e30016C, 0x30900000 },
 			{ 0x4e300170, 0x8A0A0508 },
 			{ 0x4e300250, 0x00000014 },
-			{ 0x4e300254, 0x00AA00AA },
+			{ 0x4e300254, 0x007B007B },
 			{ 0x4e300258, 0x00000008 },
 			{ 0x4e30025C, 0x00000400 },
 		},
@@ -93,16 +93,16 @@ static struct dram_fsp_cfg ddr_dram_fsp_cfg[] = {
 	},
 	{
 		{
-			{ 0x4e300100, 0x00061000 },
+			{ 0x4e300100, 0x00051000 },
 			{ 0x4e300104, 0xDA55000A },
-			{ 0x4e300108, 0x6E66FA48 },
+			{ 0x4e300108, 0x6E660A48 },
 			{ 0x4e30010C, 0x0031010D },
 			{ 0x4e300124, 0x04830000 },
 			{ 0x4e300160, 0x0000B100 },
 			{ 0x4e30016C, 0x30000000 },
 			{ 0x4e300170, 0x89090408 },
 			{ 0x4e300250, 0x00000007 },
-			{ 0x4e300254, 0x00340034 },
+			{ 0x4e300254, 0x00240024 },
 			{ 0x4e300258, 0x00000008 },
 			{ 0x4e30025C, 0x00000400 },
 		},
@@ -122,22 +122,22 @@ static struct dram_fsp_cfg ddr_dram_fsp_cfg[] = {
 
 /* PHY Initialize Configuration */
 static struct dram_cfg_param ddr_ddrphy_cfg[] = {
-	{ 0x100a0, 0x2 },
-	{ 0x100a1, 0x1 },
-	{ 0x100a2, 0x0 },
-	{ 0x100a3, 0x4 },
-	{ 0x100a4, 0x3 },
-	{ 0x100a5, 0x5 },
-	{ 0x100a6, 0x6 },
-	{ 0x100a7, 0x7 },
-	{ 0x110a0, 0x4 },
-	{ 0x110a1, 0x0 },
-	{ 0x110a2, 0x2 },
-	{ 0x110a3, 0x3 },
-	{ 0x110a4, 0x1 },
-	{ 0x110a5, 0x5 },
-	{ 0x110a6, 0x7 },
-	{ 0x110a7, 0x6 },
+	{ 0x100a0, 0x4 },
+	{ 0x100a1, 0x5 },
+	{ 0x100a2, 0x6 },
+	{ 0x100a3, 0x7 },
+	{ 0x100a4, 0x0 },
+	{ 0x100a5, 0x1 },
+	{ 0x100a6, 0x2 },
+	{ 0x100a7, 0x3 },
+	{ 0x110a0, 0x3 },
+	{ 0x110a1, 0x2 },
+	{ 0x110a2, 0x0 },
+	{ 0x110a3, 0x1 },
+	{ 0x110a4, 0x7 },
+	{ 0x110a5, 0x6 },
+	{ 0x110a6, 0x4 },
+	{ 0x110a7, 0x5 },
 	{ 0x1005f, 0x5ff },
 	{ 0x1015f, 0x5ff },
 	{ 0x1105f, 0x5ff },
@@ -999,7 +999,7 @@ static struct dram_fsp_msg ddr_dram_fsp_msg[] = {
 };
 
 /* ddr timing config params */
-struct dram_timing_info tqma93xxla_dram_timing_2gb = {
+struct dram_timing_info tqma93xxca_dram_timing_1gb_noecc = {
 	.ddrc_cfg = ddr_ddrc_cfg,
 	.ddrc_cfg_num = ARRAY_SIZE(ddr_ddrc_cfg),
 	.ddrphy_cfg = ddr_ddrphy_cfg,

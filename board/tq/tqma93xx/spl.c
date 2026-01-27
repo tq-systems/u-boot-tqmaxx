@@ -34,14 +34,14 @@ DECLARE_GLOBAL_DATA_PTR;
 
 static const struct dram_info tqma93xx_dram_info[]  = {
 #if IS_ENABLED(CONFIG_IMX91)
-	{ &tqma91xxca_dram_timing_1gb, SZ_1G * 1ULL, 'c' },
-	{ &tqma91xxla_dram_timing_1gb, SZ_1G * 1ULL, 'l' },
+	{ &tqma91xxca_dram_timing_1gb_noecc, SZ_1G * 1ULL, 'c' },
+	{ &tqma91xxla_dram_timing_1gb_noecc, SZ_1G * 1ULL, 'l' },
 #elif IS_ENABLED(CONFIG_IMX93)
-	{ &tqma93xxca_dram_timing_1gb, SZ_1G * 1ULL, 'c' },
-	{ &tqma93xxca_dram_timing_2gb, SZ_1G * 2ULL, 'c' },
-	{ &tqma93xxla_dram_timing_1gb, SZ_1G * 1ULL, 'l' },
-	{ &tqma93xxla_dram_timing_1gb5, SZ_512M * 3ULL, 'l' },
-	{ &tqma93xxla_dram_timing_2gb, SZ_1G * 2ULL, 'l' },
+	{ &tqma93xxca_dram_timing_1gb_noecc, SZ_1G * 1ULL, 'c' },
+	{ &tqma93xxca_dram_timing_2gb_noecc, SZ_1G * 2ULL, 'c' },
+	{ &tqma93xxla_dram_timing_1gb_noecc, SZ_1G * 1ULL, 'l' },
+	{ &tqma93xxla_dram_timing_1gb5_noecc, SZ_512M * 3ULL, 'l' },
+	{ &tqma93xxla_dram_timing_2gb_noecc, SZ_1G * 2ULL, 'l' },
 #endif
 };
 
