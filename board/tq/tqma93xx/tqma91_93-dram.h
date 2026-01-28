@@ -24,7 +24,8 @@ extern struct dram_timing_info tqma91xxla_dram_timing_1gb_noecc;
 #endif
 
 enum tqma93xxxa_ram_size {
-	TQMA93XXXA_RAM_SIZE_1G = 1,
+	TQMA93XXXA_RAM_SIZE_0G5 = 1,
+	TQMA93XXXA_RAM_SIZE_1G,
 	TQMA93XXXA_RAM_SIZE_1G5,
 	TQMA93XXXA_RAM_SIZE_2G,
 };

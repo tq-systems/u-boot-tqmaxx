@@ -34,14 +34,22 @@ DECLARE_GLOBAL_DATA_PTR;
 
 static const struct dram_info tqma93xx_dram_info[]  = {
 #if IS_ENABLED(CONFIG_IMX91)
-	{ &tqma91xxca_dram_timing_1gb_noecc, SZ_1G * 1ULL, 'c' },
-	{ &tqma91xxla_dram_timing_1gb_noecc, SZ_1G * 1ULL, 'l' },
+#if IS_ENABLED(CONFIG_TQMA93XX_RAM_1024MB)
+	{ &tqma91xxca_dram_timing_1gb_noecc, TQMA93XXXA_RAM_SIZE_1G * ULL(SZ_512M), 'c' },
+	{ &tqma91xxla_dram_timing_1gb_noecc, TQMA93XXXA_RAM_SIZE_1G * ULL(SZ_512M), 'l' },
+#endif
 #elif IS_ENABLED(CONFIG_IMX93)
-	{ &tqma93xxca_dram_timing_1gb_noecc, SZ_1G * 1ULL, 'c' },
-	{ &tqma93xxca_dram_timing_2gb_noecc, SZ_1G * 2ULL, 'c' },
-	{ &tqma93xxla_dram_timing_1gb_noecc, SZ_1G * 1ULL, 'l' },
-	{ &tqma93xxla_dram_timing_1gb5_noecc, SZ_512M * 3ULL, 'l' },
-	{ &tqma93xxla_dram_timing_2gb_noecc, SZ_1G * 2ULL, 'l' },
+#if IS_ENABLED(CONFIG_TQMA93XX_RAM_1024MB)
+	{ &tqma93xxca_dram_timing_1gb_noecc, TQMA93XXXA_RAM_SIZE_1G * ULL(SZ_512M), 'c' },
+	{ &tqma93xxla_dram_timing_1gb_noecc, TQMA93XXXA_RAM_SIZE_1G * ULL(SZ_512M), 'l' },
+#endif
+#if IS_ENABLED(CONFIG_TQMA93XX_RAM_1536MB)
+	{ &tqma93xxla_dram_timing_1gb5_noecc, TQMA93XXXA_RAM_SIZE_1G5 * ULL(SZ_512M), 'l' },
+#endif
+#if IS_ENABLED(CONFIG_TQMA93XX_RAM_2048MB)
+	{ &tqma93xxca_dram_timing_2gb_noecc, TQMA93XXXA_RAM_SIZE_2G * ULL(SZ_512M), 'c' },
+	{ &tqma93xxla_dram_timing_2gb_noecc, TQMA93XXXA_RAM_SIZE_2G * ULL(SZ_512M), 'l' },
+#endif
 #endif
 };
 
@@ -81,9 +89,10 @@ static int tqma93xx_query_ddr_timing(void)
 
 	puts("Warning: no valid EEPROM!\n"
 	     "Please choose LPDDR size to proceed.\n"
-	     "1 -   1 GiB\n"
-	     "2 - 1.5 GiB\n"
-	     "3 -   2 GiB\n");
+	     "1 - 512 MiB\n"
+	     "2 -   1 GiB\n"
+	     "3 - 1.5 GiB\n"
+	     "4 -   2 GiB\n");
 
 	for (;;) {
 		/* Flush input */
@@ -93,7 +102,7 @@ static int tqma93xx_query_ddr_timing(void)
 		sel = serial_getc();
 		putc('\n');
 
-		if ((sel == '1') || (sel == '2') || (sel == '3'))
+		if ((sel == '1') || (sel == '2') || (sel == '3') || (sel == '4'))
 			break;
 
 		puts("Please enter a valid size.\n");
@@ -106,14 +115,11 @@ static int tqma93xx_query_ddr_timing(void)
 	ramsize_choice = (unsigned int)sel - (unsigned int)'0';
 
 	switch (ramsize_choice) {
+	case TQMA93XXXA_RAM_SIZE_0G5:
 	case TQMA93XXXA_RAM_SIZE_1G:
-		ramsize = (phys_size_t)1 * SZ_1G;
-		break;
 	case TQMA93XXXA_RAM_SIZE_1G5:
-		ramsize = (phys_size_t)3 * SZ_512M;
-		break;
 	case TQMA93XXXA_RAM_SIZE_2G:
-		ramsize = (phys_size_t)2 * SZ_1G;
+		ramsize = ramsize_choice * ULL(SZ_512M);
 		break;
 	default:
 		puts("ERROR: no valid RAM size given, stop\n");
