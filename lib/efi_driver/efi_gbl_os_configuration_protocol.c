@@ -163,8 +163,8 @@ int get_runtime_bootconfig(char *bootconfig, int *len) {
 }
 
 static efi_status_t EFIAPI fixup_bootconfig(
-	struct efi_gbl_os_configuration_protocol *this, const char *bootconfig,
-	size_t size, char *fixup, size_t *fixup_buffer_size)
+	struct efi_gbl_os_configuration_protocol *this, size_t size,
+	const char *bootconfig, size_t *fixup_buffer_size, char *fixup)
 {
 	char bootconfig_buf[2048] = {0};
 	uint32_t len = sizeof(bootconfig_buf);
@@ -191,8 +191,8 @@ static efi_status_t EFIAPI fixup_bootconfig(
 
 static efi_status_t EFIAPI
 select_device_trees(struct efi_gbl_os_configuration_protocol *this,
-		    struct efi_gbl_verified_device_tree *device_trees,
-		    size_t num_device_trees)
+		    size_t num_device_trees,
+		    struct efi_gbl_verified_device_tree *device_trees)
 {
 	int fdt_id = 0;
 
