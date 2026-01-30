@@ -42,19 +42,21 @@ choice
 	default TQMA95XXSA_RAM_2GB_DEFAULT
 	help
 	  Select RAM Configuration. Depending on Board usage and assembled RAM
-	  base address and usable RAM size has to be adjusted
+	  base address and usable RAM size have to be adjusted.
 
 config TQMA95XXSA_RAM_2GB_DEFAULT
 	bool "2 GiB default configuration"
 	help
-	  2GB RAM assembled. The first 256 MiB are reserved. In this reserved region
-	  is the shared memory for RPMSG with M7 is located
+	  2GiB RAM assembled. The first 256 MiB are reserved.
+	  In this reserved region the shared memory for Cortex-M7
+	  is located.
 
 config TQMA95XXSA_RAM_4GB_DEFAULT
 	bool "4 GiB default configuration"
 	help
-	  4GB RAM assembled. The first 256 MiB are reserved. In this reserved region
-	  is the shared memory for RPMSG with M7 is located
+	  4GiB RAM assembled. The first 256 MiB are reserved.
+	  In this reserved region the shared memory for Cortex-M7
+	  is located.
 
 endchoice
 
