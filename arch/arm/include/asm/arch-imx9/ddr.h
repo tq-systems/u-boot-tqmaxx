@@ -179,11 +179,6 @@ int ddr_cfg_phy(struct dram_timing_info *timing_info);
 void load_lpddr4_phy_pie(void);
 void ddrphy_trained_csr_save(struct dram_cfg_param *param, unsigned int num);
 void *dram_config_save(struct dram_timing_info *info, unsigned long base);
-void board_dram_ecc_scrub(void);
-void ddrc_inline_ecc_scrub(unsigned int start_address,
-			   unsigned int range_address);
-void ddrc_inline_ecc_scrub_end(unsigned int start_address,
-			       unsigned int range_address);
 
 /* utils function for ddr phy training */
 int wait_ddrphy_training_complete(void);
