@@ -308,7 +308,9 @@ void k3_enable_cache(void)
 {
 #if !(defined(CONFIG_SYS_ICACHE_OFF) && defined(CONFIG_SYS_DCACHE_OFF))
 	gd->ram_top = CFG_SYS_SDRAM_BASE;
+#ifdef CONFIG_XPL_BUILD
 	int ret = 0;
+#endif
 
 	dram_init();
 	dram_init_banksize();
@@ -319,9 +321,11 @@ void k3_enable_cache(void)
 	gd->ram_top += get_effective_memsize();
 	gd->relocaddr = gd->ram_top;
 
+#ifdef CONFIG_XPL_BUILD
 	ret = spl_reserve_video_from_ram_top();
 	if (ret)
 		panic("Failed to reserve framebuffer memory (%d)\n", ret);
+#endif
 
 	gd->arch.tlb_addr = gd->relocaddr - gd->arch.tlb_size;
 	gd->arch.tlb_addr &= ~(0x10000 - 1);
