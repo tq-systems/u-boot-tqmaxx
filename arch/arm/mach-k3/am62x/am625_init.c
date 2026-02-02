@@ -324,7 +324,7 @@ void board_init_f(ulong dummy)
 		if (ret)
 			panic("DRAM init failed: %d\n", ret);
 	}
-	spl_enable_cache();
+	k3_enable_cache();
 
 	fixup_a53_cpu_freq_by_speed_grade();
 }

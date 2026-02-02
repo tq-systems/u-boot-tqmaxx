@@ -304,7 +304,7 @@ void enable_caches(void)
 }
 #endif
 
-void spl_enable_cache(void)
+void k3_enable_cache(void)
 {
 #if !(defined(CONFIG_SYS_ICACHE_OFF) && defined(CONFIG_SYS_DCACHE_OFF))
 	gd->ram_top = CFG_SYS_SDRAM_BASE;
