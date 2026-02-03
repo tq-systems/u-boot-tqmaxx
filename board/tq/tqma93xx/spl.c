@@ -35,6 +35,10 @@ DECLARE_GLOBAL_DATA_PTR;
 static const struct dram_info tqma93xx_dram_info[]  = {
 #if IS_ENABLED(CONFIG_IMX91)
 
+#if IS_ENABLED(CONFIG_TQMA93XX_RAM_512MB)
+	DRAM_INFO_ENTRY(tqma91xxca_dram_timing_0gb5, TQMA93XXXA_RAM_SIZE_0G5, 'c'),
+	DRAM_INFO_ENTRY(tqma91xxla_dram_timing_0gb5, TQMA93XXXA_RAM_SIZE_0G5, 'l'),
+#endif
 #if IS_ENABLED(CONFIG_TQMA93XX_RAM_1024MB)
 	DRAM_INFO_ENTRY(tqma91xxca_dram_timing_1gb, TQMA93XXXA_RAM_SIZE_1G, 'c'),
 	DRAM_INFO_ENTRY(tqma91xxla_dram_timing_1gb, TQMA93XXXA_RAM_SIZE_1G, 'l'),

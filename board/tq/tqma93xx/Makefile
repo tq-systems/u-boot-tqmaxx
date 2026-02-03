@@ -19,9 +19,13 @@ obj-$(CONFIG_IMX93) += tqma93xx-dram.o
 
 ifeq ($(CONFIG_IMX91), y)
 ifeq ($(CONFIG_IMX9_DRAM_INLINE_ECC), y)
+obj-$(CONFIG_TQMA93XX_RAM_512MB) += lpddr4_tqma91xxca_timing_0gb5_ecc.o
+obj-$(CONFIG_TQMA93XX_RAM_512MB) += lpddr4_tqma91xxla_timing_0gb5_ecc.o
 obj-$(CONFIG_TQMA93XX_RAM_1024MB) += lpddr4_tqma91xxca_timing_1gb_ecc.o
 obj-$(CONFIG_TQMA93XX_RAM_1024MB) += lpddr4_tqma91xxla_timing_1gb_ecc.o
 else
+obj-$(CONFIG_TQMA93XX_RAM_512MB) += lpddr4_tqma91xxca_timing_0gb5_noecc.o
+obj-$(CONFIG_TQMA93XX_RAM_512MB) += lpddr4_tqma91xxla_timing_0gb5_noecc.o
 obj-$(CONFIG_TQMA93XX_RAM_1024MB) += lpddr4_tqma91xxca_timing_1gb_noecc.o
 obj-$(CONFIG_TQMA93XX_RAM_1024MB) += lpddr4_tqma91xxla_timing_1gb_noecc.o
 endif

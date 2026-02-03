@@ -79,6 +79,7 @@ choice
 
 config TQMA93XX_RAM_MULTI
 	bool "TQMa91/93 with multiple DRAM configs - Single image"
+	select TQMA93XX_RAM_512MB if TARGET_TQMA91XX
 	select TQMA93XX_RAM_1024MB
 	select TQMA93XX_RAM_1536MB if TARGET_TQMA93XX
 	select TQMA93XX_RAM_2048MB if TARGET_TQMA93XX
@@ -99,6 +100,9 @@ config TQMA93XX_RAM_SINGLE_1GB
 	  IMX9_DRAM_INLINE_ECC.
 
 endchoice
+
+config TQMA93XX_RAM_512MB
+	bool
 
 config TQMA93XX_RAM_1024MB
 	bool

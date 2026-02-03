@@ -59,6 +59,8 @@ extern struct dram_timing_info DRAM_TIMING_NAME(tqma93xxla_dram_timing_1gb5);
 extern struct dram_timing_info DRAM_TIMING_NAME(tqma93xxca_dram_timing_2gb);
 extern struct dram_timing_info DRAM_TIMING_NAME(tqma93xxla_dram_timing_2gb);
 #elif IS_ENABLED(CONFIG_IMX91)
+extern struct dram_timing_info DRAM_TIMING_NAME(tqma91xxca_dram_timing_0gb5);
+extern struct dram_timing_info DRAM_TIMING_NAME(tqma91xxla_dram_timing_0gb5);
 extern struct dram_timing_info DRAM_TIMING_NAME(tqma91xxca_dram_timing_1gb);
 extern struct dram_timing_info DRAM_TIMING_NAME(tqma91xxla_dram_timing_1gb);
 #endif
