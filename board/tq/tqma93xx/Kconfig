@@ -85,7 +85,8 @@ config TQMA93XX_RAM_MULTI
 	help
 	  Build a single U-Boot image usable for all RAM variants.
 	  The RAM size and variant to be used is derived from TQ_VARD
-	  data in EEPROM
+	  data in EEPROM. Inline ECC can be selected with config item
+	  IMX9_DRAM_INLINE_ECC.
 
 config TQMA93XX_RAM_SINGLE_1GB
 	bool "TQMa91/93 with 1 GB RAM"
@@ -94,7 +95,8 @@ config TQMA93XX_RAM_SINGLE_1GB
 	  Build a U-Boot image usable for 1GB RAM variants.
 	  This can be used as a base for configurations with
 	  a fixed feature set can not depend on VARD for security
-	  reasons.
+	  reasons.  Inline ECC can be selected with config item
+	  IMX9_DRAM_INLINE_ECC.
 
 endchoice
 

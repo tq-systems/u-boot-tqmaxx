@@ -159,6 +159,11 @@ int checkboard(void)
 	printf("Board: %s on a %s\n", tq_get_boardname(),
 	       tq_bb_get_boardname());
 
+	if (IS_ENABLED(CONFIG_IMX9_DRAM_INLINE_ECC))
+		puts("ECC:\tInline\n");
+	else
+		puts("ECC:\tNone\n");
+
 	return tq_bb_checkboard();
 }
 
