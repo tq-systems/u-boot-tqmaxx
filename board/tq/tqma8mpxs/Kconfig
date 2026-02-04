@@ -17,7 +17,6 @@ config TQMA8MPXS_DEFAULTS
 	default y
 	select TQ_BB
 	select TQ_EEPROM
-	select TQ_RTC
 	select TQ_SDMMC
 	select TQ_SPI_NOR
 	select TQ_VARD

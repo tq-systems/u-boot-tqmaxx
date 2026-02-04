@@ -346,15 +346,13 @@ int board_late_init(void)
 	if (!ret) {
 		tq_board_handle_eeprom_data(bname, &eeprom);
 		if (tq_vard_valid(&eeprom.tq_hw_data.vard)) {
-			/*
-			 * set quartz load to 7.000 femtofarads
-			 * only if RTC is assembled, to prevent warnings
-			 */
 			if (tq_vard_has_rtc(&eeprom.tq_hw_data.vard)) {
-				if (tq_pcf85063_adjust_capacity(0,
-								0x51,
-								7000))
-					puts("PCF85063: adjust error\n");
+				struct udevice *rtc;
+
+				/* Force RTC probe to apply fixes configured in DTB */
+				ret = uclass_get_device_by_name(UCLASS_RTC, "rtc@51", &rtc);
+				if (ret)
+					pr_err("RTC: detection failed %d\n", ret);
 			}
 			/*
 			 * fill feature presence flags from vard
