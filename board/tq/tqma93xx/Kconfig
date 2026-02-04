@@ -14,7 +14,6 @@ config TQMA93XX_DEFAULTS
 	select IMX9_LPDDR4X
 	select TQ_BB
 	select TQ_EEPROM
-	select TQ_RTC
 	select TQ_SDMMC
 	select TQ_VARD
 	imply MISC
