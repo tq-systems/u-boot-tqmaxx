@@ -16,6 +16,7 @@
 #include <asm/arch/sys_proto.h>
 #include <asm/arch-imx9/ccm_regs.h>
 #include <asm/mach-imx/boot_mode.h>
+#include <dm/uclass.h>
 #include <jffs2/load_kernel.h>
 
 #include "../common/tq_bb.h"
