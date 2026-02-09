@@ -5,26 +5,27 @@
  * Author: Markus Niebel
  */
 
+#include <bloblist.h>
 #include <env.h>
 #include <errno.h>
+#include <mmc.h>
+#include <mtd_node.h>
+#include <spl.h>
 #include <asm/bootm.h>
 #include <asm/io.h>
 #include <asm/setup.h>
-#include <asm/mach-imx/iomux-v3.h>
-#include <asm-generic/gpio.h>
+#include <asm/arch/clock.h>
 #include <asm/arch/imx8mp_pins.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/mach-imx/boot_mode.h>
-#include <asm/mach-imx/gpio.h>
-#include <asm/mach-imx/mxc_i2c.h>
-#include <asm/arch/clock.h>
-#include <spl.h>
 #include <asm/mach-imx/dma.h>
-#include <bloblist.h>
+#include <asm/mach-imx/gpio.h>
+#include <asm/mach-imx/iomux-v3.h>
+#include <asm/mach-imx/mxc_i2c.h>
+#include <asm-generic/gpio.h>
+#include <dm/uclass.h>
 #include <jffs2/load_kernel.h>
-#include <mtd_node.h>
 #include <power/pmic.h>
-#include <mmc.h>
 
 #include "../common/tq_bb.h"
 #include "../common/tq_blob.h"
