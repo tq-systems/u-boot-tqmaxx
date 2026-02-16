@@ -12,9 +12,6 @@
 #include <linux/stringify.h>
 #include <asm/arch/imx-regs.h>
 
-#define CFG_SYS_UBOOT_BASE	\
-	(QSPI0_AMBA_BASE + CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR * 512)
-
 #if defined(CONFIG_FASTBOOT) && !defined(CONFIG_FSL_FASTBOOT)
 
 #if !defined(CONFIG_FASTBOOT_FLASH_MMC_DEV)
