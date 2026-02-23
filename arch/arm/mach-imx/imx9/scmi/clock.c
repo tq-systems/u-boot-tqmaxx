@@ -57,19 +57,19 @@ void init_uart_clk(u32 index)
 		clock_id = SCMI_CLK(LPUART3);
 		break;
 	case 3:
-		clock_id = IMX95_CLK_LPUART4;
+		clock_id = SCMI_CLK(LPUART4);
 		break;
 	case 4:
-		clock_id = IMX95_CLK_LPUART5;
+		clock_id = SCMI_CLK(LPUART5);
 		break;
 	case 5:
-		clock_id = IMX95_CLK_LPUART6;
+		clock_id = SCMI_CLK(LPUART6);
 		break;
 	case 6:
-		clock_id = IMX95_CLK_LPUART7;
+		clock_id = SCMI_CLK(LPUART7);
 		break;
 	case 7:
-		clock_id = IMX95_CLK_LPUART8;
+		clock_id = SCMI_CLK(LPUART8);
 		break;
 	default:
 		return;
