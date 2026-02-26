@@ -56,7 +56,7 @@
 	"ubimtdidx=ubi\0"                                                \
 	"ubirootfs=rootfs.ubifs\0"                                     \
 	"ubirootfspart=ubi\0"                                          \
-	"ubirootfsvol=rootfs\0"                                        \
+	"ubirootfsvol=root\0"                                          \
 	"update_rootfs_spi="                                           \
 		"run check_ipaddr; "                                   \
 		"setenv filesize; "                                    \
