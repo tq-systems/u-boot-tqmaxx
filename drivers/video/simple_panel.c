@@ -283,6 +283,7 @@ static const struct udevice_id simple_panel_ids[] = {
 	  .data = (ulong)&tfc_s9700rtwv43tr_01b_data },
 	{ .compatible = "rocktech,rk043fn48h" },
 	{ .compatible = "jdi,tx26d202vm0bwa" },
+	{ .compatible = "tianma,tm070jvhg33" },
 	{ }
 };
 
