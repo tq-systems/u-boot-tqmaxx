@@ -231,6 +231,7 @@ static const struct udevice_id simple_panel_ids[] = {
 	{ .compatible = "panasonic,vvx10f004b00",
 	  .data = (ulong)&panasonic_vvx10f004b00 },
 	{ .compatible = "jdi,tx26d202vm0bwa" },
+	{ .compatible = "tianma,tm070jvhg33" },
 	{ }
 };
 
