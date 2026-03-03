@@ -44,7 +44,7 @@
 	"script_size_f=0x10000\0"                                      \
 	"rootfs_part_f=ubi\0"                                          \
 	"image=Image\0"                                                \
-	"kernel_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0"        \
+	"kernel_addr_r=0x90000000\0"                                   \
 	"pxefile_addr_r=0x80300000\0"                                  \
 	"fdt_addr_r=0x83000000\0"                                      \
 	"fdtoverlay_addr_r=0x83080000\0"                               \
