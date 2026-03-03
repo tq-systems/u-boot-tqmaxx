@@ -157,3 +157,6 @@ DRAM
 +------------+------------+------+---------------------------------------+
 | 0x96000000 | 0x97FFFFFF |      | BL32_BASE + BL32_SIZE (optee)         |
 +------------+------------+------+---------------------------------------+
+
+More addresses are defined in the environment and must be taken
+into consideration when making changes.
