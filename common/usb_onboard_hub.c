@@ -277,6 +277,12 @@ static const struct onboard_hub_data usb5744_data = {
 	.supply_names = { "vdd-supply" },
 };
 
+static const struct onboard_hub_data tusb8041_data = {
+	.reset_us = 3000,
+	.num_supplies = 1,
+	.supply_names = { "vdd-supply" },
+};
+
 static const struct onboard_hub_data usbhx3_data = {
 	.reset_us = 10000,
 	.num_supplies = 2,
@@ -293,6 +299,18 @@ static const struct udevice_id usb_onboard_hub_ids[] = {
 	}, {
 		.compatible = "usb424,5744",	/* USB5744 USB 3.0 */
 		.data = (ulong)&usb5744_data,
+	}, {
+		.compatible = "usb451,8140",	/* TI TUSB8041 USB 3.0 */
+		.data = (ulong)&tusb8041_data,
+	}, {
+		.compatible = "usb451,8142",	/* TI TUSB8041 USB 2.0 */
+		.data = (ulong)&tusb8041_data,
+	}, {
+		.compatible = "usb451,8440",	/* TI TUSB8044 USB 3.0 */
+		.data = (ulong)&tusb8041_data,
+	}, {
+		.compatible = "usb451,8442",	/* TI TUSB8044 USB 2.0 */
+		.data = (ulong)&tusb8041_data,
 	}, {
 		.compatible = "usb4b4,6504",	/* Cypress HX3 USB 3.0 */
 		.data = (ulong)&usbhx3_data,
