@@ -318,16 +318,10 @@ static int am65_cpsw_start(struct udevice *dev)
 	if (common->started)
 		return 0;
 
-	ret = power_domain_on(&common->pwrdmn);
-	if (ret) {
-		dev_err(dev, "power_domain_on() failed %d\n", ret);
-		goto out;
-	}
-
 	ret = clk_enable(&common->fclk);
 	if (ret) {
 		dev_err(dev, "clk enabled failed %d\n", ret);
-		goto err_off_pwrdm;
+		goto out;
 	}
 
 	common->rx_next = 0;
@@ -463,8 +457,6 @@ err_free_tx:
 	dma_free(&common->dma_tx);
 err_off_clk:
 	clk_disable(&common->fclk);
-err_off_pwrdm:
-	power_domain_off(&common->pwrdmn);
 out:
 	dev_err(dev, "%s end error\n", __func__);
 
@@ -784,6 +776,12 @@ static int am65_cpsw_probe_nuss(struct udevice *dev)
 	cpsw_common->bus_freq =
 			dev_read_u32_default(dev, "bus_freq",
 					     AM65_CPSW_MDIO_BUS_FREQ_DEF);
+
+	ret = power_domain_on(&cpsw_common->pwrdmn);
+	if (ret) {
+		dev_err(dev, "power_domain_on() failed %d\n", ret);
+		goto out;
+	}
 
 	dev_info(dev, "K3 CPSW: nuss_ver: 0x%08X cpsw_ver: 0x%08X ale_ver: 0x%08X Ports:%u\n",
 		 readl(cpsw_common->ss_base),
