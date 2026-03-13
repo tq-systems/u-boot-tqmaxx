@@ -160,6 +160,18 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 }
 #endif
 
+#if IS_ENABLED(CONFIG_OF_BOARD_FIXUP)
+extern int board_fix_fdt_fuse(void *fdt);
+
+int board_fix_fdt(void *fdt)
+{
+	/* Remove nodes based on fuses. */
+	board_fix_fdt_fuse(fdt);
+
+	return 0;
+}
+#endif
+
 void board_quiesce_devices(void)
 {
 	int ret;
