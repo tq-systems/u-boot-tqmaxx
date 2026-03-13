@@ -562,6 +562,18 @@
 				status = "disabled";
 			};
 
+			adc1: adc@44530000 {
+				compatible = "nxp,imx94-adc", "nxp,imx93-adc";
+				reg = <0x44530000 0x10000>;
+				interrupts = <GIC_SPI 117 IRQ_TYPE_LEVEL_HIGH>,
+					     <GIC_SPI 118 IRQ_TYPE_LEVEL_HIGH>,
+					     <GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH>;
+				clocks = <&scmi_clk IMX94_CLK_ADC>;
+				clock-names = "ipg";
+				#io-channel-cells = <1>;
+				status = "disabled";
+			};
+
 			mu2: mailbox@445b0000 {
 				compatible = "fsl,imx95-mu";
 				reg = <0x445b0000 0x1000>;
