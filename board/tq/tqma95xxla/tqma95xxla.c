@@ -67,19 +67,6 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 }
 #endif
 
-int board_phys_sdram_size(phys_size_t *size)
-{
-	if (!size)
-		return -EINVAL;
-
-	*size = PHYS_SDRAM_SIZE;
-#if defined(PHYS_SDRAM_2_SIZE)
-	*size += PHYS_SDRAM_2_SIZE;
-#endif
-
-	return 0;
-}
-
 void board_quiesce_devices(void)
 {
 	tq_bb_board_quiesce_devices();
