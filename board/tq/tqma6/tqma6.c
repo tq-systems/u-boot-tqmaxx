@@ -109,7 +109,7 @@ int board_late_init(void)
 	return 0;
 }
 
-#if (CONFIG_IS_ENABLED(LDO_BYPASS_CHECK))
+#if (IS_ENABLED(CONFIG_LDO_BYPASS_CHECK))
 /* TODO, use external pmic, for now always leave default */
 void ldo_mode_set(int ldo_bypass)
 {
