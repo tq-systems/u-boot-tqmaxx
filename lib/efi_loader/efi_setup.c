@@ -12,7 +12,6 @@
 #include <log.h>
 #include <asm-generic/unaligned.h>
 
-#include <efi_gbl_image_loading_protocol.h>
 #include <efi_gbl_avb_protocol.h>
 #include <efi_gbl_os_configuration_protocol.h>
 #include <efi_gbl_boot_control_protocol.h>
@@ -20,6 +19,7 @@
 #include <efi_gbl_fastboot_transport_protocol.h>
 #include <efi_gbl_fastboot_protocol.h>
 #include <efi_gbl_vendor_partition.h>
+#include <efi_gbl_timestamp_protocol.h>
 
 #define OBJ_LIST_NOT_INITIALIZED 1
 
@@ -359,13 +359,6 @@ efi_status_t efi_init_obj_list(void)
 	    !IS_ENABLED(CONFIG_EFI_CAPSULE_ON_DISK_EARLY))
 		ret = efi_launch_capsules();
 
-	/* Register GBL Image Loading protocol */
-	if (IS_ENABLED(CONFIG_EFI_GBL_IMAGE_LOADING)) {
-		ret = efi_gbl_image_loading_register();
-		if (ret != EFI_SUCCESS)
-			goto out;
-	}
-
 	/* Register GBL AVB protocol */
 	if (IS_ENABLED(CONFIG_EFI_GBL_AVB)) {
 		ret = efi_gbl_avb_register();
@@ -419,6 +412,15 @@ efi_status_t efi_init_obj_list(void)
 			goto out;
 		}
 	}
+
+	/* Register GBL timestamp protocol */
+	if (IS_ENABLED(CONFIG_EFI_GBL_TIMESTAMP)) {
+		ret = efi_gbl_timestamp_register();
+		if (ret != EFI_SUCCESS) {
+			goto out;
+		}
+	}
+
 out:
 	efi_obj_list_initialized = ret;
 	return ret;

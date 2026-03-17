@@ -84,11 +84,9 @@ static int check_and_send_single_var(char *var_name, char *buf, size_t buf_len,
 
 static efi_status_t EFIAPI get_var_all(struct efi_gbl_fastboot_protocol* this,
 				       void* ctx, get_var_all_callback cb) {
-	int n = 0, count = 0;
+	int n = 0;
 	char buf[FASTBOOT_RESPONSE_LEN];
-	char partition_base_name[MAX_PTN][20];
 	char var_name[FASTBOOT_RESPONSE_LEN];
-	char slot_suffix[2][5] = {"a","b"};
 
 	EFI_ENTRY("%p %p %p", this, ctx, cb);
 
@@ -100,40 +98,6 @@ static efi_status_t EFIAPI get_var_all(struct efi_gbl_fastboot_protocol* this,
 	for (n = 0; fastboot_common_var[n] != NULL; n++) {
 		if (check_and_send_single_var(fastboot_common_var[n],
 					      buf, sizeof(buf), ctx, cb))
-			return EFI_EXIT(EFI_DEVICE_ERROR);
-	}
-
-	/* Get has-slot variables */
-	count = fastboot_parts_get_name(partition_base_name);
-	for (n = 0; n < count; n++) {
-		snprintf(var_name, sizeof(var_name), "has-slot:%s", partition_base_name[n]);
-		if (check_and_send_single_var(var_name, buf, sizeof(buf), ctx, cb))
-			return EFI_EXIT(EFI_DEVICE_ERROR);
-	}
-
-	/* Get current slot */
-	strncpy(var_name, "current-slot:", FASTBOOT_RESPONSE_LEN);
-	if (check_and_send_single_var(var_name, buf, sizeof(buf), ctx, cb))
-		return EFI_EXIT(EFI_DEVICE_ERROR);
-
-	/* Get slot-successful variable */
-	for (n = 0; n < 2; n++) {
-		snprintf(var_name, sizeof(var_name), "slot-successful:%s", slot_suffix[n]);
-		if (check_and_send_single_var(var_name, buf, sizeof(buf), ctx, cb))
-			return EFI_EXIT(EFI_DEVICE_ERROR);
-	}
-
-	/* Get slot-unbootable variable */
-	for (n = 0; n < 2; n++) {
-		snprintf(var_name, sizeof(var_name), "slot-unbootable:%s", slot_suffix[n]);
-		if (check_and_send_single_var(var_name, buf, sizeof(buf), ctx, cb))
-			return EFI_EXIT(EFI_DEVICE_ERROR);
-	}
-
-	/* Get slot-retry-count variable */
-	for (n = 0; n < 2; n++) {
-		snprintf(var_name, sizeof(var_name), "slot-retry-count:%s", slot_suffix[n]);
-		if (check_and_send_single_var(var_name, buf, sizeof(buf), ctx, cb))
 			return EFI_EXIT(EFI_DEVICE_ERROR);
 	}
 
@@ -186,85 +150,19 @@ static efi_status_t EFIAPI get_staged(struct efi_gbl_fastboot_protocol* this, ui
 }
 
 /* Defined in fb_fsl_command.c */
-extern void flashing(char *cmd, char *response);
-static efi_status_t EFIAPI set_lock(struct efi_gbl_fastboot_protocol* this,
-				    bool critical, bool lock) {
-	uint8_t response[FASTBOOT_RESPONSE_LEN] = {0};
-
-	EFI_ENTRY("%p %d %d", this, critical, lock);
-
-	if (!this) {
-		return EFI_EXIT(EFI_INVALID_PARAMETER);
-	}
-
-	if (critical) {
-		/* We don't support critical partitions lock/unlock
-		 * so we just return silently with success.
-		 */
-		return EFI_EXIT(EFI_SUCCESS);
-	}
-
-	if (lock) {
-		/* Lock the device */
-		flashing("lock", response);
-	} else {
-		/* Unlock the device */
-		flashing("unlock", response);
-	}
-
-	if (strncmp(response, "OKAY", 4) == 0) {
-		/* Successfully locked/unlocked */
-		return EFI_EXIT(EFI_SUCCESS);
-	} else {
-		/* Failed to lock/unlock */
-		return EFI_EXIT(EFI_DEVICE_ERROR);
-	}
-}
-
-static efi_status_t EFIAPI get_lock(struct efi_gbl_fastboot_protocol* this,
-				    bool critical, bool* out_lock) {
-	FbLockState lock_state = FASTBOOT_LOCK_ERROR;
-
-	EFI_ENTRY("%p %d %p", this, critical, out_lock);
-
-	if (!this || !out_lock) {
-		return EFI_EXIT(EFI_INVALID_PARAMETER);
-	}
-
-	if (critical) {
-		/* We don't support critical partitions lock state */
-		return EFI_EXIT(EFI_UNSUPPORTED);
-	}
-
-	lock_state = fastboot_get_lock_stat();
-	if (lock_state == FASTBOOT_UNLOCK) {
-		*out_lock = false;
-	} else {
-		if (lock_state == FASTBOOT_LOCK_ERROR) {
-			log_err("failed to get lock status! Setting to locked.\n");
-			fastboot_set_lock_stat(FASTBOOT_LOCK);
-		}
-		*out_lock = true;
-	}
-
-	return EFI_EXIT(EFI_SUCCESS);
-}
-
-/* Defined in fb_fsl_command.c */
 extern void erase(char *cmd, char *response);
 static efi_status_t EFIAPI vendor_erase(struct efi_gbl_fastboot_protocol* this,
-					const char* part_name, size_t part_name_len,
-					efi_gbl_fastboot_erase_action* action) {
+					const char* part_name, efi_gbl_fastboot_erase_action* action) {
 	char response[FASTBOOT_RESPONSE_LEN] = {0};
 	char cmd[FASTBOOT_RESPONSE_LEN] = {0};
 
-	EFI_ENTRY("%p %p %ld %p", this, part_name, part_name_len, action);
+	EFI_ENTRY("%p %p %p", this, part_name, action);
 
-	if (!this || !part_name || !part_name_len || !action) {
+	if (!this || !part_name || !action) {
 		return EFI_EXIT(EFI_INVALID_PARAMETER);
 	}
 
-	strncat(cmd, part_name, part_name_len);
+	strncat(cmd, part_name, strlen(part_name));
 	erase(cmd, response);
 
 	if (strncmp(response, "OKAY", 4) == 0) {
@@ -284,6 +182,8 @@ static char *gbl_covered_oem_commands[] = {
 	NULL
 };
 
+/* Defined in fb_fsl_command.c */
+extern void flashing(char *cmd, char *response);
 static efi_status_t EFIAPI command_exec(struct efi_gbl_fastboot_protocol* this,
 				        size_t num_args, const char* const* args,
 				        size_t download_data_used_len,
@@ -365,23 +265,24 @@ exit:
 	return EFI_EXIT(status);
 }
 
-static efi_status_t EFIAPI start_local_session(struct efi_gbl_fastboot_protocol* this, void** ctx) {
-	EFI_ENTRY("%p %p", this, ctx);
+static efi_status_t EFIAPI get_partition_type(struct efi_gbl_fastboot_protocol* this,
+					      const uint8_t* part_name, uint8_t* part_type,
+					      size_t* part_type_len) {
+	EFI_ENTRY("%p %p %p %p", this, part_name, part_type, part_type_len);
 
-	return EFI_EXIT(EFI_UNSUPPORTED);
-}
+	if (!this || !part_name || !part_type || !part_type_len) {
+		return EFI_EXIT(EFI_INVALID_PARAMETER);
+	}
 
-static efi_status_t EFIAPI update_local_session(struct efi_gbl_fastboot_protocol* this,
-						void* ctx, uint8_t* buf, size_t* buf_size) {
-	EFI_ENTRY("%p %p %p %p", this, ctx, buf, buf_size);
+	if (!strcmp(part_name, FASTBOOT_PARTITION_DATA) ||
+			!strcmp(part_name, FASTBOOT_PARTITION_METADATA)) {
+		strcpy(part_type, "f2fs");
+		*part_type_len = strlen("f2fs");
 
-	return EFI_EXIT(EFI_UNSUPPORTED);
-}
-
-static efi_status_t EFIAPI close_local_session(struct efi_gbl_fastboot_protocol* this, void* ctx) {
-	EFI_ENTRY("%p %p", this, ctx);
-
-	return EFI_EXIT(EFI_UNSUPPORTED);
+		return EFI_EXIT(EFI_SUCCESS);
+	} else {
+		return EFI_EXIT(EFI_UNSUPPORTED);
+	}
 }
 
 static efi_gbl_fastboot_protocol efi_gbl_fastboot_proto = {
@@ -389,13 +290,9 @@ static efi_gbl_fastboot_protocol efi_gbl_fastboot_proto = {
   .get_var = get_var,
   .get_var_all = get_var_all,
   .get_staged = get_staged,
-  .set_lock = set_lock,
-  .get_lock = get_lock,
   .vendor_erase = vendor_erase,
   .command_exec = command_exec,
-  .start_local_session = start_local_session,
-  .update_local_session = update_local_session,
-  .close_local_session = close_local_session,
+  .get_partition_type = get_partition_type,
 };
 
 efi_status_t efi_gbl_fastboot_register(void)

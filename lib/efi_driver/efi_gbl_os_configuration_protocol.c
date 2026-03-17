@@ -127,6 +127,18 @@ int get_runtime_bootconfig(char *bootconfig, int *len) {
 	}
 	strncat(bootconfig, bootargs_trusty, *len - strlen(bootconfig));
 
+#ifdef CONFIG_APPEND_BOOTARGS
+	/* Add 'append_bootconfig' environment variable to hold some paramemters
+	 * which need to be appended to bootconfig. Must use ":=" operator when
+	 * doing variable override.
+	 */
+	char *append_bootconfig = env_get("append_bootconfig");
+	if (append_bootconfig) {
+		strncat(bootconfig, " ", *len - strlen(bootconfig));
+		strncat(bootconfig, append_bootconfig, *len - strlen(bootconfig));
+	}
+#endif
+
 	if (*len <= strlen(bootconfig)) {
 		log_err("Bootconfig buffer overflow!\n");
 		return -1;
@@ -151,8 +163,8 @@ int get_runtime_bootconfig(char *bootconfig, int *len) {
 }
 
 static efi_status_t EFIAPI fixup_bootconfig(
-	struct efi_gbl_os_configuration_protocol *this, const char *bootconfig,
-	size_t size, char *fixup, size_t *fixup_buffer_size)
+	struct efi_gbl_os_configuration_protocol *this, size_t size,
+	const char *bootconfig, size_t *fixup_buffer_size, char *fixup)
 {
 	char bootconfig_buf[2048] = {0};
 	uint32_t len = sizeof(bootconfig_buf);
@@ -179,9 +191,11 @@ static efi_status_t EFIAPI fixup_bootconfig(
 
 static efi_status_t EFIAPI
 select_device_trees(struct efi_gbl_os_configuration_protocol *this,
-		    struct efi_gbl_verified_device_tree *device_trees,
-		    size_t num_device_trees)
+		    size_t num_device_trees,
+		    struct efi_gbl_verified_device_tree *device_trees)
 {
+	int fdt_id = 0;
+
 	EFI_ENTRY("%p, %p, %zu", this, device_trees, num_device_trees);
 
 	if (!this || !device_trees || !num_device_trees) {
@@ -189,17 +203,35 @@ select_device_trees(struct efi_gbl_os_configuration_protocol *this,
 		return EFI_EXIT(EFI_INVALID_PARAMETER);
 	}
 
+	/* The first fdt from vendor_boot contains the Id<-->Name mapping, parse expected
+	 * dt id from it.
+	 */
+	for (int i = 0; i < num_device_trees; i++) {
+		if (device_trees[i].metadata.source == VENDOR_BOOT && \
+			device_trees[i].metadata.id == 0) {
+
+			fdt_id = get_imx_android_fdt_id((void *)device_trees[i].device_tree);
+			if (fdt_id < 0) {
+				log_err("Failed to select device tree!\n");
+				return EFI_EXIT(EFI_INVALID_PARAMETER);
+			}
+
+			break;
+		}
+	}
+
+	/* Check the selected id */
+	if (fdt_id <= 0) {
+		log_err("Failed to get device tree id!\n");
+		return EFI_EXIT(EFI_INVALID_PARAMETER);
+	}
+
 	/*
 	 * Select the device tree
 	 */
-	int fdt_id = get_imx_android_fdt_id();
-	if (fdt_id < 0) {
-		log_err("Failed to select device tree!\n");
-		return EFI_EXIT(EFI_INVALID_PARAMETER);
-	}
 	for (int i = 0; i < num_device_trees; i++) {
 		/* Select the device tree from vendor_boot. */
-		if (device_trees[i].metadata.source == BOOT && \
+		if (device_trees[i].metadata.source == VENDOR_BOOT && \
 			device_trees[i].metadata.id == fdt_id) {
 			log_info("Selected dts source: %d, type: %d, id: %d, dtb size:%d.\n",
 					device_trees[i].metadata.source,
@@ -207,6 +239,8 @@ select_device_trees(struct efi_gbl_os_configuration_protocol *this,
 					device_trees[i].metadata.id,
 					fdt_totalsize(device_trees[i].device_tree));
 			device_trees[i].selected = 1;
+
+			/* Currently we only select one dt, so we break here */
 			break;
 		}
 	}
