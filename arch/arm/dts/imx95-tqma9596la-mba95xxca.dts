@@ -547,7 +547,6 @@
 	/* X16 M.2 KEY E */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpuart5>;
-	uart-has-rtscts;
 	status = "okay";
 };
 
@@ -555,7 +554,6 @@
 	/* X5 */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpuart7>;
-	uart-has-rtscts;
 	status = "okay";
 };
 
@@ -564,7 +562,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_lpuart8>;
 	linux,rs485-enabled-at-boot-time;
-	uart-has-rtscts;
 	status = "okay";
 };
 
@@ -869,15 +866,15 @@
 	pinctrl_lpuart5: lpuart5grp {
 		fsl,pins = <IMX95_PAD_GPIO_IO00__LPUART5_TX			0x31e>,
 			   <IMX95_PAD_GPIO_IO01__LPUART5_RX			0x1300>,
-			   <IMX95_PAD_GPIO_IO02__LPUART5_CTS_B			0x31e>,
-			   <IMX95_PAD_GPIO_IO03__LPUART5_RTS_B			0x1300>;
+			   <IMX95_PAD_GPIO_IO02__LPUART5_CTS_B			0x1300>,
+			   <IMX95_PAD_GPIO_IO03__LPUART5_RTS_B			0x31e>;
 	};
 
 	pinctrl_lpuart7: lpuart7grp {
 		fsl,pins = <IMX95_PAD_GPIO_IO08__LPUART7_TX			0x31e>,
 			   <IMX95_PAD_GPIO_IO09__LPUART7_RX			0x1300>,
-			   <IMX95_PAD_GPIO_IO10__LPUART7_CTS_B			0x31e>,
-			   <IMX95_PAD_GPIO_IO11__LPUART7_RTS_B			0x1300>;
+			   <IMX95_PAD_GPIO_IO10__LPUART7_CTS_B			0x1300>,
+			   <IMX95_PAD_GPIO_IO11__LPUART7_RTS_B			0x31e>;
 	};
 
 	pinctrl_lpuart8: lpuart8grp {
