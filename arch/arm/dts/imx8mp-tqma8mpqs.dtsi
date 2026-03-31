@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 /*
- * Copyright 2025 TQ-Systems GmbH <linux@ew.tq-group.com>,
+ * Copyright 2025-2026 TQ-Systems GmbH <linux@ew.tq-group.com>,
  * D-82229 Seefeld, Germany.
  * Author: Paul Gerber
  */
@@ -236,23 +236,22 @@
 
 &gpio4 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_gpio4>, <&pinctrl_sdp>, <&pinctrl_eepromwp>;
+	pinctrl-0 = <&pinctrl_gpio4>, <&pinctrl_sdp>, <&pinctrl_espi_rst>;
 
 	gpio-line-names = "", "GPIO8", "", "",
 			  "GPIO9", "ESPI_RST#", "", "",
 			  "", "", "", "",
-			  "", "", "GBE0_SDP_DIR", "",
+			  "", "", "GBE0_SDP_DIR", "GBE1_SDP_DIR",
 			  "GPIO7", "", "", "",
 			  "", "", "", "",
 			  "", "GPIO0", "GPIO1", "",
 			  "GPIO2", "GPIO6", "", "";
 
-	/* EEPROM write control */
-	sw_en_hog: sw-en-hog {
+	espi-reset-hog {
 		gpio-hog;
 		gpios = <5 0>;
 		output-high;
-		line-name = "SW_EN";
+		line-name = "ESPI_RST#";
 	};
 };
 
@@ -725,10 +724,6 @@
 			   <MX8MP_IOMUXC_ECSPI2_MISO__GPIO5_IO12	0x1c0>;
 	};
 
-	pinctrl_eepromwp: eepromwpgrp {
-		fsl,pins = <MX8MP_IOMUXC_SAI1_RXD3__GPIO4_IO05		0x00000144>;
-	};
-
 	pinctrl_eqos: eqosgrp {
 		fsl,pins = <MX8MP_IOMUXC_ENET_MDC__ENET_QOS_MDC				0x40000044>,
 			   <MX8MP_IOMUXC_ENET_MDIO__ENET_QOS_MDIO			0x40000044>,
@@ -753,6 +748,10 @@
 
 	pinctrl_eqos_phy: eqosphygrp {
 		fsl,pins = <MX8MP_IOMUXC_SD1_CLK__GPIO2_IO00	0x1c0>;
+	};
+
+	pinctrl_espi_rst: espirstgrp {
+		fsl,pins = <MX8MP_IOMUXC_SAI1_RXD3__GPIO4_IO05		0x144>;
 	};
 
 	pinctrl_fec: fecgrp {
