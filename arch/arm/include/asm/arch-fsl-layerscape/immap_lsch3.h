@@ -598,5 +598,7 @@ struct ccsr_gpio {
 	u32	gpibe;
 };
 
+uint get_svr(void);
+
 #endif /*__ASSEMBLY__ */
 #endif /* __ARCH_FSL_LSCH3_IMMAP_H_ */
