@@ -25,6 +25,8 @@
 #include <asm-generic/gpio.h>
 #include <dm/uclass.h>
 #include <jffs2/load_kernel.h>
+#include <linux/delay.h>
+#include <power/pca9450.h>
 #include <power/pmic.h>
 
 #include "../common/tq_bb.h"
@@ -63,34 +65,53 @@ static struct tq_eeprom_data eeprom;
 
 #if IS_ENABLED(CONFIG_CMD_TQ_EEPROM_WRITE)
 
-enum {
-	EEPROM_WREN,
-};
 
-static struct tq_gpio_init_data gpio_init_data[] = {
-	GPIO_INIT_DATA_ENTRY(EEPROM_WREN, "GPIO4_5",
-			     GPIOD_IS_OUT | GPIOD_ACTIVE_LOW),
-};
+int get_pmic_device(struct udevice **dev)
+{
+	static const char *pmic_name = "pmic@25";
+	int ret;
+
+	if (!dev)
+		return -EINVAL;
+
+	ret = pmic_get(pmic_name, dev);
+	if (ret == -ENODEV) {
+		puts("ERROR: PMIC not found\n");
+		return 0;
+	} else if (ret != 0) {
+		pr_err("ERROR: request PMIC %d\n", ret);
+	}
+
+	return ret;
+}
 
 void tq_bb_eeprom_wren(void)
 {
-	dm_gpio_set_value(&gpio_init_data[EEPROM_WREN].desc, 1);
+	struct udevice *dev;
+	int ret;
+
+	ret = get_pmic_device(&dev);
+	if (!ret) {
+		pmic_clrsetbits(dev, PCA9450_LOADSW_CTRL, PCA9450_LOADSW_CTRL_SWEN_MASK,
+				PCA9450_LOADSW_CTRL_SWEN_FORCE_ON);
+		/*
+		 * Add empirical delay.
+		 * The PMIC load switch has soft start feature and ramp up needs some time
+		 */
+		mdelay(500);
+	}
 }
 
 void tq_bb_eeprom_wrdi(void)
 {
-	dm_gpio_set_value(&gpio_init_data[EEPROM_WREN].desc, 0);
+	struct udevice *dev;
+	int ret;
+
+	ret = get_pmic_device(&dev);
+	if (!ret)
+		pmic_clrsetbits(dev, PCA9450_LOADSW_CTRL, PCA9450_LOADSW_CTRL_SWEN_MASK,
+				PCA9450_LOADSW_CTRL_SWEN_FORCE_OFF);
 }
-
-static void tqma8mpxs_init_eeprom(void)
-{
-	tq_board_gpio_init(gpio_init_data, ARRAY_SIZE(gpio_init_data));
-	tq_bb_eeprom_wrdi();
-}
-
-#else
-
-static void tqma8mpxs_init_eeprom(void) {}
 
 #endif
 
@@ -230,8 +251,6 @@ int checkboard(void)
 
 int board_init(void)
 {
-	tqma8mpxs_init_eeprom();
-
 	tq_bb_board_init();
 
 	return 0;
