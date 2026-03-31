@@ -91,6 +91,10 @@
 	};
 };
 
+&usb_dwc3_0 {
+	maximum-speed = "high-speed";
+};
+
 &usdhc3 {
 	mmc-hs400-1_8v;
 	mmc-hs400-enhanced-strobe;
