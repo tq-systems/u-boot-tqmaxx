@@ -317,6 +317,9 @@ int power_init_board(void)
 	 */
 	pmic_reg_write(dev, PCA9450_BUCK2OUT_DVS0, 0x1C);
 
+	pmic_clrsetbits(dev, PCA9450_LOADSW_CTRL, PCA9450_LOADSW_CTRL_SWEN_MASK,
+			PCA9450_LOADSW_CTRL_SWEN_FORCE_OFF);
+
 	print_pmic_config(dev);
 
 	/*
