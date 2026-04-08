@@ -45,6 +45,7 @@ CONFIG_CMD_TIME=y
 CONFIG_CMD_SYSBOOT=y
 CONFIG_CMD_DDR4=y
 CONFIG_CMD_PMIC=y
+CONFIG_CMD_HASH=y
 CONFIG_CMD_MTDPARTS=y
 CONFIG_MTDIDS_DEFAULT="nor0=fc40000.spi.0"
 CONFIG_MTDPARTS_DEFAULT="mtdparts=fc40000.spi.0:1m(ospi.tiboot3),6m(ospi.u-boot),256k(ospi.env),256k(ospi.env.backup),64k@8128k(ospi.script),-@8m(ospi.rootfs)"
