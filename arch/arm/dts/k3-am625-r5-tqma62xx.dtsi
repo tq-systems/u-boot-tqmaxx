@@ -23,6 +23,11 @@
 		bootph-pre-ram;
 		base-variant = "tqma62xx-1g";
 
+		variant-1g-nanya {
+			variant-name = "tqma62xx-1g-nanya";
+			#include "k3-am62x-tqma62xx-1g-lp4-Nanya-patch.dtsi"
+		};
+
 		variant-2g {
 			variant-name = "tqma62xx-2g";
 			#include "k3-am62x-tqma62xx-2g-lp4-1600MTs-patch.dtsi"
@@ -39,6 +44,13 @@
 			variant-name = "tqma62xx-1g";
 			ram-size = /bits/ 64 <0x040000000>;
 			ram-type = <1>;
+		};
+
+		tqma62xx-1g-nanya {
+			variant-name = "tqma62xx-1g-nanya";
+			ram-size = /bits/ 64 <0x040000000>;
+			ram-type = <2>;
+			bootph-pre-ram;
 		};
 
 		tqma62xx-2g {
