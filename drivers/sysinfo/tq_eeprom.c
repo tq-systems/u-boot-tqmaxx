@@ -317,8 +317,11 @@ const struct ram_variant_info *get_ram_variant(const struct sysinfo_tq_eeprom_pr
 		variant = choose_ram_variant(priv->ram_variants, priv->n_ram_variants);
 	}
 
-	printf("Selected configuration for ");
-	print_size(variant->ram_size, " RAM\n");
+	puts("Selected configuration for ");
+	print_size(variant->ram_size, " RAM");
+	if (variant->ram_type != 1)
+		printf(" type %u", variant->ram_type);
+	puts("\n");
 
 	return variant;
 }
