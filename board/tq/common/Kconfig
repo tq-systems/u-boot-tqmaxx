@@ -1,3 +1,12 @@
+config TQ_AUX_CORE
+	bool "Enable CPU specific check for booted Cortex-M"
+	depends on IMX8MM || IMX8MN || IMX8MQ || IMX8MP || IMX93
+	default y if IMX8MM || IMX8MN || IMX8MQ || IMX8MP || IMX93
+	help
+	  Add CPU specific implementation of board_fdt_chosen_bootargs to
+	  add clk-<cpu>.mcore_booted to kernel command line if Cortex-M
+	  auxiliary core was started by U-Boot.
+
 config TQ_BB
 	bool
 	default y
