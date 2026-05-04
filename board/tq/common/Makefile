@@ -5,6 +5,7 @@
 # Author: Markus Niebel
 #
 
+obj-$(CONFIG_TQ_COMMON_AUX_CORE) += tq_aux.o
 obj-$(CONFIG_TQ_COMMON_BB) += tq_bb.o
 obj-$(CONFIG_TQ_COMMON_EEPROM) += tq_eeprom.o
 obj-$(CONFIG_TQ_COMMON_ENVLOC) += tq_envloc.o
