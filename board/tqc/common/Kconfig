@@ -2,3 +2,6 @@
 config TQC_EMMC
 	bool
 
+config TQ_COMMON_I2C
+	bool
+

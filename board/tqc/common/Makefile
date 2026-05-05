@@ -11,6 +11,7 @@ obj-$(CONFIG_TQC_EMMC) += tqc_emmc.o
 
 ifdef CONFIG_ARM
 obj-$(CONFIG_DEEP_SLEEP) += arm_sleep.o
+obj-$(CONFIG_TQ_COMMON_I2C) += tq_i2c.o
 endif
 
 obj-$(CONFIG_LS102XA_STREAM_ID) += ls102xa_stream_id.o
