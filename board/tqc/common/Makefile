@@ -27,4 +27,5 @@ obj-$(CONFIG_TQC_RTC) += tqc_rtc.o
 obj-$(CONFIG_TQC_ENVLOC) += tqc_envloc.o
 obj-$(CONFIG_TQC_VARD) += tq_som_features.o
 obj-$(CONFIG_TQC_SPI_NOR) += tqc_spi_nor.o
+obj-$(CONFIG_TQ_COMMON_I2C) += tq_i2c.o
 endif

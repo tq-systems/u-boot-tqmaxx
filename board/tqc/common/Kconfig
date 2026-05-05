@@ -8,6 +8,9 @@ config TQC_EEPROM
 config TQC_EMMC
 	bool
 
+config TQ_COMMON_I2C
+	bool
+
 #
 # This should be selected by boards that wish to support multiple env locations
 # select ENV_IS_NOWHERE to use as default if nothing matches.
