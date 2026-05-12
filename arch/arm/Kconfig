@@ -1354,6 +1354,7 @@ config TARGET_TQMLS1028A
 	select BOARD_LATE_INIT
 	select LAST_STAGE_INIT
 	select TQC_EEPROM
+	select TQ_COMMON_I2C
 	help
 	  Support for TQMLS1028A module.
 	  This module features a QorIQ LS1028A SoC.

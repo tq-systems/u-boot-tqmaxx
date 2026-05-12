@@ -26,9 +26,14 @@
 #include <jffs2/load_kernel.h>
 #include "../common/tqc_bb.h"
 #include "../common/tqc_eeprom.h"
+#include "../common/tq_i2c.h"
 #include "tqmls1028a_bb.h"
 
 DECLARE_GLOBAL_DATA_PTR;
+
+#define I2C_TEMPSENSOR_BUS		0
+#define I2C_TEMPSENSOR_ADDR		0x4c
+#define I2C_TEMPSENSOR_OFFSET_LENGTH	1
 
 int board_init(void)
 {
@@ -63,6 +68,7 @@ int board_early_init_f(void)
 #ifdef CONFIG_OF_BOARD_SETUP
 int ft_board_setup(void *blob, bd_t *bd)
 {
+	const char * const temp_path = "/soc/i2c@2000000/temperature-sensor@4c";
 	int ret;
 
 	ft_cpu_setup(blob, bd);
@@ -72,6 +78,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 
 	if (IS_ENABLED(CONFIG_FDT_FIXUP_PARTITIONS)) {
 		const char * const spi_path = "/soc/spi@20c0000";
+
 		static const struct node_info nodes[] = {
 			{ "jedec,spi-nor",	MTD_DEV_TYPE_NOR, },
 		};
@@ -85,6 +92,13 @@ int ft_board_setup(void *blob, bd_t *bd)
 		tqc_ft_spi_setup(blob, spi_path, nodes,
 				 ARRAY_SIZE(nodes));
 	}
+
+	ret = tq_i2c_detect_fixup_temp_compatible(blob, I2C_TEMPSENSOR_BUS,
+						  I2C_TEMPSENSOR_ADDR,
+						  I2C_TEMPSENSOR_OFFSET_LENGTH,
+						  temp_path);
+	if (ret)
+		return ret;
 
 	return 0;
 }
