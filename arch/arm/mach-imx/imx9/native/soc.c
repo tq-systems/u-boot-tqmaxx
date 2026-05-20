@@ -692,7 +692,8 @@ static int disable_npu_nodes(void *blob)
 {
 	static const char * const nodes_path_npu[] = {
 		"/ethosu",
-		"/reserved-memory/ethosu_region@C0000000"
+		"/reserved-memory/ethosu_region@C0000000",
+		"/soc@0/npu@4a900000"
 	};
 
 	return delete_fdt_nodes(blob, nodes_path_npu, ARRAY_SIZE(nodes_path_npu));
