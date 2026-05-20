@@ -71,7 +71,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 		return ret;
 
 	if (IS_ENABLED(CONFIG_FDT_FIXUP_PARTITIONS)) {
-		const char * const path = "/soc/spi@20c0000";
+		const char * const spi_path = "/soc/spi@20c0000";
 		static const struct node_info nodes[] = {
 			{ "jedec,spi-nor",	MTD_DEV_TYPE_NOR, },
 		};
@@ -82,7 +82,7 @@ int ft_board_setup(void *blob, bd_t *bd)
 		 * for QSPI this needs the device probed.
 		 */
 		puts("   Updating MTD partitions...\n");
-		tqc_ft_spi_setup(blob, path, nodes,
+		tqc_ft_spi_setup(blob, spi_path, nodes,
 				 ARRAY_SIZE(nodes));
 	}
 
