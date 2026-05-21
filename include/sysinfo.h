@@ -308,6 +308,53 @@ int sysinfo_detect(struct udevice *dev);
 int sysinfo_get_by_seq(struct udevice **devp, int seq);
 
 /**
+ * sysinfo_get() - Return the primary sysinfo device.
+ * @devp:	Pointer to structure to receive the sysinfo device.
+ *
+ * Return: 0 if OK, else -ve on error.
+ */
+static inline int sysinfo_get(struct udevice **devp)
+{
+	return sysinfo_get_by_seq(devp, 0);
+}
+
+/**
+ * sysinfo_get_by_seq_and_detect() - Get the primary sysinfo device by sequence
+ * number and run its detect operation.
+ * @devp:	Pointer to structure to receive the sysinfo device.
+ * @seq:	Sequence number
+ *
+ * This is a convenience wrapper around sysinfo_get() followed by
+ * sysinfo_detect()
+ *
+ * Return: 0 if OK, -ve on error.
+ */
+static inline int sysinfo_get_by_seq_and_detect(struct udevice **devp, int seq)
+{
+	int ret = sysinfo_get_by_seq(devp, seq);
+
+	if (!ret)
+		ret = sysinfo_detect(*devp);
+
+	return ret;
+}
+
+/**
+ * sysinfo_get_and_detect() - Return the primary sysinfo device and run its
+ * detect operation.
+ * @devp:	Pointer to structure to receive the sysinfo device.
+ *
+ * This is a convenience wrapper around sysinfo_get() followed by
+ * sysinfo_detect() on the primary device.
+ *
+ * Return: 0 if OK, -ve on error.
+ */
+static inline int sysinfo_get_and_detect(struct udevice **devp)
+{
+	return sysinfo_get_by_seq_and_detect(devp, 0);
+}
+
+/**
  * sysinfo_get_bool() - Read a specific bool data value that describes the
  *		      hardware setup.
  * @dev:	The sysinfo instance to gather the data.
@@ -425,6 +472,21 @@ static inline int sysinfo_get_by_seq(struct udevice **devp, int seq)
 	return -ENOSYS;
 }
 
+static inline int sysinfo_get(struct udevice **devp)
+{
+	return -ENOSYS;
+}
+
+static inline int sysinfo_get_by_seq_and_detect(struct udevice **devp)
+{
+	return -ENOSYS;
+}
+
+static inline int sysinfo_get_and_detect(struct udevice **devp)
+{
+	return -ENOSYS;
+}
+
 static inline int sysinfo_get_bool(struct udevice *dev, int id, bool *val)
 {
 	return -ENOSYS;
@@ -472,46 +534,3 @@ static inline int sysinfo_get_fit_loadable(struct udevice *dev, int index,
 
 #endif
 #endif
-
-/**
- * sysinfo_get() - Return the primary sysinfo device.
- * @devp:	Pointer to structure to receive the sysinfo device.
- *
- * Return: 0 if OK, else -ve on error.
- */
-static inline int sysinfo_get(struct udevice **devp)
-{
-	return sysinfo_get_by_seq(devp, 0);
-}
-
-/**
- * sysinfo_get_by_seq_and_detect() - Return the sysinfo device by sequence
- * number and run its detect operation.
- * sysinfo_get_and_detect() - Return the primary sysinfo device and run its
- * detect operation.
- * @devp:	Pointer to structure to receive the sysinfo device.
- * @seq:	Sequence number
- *
- * Return: 0 if OK, -ve on error.
- */
-static inline int sysinfo_get_by_seq_and_detect(struct udevice **devp, int seq)
-{
-	int ret = sysinfo_get_by_seq(devp, seq);
-
-	if (!ret)
-		ret = sysinfo_detect(*devp);
-
-	return ret;
-}
-
-/**
- * sysinfo_get_and_detect() - Return the primary sysinfo device and run its
- * detect operation.
- * @devp:	Pointer to structure to receive the sysinfo device.
- *
- * Return: 0 if OK, -ve on error.
- */
-static inline int sysinfo_get_and_detect(struct udevice **devp)
-{
-	return sysinfo_get_by_seq_and_detect(devp, 0);
-}
