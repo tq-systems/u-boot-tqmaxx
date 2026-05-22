@@ -198,12 +198,14 @@ void board_quiesce_devices(void)
  */
 const char *tq_get_boardname(void)
 {
-	switch (get_cpu_type()) {
-	case MXC_CPU_IMX95:
-		return "TQMa95xxSA";
-	default:
-		return "??";
-	}
+	static char *bname = "TQMa95xxSA";
+	u32 cpurev = get_cpu_rev();
+	const char *name = get_imx_type((cpurev & 0x1FF000) >> 12);
+
+	if (name)
+		sprintf(bname, "TQMa%sSA", name);
+
+	return bname;
 }
 
 static int print_bootinfo(void)
