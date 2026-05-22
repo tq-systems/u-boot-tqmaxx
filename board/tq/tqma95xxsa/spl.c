@@ -48,10 +48,18 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 void spl_board_init(void)
 {
 	int ret;
+	u32 bd;
 
 	ret = ele_start_rng();
 	if (ret)
 		pr_err("ERROR: failed to start RNG: %d\n", ret);
+
+	bd = spl_boot_device();
+	if (bd == BOOT_DEVICE_BOARD) { /* USB */
+		ret = power_on_hsio();
+		if (ret)
+			printf("power on hsio is failed\n");
+	}
 }
 
 void board_init_f(ulong dummy)
