@@ -53,7 +53,7 @@
 		"else "                                                \
 			"echo ERROR: loading kernel; "                 \
 		"fi;\0"                                                \
-	"ubimtdidx=ubi\0"                                                \
+	"ubimtdidx=ubi\0"                                              \
 	"ubirootfs=rootfs.ubifs\0"                                     \
 	"ubirootfspart=ubi\0"                                          \
 	"ubirootfsvol=root\0"                                          \
@@ -71,6 +71,22 @@
 			"fi; "                                         \
 		"fi; "                                                 \
 		"setenv filesize \0"                                   \
+	"boot_script_spi=boot-ubi.scr\0"                               \
+	"update_boot_script_spi="                                      \
+		"run check_ipaddr; "                                   \
+		"setenv filesize; "                                    \
+		"if tftp ${boot_script_spi}; then "                    \
+			"if itest ${filesize} >= ${script_size_f}; then "\
+				"echo ERROR: size to large ...; exit; "\
+			"fi; "                                         \
+			"echo Write boot script to SPI NOR ...; "      \
+			"if sf probe; then "                           \
+				"run write_boot_script_spi; "          \
+			"fi; "                                         \
+		"fi; "                                                 \
+		"setenv filesize \0"                                   \
+	"write_boot_script_spi="                                       \
+		"sf update ${loadaddr} script ${filesize}\0"           \
 
 #else
 #define TQ_IMX_SHARED_UBI_ENV_SETTINGS
