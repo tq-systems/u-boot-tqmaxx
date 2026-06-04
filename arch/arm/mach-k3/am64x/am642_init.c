@@ -265,6 +265,10 @@ void board_init_f(ulong dummy)
 #endif
 
 	k3_enable_cache();
+
+	ret = spl_board_init_f();
+	if (ret)
+		panic("spl_board_init_f() failed: %d\n", ret);
 }
 
 u32 spl_mmc_boot_mode(struct mmc *mmc, const u32 boot_device)
