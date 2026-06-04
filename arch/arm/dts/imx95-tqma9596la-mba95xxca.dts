@@ -769,7 +769,6 @@
 	pinctrl-0 = <&pinctrl_usdhc2>;
 	pinctrl-1 = <&pinctrl_usdhc2_100mhz>;
 	pinctrl-2 = <&pinctrl_usdhc2_200mhz>;
-	vmmc-supply = <&reg_sdvmmc>;
 	cd-gpios = <&gpio3 0 GPIO_ACTIVE_LOW>;
 	fsl,cd-gpio-wakeup-disable;
 	vmmc-supply = <&reg_sdvmmc>;
