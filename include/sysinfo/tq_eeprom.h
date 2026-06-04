@@ -19,6 +19,8 @@ enum {
 	SYSID_TQ_SERIAL,
 	/* MAC address */
 	SYSID_TQ_MAC_ADDR,
+	/* RAM type */
+	SYSID_TQ_RAM_TYPE,
 };
 
 #endif /* __SYSINFO_TQ_EEPROM_H__ */

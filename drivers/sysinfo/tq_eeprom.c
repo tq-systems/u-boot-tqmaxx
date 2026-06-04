@@ -438,6 +438,23 @@ static int sysinfo_tq_eeprom_detect(struct udevice *dev)
 	return 0;
 }
 
+static int sysinfo_tq_eeprom_get_int(struct udevice *dev, int id, int *val)
+{
+	struct sysinfo_tq_eeprom_priv *priv = dev_get_priv(dev);
+
+	switch (id) {
+	case SYSID_TQ_RAM_TYPE:
+		if (!priv->ram_variant)
+			return -ENODATA;
+
+		*val = priv->ram_variant->ram_type;
+		return 0;
+
+	default:
+		return -EINVAL;
+	}
+}
+
 static int sysinfo_tq_eeprom_get_uint64(struct udevice *dev, int id, uint64_t *val)
 {
 	struct sysinfo_tq_eeprom_priv *priv = dev_get_priv(dev);
@@ -507,6 +524,7 @@ static int sysinfo_tq_eeprom_get_data(struct udevice *dev, int id, void **data, 
 
 static const struct sysinfo_ops sysinfo_tq_eeprom_ops = {
 	.detect = sysinfo_tq_eeprom_detect,
+	.get_int = sysinfo_tq_eeprom_get_int,
 	.get_uint64 = sysinfo_tq_eeprom_get_uint64,
 	.get_str = sysinfo_tq_eeprom_get_str,
 	.get_data = sysinfo_tq_eeprom_get_data,
