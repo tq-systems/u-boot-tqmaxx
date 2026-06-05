@@ -71,11 +71,11 @@
 			"fi; "                                         \
 		"fi; "                                                 \
 		"setenv filesize \0"                                   \
-	"boot_script_spi=boot-ubi.scr\0"                               \
+	"bootscript_name=boot-ubi.scr\0"                               \
 	"update_boot_script_spi="                                      \
 		"run check_ipaddr; "                                   \
 		"setenv filesize; "                                    \
-		"if tftp ${boot_script_spi}; then "                    \
+		"if tftp ${bootscript_name}; then "                    \
 			"if itest ${filesize} >= ${script_size_f}; then "\
 				"echo ERROR: size to large ...; exit; "\
 			"fi; "                                         \
