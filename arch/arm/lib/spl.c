@@ -96,3 +96,8 @@ void __noreturn jump_to_image_optee(struct spl_image_info *spl_image)
 			(void *)spl_image->entry_point);
 }
 #endif
+
+__weak int spl_board_init_f(void)
+{
+	return 0;
+}

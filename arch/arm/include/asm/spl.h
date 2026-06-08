@@ -38,4 +38,6 @@ enum {
 extern gd_t gdata;
 #endif
 
+int spl_board_init_f(void);
+
 #endif
