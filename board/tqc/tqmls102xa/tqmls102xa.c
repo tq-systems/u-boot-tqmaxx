@@ -6,10 +6,15 @@
 
 #include "tqmls102xa_bb.h"
 #include "../common/tqc_emmc.h"
+#include "../common/tq_i2c.h"
 #include <spi.h>
 #include <spi_flash.h>
 
 DECLARE_GLOBAL_DATA_PTR;
+
+#define I2C_TEMPSENSOR_BUS		0
+#define I2C_TEMPSENSOR_ADDR		0x4c
+#define I2C_TEMPSENSOR_OFFSET_LENGTH	1
 
 static u8 tqmls102xa_module_eeprom_addr = CONFIG_SYS_I2C_EEPROM_ADDR;
 static const uint16_t tqmls102xa_emmc_dsr = 0x0100;
@@ -410,6 +415,7 @@ static void tqmls102xa_fixup_esdhc(void *blob)
 
 int ft_board_setup(void *blob, bd_t *bd)
 {
+	const char * const temp_path = "/soc/i2c@2180000/temperature-sensor@4c";
 	int off;
 	int present;
 	int err;
@@ -487,6 +493,13 @@ int ft_board_setup(void *blob, bd_t *bd)
 			       tqmls102xa_module_eeprom_addr);
 		}
 	}
+
+	err = tq_i2c_detect_fixup_temp_compatible(blob, I2C_TEMPSENSOR_BUS,
+						  I2C_TEMPSENSOR_ADDR,
+						  I2C_TEMPSENSOR_OFFSET_LENGTH,
+						  temp_path);
+	if (err)
+		return err;
 
 	return 0;
 }
