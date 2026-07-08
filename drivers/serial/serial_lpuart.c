@@ -364,9 +364,13 @@ static int _lpuart32_serial_putc(struct lpuart_serial_plat *plat,
 static int _lpuart32_serial_tstc(struct lpuart_serial_plat *plat)
 {
 	struct lpuart_fsl_reg32 *base = plat->reg;
-	u32 water;
+	u32 stat, water;
 
 	lpuart_read32(plat->flags, &base->water, &water);
+
+	lpuart_read32(plat->flags, &base->stat, &stat);
+	if (stat & STAT_OR)
+		lpuart_write32(plat->flags, &base->stat, STAT_OR);
 
 	if ((water >> 24) == 0)
 		return 0;
