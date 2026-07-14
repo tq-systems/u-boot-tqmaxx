@@ -36,6 +36,8 @@
 /* both variants use the same settings */
 #if defined(CONFIG_TQMA8MPXL_BB_MBA8MPXL)
 #include "tqma8mpxl-mba8mpxl.h"
+#elif defined(CONFIG_TQMA8MPXL_BB_MBA8MP_RAS314)
+#include "tqma8mpxl-mba8mp-ras314.h"
 #else
 #error "no mainboard variant selected"
 #endif

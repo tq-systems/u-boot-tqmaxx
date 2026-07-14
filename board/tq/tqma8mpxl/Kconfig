@@ -83,6 +83,12 @@ config TQMA8MPXL_BB_MBA8MPXL
 	  Select the MBa8MPxL starterkit for TQMa8MPxL board.
 	  This features most interfaces the CPU can provide.
 
+config TQMA8MPXL_BB_MBA8MP_RAS314
+	bool "TQMa8MPxL on MBa8MP-RAS314 SBC"
+	help
+	  Select the MBa8MPxL starterkit for TQMa8MPxL board.
+	  Select the MBa8MP-RAS314 SBC for TQMa8MPxL board.
+
 endchoice
 
 source "board/tq/common/Kconfig"
