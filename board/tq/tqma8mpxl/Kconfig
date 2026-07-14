@@ -24,6 +24,7 @@ config TQMA8MPXL_DEFAULTS
 	imply SPL_CRYPTO if SPL
 	select I2C_EEPROM
 	select SPL_I2C_EEPROM if SPL
+	select GPIO_HOG
 	imply MISC
 	imply ENV_IS_NOWHERE
 	imply SYS_REDUNDAND_ENVIRONMENT
@@ -78,7 +79,6 @@ choice
 
 config TQMA8MPXL_BB_MBA8MPXL
 	bool "TQMa8MPxL on MBa8MPxL Starterkit"
-	select GPIO_HOG
 	help
 	  Select the MBa8MPxL starterkit for TQMa8MPxL board.
 	  This features most interfaces the CPU can provide.
