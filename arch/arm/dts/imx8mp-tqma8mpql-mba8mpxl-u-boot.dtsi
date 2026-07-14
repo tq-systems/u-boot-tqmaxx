@@ -52,13 +52,6 @@
 		line-name = "GPIN_0";
 	};
 
-	pmic-irq-hog {
-		gpio-hog;
-		gpios = <8 0>;
-		input;
-		line-name = "PMIC_IRQ";
-	};
-
 	gpin1-hog {
 		gpio-hog;
 		gpios = <9 0>;

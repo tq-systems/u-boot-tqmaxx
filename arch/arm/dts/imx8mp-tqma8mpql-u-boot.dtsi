@@ -38,6 +38,13 @@
 
 &gpio1 {
 	bootph-pre-ram;
+
+	pmic-irq-hog {
+		gpio-hog;
+		gpios = <8 GPIO_ACTIVE_LOW>;
+		input;
+		line-name = "PMIC_IRQ#";
+	};
 };
 
 &gpio5 {
