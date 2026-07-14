@@ -1,4 +1,4 @@
-#include <configs/tqma8mpxl.config>
+#include <configs/tqma8mpxl_mba8mpxl.config>
 # CONFIG_ANDROID_BOOT_IMAGE is not set
 CONFIG_BOOTCOMMAND="fastboot 0"
 CONFIG_BOOTDELAY=1
