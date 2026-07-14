@@ -19,63 +19,63 @@
 &gpio1 {
 	gpout1-hog {
 		gpio-hog;
-		gpios = <0 0>;
+		gpios = <0 GPIO_ACTIVE_HIGH>;
 		output-low;
 		line-name = "GPOUT_1";
 	};
 
 	gpout0-hog {
 		gpio-hog;
-		gpios = <1 0>;
+		gpios = <1 GPIO_ACTIVE_HIGH>;
 		output-low;
 		line-name = "GPOUT_0";
 	};
 
 	gpout3-hog {
 		gpio-hog;
-		gpios = <3 0>;
+		gpios = <3 GPIO_ACTIVE_HIGH>;
 		output-low;
 		line-name = "GPOUT_3";
 	};
 
 	gpout2-hog {
 		gpio-hog;
-		gpios = <6 0>;
+		gpios = <6 GPIO_ACTIVE_HIGH>;
 		output-low;
 		line-name = "GPOUT_2";
 	};
 
 	gpin0-hog {
 		gpio-hog;
-		gpios = <7 0>;
+		gpios = <7 GPIO_ACTIVE_HIGH>;
 		input;
 		line-name = "GPIN_0";
 	};
 
 	gpin1-hog {
 		gpio-hog;
-		gpios = <9 0>;
+		gpios = <9 GPIO_ACTIVE_HIGH>;
 		input;
 		line-name = "GPIN_1";
 	};
 
 	usb-otg-id-hog {
 		gpio-hog;
-		gpios = <10 0>;
+		gpios = <10 GPIO_ACTIVE_HIGH>;
 		input;
 		line-name = "USB_OTG_ID";
 	};
 
 	gpin2-hog {
 		gpio-hog;
-		gpios = <14 0>;
+		gpios = <14 GPIO_ACTIVE_HIGH>;
 		input;
 		line-name = "GPIN_2";
 	};
 
 	gpin3-hog {
 		gpio-hog;
-		gpios = <15 0>;
+		gpios = <15 GPIO_ACTIVE_HIGH>;
 		input;
 		line-name = "GPIN_3";
 	};
@@ -84,127 +84,127 @@
 &gpio2 {
 	vcc12v-en-hog {
 		gpio-hog;
-		gpios = <6 0>;
+		gpios = <6 GPIO_ACTIVE_HIGH>;
 		output-low;
 		line-name = "VCC12V_EN";
 	};
 };
 
 &gpio3 {
-	lvds-reset-hog {
+	lvds0-resetn-hog {
 		gpio-hog;
 		gpios = <14 GPIO_ACTIVE_LOW>;
 		output-high;
-		line-name = "LVDS_RESET_B";
+		line-name = "LVDS0_RESET#";
 	};
 
-	lvds-blt-en-hog {
+	lvds0-blt-en-hog {
 		gpio-hog;
-		gpios = <19 0>;
+		gpios = <19 GPIO_ACTIVE_HIGH>;
 		output-low;
-		line-name = "LVDS_BLT_EN";
+		line-name = "LVDS0_BLT_EN";
 	};
 
-	lvds-pwr-en-hog {
+	lvds0-pwr-en-hog {
 		gpio-hog;
-		gpios = <20 0>;
+		gpios = <20 GPIO_ACTIVE_HIGH>;
 		output-low;
-		line-name = "LVDS_PWR_EN";
+		line-name = "LVDS0_PWR_EN";
 	};
 };
 
 &gpio4 {
-	enet0-int-hog {
+	enet0-intn-hog {
 		gpio-hog;
-		gpios = <1 0>;
+		gpios = <1 GPIO_ACTIVE_LOW>;
 		input;
-		line-name = "ENET0_INT";
+		line-name = "ENET0_INT#";
 	};
 
-	enet1-int-hog {
+	enet1-intn-hog {
 		gpio-hog;
-		gpios = <3 0>;
+		gpios = <3 GPIO_ACTIVE_LOW>;
 		input;
-		line-name = "ENET1_INT";
+		line-name = "ENET1_INT#";
 	};
 
 	dp-irq-hog {
 		gpio-hog;
-		gpios = <18 0>;
+		gpios = <18 GPIO_ACTIVE_HIGH>;
 		input;
 		line-name = "DP_IRQ";
 	};
 
-	dp-en-hog {
+	dsi-en-hog {
 		gpio-hog;
-		gpios = <19 0>;
+		gpios = <19 GPIO_ACTIVE_HIGH>;
 		output-low;
-		line-name = "DP_EN";
+		line-name = "DSI_EN";
 	};
 
-	hdmi-oc-hog {
+	hdmi-ocn-hog {
 		gpio-hog;
-		gpios = <20 0>;
+		gpios = <20 GPIO_ACTIVE_LOW>;
 		input;
-		line-name = "HDMI_OC";
+		line-name = "HDMI_OC#";
 	};
 
-	temp-event-hog {
+	temp-eventn-hog {
 		gpio-hog;
-		gpios = <21 0>;
+		gpios = <21 GPIO_ACTIVE_LOW>;
 		input;
-		line-name = "TEMP_EVENT";
+		line-name = "TEMP_EVENT#";
 	};
 
 	fan-pwr-hog {
 		gpio-hog;
-		gpios = <27 0>;
+		gpios = <27 GPIO_ACTIVE_HIGH>;
 		output-low;
 		line-name = "FAN_PWR";
 	};
 
-	rtc-event-hog {
+	rtc-eventn-hog {
 		gpio-hog;
-		gpios = <28 0>;
+		gpios = <28 GPIO_ACTIVE_LOW>;
 		input;
-		line-name = "RTC_EVENT";
+		line-name = "RTC_EVENT#";
 	};
 
-	codec-rst-hog {
+	audio-rstn-hog {
 		gpio-hog;
 		gpios = <29 GPIO_ACTIVE_LOW>;
 		output-high;
-		line-name = "CODEC_RST";
+		line-name = "AUDIO_RST#";
 	};
 };
 
 &gpio5 {
-	csi0-reset-hog {
+	mipi-csi0-rstn-hog {
 		gpio-hog;
 		gpios = <6 GPIO_ACTIVE_LOW>;
 		output-high;
-		line-name = "CSI0_RESET";
+		line-name = "MIPI_CSI0_RST#";
 	};
 
-	csi0-sync-hog {
+	mipi-csi0-sync-hog {
 		gpio-hog;
-		gpios = <7 0>;
+		gpios = <7 GPIO_ACTIVE_HIGH>;
 		input;
-		line-name = "CSI0_SYNC";
+		line-name = "MIPI_CSI0_SYNC";
 	};
 
-	csi0-trigger-hog {
+	mipi-csi0-trigger-hog {
 		gpio-hog;
-		gpios = <8 0>;
+		gpios = <8 GPIO_ACTIVE_HIGH>;
 		input;
-		line-name = "CSI0_TRIGGER";
+		line-name = "MIPI_CSI0_TRIGGER";
 	};
 
-	csi0-enable-hog {
+	mipi-csi0-en-hog {
 		gpio-hog;
-		gpios = <9 0>;
+		gpios = <9 GPIO_ACTIVE_HIGH>;
 		output-low;
-		line-name = "CSI0_ENABLE";
+		line-name = "MIPI_CSI0_EN";
 	};
 };
 
