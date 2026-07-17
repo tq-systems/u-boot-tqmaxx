@@ -18,7 +18,7 @@ config TQMA8MPXL_DEFAULTS
 	select TQ_BB
 	select TQ_COMMON_EEPROM
 	select TQ_COMMON_SDMMC
-	select TQ_COMMON_SPI_NOR
+	select TQ_COMMON_SPI_NOR if SPI_FLASH
 	select TQ_COMMON_VARD
 	imply FSL_CAAM
 	imply SPL_CRYPTO if SPL

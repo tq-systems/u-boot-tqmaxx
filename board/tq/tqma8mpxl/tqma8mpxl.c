@@ -270,7 +270,8 @@ int ft_board_setup(void *blob, struct bd_info *bis)
 		};
 
 		if (tq_vard_valid(&eeprom.tq_hw_data.vard)) {
-			if (tq_vard_has_spinor(&eeprom.tq_hw_data.vard)) {
+			if (IS_ENABLED(CONFIG_TQ_COMMON_SPI_NOR) &&
+			    tq_vard_has_spinor(&eeprom.tq_hw_data.vard)) {
 				/*
 				 * Update MTD partition nodes using info from
 				 * mtdparts env var
