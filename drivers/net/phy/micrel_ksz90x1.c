@@ -184,7 +184,6 @@ static int ksz9031_of_config(struct phy_device *phydev)
 	};
 	const unsigned int master = CTRL1000_CONFIG_MASTER | CTRL1000_MANUAL_CONFIG;
 	struct udevice *dev = phydev->dev;
-	u16 regval = 0;
 	ofnode node;
 	int i, ret = 0;
 
