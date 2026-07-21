@@ -15,7 +15,7 @@
 		i2c0 = &i2c0;
 		i2c_eeprom0 = &se97_50;
 		mmc0 = &esdhc1; /* eMMC */
-		mmc1 = &esdhc; /* SD-Card */
+		mmc1 = &esdhc0; /* SD-Card */
 	};
 };
 
