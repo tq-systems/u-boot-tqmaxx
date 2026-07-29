@@ -177,14 +177,14 @@ void tqmls1028a_bb_late_init(void)
 		printf("SDHC1 (SD)\n");
 
 		if (!env_get("mmcdev"))
-			env_set("mmcdev", "0");
+			env_set("mmcdev", "1");
 		break;
 
 	case BOOT_SOURCE_SD_MMC2:
 		printf("SDHC2 (eMMC)\n");
 
 		if (!env_get("mmcdev"))
-			env_set("mmcdev", "1");
+			env_set("mmcdev", "0");
 		break;
 
 	case BOOT_SOURCE_XSPI_NOR:
