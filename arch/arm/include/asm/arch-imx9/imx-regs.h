@@ -78,6 +78,7 @@
 #define BCTRL_GPR_ENET_QOS_INTF_SEL_RMII         (0x4 << 1)
 #define BCTRL_GPR_ENET_QOS_INTF_SEL_RGMII        (0x1 << 1)
 #define BCTRL_GPR_ENET_QOS_CLK_GEN_EN            (0x1 << 0)
+#define BCTRL_GPR_ENET_QOS_CLK_SEL_EXT           (0x1 << 0)
 
 #define MARKETING_GRADING_MASK	GENMASK(5, 4)
 #define SPEED_GRADING_MASK	GENMASK(11, 6)
