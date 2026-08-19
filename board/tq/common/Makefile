@@ -15,6 +15,7 @@ obj-$(CONFIG_TQ_COMMON_VARD) += tq_som_features.o
 
 ifdef CONFIG_IMX9
 obj-$(CONFIG_SCMI_FIRMWARE) += imx9-scmi.o
+obj-y += imx9-bootdev.o
 endif
 
 ifndef CONFIG_XPL_BUILD
