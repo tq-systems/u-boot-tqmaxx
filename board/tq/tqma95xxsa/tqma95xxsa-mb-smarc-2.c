@@ -23,6 +23,8 @@ int tq_bb_board_late_init(void)
 	if (IS_ENABLED(CONFIG_ENV_IS_IN_MMC))
 		board_late_mmc_env_init();
 
+	tq_set_boot_targets();
+
 	return 0;
 }
 
