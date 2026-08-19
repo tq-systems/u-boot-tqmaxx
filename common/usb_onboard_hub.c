@@ -267,10 +267,10 @@ static const struct onboard_hub_data usb2514_data = {
 
 static const struct onboard_hub_data usb5744_data = {
 	.init = usb5744_i2c_init,
-	.power_on_delay_us = 1000,
-	.reset_us = 5,
+	.power_on_delay_us = 10000,
+	.reset_us = 10,
 	.num_supplies = 1,
-	.supply_names = { "vdd-supply" },
+	.supply_names = { "vdd-supply", "vdd2-supply" },
 };
 
 static const struct onboard_hub_data usb8041_data = {
@@ -286,6 +286,12 @@ static const struct udevice_id usb_onboard_hub_ids[] = {
 	}, {
 		.compatible = "usb424,2517",	/* USB2517B USB 2.0 */
 		.data = (ulong)&usb2514_data,
+	}, {
+		.compatible = "usb424,2734",	/* USB2734 USB 2.0 */
+		.data = (ulong)&usb5744_data,
+	}, {
+		.compatible = "usb424,5734",	/* USB5734 USB 3.0 */
+		.data = (ulong)&usb5744_data,
 	}, {
 		.compatible = "usb424,2744",	/* USB2744 USB 2.0 */
 		.data = (ulong)&usb5744_data,
