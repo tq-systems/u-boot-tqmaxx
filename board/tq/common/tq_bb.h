@@ -27,6 +27,7 @@ void tq_bb_board_quiesce_devices(void);
 const char *tq_get_boardname(void);
 const char *tq_bb_get_boardname(void);
 
+int tq_print_bootinfo(void);
 void tq_set_boot_targets(void);
 
 #if IS_ENABLED(CONFIG_XPL_BUILD)

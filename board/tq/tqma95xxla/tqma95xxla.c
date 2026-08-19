@@ -11,7 +11,6 @@
 #include <mtd_node.h>
 #include <asm/global_data.h>
 #include <asm/arch/sys_proto.h>
-#include <asm/mach-imx/boot_mode.h>
 #include <jffs2/load_kernel.h>
 #include <linux/errno.h>
 
@@ -98,52 +97,9 @@ const char *tq_get_boardname(void)
 	return bname;
 }
 
-static int print_bootinfo(void)
-{
-	enum boot_device bt_dev;
-
-	bt_dev = get_boot_device();
-
-	puts("Boot:  ");
-	switch (bt_dev) {
-	case SD1_BOOT:
-		puts("USDHC1(SD)\n");
-		break;
-	case SD2_BOOT:
-		puts("USDHC2(SD)\n");
-		break;
-	case SD3_BOOT:
-		puts("USDHC3(SD)\n");
-		break;
-	case MMC1_BOOT:
-		puts("USDHC1(eMMC)\n");
-		break;
-	case MMC2_BOOT:
-		puts("USDHC2(eMMC)\n");
-		break;
-	case MMC3_BOOT:
-		puts("USDHC3(eMMC)\n");
-		break;
-	case USB_BOOT:
-		puts("USB\n");
-		break;
-	case USB2_BOOT:
-		puts("USB\n");
-		break;
-	case QSPI_BOOT:
-		puts("FlexSPI\n");
-		break;
-	default:
-		printf("Unknown/Unsupported device %u\n", bt_dev);
-		break;
-	}
-
-	return 0;
-}
-
 int checkboard(void)
 {
-	print_bootinfo();
+	tq_print_bootinfo();
 	printf("Board: %s on a %s\n", tq_get_boardname(),
 	       tq_bb_get_boardname());
 
