@@ -94,6 +94,14 @@ int tq_bb_board_init(void)
 	return 0;
 }
 
+int tq_bb_board_late_init(void)
+{
+	if (IS_ENABLED(CONFIG_ENV_IS_IN_MMC))
+		board_late_mmc_env_init();
+
+	return 0;
+}
+
 #if IS_ENABLED(CONFIG_OF_BOARD_SETUP)
 
 static const char * const usb2_device_paths[] = {
