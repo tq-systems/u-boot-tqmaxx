@@ -43,13 +43,13 @@
 
 /* Initial environment variables */
 #define CFG_MODULE_ENV_SETTINGS                                        \
-	"scriptaddr=0x95500000\0"                                      \
+	"scriptaddr=0x94000000\0"                                      \
 	"script_offset_f=0x5f0000\0"                                   \
 	"script_size_f=0x10000\0"                                      \
 	"rootfs_part_f=ubi\0"                                          \
 	"image=Image\0"                                                \
 	"kernel_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0"        \
-	"pxefile_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0"       \
+	"pxefile_addr_r=0x94100000\0"                                  \
 	"fdt_addr_r=0x95000000\0"                                      \
 	"fdtoverlay_addr_r=0x95080000\0"                               \
 	"initrd_addr=0x95800000\0"                                     \
