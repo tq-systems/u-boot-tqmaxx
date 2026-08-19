@@ -101,9 +101,6 @@ int board_init(void)
 
 int board_late_init(void)
 {
-	if (IS_ENABLED(CONFIG_ENV_IS_IN_MMC))
-		board_late_mmc_env_init();
-
 	if (IS_ENABLED(CONFIG_AHAB_BOOT))
 		env_set("sec_boot", "yes");
 	else
