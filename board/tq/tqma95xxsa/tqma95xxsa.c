@@ -40,7 +40,7 @@ int board_usb_init(int index, enum usb_init_type init)
 		}
 
 		if (IS_ENABLED(CONFIG_USB_DWC3))
-			return imx9_dwc3_device_init(index);
+			return imx9_dwc3_device_init(index, false);
 	}
 
 	return 0;

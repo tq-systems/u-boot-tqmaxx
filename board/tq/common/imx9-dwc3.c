@@ -48,6 +48,14 @@ static struct dwc3_device dwc3_device_data = {
 	.power_down_scale = 2,
 };
 
+static struct dwc3_device dwc3_host_data = {
+	.maximum_speed = USB_SPEED_SUPER,
+	.base = USB1_BASE_ADDR,
+	.dr_mode = USB_DR_MODE_HOST,
+	.index = 0,
+	.power_down_scale = 2,
+};
+
 static void dwc3_nxp_usb_phy_init(struct dwc3_device *dwc3)
 {
 	u32 value;
@@ -83,17 +91,18 @@ static void dwc3_nxp_usb_phy_init(struct dwc3_device *dwc3)
 	writel(value, dwc3->base + PHY_CTRL1);
 }
 
-int imx9_dwc3_device_init(int index)
+int imx9_dwc3_device_init(int index, bool is_host)
 {
 	if (index != 0)
 		return -ENODEV;
 
+	if (is_host) {
+		dwc3_nxp_usb_phy_init(&dwc3_host_data);
+		return dwc3_uboot_init(&dwc3_host_data);
+	}
+
 	dwc3_nxp_usb_phy_init(&dwc3_device_data);
 	return dwc3_uboot_init(&dwc3_device_data);
-
-	dwc3_uboot_exit(index);
-
-	return 0;
 }
 
 int imx9_dwc3_device_deinit(int index)

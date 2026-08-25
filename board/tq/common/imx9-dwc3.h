@@ -8,7 +8,7 @@
 #ifndef __IMX9_DWC3_H
 #define __IMX9_DWC3_H
 
-int imx9_dwc3_device_init(int index);
+int imx9_dwc3_device_init(int index, bool is_host);
 int imx9_dwc3_device_deinit(int index);
 
 #endif
