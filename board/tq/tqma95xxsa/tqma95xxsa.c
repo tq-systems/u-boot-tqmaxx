@@ -11,8 +11,10 @@
 #include <init.h>
 #include <mtd_node.h>
 #include <usb.h>
+#include <asm/bootm.h>
 #include <asm/global_data.h>
 #include <asm/io.h>
+#include <asm/setup.h>
 #include <asm/arch/clock.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/arch-imx9/ccm_regs.h>
@@ -100,10 +102,23 @@ int board_init(void)
 
 int board_late_init(void)
 {
-	if (IS_ENABLED(CONFIG_AHAB_BOOT))
-		env_set("sec_boot", "yes");
-	else
-		env_set("sec_boot", "no");
+	if (IS_ENABLED(CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG)) {
+		struct tag_serialnr serialnr;
+
+		/*
+		 * CPU UID Query - get_board_serial returns only part of the
+		 * UID but prints complete UID data for i.MX9 SOC
+		 */
+		get_board_serial(&serialnr);
+
+		env_set("board_name", tq_bb_get_boardname());
+		env_set("board_rev", tq_get_boardname());
+
+		if (CONFIG_IS_ENABLED(AHAB_BOOT))
+			env_set("sec_boot", "yes");
+		else
+			env_set("sec_boot", "no");
+	}
 
 	return tq_bb_board_late_init();
 }
