@@ -566,10 +566,6 @@
 	pinctrl-0 = <&pinctrl_usdhc2>;
 	pinctrl-1 = <&pinctrl_usdhc2_100mhz>;
 	pinctrl-2 = <&pinctrl_usdhc2_200mhz>;
-	vmmc-supply = <&reg_sdvmmc>;
-	cd-gpios = <&gpio3 0 GPIO_ACTIVE_LOW>;
-	no-1-8-v;
-	disable-wp;
 	bus-width = <4>;
 };
 
@@ -802,19 +798,19 @@
 
 	pinctrl_usdhc2_100mhz: usdhc2-100mhzgrp {
 		fsl,pins = <IMX95_PAD_SD2_CD_B__GPIO3_IO_BIT0			0x1100>,
-			   <IMX95_PAD_SD2_CLK__USDHC2_CLK			0x158e>,
-			   <IMX95_PAD_SD2_CMD__USDHC2_CMD			0x138e>,
-			   <IMX95_PAD_SD2_DATA0__USDHC2_DATA0			0x138e>,
-			   <IMX95_PAD_SD2_DATA1__USDHC2_DATA1			0x138e>,
-			   <IMX95_PAD_SD2_DATA2__USDHC2_DATA2			0x138e>,
-			   <IMX95_PAD_SD2_DATA3__USDHC2_DATA3			0x138e>,
+			   <IMX95_PAD_SD2_CLK__USDHC2_CLK			0x59e>,
+			   <IMX95_PAD_SD2_CMD__USDHC2_CMD			0x39e>,
+			   <IMX95_PAD_SD2_DATA0__USDHC2_DATA0			0x139e>,
+			   <IMX95_PAD_SD2_DATA1__USDHC2_DATA1			0x139e>,
+			   <IMX95_PAD_SD2_DATA2__USDHC2_DATA2			0x139e>,
+			   <IMX95_PAD_SD2_DATA3__USDHC2_DATA3			0x139e>,
 			   <IMX95_PAD_SD2_VSELECT__USDHC2_VSELECT		0x51e>;
 	};
 
 	pinctrl_usdhc2_200mhz: usdhc2-200mhzgrp {
 		fsl,pins = <IMX95_PAD_SD2_CD_B__GPIO3_IO_BIT0			0x1100>,
-			   <IMX95_PAD_SD2_CLK__USDHC2_CLK			0x15fe>,
-			   <IMX95_PAD_SD2_CMD__USDHC2_CMD			0x13fe>,
+			   <IMX95_PAD_SD2_CLK__USDHC2_CLK			0x5fe>,
+			   <IMX95_PAD_SD2_CMD__USDHC2_CMD			0x3fe>,
 			   <IMX95_PAD_SD2_DATA0__USDHC2_DATA0			0x13fe>,
 			   <IMX95_PAD_SD2_DATA1__USDHC2_DATA1			0x13fe>,
 			   <IMX95_PAD_SD2_DATA2__USDHC2_DATA2			0x13fe>,
