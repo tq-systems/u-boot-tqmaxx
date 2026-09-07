@@ -59,7 +59,7 @@
 
 #define TQMA6_SPI_FLASH_SECTOR_SIZE	SZ_64K
 #define TQMA6_SPI_UBOOT_START		0x400
-#define TQMA6_SPI_UBOOT_SIZE		0xa0000
+#define TQMA6_SPI_UBOOT_MAX_SIZE		0xf0000
 
 #define CFG_MODULE_ENV_SETTINGS                                                \
 	"emmc_dev=0\0"                                                         \
@@ -82,7 +82,7 @@
 	"uboot_mmc_size=" __stringify(TQMA6_MMC_UBOOT_SECTOR_COUNT) "\0"       \
 	"uboot_spi_sector_size=" __stringify(TQMA6_SPI_FLASH_SECTOR_SIZE) "\0" \
 	"uboot_spi_start=" __stringify(TQMA6_SPI_UBOOT_START) "\0"             \
-	"uboot_spi_size=" __stringify(TQMA6_SPI_UBOOT_SIZE) "\0"               \
+	"uboot_spi_size=" __stringify(TQMA6_SPI_UBOOT_MAX_SIZE) "\0"               \
 
 #include "tq-imx-shared-env.h"
 
