@@ -12,6 +12,8 @@
 #ifndef __TQMA7_CONFIG_H
 #define __TQMA7_CONFIG_H
 
+#include <linux/build_bug.h>
+
 #include "mx7_common.h"
 
 #if IS_ENABLED(CONFIG_TQMA7_512MB)
@@ -24,13 +26,20 @@
 
 /* 128 MiB offset as in ARM related docs for Linux suggested */
 #define TQMA7_FDT_ADDRESS		0x88000000
-#define FDT_OVERLAY_ADDR		(TQMA7_FDT_ADDRESS + SZ_256K)
+#define FDT_OVERLAY_ADDR		0x88040000
 /*
  * above 128 MiB offset as in ARM related docu for linux suggested
  * DTB is loaded at 128 MiB, so use just 16 MiB more
  */
-#define TQMA7_INITRD_ADDRESS		(TQMA67_FDT_ADDRESS + SZ_16M)
+#define TQMA7_INITRD_ADDRESS		0x89000000
 
+#ifndef __ASSEMBLY__
+ 
+static_assert(TQMA7_FDT_ADDRESS == (MMDC0_ARB_BASE_ADDR + SZ_128M));
+static_assert(FDT_OVERLAY_ADDR == (TQMA7_FDT_ADDRESS + SZ_256K));
+static_assert(TQMA7_INITRD_ADDRESS == (TQMA7_FDT_ADDRESS + SZ_16M));
+
+#endif
 
 #define TQMA7_UBOOT_OFFSET		SZ_1K
 #define TQMA7_MMC_UBOOT_SECTOR_START	0x2
