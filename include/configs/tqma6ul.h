@@ -10,14 +10,24 @@
 #ifndef __TQMA6UL_CONFIG_H
 #define __TQMA6UL_CONFIG_H
 
+#include <linux/build_bug.h>
+
 #include "mx6_common.h"
 
 /* 128 MiB offset as suggested in ARM related Linux docs */
 #define TQMA6UL_FDT_ADDRESS		0x88000000
-#define FDT_OVERLAY_ADDR		(TQMA6UL_FDT_ADDRESS + SZ_256K)
+#define FDT_OVERLAY_ADDR		0x88040000
 
 /* 16MiB above TQMA6UL_FDT_ADDRESS */
-#define TQMA6UL_INITRD_ADDRESS		(TQMA6UL_FDT_ADDRESS + SZ_16M)
+#define TQMA6UL_INITRD_ADDRESS		0x89000000
+
+#ifndef __ASSEMBLY__
+
+static_assert(TQMA6UL_FDT_ADDRESS == (MMDC0_ARB_BASE_ADDR + SZ_128M));
+static_assert(FDT_OVERLAY_ADDR == (TQMA6UL_FDT_ADDRESS + SZ_256K));
+static_assert(TQMA6UL_INITRD_ADDRESS == (TQMA6UL_FDT_ADDRESS + SZ_16M));
+
+#endif
 
 /* Physical Memory Map */
 #define PHYS_SDRAM			MMDC0_ARB_BASE_ADDR
