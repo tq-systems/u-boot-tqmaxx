@@ -37,7 +37,7 @@
 #define TQMA7_MMC_UBOOT_SECTOR_COUNT	0x7fe
 #define TQMA7_SPI_FLASH_SECTOR_SIZE	SZ_64K
 #define TQMA7_SPI_UBOOT_START		0x1000
-#define TQMA7_SPI_UBOOT_SIZE		0xf0000
+#define TQMA7_SPI_UBOOT_MAX_SIZE		0xf0000
 
 #if IS_ENABLED(CONFIG_IMX_BOOTAUX)
 
@@ -73,7 +73,7 @@
 	"uboot_mmc_size=" __stringify(TQMA7_MMC_UBOOT_SECTOR_COUNT) "\0"       \
 	"uboot_spi_sector_size=" __stringify(TQMA7_SPI_FLASH_SECTOR_SIZE) "\0" \
 	"uboot_spi_start=" __stringify(TQMA7_SPI_UBOOT_START) "\0"             \
-	"uboot_spi_size=" __stringify(TQMA7_SPI_UBOOT_SIZE) "\0"               \
+	"uboot_spi_size=" __stringify(TQMA7_SPI_UBOOT_MAX_SIZE) "\0"               \
 
 /* Physical Memory Map */
 #define PHYS_SDRAM			MMDC0_ARB_BASE_ADDR
