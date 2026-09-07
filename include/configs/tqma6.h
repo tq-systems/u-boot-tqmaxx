@@ -11,6 +11,7 @@
 #define __CONFIG_H
 
 #include <linux/kconfig.h>
+#include <linux/build_bug.h>
 #include <linux/stringify.h>
 
 #include "mx6_common.h"
@@ -26,13 +27,20 @@
 
 /* 128 MiB offset as in ARM related docu for linux suggested */
 #define TQMA6_FDT_ADDRESS	0x18000000
-#define FDT_OVERLAY_ADDR	(TQMA6_FDT_ADDRESS + SZ_256K)
+#define FDT_OVERLAY_ADDR	0x18040000
 
 /* 16MiB above TQMA6_FDT_ADDRESS */
-#define TQMA6_INITRD_ADDRESS	(TQMA6_FDT_ADDRESS + SZ_16M)
+#define TQMA6_INITRD_ADDRESS	0x19000000
 
 #define TQMA6_SPI_FLASH_SECTOR_SIZE SZ_64K
 
+#ifndef __ASSEMBLY__
+
+static_assert(TQMA6_FDT_ADDRESS == (MMDC0_ARB_BASE_ADDR + SZ_128M));
+static_assert(FDT_OVERLAY_ADDR == (TQMA6_FDT_ADDRESS + SZ_256K));
+static_assert(TQMA6_INITRD_ADDRESS == (TQMA6_FDT_ADDRESS + SZ_16M));
+
+#endif
 
 /* Physical Memory Map */
 #define PHYS_SDRAM		MMDC0_ARB_BASE_ADDR
@@ -72,7 +80,7 @@
 	"image=zImage\0"                                                       \
 	"kernel_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0"                \
 	"pxefile_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0"               \
-	"ramdisk_addr_r=" __stringify(TQMA6UL_INITRD_ADDRESS) "\0"             \
+	"ramdisk_addr_r=" __stringify(TQMA6_INITRD_ADDRESS) "\0"             \
 	"mmcautodetect=yes\0"                                                  \
 	"mmcblkdev=0\0"                                                        \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV)"\0"                      \
