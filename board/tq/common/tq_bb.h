@@ -37,6 +37,12 @@ void tq_bb_spl_board_init(void);
 /*
  * Device Tree Support
  */
+#if IS_ENABLED(CONFIG_OF_BOARD_FIXUP)
+
+int tq_bb_board_fix_fdt(void *fdt);
+
+#endif
+
 #if IS_ENABLED(CONFIG_OF_BOARD_SETUP) && IS_ENABLED(CONFIG_OF_LIBFDT)
 
 struct node_info;
