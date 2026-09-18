@@ -13,10 +13,7 @@ config TQMA95XXSA_DEFAULTS
 	bool
 	select IMX95
 	select TQ_BB
-	select TQ_EEPROM
-	select TQ_RTC
 	select TQ_SDMMC
-	select TQ_VARD
 	imply MISC
 	imply I2C_EEPROM
 
