@@ -15,6 +15,7 @@ obj-$(CONFIG_SPI_ASPEED_SMC) += spi-aspeed-smc.o
 obj-$(CONFIG_SPI_MEM) += spi-mem.o
 obj-$(CONFIG_TI_QSPI) += ti_qspi.o
 obj-$(CONFIG_FSL_QSPI) += fsl_qspi.o
+obj-$(CONFIG_NXP_XSPI) += nxp_xspi.o
 else
 obj-y += spi.o
 obj-$(CONFIG_SPI_MEM) += spi-mem-nodm.o
@@ -62,7 +63,6 @@ obj-$(CONFIG_MXS_SPI) += mxs_spi.o
 obj-$(CONFIG_NPCM_FIU_SPI) += npcm_fiu_spi.o
 obj-$(CONFIG_NPCM_PSPI) += npcm_pspi.o
 obj-$(CONFIG_NXP_FSPI) += nxp_fspi.o
-obj-$(CONFIG_NXP_XSPI) += nxp_xspi.o
 obj-$(CONFIG_ATCSPI200_SPI) += atcspi200_spi.o
 obj-$(CONFIG_OCTEON_SPI) += octeon_spi.o
 obj-$(CONFIG_OMAP3_SPI) += omap3_spi.o
