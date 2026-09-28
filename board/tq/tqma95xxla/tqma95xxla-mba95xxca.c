@@ -104,34 +104,76 @@ int tq_bb_board_late_init(void)
 	return 0;
 }
 
-#if IS_ENABLED(CONFIG_OF_BOARD_SETUP)
-
 static const char * const usb2_device_paths[] = {
 	"/soc/usb@4c200000",
 	"/soc/usbmisc@4c200200",
 	"/usbphynop"
 };
 
+static const char * const usb3_device_path = "/soc/usb@4c010010/usb@4c100000";
+
+static void tqma95_fdt_fixup_usb(void *blob)
+{
+	int off;
+	int rc = 0;
+
+	do {
+		/*
+		 * centralized error handling and loop termination before changing
+		 * the fdt:
+		 * - if no error the loop is executed once
+		 * - if a fixup step signals FDT_ERR_NOSPACE, we try to allocate
+		 *   and apply the fixups again
+		 * - teminate loop on all other errors
+		 */
+		if (rc == -FDT_ERR_NOSPACE)
+			rc = fdt_increase_size(blob, 512);
+
+		if (rc) {
+			pr_err("ERROR: unable fixup DTB for USB\n");
+			break;
+		}
+
+		if (is_usb_boot()) {
+			/* Chipidea USB 2.0 is disconnected */
+			for (size_t i = 0; i < ARRAY_SIZE(usb2_device_paths); ++i) {
+				off = fdt_path_offset(blob, usb2_device_paths[i]);
+				if (off >= 0) {
+					rc = fdt_set_node_status(blob, off,
+								 FDT_STATUS_DISABLED);
+					if (rc)
+						continue;
+				}
+			}
+
+			off = fdt_path_offset(blob, usb3_device_path);
+			/* DWC3 connected as USB 2.0 device to X9 */
+			rc = fdt_setprop_string(blob, off,
+						"dr_mode", "peripheral");
+			if (rc)
+				continue;
+			rc = fdt_setprop_string(blob, off,
+						"maximum-speed", "high-speed");
+			if (rc)
+				continue;
+		} else {
+			off = fdt_path_offset(blob, usb3_device_path);
+			/* DWC3 connected as USB 3 host to hub */
+			rc = fdt_setprop_string(blob, off,
+						"dr_mode", "host");
+			if (rc)
+				continue;
+		}
+	} while (rc != 0);
+
+	pr_info("Fixup DTB for USB2/3\n");
+}
+
+#if IS_ENABLED(CONFIG_OF_BOARD_SETUP)
+
 int tq_bb_ft_board_setup(void *blob, struct bd_info *bd)
 {
-	size_t i;
-	int off;
-
-	if (is_usb_boot()) {
-		printf("boot from USB - modify FDT\n");
-		/* Chipidea is disconnected */
-		for (i = 0; i < ARRAY_SIZE(usb2_device_paths); ++i) {
-			off = fdt_path_offset(blob, usb2_device_paths[i]);
-			if (off >= 0)
-				fdt_set_node_status(blob, off, FDT_STATUS_DISABLED);
-		}
-		/* DWC3 is routed to X9 USB 2.0 A/B connector */
-		off = fdt_path_offset(blob, "/soc/usb@4c010010/usb@4c100000");
-		if (off >= 0) {
-			fdt_setprop_string(blob, off, "dr_mode", "peripheral");
-			fdt_setprop_string(blob, off, "maximum-speed", "high-speed");
-		}
-	}
+	tqma95_fdt_fixup_usb(blob);
 
 	return 0;
 }
