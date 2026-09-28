@@ -179,6 +179,15 @@ int tq_bb_ft_board_setup(void *blob, struct bd_info *bd)
 }
 #endif
 
+#if IS_ENABLED(CONFIG_OF_BOARD_FIXUP)
+int tq_bb_board_fix_fdt(void *fdt)
+{
+	tqma95_fdt_fixup_usb(fdt);
+
+	return 0;
+}
+#endif
+
 void tq_bb_board_quiesce_devices(void)
 {
 	int ret;
