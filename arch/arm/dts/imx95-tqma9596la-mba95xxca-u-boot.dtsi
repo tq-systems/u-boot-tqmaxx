@@ -11,15 +11,7 @@
 	bootph-pre-ram;
 };
 
-&lpuart2 {
-	bootph-pre-ram;
-};
-
 &pinctrl_lpuart1 {
-	bootph-pre-ram;
-};
-
-&pinctrl_lpuart2 {
 	bootph-pre-ram;
 };
 
