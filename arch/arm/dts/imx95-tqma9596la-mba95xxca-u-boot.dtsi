@@ -45,21 +45,31 @@
 };
 
 &usb2 {
-	/delete-property/ power-domains;
 	compatible = "fsl,imx8mm-usb", "fsl,imx7d-usb";
-	status = "disabled";
+	/delete-property/ power-domains;
+	/* needed for dual role / board phy mode */
+	extcon = <&ptn5110>;
 };
 
 &usb3 {
 	/delete-property/ power-domains;
 };
 
+/*
+ * Peripheral for serial download mode
+ * adjusted in board_fix_fdt
+ */
 &usb3_dwc3 {
+	compatible = "fsl,imx95a-dwc3", "fsl,imx8mq-dwc3", "snps,dwc3";
 	dr_mode = "peripheral";
-	compatible = "fsl,imx8mq-dwc3", "snps,dwc3";
+	snps,dis-u1-entry-quirk;
+	snps,dis-u2-entry-quirk;
 };
 
 &usb3_phy {
+	/*
+	 * not supported, in U-Boot, enabled in board_usb_init if !usb boot
+	 */
 	/delete-property/ vbus-supply;
 };
 
