@@ -8,45 +8,223 @@
 #include <dwc3-uboot.h>
 #include <env.h>
 #include <fdt_support.h>
+#include <i2c.h>
 #include <init.h>
+#include <scmi_agent.h>
 #include <usb.h>
 #include <asm/arch/clock.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/arch-imx9/ccm_regs.h>
+#include <linux/bitfield.h>
+#include <linux/bitops.h>
+#include <linux/delay.h>
+#include <power/regulator.h>
+
 #include "../common/imx9-dwc3.h"
 #include "../common/imx9-scmi.h"
+#include "../common/tcpc.h"
 #include "../common/tq_bb.h"
 
 #define BB_BOARD_NAME "MBa95xxCA"
 
-int board_usb_init(int index, enum usb_init_type init)
+#if IS_ENABLED(CONFIG_USB_TCPC)
+
+static struct tcpc_port typec_port;
+
+static struct tcpc_port_config port_config = {
+	.i2c_bus = 1, /* i2c2 */
+	.addr = 0x50,
+	.port_type = TYPEC_PORT_UFP,
+	.disable_pd = true,
+};
+
+/*
+ * USB3 / DWC3 port handling. The USB 2.0 lane of this IP
+ * is muxed to the TYPE-C port controller if the board is
+ * configured for serial download mode. In this case the
+ * IP should be limitied to device mode with HS speed.
+ *
+ * USB3_PHY_TCA register base address
+ */
+static ulong tca_base;
+
+void tca_mux_select(enum typec_cc_polarity pol)
+{
+	u32 val;
+
+	if (!tca_base)
+		return;
+
+	/* reset XBar block */
+	setbits_le32(tca_base, BIT(9));
+
+	/* Set OP mode to System configure Mode */
+	clrbits_le32(tca_base + 0x10, 0x3);
+	/* read TCA_PSTATE */
+	val = readl(tca_base + 0x30);
+	/* PIPE0_POWERDOWN[1:0] status/value from the PIPE */
+	WARN_ON((val & GENMASK(1, 0)) != 0x3);
+	/* RX_PLL_STATE */
+	WARN_ON((val & BIT(2)) != 0);
+	/* TX_STATE */
+	WARN_ON((val & BIT(3)) != 0);
+	/* TX_CM_STATE */
+	WARN_ON((val & BIT(4)) != 0);
+	/* TCA_SYSMODE_CFG: set TYPEC_DISABLE */
+	setbits_le32(tca_base + 0x18, BIT(3));
+	udelay(1);
+	/* TCA_SYSMODE_CFG: set TYPEC_FLIP based on polarity */
+	if (pol == TYPEC_POLARITY_CC1)
+		clrbits_le32(tca_base + 0x18, BIT(2));
+	else
+		setbits_le32(tca_base + 0x18, BIT(2));
+
+	udelay(1);
+	/* TCA_SYSMODE_CFG: clear TYPEC_DISABLE, stanadard operation */
+	clrbits_le32(tca_base + 0x18, BIT(3));
+}
+
+static void setup_typec(void)
+{
+	int ret;
+
+	if (is_usb_boot()) {
+		/* use USB 3.0 TCA register block and add handler for mux select */
+		tca_base = USB1_BASE_ADDR + 0xfc000;
+
+		ret = tcpc_init(&typec_port, port_config, &tca_mux_select);
+	} else {
+		/* no special PHY handling for USB 2.0 phy */
+		ret = tcpc_init(&typec_port, port_config, NULL);
+	}
+	if (ret) {
+		printf("%s: tcpc init failed, err=%d\n", __func__, ret);
+		return;
+	}
+}
+
+int board_ehci_usb_phy_mode(struct udevice *dev)
+{
+	enum typec_cc_polarity pol;
+	enum typec_cc_state state;
+	struct tcpc_port *port_ptr;
+	int ret = 0;
+
+	/*
+	 * dev_seq == 0: USB3 / DWC3 (should never happen)
+	 * dev_seq == 1: USB2
+	 */
+	if (dev_seq(dev) == 0)
+		return USB_INIT_DEVICE;
+
+	tcpc_setup_ufp_mode(&typec_port);
+	ret = tcpc_get_cc_status(&typec_port, &pol, &state);
+
+	tcpc_print_log(&typec_port);
+	if (!ret) {
+		if (state == TYPEC_STATE_SRC_RD_RA || state == TYPEC_STATE_SRC_RD)
+			return USB_INIT_HOST;
+	} else {
+		printf("ERROR: getting TypeC CC status %d\n", ret);
+	}
+
+	return USB_INIT_DEVICE;
+}
+
+static int mba95xxca_typec_init(enum usb_init_type init)
+{
+	int ret;
+
+	switch (init) {
+	case USB_INIT_DEVICE:
+		ret = tcpc_setup_ufp_mode(&typec_port);
+		break;
+	case USB_INIT_HOST:
+		ret = tcpc_setup_dfp_mode(&typec_port);
+		break;
+	default:
+		pr_info("TYPE-C: unsupported init type\n");
+		ret = -EINVAL;
+	}
+
+	return ret;
+}
+
+static int mba95xxca_typec_deinit(enum usb_init_type init)
 {
 	int ret = 0;
 
-	if (is_usb_boot() && init != USB_INIT_DEVICE) {
-		pr_warn("USB boot detected, USB host not available\n");
-		return -ENODEV;
+	if (init == USB_INIT_HOST)
+		ret = tcpc_disable_src_vbus(&typec_port);
+
+	return ret;
+}
+
+#endif
+
+static void regulator_switch_by_name(const char *devname, bool enable)
+{
+	struct udevice *dev;
+	int ret;
+
+	ret = regulator_get_by_devname(devname, &dev);
+	if (ret) {
+		pr_warn("%s regulator not found: %d\n", devname, ret);
+		return;
 	}
 
-	if (index == 0 && init == USB_INIT_DEVICE) {
-		ret = imx9_scmi_power_domain_enable(IMX95_PD_HSIO_TOP, true);
-		if (ret) {
-			pr_err("SCMI_POWER_STATE_SET Failed for USB\n");
-			return ret;
+	ret = regulator_set_enable_if_allowed(dev, enable);
+	if (ret) {
+		pr_info("%s %s regulator failed: %d\n",
+			devname, enable ? "Enable" : "Disable", ret);
+		return;
+	}
+}
+
+int board_usb_init(int index, enum usb_init_type init)
+{
+	/* USB2 / chipidea */
+	if (index == 1 && !is_usb_boot())
+		return mba95xxca_typec_init(init);
+
+	if (index == 0) {
+		if (is_usb_boot() && init != USB_INIT_DEVICE) {
+			pr_warn("USB boot detected, USB host not available\n");
+			return -ENODEV;
 		}
 
-		if (IS_ENABLED(CONFIG_USB_DWC3))
-			return imx9_dwc3_device_init(index, false);
+		if (IS_ENABLED(CONFIG_USB_DWC3)) {
+			bool init_host = (init == USB_INIT_HOST);
+			int ret;
+
+			ret = imx9_scmi_power_domain_enable(IMX95_PD_HSIO_TOP, true);
+			if (ret) {
+				pr_err("SCMI_POWER_STATE_SET Failed for USB\n");
+				return ret;
+			}
+
+			if (init_host)
+				regulator_switch_by_name("regulator-vbus-usb3", true);
+			return imx9_dwc3_device_init(index, init_host);
+		}
 	}
 
-	return 0;
+	/* invalid port */
+	pr_err("USB%d not available\n", index);
+	return -ENODEV;
 }
 
 int board_usb_cleanup(int index, enum usb_init_type init)
 {
-	if (index == 0 && init == USB_INIT_DEVICE) {
-		if (IS_ENABLED(CONFIG_USB_DWC3))
+	/* USB2 / chipidea */
+	if (index == 1 && !is_usb_boot())
+		return mba95xxca_typec_deinit(init);
+	if (index == 0) {
+		if (IS_ENABLED(CONFIG_USB_DWC3)) {
+			if (init == USB_INIT_HOST)
+				regulator_switch_by_name("regulator-vbus-usb3", false);
 			return imx9_dwc3_device_deinit(index);
+		}
 	}
 
 	return 0;
@@ -88,6 +266,9 @@ int tq_bb_board_init(void)
 		pr_err("SCMI_POWER_STATE_SET Failed for USB\n");
 		return ret;
 	}
+
+	if (IS_ENABLED(CONFIG_USB_TCPC))
+		setup_typec();
 
 	netc_init();
 
