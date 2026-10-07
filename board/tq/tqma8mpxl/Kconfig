@@ -15,7 +15,7 @@ config IMX_CONFIG
 config TQMA8MPXL_DEFAULTS
 	bool
 	default y
-	select TQ_BB
+	select TQ_COMMON_BB
 	select TQ_COMMON_EEPROM
 	select TQ_COMMON_SDMMC
 	select TQ_COMMON_SPI_NOR if SPI_FLASH
