@@ -54,7 +54,7 @@ const char * __weak tq_bb_get_boardname(void)
 	return "INVALID";
 }
 
-#if IS_ENABLED(CONFIG_SPL_BUILD)
+#if IS_ENABLED(CONFIG_XPL_BUILD)
 void __weak tq_bb_board_init_f(ulong dummy)
 {
 	;
@@ -64,7 +64,7 @@ void __weak tq_bb_spl_board_init(void)
 {
 	;
 }
-#endif /* IS_ENABLED(CONFIG_SPL_BUILD) */
+#endif /* IS_ENABLED(CONFIG_XPL_BUILD) */
 
 /*
  * Device Tree Support

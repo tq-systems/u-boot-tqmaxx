@@ -27,7 +27,7 @@ const char *tq_bb_get_boardname(void);
 
 void tq_set_boot_targets(void);
 
-#if IS_ENABLED(CONFIG_SPL_BUILD)
+#if IS_ENABLED(CONFIG_XPL_BUILD)
 void tq_bb_board_init_f(ulong dummy);
 void tq_bb_spl_board_init(void);
 #endif
