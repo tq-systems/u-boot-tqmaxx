@@ -69,10 +69,16 @@ void __weak tq_bb_spl_board_init(void)
 /*
  * Device Tree Support
  */
+#if IS_ENABLED(CONFIG_OF_BOARD_FIXUP)
+int __weak tq_bb_board_fix_fdt(void *fdt)
+{
+	return 0;
+}
+#endif
+
 #if IS_ENABLED(CONFIG_OF_BOARD_SETUP) && IS_ENABLED(CONFIG_OF_LIBFDT)
 int __weak tq_bb_ft_board_setup(void *blob, struct bd_info *bis)
 {
 	return 0;
 }
-
 #endif /* IS_ENABLED(CONFIG_OF_BOARD_SETUP) && IS_ENABLED(CONFIG_OF_LIBFDT) */
