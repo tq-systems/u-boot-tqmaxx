@@ -254,7 +254,7 @@ static int usb_onboard_hub_remove(struct udevice *dev)
 	if (hub->reset_gpio)
 		dm_gpio_free(hub->reset_gpio->dev, hub->reset_gpio);
 
-	ret |= usb_onboard_hub_power_off(dev);
+	ret = usb_onboard_hub_power_off(dev);
 	return ret;
 }
 
