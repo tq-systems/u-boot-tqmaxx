@@ -15,7 +15,7 @@
 #include "tq_bb.h"
 
 /* All this code must be called from ft_board_setup */
-#if IS_ENABLED(CONFIG_OF_BOARD_SETUP) && !IS_ENABLED(CONFIG_SPL_BUILD)
+#if IS_ENABLED(CONFIG_OF_BOARD_SETUP) && !IS_ENABLED(CONFIG_XPL_BUILD)
 
 static void tq_ft_fixup_spi_mtdparts(void *blob,
 				     const struct node_info *nodes,
@@ -59,4 +59,4 @@ void tq_ft_spi_setup(void *blob, const char *path,
 	}
 }
 
-#endif
+#endif /* IS_ENABLED(CONFIG_OF_BOARD_SETUP) && !IS_ENABLED(CONFIG_XPL_BUILD) */
