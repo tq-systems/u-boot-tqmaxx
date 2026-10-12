@@ -447,8 +447,8 @@ void *spl_load_simple_fit_fix_load(const void *fit)
 }
 #endif
 
-#if defined(CONFIG_IMX8MP) || defined(CONFIG_IMX8MN)
-int board_handle_rdc_config(void *fdt_addr, const char *config_name, void *dst_addr)
+#if IS_ENABLED(CONFIG_IMX8MP) || IS_ENABLED(CONFIG_IMX8MN)
+static int board_handle_rdc_config(void *fdt_addr, const char *config_name, void *dst_addr)
 {
 	int node = -1, size = 0, ret = 0;
 	uint32_t *data = NULL;
@@ -498,6 +498,27 @@ exit:
 
 	return ret;
 }
+
+static void parse_cortexm_rdc_config(struct spl_image_info *spl_image)
+{
+	if (CONFIG_IMX8M_MCU_RDC_START_CONFIG_ADDR == 0ull ||
+	    CONFIG_IMX8M_MCU_RDC_STOP_CONFIG_ADDR == 0ull)
+		return;
+
+	#define MCU_RDC_MAGIC "mcu_rdc"
+	if (!board_handle_rdc_config(spl_image->fdt_addr, "start-config",
+				     (void *)(CONFIG_IMX8M_MCU_RDC_START_CONFIG_ADDR +
+					      ALIGN(strlen(MCU_RDC_MAGIC), 4))))
+		memcpy((void *)CONFIG_IMX8M_MCU_RDC_START_CONFIG_ADDR,
+			MCU_RDC_MAGIC, ALIGN(strlen(MCU_RDC_MAGIC), 4));
+	if (!board_handle_rdc_config(spl_image->fdt_addr, "stop-config",
+				     (void *)(CONFIG_IMX8M_MCU_RDC_STOP_CONFIG_ADDR +
+					      ALIGN(strlen(MCU_RDC_MAGIC), 4))))
+		memcpy((void *)CONFIG_IMX8M_MCU_RDC_STOP_CONFIG_ADDR,
+			MCU_RDC_MAGIC, ALIGN(strlen(MCU_RDC_MAGIC), 4));
+}
+#else
+static void parse_cortexm_rdc_config(struct spl_image_info *spl_image) {}
 #endif
 
 #ifdef CONFIG_IMX_TRUSTY_OS
@@ -532,15 +553,9 @@ int board_spl_fit_post_load(const void *fit, struct spl_image_info *spl_image)
 #endif
 		}
 	}
-#if defined(CONFIG_IMX8MP) || defined(CONFIG_IMX8MN)
-#define MCU_RDC_MAGIC "mcu_rdc"
-	memcpy((void *)CONFIG_IMX8M_MCU_RDC_START_CONFIG_ADDR, MCU_RDC_MAGIC, ALIGN(strlen(MCU_RDC_MAGIC), 4));
-	memcpy((void *)CONFIG_IMX8M_MCU_RDC_STOP_CONFIG_ADDR, MCU_RDC_MAGIC, ALIGN(strlen(MCU_RDC_MAGIC), 4));
-	board_handle_rdc_config(spl_image->fdt_addr, "start-config",
-				(void *)(CONFIG_IMX8M_MCU_RDC_START_CONFIG_ADDR + ALIGN(strlen(MCU_RDC_MAGIC), 4)));
-	board_handle_rdc_config(spl_image->fdt_addr, "stop-config",
-				(void *)(CONFIG_IMX8M_MCU_RDC_STOP_CONFIG_ADDR + ALIGN(strlen(MCU_RDC_MAGIC), 4)));
-#endif
+
+	if (IS_ENABLED(CONFIG_IMX8MP) || IS_ENABLED(CONFIG_IMX8MN))
+		parse_cortexm_rdc_config(spl_image);
 
 #ifdef CONFIG_IMX_TRUSTY_OS
         tee_node = fit_image_get_node(fit, TEE_SUBNODE_NAME);
