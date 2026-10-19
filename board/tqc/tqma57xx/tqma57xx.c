@@ -612,6 +612,20 @@ int board_eth_init(bd_t *bis)
 			eth_env_set_enetaddr("ethaddr", mac_addr);
 	}
 
+	mac_lo = readl((*ctrl)->control_core_mac_id_1_lo);
+	mac_hi = readl((*ctrl)->control_core_mac_id_1_hi);
+	mac_addr[0] = (mac_hi & 0xFF0000) >> 16;
+	mac_addr[1] = (mac_hi & 0xFF00) >> 8;
+	mac_addr[2] = mac_hi & 0xFF;
+	mac_addr[3] = (mac_lo & 0xFF0000) >> 16;
+	mac_addr[4] = (mac_lo & 0xFF00) >> 8;
+	mac_addr[5] = mac_lo & 0xFF;
+
+	if (!env_get("eth1addr")) {
+		if (is_valid_ethaddr(mac_addr))
+			eth_env_set_enetaddr("eth1addr", mac_addr);
+	}
+
 	ret = tqma57xx_bb_board_eth_init(bis);
 
 	return ret;
