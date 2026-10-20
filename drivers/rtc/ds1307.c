@@ -348,7 +348,7 @@ static int ds1307_rtc_get(struct udevice *dev, struct rtc_time *tm)
 			       1900 : 2000);
 	/* rx8130 is bit position, not BCD */
 	if (data->type == rx_8130)
-		tm->tm_wday = fls(buf[RTC_DAY_REG_ADDR] & 0x07);
+		tm->tm_wday = fls(buf[RTC_DAY_REG_ADDR] & 0x7f) - 1;
 	else
 		tm->tm_wday = bcd2bin((buf[RTC_DAY_REG_ADDR] - 1) & 0x07);
 	tm->tm_yday = 0;
