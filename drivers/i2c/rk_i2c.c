@@ -161,6 +161,45 @@ static inline void rk_i2c_disable(struct rk_i2c *i2c)
 	writel(0, &i2c->regs->con);
 }
 
+/*
+ * Wait for a transfer to finish, or for the slave to refuse it. Sample the
+ * pending register once and judge both bits on that sample: with two reads a
+ * NAK raised in between is lost.
+ */
+static int rk_i2c_wait_xfer(struct i2c_regs *regs, uint done_bit)
+{
+	ulong start = get_timer(0);
+
+	while (1) {
+		uint ipd = readl(&regs->ipd);
+
+		if (ipd & I2C_NAKRCVIPD) {
+			writel(I2C_NAKRCVIPD, &regs->ipd);
+			return -EREMOTEIO;
+		}
+
+		if (ipd & done_bit) {
+			writel(done_bit, &regs->ipd);
+			/*
+			 * NAK and completion come from the same bus event, but
+			 * not always in the same cycle. An interrupt driven
+			 * driver sees a late NAK as a second interrupt; a
+			 * polling loop has to look once more.
+			 */
+			if (readl(&regs->ipd) & I2C_NAKRCVIPD) {
+				writel(I2C_NAKRCVIPD, &regs->ipd);
+				return -EREMOTEIO;
+			}
+			return 0;
+		}
+
+		if (get_timer(start) > I2C_TIMEOUT_MS)
+			return -ETIMEDOUT;
+
+		udelay(1);
+	}
+}
+
 static int rk_i2c_read(struct rk_i2c *i2c, uchar chip, uint reg, uint r_len,
 		       uchar *buf, uint b_len)
 {
@@ -169,7 +208,6 @@ static int rk_i2c_read(struct rk_i2c *i2c, uchar chip, uint reg, uint r_len,
 	uint bytes_remain_len = b_len;
 	uint bytes_xferred = 0;
 	uint words_xferred = 0;
-	ulong start;
 	uint con = 0;
 	uint rxdata;
 	uint i, j;
@@ -220,23 +258,13 @@ static int rk_i2c_read(struct rk_i2c *i2c, uchar chip, uint reg, uint r_len,
 		writel(bytes_xferred, &regs->mrxcnt);
 		writel(I2C_MBRFIEN | I2C_NAKRCVIEN, &regs->ien);
 
-		start = get_timer(0);
-		while (1) {
-			if (readl(&regs->ipd) & I2C_NAKRCVIPD) {
-				writel(I2C_NAKRCVIPD, &regs->ipd);
-				err = -EREMOTEIO;
-			}
-			if (readl(&regs->ipd) & I2C_MBRFIPD) {
-				writel(I2C_MBRFIPD, &regs->ipd);
-				break;
-			}
-			if (get_timer(start) > I2C_TIMEOUT_MS) {
+		err = rk_i2c_wait_xfer(regs, I2C_MBRFIPD);
+		if (err) {
+			if (err == -ETIMEDOUT) {
 				debug("I2C Read Data Timeout\n");
-				err =  -ETIMEDOUT;
 				rk_i2c_show_regs(regs);
-				goto i2c_exit;
 			}
-			udelay(1);
+			goto i2c_exit;
 		}
 
 		for (i = 0; i < words_xferred; i++) {
@@ -267,7 +295,6 @@ static int rk_i2c_write(struct rk_i2c *i2c, uchar chip, uint reg, uint r_len,
 	uint bytes_remain_len = b_len + r_len + 1;
 	uint bytes_xferred = 0;
 	uint words_xferred = 0;
-	ulong start;
 	uint txdata;
 	uint i, j;
 
@@ -307,23 +334,13 @@ static int rk_i2c_write(struct rk_i2c *i2c, uchar chip, uint reg, uint r_len,
 		writel(bytes_xferred, &regs->mtxcnt);
 		writel(I2C_MBTFIEN | I2C_NAKRCVIEN, &regs->ien);
 
-		start = get_timer(0);
-		while (1) {
-			if (readl(&regs->ipd) & I2C_NAKRCVIPD) {
-				writel(I2C_NAKRCVIPD, &regs->ipd);
-				err = -EREMOTEIO;
-			}
-			if (readl(&regs->ipd) & I2C_MBTFIPD) {
-				writel(I2C_MBTFIPD, &regs->ipd);
-				break;
-			}
-			if (get_timer(start) > I2C_TIMEOUT_MS) {
+		err = rk_i2c_wait_xfer(regs, I2C_MBTFIPD);
+		if (err) {
+			if (err == -ETIMEDOUT) {
 				debug("I2C Write Data Timeout\n");
-				err =  -ETIMEDOUT;
 				rk_i2c_show_regs(regs);
-				goto i2c_exit;
 			}
-			udelay(1);
+			goto i2c_exit;
 		}
 
 		bytes_remain_len -= bytes_xferred;
