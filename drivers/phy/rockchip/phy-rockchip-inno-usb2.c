@@ -443,10 +443,11 @@ static const struct rockchip_usb2phy_cfg rk3568_phy_cfgs[] = {
 		.clkout_ctl	= { 0x0008, 4, 4, 1, 0 },
 		.port_cfgs	= {
 			[USB2PHY_PORT_OTG] = {
-				.phy_sus	= { 0x0000, 1, 0, 2, 1 },
+				.phy_sus	= { 0x0000, 8, 0, 0, 0x1d1 },
 			},
 			[USB2PHY_PORT_HOST] = {
-				.phy_sus	= { 0x0004, 1, 0, 2, 1 },
+				/* suspend control stays with the controller */
+				.phy_sus	= { 0x0004, 8, 0, 0x1d2, 0x1d2 },
 			}
 		},
 	},
@@ -455,10 +456,10 @@ static const struct rockchip_usb2phy_cfg rk3568_phy_cfgs[] = {
 		.clkout_ctl	= { 0x0008, 4, 4, 1, 0 },
 		.port_cfgs	= {
 			[USB2PHY_PORT_OTG] = {
-				.phy_sus	= { 0x0000, 1, 0, 2, 1 },
+				.phy_sus	= { 0x0000, 8, 0, 0x1d2, 0x1d1 },
 			},
 			[USB2PHY_PORT_HOST] = {
-				.phy_sus	= { 0x0004, 1, 0, 2, 1 },
+				.phy_sus	= { 0x0004, 8, 0, 0x1d2, 0x1d1 },
 			}
 		},
 	},
