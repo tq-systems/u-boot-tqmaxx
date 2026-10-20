@@ -38,6 +38,9 @@
 /* RESERVED - do not assign		VARD_FEATURE(0, 5) */
 /* RESERVED - do not assign		VARD_FEATURE(0, 6) */
 /* RESERVED - do not assign		VARD_FEATURE(0, 7) */
+/* RESERVED - do not assign		VARD_FEATURE(4, 0) */
+#define VARD_FEATURE_TEMPSENS		VARD_FEATURE(4, 1)
+#define VARD_FEATURE_IMU		VARD_FEATURE(4, 2)
 #define VARD_FEATURE_RTC		VARD_FEATURE(4, 3)
 /* RESERVED - do not assign		VARD_FEATURE(4, 4) */
 /* RESERVED - do not assign		VARD_FEATURE(4, 5) */
@@ -52,10 +55,16 @@
 #define VARD_FORMFACTOR_MASK_TYPE	0xf0 /* SOM type mask */
 #define VARD_FORMFACTOR_SHIFT_TYPE	4    /* SOM type shift */
 
+/*
+ * Values are stored in the module EEPROM, so they are fixed once a module
+ * has been programmed. Spell them out and only ever append.
+ */
 enum tq_formfactor_type {
-	VARD_FORMFACTOR_TYPE_CONNECTOR,      /* SOM with connector, no board standard */
-	VARD_FORMFACTOR_TYPE_LGA,            /* LGA SOM, no board standard */
-	VARD_FORMFACTOR_TYPE_SMARC2,         /* SOM conforms to SMARC-2 standard */
+	VARD_FORMFACTOR_TYPE_CONNECTOR = 0,  /* SOM with connector, no board standard */
+	VARD_FORMFACTOR_TYPE_LGA = 1,        /* LGA SOM, no board standard */
+	VARD_FORMFACTOR_TYPE_SMARC2 = 2,     /* SOM conforms to SMARC-2 standard */
+	VARD_FORMFACTOR_TYPE_OSM_S = 3,      /* SOM conforms to OSM Size-S */
+	VARD_FORMFACTOR_TYPE_OSM_L = 4,      /* SOM conforms to OSM Size-L */
 	VARD_FORMFACTOR_TYPE_NONE = 0xf,     /* unspecified SOM type */
 };
 
@@ -350,6 +359,8 @@ static void tq_vard_dump(const struct tq_vard *vard)
 	tq_vard_show_feature(vard, "SPI-NOR:", VARD_FEATURE_SPINOR);
 	tq_vard_show_feature(vard, "e-MMC:", VARD_FEATURE_EMMC);
 	tq_vard_show_feature(vard, "SE:", VARD_FEATURE_SECELEM);
+	tq_vard_show_feature(vard, "TEMPSENS:", VARD_FEATURE_TEMPSENS);
+	tq_vard_show_feature(vard, "IMU:", VARD_FEATURE_IMU);
 
 	if (tq_vard_has_feature(vard, VARD_FEATURE_EEPROM))
 		printf("  EEPROM:\ttype %u, %u KiB, pagesize %u\n",
@@ -369,6 +380,12 @@ static void tq_vard_dump(const struct tq_vard *vard)
 		break;
 	case VARD_FORMFACTOR_TYPE_SMARC2:
 		printf("SMARC-2\n");
+		break;
+	case VARD_FORMFACTOR_TYPE_OSM_S:
+		printf("OSM Size-S\n");
+		break;
+	case VARD_FORMFACTOR_TYPE_OSM_L:
+		printf("OSM Size-L\n");
 		break;
 	case VARD_FORMFACTOR_TYPE_NONE:
 		/*
