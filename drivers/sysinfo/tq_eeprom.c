@@ -209,7 +209,7 @@ static unsigned int tq_vard_ram_size(const struct tq_vard *vard)
 
 static bool tq_vard_ram_has_ecc(const struct tq_vard *vard)
 {
-	return vard->memsize & VARD_MEMTYPE_MASK_ECC;
+	return vard->memtype & VARD_MEMTYPE_MASK_ECC;
 }
 
 static unsigned int tq_vard_eeprom_size(const struct tq_vard *vard)
