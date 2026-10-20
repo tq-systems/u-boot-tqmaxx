@@ -361,6 +361,30 @@ static int ds1307_rtc_get(struct udevice *dev, struct rtc_time *tm)
 	return 0;
 }
 
+/*
+ * CONTROL1 describes how the backup supply is treated: INIEN keeps the
+ * backup input enabled, CHGEN charges whatever sits on it.
+ * Decision comes from "aux-voltage-chargeable".
+ * Absent property means not chargeable, matching Linux's defaults.
+ */
+static int ds1307_rx8130_setup_backup(struct udevice *dev)
+{
+	u8 setup = RX8130_REG_CONTROL1_INIEN;
+	u32 chargeable;
+
+	if (!dev_read_u32(dev, "aux-voltage-chargeable", &chargeable)) {
+		if (chargeable == 1)
+			setup |= RX8130_REG_CONTROL1_CHGEN;
+		else if (chargeable != 0)
+			printf("RTC: unsupported aux-voltage-chargeable value %u\n",
+			       chargeable);
+	}
+
+	return dm_i2c_reg_clrset(dev, RX8130_REG_CONTROL1,
+				 RX8130_REG_CONTROL1_INIEN |
+				 RX8130_REG_CONTROL1_CHGEN, setup);
+}
+
 int ds1307_rx8130_rtc_reset(struct udevice *dev) {
 	/*
 	 * RX8130CE manual, 18.2 Software Reset
@@ -407,13 +431,9 @@ int ds1307_rx8130_rtc_reset(struct udevice *dev) {
 					RX8130_REG_CONTROL0_AIE |  RX8130_REG_CONTROL0_TIE |
 					RX8130_REG_CONTROL0_UIE, 0);
 
-	/* Set INIEN to 1 */
+	/* INIEN and CHGEN as the devicetree describes the backup supply */
 	if (ret >= 0)
-		ret = dm_i2c_reg_clrset(dev, RX8130_REG_CONTROL1, 0, RX8130_REG_CONTROL1_INIEN);
-
-	/* Set CHGEN to 0 */
-	if (ret >= 0)
-		ret = dm_i2c_reg_clrset(dev, RX8130_REG_CONTROL1, RX8130_REG_CONTROL1_CHGEN, 0);
+		ret = ds1307_rx8130_setup_backup(dev);
 
 	/* Start clock */
 	if (ret >= 0)
@@ -466,8 +486,20 @@ static int ds1307_rtc_reset(struct udevice *dev)
 
 static int ds1307_probe(struct udevice *dev)
 {
+	struct rtc_ds1307_data *data = (void *)dev_get_driver_data(dev);
+	struct ds1307_priv *priv = dev_get_priv(dev);
+	int ret;
+
 	i2c_set_chip_flags(dev, DM_I2C_CHIP_RD_ADDRESS |
 			   DM_I2C_CHIP_WR_ADDRESS);
+
+	if (data->type == rx_8130) {
+		int ret = ds1307_rx8130_setup_backup(dev);
+
+		/* A bus error must not fail the probe, warn and go on */
+		if (ret < 0)
+			printf("RTC: backup supply setup error %d\n", ret);
+	}
 
 	return 0;
 }
