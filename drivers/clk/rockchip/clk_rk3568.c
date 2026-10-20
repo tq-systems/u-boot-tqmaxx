@@ -1623,41 +1623,37 @@ static ulong rk3568_emmc_get_clk(struct rk3568_clk_priv *priv)
 	}
 }
 
+/* Selectable CCLK_EMMC sources, highest first. The mux has no divider. */
+struct rk3568_emmc_rate {
+	ulong rate;
+	u32 sel;
+};
+
+static const struct rk3568_emmc_rate rk3568_emmc_rates[] = {
+	{ 200 * MHz, CCLK_EMMC_SEL_200M },
+	{ 150 * MHz, CCLK_EMMC_SEL_150M },
+	{ 100 * MHz, CCLK_EMMC_SEL_100M },
+	{  50 * MHz, CCLK_EMMC_SEL_50M },
+	{  24 * MHz, CCLK_EMMC_SEL_24M },
+	{ 375 * KHz, CCLK_EMMC_SEL_375K },
+};
+
 static ulong rk3568_emmc_set_clk(struct rk3568_clk_priv *priv, ulong rate)
 {
 	struct rk3568_cru *cru = priv->cru;
-	int src_clk;
+	uint i;
 
-	switch (rate) {
-	case OSC_HZ:
-	case 26 * MHz:
-	case 25 * MHz:
-		src_clk = CCLK_EMMC_SEL_24M;
-		break;
-	case 52 * MHz:
-	case 50 * MHz:
-		src_clk = CCLK_EMMC_SEL_50M;
-		break;
-	case 100 * MHz:
-		src_clk = CCLK_EMMC_SEL_100M;
-		break;
-	case 150 * MHz:
-		src_clk = CCLK_EMMC_SEL_150M;
-		break;
-	case 200 * MHz:
-		src_clk = CCLK_EMMC_SEL_200M;
-		break;
-	case 400 * KHz:
-	case 375 * KHz:
-		src_clk = CCLK_EMMC_SEL_375K;
-		break;
-	default:
+	/* Highest source at or below the request; faster would break timing. */
+	for (i = 0; i < ARRAY_SIZE(rk3568_emmc_rates); i++)
+		if (rate >= rk3568_emmc_rates[i].rate)
+			break;
+
+	if (i == ARRAY_SIZE(rk3568_emmc_rates))
 		return -ENOENT;
-	}
 
 	rk_clrsetreg(&cru->clksel_con[28],
 		     CCLK_EMMC_SEL_MASK,
-		     src_clk << CCLK_EMMC_SEL_SHIFT);
+		     rk3568_emmc_rates[i].sel << CCLK_EMMC_SEL_SHIFT);
 
 	return rk3568_emmc_get_clk(priv);
 }
