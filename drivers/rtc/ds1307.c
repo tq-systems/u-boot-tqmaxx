@@ -97,6 +97,14 @@ struct rtc_ds1307_data {
 #define RX8130_REG_CONTROL1_INIEN	BIT(4)
 #define RX8130_REG_CONTROL1_CHGEN	BIT(5)
 
+/*
+ * VLF is write-zero-to-clear and cannot be cleared before the oscillator
+ * runs. The RX8130CE manual gives that start-up time as t_str, typically
+ * 0.19 s and up to 1 s.
+ */
+#define RX8130_VLF_RETRY_MS		10
+#define RX8130_VLF_RETRIES		150
+
 #ifndef CONFIG_DM_RTC
 
 /*---------------------------------------------------------------------*/
@@ -408,13 +416,29 @@ int ds1307_rx8130_rtc_reset(struct udevice *dev) {
 	if (ret < 0)
 		return ret;
 
-	while (ret >= 0 && (ret & RX8130_REG_FLAG_VLF)) {
-		ret &= ~RX8130_REG_FLAG_VLF;
-		dm_i2c_reg_write(dev, RX8130_REG_FLAG, ret);
-		mdelay(1);
+	/*
+	 * VLF has to be written back as zero, and comes straight back while
+	 * the supply is still below its threshold. Bound the retries: an i2c
+	 * error breaks out of the loop, a flag that simply refuses to clear
+	 * does not, and without a limit the reset never returns.
+	 */
+	for (i = 0; (ret & RX8130_REG_FLAG_VLF) && i < RX8130_VLF_RETRIES; i++) {
+		ret = dm_i2c_reg_clrset(dev, RX8130_REG_FLAG,
+					RX8130_REG_FLAG_VLF, 0);
+		if (ret < 0)
+			return ret;
+
+		mdelay(RX8130_VLF_RETRY_MS);
 		ret = dm_i2c_reg_read(dev, RX8130_REG_FLAG);
+		if (ret < 0)
+			return ret;
 	}
-	printf("rx8130 VLF cleared: %d\n", ret);
+
+	if (ret & RX8130_REG_FLAG_VLF) {
+		printf("RTC: VLF still set after %d ms, supply too low?\n",
+		       RX8130_VLF_RETRIES * RX8130_VLF_RETRY_MS);
+		return -ETIMEDOUT;
+	}
 
 	/* Clear TE bit and Disable FOUT */
 	if (ret >= 0)
