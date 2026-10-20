@@ -578,7 +578,8 @@ static int read_fsr(struct spi_nor *nor)
  * location. Return the configuration register value.
  * Returns negative if error occurred.
  */
-#if defined(CONFIG_SPI_FLASH_SPANSION) || defined(CONFIG_SPI_FLASH_WINBOND)
+#if defined(CONFIG_SPI_FLASH_SPANSION) || defined(CONFIG_SPI_FLASH_WINBOND) || \
+	CONFIG_IS_ENABLED(SPI_FLASH_SFDP_SUPPORT)
 static int read_cr(struct spi_nor *nor)
 {
 	int ret;
@@ -2110,7 +2111,8 @@ write_err:
 	return ret;
 }
 
-#if defined(CONFIG_SPI_FLASH_MACRONIX) || defined(CONFIG_SPI_FLASH_ISSI)
+#if defined(CONFIG_SPI_FLASH_MACRONIX) || defined(CONFIG_SPI_FLASH_ISSI) || \
+	CONFIG_IS_ENABLED(SPI_FLASH_SFDP_SUPPORT)
 /**
  * macronix_quad_enable() - set QE bit in Status Register.
  * @nor:	pointer to a 'struct spi_nor'
@@ -2204,7 +2206,8 @@ static int spansion_quad_enable_volatile(struct spi_nor *nor, u32 addr_base,
 }
 #endif
 
-#if defined(CONFIG_SPI_FLASH_SPANSION) || defined(CONFIG_SPI_FLASH_WINBOND)
+#if defined(CONFIG_SPI_FLASH_SPANSION) || defined(CONFIG_SPI_FLASH_WINBOND) || \
+	CONFIG_IS_ENABLED(SPI_FLASH_SFDP_SUPPORT)
 /*
  * Write status Register and configuration register with 2 bytes
  * The first byte will be written to the status register, while the
@@ -2710,18 +2713,21 @@ static int spi_nor_parse_bfpt(struct spi_nor *nor,
 	case BFPT_DWORD15_QER_NONE:
 		params->quad_enable = NULL;
 		break;
-#if defined(CONFIG_SPI_FLASH_SPANSION) || defined(CONFIG_SPI_FLASH_WINBOND)
+#if defined(CONFIG_SPI_FLASH_SPANSION) || defined(CONFIG_SPI_FLASH_WINBOND) || \
+	CONFIG_IS_ENABLED(SPI_FLASH_SFDP_SUPPORT)
 	case BFPT_DWORD15_QER_SR2_BIT1_BUGGY:
 	case BFPT_DWORD15_QER_SR2_BIT1_NO_RD:
 		params->quad_enable = spansion_no_read_cr_quad_enable;
 		break;
 #endif
-#if defined(CONFIG_SPI_FLASH_MACRONIX) || defined(CONFIG_SPI_FLASH_ISSI)
+#if defined(CONFIG_SPI_FLASH_MACRONIX) || defined(CONFIG_SPI_FLASH_ISSI) || \
+	CONFIG_IS_ENABLED(SPI_FLASH_SFDP_SUPPORT)
 	case BFPT_DWORD15_QER_SR1_BIT6:
 		params->quad_enable = macronix_quad_enable;
 		break;
 #endif
-#if defined(CONFIG_SPI_FLASH_SPANSION) || defined(CONFIG_SPI_FLASH_WINBOND)
+#if defined(CONFIG_SPI_FLASH_SPANSION) || defined(CONFIG_SPI_FLASH_WINBOND) || \
+	CONFIG_IS_ENABLED(SPI_FLASH_SFDP_SUPPORT)
 	case BFPT_DWORD15_QER_SR2_BIT1:
 		params->quad_enable = spansion_read_cr_quad_enable;
 		break;
