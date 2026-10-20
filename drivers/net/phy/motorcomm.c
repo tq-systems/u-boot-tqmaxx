@@ -252,6 +252,9 @@ struct ytphy_cfg_reg_map {
 	u32 reg;
 };
 
+/* Default delay in picoseconds, as the property is specified. */
+#define YTPHY_DEFAULT_DELAY_PS			1950
+
 static const struct ytphy_cfg_reg_map ytphy_rgmii_delays[] = {
 	/* for tx delay / rx delay with YT8531_CCR_RXC_DLY_EN is not set. */
 	{ 0,	YT8531_RC1R_RGMII_0_000_NS },
@@ -312,8 +315,8 @@ static u32 ytphy_get_delay_reg_value(struct phy_device *phydev,
 		}
 	}
 
-	pr_warn("Unsupported value %d, using default (%u)\n",
-		val, YT8531_RC1R_RGMII_1_950_NS);
+	pr_warn("Unsupported delay %d ps, using default (%u ps)\n",
+		val, YTPHY_DEFAULT_DELAY_PS);
 
 	/* when rxc_dly_en is not NULL, it is get the delay for rx.
 	 * The rx default in dts and ytphy_rgmii_clk_delay_config is 1950 ps,
@@ -473,10 +476,10 @@ static void ytphy_dt_parse(struct phy_device *phydev)
 							  YTPHY_DTS_OUTPUT_CLK_DIS);
 	priv->rx_delay_ps = ofnode_read_u32_default(phydev->node,
 						    "rx-internal-delay-ps",
-						    YT8531_RC1R_RGMII_1_950_NS);
+						    YTPHY_DEFAULT_DELAY_PS);
 	priv->tx_delay_ps = ofnode_read_u32_default(phydev->node,
 						    "tx-internal-delay-ps",
-						    YT8531_RC1R_RGMII_1_950_NS);
+						    YTPHY_DEFAULT_DELAY_PS);
 
 	if (ofnode_read_bool(phydev->node, "motorcomm,auto-sleep-disabled"))
 		priv->flag |= AUTO_SLEEP_DISABLED;
