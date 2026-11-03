@@ -193,8 +193,7 @@ static int spl_romapi_load_image_seekable(struct spl_image_info *spl_image,
 		memset(&load, 0, sizeof(load));
 		spl_set_bl_len(&load, pagesize);
 		load.read = spl_romapi_read_seekable;
-
-		ret = spl_load_imx_container(spl_image, &load, offset);
+		return  spl_load_imx_container(spl_image, &load, offset);
 	} else {
 		/* TODO */
 		puts("Can't support legacy image\n");
