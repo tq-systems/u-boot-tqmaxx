@@ -18,11 +18,13 @@ ifdef CONFIG_IMX8M_DRAM_INLINE_ECC
 obj-$(CONFIG_TQMA8MPXL_RAM_1024MB) += lpddr4_timing_1gb_type1_ecc.o
 obj-$(CONFIG_TQMA8MPXL_RAM_2048MB) += lpddr4_timing_2gb_type1_ecc.o
 obj-$(CONFIG_TQMA8MPXL_RAM_4096MB) += lpddr4_timing_4gb_type1_ecc.o
+obj-$(CONFIG_TQMA8MPXL_RAM_4096MB) += lpddr4_timing_4gb_type2_ecc.o
 obj-$(CONFIG_TQMA8MPXL_RAM_8192MB) += lpddr4_timing_8gb_type1_ecc.o
 else
 obj-$(CONFIG_TQMA8MPXL_RAM_1024MB) += lpddr4_timing_1gb_type1_no_ecc.o
 obj-$(CONFIG_TQMA8MPXL_RAM_2048MB) += lpddr4_timing_2gb_type1_no_ecc.o
 obj-$(CONFIG_TQMA8MPXL_RAM_4096MB) += lpddr4_timing_4gb_type1_no_ecc.o
+obj-$(CONFIG_TQMA8MPXL_RAM_4096MB) += lpddr4_timing_4gb_type2_no_ecc.o
 obj-$(CONFIG_TQMA8MPXL_RAM_8192MB) += lpddr4_timing_8gb_type1_no_ecc.o
 endif
 
