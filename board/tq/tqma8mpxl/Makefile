@@ -15,15 +15,15 @@ obj-$(CONFIG_TQMA8MPXL_BB_MBA8MPXL) += spl-mba8mpxl.o
 obj-$(CONFIG_TQMA8MPXL_BB_MBA8MP_RAS314) += spl-mba8mp-ras314.o
 
 ifdef CONFIG_IMX8M_DRAM_INLINE_ECC
-obj-$(CONFIG_TQMA8MPXL_RAM_1024MB) += lpddr4_timing_1gb_ecc.o
-obj-$(CONFIG_TQMA8MPXL_RAM_2048MB) += lpddr4_timing_2gb_ecc.o
-obj-$(CONFIG_TQMA8MPXL_RAM_4096MB) += lpddr4_timing_4gb_ecc.o
-obj-$(CONFIG_TQMA8MPXL_RAM_8192MB) += lpddr4_timing_8gb_ecc.o
+obj-$(CONFIG_TQMA8MPXL_RAM_1024MB) += lpddr4_timing_1gb_type1_ecc.o
+obj-$(CONFIG_TQMA8MPXL_RAM_2048MB) += lpddr4_timing_2gb_type1_ecc.o
+obj-$(CONFIG_TQMA8MPXL_RAM_4096MB) += lpddr4_timing_4gb_type1_ecc.o
+obj-$(CONFIG_TQMA8MPXL_RAM_8192MB) += lpddr4_timing_8gb_type1_ecc.o
 else
-obj-$(CONFIG_TQMA8MPXL_RAM_1024MB) += lpddr4_timing_1gb_no_ecc.o
-obj-$(CONFIG_TQMA8MPXL_RAM_2048MB) += lpddr4_timing_2gb_no_ecc.o
-obj-$(CONFIG_TQMA8MPXL_RAM_4096MB) += lpddr4_timing_4gb_no_ecc.o
-obj-$(CONFIG_TQMA8MPXL_RAM_8192MB) += lpddr4_timing_8gb_no_ecc.o
+obj-$(CONFIG_TQMA8MPXL_RAM_1024MB) += lpddr4_timing_1gb_type1_no_ecc.o
+obj-$(CONFIG_TQMA8MPXL_RAM_2048MB) += lpddr4_timing_2gb_type1_no_ecc.o
+obj-$(CONFIG_TQMA8MPXL_RAM_4096MB) += lpddr4_timing_4gb_type1_no_ecc.o
+obj-$(CONFIG_TQMA8MPXL_RAM_8192MB) += lpddr4_timing_8gb_type1_no_ecc.o
 endif
 
 endif
