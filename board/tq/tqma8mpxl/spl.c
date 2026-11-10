@@ -40,16 +40,16 @@ DECLARE_GLOBAL_DATA_PTR;
  */
 static struct dram_info tqma8mpxl_dram_info[]  = {
 #if IS_ENABLED(CONFIG_TQMA8MPXL_RAM_1024MB)
-	DRAM_INFO_ENTRY(1),
+	DRAM_INFO_ENTRY(1, 1),
 #endif
 #if IS_ENABLED(CONFIG_TQMA8MPXL_RAM_2048MB)
-	DRAM_INFO_ENTRY(2),
+	DRAM_INFO_ENTRY(2, 1),
 #endif
 #if IS_ENABLED(CONFIG_TQMA8MPXL_RAM_4096MB)
-	DRAM_INFO_ENTRY(4),
+	DRAM_INFO_ENTRY(4, 1),
 #endif
 #if IS_ENABLED(CONFIG_TQMA8MPXL_RAM_8192MB)
-	DRAM_INFO_ENTRY(8)
+	DRAM_INFO_ENTRY(8, 1)
 #endif
 };
 
@@ -74,11 +74,31 @@ static int tqma8mpxl_query_ddr_timing(void)
 	if (IS_ENABLED(CONFIG_TQMA8MPXL_RAM_MULTI)) {
 		char sel = '-';
 		phys_size_t ramsize;
+		unsigned int memtype;
 		int idx;
 
 		puts("Warning: no valid EEPROM!\n"
-			"Please enter LPDDR size in GByte to proceed.\n"
-			"Valid sizes are 1,2,4 and 8.\n");
+		     "Please enter LPDDR type to proceed.\n"
+		     "Valid types are 1 and 2.\n");
+
+		for (;;) {
+			/* Flush input */
+			while (serial_tstc())
+				serial_getc();
+
+			sel = serial_getc();
+			putc('\n');
+
+			if ((sel == '1') || (sel == '2'))
+				break;
+
+			puts("Please enter a valid LPDDR type.\n");
+		}
+
+		memtype = ((unsigned int)sel - (unsigned int)('0'));
+
+		puts("Please enter LPDDR size in GByte to proceed.\n"
+		     "Valid sizes are 1,2,4 and 8.\n");
 
 		for (;;) {
 			/* Flush input */
@@ -96,7 +116,8 @@ static int tqma8mpxl_query_ddr_timing(void)
 
 		ramsize = (phys_size_t)((unsigned int)sel - (unsigned int)('0')) * SZ_1G;
 		for (idx = 0; idx < ARRAY_SIZE(tqma8mpxl_dram_info); ++idx) {
-			if (ramsize == tqma8mpxl_dram_info[idx].size)
+			if (ramsize == tqma8mpxl_dram_info[idx].size &&
+			    memtype == tqma8mpxl_dram_info[idx].type)
 				break;
 		}
 
@@ -133,10 +154,11 @@ static void spl_dram_init(int memtype)
 	if (IS_ENABLED(CONFIG_TQMA8MPXL_RAM_MULTI)) {
 		phys_size_t ramsize;
 
-		if (memtype == 1) {
+		if (memtype == 1 || memtype == 2) {
 			ramsize = tq_vard_ramsize(&vard);
 			for (idx = 0; idx < ARRAY_SIZE(tqma8mpxl_dram_info); ++idx) {
-				if (ramsize == tqma8mpxl_dram_info[idx].size)
+				if (ramsize == tqma8mpxl_dram_info[idx].size &&
+				    memtype == tqma8mpxl_dram_info[idx].type)
 					break;
 			}
 			if (idx >= ARRAY_SIZE(tqma8mpxl_dram_info))
