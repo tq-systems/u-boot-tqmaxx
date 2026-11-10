@@ -11,6 +11,7 @@
 struct dram_info {
 	struct dram_timing_info *table;
 	phys_size_t size;
+	size_t type;
 	void (*board_dram_ecc_scrub)(void);
 };
 
@@ -20,50 +21,52 @@ extern const u32 ddr_ddrphy_trained_csr_num;
 #if defined(CONFIG_IMX8M_DRAM_INLINE_ECC)
 
 #if defined(CONFIG_TQMA8MPXL_RAM_1024MB)
-extern struct dram_timing_info dram_timing_1gb_ecc;
-void board_dram_1gb_ecc_scrub(void);
+extern struct dram_timing_info dram_timing_1gb_type1_ecc;
+void board_dram_1gb_type1_ecc_scrub(void);
 #endif
 #if defined(CONFIG_TQMA8MPXL_RAM_2048MB)
-extern struct dram_timing_info dram_timing_2gb_ecc;
-void board_dram_2gb_ecc_scrub(void);
+extern struct dram_timing_info dram_timing_2gb_type1_ecc;
+void board_dram_2gb_type1_ecc_scrub(void);
 #endif
 #if defined(CONFIG_TQMA8MPXL_RAM_4096MB)
-extern struct dram_timing_info dram_timing_4gb_ecc;
-void board_dram_4gb_ecc_scrub(void);
+extern struct dram_timing_info dram_timing_4gb_type1_ecc;
+void board_dram_4gb_type1_ecc_scrub(void);
 #endif
 #if defined(CONFIG_TQMA8MPXL_RAM_8192MB)
-extern struct dram_timing_info dram_timing_8gb_ecc;
-void board_dram_8gb_ecc_scrub(void);
+extern struct dram_timing_info dram_timing_8gb_type1_ecc;
+void board_dram_8gb_type1_ecc_scrub(void);
 #endif
 
 #else /* !defined(CONFIG_IMX8M_DRAM_INLINE_ECC) */
 
 #if defined(CONFIG_TQMA8MPXL_RAM_1024MB)
-extern struct dram_timing_info dram_timing_1gb_no_ecc;
+extern struct dram_timing_info dram_timing_1gb_type1_no_ecc;
 #endif
 #if defined(CONFIG_TQMA8MPXL_RAM_2048MB)
-extern struct dram_timing_info dram_timing_2gb_no_ecc;
+extern struct dram_timing_info dram_timing_2gb_type1_no_ecc;
 #endif
 #if defined(CONFIG_TQMA8MPXL_RAM_4096MB)
-extern struct dram_timing_info dram_timing_4gb_no_ecc;
+extern struct dram_timing_info dram_timing_4gb_type1_no_ecc;
 #endif
 #if defined(CONFIG_TQMA8MPXL_RAM_8192MB)
-extern struct dram_timing_info dram_timing_8gb_no_ecc;
+extern struct dram_timing_info dram_timing_8gb_type1_no_ecc;
 #endif
 
 #endif /* !defined(CONFIG_IMX8M_DRAM_INLINE_ECC) */
 
 #if defined(CONFIG_IMX8M_DRAM_INLINE_ECC)
-#define	DRAM_INFO_ENTRY(SIZE)							\
-	{									\
-		.table = &dram_timing_##SIZE##gb_ecc,				\
-		.size = SZ_1G * SIZE##ULL,					\
-		.board_dram_ecc_scrub = board_dram_##SIZE##gb_ecc_scrub		\
+#define	DRAM_INFO_ENTRY(SIZE, TYPE)							\
+	{										\
+		.table = &dram_timing_##SIZE##gb_type##TYPE##_ecc,			\
+		.size = SZ_1G * SIZE##ULL,						\
+		.type = TYPE,								\
+		.board_dram_ecc_scrub = board_dram_##SIZE##gb_type##TYPE##_ecc_scrub	\
 	}
 #else
-#define	DRAM_INFO_ENTRY(SIZE)							\
+#define	DRAM_INFO_ENTRY(SIZE, TYPE)						\
 	{									\
-		.table = &dram_timing_##SIZE##gb_no_ecc,			\
+		.table = &dram_timing_##SIZE##gb_type##TYPE##_no_ecc,		\
 		.size = SZ_1G * SIZE##ULL,					\
+		.type = TYPE,							\
 	}
 #endif

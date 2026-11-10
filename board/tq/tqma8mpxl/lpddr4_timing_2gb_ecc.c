@@ -1108,7 +1108,7 @@ static struct dram_fsp_msg ddr_dram_fsp_msg[] = {
 };
 
 /* ddr timing config params */
-struct dram_timing_info dram_timing_2gb_ecc = {
+struct dram_timing_info dram_timing_2gb_type1_ecc = {
 	.ddrc_cfg = ddr_ddrc_cfg,
 	.ddrc_cfg_num = ARRAY_SIZE(ddr_ddrc_cfg),
 	.ddrphy_cfg = ddr_ddrphy_cfg,
@@ -1120,7 +1120,7 @@ struct dram_timing_info dram_timing_2gb_ecc = {
 	.fsp_table = { 4000, 400, 100, },
 };
 
-void board_dram_2gb_ecc_scrub(void)
+void board_dram_2gb_type1_ecc_scrub(void)
 {
 	ddrc_inline_ecc_scrub(0x0, 0x3ffffff);
 	ddrc_inline_ecc_scrub(0x4000000, 0x7ffffff);
