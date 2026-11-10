@@ -34,6 +34,19 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#if IS_ENABLED(CONFIG_TQMA8MPXL_RAM_1024MB)
+	DECLARE_DRAM_DATA(1, 1);
+#endif
+#if IS_ENABLED(CONFIG_TQMA8MPXL_RAM_2048MB)
+	DECLARE_DRAM_DATA(2, 1);
+#endif
+#if IS_ENABLED(CONFIG_TQMA8MPXL_RAM_4096MB)
+	DECLARE_DRAM_DATA(4, 1);
+#endif
+#if IS_ENABLED(CONFIG_TQMA8MPXL_RAM_8192MB)
+	DECLARE_DRAM_DATA(8, 1);
+#endif
+
 /*
  * Currently this is known to work with up to four timings in one SPL
  * Needs to be rechecked when increasing

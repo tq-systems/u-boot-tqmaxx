@@ -20,37 +20,14 @@ extern const u32 ddr_ddrphy_trained_csr_num;
 
 #if defined(CONFIG_IMX8M_DRAM_INLINE_ECC)
 
-#if defined(CONFIG_TQMA8MPXL_RAM_1024MB)
-extern struct dram_timing_info dram_timing_1gb_type1_ecc;
-void board_dram_1gb_type1_ecc_scrub(void);
-#endif
-#if defined(CONFIG_TQMA8MPXL_RAM_2048MB)
-extern struct dram_timing_info dram_timing_2gb_type1_ecc;
-void board_dram_2gb_type1_ecc_scrub(void);
-#endif
-#if defined(CONFIG_TQMA8MPXL_RAM_4096MB)
-extern struct dram_timing_info dram_timing_4gb_type1_ecc;
-void board_dram_4gb_type1_ecc_scrub(void);
-#endif
-#if defined(CONFIG_TQMA8MPXL_RAM_8192MB)
-extern struct dram_timing_info dram_timing_8gb_type1_ecc;
-void board_dram_8gb_type1_ecc_scrub(void);
-#endif
+#define DECLARE_DRAM_DATA(SIZE, TYPE) \
+	extern struct dram_timing_info dram_timing_##SIZE##gb_type##TYPE##_ecc; \
+	void board_dram_##SIZE##gb_type##TYPE##_ecc_scrub(void)
 
 #else /* !defined(CONFIG_IMX8M_DRAM_INLINE_ECC) */
 
-#if defined(CONFIG_TQMA8MPXL_RAM_1024MB)
-extern struct dram_timing_info dram_timing_1gb_type1_no_ecc;
-#endif
-#if defined(CONFIG_TQMA8MPXL_RAM_2048MB)
-extern struct dram_timing_info dram_timing_2gb_type1_no_ecc;
-#endif
-#if defined(CONFIG_TQMA8MPXL_RAM_4096MB)
-extern struct dram_timing_info dram_timing_4gb_type1_no_ecc;
-#endif
-#if defined(CONFIG_TQMA8MPXL_RAM_8192MB)
-extern struct dram_timing_info dram_timing_8gb_type1_no_ecc;
-#endif
+#define DECLARE_DRAM_DATA(SIZE, TYPE) \
+	extern struct dram_timing_info dram_timing_##SIZE##gb_type##TYPE##_no_ecc
 
 #endif /* !defined(CONFIG_IMX8M_DRAM_INLINE_ECC) */
 
