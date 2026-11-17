@@ -380,8 +380,6 @@ void board_init_f(ulong dummy)
 
 	arch_cpu_init();
 
-	init_uart_clk(3);
-
 	board_early_init_f();
 
 	ret = spl_early_init();
