@@ -73,11 +73,6 @@ int mmc_map_to_kernel_blk(int devno)
 	return devno;
 }
 
-int tq_bb_board_init(void)
-{
-	return 0;
-}
-
 int tq_bb_ft_board_setup(void *blob, struct bd_info *bis)
 {
 	if (IS_ENABLED(CONFIG_OF_BOARD_SETUP)) {
