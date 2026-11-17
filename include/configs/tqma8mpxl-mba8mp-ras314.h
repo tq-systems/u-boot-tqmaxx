@@ -12,8 +12,8 @@
 
 #define FEC_QUIRK_ENET_MAC
 
-#define CONSOLE_DEV			ttymxc3
-
 #endif /* CONFIG_FEC_MXC */
+
+#define CONSOLE_DEV			ttymxc3
 
 #endif /* __TQMA8MPXL_MBA8MP_RAS314_H */
