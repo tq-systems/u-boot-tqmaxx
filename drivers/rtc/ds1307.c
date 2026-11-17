@@ -16,6 +16,7 @@
 #include <config.h>
 #include <command.h>
 #include <dm.h>
+#include <dm/device_compat.h>
 #include <linux/delay.h>
 #include <log.h>
 #include <rtc.h>
@@ -29,11 +30,21 @@ enum ds_type {
 	m41t11,
 	mcp794xx,
 	rx_8130,
+	ysn_8130,
 };
 
 struct rtc_ds1307_data {
 	enum ds_type type;
 	int offset;
+};
+
+/**
+ * struct ds1307_priv - per device state
+ * @por_seen: the backup domain had lost power when this boot probed the
+ *            device, so whatever the time registers hold is meaningless
+ */
+struct ds1307_priv {
+	bool por_seen;
 };
 
 /*
@@ -87,6 +98,7 @@ struct rtc_ds1307_data {
 #define RX8130_REG_FLAG			0x1d
 #define RX8130_REG_FLAG_VLF		BIT(1)
 #define RX8130_REG_FLAG_AF		BIT(3)
+#define RX8130_REG_FLAG_VBLF		BIT(7)
 #define RX8130_REG_CONTROL0		0x1e
 #define RX8130_REG_CONTROL0_AIE		BIT(3)
 #define RX8130_REG_CONTROL0_TIE		BIT(4)
@@ -96,6 +108,8 @@ struct rtc_ds1307_data {
 #define RX8130_REG_CONTROL1		0x1f
 #define RX8130_REG_CONTROL1_INIEN	BIT(4)
 #define RX8130_REG_CONTROL1_CHGEN	BIT(5)
+#define RX8130_REG_EXTENSION1		0x31
+#define RX8130_REG_EXTENSION1_VBLFE	BIT(0)
 
 /*
  * VLF is write-zero-to-clear and cannot be cleared before the oscillator
@@ -256,11 +270,18 @@ static void rtc_write (uchar reg, uchar val)
 #endif /* !CONFIG_DM_RTC */
 
 #ifdef CONFIG_DM_RTC
+/* The YSN8130 is register compatible with the RX8130, flags differ */
+static bool ds1307_is_rx8130(enum ds_type type)
+{
+	return type == rx_8130 || type == ysn_8130;
+}
+
 static int ds1307_rtc_set(struct udevice *dev, const struct rtc_time *tm)
 {
 	int ret;
 	uchar buf[7];
 	struct rtc_ds1307_data *data = (void *)dev_get_driver_data(dev);
+	struct ds1307_priv *priv = dev_get_priv(dev);
 
 	debug("Set DATE: %4d-%02d-%02d (wday=%d)  TIME: %2d:%02d:%02d\n",
 	      tm->tm_year, tm->tm_mon, tm->tm_mday, tm->tm_wday,
@@ -272,7 +293,7 @@ static int ds1307_rtc_set(struct udevice *dev, const struct rtc_time *tm)
 	buf[RTC_YR_REG_ADDR] = bin2bcd(tm->tm_year % 100);
 	buf[RTC_MON_REG_ADDR] = bin2bcd(tm->tm_mon);
 	/* rx8130 is bit position, not BCD */
-	if (data->type == rx_8130)
+	if (ds1307_is_rx8130(data->type))
 		buf[RTC_DAY_REG_ADDR] = 1 << tm->tm_wday;
 	else
 		buf[RTC_DAY_REG_ADDR] = bin2bcd(tm->tm_wday + 1);
@@ -284,7 +305,7 @@ static int ds1307_rtc_set(struct udevice *dev, const struct rtc_time *tm)
 	if (data->type == mcp794xx) {
 		buf[RTC_DAY_REG_ADDR] |= MCP7941X_BIT_VBATEN;
 		buf[RTC_SEC_REG_ADDR] |= MCP7941X_BIT_ST;
-	} else if (data->type == rx_8130) {
+	} else if (ds1307_is_rx8130(data->type)) {
 		ret = dm_i2c_reg_clrset(dev, RX8130_REG_CONTROL0, 0, RX8130_REG_CONTROL0_STOP);
 		if (ret < 0)
 			return ret;
@@ -297,17 +318,24 @@ static int ds1307_rtc_set(struct udevice *dev, const struct rtc_time *tm)
 	if (data->type == ds_1337) {
 		/* Ensure oscillator is enabled */
 		dm_i2c_reg_write(dev, data->offset + DS1337_CTL_REG_ADDR, 0);
-	} else if (data->type == rx_8130) {
+	} else if (ds1307_is_rx8130(data->type)) {
 		ret = dm_i2c_reg_clrset(dev, RX8130_REG_CONTROL0, RX8130_REG_CONTROL0_STOP, 0);
 		if (ret < 0)
 			return ret;
 
-		/* clear Voltage Loss Flag as data is available now */
-		ret = dm_i2c_reg_clrset(dev, RX8130_REG_FLAG, RX8130_REG_FLAG_VLF, 0);
+		/*
+		 * The time is known now, so drop everything that marks it as
+		 * unusable: both flags and the power-on reset seen at probe.
+		 */
+		ret = dm_i2c_reg_clrset(dev, RX8130_REG_FLAG,
+					RX8130_REG_FLAG_VLF |
+					RX8130_REG_FLAG_VBLF, 0);
 		if (ret < 0) {
-			printf("RTC: write VLF error %d\n", ret);
+			printf("RTC: clear VLF/VBLF error %d\n", ret);
 			return ret;
 		}
+
+		priv->por_seen = false;
 	}
 
 	return 0;
@@ -318,6 +346,7 @@ static int ds1307_rtc_get(struct udevice *dev, struct rtc_time *tm)
 	int ret;
 	uchar buf[7];
 	struct rtc_ds1307_data *data = (void *)dev_get_driver_data(dev);
+	struct ds1307_priv *priv = dev_get_priv(dev);
 
 	ret = dm_i2c_read(dev, data->offset, buf, sizeof(buf));
 	if (ret < 0)
@@ -340,8 +369,30 @@ static int ds1307_rtc_get(struct udevice *dev, struct rtc_time *tm)
 			return ret;
 		}
 
+		/* EPSON sets VLF on oscillator stop or power-on reset */
 		if (ret & RX8130_REG_FLAG_VLF) {
 			printf("RTC: oscillator failed, set time!\n");
+			return -EINVAL;
+		}
+	} else if (data->type == ysn_8130) {
+		ret = dm_i2c_reg_read(dev, RX8130_REG_FLAG);
+		if (ret < 0) {
+			printf("RTC: read error %d\n", ret);
+			return ret;
+		}
+
+		/*
+		 * The YSN8130 sets VLF on every switchover to the backup
+		 * supply, so ignore it and judge by VBLF and a power-on
+		 * reset seen at probe.
+		 */
+		if (ret & RX8130_REG_FLAG_VBLF) {
+			printf("RTC: backup supply failed, set time!\n");
+			return -EINVAL;
+		}
+
+		if (priv->por_seen) {
+			printf("RTC: time not set\n");
 			return -EINVAL;
 		}
 	}
@@ -355,7 +406,7 @@ static int ds1307_rtc_get(struct udevice *dev, struct rtc_time *tm)
 			      (bcd2bin(buf[RTC_YR_REG_ADDR]) >= 70 ?
 			       1900 : 2000);
 	/* rx8130 is bit position, not BCD */
-	if (data->type == rx_8130)
+	if (ds1307_is_rx8130(data->type))
 		tm->tm_wday = fls(buf[RTC_DAY_REG_ADDR] & 0x7f) - 1;
 	else
 		tm->tm_wday = bcd2bin((buf[RTC_DAY_REG_ADDR] - 1) & 0x07);
@@ -370,15 +421,16 @@ static int ds1307_rtc_get(struct udevice *dev, struct rtc_time *tm)
 }
 
 /*
- * CONTROL1 describes how the backup supply is treated: INIEN keeps the
- * backup input enabled, CHGEN charges whatever sits on it.
- * Decision comes from "aux-voltage-chargeable".
- * Absent property means not chargeable, matching Linux's defaults.
+ * CONTROL1 sets the backup supply handling: INIEN keeps the backup input
+ * enabled, CHGEN charges it, both from "aux-voltage-chargeable" (absent
+ * means not chargeable, as in Linux). VBLFE goes along: without it, low-VBAT
+ * detection runs only while CHGEN is set and VBLF would never fire.
  */
 static int ds1307_rx8130_setup_backup(struct udevice *dev)
 {
 	u8 setup = RX8130_REG_CONTROL1_INIEN;
 	u32 chargeable;
+	int ret;
 
 	if (!dev_read_u32(dev, "aux-voltage-chargeable", &chargeable)) {
 		if (chargeable == 1)
@@ -387,6 +439,16 @@ static int ds1307_rx8130_setup_backup(struct udevice *dev)
 			printf("RTC: unsupported aux-voltage-chargeable value %u\n",
 			       chargeable);
 	}
+
+	/*
+	 * Best effort: a register compatible part need not implement 0x31,
+	 * and losing VBLF detection is far better than refusing to bind the
+	 * clock at all.
+	 */
+	ret = dm_i2c_reg_clrset(dev, RX8130_REG_EXTENSION1, 0,
+				RX8130_REG_EXTENSION1_VBLFE);
+	if (ret < 0)
+		printf("RTC: cannot enable VBLF detection (%d)\n", ret);
 
 	return dm_i2c_reg_clrset(dev, RX8130_REG_CONTROL1,
 				 RX8130_REG_CONTROL1_INIEN |
@@ -397,6 +459,7 @@ int ds1307_rx8130_rtc_reset(struct udevice *dev) {
 	/*
 	 * RX8130CE manual, 18.2 Software Reset
 	 */
+	struct ds1307_priv *priv = dev_get_priv(dev);
 	const uint8_t reg_address[]  = { 0x1e, 0x1e, 0x50, 0x53, 0x66, 0x6b, 0x6b };
 	const uint8_t reg_sequence[] = { 0x00, 0x80, 0x6c, 0x01, 0x03, 0x02, 0x01 };
 	int ret = 0;
@@ -445,9 +508,11 @@ int ds1307_rx8130_rtc_reset(struct udevice *dev) {
 		ret = dm_i2c_reg_clrset(dev, RX8130_REG_EXTENSION, RX8130_REG_EXTENSION_TE,
 					RX8130_REG_EXTENSION_FSEL0 | RX8130_REG_EXTENSION_FESL1);
 
-	/* Clear VLF bit */
+	/* Clear VLF and VBLF bits */
 	if (ret >= 0)
-		ret = dm_i2c_reg_clrset(dev, RX8130_REG_FLAG, RX8130_REG_FLAG_VLF, 0);
+		ret = dm_i2c_reg_clrset(dev, RX8130_REG_FLAG,
+					RX8130_REG_FLAG_VLF |
+					RX8130_REG_FLAG_VBLF, 0);
 
 	/* Clear TEST, AIE, TIE, UIE for inhibit interrupt output of suddenness */
 	if (ret >= 0)
@@ -463,6 +528,14 @@ int ds1307_rx8130_rtc_reset(struct udevice *dev) {
 	if (ret >= 0)
 		ret = dm_i2c_reg_clrset(dev, RX8130_REG_CONTROL0, RX8130_REG_CONTROL0_STOP, 0);
 
+	/*
+	 * A reset leaves the time registers initialized but meaningless, so
+	 * keep reporting it as unset until someone writes a real time. The
+	 * flags were just cleared and cannot say this any more.
+	 */
+	if (ret >= 0)
+		priv->por_seen = true;
+
 	return ret;
 }
 
@@ -471,7 +544,7 @@ static int ds1307_rtc_reset(struct udevice *dev)
 	int ret;
 	struct rtc_ds1307_data *data = (void *)dev_get_driver_data(dev);
 
-	if (data->type == rx_8130) {
+	if (ds1307_is_rx8130(data->type)) {
 		ret = ds1307_rx8130_rtc_reset(dev);
 		if (ret < 0)
 			return ret;
@@ -517,10 +590,23 @@ static int ds1307_probe(struct udevice *dev)
 	i2c_set_chip_flags(dev, DM_I2C_CHIP_RD_ADDRESS |
 			   DM_I2C_CHIP_WR_ADDRESS);
 
-	if (data->type == rx_8130) {
-		int ret = ds1307_rx8130_setup_backup(dev);
+	if (ds1307_is_rx8130(data->type)) {
+		/*
+		 * A power-on reset (backup supply lost) clears INIEN in
+		 * CONTROL1, so read it before the setup below writes it back.
+		 * A bus error must not fail the probe: assume the backup was
+		 * lost, the YSN8130 then reports the time as unset.
+		 */
+		ret = dm_i2c_reg_read(dev, RX8130_REG_CONTROL1);
+		if (ret < 0) {
+			printf("RTC: read CONTROL1 error %d, time not trusted\n",
+			       ret);
+			priv->por_seen = true;
+		} else {
+			priv->por_seen = !(ret & RX8130_REG_CONTROL1_INIEN);
+		}
 
-		/* A bus error must not fail the probe, warn and go on */
+		ret = ds1307_rx8130_setup_backup(dev);
 		if (ret < 0)
 			printf("RTC: backup supply setup error %d\n", ret);
 	}
@@ -559,6 +645,11 @@ static const struct rtc_ds1307_data rx_8130_data = {
 	.offset = 0x10,
 };
 
+static const struct rtc_ds1307_data ysn_8130_data = {
+	.type   = ysn_8130,
+	.offset = 0x10,
+};
+
 static const struct rtc_ds1307_data mcp794xx_data = {
 	.type   = mcp794xx,
 	.offset = 0,
@@ -575,6 +666,7 @@ static const struct udevice_id ds1307_rtc_ids[] = {
 	{ .compatible = "dallas,ds1339", .data = (ulong)&ds_1339_data },
 	{ .compatible = "dallas,ds1340", .data = (ulong)&ds_1340_data },
 	{ .compatible = "epson,rx8130", .data = (ulong)&rx_8130_data },
+	{ .compatible = "yxc,ysn8130", .data = (ulong)&ysn_8130_data },
 	{ .compatible = "microchip,mcp7940x", .data = (ulong)&mcp794xx_data },
 	{ .compatible = "microchip,mcp7941x", .data = (ulong)&mcp794xx_data },
 	{ .compatible = "st,m41t11", .data = (ulong)&m41t11_data },
@@ -585,6 +677,7 @@ U_BOOT_DRIVER(rtc_ds1307) = {
 	.name	= "rtc-ds1307",
 	.id	= UCLASS_RTC,
 	.probe	= ds1307_probe,
+	.priv_auto = sizeof(struct ds1307_priv),
 	.of_match = ds1307_rtc_ids,
 	.ops	= &ds1307_rtc_ops,
 };
