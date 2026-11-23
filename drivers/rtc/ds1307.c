@@ -31,7 +31,7 @@ enum ds_type {
 	rx_8130,
 };
 
-struct rtc_ds1370_data {
+struct rtc_ds1307_data {
 	enum ds_type type;
 	int offset;
 };
@@ -252,7 +252,7 @@ static int ds1307_rtc_set(struct udevice *dev, const struct rtc_time *tm)
 {
 	int ret;
 	uchar buf[7];
-	struct rtc_ds1370_data *data = (void*)dev_get_driver_data(dev);
+	struct rtc_ds1307_data *data = (void *)dev_get_driver_data(dev);
 
 	debug("Set DATE: %4d-%02d-%02d (wday=%d)  TIME: %2d:%02d:%02d\n",
 	      tm->tm_year, tm->tm_mon, tm->tm_mday, tm->tm_wday,
@@ -309,7 +309,7 @@ static int ds1307_rtc_get(struct udevice *dev, struct rtc_time *tm)
 {
 	int ret;
 	uchar buf[7];
-	struct rtc_ds1370_data *data = (void*)dev_get_driver_data(dev);
+	struct rtc_ds1307_data *data = (void *)dev_get_driver_data(dev);
 
 	ret = dm_i2c_read(dev, data->offset, buf, sizeof(buf));
 	if (ret < 0)
@@ -425,7 +425,7 @@ int ds1307_rx8130_rtc_reset(struct udevice *dev) {
 static int ds1307_rtc_reset(struct udevice *dev)
 {
 	int ret;
-	struct rtc_ds1370_data *data = (void*)dev_get_driver_data(dev);
+	struct rtc_ds1307_data *data = (void *)dev_get_driver_data(dev);
 
 	if (data->type == rx_8130) {
 		ret = ds1307_rx8130_rtc_reset(dev);
@@ -478,37 +478,37 @@ static const struct rtc_ops ds1307_rtc_ops = {
 	.reset = ds1307_rtc_reset,
 };
 
-static const struct rtc_ds1370_data ds_1307_data = {
+static const struct rtc_ds1307_data ds_1307_data = {
 	.type   = ds_1307,
 	.offset = 0,
 };
 
-static const struct rtc_ds1370_data ds_1337_data = {
+static const struct rtc_ds1307_data ds_1337_data = {
 	.type   = ds_1337,
 	.offset = 0,
 };
 
-static const struct rtc_ds1370_data ds_1339_data = {
+static const struct rtc_ds1307_data ds_1339_data = {
 	.type   = ds_1339,
 	.offset = 0,
 };
 
-static const struct rtc_ds1370_data ds_1340_data = {
+static const struct rtc_ds1307_data ds_1340_data = {
 	.type   = ds_1340,
 	.offset = 0,
 };
 
-static const struct rtc_ds1370_data rx_8130_data = {
+static const struct rtc_ds1307_data rx_8130_data = {
 	.type   = rx_8130,
 	.offset = 0x10,
 };
 
-static const struct rtc_ds1370_data mcp794xx_data = {
+static const struct rtc_ds1307_data mcp794xx_data = {
 	.type   = mcp794xx,
 	.offset = 0,
 };
 
-static const struct rtc_ds1370_data m41t11_data = {
+static const struct rtc_ds1307_data m41t11_data = {
 	.type   = m41t11,
 	.offset = 0,
 };
