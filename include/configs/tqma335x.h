@@ -55,8 +55,8 @@
 			"if tftp ${mlo_load_addr} ${mlo}; then " \
 				"setenv mlo_size $filesize; " \
 				"if tftp ${uboot_load_addr} ${uboot}; then " \
-					"fatwrite mmc ${mmcdev}:1 ${mlo_load_addr} ${mlo} ${mlo_size} && " \
-					"fatwrite mmc ${mmcdev}:1 ${uboot_load_addr} ${uboot} ${filesize}; " \
+					"fatwrite mmc ${mmcdev}:1 ${mlo_load_addr} MLO ${mlo_size} && " \
+					"fatwrite mmc ${mmcdev}:1 ${uboot_load_addr} u-boot.img ${filesize}; " \
 				"else " \
 					"echo ERROR: tftp ${uboot} failed; " \
 				"fi; " \
