@@ -20,6 +20,7 @@
 #include <dm.h>
 #include <spi.h>
 #include <malloc.h>
+#include <watchdog.h>
 #include <asm/io.h>
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -151,6 +152,8 @@ static int omap3_spi_write(struct omap3_spi_priv *priv, unsigned int len,
 	omap3_spi_write_chconf(priv, chconf);
 
 	for (i = 0; i < len; i++) {
+		WATCHDOG_RESET();
+
 		/* wait till TX register is empty (TXS == 1) */
 		start = get_timer(0);
 		while (!(readl(&priv->regs->channel[priv->cs].chstat) &
@@ -208,6 +211,8 @@ static int omap3_spi_read(struct omap3_spi_priv *priv, unsigned int len,
 	writel(0, &priv->regs->channel[priv->cs].tx);
 
 	for (i = 0; i < len; i++) {
+		WATCHDOG_RESET();
+
 		start = get_timer(0);
 		/* Wait till RX register contains data (RXS == 1) */
 		while (!(readl(&priv->regs->channel[priv->cs].chstat) &
@@ -261,6 +266,8 @@ static int omap3_spi_txrx(struct omap3_spi_priv *priv, unsigned int len,
 
 	/*Shift in and out 1 byte at time*/
 	for (i=0; i < len; i++){
+		WATCHDOG_RESET();
+
 		/* Write: wait for TX empty (TXS == 1)*/
 		start = get_timer(0);
 		while (!(readl(&priv->regs->channel[priv->cs].chstat) &
